@@ -106,27 +106,9 @@ compileTestKotlin {
     }
 }
 
-javadoc {
-    source = sourceSets.main.allJava
-    classpath = configurations.compileClasspath
-
-    options {
-        setMemberLevel JavadocMemberLevel.PUBLIC
-        setAuthor true
-
-        links "https://docs.oracle.com/javase/8/docs/api/"
-    }
-}
-
 signing {
     sign configurations.archives
 }
-
-
-artifacts {
-    archives javadocJar, sourcesJar
-}
-
 
 task javadocJar(type: Jar) {
     classifier = 'javadoc'
@@ -136,4 +118,8 @@ task javadocJar(type: Jar) {
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
 }
