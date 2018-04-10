@@ -1,0 +1,24 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+mainClassName = "coalMiningDisasters.CoalMiningDisasters"
+
+group = 'improbable'
+version = '0.0.1-SNAPSHOT'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+dependencies {
+    compile project(":keanu-project")
+    
+
+    //testing
+    testCompile 'junit:junit:4.12'
+}
