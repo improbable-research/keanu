@@ -11,7 +11,6 @@ buildscript {
 plugins {
     id 'java'
     id 'maven'
-    id 'signing'
 }
 
 group = 'io.improbable'
@@ -106,8 +105,11 @@ compileTestKotlin {
     }
 }
 
-signing {
-    sign configurations.archives
+if (project.hasProperty("signing.keyId")) {
+    apply plugin: 'signing'
+    signing {
+        sign configurations.archives
+    }
 }
 
 task javadocJar(type: Jar) {
