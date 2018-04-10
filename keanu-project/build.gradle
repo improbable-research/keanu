@@ -11,12 +11,11 @@ buildscript {
 plugins {
     id 'java'
     id 'maven'
-    id 'signing'
 }
 
-group = 'improbable'
+group = 'io.improbable'
 version = '0.0.3'
-def artifactName = "keanu"
+archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -106,8 +105,11 @@ compileTestKotlin {
     }
 }
 
-signing {
-    sign configurations.archives
+if (project.hasProperty("signing.keyId")) {
+    apply plugin: 'signing'
+    signing {
+        sign configurations.archives
+    }
 }
 
 task javadocJar(type: Jar) {
