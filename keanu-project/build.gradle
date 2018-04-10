@@ -14,9 +14,9 @@ plugins {
     id 'signing'
 }
 
-group = 'improbable'
+group = 'io.improbable'
 version = '0.0.3'
-def artifactName = "keanu"
+archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
