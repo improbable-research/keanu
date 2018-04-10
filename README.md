@@ -30,10 +30,11 @@ Please create a Github Issue if you encounter any bugs or have a feature request
 * Probabilistic Programming Operators and Distributions
 * Auto-differentiation
 * Inference
-  * Variational
+  * Maximum a posteriori
   * Metropolis Hastings
   * Hamiltonian Monte Carlo
   * Sequential Monte Carlo (Particle Filtering)
+* Support for Kotlin
  
 ## Getting Started
 
