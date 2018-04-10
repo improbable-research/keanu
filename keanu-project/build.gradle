@@ -11,7 +11,7 @@ buildscript {
 plugins {
     id 'java'
     id 'maven'
-    id 'maven-publish'
+    id 'signing'
 }
 
 group = 'improbable'
@@ -49,26 +49,45 @@ if (!hasProperty('nexusPassword')) {
     ext.nexusPassword = ''
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId artifactName
-            from components.java
-
-            artifact sourceJar
-            artifact packageJavadoc
-        }
-    }
+uploadArchives {
     repositories {
-        maven {
-            credentials {
-                username nexusUser
-                password nexusPassword
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: nexusUser, password: nexusPassword)
             }
-            if (project.version.endsWith('-SNAPSHOT')) {
-                url "http://nexus.enterprise.improbable.io:8080/repository/maven-snapshots/"
-            } else {
-                url "http://nexus.enterprise.improbable.io:8080/repository/maven-releases/"
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: nexusUser, password: nexusPassword)
+            }
+
+            pom.project {
+                name 'Keanu'
+                packaging 'jar'
+                description 'A probabilistic approach from an Improbabilistic company'
+                url 'https://github.com/improbable-research/keanu'
+
+                scm {
+                    connection 'scm:git@github.com:improbable-research/keanu.git'
+                    developerConnection 'scm:git@github.com:improbable-research/keanu.git'
+                    url 'https://github.com/improbable-research/keanu.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'caleb'
+                        name 'Caleb Walker'
+                        email 'caleb@improbable.io'
+                    }
+                }
             }
         }
     }
@@ -99,12 +118,22 @@ javadoc {
     }
 }
 
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
+signing {
+    sign configurations.archives
 }
 
-task packageJavadoc(type: Jar) {
-    from javadoc
+
+artifacts {
+    archives javadocJar, sourcesJar
+}
+
+
+task javadocJar(type: Jar) {
     classifier = 'javadoc'
+    from javadoc
+}
+
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
 }
