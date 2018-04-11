@@ -1,0 +1,8 @@
+.idea
+.gradle
+target
+nbproject
+*.DS_Store
+*.iml
+build
+/out
