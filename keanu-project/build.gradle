@@ -11,12 +11,11 @@ buildscript {
 plugins {
     id 'java'
     id 'maven'
-    id 'maven-publish'
 }
 
-group = 'improbable'
+group = 'io.improbable'
 version = '0.0.3'
-def artifactName = "keanu"
+archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -49,26 +48,45 @@ if (!hasProperty('nexusPassword')) {
     ext.nexusPassword = ''
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            artifactId artifactName
-            from components.java
-
-            artifact sourceJar
-            artifact packageJavadoc
-        }
-    }
+uploadArchives {
     repositories {
-        maven {
-            credentials {
-                username nexusUser
-                password nexusPassword
+        mavenDeployer {
+            beforeDeployment { MavenDeployment deployment -> signing.signPom(deployment) }
+
+            repository(url: "https://oss.sonatype.org/service/local/staging/deploy/maven2/") {
+                authentication(userName: nexusUser, password: nexusPassword)
             }
-            if (project.version.endsWith('-SNAPSHOT')) {
-                url "http://nexus.enterprise.improbable.io:8080/repository/maven-snapshots/"
-            } else {
-                url "http://nexus.enterprise.improbable.io:8080/repository/maven-releases/"
+
+            snapshotRepository(url: "https://oss.sonatype.org/content/repositories/snapshots/") {
+                authentication(userName: nexusUser, password: nexusPassword)
+            }
+
+            pom.project {
+                name 'Keanu'
+                packaging 'jar'
+                description 'A probabilistic approach from an Improbabilistic company'
+                url 'https://github.com/improbable-research/keanu'
+
+                scm {
+                    connection 'scm:git@github.com:improbable-research/keanu.git'
+                    developerConnection 'scm:git@github.com:improbable-research/keanu.git'
+                    url 'https://github.com/improbable-research/keanu.git'
+                }
+
+                licenses {
+                    license {
+                        name 'MIT'
+                        url 'http://www.opensource.org/licenses/mit-license.php'
+                    }
+                }
+
+                developers {
+                    developer {
+                        id 'caleb'
+                        name 'Caleb Walker'
+                        email 'caleb@improbable.io'
+                    }
+                }
             }
         }
     }
@@ -87,24 +105,23 @@ compileTestKotlin {
     }
 }
 
-javadoc {
-    source = sourceSets.main.allJava
-    classpath = configurations.compileClasspath
-
-    options {
-        setMemberLevel JavadocMemberLevel.PUBLIC
-        setAuthor true
-
-        links "https://docs.oracle.com/javase/8/docs/api/"
+if (project.hasProperty("signing.keyId")) {
+    apply plugin: 'signing'
+    signing {
+        sign configurations.archives
     }
 }
 
-task sourceJar(type: Jar) {
-    classifier = 'sources'
-    from sourceSets.main.allJava
+task javadocJar(type: Jar) {
+    classifier = 'javadoc'
+    from javadoc
 }
 
-task packageJavadoc(type: Jar) {
-    from javadoc
-    classifier = 'javadoc'
+task sourcesJar(type: Jar) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+artifacts {
+    archives javadocJar, sourcesJar
 }
