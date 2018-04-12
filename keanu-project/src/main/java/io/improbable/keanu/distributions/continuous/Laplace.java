@@ -19,7 +19,13 @@ public class Laplace {
     }
 
     public static Diff dPdf(double mu, double beta, double x) {
-        return null;
+        double denominator = 2 * Math.pow(beta, 2) * Math.abs(mu - x);
+        double expAbsMuMinusXDivBeta = Math.exp(- (Math.abs(mu - x) / beta));
+
+        double dPdx = ((mu - x) * expAbsMuMinusXDivBeta) / denominator;
+        double dPdm = ((x - mu) * expAbsMuMinusXDivBeta) / denominator;
+        double dPdb = (expAbsMuMinusXDivBeta * (Math.abs(mu - x) - beta)) / (2 * Math.pow(beta, 3));
+        return new Diff(dPdm, dPdb, dPdx);
     }
 
     public static double logPdf(double mu, double beta, double x) {

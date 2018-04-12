@@ -10,9 +10,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
 
 public class LaplaceVertexTest {
+
+    private static final double DELTA = 0.0001;
 
     private final Logger log = LoggerFactory.getLogger(LaplaceVertexTest.class);
 
@@ -63,5 +66,45 @@ public class LaplaceVertexTest {
         double logOfDensity = Math.log(l.density(atValue));
         double logDensity = l.logDensity(atValue);
         assertEquals(logDensity, logOfDensity, 0.01);
+    }
+
+    @Test
+    public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
+        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0));
+        LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0));
+
+        double vertexStartValue = 2.0;
+        double vertexEndValue = 5.0;
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
+                2.0,
+                0.1,
+                uniform,
+                laplace,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
+    }
+
+    @Test
+    public void dDensityMatchesFiniteDifferenceCalculationFordPdbeta() {
+        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0));
+        LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform);
+
+        double vertexStartValue = -5.0;
+        double vertexEndValue = 5.0;
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(2.0,
+                3.0,
+                0.1,
+                uniform,
+                laplace,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
     }
 }
