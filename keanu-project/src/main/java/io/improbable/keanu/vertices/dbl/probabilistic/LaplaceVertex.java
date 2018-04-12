@@ -52,7 +52,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
     @Override
     public Map<String, Double> dlnDensityAtValue() {
         Laplace.Diff diff = Laplace.dlnPdf(mu.getValue(), beta.getValue(), getValue());
-        return null;
+        return convertDualNumbersToDiff(diff.dPdmu, diff.dPdbeta, diff.dPdx);
     }
 
     @Override

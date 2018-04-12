@@ -33,7 +33,12 @@ public class Laplace {
     }
 
     public static Diff dlnPdf(double mu, double beta, double x) {
-        return null;
+        double denominator = (beta * Math.abs(mu - x));
+
+        double dPdx = (mu - x) / denominator;
+        double dPdm = (x - mu)/ denominator;
+        double dPdb = (Math.abs(mu - x) - beta) / Math.pow(beta, 2);
+        return new Diff(dPdm, dPdb, dPdx);
     }
 
     public static class Diff {

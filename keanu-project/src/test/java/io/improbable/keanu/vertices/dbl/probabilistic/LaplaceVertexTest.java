@@ -107,4 +107,10 @@ public class LaplaceVertexTest {
                 vertexIncrement,
                 DELTA);
     }
+
+    @Test
+    public void diffLnDensityIsSameAsLogOfDiffDensity() {
+        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(l, 0.5, 0.001);
+    }
 }
