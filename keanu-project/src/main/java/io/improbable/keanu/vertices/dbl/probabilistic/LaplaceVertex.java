@@ -7,13 +7,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import java.util.Map;
 import java.util.Random;
 
-public class LaplaceDistribution extends ProbabilisticDouble {
+public class LaplaceVertex extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
     private final Random random;
 
-    public LaplaceDistribution(DoubleVertex mu, DoubleVertex beta, Random random) {
+    public LaplaceVertex(DoubleVertex mu, DoubleVertex beta, Random random) {
         this.mu = mu;
         this.beta = beta;
         this.random = random;
@@ -21,15 +21,15 @@ public class LaplaceDistribution extends ProbabilisticDouble {
         setParents(mu, beta);
     }
 
-    public LaplaceDistribution(DoubleVertex mu, DoubleVertex beta) {
+    public LaplaceVertex(DoubleVertex mu, DoubleVertex beta) {
         this(mu, beta, new Random());
     }
 
-    public LaplaceDistribution(double mu, double beta, Random random) {
+    public LaplaceVertex(double mu, double beta, Random random) {
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta), random);
     }
 
-    public LaplaceDistribution(double mu, double beta) {
+    public LaplaceVertex(double mu, double beta) {
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta), new Random());
     }
 

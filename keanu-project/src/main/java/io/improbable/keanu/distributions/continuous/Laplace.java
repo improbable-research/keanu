@@ -23,7 +23,7 @@ public class Laplace {
     }
 
     public static double logPdf(double mu, double beta, double x) {
-        return 0;
+        return - (Math.abs(mu - x) + beta * Math.log(2 * beta)) / beta;
     }
 
     public static Diff dlnPdf(double mu, double beta, double x) {
