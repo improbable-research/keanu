@@ -53,6 +53,14 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
         return new DivisionVertex(this, new CastDoubleVertex(that));
     }
 
+    public DoubleVertex pow(DoubleVertex power) {
+        return new PowerVertex(this, power);
+    }
+
+    public DoubleVertex pow(double power) {
+        return new PowerVertex(this, power);
+    }
+
     public DoubleVertex minus(double value) {
         return new DifferenceVertex(this, new ConstantDoubleVertex(value));
     }
@@ -67,10 +75,6 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
 
     public DoubleVertex divideBy(double divisor) {
         return new DivisionVertex(this, new ConstantDoubleVertex(divisor));
-    }
-
-    public DoubleVertex pow(double power) {
-        return new PowerVertex(this, power);
     }
 
     public DoubleVertex abs() {
