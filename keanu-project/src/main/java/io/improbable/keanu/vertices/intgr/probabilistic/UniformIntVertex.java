@@ -40,6 +40,14 @@ public class UniformIntVertex extends ProbabilisticInteger {
         this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
     }
 
+    public Vertex<Integer> getMin() {
+        return min;
+    }
+
+    public Vertex<Integer> getMax() {
+        return max;
+    }
+
     @Override
     public double density(Integer value) {
         return 1.0 / (max.getValue() - min.getValue());

@@ -33,6 +33,18 @@ public class GammaVertex extends ProbabilisticDouble {
         this(a, theta, c, new Random());
     }
 
+    public DoubleVertex getA() {
+        return a;
+    }
+
+    public DoubleVertex getTheta() {
+        return theta;
+    }
+
+    public DoubleVertex getK() {
+        return k;
+    }
+
     @Override
     public double density(Double value) {
         return Gamma.pdf(a.getValue(), theta.getValue(), k.getValue(), value);
