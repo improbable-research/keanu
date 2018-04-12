@@ -33,8 +33,8 @@ public class ArcSinVertexTest {
         DoubleVertex pow = new PowerVertex(uniform, 3);
 
         ArcSinVertex aSine = new ArcSinVertex(pow);
-        //dArcSine = 1 / √(1 - (0.5^3)^2) * 3 * 0.5^2
         double dArcSine = aSine.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId());
+        //dArcSine = 1 / √(1 - (0.5^3)^2) * 3 * 0.5^2
         double expected = 1 / Math.sqrt(1 - Math.pow(Math.pow(uniform.getValue(), 3), 2)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
 
         assertEquals(expected, dArcSine, 0.0001);

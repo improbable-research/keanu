@@ -33,7 +33,8 @@ public class ArcCosVertexTest {
         DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
         ArcCosVertex aCos = new ArcCosVertex(pow);
 
-        double dArcCos = aCos.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId()); //dArcCos = π / 2 - asin(5^3) * 3 * 5^2
+        double dArcCos = aCos.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId());
+        //dArcCos = π / 2 - asin(5^3) * 3 * 5^2
         double expected = Math.PI / 2 - Math.asin(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
 
         assertEquals(expected, dArcCos, 0.0001);

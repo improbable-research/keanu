@@ -33,7 +33,8 @@ public class SinVertexTest {
         DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
         SinVertex sin = new SinVertex(pow);
 
-        double dSin = sin.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId()); //dSin = cos(5^3) * 3 * 5^2
+        double dSin = sin.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId());
+        //dSin = cos(5^3) * 3 * 5^2
         double expected =Math.cos(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
 
         assertEquals(expected, dSin, 0.0001);
