@@ -38,4 +38,30 @@ public class LaplaceVertexTest {
         assertEquals(0.0, mean, epsilon);
         assertEquals(Math.sqrt(2 * 1.0), sd, epsilon);
     }
+
+    @Test
+    public void samplingMatchesPdf() {
+        LaplaceVertex laplace = new LaplaceVertex(
+                new ConstantDoubleVertex(0.0),
+                new ConstantDoubleVertex(1.0),
+                new Random()
+        );
+
+        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+                laplace,
+                100000,
+                2.0,
+                10.0,
+                0.1,
+                0.01);
+    }
+
+    @Test
+    public void logDensityIsSameAsLogOfDensity() {
+        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        double atValue = 0.5;
+        double logOfDensity = Math.log(l.density(atValue));
+        double logDensity = l.logDensity(atValue);
+        assertEquals(logDensity, logOfDensity, 0.01);
+    }
 }
