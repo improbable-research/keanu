@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
@@ -38,7 +39,8 @@ public class PowerVertexTest {
     @Test
     public void calculatePowerVertexUsingVertexAsHyper() {
         DoubleVertex A = new ConstantDoubleVertex(5.);
-        DoubleVertex B = new ConstantDoubleVertex(2.);
+        DoubleVertex B = new GaussianVertex(2.0, 1.0);
+        B.setValue(2.0);
         DoubleVertex C = A.pow(B);
 
         assertEquals(Math.pow(5, 2), C.getValue(), 0.0001);
