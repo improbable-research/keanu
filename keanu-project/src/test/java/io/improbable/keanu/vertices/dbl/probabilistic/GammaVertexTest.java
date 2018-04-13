@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.junit.Before;
@@ -7,6 +8,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
@@ -202,6 +205,33 @@ public class GammaVertexTest {
                 10.0,
                 0.1,
                 0.01);
+    }
+
+    @Test
+    public void inferHyperParamsFromSamples() {
+
+        double trueA = 0.0;
+        double trueTheta = 3.0;
+        double trueK = 2.0;
+
+        DoubleVertex a = new ConstantDoubleVertex(trueA);
+
+        List<DoubleVertex> aThetaK = new ArrayList<>();
+        aThetaK.add(a);
+        aThetaK.add(new ConstantDoubleVertex(trueTheta));
+        aThetaK.add(new ConstantDoubleVertex(trueK));
+
+        List<DoubleVertex> latentAThetaK = new ArrayList<>();
+        latentAThetaK.add(a);
+        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0));
+
+        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+                hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),
+                aThetaK,
+                latentAThetaK,
+                2000
+        );
     }
 
 }
