@@ -111,7 +111,7 @@ public class ProbabilisticDoubleContract {
             dP.put(vertexId, dP.get(vertexId) / density);
         }
 
-        assertEquals(dP.get(vertexUnderTest.getId()), dlnP.get(vertexUnderTest.getId()), 0.01);
+        assertEquals(dP.get(vertexUnderTest.getId()), dlnP.get(vertexUnderTest.getId()), maxError);
     }
 
     private static Double bucketCenter(Double x, double bucketSize, double from) {

@@ -29,8 +29,8 @@ public class GammaVertex extends ProbabilisticDouble {
         setParents(a, theta, k);
     }
 
-    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex c) {
-        this(a, theta, c, new Random());
+    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k) {
+        this(a, theta, k, new Random());
     }
 
     @Override
