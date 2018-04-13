@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
@@ -35,7 +36,7 @@ public class PowerVertexTest {
     }
 
     @Test
-    public void calculatePowerVertexUsingVertex() {
+    public void calculatePowerVertexUsingVertexAsHyper() {
         DoubleVertex A = new ConstantDoubleVertex(5.);
         DoubleVertex B = new ConstantDoubleVertex(2.);
         DoubleVertex C = A.pow(B);
@@ -50,6 +51,18 @@ public class PowerVertexTest {
         DoubleVertex B = new LogVertex(A);
         //Differential of B = 1 / A
         DoubleVertex APower = new PowerVertex(B, 3.);
+        //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
+
+        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.0001);
+    }
+
+    @Test
+    public void calculateInfintesimalUsingVertexAsHyper() {
+        DoubleVertex A = new UniformVertex(0, 10);
+        A.setValue(4d);
+        DoubleVertex B = new LogVertex(A);
+        //Differential of B = 1 / A
+        DoubleVertex APower = new PowerVertex(B, new ConstantDoubleVertex(3.0));
         //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
 
         assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.0001);
