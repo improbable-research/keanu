@@ -1,10 +1,9 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
@@ -23,8 +22,9 @@ public class PowerVertex extends DoubleBinaryOpVertex {
 
     @Override
     public DualNumber getDualNumber() {
-        DualNumber inputDualNumber = a.getDualNumber();
-        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(b.getValue() * (Math.pow(a.getValue(), b.getValue() - 1.0)));
-        return new DualNumber(op(inputDualNumber.getValue(), b.getDualNumber().getValue()), outputInfinitesimal);
+        DualNumber aDual = a.getDualNumber();
+        DualNumber bDual = b.getDualNumber();
+        Infinitesimal outputInfinitesimal = aDual.getInfinitesimal().multiplyBy(b.getValue() * (Math.pow(a.getValue(), b.getValue() - 1.0)));
+        return new DualNumber(op(aDual.getValue(), bDual.getValue()), outputInfinitesimal);
     }
 }
