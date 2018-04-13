@@ -24,7 +24,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     public DualNumber getDualNumber() {
         DualNumber aDual = a.getDualNumber();
         DualNumber bDual = b.getDualNumber();
-        Infinitesimal outputInfinitesimal = aDual.getInfinitesimal().multiplyBy(b.getValue() * (Math.pow(a.getValue(), b.getValue() - 1.0)));
+        double dPower = b.getValue() * (Math.pow(a.getValue(), b.getValue() - 1.0));
+        Infinitesimal outputInfinitesimal = aDual.getInfinitesimal().multiplyBy(dPower);
         return new DualNumber(op(aDual.getValue(), bDual.getValue()), outputInfinitesimal);
     }
 }
