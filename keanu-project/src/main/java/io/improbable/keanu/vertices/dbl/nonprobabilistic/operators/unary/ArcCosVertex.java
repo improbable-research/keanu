@@ -25,6 +25,6 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
         DualNumber inputDualNumber = inputVertex.getDualNumber();
         double dArcCos = Math.PI / 2 - Math.asin(inputVertex.getValue());
         Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dArcCos);
-        return new DualNumber(Math.cos(inputVertex.getValue()), outputInfinitesimal);
+        return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
     }
 }

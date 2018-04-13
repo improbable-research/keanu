@@ -25,6 +25,6 @@ public class CosVertex extends DoubleUnaryOpVertex {
         DualNumber inputDualNumber = inputVertex.getDualNumber();
         double dCos = -Math.sin(inputVertex.getValue());
         Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dCos);
-        return new DualNumber(Math.cos(inputVertex.getValue()), outputInfinitesimal);
+        return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
     }
 }

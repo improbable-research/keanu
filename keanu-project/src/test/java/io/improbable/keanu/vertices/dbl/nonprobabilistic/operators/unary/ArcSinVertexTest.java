@@ -13,16 +13,16 @@ public class ArcSinVertexTest {
     @Test
     public void arcSineOpIsCalculatedCorrectly() {
         ConstantDoubleVertex x = new ConstantDoubleVertex(0.5);
-        ArcSinVertex sin = new ArcSinVertex(x);
+        ArcSinVertex arcSin = new ArcSinVertex(x);
 
-        assertEquals(Math.asin(0.5), sin.getValue(), 0.00001);
+        assertEquals(Math.asin(0.5), arcSin.getValue(), 0.00001);
     }
 
     @Test
     public void arcSineOpIsCalculatedCorrectlyWithValues() {
-        ArcSinVertex sinWithValue = new ArcSinVertex(0.5);
+        ArcSinVertex arcSinWithValue = new ArcSinVertex(0.5);
 
-        assertEquals(Math.asin(0.5), sinWithValue.getValue(), 0.00001);
+        assertEquals(Math.asin(0.5), arcSinWithValue.getValue(), 0.00001);
     }
 
     @Test
