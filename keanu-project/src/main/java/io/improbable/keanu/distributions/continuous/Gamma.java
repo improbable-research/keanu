@@ -81,11 +81,10 @@ public class Gamma {
     }
 
     public static Diff dlnPdf(double a, double theta, double k, double x) {
-        double dPdx = (1 - k) / (a - x) - (1 / theta);
-        double dPda = (1 - k) / (x - a) - (1 / theta);
-        double dPdtheta = (a - x) / (theta * theta) + (k - 1) / (theta - a) - (k / theta);
-        double dPdk = Math.log(1 - (a / theta)) - digamma(k);
-
+        double dPdx = (k - 1) / (x - a) - (1 / theta);
+        double dPda = (k - 1) / (a - x)  + (1 / theta);
+        double dPdtheta = - ((a + (theta * k) - x) / Math.pow(theta, 2));
+        double dPdk = Math.log(x - a) - Math.log(theta) - digamma(k);
         return new Diff(dPda, dPdtheta, dPdk, dPdx);
     }
 
