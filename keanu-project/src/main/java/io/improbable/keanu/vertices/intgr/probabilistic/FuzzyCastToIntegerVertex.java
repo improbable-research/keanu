@@ -49,6 +49,22 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
                 new ConstantIntegerVertex(max), random);
     }
 
+    public DoubleVertex getInput() {
+        return input;
+    }
+
+    public DoubleVertex getFuzzinessSigma() {
+        return fuzzinessSigma;
+    }
+
+    public Vertex<Integer> getMin() {
+        return min;
+    }
+
+    public Vertex<Integer> getMax() {
+        return max;
+    }
+
     @Override
     public double density(Integer value) {
         double i = value;

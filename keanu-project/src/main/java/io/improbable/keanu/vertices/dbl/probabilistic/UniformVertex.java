@@ -35,6 +35,14 @@ public class UniformVertex extends ProbabilisticDouble {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), new Random());
     }
 
+    public DoubleVertex getXMin() {
+        return xMin;
+    }
+
+    public DoubleVertex getXMax() {
+        return xMax;
+    }
+
     @Override
     public double density(Double value) {
         return Uniform.pdf(xMin.getValue(), xMax.getValue(), value);
