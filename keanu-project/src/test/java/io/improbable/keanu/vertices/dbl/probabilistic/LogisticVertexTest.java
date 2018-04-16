@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,13 @@ public class LogisticVertexTest {
     private final Logger log = LoggerFactory.getLogger(LogisticVertexTest.class);
 
     private static final double DELTA = 0.0001;
+
+    private Random random;
+
+    @Before
+    public void setup() {
+        random = new Random(1);
+    }
 
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
@@ -133,7 +142,8 @@ public class LogisticVertexTest {
         double vertexEndValue = 1.0;
         double vertexIncrement = 0.1;
 
-        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+                0.5,
                 3.0,
                 0.1,
                 uniformB,
@@ -142,6 +152,28 @@ public class LogisticVertexTest {
                 vertexEndValue,
                 vertexIncrement,
                 DELTA);
+    }
+
+    @Test
+    public void inferHyperParamsFromSamples() {
+
+        double trueA = 2.0;
+        double trueB = 2.0;
+
+        List<DoubleVertex> AB = new ArrayList<>();
+        AB.add(new ConstantDoubleVertex(trueA));
+        AB.add(new ConstantDoubleVertex(trueB));
+
+        List<DoubleVertex> latentAB = new ArrayList<>();
+        latentAB.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAB.add(new SmoothUniformVertex(0.01, 10.0));
+
+        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+                hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1), random),
+                AB,
+                latentAB,
+                1000
+        );
     }
 
 }

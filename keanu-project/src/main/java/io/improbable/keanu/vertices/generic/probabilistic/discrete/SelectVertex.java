@@ -23,6 +23,10 @@ public class SelectVertex<T> extends Probabilistic<T> {
         this(selectableValues, new Random());
     }
 
+    public LinkedHashMap<T, DoubleVertex> getSelectableValues() {
+        return selectableValues;
+    }
+
     @Override
     public T sample() {
         double sumP = sumProbabilities();

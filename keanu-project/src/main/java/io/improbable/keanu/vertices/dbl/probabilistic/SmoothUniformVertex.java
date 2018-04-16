@@ -39,6 +39,18 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         this(xMin, xMax, new Random());
     }
 
+    public DoubleVertex getXMin() {
+        return xMin;
+    }
+
+    public DoubleVertex getXMax() {
+        return xMax;
+    }
+
+    public double getEdgeSharpness() {
+        return edgeSharpness;
+    }
+
     @Override
     public double density(Double value) {
         final double min = xMin.getValue();

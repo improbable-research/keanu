@@ -26,6 +26,14 @@ public class TriangularVertex extends ProbabilisticDouble {
         this(xMin, xMax, c, new Random());
     }
 
+    public DoubleVertex getXMin() {
+        return xMin;
+    }
+
+    public DoubleVertex getXMax() {
+        return xMax;
+    }
+
     @Override
     public double density(Double value) {
         return Triangular.pdf(xMin.getValue(), xMax.getValue(), c.getValue(), value);
