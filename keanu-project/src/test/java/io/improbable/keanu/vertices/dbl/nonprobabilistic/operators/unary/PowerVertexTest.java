@@ -3,9 +3,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -68,6 +70,20 @@ public class PowerVertexTest {
         //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
 
         assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.0001);
+    }
+
+    @Test
+    public void calculateInfintesimalsWithRespectToAandB() {
+        UniformVertex A = new UniformVertex(1.0, 5.0);
+        UniformVertex B = new UniformVertex(1.0, 10.0);
+
+        A.setValue(4.0);
+        B.setValue(3.0);
+
+        PowerVertex P = new PowerVertex(A, B);
+
+        Assert.assertEquals((3 * Math.pow(4, 3 - 1)), P.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.001);
+        Assert.assertEquals(Math.pow(4, 3) * Math.log(4), P.getDualNumber().getInfinitesimal().getInfinitesimals().get(B.getId()), 0.001);
     }
 
 }
