@@ -79,7 +79,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0));
+        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0), random);
 
         double vertexStartValue = 2.0;
@@ -99,7 +99,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void dDensityMatchesFiniteDifferenceCalculationFordPdbeta() {
-        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0));
+        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform, random);
 
         double vertexStartValue = -5.0;
