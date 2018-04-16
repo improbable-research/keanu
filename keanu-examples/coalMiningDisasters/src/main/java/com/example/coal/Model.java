@@ -23,12 +23,19 @@ public class Model {
 
     public static void main(String[] args) {
 
-        //Load data from a csv file
+        System.out.println("Loading data from a csv file");
         Data coalMiningDisasterData = Data.load("coal-mining-disaster-data.csv");
 
-        //create my model using the data
+        System.out.println("Creating model using loaded data");
         Model coalMiningDisastersModel = new Model(coalMiningDisasterData);
+
+        System.out.println("Running model...");
         coalMiningDisastersModel.run();
+        System.out.println("Run complete");
+
+        int switchYear = coalMiningDisastersModel.results.get(coalMiningDisastersModel.switchpoint).getMode();
+
+        System.out.println("Switch year found: " + switchYear);
     }
 
     private final Random r;

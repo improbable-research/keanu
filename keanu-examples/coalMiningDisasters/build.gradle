@@ -2,7 +2,7 @@ plugins {
     id 'java'
     id 'application'
 }
-mainClassName = "coalMiningDisasters.CoalMiningDisasters"
+mainClassName = "com.example.coal.Model"
 
 group = 'improbable'
 version = '0.0.1-SNAPSHOT'
