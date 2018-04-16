@@ -32,7 +32,7 @@ public class LaplaceVertexTest {
     public void laplaceSampleMethodMatchesDensityMethod() {
         int N = 100000;
         double epsilon = 0.01;
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), new Random(1));
+        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
@@ -56,7 +56,7 @@ public class LaplaceVertexTest {
         LaplaceVertex laplace = new LaplaceVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(1.0),
-                new Random()
+                random
         );
 
         ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
@@ -70,7 +70,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void logDensityIsSameAsLogOfDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         double atValue = 0.5;
         double logOfDensity = Math.log(l.density(atValue));
         double logDensity = l.logDensity(atValue);
@@ -80,7 +80,7 @@ public class LaplaceVertexTest {
     @Test
     public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0));
-        LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0));
+        LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0), random);
 
         double vertexStartValue = 2.0;
         double vertexEndValue = 5.0;
@@ -100,7 +100,7 @@ public class LaplaceVertexTest {
     @Test
     public void dDensityMatchesFiniteDifferenceCalculationFordPdbeta() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0));
-        LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform);
+        LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform, random);
 
         double vertexStartValue = -5.0;
         double vertexEndValue = 5.0;
@@ -119,7 +119,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(l, 0.5, 0.001);
     }
 
