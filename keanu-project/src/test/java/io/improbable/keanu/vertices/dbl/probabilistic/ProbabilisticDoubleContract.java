@@ -55,6 +55,11 @@ public class ProbabilisticDoubleContract {
         }
     }
 
+    private static Double bucketCenter(Double x, double bucketSize, double from) {
+        double bucketNumber = Math.floor((x - from) / bucketSize);
+        return bucketNumber * bucketSize + bucketSize / 2 + from;
+    }
+
     public static void moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(double hyperParameterStartValue,
                                                                                           double hyperParameterEndValue,
                                                                                           double hyperParameterValueIncrement,
@@ -66,7 +71,7 @@ public class ProbabilisticDoubleContract {
                                                                                           double gradientDelta) {
 
         for (double value = vertexStartValue; value <= vertexEndValue; value += vertexValueIncrement) {
-            vertexUnderTest.setValue(value);
+            vertexUnderTest.setAndCascade(value);
             testGradientAcrossMultipleHyperParameterValues(hyperParameterStartValue, hyperParameterEndValue, hyperParameterValueIncrement, hyperParameterVertex, value, vertexUnderTest, gradientDelta);
         }
     }
@@ -85,17 +90,30 @@ public class ProbabilisticDoubleContract {
     }
 
     public static void testGradientAtHyperParameterValue(double hyperParameterValue, Vertex<Double> hyperParameterVertex, double vertexValue, Vertex<Double> vertexUnderTest, double gradientDelta) {
-        hyperParameterVertex.setValue(hyperParameterValue - gradientDelta);
+        hyperParameterVertex.setAndCascade(hyperParameterValue - gradientDelta);
         double densityA1 = vertexUnderTest.density(vertexValue);
-        hyperParameterVertex.setValue(hyperParameterValue + gradientDelta);
+        double lnDensityA1 = vertexUnderTest.logDensity(vertexValue);
+
+        hyperParameterVertex.setAndCascade(hyperParameterValue + gradientDelta);
         double densityA2 = vertexUnderTest.density(vertexValue);
-        double approxExpected = (densityA2 - densityA1) / (2 * gradientDelta);
-        hyperParameterVertex.setValue(hyperParameterValue);
+        double lnDensityA2 = vertexUnderTest.logDensity(vertexValue);
+
+        double diffDensityApproxExpected = (densityA2 - densityA1) / (2 * gradientDelta);
+        double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
+
+        hyperParameterVertex.setAndCascade(hyperParameterValue);
+
         Map<String, Double> diff = vertexUnderTest.dDensityAtValue();
-        double actual = diff.get(hyperParameterVertex.getId());
+        Map<String, Double> diffln = vertexUnderTest.dlnDensityAtValue();
 
-        assertEquals(approxExpected, actual, 0.1);
+        double actualDiffDensity = diff.get(hyperParameterVertex.getId());
+        double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId());
 
+        assertThat("Diff density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
+                diffDensityApproxExpected, closeTo(actualDiffDensity, 0.1));
+
+        assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
+                diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
     public static void diffLnDensityIsSameAsLogOfDiffDensity(Vertex<Double> vertexUnderTest,
@@ -111,11 +129,7 @@ public class ProbabilisticDoubleContract {
             dP.put(vertexId, dP.get(vertexId) / density);
         }
 
-        assertEquals(dP.get(vertexUnderTest.getId()), dlnP.get(vertexUnderTest.getId()), 0.01);
+        assertEquals(dP.get(vertexUnderTest.getId()), dlnP.get(vertexUnderTest.getId()), maxError);
     }
 
-    private static Double bucketCenter(Double x, double bucketSize, double from) {
-        double bucketNumber = Math.floor((x - from) / bucketSize);
-        return bucketNumber * bucketSize + bucketSize / 2 + from;
-    }
 }

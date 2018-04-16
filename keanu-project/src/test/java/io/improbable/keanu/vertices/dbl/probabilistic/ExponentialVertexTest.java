@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,13 @@ public class ExponentialVertexTest {
     private final Logger log = LoggerFactory.getLogger(ExponentialVertexTest.class);
 
     private static final double DELTA = 0.0001;
+
+    private Random random;
+
+    @Before
+    public void setup() {
+        random = new Random(1);
+    }
 
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
@@ -127,6 +136,29 @@ public class ExponentialVertexTest {
                 vertexEndValue,
                 vertexIncrement,
                 DELTA);
+    }
+
+    @Test
+    public void inferHyperParamsFromSamples() {
+
+        double trueB = 2.0;
+
+        DoubleVertex A = new ConstantDoubleVertex(0.0);
+
+        List<DoubleVertex> AB = new ArrayList<>();
+        AB.add(A);
+        AB.add(new ConstantDoubleVertex(trueB));
+
+        List<DoubleVertex> latentAB = new ArrayList<>();
+        latentAB.add(A);
+        latentAB.add(new SmoothUniformVertex(0.01, 10.0));
+
+        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+                hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1), random),
+                AB,
+                latentAB,
+                10000
+        );
     }
 
 }
