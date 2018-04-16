@@ -33,4 +33,9 @@ public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
         return new GaussianVertex(mu, sigma, random);
     }
 
+    @Override
+    public DoubleVertex nextGaussian(double mu, DoubleVertex sigma) {
+        return new GaussianVertex(mu, sigma, random);
+    }
+
 }
