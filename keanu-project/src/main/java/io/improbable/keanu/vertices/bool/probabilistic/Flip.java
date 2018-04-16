@@ -26,6 +26,10 @@ public class Flip extends ProbabilisticBool {
         this(new ConstantDoubleVertex(probTrue), new Random());
     }
 
+    public Vertex<Double> getProbTrue() {
+        return probTrue;
+    }
+
     @Override
     public double density(Boolean value) {
         return value ? probTrue.getValue() : 1 - probTrue.getValue();

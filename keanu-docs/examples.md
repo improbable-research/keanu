@@ -16,3 +16,4 @@ It uses data of yearly number of coal mining accidents in the UK. The aim is to 
 It uses Metropolis Hastings Monte Carlo to sample the posterior distribution of the switch point, since this uses non continuous Integer Vertices you cannot use the MAP method.
 
 [Code](../keanu-examples/coalMiningDisasters)
+

@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Divisi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -51,6 +51,10 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
 
     public DoubleVertex divideBy(Vertex<Double> that) {
         return new DivisionVertex(this, new CastDoubleVertex(that));
+    }
+
+    public DoubleVertex pow(DoubleVertex power) {
+        return new PowerVertex(this, power);
     }
 
     public DoubleVertex minus(double value) {
