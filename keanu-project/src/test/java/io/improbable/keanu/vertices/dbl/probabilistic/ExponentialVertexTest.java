@@ -17,6 +17,7 @@ import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class ExponentialVertexTest {
+
     private final Logger log = LoggerFactory.getLogger(ExponentialVertexTest.class);
 
     private static final double DELTA = 0.0001;
