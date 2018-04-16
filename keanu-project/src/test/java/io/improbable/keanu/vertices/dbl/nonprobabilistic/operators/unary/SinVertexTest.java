@@ -6,6 +6,8 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
 public class SinVertexTest {
 
     @Test
@@ -13,14 +15,14 @@ public class SinVertexTest {
         ConstantDoubleVertex x = new ConstantDoubleVertex(Math.PI / 2);
         SinVertex sin = new SinVertex(x);
 
-        Assert.assertEquals(Math.sin(Math.PI / 2), sin.getValue(), 0.00001);
+        assertEquals(Math.sin(Math.PI / 2), sin.getValue(), 0.00001);
     }
 
     @Test
     public void sinOpIsCalculatedCorrectlyWithValue() {
         SinVertex sinWithValue = new SinVertex(Math.PI / 2);
 
-        Assert.assertEquals(Math.sin(Math.PI / 2), sinWithValue.getValue(), 0.00001);
+        assertEquals(Math.sin(Math.PI / 2), sinWithValue.getValue(), 0.00001);
     }
 
     @Test
@@ -30,9 +32,12 @@ public class SinVertexTest {
 
         DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
         SinVertex sin = new SinVertex(pow);
-        double dSin = sin.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId()); //dSin = cos(5^3) * 3 * 5^2
 
-        Assert.assertEquals(Math.cos(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1)), dSin, 0.0001);
+        double dSin = sin.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId());
+        //dSin = cos(5^3) * 3 * 5^2
+        double expected =Math.cos(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
+
+        assertEquals(expected, dSin, 0.0001);
     }
 
 }
