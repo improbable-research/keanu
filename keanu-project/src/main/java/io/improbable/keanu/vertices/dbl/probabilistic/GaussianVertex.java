@@ -50,6 +50,14 @@ public class GaussianVertex extends ProbabilisticDouble {
         this(mu, new ConstantDoubleVertex(sigma), random);
     }
 
+    public DoubleVertex getMu() {
+        return mu;
+    }
+
+    public DoubleVertex getSigma() {
+        return sigma;
+    }
+
     @Override
     public double density(Double value) {
         return Gaussian.pdf(mu.getValue(), sigma.getValue(), value);

@@ -26,6 +26,6 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
         DualNumber inputDualNumber = inputVertex.getDualNumber();
         double dArcSin = 1 / Math.sqrt(1 - Math.pow(inputVertex.getValue(), 2));
         Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dArcSin);
-        return new DualNumber(Math.asin(inputVertex.getValue()), outputInfinitesimal);
+        return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
     }
 }
