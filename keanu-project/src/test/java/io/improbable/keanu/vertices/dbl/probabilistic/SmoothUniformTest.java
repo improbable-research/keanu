@@ -28,7 +28,7 @@ public class SmoothUniformTest {
     public void optimizerMovesAwayFromLeftShoulder() {
 
         A = new SmoothUniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1000.), 0.05, random);
-        B = new SmoothUniformVertex(0, 1000);
+        B = new SmoothUniformVertex(0, 1000, random);
         C = A.plus(B);
         CObserved = new GaussianVertex(C, 0.2);
 

@@ -223,8 +223,8 @@ public class GammaVertexTest {
 
         List<DoubleVertex> latentAThetaK = new ArrayList<>();
         latentAThetaK.add(a);
-        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0));
-        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
+        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAPTest.inferHyperParamsFromSamples(
                 hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),

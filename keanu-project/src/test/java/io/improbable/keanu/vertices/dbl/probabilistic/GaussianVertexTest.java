@@ -164,8 +164,8 @@ public class GaussianVertexTest {
         muSigma.add(new ConstantDoubleVertex(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
-        latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0));
-        latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0));
+        latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0, random));
+        latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAPTest.inferHyperParamsFromSamples(
                 hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1), random),
