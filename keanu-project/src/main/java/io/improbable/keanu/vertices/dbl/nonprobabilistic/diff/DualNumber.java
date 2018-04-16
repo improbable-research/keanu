@@ -67,9 +67,10 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     public DualNumber powerTo(DualNumber that) {
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         double newValue = Math.pow(this.value, that.value);
-        Infinitesimal infinitesimal = (this.infinitesimal.multiplyBy(that.value).multiplyBy(Math.pow(this.value, that.value - 1)));
-        infinitesimal = infinitesimal.add(that.infinitesimal.multiplyBy(Math.log(this.value)).multiplyBy(newValue));
-        return new DualNumber(newValue, infinitesimal);
+        Infinitesimal thisInfPowerTo = this.infinitesimal.multiplyBy(that.value).multiplyBy(Math.pow(this.value, that.value - 1));
+        Infinitesimal thatInfPowerTo = that.infinitesimal.multiplyBy(Math.log(this.value)).multiplyBy(newValue);
+        Infinitesimal newInf = thisInfPowerTo.add(thatInfPowerTo);
+        return new DualNumber(newValue, newInf);
     }
 
     public DualNumber plus(DualNumber that) {
