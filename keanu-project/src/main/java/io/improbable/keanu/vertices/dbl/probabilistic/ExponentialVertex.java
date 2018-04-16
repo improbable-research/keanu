@@ -50,6 +50,14 @@ public class ExponentialVertex extends ProbabilisticDouble {
         this(a, new ConstantDoubleVertex(b), random);
     }
 
+    public DoubleVertex getA() {
+        return a;
+    }
+
+    public DoubleVertex getB() {
+        return b;
+    }
+
     @Override
     public double density(Double value) {
         return Exponential.pdf(a.getValue(), b.getValue(), value);

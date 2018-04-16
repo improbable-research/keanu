@@ -23,6 +23,10 @@ public class PoissonVertex extends ProbabilisticInteger {
         this(new ConstantDoubleVertex(mu), random);
     }
 
+    public Vertex<Double> getMu() {
+        return mu;
+    }
+
     @Override
     public double density(Integer value) {
         return Poisson.pdf(mu.getValue(), value);
