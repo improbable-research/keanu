@@ -168,8 +168,8 @@ public class BetaVertexTest {
         alphaBeta.add(new ConstantDoubleVertex(trueBeta));
 
         List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
-        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
-        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
+        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAPTest.inferHyperParamsFromSamples(
                 hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1), random),

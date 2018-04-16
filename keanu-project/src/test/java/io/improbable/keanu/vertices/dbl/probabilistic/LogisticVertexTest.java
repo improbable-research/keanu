@@ -165,8 +165,8 @@ public class LogisticVertexTest {
         AB.add(new ConstantDoubleVertex(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
-        latentAB.add(new SmoothUniformVertex(0.01, 10.0));
-        latentAB.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
+        latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAPTest.inferHyperParamsFromSamples(
                 hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1), random),

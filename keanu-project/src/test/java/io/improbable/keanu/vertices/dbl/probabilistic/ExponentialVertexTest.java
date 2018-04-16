@@ -152,7 +152,7 @@ public class ExponentialVertexTest {
 
         List<DoubleVertex> latentAB = new ArrayList<>();
         latentAB.add(A);
-        latentAB.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAPTest.inferHyperParamsFromSamples(
                 hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1), random),
