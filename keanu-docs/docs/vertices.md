@@ -21,13 +21,42 @@ make C not a constant value but still completely dependent on A and B.
 A DoubleVertex can be used by most arithmetic operators. They can be used to describe a problem
 that can be solved using gradient ascent optimization.
 
+* Probabilistic
+    * Beta
+    * Exponential
+    * Gamma
+    * Gaussian
+    * Laplace
+    * Logistic
+    * Smooth Uniform
+    * Triangular
+    * Uniform
+    
+* Non-Probabilistic
+    * Operators
+    
 ### The Integer Family
 
 An IntegerVertex can also be used by most arithmetic operators.
 
+* Probabilistic
+    * Poisson
+    * Uniform
+    * Fuzzy Cast To Integer
+    
+* Non-Probabilistic
+    * Operators
+
 ### The Boolean (true/false) Family
 
 A BoolVertex can be used by most boolean operators. These can be observed directly and used in MCMC.
+
+* Probabilistic
+    * Flip
+    
+* Non-Probabilistic
+    * Operators
+    * Boolean Cast
 
 ### The Generic family
 
@@ -53,3 +82,12 @@ An example of this is the SelectVertex<T> where T is any type.
 
 The getSelectorForMyType() method would return a probabilistic vertex that would contain an 
 object of type MyType A, B, C or D, 25% of the time respectively.
+
+* Probabilistic
+    * Select
+
+* Non-Probabilistic
+    * Operators
+    * Constant
+    * If
+    * Multiplexer
