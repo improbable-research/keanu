@@ -1,59 +1,57 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class TanVertexTest {
 
+
     @Test
-    public void tanTest() {
-        GaussianVertex unknownAngle = new GaussianVertex(0.0, 1.0);
+    public void tanOpIsCalculatedCorrectly() {
+        ConstantDoubleVertex x = new ConstantDoubleVertex(Math.PI / 2);
+        TanVertex tan = new TanVertex(x);
 
-        TanVertex tan = new TanVertex(unknownAngle);
-        SinVertex sin = new SinVertex(unknownAngle);
-
-        DoubleVertex x = tan.div(sin);
-        GaussianVertex g = new GaussianVertex(x, 0.1);
-        g.observe(1.15470053838);
-
-        BayesNet bayesNet = new BayesNet(tan.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesNet);
-        gradientOptimizer.maxLikelihood(1000);
-
-        System.out.println(unknownAngle.getValue());
+        assertEquals(Math.tan(Math.PI / 2), tan.getValue(), 0.0001);
     }
 
     @Test
-    public void tanIdentity() {
-        GaussianVertex x = new GaussianVertex(0, 1);
-        GaussianVertex y = new GaussianVertex(0, 1);
-        GaussianVertex z = new GaussianVertex(0, 1);
+    public void tanOpIsCalculatedCorrectlyWithValue() {
+        TanVertex tan = new TanVertex(Math.PI / 2);
 
-        TanVertex tanX = new TanVertex(x);
-        TanVertex tanY = new TanVertex(y);
-        TanVertex tanZ = new TanVertex(z);
+        assertEquals(Math.tan(Math.PI / 2), tan.getValue(), 0.0001);
+    }
 
-        DoubleVertex sum = tanX.plus(tanY).plus(tanZ);
-        DoubleVertex product = tanX.multiply(tanY).multiply(tanZ);
+    @Test
+    public void canSolveTanEquation() {
+        //tan 3x = 1
+        //x = 45, 105 or 165
 
-        GaussianVertex sumGaussian = new GaussianVertex(sum, 0.1);
-        GaussianVertex sumProduct = new GaussianVertex(product, 0.1);
+        DoubleVertex unknownTheta = new UniformVertex(0.0, 10.0);
+        TanVertex tan = new TanVertex(unknownTheta.multiply(3.0));
 
-        double value = 1.73205080757;
+        GaussianVertex observableTan = new GaussianVertex(tan, 1.0);
+        observableTan.observe(-1.0);
 
-        sumGaussian.observe(value);
-        sumProduct.observe(value);
-
-        BayesNet bayesNet = new BayesNet(x.getConnectedGraph());
+        BayesNet bayesNet = new BayesNet(unknownTheta.getConnectedGraph());
         GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesNet);
 
-        gradientOptimizer.maxLikelihood(1000);
+        gradientOptimizer.maxLikelihood(5000);
 
-        System.out.println("Pi = " + Math.PI);
-        System.out.println("Sum of angles = " + (x.getValue() + y.getValue() + z.getValue()));
+        double theta = Math.toDegrees(unknownTheta.getValue()) % 60;
+
+        assertEquals(45, theta, 0.001);
     }
 
 }
