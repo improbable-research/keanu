@@ -21,7 +21,7 @@ public class ArcTanVertexTest {
     public void arcTanOpIsCalculatedCorrectlyWithValue() {
         ArcTanVertex aTan = new ArcTanVertex(Math.PI / 2);
 
-        assertEquals(Math.tan(Math.PI / 2), aTan.getValue(), 0.0001);
+        assertEquals(Math.atan(Math.PI / 2), aTan.getValue(), 0.0001);
     }
 
     @Test
