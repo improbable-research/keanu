@@ -26,7 +26,7 @@ public class CeilVertexTest {
     }
 
     @Test
-    public void ceilVertexDoesNotChangeDerivativeCalculations() {
+    public void ceilOnlyChangesValueAndNotInfintesimal() {
         DoubleVertex A = new UniformVertex(0.0, 10.0);
         A.setValue(5.7);
         CeilVertex ceilVertex= new CeilVertex(A);

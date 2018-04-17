@@ -26,7 +26,7 @@ public class FloorVertexTest {
     }
 
     @Test
-    public void floorVertexDoesNotChangeDerivativeCalculations() {
+    public void floorOnlyChangesValueAndNotInfintesimal() {
         DoubleVertex A = new UniformVertex(0.0, 10.0);
         A.setValue(5.2);
         FloorVertex floorVertex = new FloorVertex(A);
