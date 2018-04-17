@@ -17,13 +17,13 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected Double op(Double a) {
-        return Math.tan(a);
+        return Math.atan(a);
     }
 
     @Override
     public DualNumber getDualNumber() {
         DualNumber inputDualNumber = inputVertex.getDualNumber();
-        double dArcTan = 1 / (1 + Math.pow(this.getValue(), 2));
+        double dArcTan = 1 / (1 + Math.pow(inputVertex.getValue(), 2));
         Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dArcTan);
         return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
     }
