@@ -16,6 +16,14 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
     }
 
+    public ArcTan2Vertex(DoubleVertex a, double b) {
+        this(a, new ConstantDoubleVertex(b));
+    }
+
+    public ArcTan2Vertex(double a, DoubleVertex b) {
+        this(new ConstantDoubleVertex(a), b);
+    }
+
     @Override
     protected Double op(Double a, Double b) {
         return Math.atan2(a, b);
