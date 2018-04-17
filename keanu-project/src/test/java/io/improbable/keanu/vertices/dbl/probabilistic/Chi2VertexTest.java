@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertexTest;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
 import org.junit.Before;
@@ -18,7 +17,7 @@ import static org.junit.Assert.assertEquals;
 
 public class Chi2VertexTest {
 
-    private final Logger log = LoggerFactory.getLogger(PoissonVertexTest.class);
+    private final Logger log = LoggerFactory.getLogger(Chi2VertexTest.class);
 
     private Random random;
 
