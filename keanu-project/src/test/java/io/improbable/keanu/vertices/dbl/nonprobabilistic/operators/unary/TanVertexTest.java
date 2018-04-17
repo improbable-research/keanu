@@ -55,7 +55,7 @@ public class TanVertexTest {
 
     @Test
     public void canSolveTanIdentity() {
-        //Tan(PI / 2 - X) = cot(x)
+        //Tan(PI / 2 - X) = cos(x) / sin(x)
 
         List<Double> data = new ArrayList<>();
         int dataCount = 100;
@@ -82,9 +82,8 @@ public class TanVertexTest {
 
         gradientOptimizer.maxLikelihood(1500);
 
-        DoubleVertex answer = new AbsVertex(unknownConstant);
-
-        assertEquals(answer.getValue() % Math.PI, Math.PI / 2, 0.001);
+        DoubleVertex absTan = new AbsVertex(unknownConstant);
+        assertEquals(absTan.getValue() % Math.PI, Math.PI / 2, 0.001);
     }
 
     @Test
