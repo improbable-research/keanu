@@ -1,8 +1,9 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
@@ -34,6 +35,14 @@ public class PowerVertexTest {
         DoubleVertex ASquared = new PowerVertex(A, 2.);
 
         assertEquals(Math.pow(5., 2.), ASquared.getDualNumber().getValue(), 0.0001);
+    }
+
+    @Test
+    public void calculatePowerVertexUsingVertexAsHyperAndValueAsBase() {
+        DoubleVertex A = new ConstantDoubleVertex(2.0);
+        DoubleVertex B = new PowerVertex(5.0, A);
+
+        assertEquals(Math.pow(5, 2), B.getValue(), 0.0001);
     }
 
     @Test

@@ -17,7 +17,6 @@ import static org.junit.Assert.assertEquals;
 
 public class TanVertexTest {
 
-
     @Test
     public void tanOpIsCalculatedCorrectly() {
         ConstantDoubleVertex x = new ConstantDoubleVertex(Math.PI / 2);
