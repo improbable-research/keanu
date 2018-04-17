@@ -5,13 +5,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
 
-public class TanVertex extends DoubleUnaryOpVertex {
+public class ArcTanVertex extends DoubleUnaryOpVertex {
 
-    public TanVertex(DoubleVertex inputVertex) {
+    public ArcTanVertex(DoubleVertex inputVertex) {
         super(inputVertex);
     }
 
-    public TanVertex(double inputValue) {
+    public ArcTanVertex(double inputValue) {
         this(new ConstantDoubleVertex(inputValue));
     }
 
@@ -23,8 +23,8 @@ public class TanVertex extends DoubleUnaryOpVertex {
     @Override
     public DualNumber getDualNumber() {
         DualNumber inputDualNumber = inputVertex.getDualNumber();
-        double dTan = 1 / Math.pow(Math.cos(inputVertex.getValue()), 2);
-        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dTan);
+        double dArcTan = 1 / (1 + Math.pow(this.getValue(), 2));
+        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dArcTan);
         return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
     }
 }
