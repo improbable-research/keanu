@@ -1,30 +1,70 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertexTest;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import static org.junit.Assert.assertEquals;
 
 public class Chi2VertexTest {
 
-    @Test
-    public void canCreateChiVertex() {
-        Chi2Vertex chi = new Chi2Vertex(2);
-        double x = chi.sample();
-        Assert.assertTrue(x > 0);
+    private final Logger log = LoggerFactory.getLogger(PoissonVertexTest.class);
+
+    private Random random;
+
+    @Before
+    public void setup() {
+        random = new Random(1);
     }
 
     @Test
-    public void canGetDensityOfChi() {
-        Chi2Vertex chi = new Chi2Vertex(3);
-        double a = chi.density(0.0);
-        double b = chi.density(1.0);
-        Assert.assertTrue(a < b);
+    public void samplingProducesRealisticMeanAndStandardDeviation() {
+        int N = 100000;
+        double epsilon = 0.1;
+        int k = 10;
+        Chi2Vertex testChiVertex = new Chi2Vertex(new ConstantIntegerVertex(k), new Random(1));
+
+        List<Double> samples = new ArrayList<>();
+        for (int i = 0; i < N; i++) {
+            double sample = testChiVertex.sample();
+            samples.add(sample);
+        }
+
+        SummaryStatistics stats = new SummaryStatistics();
+        samples.forEach(stats::addValue);
+
+        double mean = stats.getMean();
+        double sd = stats.getStandardDeviation();
+        double standardDeviation = Math.sqrt(k * 2);
+        log.info("Mean: " + mean);
+        log.info("Standard deviation: " + sd);
+        assertEquals(mean, k, epsilon);
+        assertEquals(sd, standardDeviation, epsilon);
     }
 
     @Test
-    public void canGetLogDensityOfChi() {
-        Chi2Vertex chi = new Chi2Vertex(2);
-        double a = chi.logDensity(0.1);
-        System.out.println(a);
+    public void chiSampleMethodMatchesDensityMethod() {
+        Vertex<Double> vertex = new Chi2Vertex(
+                new ConstantIntegerVertex(2),
+                random
+        );
+
+        double from = 2;
+        double to = 4;
+        double bucketSize = 0.05;
+        long sampleCount = 100000;
+
+        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
     }
 
     @Test
