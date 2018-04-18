@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
 
 public class InverseGammaVertexTest {
@@ -24,7 +25,7 @@ public class InverseGammaVertexTest {
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new Random(3);
     }
 
     @Test
@@ -85,6 +86,26 @@ public class InverseGammaVertexTest {
     }
 
     @Test
+    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(4.0), random);
+        InverseGammaVertex inverted = new InverseGammaVertex(uniformA, new ConstantDoubleVertex(1.0), random);
+
+        double vertexStartValue = 0.5;
+        double vertexEndValue = 3.0;
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
+                2.0,
+                0.1,
+                uniformA,
+                inverted,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
+    }
+
+    @Test
     public void inferHyperParamsFromSamples() {
         double trueAlpha = 3.0;
         double trueBeta = 0.5;
@@ -101,7 +122,7 @@ public class InverseGammaVertexTest {
                 hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1), random),
                 alphaBeta,
                 latentAlphaBeta,
-                1000
+                10000
         );
     }
 }
