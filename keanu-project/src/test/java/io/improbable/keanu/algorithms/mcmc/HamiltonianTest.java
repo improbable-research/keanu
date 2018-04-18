@@ -5,6 +5,7 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.vis.Vizer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,12 +21,18 @@ public class HamiltonianTest {
 
     private Random random;
 
-    @Before
+    public static void main(String[] args) {
+        HamiltonianTest hamiltonianTest = new HamiltonianTest();
+        hamiltonianTest.setup();
+        hamiltonianTest.samplesFromDonut();
+    }
+
+//    @Before
     public void setup() {
         random = new Random(1);
     }
 
-    @Test
+//    @Test
     public void samplesGaussian() {
         GaussianVertex A = new GaussianVertex(0.0, 1, random);
         BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
@@ -47,7 +54,7 @@ public class HamiltonianTest {
         assertEquals(0.0, averagePosteriorA.getAsDouble(), 0.1);
     }
 
-    @Test
+//    @Test
     public void samplesContinuousPrior() {
         DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
         DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
@@ -82,7 +89,7 @@ public class HamiltonianTest {
         assertEquals(44.0, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    @Test
+//    @Test
     public void samplesFromDonut() {
         DoubleVertex A = new GaussianVertex(0, 1, random);
         DoubleVertex B = new GaussianVertex(0, 1, random);
@@ -104,6 +111,9 @@ public class HamiltonianTest {
 
         List<Double> samplesA = samples.get(A).asList();
         List<Double> samplesB = samples.get(B).asList();
+
+
+        Vizer.plot(samplesA, samplesB, "Donut");
 
         boolean topOfDonut, rightOfDonut, bottomOfDonut, leftOfDonut, middleOfDonut;
         topOfDonut = rightOfDonut = bottomOfDonut = leftOfDonut = middleOfDonut = false;

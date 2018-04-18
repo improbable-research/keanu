@@ -134,7 +134,7 @@ public class Hamiltonian {
     }
 
     private static void leapfrogVertices(final List<DoubleVertex> fromVertices,
-                                         final Map<String, Double> position,
+                                         final Map<String, Double> allPositions,
                                          final Map<String, Double> momentum,
                                          final double stepSize,
                                          final BayesNet bayesNet,
@@ -143,7 +143,7 @@ public class Hamiltonian {
 
         for (DoubleVertex currentVertex : fromVertices) {
 
-            final double vertexPosition = position.get(currentVertex.getId());
+            final double vertexPosition = allPositions.get(currentVertex.getId());
             final double vertexMomentum = momentum.get(currentVertex.getId());
 
             final Leapfrog leapfrog = leapfrogVertex(
@@ -152,12 +152,12 @@ public class Hamiltonian {
                     vertexMomentum,
                     stepSize,
                     bayesNet,
-                    position,
+                    allPositions,
                     logOfMasterPGradientFunction,
                     indexLookup.get(currentVertex.getId())
             );
 
-            position.put(currentVertex.getId(), leapfrog.getPosition());
+            allPositions.put(currentVertex.getId(), leapfrog.getPosition());
             momentum.put(currentVertex.getId(), leapfrog.getMomentum());
 
         }

@@ -16,30 +16,50 @@ public class FitnessFunctionWithGradient extends FitnessFunction {
     public MultivariateVectorFunction gradient() {
         return point -> {
 
-            setPoint(point);
+            setAndCascadePoint(point);
 
-            Map<String, Double> diffs = getDiffsWithRespectToUpstreamLatents();
+            Map<String, Double> diffs = getDiffsWithRespectToUpstreamLatents(probabilisticVertices);
 
             return alignGradientsToAppropriateIndex(diffs);
         };
     }
 
-    private Map<String, Double> getDiffsWithRespectToUpstreamLatents() {
-        Map<String, Double> diffOfLogWrt = new HashMap<>();
+    protected void setPoint(double[] point) {
+        for (int i = 0; i < point.length; i++) {
+            latentVertices
+                    .get(i)
+                    .setValue(point[i]);
+        }
+    }
 
-        for (final Vertex<?> v : probabilisticVertices) {
+    /**
+     * @param probabilisticVertices
+     * @return
+     */
+    public Map<String, Double> getDiffsWithRespectToUpstreamLatents(List<Vertex<?>> probabilisticVertices) {
+        final Map<String, Double> diffOfLogWrt = new HashMap<>();
 
-            //dlnDensityForV is the differential of the natural log of the fitness vertex's
-            //density w.r.t an input vertex. The key of the map is the input vertex's
-            //id.
-            Map<String, Double> dlnDensityForV = v.dlnDensityAtValue();
+        for (final Vertex<?> probabilisticVertex : probabilisticVertices) {
 
-            dlnDensityForV.forEach((vInput, dlogPdvInContrib) -> {
-                //dlogPdvInContrib is the contribution to the rate of change of
-                //the natural log of the fitness vertex due to vInput.
-                double dlogPdvIn = diffOfLogWrt.getOrDefault(vInput, 0.0);
-                diffOfLogWrt.put(vInput, dlogPdvIn + dlogPdvInContrib);
-            });
+            //Non-probabilistic vertices are non-differentiable
+            if (!probabilisticVertex.isProbabilistic()) {
+                continue;
+            }
+
+            //dlnDensityForProbabilisticVertex is the partial differentials of the natural
+            //log of the fitness vertex's density w.r.t latent vertices. The key of the
+            //map is the latent vertex's id.
+            final Map<String, Double> dlnDensityForProbabilisticVertex = probabilisticVertex.dlnDensityAtValue();
+
+            for (Map.Entry<String, Double> partialDiffLogPWrt : dlnDensityForProbabilisticVertex.entrySet()) {
+                final String wrtLatentVertexId = partialDiffLogPWrt.getKey();
+                final double partialDiffLogPContribution = partialDiffLogPWrt.getValue();
+
+                //partialDiffLogPContribution is the contribution to the rate of change of
+                //the natural log of the fitness vertex due to wrtLatentVertexId.
+                final double accumulatedDiffOfLogPWrtLatent = diffOfLogWrt.getOrDefault(wrtLatentVertexId, 0.0);
+                diffOfLogWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent + partialDiffLogPContribution);
+            }
         }
 
         return diffOfLogWrt;
