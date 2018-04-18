@@ -5,27 +5,27 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class CastDoubleVertex extends NonProbabilisticDouble {
 
-    private final Vertex<Double> inputVertex;
+    private final Vertex<? extends Number> inputVertex;
 
-    public CastDoubleVertex(Vertex<Double> inputVertex) {
+    public CastDoubleVertex(Vertex<? extends Number> inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
 
     @Override
     public Double sample() {
-        return inputVertex.sample();
+        return inputVertex.sample().doubleValue();
     }
 
     @Override
     public Double lazyEval() {
-        setValue(inputVertex.lazyEval());
+        setValue(inputVertex.lazyEval().doubleValue());
         return getValue();
     }
 
     @Override
     public Double getDerivedValue() {
-        return inputVertex.getValue();
+        return inputVertex.getValue().doubleValue();
     }
 
     @Override
