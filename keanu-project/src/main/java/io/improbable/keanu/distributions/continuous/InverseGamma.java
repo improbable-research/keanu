@@ -4,7 +4,7 @@ import java.util.Random;
 import static org.apache.commons.math3.special.Gamma.gamma;
 import static org.apache.commons.math3.special.Gamma.digamma;
 
-public class InvertedGamma {
+public class InverseGamma {
 
     public static double sample(double a, double b, Random random) {
         assert (b > 0.0 && a > 0.0);
