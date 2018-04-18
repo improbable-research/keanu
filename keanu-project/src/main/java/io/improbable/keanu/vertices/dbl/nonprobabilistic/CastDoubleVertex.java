@@ -30,6 +30,6 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
 
     @Override
     public DualNumber getDualNumber() {
-        return new DualNumber(inputVertex.getValue(), inputVertex.getId());
+        throw new UnsupportedOperationException("CastDoubleVertex is non-differentiable");
     }
 }
