@@ -21,7 +21,7 @@ public class InverseGammaVertexTest {
 
     private Random random;
 
-    private static final double DELTA = 0.0000001;
+    private static final double DELTA = 0.001;
 
     @Before
     public void setup() {
@@ -98,6 +98,26 @@ public class InverseGammaVertexTest {
                 2.0,
                 0.1,
                 uniformA,
+                inverted,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
+    }
+
+    @Test
+    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+        UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(3.0), random);
+        InverseGammaVertex inverted = new InverseGammaVertex(new ConstantDoubleVertex(2.0), uniformB, random);
+
+        double vertexStartValue = 0.5;
+        double vertexEndValue = 3.0;
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
+                3.0,
+                0.1,
+                uniformB,
                 inverted,
                 vertexStartValue,
                 vertexEndValue,
