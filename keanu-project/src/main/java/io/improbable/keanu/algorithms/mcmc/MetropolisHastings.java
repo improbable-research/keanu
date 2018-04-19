@@ -38,12 +38,14 @@ public class MetropolisHastings {
         List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
+        Map<String, Map<String, Integer>> setAndCascadeCache = new HashMap<>();
+
         double logP = bayesNet.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
             Set<Vertex<?>> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = nextSample(chosenVertex, logP, affectedVertices, 1.0, random);
+            logP = nextSample(chosenVertex, logP, affectedVertices, 1.0, setAndCascadeCache, random);
 
             takeSamples(samplesByVertex, fromVertices);
         }
@@ -55,6 +57,7 @@ public class MetropolisHastings {
                                  final double logPOld,
                                  final Set<Vertex<?>> affectedVertices,
                                  final double T,
+                                 final Map<String, Map<String, Integer>> setAndCascadeCache,
                                  final Random random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
@@ -62,7 +65,8 @@ public class MetropolisHastings {
         final T oldValue = chosenVertex.getValue();
         final T proposedValue = chosenVertex.sample();
 
-        chosenVertex.setAndCascade(proposedValue);
+        Map<String, Integer> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), (id) -> chosenVertex.exploreSetting());
+        chosenVertex.setAndCascade(proposedValue, cascadeCache);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);
 
@@ -77,7 +81,7 @@ public class MetropolisHastings {
         final boolean shouldReject = r < random.nextDouble();
 
         if (shouldReject) {
-            chosenVertex.setAndCascade(oldValue);
+            chosenVertex.setAndCascade(oldValue, cascadeCache);
             return logPOld;
         }
 

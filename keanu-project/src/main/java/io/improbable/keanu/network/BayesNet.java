@@ -125,7 +125,9 @@ public class BayesNet {
     }
 
     public static void sampleAndCascade(List<? extends Vertex<?>> vertices) {
-        vertices.forEach(BayesNet::sampleAndCascade);
+        for (Vertex<?> vertex : vertices) {
+            sampleAndCascade(vertex);
+        }
     }
 
     public static <T> void sampleAndCascade(Vertex<T> v) {
@@ -136,7 +138,7 @@ public class BayesNet {
         vertices.forEach(BayesNet::cascadeValue);
     }
 
-    public static <T> void cascadeValue(Vertex<T> v) {
+    private static <T> void cascadeValue(Vertex<T> v) {
         v.updateChildren();
     }
 }

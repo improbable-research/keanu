@@ -129,8 +129,61 @@ public abstract class Vertex<T> implements Identifiable {
      * @param value The new value at this vertex
      */
     public void setAndCascade(T value) {
+        setAndCascade(value, exploreSetting());
+    }
+
+    public void setAndCascade(T value, Map<String, Integer> explored) {
+
+        Map<String, Integer> turnAroundCounts = new HashMap<>(explored);
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+
         setValue(value);
-        updateChildren();
+        stack.push(this);
+
+        while (!stack.isEmpty()) {
+            Vertex<?> visiting = stack.pop();
+
+            visiting.updateValue();
+
+            for (Vertex<?> child : visiting.children) {
+
+                Integer currentCount = turnAroundCounts.get(child.getId());
+
+                if (currentCount != null && currentCount != 0) {
+                    turnAroundCounts.put(child.getId(), currentCount - 1);
+                } else {
+                    stack.push(child);
+                }
+            }
+
+        }
+    }
+
+    public Map<String, Integer> exploreSetting() {
+
+        Set<Vertex<?>> hasVisited = new HashSet<>();
+        Map<String, Integer> crossRoadCount = new HashMap<>();
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+
+        stack.push(this);
+
+        while (!stack.isEmpty()) {
+
+            Vertex<?> visiting = stack.pop();
+            hasVisited.add(visiting);
+
+            for (Vertex<?> child : visiting.children) {
+
+                if (!hasVisited.contains(child)) {
+                    stack.push(child);
+                } else {
+                    crossRoadCount.put(child.getId(), crossRoadCount.getOrDefault(child.getId(), 0) + 1);
+                }
+
+            }
+        }
+
+        return crossRoadCount;
     }
 
     /**
