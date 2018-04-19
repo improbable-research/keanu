@@ -20,12 +20,6 @@ public class HamiltonianTest {
 
     private Random random;
 
-    public static void main(String[] args) {
-        HamiltonianTest hamiltonianTest = new HamiltonianTest();
-        hamiltonianTest.setup();
-        hamiltonianTest.samplesContinuousPrior();
-    }
-
     @Before
     public void setup() {
         random = new Random(1);
