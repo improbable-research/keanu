@@ -14,7 +14,7 @@ public class MultiModeDiscovery {
     public static List<NetworkState> findModesBySimulatedAnnealing(BayesNet network, int attempts, int samplesPerAttempt) {
 
         List<NetworkState> maxSamples = new ArrayList<>();
-        BayesNet.cascadeValues(network.getObservedVertices());
+        Vertex.cascadeUpdate(network.getObservedVertices());
         List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
 
         for (int i = 0; i < attempts; i++) {

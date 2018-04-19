@@ -91,11 +91,10 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
-     *
      */
     public void probeForNonZeroMasterP(int attempts) {
 
-        cascadeValues(observedVertices);
+        Vertex.cascadeUpdate(observedVertices);
         List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(latentVertices);
         sampleAndCascade(sortedByDependency);
 
@@ -126,19 +125,13 @@ public class BayesNet {
 
     public static void sampleAndCascade(List<? extends Vertex<?>> vertices) {
         for (Vertex<?> vertex : vertices) {
-            sampleAndCascade(vertex);
+            setValueFromSample(vertex);
         }
+        Vertex.cascadeUpdate(vertices);
     }
 
-    public static <T> void sampleAndCascade(Vertex<T> v) {
-        v.setAndCascade(v.sample());
+    private static <T> void setValueFromSample(Vertex<T> v) {
+        v.setValue(v.sample());
     }
 
-    public static void cascadeValues(List<? extends Vertex<?>> vertices) {
-        vertices.forEach(BayesNet::cascadeValue);
-    }
-
-    private static <T> void cascadeValue(Vertex<T> v) {
-        v.updateChildren();
-    }
 }

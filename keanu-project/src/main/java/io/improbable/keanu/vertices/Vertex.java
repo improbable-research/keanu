@@ -133,12 +133,27 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     public void setAndCascade(T value, Map<String, Integer> explored) {
+        setValue(value);
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        stack.push(this);
+        cascadeUpdate(stack, explored);
+    }
+
+    public static void cascadeUpdate(List<? extends Vertex<?>> vertices) {
+        cascadeUpdate(vertices, exploreSetting(vertices));
+    }
+
+    public static void cascadeUpdate(List<? extends Vertex<?>> vertices, Map<String, Integer> explored) {
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        for (Vertex<?> v : vertices) {
+            stack.push(v);
+        }
+        cascadeUpdate(stack, explored);
+    }
+
+    private static void cascadeUpdate(Deque<Vertex<?>> stack, Map<String, Integer> explored) {
 
         Map<String, Integer> turnAroundCounts = new HashMap<>(explored);
-        Deque<Vertex<?>> stack = new ArrayDeque<>();
-
-        setValue(value);
-        stack.push(this);
 
         while (!stack.isEmpty()) {
             Vertex<?> visiting = stack.pop();
@@ -160,12 +175,23 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     public Map<String, Integer> exploreSetting() {
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        stack.push(this);
+        return exploreSetting(stack);
+    }
+
+    public static Map<String, Integer> exploreSetting(Collection<? extends Vertex<?>> toBeSet) {
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        for (Vertex<?> v : toBeSet) {
+            stack.push(v);
+        }
+        return exploreSetting(stack);
+    }
+
+    private static Map<String, Integer> exploreSetting(Deque<Vertex<?>> stack) {
 
         Set<Vertex<?>> hasVisited = new HashSet<>();
         Map<String, Integer> crossRoadCount = new HashMap<>();
-        Deque<Vertex<?>> stack = new ArrayDeque<>();
-
-        stack.push(this);
 
         while (!stack.isEmpty()) {
 
@@ -184,16 +210,6 @@ public abstract class Vertex<T> implements Identifiable {
         }
 
         return crossRoadCount;
-    }
-
-    /**
-     * This causes this vertex's value to propagate to child vertices.
-     */
-    public void updateChildren() {
-        for (Vertex<?> child : this.children) {
-            child.updateValue();
-            child.updateChildren();
-        }
     }
 
     /**
