@@ -228,7 +228,7 @@ public class Hamiltonian {
     }
 
     private static boolean shouldAccept(double likelihood, Random random) {
-        return likelihood < random.nextDouble();
+        return likelihood > random.nextDouble();
     }
 
     private static void addAsLatest(Map<String, List<Double>> samples,

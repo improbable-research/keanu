@@ -24,15 +24,15 @@ public class HamiltonianTest {
     public static void main(String[] args) {
         HamiltonianTest hamiltonianTest = new HamiltonianTest();
         hamiltonianTest.setup();
-        hamiltonianTest.samplesFromDonut();
+        hamiltonianTest.samplesGaussian();
     }
 
-//    @Before
+    @Before
     public void setup() {
         random = new Random(1);
     }
 
-//    @Test
+    @Test
     public void samplesGaussian() {
         GaussianVertex A = new GaussianVertex(0.0, 1, random);
         BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
@@ -41,11 +41,13 @@ public class HamiltonianTest {
                 bayesNet,
                 Arrays.asList(A),
                 50000,
-                10,
-                0.1,
+                5,
+                0.02,
                 Arrays.asList(0.02),
                 random
         );
+
+//        Vizer.histogram(posteriorSamples.get(A).asList(), "Gauss");
 
         OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
                 .mapToDouble(sample -> sample)
@@ -54,26 +56,25 @@ public class HamiltonianTest {
         assertEquals(0.0, averagePosteriorA.getAsDouble(), 0.1);
     }
 
-//    @Test
+    @Test
     public void samplesContinuousPrior() {
         DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
         DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
 
         A.setValue(20.0);
-        B.setAndCascade(20.0);
+        B.setValue(20.0);
 
         DoubleVertex C = new GaussianVertex(A.plus(B), new ConstantDoubleVertex(1.0), random);
         C.observe(46.0);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
-        bayesNet.probeForNonZeroMasterP(100);
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
                 bayesNet,
                 Arrays.asList(A, B),
                 25000,
                 10,
-                0.1,
+                0.06,
                 Arrays.asList(21.0, 22.5),
                 random
         );
@@ -89,7 +90,7 @@ public class HamiltonianTest {
         assertEquals(44.0, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-//    @Test
+    @Test
     public void samplesFromDonut() {
         DoubleVertex A = new GaussianVertex(0, 1, random);
         DoubleVertex B = new GaussianVertex(0, 1, random);
@@ -113,7 +114,7 @@ public class HamiltonianTest {
         List<Double> samplesB = samples.get(B).asList();
 
 
-        Vizer.plot(samplesA, samplesB, "Donut");
+//        Vizer.plot(samplesA, samplesB, "Donut");
 
         boolean topOfDonut, rightOfDonut, bottomOfDonut, leftOfDonut, middleOfDonut;
         topOfDonut = rightOfDonut = bottomOfDonut = leftOfDonut = middleOfDonut = false;
