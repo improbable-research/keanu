@@ -25,14 +25,4 @@ public class FloorVertexTest {
         assertEquals(Math.floor(8.12), floor.getValue(), 0.0001);
     }
 
-    @Test
-    public void floorOnlyChangesValueAndNotInfintesimal() {
-        DoubleVertex A = new UniformVertex(0.0, 10.0);
-        A.setValue(5.2);
-        FloorVertex floorVertex = new FloorVertex(A);
-        PowerVertex powerVertex = new PowerVertex(floorVertex, 2.0);
-
-        assertEquals(2 * Math.pow(5.0, 2 - 1), powerVertex.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.000);
-    }
-
 }

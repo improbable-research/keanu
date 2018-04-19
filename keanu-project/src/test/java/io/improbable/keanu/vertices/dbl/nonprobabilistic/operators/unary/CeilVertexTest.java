@@ -25,14 +25,4 @@ public class CeilVertexTest {
         assertEquals(Math.ceil(8.12), ceil.getValue(), 0.0001);
     }
 
-    @Test
-    public void ceilOnlyChangesValueAndNotInfintesimal() {
-        DoubleVertex A = new UniformVertex(0.0, 10.0);
-        A.setValue(5.7);
-        CeilVertex ceilVertex= new CeilVertex(A);
-        PowerVertex powerVertex = new PowerVertex(ceilVertex, 2.0);
-
-        assertEquals(2 * Math.pow(6.0, 2 - 1), powerVertex.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.000);
-    }
-
 }

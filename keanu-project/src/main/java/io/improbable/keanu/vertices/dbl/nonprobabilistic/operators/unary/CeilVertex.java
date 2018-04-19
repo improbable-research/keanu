@@ -21,6 +21,6 @@ public class CeilVertex extends DoubleUnaryOpVertex {
 
     @Override
     public DualNumber getDualNumber() {
-        return new DualNumber(op(inputVertex.getValue()), inputVertex.getDualNumber().getInfinitesimal());
+        throw new UnsupportedOperationException();
     }
 }

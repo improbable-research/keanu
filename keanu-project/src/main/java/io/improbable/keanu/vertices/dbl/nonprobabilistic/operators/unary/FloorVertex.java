@@ -21,7 +21,6 @@ public class FloorVertex extends DoubleUnaryOpVertex {
 
     @Override
     public DualNumber getDualNumber() {
-        this.setAndCascade(this.getValue());
-        return new DualNumber(op(inputVertex.getValue()), inputVertex.getDualNumber().getInfinitesimal());
+        throw new UnsupportedOperationException();
     }
 }
