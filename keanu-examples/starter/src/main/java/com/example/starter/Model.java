@@ -31,6 +31,8 @@ public class Model {
 
     private final Data data;
 
+    public double results;
+
     Model(Data data) {
         this.data = data;
     }
@@ -61,9 +63,13 @@ public class Model {
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
         optimizer.maxAPosteriori(5000);
 
+        //Expose model results
+        results = (A.getValue() + B.getValue());
+
         System.out.println("A is most probably " + A.getValue());
         System.out.println("B is most probably " + B.getValue());
-        System.out.println("Most probable actual value of the sum " + (A.getValue() + B.getValue()));
+        System.out.println("Most probable actual value of the sum " + results);
+
     }
 
 }
