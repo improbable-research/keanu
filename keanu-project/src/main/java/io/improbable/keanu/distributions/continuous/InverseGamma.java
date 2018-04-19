@@ -7,24 +7,23 @@ import static org.apache.commons.math3.special.Gamma.digamma;
 public class InverseGamma {
 
     public static double sample(double a, double b, Random random) {
-        assert (b > 0.0 && a > 0.0);
+        assert (a > 0.0 && b > 0.0);
         return 1.0 /  Gamma.sample(0.0, 1.0 / b, a, random);
     }
 
     public static double pdf(double a, double b, double x) {
-        double numerator = Math.pow(b, a) * Math.pow(x, - a - 1) * Math.exp(- b / x);
-        double denominator = gamma(a);
-        return numerator / denominator;
+        double numerator = Math.pow(b, a) * Math.pow(x, - a - 1) * Math.exp(-b / x);
+        return numerator / gamma(a);
     }
 
     public static Diff dPdf(double a, double b, double x) {
-        double bToTheA = Math.pow(b, a);
-        double eToTheMinusBOverX = Math.exp(- b / x);
+        double bToThePowerOfA = Math.pow(b, a);
+        double eToTheMinusBOverX = Math.exp(-b / x);
         double gammaA = gamma(a);
 
-        double dPda = bToTheA * Math.pow(x, - a - 1) * eToTheMinusBOverX * (-digamma(a) + Math.log(b) - Math.log(x));
+        double dPda = bToThePowerOfA * Math.pow(x, -a - 1) * eToTheMinusBOverX * (-digamma(a) + Math.log(b) - Math.log(x));
         double dPdb = (Math.pow(b, a - 1) * Math.pow(x, -a - 2) * eToTheMinusBOverX * (a * x - b)) / gammaA;
-        double dPdx = (bToTheA * Math.pow(x, -a - 3) * eToTheMinusBOverX * (b - (a + 1) * x)) / gammaA;
+        double dPdx = (bToThePowerOfA * Math.pow(x, -a - 3) * eToTheMinusBOverX * (b - (a + 1) * x)) / gammaA;
 
         return new Diff(dPda, dPdb, dPdx);
     }
