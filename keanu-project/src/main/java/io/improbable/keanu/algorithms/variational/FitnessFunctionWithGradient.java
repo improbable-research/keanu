@@ -24,19 +24,11 @@ public class FitnessFunctionWithGradient extends FitnessFunction {
         };
     }
 
-    protected void setPoint(double[] point) {
-        for (int i = 0; i < point.length; i++) {
-            latentVertices
-                    .get(i)
-                    .setValue(point[i]);
-        }
-    }
-
     /**
      * @param probabilisticVertices
-     * @return
+     * @return the partial derivatives with respect to any latents upstream
      */
-    public Map<String, Double> getDiffsWithRespectToUpstreamLatents(List<Vertex<?>> probabilisticVertices) {
+    public static Map<String, Double> getDiffsWithRespectToUpstreamLatents(List<Vertex<?>> probabilisticVertices) {
         final Map<String, Double> diffOfLogWrt = new HashMap<>();
 
         for (final Vertex<?> probabilisticVertex : probabilisticVertices) {

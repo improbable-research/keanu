@@ -24,26 +24,26 @@ public class HamiltonianTest {
     public static void main(String[] args) {
         HamiltonianTest hamiltonianTest = new HamiltonianTest();
         hamiltonianTest.setup();
-        hamiltonianTest.samplesGaussian();
+        hamiltonianTest.samplesContinuousPrior();
     }
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new Random(3);
     }
 
     @Test
     public void samplesGaussian() {
         GaussianVertex A = new GaussianVertex(0.0, 1, random);
+        A.setAndCascade(0.02);
         BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
                 bayesNet,
                 Arrays.asList(A),
                 50000,
-                5,
-                0.02,
-                Arrays.asList(0.02),
+                10,
+                0.1,
                 random
         );
 
@@ -56,28 +56,29 @@ public class HamiltonianTest {
         assertEquals(0.0, averagePosteriorA.getAsDouble(), 0.1);
     }
 
-    @Test
+    //    @Test
     public void samplesContinuousPrior() {
         DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
         DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
 
-        A.setValue(20.0);
-        B.setValue(20.0);
-
         DoubleVertex C = new GaussianVertex(A.plus(B), new ConstantDoubleVertex(1.0), random);
         C.observe(46.0);
+
+        A.setAndCascade(20.0);
+        B.setAndCascade(20.0);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
                 bayesNet,
                 Arrays.asList(A, B),
-                25000,
-                10,
-                0.06,
-                Arrays.asList(21.0, 22.5),
+                50000,
+                5,
+                0.001,
                 random
         );
+
+//        Vizer.histogram(posteriorSamples.get(A).asList(), "Gauss");
 
         OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
                 .mapToDouble(sample -> sample)
@@ -98,6 +99,9 @@ public class HamiltonianTest {
         DoubleVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03, random);
         D.observe(0.5);
 
+        A.setAndCascade(Math.sqrt(0.5));
+        B.setAndCascade(0.0);
+
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, D));
 
         NetworkSamples samples = Hamiltonian.getPosteriorSamples(
@@ -106,13 +110,11 @@ public class HamiltonianTest {
                 25000,
                 10,
                 0.005,
-                Arrays.asList(Math.sqrt(0.5), 0.0),
                 random
         );
 
         List<Double> samplesA = samples.get(A).asList();
         List<Double> samplesB = samples.get(B).asList();
-
 
 //        Vizer.plot(samplesA, samplesB, "Donut");
 
