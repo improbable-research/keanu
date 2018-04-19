@@ -5,7 +5,6 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.vis.Vizer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -29,7 +28,7 @@ public class HamiltonianTest {
 
     @Before
     public void setup() {
-        random = new Random(3);
+        random = new Random(1);
     }
 
     @Test
@@ -41,13 +40,11 @@ public class HamiltonianTest {
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
                 bayesNet,
                 Arrays.asList(A),
-                50000,
+                100000,
                 10,
                 0.1,
                 random
         );
-
-//        Vizer.histogram(posteriorSamples.get(A).asList(), "Gauss");
 
         OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
                 .mapToDouble(sample -> sample)
@@ -56,7 +53,7 @@ public class HamiltonianTest {
         assertEquals(0.0, averagePosteriorA.getAsDouble(), 0.1);
     }
 
-    //    @Test
+    @Test
     public void samplesContinuousPrior() {
         DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
         DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
@@ -73,12 +70,10 @@ public class HamiltonianTest {
                 bayesNet,
                 Arrays.asList(A, B),
                 50000,
-                5,
-                0.001,
+                10,
+                0.01,
                 random
         );
-
-//        Vizer.histogram(posteriorSamples.get(A).asList(), "Gauss");
 
         OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
                 .mapToDouble(sample -> sample)
@@ -116,8 +111,6 @@ public class HamiltonianTest {
         List<Double> samplesA = samples.get(A).asList();
         List<Double> samplesB = samples.get(B).asList();
 
-//        Vizer.plot(samplesA, samplesB, "Donut");
-
         boolean topOfDonut, rightOfDonut, bottomOfDonut, leftOfDonut, middleOfDonut;
         topOfDonut = rightOfDonut = bottomOfDonut = leftOfDonut = middleOfDonut = false;
 
@@ -137,7 +130,6 @@ public class HamiltonianTest {
                 middleOfDonut = true;
             }
         }
-
 
         assertTrue(topOfDonut && rightOfDonut && bottomOfDonut && leftOfDonut && !middleOfDonut);
     }

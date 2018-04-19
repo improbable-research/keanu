@@ -1,13 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.variational.FitnessFunctionWithGradient;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 import java.util.*;
-
 
 /**
  * Hamiltonian Monte Carlo is a method for obtaining samples from a probability
@@ -38,14 +37,13 @@ public class Hamiltonian {
                                                      final double stepSize,
                                                      final Random random) {
 
-
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
         takeSamples(samples, fromVertices);
 
         final Map<String, Double> positionBeforeLeapfrog = new HashMap<>();
-
         final Map<String, Double> momentum = new HashMap<>();
         final Map<String, Double> momentumBeforeLeapfrog = new HashMap<>();
 
@@ -56,27 +54,30 @@ public class Hamiltonian {
             initializeMomentumForEachVertex(latentVertices, momentum, random);
             cacheMomentum(momentum, momentumBeforeLeapfrog);
 
-            final double logOfMasterP = bayesNet.getLogOfMasterP();
+            final double logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
+
+            Map<String, Double> gradient = LogProbGradient
+                    .getJointLogProbGradientWrtLatents(bayesNet.getVerticesThatContributeToMasterP());
 
             for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
-                leapfrogVertices(
+                gradient = leapfrog(
                         latentVertices,
+                        gradient,
                         momentum,
                         stepSize,
-                        bayesNet
+                        probabilisticVertices
                 );
             }
 
             final double likelihoodOfLeapfrog = getLikelihoodOfLeapfrog(
                     bayesNet,
                     momentum,
-                    logOfMasterP,
+                    logOfMasterPBeforeLeapfrog,
                     momentumBeforeLeapfrog
             );
 
             if (shouldReject(likelihoodOfLeapfrog, random)) {
-                //revert position to previous
-                setAndCascadeValues(latentVertices, positionBeforeLeapfrog);
+                revertToPosition(latentVertices, positionBeforeLeapfrog);
             }
 
             takeSamples(samples, fromVertices);
@@ -108,61 +109,56 @@ public class Hamiltonian {
         }
     }
 
-    private static void leapfrogVertices(final List<Vertex<Double>> latentVertices,
-                                         final Map<String, Double> momentum,
-                                         final double stepSize,
-                                         final BayesNet bayesNet) {
-
-        for (Vertex<Double> currentVertex : latentVertices) {
-
-            final double vertexMomentum = momentum.get(currentVertex.getId());
-
-            final double newMomentum = leapfrogVertex(
-                    currentVertex,
-                    vertexMomentum,
-                    stepSize,
-                    bayesNet
-            );
-
-            momentum.put(currentVertex.getId(), newMomentum);
-        }
-    }
-
-    private static double leapfrogVertex(final Vertex<Double> vertex,
-                                         final double vertexMomentum,
-                                         final double stepSize,
-                                         final BayesNet bayesNet) {
+    /**
+     * function Leapfrog(θ, r, )
+     * Set ˜r ← r + (eps/2)∇θL(θ)
+     * Set ˜θ ← θ + r˜
+     * Set ˜r ← r˜ + (eps/2)∇θL(˜θ)
+     * return ˜θ, r˜
+     *
+     * @param latentVertices
+     * @param gradient              gradient at current position
+     * @param momentums             current vertex momentums
+     * @param stepSize
+     * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
+     * @return the gradient at the updated position
+     */
+    private static Map<String, Double> leapfrog(final List<Vertex<Double>> latentVertices,
+                                                final Map<String, Double> gradient,
+                                                final Map<String, Double> momentums,
+                                                final double stepSize,
+                                                final List<Vertex<?>> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 
-        Map<String, Double> gradients = FitnessFunctionWithGradient
-                .getDiffsWithRespectToUpstreamLatents(bayesNet.getVerticesThatContributeToMasterP());
+        Map<String, Double> momentumsAtHalfTimeStep = new HashMap<>();
 
-        final double gradient = gradients.get(vertex.getId());
+        //Set ˜r ← r + (eps/2)∇θL(θ)
+        for (Map.Entry<String, Double> vertexMomentum : momentums.entrySet()) {
+            final double updatedMomentum = vertexMomentum.getValue() + halfTimeStep * gradient.get(vertexMomentum.getKey());
+            momentumsAtHalfTimeStep.put(vertexMomentum.getKey(), updatedMomentum);
+        }
 
-        final double logOfMasterPBeforeLeap = bayesNet.getLogOfMasterP();
+        //Set ˜θ ← θ + ˜r.
+        for (Vertex<Double> latent : latentVertices) {
+            final double nextPosition = latent.getValue() + halfTimeStep * momentumsAtHalfTimeStep.get(latent.getId());
+            latent.setAndCascade(nextPosition);
+        }
 
-        final double momentumHalfTimeStep = vertexMomentum - (halfTimeStep * gradient * logOfMasterPBeforeLeap);
+        //Set ˜r ← ˜r + (eps/2)∇θL(˜θ)
+        Map<String, Double> newGradient = LogProbGradient
+                .getJointLogProbGradientWrtLatents(probabilisticVertices);
 
-        final double positionTimeStep = vertex.getValue() + (stepSize * momentumHalfTimeStep);
+        for (Map.Entry<String, Double> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
+            final double updatedMomentum = halfTimeStepMomentum.getValue() + halfTimeStep * newGradient.get(halfTimeStepMomentum.getKey());
+            momentums.put(halfTimeStepMomentum.getKey(), updatedMomentum);
+        }
 
-        vertex.setAndCascade(positionTimeStep);
-
-        Map<String, Double> newGradients = FitnessFunctionWithGradient
-                .getDiffsWithRespectToUpstreamLatents(bayesNet.getVerticesThatContributeToMasterP());
-
-        final double newGradient = newGradients.get(vertex.getId());
-
-        //TODO: master p only due to change in vertex
-        final double logOfMasterPAfterLeap = bayesNet.getLogOfMasterP();
-
-        final double momentumTimeStep = momentumHalfTimeStep - (halfTimeStep * newGradient * logOfMasterPAfterLeap);
-
-        return momentumTimeStep;
+        return newGradient;
     }
 
-    private static void setAndCascadeValues(List<Vertex<Double>> continuousLatentVertices,
-                                            Map<String, Double> values) {
+    private static void revertToPosition(List<Vertex<Double>> continuousLatentVertices,
+                                         Map<String, Double> values) {
 
         for (Vertex<Double> latent : continuousLatentVertices) {
             latent.setAndCascade(values.get(latent.getId()));
@@ -200,7 +196,9 @@ public class Hamiltonian {
     }
 
     private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
-        fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
+        for (Vertex<?> vertex : fromVertices) {
+            addSampleForVertex(vertex, samples);
+        }
     }
 
     private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
