@@ -171,6 +171,10 @@ public abstract class Vertex<T> implements Identifiable {
 
             for (Vertex<?> child : visiting.children) {
 
+                if(child.isProbabilistic()){
+                    continue;
+                }
+
                 Integer currentCount = turnAroundCounts.get(child.getId());
 
                 if (currentCount != null && currentCount != 0) {
@@ -208,6 +212,10 @@ public abstract class Vertex<T> implements Identifiable {
             hasVisited.add(visiting);
 
             for (Vertex<?> child : visiting.children) {
+
+                if(child.isProbabilistic()){
+                    continue;
+                }
 
                 if (!hasVisited.contains(child)) {
                     stack.push(child);
