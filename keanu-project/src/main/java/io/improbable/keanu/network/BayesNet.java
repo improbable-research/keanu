@@ -96,7 +96,7 @@ public class BayesNet {
 
         Vertex.cascadeUpdate(observedVertices);
         List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(latentVertices);
-        sampleAndCascade(sortedByDependency);
+        setFromSampleAndCascade(sortedByDependency);
 
         probeForNonZeroMasterP(sortedByDependency, attempts);
     }
@@ -109,7 +109,7 @@ public class BayesNet {
 
         int iteration = 0;
         while (isInImpossibleState()) {
-            sampleAndCascade(latentVertices);
+            setFromSampleAndCascade(latentVertices);
             iteration++;
 
             if (iteration > attempts) {
@@ -123,7 +123,7 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void sampleAndCascade(List<? extends Vertex<?>> vertices) {
+    public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }

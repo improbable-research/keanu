@@ -8,8 +8,6 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> implements Identifiable {
 
-    //This is a temp fix for a larger problem
-    //TODO: SOL-1016
     public static AtomicLong idGenerator = new AtomicLong(0L);
 
     private String uuid = idGenerator.getAndIncrement() + "";
@@ -85,7 +83,7 @@ public abstract class Vertex<T> implements Identifiable {
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's
-     * current parent values.
+     * parent's current values.
      *
      * @return The updated value
      */
@@ -102,7 +100,9 @@ public abstract class Vertex<T> implements Identifiable {
     public abstract T lazyEval();
 
     /**
-     * A probabilistic vertex is defined as a vertex that is probabilistic.
+     * A probabilistic vertex is defined as a vertex whose value is not
+     * derived from it's parents. However, the probability of the vertex's
+     * value may be dependent on it's parents values.
      */
     public abstract boolean isProbabilistic();
 
@@ -124,7 +124,7 @@ public abstract class Vertex<T> implements Identifiable {
     /**
      * This sets the value in this vertex and tells each child vertex about
      * the new change. This causes a cascading change of values if any of the
-     * children vertices are lambda vertices.
+     * children vertices are non-probabilistic vertices (e.g. mathematical operations).
      *
      * @param value The new value at this vertex
      */
@@ -132,6 +132,11 @@ public abstract class Vertex<T> implements Identifiable {
         setAndCascade(value, exploreSetting());
     }
 
+    /**
+     * @param value    the new value at this vertex
+     * @param explored the results of previously exploring the graph, which
+     *                 allows the efficient propagation of this new value.
+     */
     public void setAndCascade(T value, Map<String, Integer> explored) {
         setValue(value);
         Deque<Vertex<?>> stack = new ArrayDeque<>();

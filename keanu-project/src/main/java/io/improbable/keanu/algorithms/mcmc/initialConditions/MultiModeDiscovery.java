@@ -18,7 +18,7 @@ public class MultiModeDiscovery {
         List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
 
         for (int i = 0; i < attempts; i++) {
-            BayesNet.sampleAndCascade(sortedByDependency);
+            BayesNet.setFromSampleAndCascade(sortedByDependency);
             NetworkState maxAPosteriori = SimulatedAnnealing.getMaxAPosteriori(network, samplesPerAttempt);
             maxSamples.add(maxAPosteriori);
         }
