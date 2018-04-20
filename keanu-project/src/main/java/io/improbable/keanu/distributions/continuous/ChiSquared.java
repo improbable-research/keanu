@@ -3,7 +3,7 @@ package io.improbable.keanu.distributions.continuous;
 import java.util.Random;
 import static org.apache.commons.math3.special.Gamma.gamma;
 
-public class Chi2 {
+public class ChiSquared {
 
     public static double sample(int k, Random random) {
         assert (k >= 1);

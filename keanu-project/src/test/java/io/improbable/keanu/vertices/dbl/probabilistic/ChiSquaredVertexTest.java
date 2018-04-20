@@ -15,9 +15,9 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class Chi2VertexTest {
+public class ChiSquaredVertexTest {
 
-    private final Logger log = LoggerFactory.getLogger(Chi2VertexTest.class);
+    private final Logger log = LoggerFactory.getLogger(ChiSquaredVertexTest.class);
 
     private Random random;
 
@@ -31,7 +31,7 @@ public class Chi2VertexTest {
         int N = 100000;
         double epsilon = 0.1;
         int k = 10;
-        Chi2Vertex testChiVertex = new Chi2Vertex(new ConstantIntegerVertex(k), new Random(1));
+        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(new ConstantIntegerVertex(k), new Random(1));
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
@@ -53,7 +53,7 @@ public class Chi2VertexTest {
 
     @Test
     public void chiSampleMethodMatchesDensityMethod() {
-        Vertex<Double> vertex = new Chi2Vertex(
+        Vertex<Double> vertex = new ChiSquaredVertex(
                 new ConstantIntegerVertex(2),
                 random
         );
@@ -68,7 +68,7 @@ public class Chi2VertexTest {
 
     @Test
     public void testLogDensityEqualsLogOfDensity() {
-        Chi2Vertex chi = new Chi2Vertex(1);
+        ChiSquaredVertex chi = new ChiSquaredVertex(1);
         chi.setValue(0.0);
         double density = chi.density(0.1);
         double logDensity = chi.logDensity(0.1);
