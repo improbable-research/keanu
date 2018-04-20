@@ -40,10 +40,6 @@ public class SetAndCascadeTest {
 
         DoubleVertex end = addLinks(start, n, 1);
 
-        start.setAndCascade(2.0);
-
-        System.out.println("");
-        System.out.println("");
         DoubleVertex nextLayerStart = new GaussianVertex(end, 1, random);
 
         DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, 1);

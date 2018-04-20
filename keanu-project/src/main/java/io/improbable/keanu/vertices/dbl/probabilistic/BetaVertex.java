@@ -17,7 +17,6 @@ public class BetaVertex extends ProbabilisticDouble {
         this.alpha = alpha;
         this.beta = beta;
         this.random = random;
-        setValue(sample());
         setParents(alpha, beta);
     }
 

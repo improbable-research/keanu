@@ -18,7 +18,6 @@ public class LogisticVertex extends ProbabilisticDouble {
         this.a = a;
         this.b = b;
         this.random = random;
-        setValue(sample());
         setParents(a, b);
     }
 

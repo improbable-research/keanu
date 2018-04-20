@@ -28,7 +28,7 @@ public abstract class Vertex<T> implements Identifiable {
      * Just a helper method for a common function
      */
     public double densityAtValue() {
-        return density(value);
+        return density(getValue());
     }
 
     /**
@@ -45,7 +45,7 @@ public abstract class Vertex<T> implements Identifiable {
      * Just a helper method for a common function
      */
     public double logDensityAtValue() {
-        return logDensity(value);
+        return logDensity(getValue());
     }
 
     /**
@@ -118,7 +118,11 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     public T getValue() {
-        return value == null ? lazyEval() : value;
+        return !hasValue() ? lazyEval() : value;
+    }
+
+    public boolean hasValue() {
+        return value != null;
     }
 
     /**

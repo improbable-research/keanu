@@ -20,7 +20,6 @@ public class UniformIntVertex extends ProbabilisticInteger {
         this.min = min;
         this.max = max;
         this.random = random;
-        setValue(sample());
         setParents(min, max);
     }
 

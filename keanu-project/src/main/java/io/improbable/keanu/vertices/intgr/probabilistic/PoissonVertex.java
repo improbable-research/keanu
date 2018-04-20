@@ -16,7 +16,6 @@ public class PoissonVertex extends ProbabilisticInteger {
         this.mu = mu;
         this.random = random;
         setParents(mu);
-        setValue(sample());
     }
 
     public PoissonVertex(double mu, Random random) {
