@@ -108,7 +108,7 @@ public class Vizer {
         display(createHistogram(samples), title);
     }
 
-    public static void plot(List<Double> x, List<Double> y, String title) {
+    public static void scatter(List<Double> x, List<Double> y, String title) {
         display(createPlot(x, y, PlotType.SCATTER), title);
     }
 

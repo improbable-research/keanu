@@ -5,6 +5,7 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.vis.Vizer;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -41,27 +41,38 @@ public class Hamiltonian {
         final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
-        takeSamples(samples, fromVertices);
+        addSampleFromVertices(samples, fromVertices);
 
-        final Map<String, Double> positionBeforeLeapfrog = new HashMap<>();
+        Map<String, Double> position = new HashMap<>();
+        cachePosition(latentVertices, position);
+        Map<String, Double> positionBeforeLeapfrog = new HashMap<>();
+
+        Map<String, Double> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
+                bayesNet.getVerticesThatContributeToMasterP()
+        );
+        Map<String, Double> gradientBeforeLeapfrog = new HashMap<>();
+
         final Map<String, Double> momentum = new HashMap<>();
         final Map<String, Double> momentumBeforeLeapfrog = new HashMap<>();
 
+        double logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
+
+        final Map<String, ?> sampleBeforeLeapfrog = new HashMap<>();
+
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
 
-            cachePosition(latentVertices, positionBeforeLeapfrog);
+            cache(position, positionBeforeLeapfrog);
+            cache(gradient, gradientBeforeLeapfrog);
 
             initializeMomentumForEachVertex(latentVertices, momentum, random);
-            cacheMomentum(momentum, momentumBeforeLeapfrog);
+            cache(momentum, momentumBeforeLeapfrog);
 
-            final double logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
-
-            Map<String, Double> gradient = LogProbGradient
-                    .getJointLogProbGradientWrtLatents(bayesNet.getVerticesThatContributeToMasterP());
+            takeSample(sampleBeforeLeapfrog, fromVertices);
 
             for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
                 gradient = leapfrog(
                         latentVertices,
+                        position,
                         gradient,
                         momentum,
                         stepSize,
@@ -69,28 +80,40 @@ public class Hamiltonian {
                 );
             }
 
+            final double logOfMasterPAfterLeapfrog = bayesNet.getLogOfMasterP();
+
             final double likelihoodOfLeapfrog = getLikelihoodOfLeapfrog(
-                    bayesNet,
-                    momentum,
+                    logOfMasterPAfterLeapfrog,
                     logOfMasterPBeforeLeapfrog,
+                    momentum,
                     momentumBeforeLeapfrog
             );
 
             if (shouldReject(likelihoodOfLeapfrog, random)) {
-                revertToPosition(latentVertices, positionBeforeLeapfrog);
-            }
 
-            takeSamples(samples, fromVertices);
+                //Revert to position and gradient before leapfrog
+                Map<String, Double> tempSwap = position;
+                position = positionBeforeLeapfrog;
+                positionBeforeLeapfrog = tempSwap;
+
+                tempSwap = gradient;
+                gradient = gradientBeforeLeapfrog;
+                gradientBeforeLeapfrog = tempSwap;
+
+                addSampleFromCache(samples, sampleBeforeLeapfrog);
+            } else {
+                addSampleFromVertices(samples, fromVertices);
+                logOfMasterPBeforeLeapfrog = logOfMasterPAfterLeapfrog;
+            }
         }
 
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static Map<String, Double> cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
+    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
         for (Vertex<Double> vertex : latentVertices) {
             position.put(vertex.getId(), vertex.getValue());
         }
-        return position;
     }
 
     private static Map<String, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
@@ -103,9 +126,9 @@ public class Hamiltonian {
         return momentums;
     }
 
-    private static void cacheMomentum(Map<String, Double> momentums, Map<String, Double> cache) {
-        for (Map.Entry<String, Double> entry : momentums.entrySet()) {
-            cache.put(entry.getKey(), entry.getValue());
+    private static void cache(Map<String, Double> from, Map<String, Double> to) {
+        for (Map.Entry<String, Double> entry : from.entrySet()) {
+            to.put(entry.getKey(), entry.getValue());
         }
     }
 
@@ -124,6 +147,7 @@ public class Hamiltonian {
      * @return the gradient at the updated position
      */
     private static Map<String, Double> leapfrog(final List<Vertex<Double>> latentVertices,
+                                                final Map<String, Double> position,
                                                 final Map<String, Double> gradient,
                                                 final Map<String, Double> momentums,
                                                 final double stepSize,
@@ -141,13 +165,15 @@ public class Hamiltonian {
 
         //Set ˜θ ← θ + ˜r.
         for (Vertex<Double> latent : latentVertices) {
-            final double nextPosition = latent.getValue() + halfTimeStep * momentumsAtHalfTimeStep.get(latent.getId());
+            final double nextPosition = position.get(latent.getId()) + halfTimeStep * momentumsAtHalfTimeStep.get(latent.getId());
+            position.put(latent.getId(), nextPosition);
             latent.setAndCascade(nextPosition);
         }
 
         //Set ˜r ← ˜r + (eps/2)∇θL(˜θ)
-        Map<String, Double> newGradient = LogProbGradient
-                .getJointLogProbGradientWrtLatents(probabilisticVertices);
+        Map<String, Double> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
+                probabilisticVertices
+        );
 
         for (Map.Entry<String, Double> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
             final double updatedMomentum = halfTimeStepMomentum.getValue() + halfTimeStep * newGradient.get(halfTimeStepMomentum.getKey());
@@ -165,16 +191,15 @@ public class Hamiltonian {
         }
     }
 
-    private static double getLikelihoodOfLeapfrog(final BayesNet bayesNet,
-                                                  final Map<String, Double> leapfroggedMomentum,
+    private static double getLikelihoodOfLeapfrog(final double logOfMasterPAfterLeapfrog,
                                                   final double previousLogOfMasterP,
+                                                  final Map<String, Double> leapfroggedMomentum,
                                                   final Map<String, Double> momentumPreviousTimeStep) {
-        final double logOfMasterP = bayesNet.getLogOfMasterP();
 
         final double leapFroggedMomentumDotProduct = (0.5 * dotProduct(leapfroggedMomentum));
         final double previousMomentumDotProduct = (0.5 * dotProduct(momentumPreviousTimeStep));
 
-        final double leapFroggedLikelihood = logOfMasterP - leapFroggedMomentumDotProduct;
+        final double leapFroggedLikelihood = logOfMasterPAfterLeapfrog - leapFroggedMomentumDotProduct;
         final double previousLikelihood = previousLogOfMasterP - previousMomentumDotProduct;
 
         final double logLikelihoodOfLeapFrog = leapFroggedLikelihood - previousLikelihood;
@@ -195,15 +220,52 @@ public class Hamiltonian {
         return dotProduct;
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    /**
+     * This is meant to be used for caching a pre-leapfrog sample. This sample
+     * will be used if the leapfrog is rejected.
+     *
+     * @param sample
+     * @param fromVertices
+     */
+    private static void takeSample(Map<String, ?> sample, List<? extends Vertex<?>> fromVertices) {
         for (Vertex<?> vertex : fromVertices) {
-            addSampleForVertex(vertex, samples);
+            putValue(vertex, sample);
         }
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
-        samplesForVertex.add(vertex.getValue());
+    private static <T> void putValue(Vertex<T> vertex, Map<String, ?> target) {
+        ((Map<String, T>) target).put(vertex.getId(), vertex.getValue());
+    }
+
+    /**
+     * This is used when a leapfrog is rejected. At that point the vertices are in a post
+     * leapfrog state and a pre-leapfrog sample must be used.
+     *
+     * @param samples
+     * @param cachedSample a cached sample from before leapfrog
+     */
+    private static void addSampleFromCache(Map<String, List<?>> samples, Map<String, ?> cachedSample) {
+        for (Map.Entry<String, ?> sampleEntry : cachedSample.entrySet()) {
+            addSampleForVertex(sampleEntry.getKey(), sampleEntry.getValue(), samples);
+        }
+    }
+
+    /**
+     * This is used when a leapfrog is accepted. At that point the vertices are in a
+     * post leapfrog state.
+     *
+     * @param samples
+     * @param fromVertices vertices from which to create and save new sample.
+     */
+    private static void addSampleFromVertices(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+        for (Vertex<?> vertex : fromVertices) {
+            addSampleForVertex(vertex.getId(), vertex.getValue(), samples);
+        }
+    }
+
+    private static <T> void addSampleForVertex(String id, T value, Map<String, List<?>> samples) {
+        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
+        samplesForVertex.add(value);
     }
 
 }
