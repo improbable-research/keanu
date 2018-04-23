@@ -2,7 +2,7 @@ package com.example.starter;
 
 import org.junit.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertEquals;
 
 public class ModelTest {
 
@@ -17,6 +17,6 @@ public class ModelTest {
         model.run();
 
         //make some assertions about the results of your model
-        assertTrue(model.results != null);
+        assertEquals(2.16, model.results, 0.1);
     }
 }
