@@ -17,12 +17,12 @@ public class FitnessFunction {
 
     public MultivariateFunction fitness() {
         return point -> {
-            setPoint(point);
+            setAndCascadePoint(point);
             return logOfTotalProbability();
         };
     }
 
-    protected void setPoint(double[] point) {
+    protected void setAndCascadePoint(double[] point) {
         for (int i = 0; i < point.length; i++) {
             latentVertices
                     .get(i)
