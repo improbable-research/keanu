@@ -122,4 +122,41 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     public DualNumber unaryMinus() {
         return times(-1.0);
     }
+
+    public DualNumber pow(DualNumber exponent) {
+        double newValue = Math.pow(getValue(), exponent.getValue());
+        Infinitesimal dInf =
+                getInfinitesimal().multiplyBy(exponent.getValue()*Math.pow(getValue(), exponent.getValue()-1.0)).add(
+                    exponent.getInfinitesimal().multiplyBy(Math.log(getValue())*newValue)
+                );
+        return new DualNumber(newValue, dInf);
+    }
+
+    public DualNumber log() {
+        return new DualNumber(Math.log(getValue()), getInfinitesimal().divideBy(getValue()));
+
+    }
+
+    public DualNumber exp() {
+        double eVal = Math.exp(getValue());
+        return new DualNumber(eVal, getInfinitesimal().multiplyBy(eVal));
+    }
+
+    public DualNumber sin() {
+        return new DualNumber(Math.sin(getValue()), getInfinitesimal().multiplyBy(Math.cos(getValue())));
+    }
+
+    public DualNumber cos() {
+        return new DualNumber(Math.cos(getValue()), getInfinitesimal().multiplyBy(-Math.sin(getValue())));
+    }
+
+    public DualNumber asin() {
+        double dArcSin = 1.0 / Math.sqrt(1.0 - getValue()*getValue());
+        return new DualNumber(Math.asin(getValue()), getInfinitesimal().multiplyBy(dArcSin));
+    }
+
+    public DualNumber acos() {
+        double dArcCos = -1.0 / Math.sqrt(1.0 - getValue()*getValue());
+        return new DualNumber(Math.acos(getValue()), getInfinitesimal().multiplyBy(dArcCos));
+    }
 }

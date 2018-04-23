@@ -53,7 +53,7 @@ public class DualNumbersTest {
         DoubleVertex vC = vA.plus(vB);
         DoubleVertex vD = vA.divideBy(vB);
         DoubleVertex vE = vC.multiply(vD);
-        assertDiffIsCorrect(vA, vB, new LogVertex(10, vE));
+        assertDiffIsCorrect(vA, vB, new LogVertex(vE));
     }
 
     private void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, DoubleVertex vC) {

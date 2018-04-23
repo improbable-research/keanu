@@ -5,21 +5,22 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
 
-public class CosVertex extends DoubleUnaryOpVertex {
+public class ExpVertex extends DoubleUnaryOpVertex {
 
-    public CosVertex(DoubleVertex inputVertex) {
+    public ExpVertex(DoubleVertex inputVertex) {
         super(inputVertex);
     }
 
-    public CosVertex(double inputValue) {
+    public ExpVertex(double inputValue) {
         super(new ConstantDoubleVertex(inputValue));
     }
 
     @Override
     protected Double op(Double a) {
-        return Math.cos(a);
+        return Math.exp(a);
     }
 
     @Override
-    public DualNumber getDualNumber() {return inputVertex.getDualNumber().cos();}
+    public DualNumber getDualNumber() {return inputVertex.getDualNumber().exp(); }
+
 }
