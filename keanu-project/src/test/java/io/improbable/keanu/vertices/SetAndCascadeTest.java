@@ -4,19 +4,32 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpLambda;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 
 public class SetAndCascadeTest {
 
+    private final Logger log = LoggerFactory.getLogger(SetAndCascadeTest.class);
+
+    Random random;
+
+    @Before
+    public void setup() {
+        random = new Random(1);
+    }
+
     @Test
     public void doesNotDoUnnecessaryOperations() {
 
-        Random random = new Random(1);
         AtomicInteger n = new AtomicInteger(0);
         DoubleVertex start = new GaussianVertex(0, 1, random);
 
@@ -34,7 +47,6 @@ public class SetAndCascadeTest {
 
     @Test
     public void doesNotPropagateThroughProbabilisticVertices() {
-        Random random = new Random(1);
         AtomicInteger n = new AtomicInteger(0);
         DoubleVertex start = new GaussianVertex(0, 1, random);
 
@@ -46,39 +58,66 @@ public class SetAndCascadeTest {
 
         start.setAndCascade(3.0);
 
+        //Calculates the correct answer
         assertEquals(6.0, end.getValue(), 0.0);
+
+        //Does the right amount of work
         assertEquals(3, n.get());
+    }
+
+    @Test
+    public void doesPropagateAroundProbabilisticVertices() {
+        AtomicInteger n = new AtomicInteger(0);
+        DoubleVertex firstLayerStart = new GaussianVertex(0, 1, random);
+
+        DoubleVertex firstLayerEnd = addLinks(firstLayerStart, n, 1);
+
+        DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1, random);
+
+        secondLayerStart.setValue(2.0);
+
+        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, id -> log.info("OP on id:" + id));
+        DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, id -> log.info("OP on id:" + id));
+        DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, id -> log.info("OP on id:" + id));
+
+        firstLayerStart.setValue(3.0);
+
+        Vertex.cascadeUpdate(Arrays.asList(firstLayerStart, secondLayerStart));
+
+        //Calculates the correct answer
+        assertEquals(6.0, firstLayerEnd.getValue(), 0.0);
+        assertEquals(10.0, secondLayerEnd.getValue(), 0.0);
+
+        //Does the right amount of work
+        assertEquals(6, n.get());
     }
 
     private DoubleVertex addLinks(DoubleVertex end, AtomicInteger n, int links) {
 
-
-        long id;
-
         for (int i = 0; i < links; i++) {
-
-            final long leftId = Vertex.idGenerator.get();
-            DoubleVertex left = new DoubleUnaryOpLambda<>(end, (a) -> {
-                n.incrementAndGet();
-                System.out.println("left " + leftId + " " + n.get());
-                return a;
-            });
-
-            final long rightId = Vertex.idGenerator.get();
-            DoubleVertex right = new DoubleUnaryOpLambda<>(end, (a) -> {
-                n.incrementAndGet();
-                System.out.println("right " + rightId + " " + n.get());
-                return a;
-            });
-
-            final long centerId = Vertex.idGenerator.get();
-            end = new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
-                n.incrementAndGet();
-                System.out.println("center " + centerId + " " + n.get());
-                return a + b;
-            });
+            DoubleVertex left = passThroughVertex(end, n, id -> log.info("OP on id:" + id));
+            DoubleVertex right = passThroughVertex(end, n, id -> log.info("OP on id:" + id));
+            end = sumVertex(left, right, n, id -> log.info("OP on id:" + id));
         }
 
         return end;
+    }
+
+    private DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger n, Consumer<Long> onOp) {
+        final long id = Vertex.idGenerator.get();
+        return new DoubleUnaryOpLambda<>(from, (a) -> {
+            n.incrementAndGet();
+            onOp.accept(id);
+            return a;
+        });
+    }
+
+    private DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger n, Consumer<Long> onOp) {
+        final long id = Vertex.idGenerator.get();
+        return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
+            n.incrementAndGet();
+            onOp.accept(id);
+            return a + b;
+        });
     }
 }
