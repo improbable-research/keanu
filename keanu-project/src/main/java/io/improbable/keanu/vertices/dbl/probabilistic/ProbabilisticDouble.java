@@ -11,11 +11,6 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public Double lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public boolean isProbabilistic() {
         return true;
     }

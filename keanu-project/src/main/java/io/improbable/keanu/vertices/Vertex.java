@@ -109,7 +109,7 @@ public abstract class Vertex<T> implements Identifiable {
             Vertex<?> head = stack.peek();
             Set<Vertex<?>> parents = head.getParents();
 
-            if (parents.isEmpty() || areParentsCalculated(hasCalculated, parents)) {
+            if (parents.isEmpty() || areParentsCalculated(hasCalculated, parents) || head.isProbabilistic()) {
                 Vertex<?> top = stack.pop();
                 top.updateValue();
                 hasCalculated.add(top);
@@ -120,10 +120,6 @@ public abstract class Vertex<T> implements Identifiable {
 
         }
         return this.getValue();
-    }
-
-    private boolean areParentsCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
-        return calculated.containsAll(parents);
     }
 
     /**
@@ -248,5 +244,9 @@ public abstract class Vertex<T> implements Identifiable {
 
     public Set<Vertex<?>> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
+    }
+
+    private boolean areParentsCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+        return calculated.containsAll(parents);
     }
 }
