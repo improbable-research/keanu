@@ -22,12 +22,6 @@ public class IntegerUnaryOpLambda<IN> extends NonProbabilisticInteger {
     }
 
     @Override
-    public Integer lazyEval() {
-        setValue(op.apply(inputVertex.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Integer getDerivedValue() {
         return op.apply(inputVertex.getValue());
     }

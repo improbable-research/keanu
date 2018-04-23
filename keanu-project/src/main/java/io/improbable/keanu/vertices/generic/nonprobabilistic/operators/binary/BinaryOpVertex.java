@@ -19,12 +19,6 @@ public abstract class BinaryOpVertex<A, B, C> extends NonProbabilistic<C> {
         return op(a.sample(), b.sample());
     }
 
-    @Override
-    public C lazyEval() {
-        setValue(op(a.lazyEval(), b.lazyEval()));
-        return getValue();
-    }
-
     public C getDerivedValue() {
         return op(a.getValue(), b.getValue());
     }

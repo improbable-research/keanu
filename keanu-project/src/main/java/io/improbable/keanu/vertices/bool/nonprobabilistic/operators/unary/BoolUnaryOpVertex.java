@@ -18,12 +18,6 @@ public abstract class BoolUnaryOpVertex<A> extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean lazyEval() {
-        setValue(op(a.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Boolean getDerivedValue(){
         return op(a.getValue());
     }

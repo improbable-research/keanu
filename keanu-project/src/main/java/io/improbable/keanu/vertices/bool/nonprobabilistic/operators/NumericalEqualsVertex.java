@@ -25,12 +25,6 @@ public class NumericalEqualsVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean lazyEval() {
-        setValue(op(a.lazyEval(), b.lazyEval(), epsilon.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Boolean getDerivedValue() {
         return op(a.getValue(), b.getValue(), epsilon.getValue());
     }

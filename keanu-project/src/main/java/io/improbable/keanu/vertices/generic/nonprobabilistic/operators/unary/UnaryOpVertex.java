@@ -18,12 +18,6 @@ public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
         return op(inputVertex.sample());
     }
 
-    @Override
-    public OUT lazyEval() {
-        setValue(op(inputVertex.lazyEval()));
-        return getValue();
-    }
-
     public OUT getDerivedValue() {
         return op(inputVertex.getValue());
     }

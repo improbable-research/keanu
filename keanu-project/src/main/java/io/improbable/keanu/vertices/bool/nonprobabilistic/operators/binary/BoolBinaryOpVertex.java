@@ -20,12 +20,6 @@ public abstract class BoolBinaryOpVertex<A, B> extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean lazyEval() {
-        setValue(op(a.lazyEval(), b.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Boolean getDerivedValue(){
         return op(a.getValue(), b.getValue());
     }

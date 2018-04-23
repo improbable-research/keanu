@@ -99,7 +99,32 @@ public abstract class Vertex<T> implements Identifiable {
      * @return The value at this vertex after recalculating any parent non-probabilistic
      * vertices.
      */
-    public abstract T lazyEval();
+    public T lazyEval() {
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        stack.push(this);
+        Set<Vertex<?>> hasCalculated = new HashSet<>();
+
+        while (!stack.isEmpty()) {
+
+            Vertex<?> head = stack.peek();
+            Set<Vertex<?>> parents = head.getParents();
+
+            if (parents.isEmpty() || areParentsCalculated(hasCalculated, parents)) {
+                Vertex<?> top = stack.pop();
+                top.updateValue();
+                hasCalculated.add(top);
+
+            } else {
+                parents.forEach(stack::push);
+            }
+
+        }
+        return this.getValue();
+    }
+
+    private boolean areParentsCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+        return calculated.containsAll(parents);
+    }
 
     /**
      * A probabilistic vertex is defined as a vertex that is probabilistic.

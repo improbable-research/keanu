@@ -17,12 +17,6 @@ public class CastIntegerVertex extends NonProbabilisticInteger {
     }
 
     @Override
-    public Integer lazyEval() {
-        setValue(inputVertex.lazyEval());
-        return getValue();
-    }
-
-    @Override
     public Integer getDerivedValue() {
         return inputVertex.getValue();
     }

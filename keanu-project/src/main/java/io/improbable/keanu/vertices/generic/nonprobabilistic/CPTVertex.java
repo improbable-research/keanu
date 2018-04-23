@@ -29,14 +29,6 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T lazyEval() {
-        final Condition condition = getCondition(Vertex::lazyEval);
-        T value = conditions.getOrDefault(condition, defaultResult).lazyEval();
-        setValue(value);
-        return getValue();
-    }
-
-    @Override
     public T getDerivedValue() {
         final Condition condition = getCondition(Vertex::getValue);
         return conditions.getOrDefault(condition, defaultResult).getValue();
