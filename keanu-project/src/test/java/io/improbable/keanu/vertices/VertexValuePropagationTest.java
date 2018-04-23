@@ -10,7 +10,6 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
@@ -75,15 +74,13 @@ public class VertexValuePropagationTest {
 
         DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1, random);
 
-        secondLayerStart.setValue(2.0);
-
         DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, id -> log.info("OP on id:" + id));
         DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, id -> log.info("OP on id:" + id));
         DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, id -> log.info("OP on id:" + id));
 
+        secondLayerStart.setValue(2.0);
         firstLayerStart.setValue(3.0);
-
-        VertexValuePropagation.cascadeUpdate(Arrays.asList(firstLayerStart, secondLayerStart));
+        VertexValuePropagation.cascadeUpdate(firstLayerStart, secondLayerStart);
 
         //Calculates the correct answer
         assertEquals(6.0, firstLayerEnd.getValue(), 0.0);
