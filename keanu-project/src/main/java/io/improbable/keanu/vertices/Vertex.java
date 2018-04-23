@@ -113,7 +113,6 @@ public abstract class Vertex<T> implements Identifiable {
                 Vertex<?> top = stack.pop();
                 top.updateValue();
                 hasCalculated.add(top);
-
             } else {
                 parents.forEach(stack::push);
             }
