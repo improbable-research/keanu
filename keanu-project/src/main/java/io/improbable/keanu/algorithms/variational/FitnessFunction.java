@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
@@ -15,7 +16,7 @@ public class FitnessFunction {
     public FitnessFunction(List<Vertex<?>> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
-        this.exploreSettingAll = Vertex.exploreSetting(latentVertices);
+        this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
     }
 
     public MultivariateFunction fitness() {
@@ -31,7 +32,7 @@ public class FitnessFunction {
             v.setValue(point[i]);
         }
 
-        Vertex.cascadeUpdate(latentVertices, exploreSettingAll);
+        VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
     }
 
     protected double logOfTotalProbability() {

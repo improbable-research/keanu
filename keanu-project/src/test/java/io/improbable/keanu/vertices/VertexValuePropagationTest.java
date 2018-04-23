@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices;
 
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpLambda;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
@@ -16,9 +17,9 @@ import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
 
-public class SetAndCascadeTest {
+public class VertexValuePropagationTest {
 
-    private final Logger log = LoggerFactory.getLogger(SetAndCascadeTest.class);
+    private final Logger log = LoggerFactory.getLogger(VertexValuePropagationTest.class);
 
     Random random;
 
@@ -82,7 +83,7 @@ public class SetAndCascadeTest {
 
         firstLayerStart.setValue(3.0);
 
-        Vertex.cascadeUpdate(Arrays.asList(firstLayerStart, secondLayerStart));
+        VertexValuePropagation.cascadeUpdate(Arrays.asList(firstLayerStart, secondLayerStart));
 
         //Calculates the correct answer
         assertEquals(6.0, firstLayerEnd.getValue(), 0.0);

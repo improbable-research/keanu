@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
@@ -94,7 +95,7 @@ public class BayesNet {
      */
     public void probeForNonZeroMasterP(int attempts) {
 
-        Vertex.cascadeUpdate(observedVertices);
+        VertexValuePropagation.cascadeUpdate(observedVertices);
         List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(latentVertices);
         setFromSampleAndCascade(sortedByDependency);
 
@@ -107,9 +108,10 @@ public class BayesNet {
      */
     private void probeForNonZeroMasterP(List<? extends Vertex<?>> latentVertices, int attempts) {
 
+        Map<String, Integer> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
-            setFromSampleAndCascade(latentVertices);
+            setFromSampleAndCascade(latentVertices, setAndCascadeCache);
             iteration++;
 
             if (iteration > attempts) {
@@ -124,10 +126,14 @@ public class BayesNet {
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices) {
+        setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
+    }
+
+    public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices, Map<String, Integer> setAndCascadeCache) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }
-        Vertex.cascadeUpdate(vertices);
+        VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
     }
 
     private static <T> void setValueFromSample(Vertex<T> v) {

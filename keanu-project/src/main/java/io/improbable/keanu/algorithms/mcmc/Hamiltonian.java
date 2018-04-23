@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -38,7 +39,7 @@ public class Hamiltonian {
                                                      final Random random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final Map<String, Integer> latentSetAndCascadeCache = Vertex.exploreSetting(latentVertices);
+        final Map<String, Integer> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
@@ -173,7 +174,7 @@ public class Hamiltonian {
             latent.setValue(nextPosition);
         }
 
-        Vertex.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
+        VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
         //Set ˜r ← ˜r + (eps/2)∇θL(˜θ)
         Map<String, Double> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(

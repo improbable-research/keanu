@@ -14,7 +14,7 @@ public class DiscoverGraph {
      * requirements is on the order of number of vertices in the graph
      * and compute requirements on the order of edges in the graph.
      * <p>
-     * If the graph is very large (i.e. > 100k vertices), it will be
+     * If the graph is very large (i.e. greater than 100k vertices), it will be
      * much faster to keep track of vertices as they are created than
      * to create the graph and then collect it with this method.
      *
