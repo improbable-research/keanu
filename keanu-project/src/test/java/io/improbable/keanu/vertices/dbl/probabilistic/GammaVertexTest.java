@@ -40,6 +40,23 @@ public class GammaVertexTest {
     }
 
     @Test
+    public void samplingProducesRealisticMeanAndStandardDeviation() {
+        int N = 100000;
+        double epsilon = 1e-2;
+
+        double a = 0.5;
+        double theta = 0.5;
+        double k = 6.0;
+
+        GammaVertex g = new GammaVertex(a, theta, k, random);
+
+        double mean = k * theta + a;
+        double standardDeviation = Math.sqrt(k * Math.pow(theta, 2));
+
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, g, mean, standardDeviation, epsilon);
+    }
+
+    @Test
     public void pdfMatchesApacheMathGammaDistribution() {
         for (int i = 0; i < TEST_VALUES.length; i++) {
             testPdfAtPercentiles(TEST_VALUES[i][0], TEST_VALUES[i][1]);

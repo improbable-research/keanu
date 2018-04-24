@@ -26,7 +26,7 @@ public class GaussianVertexTest {
 
     @Before
     public void setup() {
-        random = new Random();
+        random = new Random(1);
     }
 
     @Test
@@ -35,21 +35,7 @@ public class GaussianVertexTest {
         double epsilon = 0.01;
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = g.sample();
-            samples.add(sample);
-        }
-
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(0.0, mean, epsilon);
-        assertEquals(1.0, sd, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, g, 0.0, 1.0, epsilon);
     }
 
     @Test

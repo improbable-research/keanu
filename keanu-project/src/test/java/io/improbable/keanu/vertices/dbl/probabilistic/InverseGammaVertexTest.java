@@ -34,29 +34,17 @@ public class InverseGammaVertexTest {
         double epsilon = 0.01;
         double alpha = 3.0;
         double beta = .5;
+
         InverseGammaVertex inverted = new InverseGammaVertex(
                 new ConstantDoubleVertex(alpha),
                 new ConstantDoubleVertex(beta),
                 random
         );
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = inverted.sample();
-            samples.add(sample);
-        }
+        double mean = beta / (alpha - 1.0);
+        double standardDeviation = Math.sqrt(Math.pow(beta, 2) / (Math.pow(alpha - 1, 2) * (alpha - 2)));
 
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        double expectedMean = beta / (alpha - 1.0);
-        double expectedVariance = Math.sqrt(Math.pow(beta, 2) / (Math.pow(alpha - 1, 2) * (alpha - 2)));
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(expectedMean, mean, epsilon);
-        assertEquals(expectedVariance, sd, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, inverted, mean, standardDeviation, epsilon);
     }
 
     @Test
