@@ -14,6 +14,10 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         this(a, new ConstantDoubleVertex(b));
     }
 
+    public PowerVertex(double a, DoubleVertex b) {
+        this (new ConstantDoubleVertex(a), b);
+    }
+
     @Override
     protected Double op(Double a, Double b) {
         return Math.pow(a, b);
