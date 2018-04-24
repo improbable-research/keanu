@@ -28,15 +28,15 @@ public class Exponential {
         double bSquared = b * b;
 
         double dPda = exponent / bSquared;
-        double dPdb = - (exponent * (a + b - x)) / (Math.pow(b, 3));
-        double dPdx = - dPda;
+        double dPdb = -(exponent * (a + b - x)) / (Math.pow(b, 3));
+        double dPdx = -dPda;
         return new Diff(dPda, dPdb, dPdx);
     }
 
     public static Diff dlnPdf(double a, double b, double x) {
         double dPda = 1 / b;
-        double dPdb = - (a + b - x) / Math.pow(b, 2);
-        double dPdx = - dPda;
+        double dPdb = -(a + b - x) / Math.pow(b, 2);
+        double dPdx = -dPda;
         return new Diff(dPda, dPdb, dPdx);
     }
 
