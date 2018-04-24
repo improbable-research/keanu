@@ -108,7 +108,7 @@ public abstract class Vertex<T> implements Identifiable {
             Vertex<?> head = stack.peek();
             Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
 
-            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.size() == 0) {
+            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
                 Vertex<?> top = stack.pop();
                 top.updateValue();
