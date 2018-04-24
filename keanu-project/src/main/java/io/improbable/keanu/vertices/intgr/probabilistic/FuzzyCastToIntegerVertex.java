@@ -41,7 +41,6 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         this.max = max;
         this.random = random;
         setParents(input, fuzzinessSigma, min, max);
-        setValue(sample());
     }
 
     public FuzzyCastToIntegerVertex(DoubleVertex input, double fuzzinessSigma, int min, int max, Random random) {

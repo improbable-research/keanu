@@ -18,7 +18,6 @@ public class TriangularVertex extends ProbabilisticDouble {
         this.xMax = xMax;
         this.c = c;
         this.random = random;
-        setValue(sample());
         setParents(xMin, xMax, c);
     }
 
