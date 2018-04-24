@@ -21,6 +21,8 @@ public class ExpVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {return inputVertex.getDualNumber().exp(); }
+    public DualNumber getDualNumber() {
+        return inputVertex.getDualNumber().exp();
+    }
 
 }

@@ -22,5 +22,7 @@ public class SinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() { return inputVertex.getDualNumber().sin();}
+    public DualNumber getDualNumber() {
+        return inputVertex.getDualNumber().sin();
+    }
 }

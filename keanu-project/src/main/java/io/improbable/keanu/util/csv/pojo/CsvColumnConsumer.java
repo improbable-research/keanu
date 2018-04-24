@@ -12,7 +12,8 @@ import java.util.function.BiConsumer;
  * provided. Every column in the csv source should map to a type
  * of CsvColumnConsumer, whether it's a public field CsvColumnConsumer
  * or a setter method CsvColumnConsumer.
+ *
  * @param <T> target object type
  */
-public interface CsvColumnConsumer<T> extends BiConsumer<T, String>{
+public interface CsvColumnConsumer<T> extends BiConsumer<T, String> {
 }

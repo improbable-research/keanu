@@ -17,6 +17,8 @@ public class LogVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {return inputVertex.getDualNumber().log();}
+    public DualNumber getDualNumber() {
+        return inputVertex.getDualNumber().log();
+    }
 
 }

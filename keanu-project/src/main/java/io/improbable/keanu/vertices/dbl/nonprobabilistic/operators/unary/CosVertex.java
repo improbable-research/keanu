@@ -21,5 +21,7 @@ public class CosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {return inputVertex.getDualNumber().cos();}
+    public DualNumber getDualNumber() {
+        return inputVertex.getDualNumber().cos();
+    }
 }

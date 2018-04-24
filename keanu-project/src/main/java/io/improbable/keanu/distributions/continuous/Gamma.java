@@ -18,7 +18,7 @@ public class Gamma {
 
     /**
      * @param a      location
-     * @param theta      scale
+     * @param theta  scale
      * @param k      shape
      * @param random
      * @return a random number from the Gamma distribution
@@ -82,8 +82,8 @@ public class Gamma {
 
     public static Diff dlnPdf(double a, double theta, double k, double x) {
         double dPdx = (k - 1) / (x - a) - (1 / theta);
-        double dPda = (k - 1) / (a - x)  + (1 / theta);
-        double dPdtheta = - ((a + (theta * k) - x) / Math.pow(theta, 2));
+        double dPda = (k - 1) / (a - x) + (1 / theta);
+        double dPdtheta = -((a + (theta * k) - x) / Math.pow(theta, 2));
         double dPdk = Math.log(x - a) - Math.log(theta) - digamma(k);
         return new Diff(dPda, dPdtheta, dPdk, dPdx);
     }

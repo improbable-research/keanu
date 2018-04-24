@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.Random;
 
+import static io.improbable.keanu.kotlin.ExtendPrefixOperatorsKt.exp;
 import static org.junit.Assert.assertEquals;
 
 public class DualNumbersTest {
@@ -38,6 +39,11 @@ public class DualNumbersTest {
     @Test
     public void diffOverSubtraction() {
         assertDiffIsCorrect(vA, vB, vA.minus(vB));
+    }
+
+    @Test
+    public void diffOverExponent() {
+        assertDiffIsCorrect(vA, vB, exp(vA.times(vB)));
     }
 
     @Test

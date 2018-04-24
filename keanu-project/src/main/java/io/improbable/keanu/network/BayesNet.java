@@ -91,7 +91,6 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
-     *
      */
     public void probeForNonZeroMasterP(int attempts) {
 

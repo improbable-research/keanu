@@ -31,7 +31,9 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logDensity(Double value) {  return Beta.logPdf(alpha.getValue(), beta.getValue(), value); }
+    public double logDensity(Double value) {
+        return Beta.logPdf(alpha.getValue(), beta.getValue(), value);
+    }
 
     public DoubleVertex getAlpha() {
         return alpha;

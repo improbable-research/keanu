@@ -22,5 +22,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() { return inputVertex.getDualNumber().asin(); }
+    public DualNumber getDualNumber() {
+        return inputVertex.getDualNumber().asin();
+    }
 }

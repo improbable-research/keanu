@@ -108,16 +108,28 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
     }
 
 
-    public DoubleVertex log() { return new LogVertex(this); }
+    public DoubleVertex log() {
+        return new LogVertex(this);
+    }
 
-    public DoubleVertex exp() { return new ExpVertex(this);}
+    public DoubleVertex exp() {
+        return new ExpVertex(this);
+    }
 
-    public DoubleVertex sin() { return new SinVertex(this); }
+    public DoubleVertex sin() {
+        return new SinVertex(this);
+    }
 
-    public DoubleVertex cos() { return new CosVertex(this); }
+    public DoubleVertex cos() {
+        return new CosVertex(this);
+    }
 
-    public DoubleVertex asin() { return new ArcSinVertex(this); }
+    public DoubleVertex asin() {
+        return new ArcSinVertex(this);
+    }
 
-    public DoubleVertex acos() { return new ArcCosVertex(this); }
+    public DoubleVertex acos() {
+        return new ArcCosVertex(this);
+    }
 
 }

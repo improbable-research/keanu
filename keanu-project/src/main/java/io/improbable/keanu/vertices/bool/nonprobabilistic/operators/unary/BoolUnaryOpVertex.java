@@ -24,7 +24,7 @@ public abstract class BoolUnaryOpVertex<A> extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean getDerivedValue(){
+    public Boolean getDerivedValue() {
         return op(a.getValue());
     }
 
