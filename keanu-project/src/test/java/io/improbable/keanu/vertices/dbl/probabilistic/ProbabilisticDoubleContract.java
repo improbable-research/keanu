@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.ArrayList;
@@ -65,10 +64,10 @@ public class ProbabilisticDoubleContract {
     }
 
     public static void samplingProducesRealisticMeanAndStandardDeviation(int numberOfSamples,
-                                                                  Vertex<Double> vertexUnderTest,
-                                                                  double expectedMean,
-                                                                  double expectedStandardDeviation,
-                                                                  double maxError) {
+                                                                         Vertex<Double> vertexUnderTest,
+                                                                         double expectedMean,
+                                                                         double expectedStandardDeviation,
+                                                                         double maxError) {
         List<Double> samples = new ArrayList<>();
 
         for (int i = 0; i < numberOfSamples; i++) {

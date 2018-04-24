@@ -17,7 +17,7 @@ public class GammaVertex extends ProbabilisticDouble {
 
     /**
      * @param a      location
-     * @param theta      scale
+     * @param theta  scale
      * @param k      shape
      * @param random
      */

@@ -1,18 +1,19 @@
 package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
-import static org.apache.commons.math3.special.Gamma.gamma;
+
 import static org.apache.commons.math3.special.Gamma.digamma;
+import static org.apache.commons.math3.special.Gamma.gamma;
 
 public class InverseGamma {
 
     public static double sample(double a, double b, Random random) {
         assert (a > 0.0 && b > 0.0);
-        return 1.0 /  Gamma.sample(0.0, 1.0 / b, a, random);
+        return 1.0 / Gamma.sample(0.0, 1.0 / b, a, random);
     }
 
     public static double pdf(double a, double b, double x) {
-        double numerator = Math.pow(b, a) * Math.pow(x, - a - 1) * Math.exp(-b / x);
+        double numerator = Math.pow(b, a) * Math.pow(x, -a - 1) * Math.exp(-b / x);
         return numerator / gamma(a);
     }
 

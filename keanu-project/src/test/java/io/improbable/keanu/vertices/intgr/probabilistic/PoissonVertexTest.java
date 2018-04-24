@@ -42,7 +42,6 @@ public class PoissonVertexTest {
     }
 
 
-
     @Test
     public void densityForValuesGreaterThanTwenty() {
         double mu = 25.0;
