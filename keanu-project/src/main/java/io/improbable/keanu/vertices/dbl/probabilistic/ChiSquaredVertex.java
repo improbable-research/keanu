@@ -19,6 +19,14 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
         setParents(k);
     }
 
+    public ChiSquaredVertex(IntegerVertex k) {
+        this(k, new Random());
+    }
+
+    public ChiSquaredVertex(int k, Random random) {
+        this(new ConstantIntegerVertex(k), random);
+    }
+
     public ChiSquaredVertex(int k) {
         this(new ConstantIntegerVertex(k), new Random());
     }
