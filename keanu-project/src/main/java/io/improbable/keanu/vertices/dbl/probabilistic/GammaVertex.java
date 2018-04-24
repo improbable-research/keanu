@@ -25,7 +25,6 @@ public class GammaVertex extends ProbabilisticDouble {
         this.theta = theta;
         this.k = k;
         this.random = random;
-        setValue(sample());
         setParents(a, theta, k);
     }
 

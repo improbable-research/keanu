@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
@@ -91,13 +92,12 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
-     *
      */
     public void probeForNonZeroMasterP(int attempts) {
 
-        cascadeValues(observedVertices);
+        VertexValuePropagation.cascadeUpdate(observedVertices);
         List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(latentVertices);
-        sampleAndCascade(sortedByDependency);
+        setFromSampleAndCascade(sortedByDependency);
 
         probeForNonZeroMasterP(sortedByDependency, attempts);
     }
@@ -108,9 +108,10 @@ public class BayesNet {
      */
     private void probeForNonZeroMasterP(List<? extends Vertex<?>> latentVertices, int attempts) {
 
+        Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
-            sampleAndCascade(latentVertices);
+            setFromSampleAndCascade(latentVertices, setAndCascadeCache);
             iteration++;
 
             if (iteration > attempts) {
@@ -124,19 +125,19 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void sampleAndCascade(List<? extends Vertex<?>> vertices) {
-        vertices.forEach(BayesNet::sampleAndCascade);
+    public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices) {
+        setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static <T> void sampleAndCascade(Vertex<T> v) {
-        v.setAndCascade(v.sample());
+    public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices, Map<String, Long> setAndCascadeCache) {
+        for (Vertex<?> vertex : vertices) {
+            setValueFromSample(vertex);
+        }
+        VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
     }
 
-    public static void cascadeValues(List<? extends Vertex<?>> vertices) {
-        vertices.forEach(BayesNet::cascadeValue);
+    private static <T> void setValueFromSample(Vertex<T> vertex) {
+        vertex.setValue(vertex.sample());
     }
 
-    public static <T> void cascadeValue(Vertex<T> v) {
-        v.updateChildren();
-    }
 }
