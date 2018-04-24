@@ -92,7 +92,7 @@ public class TanVertexTest {
         gradientOptimizer.maxLikelihood(1500);
 
         DoubleVertex absTan = new AbsVertex(unknownConstant);
-        assertEquals(absTan.getValue() % Math.PI, Math.PI / 2, 0.001);
+        assertEquals(Math.PI / 2, absTan.getValue() % Math.PI,0.001);
     }
 
     @Test
