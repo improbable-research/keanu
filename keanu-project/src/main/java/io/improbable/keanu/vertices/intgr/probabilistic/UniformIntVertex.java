@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -8,33 +9,45 @@ import java.util.Random;
 
 public class UniformIntVertex extends ProbabilisticInteger {
 
-    private Vertex<Integer> min;
-    private Vertex<Integer> max;
+    private IntegerVertex min;
+    private IntegerVertex max;
     private Random random;
 
     /**
      * @param min The inclusive lower bound.
      * @param max The exclusive upper bound.
      */
-    public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max, Random random) {
+    public UniformIntVertex(IntegerVertex min, IntegerVertex max, Random random) {
         this.min = min;
         this.max = max;
         this.random = random;
         setParents(min, max);
     }
 
-    /**
-     * @param min The inclusive lower max.
-     * @param max The exclusive upper max.
-     */
-    public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max) {
+    public UniformIntVertex(IntegerVertex min, int max, Random random) {
+        this(min, new ConstantIntegerVertex(max), new Random());
+    }
+
+    public UniformIntVertex(int min, IntegerVertex max, Random random) {
+        this(new ConstantIntegerVertex(min), max, new Random());
+    }
+
+    public UniformIntVertex(int min, int max, Random random) {
+        this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max), random);
+    }
+
+    public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
         this(min, max, new Random());
     }
 
-    /**
-     * @param min The inclusive lower max.
-     * @param max The exclusive upper max.
-     */
+    public UniformIntVertex(IntegerVertex min, int max) {
+        this(min, new ConstantIntegerVertex(max), new Random());
+    }
+
+    public UniformIntVertex(int min, IntegerVertex max) {
+        this(new ConstantIntegerVertex(min), max, new Random());
+    }
+
     public UniformIntVertex(int min, int max) {
         this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
     }

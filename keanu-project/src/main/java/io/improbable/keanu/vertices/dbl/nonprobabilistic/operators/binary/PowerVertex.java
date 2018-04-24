@@ -15,7 +15,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     public PowerVertex(double a, DoubleVertex b) {
-        this (new ConstantDoubleVertex(a), b);
+        this(new ConstantDoubleVertex(a), b);
     }
 
     @Override
