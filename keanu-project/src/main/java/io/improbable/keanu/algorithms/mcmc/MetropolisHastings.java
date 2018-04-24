@@ -36,6 +36,7 @@ public class MetropolisHastings {
 
         Map<String, List<?>> samplesByVertex = new HashMap<>();
         List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
+        assert (latentVertices.size() > 0) : "Error: Cannot sample from a completely deterministic graph.";
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
         Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
