@@ -23,7 +23,6 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         this.xMax = xMax;
         this.edgeSharpness = edgeSharpness;
         this.random = random;
-        setValue(sample());
         setParents(xMin, xMax);
     }
 

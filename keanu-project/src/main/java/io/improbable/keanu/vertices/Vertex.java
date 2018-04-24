@@ -2,14 +2,13 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.Identifiable;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> implements Identifiable {
 
-    //This is a temp fix for a larger problem
-    //TODO: SOL-1016
     public static AtomicLong idGenerator = new AtomicLong(0L);
 
     private String uuid = idGenerator.getAndIncrement() + "";
@@ -30,7 +29,7 @@ public abstract class Vertex<T> implements Identifiable {
      * Just a helper method for a common function
      */
     public double densityAtValue() {
-        return density(value);
+        return density(getValue());
     }
 
     /**
@@ -47,7 +46,7 @@ public abstract class Vertex<T> implements Identifiable {
      * Just a helper method for a common function
      */
     public double logDensityAtValue() {
-        return logDensity(value);
+        return logDensity(getValue());
     }
 
     /**
@@ -85,7 +84,7 @@ public abstract class Vertex<T> implements Identifiable {
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's
-     * current parent values.
+     * parent's current values.
      *
      * @return The updated value
      */
@@ -110,11 +109,19 @@ public abstract class Vertex<T> implements Identifiable {
             Set<Vertex<?>> parents = head.getParents();
 
             if (parents.isEmpty() || areParentsCalculated(hasCalculated, parents) || head.isProbabilistic()) {
+
                 Vertex<?> top = stack.pop();
                 top.updateValue();
                 hasCalculated.add(top);
+
             } else {
-                parents.forEach(stack::push);
+
+                for (Vertex<?> vertex : parents) {
+                    if (!hasCalculated.contains(vertex)) {
+                        stack.push(vertex);
+                    }
+                }
+
             }
 
         }
@@ -122,7 +129,9 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     /**
-     * A probabilistic vertex is defined as a vertex that is probabilistic.
+     * A probabilistic vertex is defined as a vertex whose value is not
+     * derived from it's parents. However, the probability of the vertex's
+     * value may be dependent on it's parents values.
      */
     public abstract boolean isProbabilistic();
 
@@ -138,29 +147,36 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     public T getValue() {
-        return value == null ? lazyEval() : value;
+        return !hasValue() ? lazyEval() : value;
+    }
+
+    public boolean hasValue() {
+        return value != null;
     }
 
     /**
      * This sets the value in this vertex and tells each child vertex about
      * the new change. This causes a cascading change of values if any of the
-     * children vertices are lambda vertices.
+     * children vertices are non-probabilistic vertices (e.g. mathematical operations).
      *
      * @param value The new value at this vertex
      */
     public void setAndCascade(T value) {
-        setValue(value);
-        updateChildren();
+        setAndCascade(value, exploreSetting());
     }
 
     /**
-     * This causes this vertex's value to propagate to child vertices.
+     * @param value    the new value at this vertex
+     * @param explored the results of previously exploring the graph, which
+     *                 allows the efficient propagation of this new value.
      */
-    public void updateChildren() {
-        for (Vertex<?> child : this.children) {
-            child.updateValue();
-            child.updateChildren();
-        }
+    public void setAndCascade(T value, Map<String, Long> explored) {
+        setValue(value);
+        VertexValuePropagation.cascadeUpdate(this, explored);
+    }
+
+    public Map<String, Long> exploreSetting() {
+        return VertexValuePropagation.exploreSetting(this);
     }
 
     /**

@@ -19,7 +19,6 @@ public class UniformVertex extends ProbabilisticDouble {
         this.xMin = xMin;
         this.xMax = xMax;
         this.random = random;
-        setValue(sample());
         setParents(xMin, xMax);
     }
 

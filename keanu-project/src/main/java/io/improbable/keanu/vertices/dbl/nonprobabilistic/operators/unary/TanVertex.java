@@ -5,26 +5,26 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
 
-public class SinVertex extends DoubleUnaryOpVertex {
+public class TanVertex extends DoubleUnaryOpVertex {
 
-    public SinVertex(double inputValue) {
-        super(new ConstantDoubleVertex(inputValue));
+    public TanVertex(DoubleVertex inputVertex) {
+        super(inputVertex);
     }
 
-    public SinVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
+    public TanVertex(double inputValue) {
+        this(new ConstantDoubleVertex(inputValue));
     }
 
     @Override
     protected Double op(Double a) {
-        return Math.sin(a);
+        return Math.tan(a);
     }
 
     @Override
     public DualNumber getDualNumber() {
         DualNumber inputDualNumber = inputVertex.getDualNumber();
-        double dSin = Math.cos(inputVertex.getValue());
-        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dSin);
+        double dTan = 1 / Math.pow(Math.cos(inputVertex.getValue()), 2);
+        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dTan);
         return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
     }
 }

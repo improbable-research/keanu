@@ -18,7 +18,6 @@ public class LogisticVertex extends ProbabilisticDouble {
         this.a = a;
         this.b = b;
         this.random = random;
-        setValue(sample());
         setParents(a, b);
     }
 
@@ -63,7 +62,9 @@ public class LogisticVertex extends ProbabilisticDouble {
         return Logistic.pdf(a.getValue(), b.getValue(), value);
     }
 
-    public double logDensity(Double value) { return Logistic.logPdf(a.getValue(), b.getValue(), value); }
+    public double logDensity(Double value) {
+        return Logistic.logPdf(a.getValue(), b.getValue(), value);
+    }
 
     @Override
     public Map<String, Double> dDensityAtValue() {

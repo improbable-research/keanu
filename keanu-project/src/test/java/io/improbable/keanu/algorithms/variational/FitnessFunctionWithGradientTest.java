@@ -2,24 +2,31 @@ package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 public class FitnessFunctionWithGradientTest {
 
     private final double dx = 0.0000000001;
+    private Random random;
+
+    @Before
+    public void setup() {
+        this.random = new Random(1);
+    }
 
     @Test
     public void calculatesGradientCorrectlyWithMultiplyAndMinus() {
 
-        GaussianVertex A = new GaussianVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(1.0));
-        GaussianVertex B = new GaussianVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(1.0));
+        GaussianVertex A = new GaussianVertex(1.0, 1.0, random);
+        GaussianVertex B = new GaussianVertex(2.0, 1.0, random);
 
         A.setValue(1.5);
         B.setValue(2.5);
@@ -27,10 +34,10 @@ public class FitnessFunctionWithGradientTest {
         DoubleVertex C = A.multiply(B);
         DoubleVertex D = A.minus(B);
 
-        GaussianVertex cObservation = new GaussianVertex(C, new ConstantDoubleVertex(1.0));
+        GaussianVertex cObservation = new GaussianVertex(C, 1.0, random);
         cObservation.observe(3.0);
 
-        GaussianVertex dObservation = new GaussianVertex(D, new ConstantDoubleVertex(1.0));
+        GaussianVertex dObservation = new GaussianVertex(D, 1.0, random);
         dObservation.observe(3.0);
 
         assert2DGradientEqualsApproxGradient(
@@ -45,8 +52,8 @@ public class FitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithAdditionAndDivision() {
 
-        GaussianVertex A = new GaussianVertex(new ConstantDoubleVertex(7.0), new ConstantDoubleVertex(3.0));
-        GaussianVertex B = new GaussianVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0));
+        GaussianVertex A = new GaussianVertex(7.0, 3.0, random);
+        GaussianVertex B = new GaussianVertex(3.0, 3.0, random);
 
         A.setValue(6.0);
         B.setValue(3.0);
@@ -54,10 +61,10 @@ public class FitnessFunctionWithGradientTest {
         DoubleVertex C = A.divideBy(B);
         DoubleVertex D = A.multiply(B);
 
-        GaussianVertex cObservation = new GaussianVertex(C, new ConstantDoubleVertex(5.0));
+        GaussianVertex cObservation = new GaussianVertex(C, 5.0, random);
         cObservation.observe(2.1);
 
-        GaussianVertex dObservation = new GaussianVertex(D, new ConstantDoubleVertex(5.0));
+        GaussianVertex dObservation = new GaussianVertex(D, 5.0, random);
         dObservation.observe(18.0);
 
         assert2DGradientEqualsApproxGradient(
@@ -72,8 +79,8 @@ public class FitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithAdditionMultiplicationSubtractionDivision() {
 
-        GaussianVertex A = new GaussianVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(3.0));
-        GaussianVertex B = new GaussianVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0));
+        GaussianVertex A = new GaussianVertex(2.0, 3.0, random);
+        GaussianVertex B = new GaussianVertex(3.0, 3.0, random);
 
         A.setValue(2.2);
         B.setValue(3.2);
@@ -84,7 +91,7 @@ public class FitnessFunctionWithGradientTest {
         DoubleVertex E = C.minus(D);
         DoubleVertex F = C.divideBy(D);
 
-        GaussianVertex eObservation = new GaussianVertex(E, new ConstantDoubleVertex(5.0));
+        GaussianVertex eObservation = new GaussianVertex(E, 5.0, random);
         eObservation.observe(1.2);
 
         GaussianVertex fObservation = new GaussianVertex(F, C);
