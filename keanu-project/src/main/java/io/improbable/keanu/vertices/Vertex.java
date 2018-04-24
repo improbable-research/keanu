@@ -106,9 +106,9 @@ public abstract class Vertex<T> implements Identifiable {
         while (!stack.isEmpty()) {
 
             Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parents = head.getParents();
+            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
 
-            if (parents.isEmpty() || areParentsCalculated(hasCalculated, parents) || head.isProbabilistic()) {
+            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.size() == 0) {
 
                 Vertex<?> top = stack.pop();
                 top.updateValue();
@@ -116,10 +116,8 @@ public abstract class Vertex<T> implements Identifiable {
 
             } else {
 
-                for (Vertex<?> vertex : parents) {
-                    if (!hasCalculated.contains(vertex)) {
-                        stack.push(vertex);
-                    }
+                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                    stack.push(vertex);
                 }
 
             }
@@ -261,7 +259,15 @@ public abstract class Vertex<T> implements Identifiable {
         return DiscoverGraph.getEntireGraph(this);
     }
 
-    private boolean areParentsCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
-        return calculated.containsAll(parents);
+    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
+        Iterator iterator = parents.iterator();
+        while (iterator.hasNext()) {
+            Vertex<?> next = (Vertex) iterator.next();
+            if (!calculated.contains(next)) {
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 }
