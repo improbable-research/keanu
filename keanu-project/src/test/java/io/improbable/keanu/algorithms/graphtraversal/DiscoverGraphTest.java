@@ -4,13 +4,16 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class DiscoverGraphTest {
@@ -51,6 +54,28 @@ public class DiscoverGraphTest {
         for (Vertex<?> v : allVertices) {
             assertFindsAllVertices(v);
         }
+    }
+
+    @Test
+    public void findsVeryLongGraph() {
+
+        Random random = new Random(1);
+        DoubleVertex start = new GaussianVertex(0, 1, random);
+
+        DoubleVertex end = start;
+
+        int links = 15000;
+        for (int i = 0; i < links; i++) {
+            DoubleVertex left = end.abs();
+            DoubleVertex right = end.abs();
+            end = left.plus(right);
+        }
+
+        Set<Vertex<?>> connectedGraph = end.getConnectedGraph();
+
+        int expectedSize = 3 + 3 * links;
+
+        assertEquals(expectedSize, connectedGraph.size());
     }
 
     private void assertFindsAllVertices(Vertex<?> v) {

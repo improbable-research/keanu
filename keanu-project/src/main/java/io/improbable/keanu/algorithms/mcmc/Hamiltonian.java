@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -38,6 +39,7 @@ public class Hamiltonian {
                                                      final Random random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
@@ -72,6 +74,7 @@ public class Hamiltonian {
             for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
                 gradient = leapfrog(
                         latentVertices,
+                        latentSetAndCascadeCache,
                         position,
                         gradient,
                         momentum,
@@ -147,6 +150,7 @@ public class Hamiltonian {
      * @return the gradient at the updated position
      */
     private static Map<String, Double> leapfrog(final List<Vertex<Double>> latentVertices,
+                                                final Map<String, Long> latentSetAndCascadeCache,
                                                 final Map<String, Double> position,
                                                 final Map<String, Double> gradient,
                                                 final Map<String, Double> momentums,
@@ -167,8 +171,10 @@ public class Hamiltonian {
         for (Vertex<Double> latent : latentVertices) {
             final double nextPosition = position.get(latent.getId()) + halfTimeStep * momentumsAtHalfTimeStep.get(latent.getId());
             position.put(latent.getId(), nextPosition);
-            latent.setAndCascade(nextPosition);
+            latent.setValue(nextPosition);
         }
+
+        VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
         //Set ˜r ← ˜r + (eps/2)∇θL(˜θ)
         Map<String, Double> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
@@ -181,14 +187,6 @@ public class Hamiltonian {
         }
 
         return newGradient;
-    }
-
-    private static void revertToPosition(List<Vertex<Double>> continuousLatentVertices,
-                                         Map<String, Double> values) {
-
-        for (Vertex<Double> latent : continuousLatentVertices) {
-            latent.setAndCascade(values.get(latent.getId()));
-        }
     }
 
     private static double getLikelihoodOfLeapfrog(final double logOfMasterPAfterLeapfrog,
