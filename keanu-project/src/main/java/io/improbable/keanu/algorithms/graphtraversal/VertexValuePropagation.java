@@ -15,13 +15,13 @@ public class VertexValuePropagation {
     private VertexValuePropagation() {
     }
 
-    public static Map<String, Integer> exploreSetting(Vertex<?> toBeSet) {
+    public static Map<String, Long> exploreSetting(Vertex<?> toBeSet) {
         Deque<Vertex<?>> stack = new ArrayDeque<>();
         stack.push(toBeSet);
         return exploreSetting(stack);
     }
 
-    public static Map<String, Integer> exploreSetting(Collection<? extends Vertex<?>> toBeSet) {
+    public static Map<String, Long> exploreSetting(Collection<? extends Vertex<?>> toBeSet) {
         Deque<Vertex<?>> stack = new ArrayDeque<>();
         for (Vertex<?> v : toBeSet) {
             stack.push(v);
@@ -40,12 +40,12 @@ public class VertexValuePropagation {
      *
      * @param stack a Stack containing the vertices to be set
      * @return a map containing the vertex id as a key and the number of times
-     * to visit before evaluation as the value.
+     * to visit before vertex evaluation as the value of the map.
      */
-    private static Map<String, Integer> exploreSetting(Deque<Vertex<?>> stack) {
+    private static Map<String, Long> exploreSetting(Deque<Vertex<?>> stack) {
 
         Set<Vertex<?>> hasVisited = new HashSet<>();
-        Map<String, Integer> crossRoadCount = new HashMap<>();
+        Map<String, Long> crossRoadCount = new HashMap<>();
 
         while (!stack.isEmpty()) {
 
@@ -61,7 +61,7 @@ public class VertexValuePropagation {
                 if (!hasVisited.contains(child)) {
                     stack.push(child);
                 } else {
-                    crossRoadCount.put(child.getId(), crossRoadCount.getOrDefault(child.getId(), 0) + 1);
+                    crossRoadCount.put(child.getId(), crossRoadCount.getOrDefault(child.getId(), 0L) + 1);
                 }
 
             }
@@ -79,13 +79,13 @@ public class VertexValuePropagation {
         cascadeUpdate(vertices, exploreSetting(vertices));
     }
 
-    public static void cascadeUpdate(Vertex<?> vertex, Map<String, Integer> explored) {
+    public static void cascadeUpdate(Vertex<?> vertex, Map<String, Long> explored) {
         Deque<Vertex<?>> stack = new ArrayDeque<>();
         stack.push(vertex);
         cascadeUpdate(stack, explored);
     }
 
-    public static void cascadeUpdate(List<? extends Vertex<?>> vertices, Map<String, Integer> explored) {
+    public static void cascadeUpdate(List<? extends Vertex<?>> vertices, Map<String, Long> explored) {
         Deque<Vertex<?>> stack = new ArrayDeque<>();
         for (Vertex<?> v : vertices) {
             stack.push(v);
@@ -99,9 +99,9 @@ public class VertexValuePropagation {
      *                 the vertex ids and the values are how many times to visit them before
      *                 evaluating.
      */
-    private static void cascadeUpdate(Deque<Vertex<?>> stack, Map<String, Integer> explored) {
+    private static void cascadeUpdate(Deque<Vertex<?>> stack, Map<String, Long> explored) {
 
-        Map<String, Integer> turnAroundCounts = new HashMap<>(explored);
+        Map<String, Long> turnAroundCounts = new HashMap<>(explored);
 
         while (!stack.isEmpty()) {
             Vertex<?> visiting = stack.pop();
@@ -114,7 +114,7 @@ public class VertexValuePropagation {
                     continue;
                 }
 
-                Integer currentCount = turnAroundCounts.get(child.getId());
+                Long currentCount = turnAroundCounts.get(child.getId());
 
                 if (currentCount != null && currentCount != 0) {
                     turnAroundCounts.put(child.getId(), currentCount - 1);

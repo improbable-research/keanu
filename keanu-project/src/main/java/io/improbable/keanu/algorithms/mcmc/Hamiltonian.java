@@ -39,7 +39,7 @@ public class Hamiltonian {
                                                      final Random random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final Map<String, Integer> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
+        final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
@@ -150,7 +150,7 @@ public class Hamiltonian {
      * @return the gradient at the updated position
      */
     private static Map<String, Double> leapfrog(final List<Vertex<Double>> latentVertices,
-                                                final Map<String, Integer> latentSetAndCascadeCache,
+                                                final Map<String, Long> latentSetAndCascadeCache,
                                                 final Map<String, Double> position,
                                                 final Map<String, Double> gradient,
                                                 final Map<String, Double> momentums,

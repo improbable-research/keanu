@@ -38,7 +38,7 @@ public class MetropolisHastings {
         List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
-        Map<String, Map<String, Integer>> setAndCascadeCache = new HashMap<>();
+        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
 
         double logP = bayesNet.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
@@ -57,7 +57,7 @@ public class MetropolisHastings {
                                  final double logPOld,
                                  final Set<Vertex<?>> affectedVertices,
                                  final double T,
-                                 final Map<String, Map<String, Integer>> setAndCascadeCache,
+                                 final Map<String, Map<String, Long>> setAndCascadeCache,
                                  final Random random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
@@ -65,7 +65,7 @@ public class MetropolisHastings {
         final T oldValue = chosenVertex.getValue();
         final T proposedValue = chosenVertex.sample();
 
-        Map<String, Integer> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), (id) -> chosenVertex.exploreSetting());
+        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), (id) -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);

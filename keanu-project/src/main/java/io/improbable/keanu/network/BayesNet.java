@@ -108,7 +108,7 @@ public class BayesNet {
      */
     private void probeForNonZeroMasterP(List<? extends Vertex<?>> latentVertices, int attempts) {
 
-        Map<String, Integer> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
+        Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
             setFromSampleAndCascade(latentVertices, setAndCascadeCache);
@@ -129,15 +129,15 @@ public class BayesNet {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices, Map<String, Integer> setAndCascadeCache) {
+    public static void setFromSampleAndCascade(List<? extends Vertex<?>> vertices, Map<String, Long> setAndCascadeCache) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }
         VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
     }
 
-    private static <T> void setValueFromSample(Vertex<T> v) {
-        v.setValue(v.sample());
+    private static <T> void setValueFromSample(Vertex<T> vertex) {
+        vertex.setValue(vertex.sample());
     }
 
 }

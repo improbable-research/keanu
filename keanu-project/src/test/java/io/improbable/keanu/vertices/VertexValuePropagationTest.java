@@ -74,9 +74,9 @@ public class VertexValuePropagationTest {
 
         DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1, random);
 
-        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, id -> log.info("OP on id:" + id));
-        DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, id -> log.info("OP on id:" + id));
-        DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, id -> log.info("OP on id:" + id));
+        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, id -> log.info("OP on id: " + id));
 
         secondLayerStart.setValue(2.0);
         firstLayerStart.setValue(3.0);
@@ -93,8 +93,8 @@ public class VertexValuePropagationTest {
     private DoubleVertex addLinks(DoubleVertex end, AtomicInteger n, int links) {
 
         for (int i = 0; i < links; i++) {
-            DoubleVertex left = passThroughVertex(end, n, id -> log.info("OP on id:" + id));
-            DoubleVertex right = passThroughVertex(end, n, id -> log.info("OP on id:" + id));
+            DoubleVertex left = passThroughVertex(end, n, id -> log.info("OP on id: " + id));
+            DoubleVertex right = passThroughVertex(end, n, id -> log.info("OP on id: " + id));
             end = sumVertex(left, right, n, id -> log.info("OP on id:" + id));
         }
 

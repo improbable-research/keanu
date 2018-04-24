@@ -53,7 +53,7 @@ public class SimulatedAnnealing {
 
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 
-        Map<String, Map<String, Integer>> setAndCascadeCache = new HashMap<>();
+        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
 
         double logP = bayesNet.getLogOfMasterP();
         double maxLogP = logP;

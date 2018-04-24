@@ -142,12 +142,12 @@ public abstract class Vertex<T> implements Identifiable {
      * @param explored the results of previously exploring the graph, which
      *                 allows the efficient propagation of this new value.
      */
-    public void setAndCascade(T value, Map<String, Integer> explored) {
+    public void setAndCascade(T value, Map<String, Long> explored) {
         setValue(value);
         VertexValuePropagation.cascadeUpdate(this, explored);
     }
 
-    public Map<String, Integer> exploreSetting() {
+    public Map<String, Long> exploreSetting() {
         return VertexValuePropagation.exploreSetting(this);
     }
 

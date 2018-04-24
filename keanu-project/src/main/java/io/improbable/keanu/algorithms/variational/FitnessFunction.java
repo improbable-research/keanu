@@ -11,7 +11,7 @@ public class FitnessFunction {
 
     protected final List<Vertex<?>> probabilisticVertices;
     protected final List<? extends Vertex<Double>> latentVertices;
-    protected final Map<String, Integer> exploreSettingAll;
+    protected final Map<String, Long> exploreSettingAll;
 
     public FitnessFunction(List<Vertex<?>> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
@@ -28,8 +28,8 @@ public class FitnessFunction {
 
     protected void setAndCascadePoint(double[] point) {
         for (int i = 0; i < point.length; i++) {
-            Vertex<Double> v = latentVertices.get(i);
-            v.setValue(point[i]);
+            Vertex<Double> vertex = latentVertices.get(i);
+            vertex.setValue(point[i]);
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
