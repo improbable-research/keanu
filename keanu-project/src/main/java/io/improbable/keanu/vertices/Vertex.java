@@ -261,9 +261,7 @@ public abstract class Vertex<T> implements Identifiable {
 
     private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        Iterator iterator = parents.iterator();
-        while (iterator.hasNext()) {
-            Vertex<?> next = (Vertex) iterator.next();
+        for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {
                 notCalculatedParents.add(next);
             }
