@@ -20,7 +20,6 @@ public class InverseGammaVertex extends ProbabilisticDouble {
         this.b = b;
         this.random = random;
         setParents(a, b);
-        setValue(sample());
     }
 
     public InverseGammaVertex(DoubleVertex a, DoubleVertex b) {
