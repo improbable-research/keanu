@@ -6,6 +6,8 @@
 /_/ |_\___/\__,_/_/ /_/\__,_/  
 ```
 
+https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status
+
 ## Overview
 
 Keanu is a general purpose probabilistic programming library built in Java and developed by Improbable's research team.
