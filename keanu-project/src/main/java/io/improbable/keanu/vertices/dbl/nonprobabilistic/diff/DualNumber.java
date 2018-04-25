@@ -125,7 +125,6 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
     public DualNumber log() {
         return new DualNumber(Math.log(getValue()), getInfinitesimal().divideBy(getValue()));
-
     }
 
     public DualNumber exp() {
