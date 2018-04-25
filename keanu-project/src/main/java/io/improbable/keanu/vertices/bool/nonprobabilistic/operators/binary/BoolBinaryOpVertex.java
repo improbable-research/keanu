@@ -26,4 +26,3 @@ public abstract class BoolBinaryOpVertex<A, B> extends NonProbabilisticBool {
 
     protected abstract Boolean op(A a, B b);
 }
-

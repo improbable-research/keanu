@@ -301,6 +301,7 @@ class OperatorOverloadingTest {
         assertEquals(e3, r3.value)
     }
 
+
     @Test
     fun integerVertexDivide() {
         val a = PoissonVertex(1.0, random)
@@ -433,4 +434,34 @@ class OperatorOverloadingTest {
             return a + b
         }
     }
+
+    @Test
+    fun vertexOperatorTest() {
+        val a = ConstantDoubleVertex(0.123)
+
+        assertEquals(Math.acos(a.value), acos(a).value)
+        assertEquals(Math.asin(a.value), asin(a).value)
+        assertEquals(Math.cos(a.value), cos(a).value)
+        assertEquals(Math.sin(a.value), sin(a).value)
+        assertEquals(Math.exp(a.value), exp(a).value)
+        assertEquals(Math.log(a.value), log(a).value)
+        assertEquals(Math.pow(a.value, 2.345), pow(a, 2.345).value)
+        assertEquals(Math.pow(a.value, a.value), pow(a, a).value)
+    }
+
+    @Test
+    fun arithmeticDoubleOperatorTest() {
+        val a = ArithmeticDouble(0.123)
+
+        assertEquals(Math.acos(a.value), acos(a).value)
+        assertEquals(Math.asin(a.value), asin(a).value)
+        assertEquals(Math.cos(a.value), cos(a).value)
+        assertEquals(Math.sin(a.value), sin(a).value)
+        assertEquals(Math.exp(a.value), exp(a).value)
+        assertEquals(Math.log(a.value), log(a).value)
+        assertEquals(Math.pow(a.value, 2.345), pow(a, 2.345).value)
+        assertEquals(Math.pow(a.value, a.value), pow(a, a).value)
+    }
+
+
 }

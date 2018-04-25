@@ -22,9 +22,6 @@ public class SinVertex extends DoubleUnaryOpVertex {
 
     @Override
     public DualNumber getDualNumber() {
-        DualNumber inputDualNumber = inputVertex.getDualNumber();
-        double dSin = Math.cos(inputVertex.getValue());
-        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dSin);
-        return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
+        return inputVertex.getDualNumber().sin();
     }
 }
