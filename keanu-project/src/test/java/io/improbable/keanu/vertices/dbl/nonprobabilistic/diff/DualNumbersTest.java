@@ -10,6 +10,7 @@ import org.junit.Test;
 import java.util.Map;
 import java.util.Random;
 
+import static io.improbable.keanu.kotlin.ExtendPrefixOperatorsKt.exp;
 import static org.junit.Assert.assertEquals;
 
 public class DualNumbersTest {
@@ -41,6 +42,11 @@ public class DualNumbersTest {
     }
 
     @Test
+    public void diffOverExponent() {
+        assertDiffIsCorrect(vA, vB, exp(vA.times(vB)));
+    }
+
+    @Test
     public void diffOverPlusMinusMultiplyCombination() {
         DoubleVertex vC = vA.plus(vB);
         DoubleVertex vD = vA.minus(vB);
@@ -53,7 +59,7 @@ public class DualNumbersTest {
         DoubleVertex vC = vA.plus(vB);
         DoubleVertex vD = vA.divideBy(vB);
         DoubleVertex vE = vC.multiply(vD);
-        assertDiffIsCorrect(vA, vB, new LogVertex(10, vE));
+        assertDiffIsCorrect(vA, vB, new LogVertex(vE));
     }
 
     private void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, DoubleVertex vC) {

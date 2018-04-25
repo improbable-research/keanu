@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 import java.util.Random;
@@ -18,12 +19,63 @@ public class TriangularVertex extends ProbabilisticDouble {
         this.xMax = xMax;
         this.c = c;
         this.random = random;
-        setValue(sample());
         setParents(xMin, xMax, c);
     }
 
-    public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
-        this(xMin, xMax, c, new Random());
+    public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, double c, Random random) {
+        this(xMin, xMax, new ConstantDoubleVertex(c), random);
+    }
+
+    public TriangularVertex(DoubleVertex xMin, double xMax, DoubleVertex c, Random random) {
+        this(xMin, new ConstantDoubleVertex(xMax), c, random);
+    }
+
+    public TriangularVertex(double xMin, DoubleVertex xMax, DoubleVertex c, Random random) {
+        this(new ConstantDoubleVertex(xMin), xMax, c, random);
+    }
+
+    public TriangularVertex(DoubleVertex xMin, double xMax, double c, Random random) {
+        this(xMin, new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c), random);
+    }
+
+    public TriangularVertex(double xMin, DoubleVertex xMax, double c, Random random) {
+        this(new ConstantDoubleVertex(xMin), xMax, c, random);
+    }
+
+    public TriangularVertex(double xMin, double xMax, DoubleVertex c, Random random) {
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), c, random);
+    }
+
+    public TriangularVertex(double xMin, double xMax, double c, Random random) {
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c), random);
+    }
+
+    public TriangularVertex(DoubleVertex xMin, DoubleVertex xMax, double c) {
+        this(xMin, xMax, new ConstantDoubleVertex(c), new Random());
+    }
+
+    public TriangularVertex(DoubleVertex xMin, double xMax, DoubleVertex c) {
+        this(xMin, new ConstantDoubleVertex(xMax), c, new Random());
+    }
+
+    public TriangularVertex(double xMin, DoubleVertex xMax, DoubleVertex c) {
+        this(new ConstantDoubleVertex(xMin), xMax, c, new Random());
+    }
+
+    public TriangularVertex(DoubleVertex xMin, double xMax, double c) {
+        this(xMin, new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c), new Random());
+    }
+
+    public TriangularVertex(double xMin, DoubleVertex xMax, double c) {
+        this(new ConstantDoubleVertex(xMin), xMax, c, new Random());
+    }
+
+    public TriangularVertex(double xMin, double xMax, DoubleVertex c) {
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), c, new Random());
+    }
+
+    public TriangularVertex(double xMin, double xMax, double c) {
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c), new Random());
     }
 
     public DoubleVertex getXMin() {

@@ -52,7 +52,7 @@ public class Beta {
     }
 
     public static Diff dlnPdf(double alpha, double beta, double x) {
-        double dPdx = ((alpha - 1) / x) - ((beta- 1) / (1 - x));
+        double dPdx = ((alpha - 1) / x) - ((beta - 1) / (1 - x));
         double dPda = digamma(alpha + beta) - digamma(alpha) + Math.log(x);
         double dPdb = digamma(alpha + beta) - digamma(beta) + Math.log(1 - x);
 

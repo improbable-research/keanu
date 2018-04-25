@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'io.improbable'
-version = '0.0.4'
+version = '0.0.5'
 archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
@@ -33,6 +33,7 @@ dependencies {
 
     //testing
     testCompile 'junit:junit:4.12'
+    testCompile 'org.jfree:jfreechart:1.0.19'
     testCompile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
     testCompile 'org.hamcrest:hamcrest-library:1.3'

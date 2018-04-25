@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -31,29 +30,18 @@ public class ExponentialVertexTest {
 
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
-        int N = (int) 1e6;
+        int N = 100000;
         double epsilon = 1e-2;
+
         double a = 0.0;
         double b = 0.5;
-        double expectedMean = Math.pow(1 / b, -1);
-        double expectedVariance = Math.pow(1 / b, -2);
+
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = e.sample();
-            samples.add(sample);
-        }
+        double mean = Math.pow(1 / b, -1);
+        double standardDeviation = Math.sqrt(Math.pow(1 / b, -2));
 
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(mean, expectedMean, epsilon);
-        assertEquals(sd, Math.sqrt(expectedVariance), epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, e, mean, standardDeviation, epsilon);
     }
 
     @Test

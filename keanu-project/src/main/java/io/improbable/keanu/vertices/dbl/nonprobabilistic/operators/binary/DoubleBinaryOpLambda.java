@@ -32,12 +32,6 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(op.apply(a.lazyEval(), b.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return op.apply(a.getValue(), b.getValue());
     }
