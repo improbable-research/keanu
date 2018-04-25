@@ -30,10 +30,8 @@ public class MetropolisHastings {
                                                      final List<? extends Vertex<?>> fromVertices,
                                                      final int sampleCount,
                                                      final Random random) {
-        if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
-        }
-
+        checkBayesNetInHealthyState(bayesNet);
+        
         Map<String, List<?>> samplesByVertex = new HashMap<>();
         List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
@@ -113,6 +111,14 @@ public class MetropolisHastings {
     private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
+    }
+
+    private static void checkBayesNetInHealthyState(BayesNet bayesNet) {
+        if (bayesNet.getVerticesThatContributeToMasterP().size() == 0) {
+            throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
+        } else if (bayesNet.isInImpossibleState()) {
+            throw new RuntimeException("Cannot start optimizer on zero probability network");
+        }
     }
 
 }

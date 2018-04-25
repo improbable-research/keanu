@@ -18,12 +18,6 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(inputVertex.lazyEval().doubleValue());
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return inputVertex.getValue().doubleValue();
     }

@@ -82,7 +82,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         double clampedX = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
 
-        double dPdInput = clampedX == x? dPdx(x, i, sigma) : 0.0;
+        double dPdInput = clampedX == x ? dPdx(x, i, sigma) : 0.0;
         double dPdSigma = dPdSigma(clampedX, i, sigma);
 
         return convertDualNumbersToDiff(dPdInput, dPdSigma);
@@ -95,7 +95,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         double clampedX = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
 
-        double dPdInput = clampedX == x? dPdx(x, i, sigma) : 0.0;
+        double dPdInput = clampedX == x ? dPdx(x, i, sigma) : 0.0;
         double dPdSigma = dPdSigma(clampedX, i, sigma);
 
         double p = densityAtValue();

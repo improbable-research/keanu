@@ -9,8 +9,11 @@ public interface RandomFactory<T> {
     T nextDouble(double min, double max);
 
     T nextGaussian(T mu, T sigma);
+
     T nextGaussian(double mu, T sigma);
+
     T nextGaussian(T mu, double sigma);
+
     T nextGaussian(double mu, double sigma);
 
     default T nextGaussian() {

@@ -98,7 +98,33 @@ public abstract class Vertex<T> implements Identifiable {
      * @return The value at this vertex after recalculating any parent non-probabilistic
      * vertices.
      */
-    public abstract T lazyEval();
+    public T lazyEval() {
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        stack.push(this);
+        Set<Vertex<?>> hasCalculated = new HashSet<>();
+
+        while (!stack.isEmpty()) {
+
+            Vertex<?> head = stack.peek();
+            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
+
+            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+
+                Vertex<?> top = stack.pop();
+                top.updateValue();
+                hasCalculated.add(top);
+
+            } else {
+
+                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                    stack.push(vertex);
+                }
+
+            }
+
+        }
+        return this.getValue();
+    }
 
     /**
      * A probabilistic vertex is defined as a vertex whose value is not
@@ -231,5 +257,15 @@ public abstract class Vertex<T> implements Identifiable {
 
     public Set<Vertex<?>> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
+    }
+
+    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!calculated.contains(next)) {
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 }

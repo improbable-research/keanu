@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -23,18 +24,30 @@ public class UniformIntVertex extends ProbabilisticInteger {
         setParents(min, max);
     }
 
-    /**
-     * @param min The inclusive lower max.
-     * @param max The exclusive upper max.
-     */
+    public UniformIntVertex(Vertex<Integer> min, int max, Random random) {
+        this(min, new ConstantIntegerVertex(max), new Random());
+    }
+
+    public UniformIntVertex(int min, Vertex<Integer> max, Random random) {
+        this(new ConstantIntegerVertex(min), max, new Random());
+    }
+
+    public UniformIntVertex(int min, int max, Random random) {
+        this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max), random);
+    }
+
     public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max) {
         this(min, max, new Random());
     }
 
-    /**
-     * @param min The inclusive lower max.
-     * @param max The exclusive upper max.
-     */
+    public UniformIntVertex(Vertex<Integer> min, int max) {
+        this(min, new ConstantIntegerVertex(max), new Random());
+    }
+
+    public UniformIntVertex(int min, Vertex<Integer> max) {
+        this(new ConstantIntegerVertex(min), max, new Random());
+    }
+
     public UniformIntVertex(int min, int max) {
         this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
     }

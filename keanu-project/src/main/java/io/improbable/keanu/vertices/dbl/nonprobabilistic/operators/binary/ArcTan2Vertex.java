@@ -37,7 +37,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         double denominator = (Math.pow(b.getValue(), 2) * Math.pow(a.getValue(), 2));
 
         Infinitesimal thisInfA = aDual.getInfinitesimal().multiplyBy(b.getValue() / denominator);
-        Infinitesimal thisInfB = bDual.getInfinitesimal().multiplyBy(- (a.getValue() / denominator));
+        Infinitesimal thisInfB = bDual.getInfinitesimal().multiplyBy(-(a.getValue() / denominator));
         Infinitesimal newInf = thisInfA.add(thisInfB);
         return new DualNumber(op(a.getValue(), b.getValue()), newInf);
     }

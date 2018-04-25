@@ -15,7 +15,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     public PowerVertex(double a, DoubleVertex b) {
-        this (new ConstantDoubleVertex(a), b);
+        this(new ConstantDoubleVertex(a), b);
     }
 
     @Override
@@ -27,6 +27,6 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     public DualNumber getDualNumber() {
         DualNumber aDual = a.getDualNumber();
         DualNumber bDual = b.getDualNumber();
-        return aDual.powerTo(bDual);
+        return aDual.pow(bDual);
     }
 }

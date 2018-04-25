@@ -21,32 +21,32 @@ public class LogisticVertex extends ProbabilisticDouble {
         setParents(a, b);
     }
 
-    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
-        this(a, b, new Random());
-    }
-
-    public LogisticVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
-    }
-
-    public LogisticVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b, new Random());
-    }
-
-    public LogisticVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b), new Random());
-    }
-
-    public LogisticVertex(double a, double b, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
+    public LogisticVertex(DoubleVertex a, double b, Random random) {
+        this(a, new ConstantDoubleVertex(b), random);
     }
 
     public LogisticVertex(double a, DoubleVertex b, Random random) {
         this(new ConstantDoubleVertex(a), b, random);
     }
 
-    public LogisticVertex(DoubleVertex a, double b, Random random) {
-        this(a, new ConstantDoubleVertex(b), random);
+    public LogisticVertex(double a, double b, Random random) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
+    }
+
+    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
+        this(a, b, new Random());
+    }
+
+    public LogisticVertex(DoubleVertex a, double b) {
+        this(a, new ConstantDoubleVertex(b), new Random());
+    }
+
+    public LogisticVertex(double a, DoubleVertex b) {
+        this(new ConstantDoubleVertex(a), b, new Random());
+    }
+
+    public LogisticVertex(double a, double b) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
     }
 
     public DoubleVertex getA() {
@@ -62,7 +62,9 @@ public class LogisticVertex extends ProbabilisticDouble {
         return Logistic.pdf(a.getValue(), b.getValue(), value);
     }
 
-    public double logDensity(Double value) { return Logistic.logPdf(a.getValue(), b.getValue(), value); }
+    public double logDensity(Double value) {
+        return Logistic.logPdf(a.getValue(), b.getValue(), value);
+    }
 
     @Override
     public Map<String, Double> dDensityAtValue() {
