@@ -27,12 +27,12 @@ public class EfficientNUTSTest {
         test.samplesFromDonut();
     }
 
-//    @Before
+    @Before
     public void setup() {
         random = new Random(1);
     }
 
-//    @Test
+    @Test
     public void samplesGaussian() {
         GaussianVertex A = new GaussianVertex(0.0, 1, random);
         A.setAndCascade(0.02);
@@ -46,7 +46,7 @@ public class EfficientNUTSTest {
                 random
         );
 
-        Vizer.histogram(posteriorSamples.get(A).asList());
+//        Vizer.histogram(posteriorSamples.get(A).asList());
 
         OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
                 .mapToDouble(sample -> sample)
@@ -55,7 +55,7 @@ public class EfficientNUTSTest {
         assertEquals(0.0, averagePosteriorA.getAsDouble(), 0.1);
     }
 
-//    @Test
+    @Test
     public void samplesContinuousPrior() {
         DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
         DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
@@ -87,7 +87,7 @@ public class EfficientNUTSTest {
         assertEquals(44.0, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-//    @Test
+    @Test
     public void samplesFromDonut() {
         DoubleVertex A = new GaussianVertex(0, 1, random);
         DoubleVertex B = new GaussianVertex(0, 1, random);

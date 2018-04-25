@@ -19,6 +19,9 @@ import java.util.*;
  */
 public class Hamiltonian {
 
+    public static long leapfrogCount = 0;
+    public static long masterpCount = 0;
+
     private Hamiltonian() {
     }
 
@@ -83,6 +86,7 @@ public class Hamiltonian {
                 );
             }
 
+            masterpCount++;
             final double logOfMasterPAfterLeapfrog = bayesNet.getLogOfMasterP();
 
             final double likelihoodOfLeapfrog = getLikelihoodOfLeapfrog(
@@ -109,6 +113,9 @@ public class Hamiltonian {
                 logOfMasterPBeforeLeapfrog = logOfMasterPAfterLeapfrog;
             }
         }
+
+        System.out.println("leapfrogCount: " + leapfrogCount);
+        System.out.println("masterPCount: " + masterpCount);
 
         return new NetworkSamples(samples, sampleCount);
     }
@@ -185,6 +192,8 @@ public class Hamiltonian {
             final double updatedMomentum = halfTimeStepMomentum.getValue() + halfTimeStep * newGradient.get(halfTimeStepMomentum.getKey());
             momentums.put(halfTimeStepMomentum.getKey(), updatedMomentum);
         }
+
+        leapfrogCount++;
 
         return newGradient;
     }

@@ -16,6 +16,12 @@ import java.util.*;
  */
 public class EfficientNUTS {
 
+    private final static double DELTA_MAX = 1000.0;
+
+    public static long leapfrogCount = 0;
+    public static long masterpCount = 0;
+
+
     private EfficientNUTS() {
     }
 
@@ -58,6 +64,8 @@ public class EfficientNUTS {
         double logOfMasterPreviously = getLogOfMasterP(probabilisticVertices);
 
         final Map<String, ?> sampleBeforeLeapfrog = new HashMap<>();
+
+        int maxJ = 0;
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
 
@@ -140,10 +148,17 @@ public class EfficientNUTS {
                 );
 
                 j++;
+
+                maxJ = Math.max(j, maxJ);
             }
 
+            //TODO: should be sample not only position
             addSampleFromCache(samples, position);
         }
+
+        System.out.println(maxJ);
+        System.out.println("leapfrogCount: " + leapfrogCount);
+        System.out.println("masterPCount: " + masterpCount);
 
         return new NetworkSamples(samples, sampleCount);
     }
@@ -153,6 +168,7 @@ public class EfficientNUTS {
         for (Vertex<?> vertex : probabilisticVertices) {
             sum += vertex.logDensityAtValue();
         }
+        masterpCount++;
         return sum;
     }
 
@@ -168,8 +184,6 @@ public class EfficientNUTS {
                                        double epsilon,
                                        Random random
     ) {
-
-        final double deltaMax = 1000.0;
 
         if (j == 0) {
             //Base case—take one leapfrog step in the direction v
@@ -188,7 +202,7 @@ public class EfficientNUTS {
 
             final double logMpMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
             final int nPrime = u < Math.exp(logMpMinusMomentum) ? 1 : 0;
-            final int sPrime = u < Math.exp(deltaMax + logMpMinusMomentum) ? 1 : 0;
+            final int sPrime = u < Math.exp(DELTA_MAX + logMpMinusMomentum) ? 1 : 0;
 
             return new BuiltTree(
                     leapfrog.position,
@@ -413,6 +427,7 @@ public class EfficientNUTS {
             rPrime.put(rPrimeEntry.getKey(), rDoublePrime);
         }
 
+        leapfrogCount++;
         return new LeapFrogged(thetaPrime, rPrime, thetaPrimeGradient);
     }
 
