@@ -16,7 +16,6 @@ public class SelectVertex<T> extends Probabilistic<T> {
         this.selectableValues = selectableValues;
         this.random = random;
         setParents(selectableValues.values());
-        setValue(sample());
     }
 
     public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues) {

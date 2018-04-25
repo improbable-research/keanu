@@ -436,7 +436,7 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun VertexOperatorTest() {
+    fun vertexOperatorTest() {
         val a = ConstantDoubleVertex(0.123)
 
         assertEquals(Math.acos(a.value), acos(a).value)
@@ -450,7 +450,7 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun ArithmeticDoubleOperatorTest() {
+    fun arithmeticDoubleOperatorTest() {
         val a = ArithmeticDouble(0.123)
 
         assertEquals(Math.acos(a.value), acos(a).value)

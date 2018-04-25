@@ -5,6 +5,7 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.vis.Vizer;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,15 +29,15 @@ public class HamiltonianTest {
     @Test
     public void samplesGaussian() {
         GaussianVertex A = new GaussianVertex(0.0, 1, random);
+        A.setAndCascade(0.02);
         BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
                 bayesNet,
                 Arrays.asList(A),
-                50000,
+                100000,
                 10,
                 0.1,
-                Arrays.asList(0.02),
                 random
         );
 
@@ -52,22 +53,20 @@ public class HamiltonianTest {
         DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
         DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
 
-        A.setValue(20.0);
-        B.setAndCascade(20.0);
-
         DoubleVertex C = new GaussianVertex(A.plus(B), new ConstantDoubleVertex(1.0), random);
         C.observe(46.0);
 
+        A.setAndCascade(20.0);
+        B.setAndCascade(20.0);
+
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
-        bayesNet.probeForNonZeroMasterP(100);
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
                 bayesNet,
                 Arrays.asList(A, B),
-                25000,
+                50000,
                 10,
-                0.1,
-                Arrays.asList(21.0, 22.5),
+                0.01,
                 random
         );
 
@@ -90,6 +89,9 @@ public class HamiltonianTest {
         DoubleVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03, random);
         D.observe(0.5);
 
+        A.setAndCascade(Math.sqrt(0.5));
+        B.setAndCascade(0.0);
+
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, D));
 
         NetworkSamples samples = Hamiltonian.getPosteriorSamples(
@@ -98,7 +100,6 @@ public class HamiltonianTest {
                 25000,
                 10,
                 0.005,
-                Arrays.asList(Math.sqrt(0.5), 0.0),
                 random
         );
 
@@ -124,7 +125,6 @@ public class HamiltonianTest {
                 middleOfDonut = true;
             }
         }
-
 
         assertTrue(topOfDonut && rightOfDonut && bottomOfDonut && leftOfDonut && !middleOfDonut);
     }

@@ -18,7 +18,6 @@ public class GaussianVertex extends ProbabilisticDouble {
         this.mu = mu;
         this.sigma = sigma;
         this.random = random;
-        setValue(sample());
         setParents(mu, sigma);
     }
 

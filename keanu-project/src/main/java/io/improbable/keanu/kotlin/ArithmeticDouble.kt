@@ -20,7 +20,6 @@ class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDouble> {
 
     override fun sin(): ArithmeticDouble {
         return ArithmeticDouble(Math.sin(this.value))
-
     }
 
     override fun cos(): ArithmeticDouble {

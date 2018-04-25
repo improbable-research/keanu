@@ -18,7 +18,6 @@ public class LaplaceVertex extends ProbabilisticDouble {
         this.mu = mu;
         this.beta = beta;
         this.random = random;
-        setValue(sample());
         setParents(mu, beta);
     }
 

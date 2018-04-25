@@ -30,12 +30,6 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(op.apply(inputVertex.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return op.apply(inputVertex.getValue());
     }
@@ -49,3 +43,5 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
         throw new UnsupportedOperationException();
     }
 }
+
+
