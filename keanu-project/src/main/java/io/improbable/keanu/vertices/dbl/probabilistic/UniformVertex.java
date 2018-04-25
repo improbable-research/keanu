@@ -22,12 +22,28 @@ public class UniformVertex extends ProbabilisticDouble {
         setParents(xMin, xMax);
     }
 
-    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
-        this(xMin, xMax, new Random());
+    public UniformVertex(DoubleVertex xMin, double xMax, Random random) {
+        this(xMin, new ConstantDoubleVertex(xMax), random);
+    }
+
+    public UniformVertex(double xMin, DoubleVertex xMax, Random random) {
+        this(new ConstantDoubleVertex(xMin), xMax, random);
     }
 
     public UniformVertex(double xMin, double xMax, Random random) {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), random);
+    }
+
+    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+        this(xMin, xMax, new Random());
+    }
+
+    public UniformVertex(DoubleVertex xMin, double xMax) {
+        this(xMin, xMax, new Random());
+    }
+
+    public UniformVertex(double xMin, DoubleVertex xMax) {
+        this(new ConstantDoubleVertex(xMin), xMax, new Random());
     }
 
     public UniformVertex(double xMin, double xMax) {

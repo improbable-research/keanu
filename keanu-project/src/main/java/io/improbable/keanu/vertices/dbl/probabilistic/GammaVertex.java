@@ -29,16 +29,36 @@ public class GammaVertex extends ProbabilisticDouble {
         setParents(a, theta, k);
     }
 
-    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k) {
-        this(a, theta, k, new Random());
+    public GammaVertex(DoubleVertex theta, double k, Random random) {
+        this(new ConstantDoubleVertex(0.0), theta, new ConstantDoubleVertex(k), random);
     }
 
-    public GammaVertex(DoubleVertex theta, DoubleVertex k, Random random) {
-        this(new ConstantDoubleVertex(0.0), theta, k, random);
+    public GammaVertex(double theta, DoubleVertex k, Random random) {
+        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), k, random);
+    }
+
+    public GammaVertex(double theta, double k, Random random) {
+        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k), random);
     }
 
     public GammaVertex(double a, double theta, double k, Random random) {
         this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k), random);
+    }
+
+    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k) {
+        this(a, theta, k, new Random());
+    }
+
+    public GammaVertex(DoubleVertex theta, double k) {
+        this(new ConstantDoubleVertex(0.0), theta, new ConstantDoubleVertex(k), new Random());
+    }
+
+    public GammaVertex(double theta, DoubleVertex k) {
+        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), k, new Random());
+    }
+
+    public GammaVertex(double theta, double k) {
+        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k), new Random());
     }
 
     public DoubleVertex getA() {

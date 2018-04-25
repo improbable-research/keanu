@@ -26,16 +26,32 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         setParents(xMin, xMax);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
-        this(xMin, xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+    public SmoothUniformVertex(DoubleVertex xMin, double xMax, Random random) {
+        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, random);
+    }
+
+    public SmoothUniformVertex(double xMin, DoubleVertex xMax, Random random) {
+        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS, random);
     }
 
     public SmoothUniformVertex(double xMin, double xMax, Random random) {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, random);
     }
 
+    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+        this(xMin, xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+    }
+
+    public SmoothUniformVertex(DoubleVertex xMin, double xMax) {
+        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, new Random());
+    }
+
+    public SmoothUniformVertex(double xMin, DoubleVertex xMax) {
+        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+    }
+
     public SmoothUniformVertex(double xMin, double xMax) {
-        this(xMin, xMax, new Random());
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, new Random());
     }
 
     public DoubleVertex getXMin() {
