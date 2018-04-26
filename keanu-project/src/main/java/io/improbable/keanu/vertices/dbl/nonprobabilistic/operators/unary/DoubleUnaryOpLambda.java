@@ -14,10 +14,10 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     protected final Function<IN, Double> op;
     protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier) {
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this.inputVertex = inputVertex;
         this.op = op;
-        this.dualNumberSupplier = dualNumberSupplier;
+        this.dualNumberSupplier = dualNumberCalculation;
         setParents(inputVertex);
     }
 

@@ -16,11 +16,11 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     protected final BiFunction<A, B, Double> op;
     protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier) {
+    public DoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this.a = a;
         this.b = b;
         this.op = op;
-        this.dualNumberSupplier = dualNumberSupplier;
+        this.dualNumberSupplier = dualNumberCalculation;
         setParents(a, b);
     }
 
