@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 
 public abstract class DoubleVertex extends Vertex<Double> implements DoubleOperators<DoubleVertex> {
 
-    public abstract DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap);
+    public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap);
 
     public DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap();
@@ -33,18 +33,20 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
             DoubleVertex head = stack.peek();
             Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(dualNumbers, head.getParents());
 
-            //if parents have their dual numbers calculated
             if (parentsThatAreNotYetCalculated.isEmpty()) {
-                //calculate dual number based on parents dual
+
                 DoubleVertex top = stack.pop();
-                DualNumber dual = top.calcDualNumber(dualNumbers);
+                DualNumber dual = top.calculateDualNumber(dualNumbers);
                 dualNumbers.put(top, dual);
 
             } else {
 
                 for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
-                    //Throw error if not DoubleVertex
-                    stack.push((DoubleVertex) vertex);
+                    if (vertex instanceof DoubleVertex) {
+                        stack.push((DoubleVertex) vertex);
+                    } else {
+                        throw new RuntimeException("Can only calculate Dual Numbers on a graph made of Double's");
+                    }
                 }
 
             }
@@ -113,7 +115,7 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
         return new AbsVertex(this);
     }
 
-    public DoubleVertex lambda(Function<Double, Double> op, Supplier<DualNumber> dualNumberSupplier) {
+    public DoubleVertex lambda(Function<Double, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier) {
         return new DoubleUnaryOpLambda<>(this, op, dualNumberSupplier);
     }
 

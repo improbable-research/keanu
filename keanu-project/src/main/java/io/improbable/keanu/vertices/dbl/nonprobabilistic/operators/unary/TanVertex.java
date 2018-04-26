@@ -24,7 +24,7 @@ public class TanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         DualNumber inputDualNumber = dualNumberMap.get(inputVertex);
         double dTan = 1 / Math.pow(Math.cos(inputVertex.getValue()), 2);
         Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dTan);

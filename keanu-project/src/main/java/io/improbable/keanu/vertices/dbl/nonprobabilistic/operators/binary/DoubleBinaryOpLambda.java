@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
@@ -13,9 +14,9 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     protected final Vertex<A> a;
     protected final Vertex<B> b;
     protected final BiFunction<A, B, Double> op;
-    protected final Supplier<DualNumber> dualNumberSupplier;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, Double> op, Supplier<DualNumber> dualNumberSupplier) {
+    public DoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier) {
         this.a = a;
         this.b = b;
         this.op = op;
@@ -38,9 +39,9 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         if (dualNumberSupplier != null) {
-            return dualNumberSupplier.get();
+            return dualNumberSupplier.apply(dualNumberMap);
         }
 
         throw new UnsupportedOperationException();

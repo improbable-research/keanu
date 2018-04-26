@@ -6,6 +6,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Double
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,20 +15,24 @@ import org.slf4j.LoggerFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import static org.junit.Assert.assertEquals;
+
 public class DualNumberPropagationTest {
 
     private final Logger log = LoggerFactory.getLogger(DualNumberPropagationTest.class);
 
     @Test
     public void doesNotPerformUnneccesaryDualNumberCalculations() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(5.0);
-        PowerVertex xPow = new PowerVertex(x, 2.0);
-        PowerVertex yPow = new PowerVertex(x, 3.0);
-        MultiplicationVertex multiplicationVertex = new MultiplicationVertex(xPow, yPow);
-        PowerVertex xPow2 = new PowerVertex(multiplicationVertex, 2.0);
-        PowerVertex yPow2 = new PowerVertex(multiplicationVertex, 3.0);
-        MultiplicationVertex multiplicationVertex1 = new MultiplicationVertex(xPow2, yPow2);
-        multiplicationVertex1.getDualNumber();
+        AtomicInteger n = new AtomicInteger(0);
+        DoubleVertex start = new SinVertex(Math.PI / 3);
+
+        int links = 20;
+        DoubleVertex end = addLinks(start, n, links);
+
+        end.getDualNumber();
+
+        //Does the right amount of work
+        assertEquals(3 * links, n.get());
     }
 
     private DoubleVertex addLinks(DoubleVertex end, AtomicInteger n, int links) {
@@ -43,19 +49,23 @@ public class DualNumberPropagationTest {
     private DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger n, Consumer<Long> onOp) {
         final long id = Vertex.idGenerator.get();
         return new DoubleUnaryOpLambda<>(from, (a) -> {
-            n.incrementAndGet();
             onOp.accept(id);
             return a;
+        }, (a) -> {
+            n.incrementAndGet();
+            return a.get(from);
         });
     }
 
     private DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger n, Consumer<Long> onOp) {
         final long id = Vertex.idGenerator.get();
         return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
-            n.incrementAndGet();
             onOp.accept(id);
             return a + b;
-        });
+        }, (a) -> {
+            n.incrementAndGet();
+            return a.get(left).add(a.get(right));
+        } );
     }
 
 }

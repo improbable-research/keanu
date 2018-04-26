@@ -23,7 +23,7 @@ public class CeilVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         throw new UnsupportedOperationException();
     }
 }

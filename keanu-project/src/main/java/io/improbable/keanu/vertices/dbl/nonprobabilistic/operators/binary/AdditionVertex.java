@@ -13,7 +13,7 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         final DualNumber aDual = dualNumberMap.get(a);
         final DualNumber bDual = dualNumberMap.get(b);
         return aDual.add(bDual);

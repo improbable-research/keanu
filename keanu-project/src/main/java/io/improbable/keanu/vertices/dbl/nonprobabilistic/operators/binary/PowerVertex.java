@@ -27,7 +27,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         DualNumber aDual = dualNumberMap.get(a);
         DualNumber bDual = dualNumberMap.get(b);
         return aDual.pow(bDual);

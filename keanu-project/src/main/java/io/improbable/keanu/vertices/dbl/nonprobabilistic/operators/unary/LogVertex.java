@@ -20,7 +20,7 @@ public class LogVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         return dualNumberMap.get(inputVertex).log();
     }
 

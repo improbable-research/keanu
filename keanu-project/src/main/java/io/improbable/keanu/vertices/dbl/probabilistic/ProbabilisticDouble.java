@@ -27,7 +27,7 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         return new DualNumber(getValue(), getId());
     }
 

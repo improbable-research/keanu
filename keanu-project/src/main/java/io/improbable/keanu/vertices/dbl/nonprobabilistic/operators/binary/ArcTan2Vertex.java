@@ -33,7 +33,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         DualNumber aDual = dualNumberMap.get(a);
         DualNumber bDual = dualNumberMap.get(b);
 

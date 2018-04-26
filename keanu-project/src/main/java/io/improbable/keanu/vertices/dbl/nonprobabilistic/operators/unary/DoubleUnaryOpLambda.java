@@ -12,9 +12,9 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, Double> op;
-    protected final Supplier<DualNumber> dualNumberSupplier;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, Double> op, Supplier<DualNumber> dualNumberSupplier) {
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier) {
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualNumberSupplier = dualNumberSupplier;
@@ -36,9 +36,9 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         if (dualNumberSupplier != null) {
-            return dualNumberSupplier.get();
+            return dualNumberSupplier.apply(dualNumberMap);
         }
 
         throw new UnsupportedOperationException();

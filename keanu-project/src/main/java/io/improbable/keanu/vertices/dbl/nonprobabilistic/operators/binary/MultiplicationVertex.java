@@ -14,7 +14,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         DualNumber aDual = dualNumberMap.get(a);
         DualNumber bDual = dualNumberMap.get(b);
         return aDual.multiplyBy(bDual);
