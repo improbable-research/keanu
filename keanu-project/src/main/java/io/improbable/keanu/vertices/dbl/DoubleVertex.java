@@ -21,6 +21,12 @@ import java.util.function.Supplier;
 
 public abstract class DoubleVertex extends Vertex<Double> implements DoubleOperators<DoubleVertex> {
 
+    /**
+     * Calculate the Dual Number of a DoubleVertex.
+     *
+     * @param dualNumbers A Map that is guaranteed to contain the Dual Numbers of the parent of the vertex.
+     * @return The Dual Number of the vertex.
+     */
     public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     public DualNumber getDualNumber() {
