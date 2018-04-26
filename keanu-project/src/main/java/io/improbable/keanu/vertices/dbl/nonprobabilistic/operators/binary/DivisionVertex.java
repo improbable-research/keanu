@@ -14,9 +14,9 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
-        DualNumber aDual = dualNumberMap.get(a);
-        DualNumber bDual = dualNumberMap.get(b);
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        DualNumber aDual = dualNumbers.get(a);
+        DualNumber bDual = dualNumbers.get(b);
         return aDual.divideBy(bDual);
     }
 

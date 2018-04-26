@@ -23,7 +23,7 @@ public class FloorVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         throw new UnsupportedOperationException();
     }
 }

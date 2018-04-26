@@ -21,7 +21,7 @@ import java.util.function.Supplier;
 
 public abstract class DoubleVertex extends Vertex<Double> implements DoubleOperators<DoubleVertex> {
 
-    public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap);
+    public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     public DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap();
@@ -45,7 +45,7 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
                     if (vertex instanceof DoubleVertex) {
                         stack.push((DoubleVertex) vertex);
                     } else {
-                        throw new RuntimeException("Can only calculate Dual Numbers on a graph made of Double's");
+                        throw new RuntimeException("Can only calculate Dual Numbers on a graph made of Doubles");
                     }
                 }
 

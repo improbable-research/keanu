@@ -13,9 +13,9 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
-        final DualNumber aDual = dualNumberMap.get(a);
-        final DualNumber bDual = dualNumberMap.get(b);
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        final DualNumber aDual = dualNumbers.get(a);
+        final DualNumber bDual = dualNumbers.get(b);
         return aDual.subtract(bDual);
     }
 

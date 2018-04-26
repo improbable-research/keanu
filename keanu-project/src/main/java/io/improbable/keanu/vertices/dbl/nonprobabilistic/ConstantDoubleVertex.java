@@ -14,7 +14,7 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble implements Cons
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return new DualNumber(getValue(), Collections.emptyMap());
     }
 

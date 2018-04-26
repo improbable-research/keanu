@@ -24,8 +24,8 @@ public class ExpVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
-        return dualNumberMap.get(inputVertex).exp();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        return dualNumbers.get(inputVertex).exp();
     }
 
 }

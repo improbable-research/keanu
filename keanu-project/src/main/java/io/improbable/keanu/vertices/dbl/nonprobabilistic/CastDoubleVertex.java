@@ -25,7 +25,7 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         throw new UnsupportedOperationException("CastDoubleVertex is non-differentiable");
     }
 }
