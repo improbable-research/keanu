@@ -115,8 +115,8 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
         return new AbsVertex(this);
     }
 
-    public DoubleVertex lambda(Function<Double, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier) {
-        return new DoubleUnaryOpLambda<>(this, op, dualNumberSupplier);
+    public DoubleVertex lambda(Function<Double, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation);
     }
 
 
