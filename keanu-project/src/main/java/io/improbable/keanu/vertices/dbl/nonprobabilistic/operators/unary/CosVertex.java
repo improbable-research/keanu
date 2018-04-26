@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+
+import java.util.Map;
 
 public class CosVertex extends DoubleUnaryOpVertex {
 
@@ -21,7 +24,7 @@ public class CosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        return inputVertex.getDualNumber().cos();
+    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
+        return dualNumberMap.get(inputVertex).cos();
     }
 }

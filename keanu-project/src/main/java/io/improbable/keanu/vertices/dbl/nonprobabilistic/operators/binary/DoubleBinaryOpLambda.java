@@ -4,6 +4,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 
@@ -37,7 +38,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber getDualNumber() {
+    public DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.get();
         }

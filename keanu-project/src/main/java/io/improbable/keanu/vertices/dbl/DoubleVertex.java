@@ -15,12 +15,43 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerV
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 
+import java.util.*;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class DoubleVertex extends Vertex<Double> implements DoubleOperators<DoubleVertex> {
 
-    public abstract DualNumber getDualNumber();
+    public abstract DualNumber calcDualNumber(Map<Vertex, DualNumber> dualNumberMap);
+
+    public DualNumber getDualNumber() {
+        Map<Vertex, DualNumber> dualNumbers = new HashMap();
+        Deque<DoubleVertex> stack = new ArrayDeque<>();
+        stack.push(this);
+
+        while (!stack.isEmpty()) {
+
+            DoubleVertex head = stack.peek();
+            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(dualNumbers, head.getParents());
+
+            //if parents have their dual numbers calculated
+            if (parentsThatAreNotYetCalculated.isEmpty()) {
+                //calculate dual number based on parents dual
+                DoubleVertex top = stack.pop();
+                DualNumber dual = top.calcDualNumber(dualNumbers);
+                dualNumbers.put(top, dual);
+
+            } else {
+
+                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                    //Throw error if not DoubleVertex
+                    stack.push((DoubleVertex) vertex);
+                }
+
+            }
+
+        }
+        return dualNumbers.get(this);
+    }
 
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
@@ -131,6 +162,16 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
 
     public DoubleVertex acos() {
         return new ArcCosVertex(this);
+    }
+
+    private Set<Vertex<?>> parentsThatAreNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex<?>> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!dualNumbers.containsKey(next)){
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 
 }
