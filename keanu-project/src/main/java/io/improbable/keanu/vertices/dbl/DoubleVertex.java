@@ -17,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleU
 
 import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public abstract class DoubleVertex extends Vertex<Double> implements DoubleOperators<DoubleVertex> {
 
@@ -37,9 +36,9 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
         while (!stack.isEmpty()) {
 
             DoubleVertex head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(dualNumbers, head.getParents());
+            Set<Vertex<?>> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
-            if (parentsThatAreNotYetCalculated.isEmpty()) {
+            if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
 
                 DoubleVertex top = stack.pop();
                 DualNumber dual = top.calculateDualNumber(dualNumbers);
@@ -47,7 +46,7 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                for (Vertex<?> vertex : parentsThatDualNumberIsNotCalculated) {
                     if (vertex instanceof DoubleVertex) {
                         stack.push((DoubleVertex) vertex);
                     } else {
@@ -172,7 +171,7 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
         return new ArcCosVertex(this);
     }
 
-    private Set<Vertex<?>> parentsThatAreNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex<?>> parents) {
+    private Set<Vertex<?>> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex<?>> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!dualNumbers.containsKey(next)){
