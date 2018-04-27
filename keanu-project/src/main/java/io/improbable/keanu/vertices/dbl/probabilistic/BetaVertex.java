@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
 
 import java.util.Map;
@@ -20,8 +21,32 @@ public class BetaVertex extends ProbabilisticDouble {
         setParents(alpha, beta);
     }
 
+    public BetaVertex(DoubleVertex alpha, double beta, Random random) {
+        this(alpha, new ConstantDoubleVertex(beta), random);
+    }
+
+    public BetaVertex(double alpha, DoubleVertex beta, Random random) {
+        this(new ConstantDoubleVertex(alpha), beta, random);
+    }
+
+    public BetaVertex(double alpha, double beta, Random random) {
+        this(new ConstantDoubleVertex(alpha), beta, random);
+    }
+
     public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this(alpha, beta, new Random());
+    }
+
+    public BetaVertex(DoubleVertex alpha, double beta) {
+        this(alpha, new ConstantDoubleVertex(beta), new Random());
+    }
+
+    public BetaVertex(double alpha, DoubleVertex beta) {
+        this(new ConstantDoubleVertex(alpha), beta, new Random());
+    }
+
+    public BetaVertex(double alpha, double beta) {
+        this(new ConstantDoubleVertex(alpha), beta, new Random());
     }
 
     @Override

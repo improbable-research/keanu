@@ -22,20 +22,32 @@ public class InverseGammaVertex extends ProbabilisticDouble {
         setParents(a, b);
     }
 
-    public InverseGammaVertex(DoubleVertex a, DoubleVertex b) {
-        this(a, b, new Random());
-    }
-
-    public InverseGammaVertex(double a, double b, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
-    }
-
     public InverseGammaVertex(DoubleVertex a, double b, Random random) {
         this(a, new ConstantDoubleVertex(b), random);
     }
 
     public InverseGammaVertex(double a, DoubleVertex b, Random random) {
         this(new ConstantDoubleVertex(a), b, random);
+    }
+
+    public InverseGammaVertex(double a, double b, Random random) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
+    }
+
+    public InverseGammaVertex(DoubleVertex a, DoubleVertex b) {
+        this(a, b, new Random());
+    }
+
+    public InverseGammaVertex(DoubleVertex a, double b) {
+        this(a, new ConstantDoubleVertex(b), new Random());
+    }
+
+    public InverseGammaVertex(double a, DoubleVertex b) {
+        this(new ConstantDoubleVertex(a), b, new Random());
+    }
+
+    public InverseGammaVertex(double a, double b) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
     }
 
     @Override
