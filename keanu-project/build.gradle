@@ -11,7 +11,6 @@ buildscript {
 plugins {
     id 'java'
     id 'maven'
-    id "org.sonarqube" version "2.6.2"
 }
 
 group = 'io.improbable'
@@ -126,11 +125,4 @@ task sourcesJar(type: Jar) {
 
 artifacts {
     archives javadocJar, sourcesJar
-}
-
-sonarqube {
-    properties {
-        property "sonar.projectName", "Keanu"
-        property "sonar.projectKey", "keanu:keanu-project"
-    }
 }
