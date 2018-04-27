@@ -30,7 +30,7 @@ public class NUTS {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
-                                                     final List<? extends Vertex<?>> fromVertices,
+                                                     final List<? extends Vertex<?>> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,
                                                      final Random random) {
@@ -40,7 +40,7 @@ public class NUTS {
         final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
-        addSampleFromVertices(samples, fromVertices);
+        addSampleFromCache(samples, takeSample(sampleFromVertices));
 
         Map<String, Double> position = new HashMap<>();
         cachePosition(latentVertices, position);
@@ -57,9 +57,9 @@ public class NUTS {
         Map<String, Double> momentumForward = new HashMap<>();
         Map<String, Double> momentumBackward = new HashMap<>();
 
-        double logOfMasterPreviously = getLogOfMasterP(probabilisticVertices);
+        Map<String, ?> sample = takeSample(sampleFromVertices);
 
-        final Map<String, ?> sampleBeforeLeapfrog = new HashMap<>();
+        double logOfMasterPreviously = getLogProb(probabilisticVertices);
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
 
@@ -72,14 +72,20 @@ public class NUTS {
             initializeMomentumForEachVertex(latentVertices, momentumForward, random);
             cache(momentumForward, momentumBackward);
 
-            takeSample(sampleBeforeLeapfrog, fromVertices);
-
             double u = random.nextDouble() * Math.exp(logOfMasterPreviously - 0.5 * dotProduct(momentumForward));
+
+            //tree height
             int j = 0;
+
+            //stop flag
             int s = 1;
+
+            //acceptable leapfrog count
             int n = 1;
 
             while (s == 1) {
+
+                //build tree direction -1 = backwards OR 1 = forwards
                 int v = random.nextBoolean() ? 1 : -1;
 
                 BuiltTree builtTree;
@@ -88,6 +94,7 @@ public class NUTS {
                             latentVertices,
                             latentSetAndCascadeCache,
                             probabilisticVertices,
+                            sampleFromVertices,
                             positionBackward,
                             gradientBackward,
                             momentumBackward,
@@ -108,6 +115,7 @@ public class NUTS {
                             latentVertices,
                             latentSetAndCascadeCache,
                             probabilisticVertices,
+                            sampleFromVertices,
                             positionForward,
                             gradientForward,
                             momentumForward,
@@ -129,6 +137,7 @@ public class NUTS {
                         position = builtTree.thetaPrime;
                         gradient = builtTree.gradientAtThetaPrime;
                         logOfMasterPreviously = builtTree.logOfMasterPAtThetaPrime;
+                        sample = builtTree.sampleAtThetaPrime;
                     }
                 }
 
@@ -145,24 +154,16 @@ public class NUTS {
 
             }
 
-            //TODO: should be sample not only position
-            addSampleFromCache(samples, position);
+            addSampleFromCache(samples, sample);
         }
 
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static double getLogOfMasterP(List<Vertex<?>> probabilisticVertices) {
-        double sum = 0.0;
-        for (Vertex<?> vertex : probabilisticVertices) {
-            sum += vertex.logDensityAtValue();
-        }
-        return sum;
-    }
-
     private static BuiltTree BuildTree(List<Vertex<Double>> latentVertices,
                                        final Map<String, Long> latentSetAndCascadeCache,
                                        List<Vertex<?>> probabilisticVertices,
+                                       final List<? extends Vertex<?>> sampleFromVertices,
                                        Map<String, Double> position,
                                        Map<String, Double> gradient,
                                        Map<String, Double> momentum,
@@ -186,11 +187,13 @@ public class NUTS {
                     epsilon * v
             );
 
-            final double logOfMasterPAfterLeapfrog = getLogOfMasterP(probabilisticVertices);
+            final double logOfMasterPAfterLeapfrog = getLogProb(probabilisticVertices);
 
             final double logMpMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
             final int nPrime = u <= Math.exp(logMpMinusMomentum) ? 1 : 0;
             final int sPrime = u < Math.exp(DELTA_MAX + logMpMinusMomentum) ? 1 : 0;
+
+            final Map<String, ?> sampleAtThetaPrime = takeSample(sampleFromVertices);
 
             return new BuiltTree(
                     leapfrog.position,
@@ -204,6 +207,7 @@ public class NUTS {
                     leapfrog.position,
                     leapfrog.gradient,
                     logOfMasterPAfterLeapfrog,
+                    sampleAtThetaPrime,
                     nPrime,
                     sPrime
             );
@@ -211,10 +215,11 @@ public class NUTS {
         } else {
             //Recursion—implicitly build the left and right subtrees.
 
-            BuiltTree tree = BuildTree(
+            BuiltTree leftTree = BuildTree(
                     latentVertices,
                     latentSetAndCascadeCache,
                     probabilisticVertices,
+                    sampleFromVertices,
                     position,
                     gradient,
                     momentum,
@@ -225,33 +230,36 @@ public class NUTS {
                     random
             );
 
-            Map<String, Double> positionBackward = tree.positionBackward;
-            Map<String, Double> gradientBackward = tree.gradientBackward;
-            Map<String, Double> momentumBackward = tree.momentumBackward;
-            double logOfMasterPAtPositionBackward = tree.logOfMasterPAtPositionBackward;
+            Map<String, Double> positionBackward = leftTree.positionBackward;
+            Map<String, Double> gradientBackward = leftTree.gradientBackward;
+            Map<String, Double> momentumBackward = leftTree.momentumBackward;
+            double logOfMasterPAtPositionBackward = leftTree.logOfMasterPAtPositionBackward;
 
-            Map<String, Double> positionForward = tree.positionForward;
-            Map<String, Double> gradientForward = tree.gradientForward;
-            Map<String, Double> momentumForward = tree.momentumForward;
-            double logOfMasterPAtPositionForward = tree.logOfMasterPAtPositionForward;
+            Map<String, Double> positionForward = leftTree.positionForward;
+            Map<String, Double> gradientForward = leftTree.gradientForward;
+            Map<String, Double> momentumForward = leftTree.momentumForward;
+            double logOfMasterPAtPositionForward = leftTree.logOfMasterPAtPositionForward;
 
-            Map<String, Double> thetaPrime = tree.thetaPrime;
-            Map<String, Double> gradientAtThetaPrime = tree.gradientAtThetaPrime;
-            double logOfMasterPAtThetaPrime = tree.logOfMasterPAtThetaPrime;
+            Map<String, Double> thetaPrime = leftTree.thetaPrime;
+            Map<String, Double> gradientAtThetaPrime = leftTree.gradientAtThetaPrime;
+            double logOfMasterPAtThetaPrime = leftTree.logOfMasterPAtThetaPrime;
+            Map<String, ?> sampleAtThetaPrime = leftTree.sampleAtThetaPrime;
 
-            int sPrime = tree.sPrime;
-            int nPrime = tree.nPrime;
+            int sPrime = leftTree.sPrime;
+            int nPrime = leftTree.nPrime;
 
+            //Should continue building right tree if left tree stop flag is 1
             if (sPrime == 1) {
 
-                BuiltTree treePrime;
+                BuiltTree rightTree;
                 if (v == -1) {
-                    treePrime = BuildTree(
+                    rightTree = BuildTree(
                             latentVertices,
                             latentSetAndCascadeCache,
                             probabilisticVertices,
+                            sampleFromVertices,
                             positionBackward,
-                            tree.gradientBackward,
+                            leftTree.gradientBackward,
                             momentumBackward,
                             u,
                             v,
@@ -260,18 +268,19 @@ public class NUTS {
                             random
                     );
 
-                    positionBackward = treePrime.positionBackward;
-                    gradientBackward = treePrime.gradientBackward;
-                    momentumBackward = treePrime.momentumBackward;
-                    logOfMasterPAtPositionBackward = treePrime.logOfMasterPAtPositionBackward;
+                    positionBackward = rightTree.positionBackward;
+                    gradientBackward = rightTree.gradientBackward;
+                    momentumBackward = rightTree.momentumBackward;
+                    logOfMasterPAtPositionBackward = rightTree.logOfMasterPAtPositionBackward;
 
                 } else {
-                    treePrime = BuildTree(
+                    rightTree = BuildTree(
                             latentVertices,
                             latentSetAndCascadeCache,
                             probabilisticVertices,
+                            sampleFromVertices,
                             positionForward,
-                            tree.gradientForward,
+                            leftTree.gradientForward,
                             momentumForward,
                             u,
                             v,
@@ -280,28 +289,29 @@ public class NUTS {
                             random
                     );
 
-                    positionForward = treePrime.positionForward;
-                    gradientForward = treePrime.gradientForward;
-                    momentumForward = treePrime.momentumForward;
-                    logOfMasterPAtPositionForward = treePrime.logOfMasterPAtPositionForward;
+                    positionForward = rightTree.positionForward;
+                    gradientForward = rightTree.gradientForward;
+                    momentumForward = rightTree.momentumForward;
+                    logOfMasterPAtPositionForward = rightTree.logOfMasterPAtPositionForward;
                 }
 
-                double prob = (double) treePrime.nPrime / (tree.nPrime + treePrime.nPrime);
+                double acceptThetaPrimeProbability = (double) rightTree.nPrime / (leftTree.nPrime + rightTree.nPrime);
 
-                if (withProbability(prob, random)) {
-                    thetaPrime = treePrime.thetaPrime;
-                    gradientAtThetaPrime = treePrime.gradientAtThetaPrime;
-                    logOfMasterPAtThetaPrime = treePrime.logOfMasterPAtThetaPrime;
+                if (withProbability(acceptThetaPrimeProbability, random)) {
+                    thetaPrime = rightTree.thetaPrime;
+                    gradientAtThetaPrime = rightTree.gradientAtThetaPrime;
+                    logOfMasterPAtThetaPrime = rightTree.logOfMasterPAtThetaPrime;
+                    sampleAtThetaPrime = rightTree.sampleAtThetaPrime;
                 }
 
-                sPrime = treePrime.sPrime * isNotUTurning(
+                sPrime = rightTree.sPrime * isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
                         momentumBackward
                 );
 
-                nPrime = nPrime + treePrime.nPrime;
+                nPrime = nPrime + rightTree.nPrime;
             }
 
             return new BuiltTree(
@@ -316,11 +326,20 @@ public class NUTS {
                     thetaPrime,
                     gradientAtThetaPrime,
                     logOfMasterPAtThetaPrime,
+                    sampleAtThetaPrime,
                     nPrime,
                     sPrime
             );
         }
 
+    }
+
+    private static double getLogProb(List<Vertex<?>> probabilisticVertices) {
+        double sum = 0.0;
+        for (Vertex<?> vertex : probabilisticVertices) {
+            sum += vertex.logDensityAtValue();
+        }
+        return sum;
     }
 
     private static boolean withProbability(double probability, Random random) {
@@ -427,16 +446,16 @@ public class NUTS {
     }
 
     /**
-     * This is meant to be used for caching a pre-leapfrog sample. This sample
-     * will be used if the leapfrog is rejected.
+     * This is meant to be used for tracking a sample while building tree.
      *
-     * @param sample
-     * @param fromVertices
+     * @param sampleFromVertices
      */
-    private static void takeSample(Map<String, ?> sample, List<? extends Vertex<?>> fromVertices) {
-        for (Vertex<?> vertex : fromVertices) {
+    private static Map<String, ?> takeSample(List<? extends Vertex<?>> sampleFromVertices) {
+        Map<String, ?> sample = new HashMap<>();
+        for (Vertex<?> vertex : sampleFromVertices) {
             putValue(vertex, sample);
         }
+        return sample;
     }
 
     private static <T> void putValue(Vertex<T> vertex, Map<String, ?> target) {
@@ -444,8 +463,7 @@ public class NUTS {
     }
 
     /**
-     * This is used when a leapfrog is rejected. At that point the vertices are in a post
-     * leapfrog state and a pre-leapfrog sample must be used.
+     * This is used to save of the sample from the uniformly chosen thetaPrime position
      *
      * @param samples
      * @param cachedSample a cached sample from before leapfrog
@@ -453,19 +471,6 @@ public class NUTS {
     private static void addSampleFromCache(Map<String, List<?>> samples, Map<String, ?> cachedSample) {
         for (Map.Entry<String, ?> sampleEntry : cachedSample.entrySet()) {
             addSampleForVertex(sampleEntry.getKey(), sampleEntry.getValue(), samples);
-        }
-    }
-
-    /**
-     * This is used when a leapfrog is accepted. At that point the vertices are in a
-     * post leapfrog state.
-     *
-     * @param samples
-     * @param fromVertices vertices from which to create and save new sample.
-     */
-    private static void addSampleFromVertices(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
-        for (Vertex<?> vertex : fromVertices) {
-            addSampleForVertex(vertex.getId(), vertex.getValue(), samples);
         }
     }
 
@@ -501,6 +506,7 @@ public class NUTS {
         public final Map<String, Double> thetaPrime;
         public final Map<String, Double> gradientAtThetaPrime;
         public final double logOfMasterPAtThetaPrime;
+        public final Map<String, ?> sampleAtThetaPrime;
         public final int nPrime;
         public final int sPrime;
 
@@ -515,6 +521,7 @@ public class NUTS {
                          Map<String, Double> thetaPrime,
                          Map<String, Double> gradientAtThetaPrime,
                          double logOfMasterPAtThetaPrime,
+                         Map<String, ?> sampleAtThetaPrime,
                          int nPrime,
                          int sPrime) {
 
@@ -529,6 +536,7 @@ public class NUTS {
             this.thetaPrime = thetaPrime;
             this.gradientAtThetaPrime = gradientAtThetaPrime;
             this.logOfMasterPAtThetaPrime = logOfMasterPAtThetaPrime;
+            this.sampleAtThetaPrime = sampleAtThetaPrime;
             this.nPrime = nPrime;
             this.sPrime = sPrime;
         }
