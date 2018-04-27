@@ -6,12 +6,12 @@ class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDouble> {
         return ArithmeticDouble(Math.exp(this.value))
     }
 
-    override fun pow(that: ArithmeticDouble): ArithmeticDouble {
-        return ArithmeticDouble(Math.pow(this.value, that.value))
+    override fun pow(exponent: ArithmeticDouble): ArithmeticDouble {
+        return ArithmeticDouble(Math.pow(this.value, exponent.value))
     }
 
-    override fun pow(value: Double): ArithmeticDouble {
-        return ArithmeticDouble(Math.pow(this.value, value))
+    override fun pow(exponent: Double): ArithmeticDouble {
+        return ArithmeticDouble(Math.pow(this.value, exponent))
     }
 
     override fun log(): ArithmeticDouble {
@@ -50,20 +50,20 @@ class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDouble> {
         return ArithmeticDouble(value / that.value)
     }
 
-    override fun minus(value: Double): ArithmeticDouble {
-        return ArithmeticDouble(this.value - value)
+    override fun minus(that: Double): ArithmeticDouble {
+        return ArithmeticDouble(this.value - that)
     }
 
-    override fun plus(value: Double): ArithmeticDouble {
-        return ArithmeticDouble(this.value + value)
+    override fun plus(that: Double): ArithmeticDouble {
+        return ArithmeticDouble(this.value + that)
     }
 
-    override fun times(value: Double): ArithmeticDouble {
-        return ArithmeticDouble(this.value * value)
+    override fun times(that: Double): ArithmeticDouble {
+        return ArithmeticDouble(this.value * that)
     }
 
-    override fun div(value: Double): ArithmeticDouble {
-        return ArithmeticDouble(this.value / value)
+    override fun div(that: Double): ArithmeticDouble {
+        return ArithmeticDouble(this.value / that)
     }
 
     override fun unaryMinus(): ArithmeticDouble {

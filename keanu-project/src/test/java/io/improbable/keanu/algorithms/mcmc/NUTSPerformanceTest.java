@@ -5,7 +5,7 @@ import org.openjdk.jmh.annotations.BenchmarkMode;
 import org.openjdk.jmh.annotations.Fork;
 import org.openjdk.jmh.annotations.Mode;
 
-public class NUTSPerfTest {
+public class NUTSPerformanceTest {
 
     public static void main(String[] args) throws Exception {
         org.openjdk.jmh.Main.main(args);
@@ -14,7 +14,7 @@ public class NUTSPerfTest {
     @Fork(value = 1, warmups = 1)
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    public void testHMC() {
+    public void simpleGaussianSamplingHMCTest() {
         HamiltonianTest test = new HamiltonianTest();
         test.setup();
         test.samplesGaussian();
@@ -23,8 +23,8 @@ public class NUTSPerfTest {
     @Fork(value = 1, warmups = 1)
     @Benchmark
     @BenchmarkMode(Mode.AverageTime)
-    public void testNUTS() {
-        EfficientNUTSTest test = new EfficientNUTSTest();
+    public void simpleGaussianSamplingNUTSTest() {
+        NUTSTest test = new NUTSTest();
         test.setup();
         test.samplesGaussian();
     }

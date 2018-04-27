@@ -31,7 +31,7 @@ public class MetropolisHastings {
                                                      final int sampleCount,
                                                      final Random random) {
         checkBayesNetInHealthyState(bayesNet);
-        
+
         Map<String, List<?>> samplesByVertex = new HashMap<>();
         List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);

@@ -14,15 +14,11 @@ import java.util.*;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-public class EfficientNUTS {
+public class NUTS {
 
     private final static double DELTA_MAX = 1000.0;
 
-    public static long leapfrogCount = 0;
-    public static long masterpCount = 0;
-
-
-    private EfficientNUTS() {
+    private NUTS() {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
@@ -65,8 +61,6 @@ public class EfficientNUTS {
 
         final Map<String, ?> sampleBeforeLeapfrog = new HashMap<>();
 
-        int maxJ = 0;
-
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
 
             cache(position, positionForward);
@@ -80,7 +74,7 @@ public class EfficientNUTS {
 
             takeSample(sampleBeforeLeapfrog, fromVertices);
 
-            double u = random.nextDouble() * logOfMasterPreviously - 0.5 * dotProduct(momentumForward);
+            double u = random.nextDouble() * Math.exp(logOfMasterPreviously - 0.5 * dotProduct(momentumForward));
             int j = 0;
             int s = 1;
             int n = 1;
@@ -130,7 +124,7 @@ public class EfficientNUTS {
                 }
 
                 if (builtTree.sPrime == 1) {
-                    final double acceptanceProb = n / (double) builtTree.nPrime;
+                    final double acceptanceProb = (double) builtTree.nPrime / n;
                     if (withProbability(acceptanceProb, random)) {
                         position = builtTree.thetaPrime;
                         gradient = builtTree.gradientAtThetaPrime;
@@ -140,7 +134,7 @@ public class EfficientNUTS {
 
                 n = n + builtTree.nPrime;
 
-                s = builtTree.sPrime * isUTurning(
+                s = builtTree.sPrime * isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
@@ -149,16 +143,11 @@ public class EfficientNUTS {
 
                 j++;
 
-                maxJ = Math.max(j, maxJ);
             }
 
             //TODO: should be sample not only position
             addSampleFromCache(samples, position);
         }
-
-        System.out.println(maxJ);
-        System.out.println("leapfrogCount: " + leapfrogCount);
-        System.out.println("masterPCount: " + masterpCount);
 
         return new NetworkSamples(samples, sampleCount);
     }
@@ -168,7 +157,6 @@ public class EfficientNUTS {
         for (Vertex<?> vertex : probabilisticVertices) {
             sum += vertex.logDensityAtValue();
         }
-        masterpCount++;
         return sum;
     }
 
@@ -201,7 +189,7 @@ public class EfficientNUTS {
             final double logOfMasterPAfterLeapfrog = getLogOfMasterP(probabilisticVertices);
 
             final double logMpMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
-            final int nPrime = u < Math.exp(logMpMinusMomentum) ? 1 : 0;
+            final int nPrime = u <= Math.exp(logMpMinusMomentum) ? 1 : 0;
             final int sPrime = u < Math.exp(DELTA_MAX + logMpMinusMomentum) ? 1 : 0;
 
             return new BuiltTree(
@@ -306,7 +294,7 @@ public class EfficientNUTS {
                     logOfMasterPAtThetaPrime = treePrime.logOfMasterPAtThetaPrime;
                 }
 
-                sPrime = treePrime.sPrime * isUTurning(
+                sPrime = treePrime.sPrime * isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
@@ -339,10 +327,10 @@ public class EfficientNUTS {
         return random.nextDouble() < probability;
     }
 
-    private static int isUTurning(Map<String, Double> positionForward,
-                                  Map<String, Double> positionBack,
-                                  Map<String, Double> momentumForward,
-                                  Map<String, Double> momentumBack) {
+    private static int isNotUTurning(Map<String, Double> positionForward,
+                                     Map<String, Double> positionBack,
+                                     Map<String, Double> momentumForward,
+                                     Map<String, Double> momentumBack) {
         double forward = 0.0;
         double backward = 0.0;
 
@@ -355,9 +343,9 @@ public class EfficientNUTS {
             backward += forwardMinusBack * momentumBack.get(id);
         }
 
-        boolean turning = forward >= 0.0 || backward >= 0.0;
+        boolean notTurning = forward >= 0.0 && backward >= 0.0;
 
-        return turning ? 1 : 0;
+        return notTurning ? 1 : 0;
     }
 
     private static void cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
@@ -427,7 +415,6 @@ public class EfficientNUTS {
             rPrime.put(rPrimeEntry.getKey(), rDoublePrime);
         }
 
-        leapfrogCount++;
         return new LeapFrogged(thetaPrime, rPrime, thetaPrimeGradient);
     }
 
