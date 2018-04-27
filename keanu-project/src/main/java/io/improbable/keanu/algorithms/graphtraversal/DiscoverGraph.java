@@ -22,7 +22,7 @@ public class DiscoverGraph {
      * @return a set containing EVERY vertex in a graph that the
      * starting vertex is apart of.
      */
-    public static Set<Vertex<?>> getEntireGraph(Vertex initialVertex) {
+    public static Set<Vertex<?>> getEntireGraph(Vertex<?> initialVertex) {
 
         Set<Vertex<?>> discoveredGraph = new HashSet<>();
 
