@@ -58,6 +58,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }
 
+    @Override
     public Map<String, Double> dlnDensityAtValue() {
         InverseGamma.Diff dP = InverseGamma.dlnPdf(a.getValue(), b.getValue(), getValue());
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);

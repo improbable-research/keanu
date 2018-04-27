@@ -9,20 +9,20 @@ import java.util.Random;
 
 public class SelectVertex<T> extends Probabilistic<T> {
 
-    private final LinkedHashMap<T, DoubleVertex> selectableValues;
+    private final Map<T, DoubleVertex> selectableValues;
     private final Random random;
 
-    public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues, Random random) {
+    public SelectVertex(Map<T, DoubleVertex> selectableValues, Random random) {
         this.selectableValues = selectableValues;
         this.random = random;
         setParents(selectableValues.values());
     }
 
-    public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues) {
+    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
         this(selectableValues, new Random());
     }
 
-    public LinkedHashMap<T, DoubleVertex> getSelectableValues() {
+    public Map<T, DoubleVertex> getSelectableValues() {
         return selectableValues;
     }
 
@@ -31,6 +31,10 @@ public class SelectVertex<T> extends Probabilistic<T> {
         double sumP = sumProbabilities();
         double p = random.nextDouble();
         double sum = 0;
+
+        if (sumP == 0.0) {
+            throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
+        }
 
         T value = null;
         for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
@@ -50,7 +54,11 @@ public class SelectVertex<T> extends Probabilistic<T> {
 
     @Override
     public double density(T value) {
-        return selectableValues.get(value).getValue() / sumProbabilities();
+        double sumP = sumProbabilities();
+        if (sumP == 0.0) {
+            throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
+        }
+        return selectableValues.get(value).getValue() / sumP;
     }
 
     @Override

@@ -72,7 +72,7 @@ public class Infinitesimal {
         return new Infinitesimal(powered);
     }
 
-    public Infinitesimal clone() {
+    public Infinitesimal copy() {
         return new Infinitesimal(cloneInfinitesimals(infinitesimals));
     }
 

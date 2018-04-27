@@ -114,23 +114,21 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     private double sampleFuzzyDoubleInBounds() {
         double mu = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
-        int min = this.min.getValue();
-        int max = this.max.getValue();
 
         double doubleInBounds;
 
         do {
             doubleInBounds = Gaussian.sample(mu, sigma, random);
-        } while (doubleInBounds < (min - 0.5) || doubleInBounds > (max + 0.5 - 1e-10));
+        } while (doubleInBounds < (min.getValue() - 0.5) || doubleInBounds > (max.getValue() + 0.5 - 1e-10));
 
         return doubleInBounds;
     }
 
     private double getClampedInput() {
         double sigma = fuzzinessSigma.getValue();
-        double min = this.min.getValue() - sigma;
-        double max = this.max.getValue() + sigma;
-        return Math.min(Math.max(input.getValue(), min), max);
+        double minClamped = this.min.getValue() - sigma;
+        double maxClamped = this.max.getValue() + sigma;
+        return Math.min(Math.max(input.getValue(), minClamped), maxClamped);
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
@@ -146,25 +144,19 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     private double lambda(double x, double sigma) {
-        int max = this.max.getValue();
-        int min = this.min.getValue();
-        return 1.0 / (s(max + 0.5 - x, sigma) - s(min - 0.5 - x, sigma));
+        return 1.0 / (s(max.getValue() + 0.5 - x, sigma) - s(min.getValue() - 0.5 - x, sigma));
     }
 
     private double dPdx(double x, int i, double sigma) {
-        int max = this.max.getValue();
-        int min = this.min.getValue();
         double p = density(i);
         return -lambda(x, sigma) * (N(i + 0.5 - x, sigma) - N(i - 0.5 - x, sigma)
-                - p * (N(max + 0.5 - x, sigma) - N(min - 0.5 - x, sigma)));
+                - p * (N(max.getValue() + 0.5 - x, sigma) - N(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dPdSigma(double x, int i, double sigma) {
-        int max = this.max.getValue();
-        int min = this.min.getValue();
         double p = density(i);
         return lambda(x, sigma) * (dSdSigma(i + 0.5 - x, sigma) - dSdSigma(i - 0.5 - x, sigma)
-                - p * (dSdSigma(max + 0.5 - x, sigma) - dSdSigma(min - 0.5 - x, sigma)));
+                - p * (dSdSigma(max.getValue() + 0.5 - x, sigma) - dSdSigma(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dSdSigma(double x, double sigma) {

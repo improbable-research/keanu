@@ -126,7 +126,7 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muBeta,
                 latentMuBeta,

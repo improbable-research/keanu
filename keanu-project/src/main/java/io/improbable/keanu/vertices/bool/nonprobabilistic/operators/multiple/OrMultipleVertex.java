@@ -11,6 +11,6 @@ public class OrMultipleVertex extends BoolReduceVertex {
     }
 
     private static Boolean or(Boolean a, Boolean b) {
-        return a | b;
+        return a || b;
     }
 }

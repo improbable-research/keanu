@@ -8,6 +8,9 @@ import java.util.Map;
 
 public class LogProbGradient {
 
+    private LogProbGradient() {
+    }
+
     /**
      * @param probabilisticVertices
      * @return the partial derivatives with respect to any latents upstream
