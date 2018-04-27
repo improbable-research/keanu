@@ -8,20 +8,23 @@ import java.util.stream.Collectors;
 
 public class LatentIncrementSort {
 
+    private LatentIncrementSort() {
+    }
+
     /**
      * Orders observed vertices by the smallest increment of additional latent vertices upstream of the observed vertex.
      *
      * @param vertices vertices to sort
      * @return Sorted observed vertices
      */
-    public static LinkedHashMap<Vertex<?>, Set<Vertex<?>>> sort(Collection<? extends Vertex<?>> vertices) {
+    public static Map<Vertex<?>, Set<Vertex<?>>> sort(Collection<? extends Vertex<?>> vertices) {
 
         Map<Vertex<?>, Set<Vertex<?>>> dependencies = getObservedVertexLatentDependencies(vertices);
         Map<Vertex<?>, Set<Vertex<?>>> dependants = mapDependents(dependencies);
         LinkedHashMap<Vertex<?>, Set<Vertex<?>>> observedVertexOrder = new LinkedHashMap<>();
         List<Vertex<?>> verticesWithFewestDependencies;
 
-        while ((verticesWithFewestDependencies = getVerticesWithFewestDependencies(dependencies)).size() > 0) {
+        while (!(verticesWithFewestDependencies = getVerticesWithFewestDependencies(dependencies)).isEmpty()) {
             Vertex<?> vertex = verticesWithFewestDependencies.get(0);
             Set<Vertex<?>> vertexDependencies = dependencies.remove(vertex);
             observedVertexOrder.put(vertex, vertexDependencies);

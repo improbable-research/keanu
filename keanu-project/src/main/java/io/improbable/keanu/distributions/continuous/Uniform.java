@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class Uniform {
 
+    private Uniform() {
+    }
+
     /**
      * Computer Generation of Statistical Distributions
      * by Richard Saucier

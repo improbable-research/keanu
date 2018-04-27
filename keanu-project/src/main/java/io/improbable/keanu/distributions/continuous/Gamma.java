@@ -8,6 +8,9 @@ import static org.apache.commons.math3.special.Gamma.gamma;
 
 public class Gamma {
 
+    private Gamma() {
+    }
+
     /**
      * Computer Generation of Statistical Distributions
      * by Richard Saucier
@@ -24,7 +27,9 @@ public class Gamma {
      * @return a random number from the Gamma distribution
      */
     public static double sample(double a, double theta, double k, Random random) {
-        assert (theta > 0. && k > 0.);
+        if (theta <= 0. || k <= 0.) {
+            throw new IllegalArgumentException("Invalid value for theta or k. Theta: " + theta + ". k: " + k);
+        }
         final double A = 1. / sqrt(2. * k - 1.);
         final double B = k - log(4.);
         final double Q = k + 1. / A;

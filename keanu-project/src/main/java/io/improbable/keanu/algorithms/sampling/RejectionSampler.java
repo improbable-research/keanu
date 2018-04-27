@@ -12,6 +12,9 @@ import java.util.function.Supplier;
 
 public class RejectionSampler {
 
+    private RejectionSampler() {
+    }
+
     public static double getPosteriorProbability(List<? extends Vertex<?>> latentVertices, List<Vertex<?>> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
         int matchedSampleCount = 0;
         int success = 0;
@@ -26,7 +29,11 @@ public class RejectionSampler {
             }
         }
 
-        return success / (double) matchedSampleCount;
+        if (matchedSampleCount == 0) {
+            throw new RuntimeException("No samples are matching.");
+        } else {
+            return success / (double) matchedSampleCount;
+        }
     }
 
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet, List<Vertex<?>> fromVertices, int sampleCount) {

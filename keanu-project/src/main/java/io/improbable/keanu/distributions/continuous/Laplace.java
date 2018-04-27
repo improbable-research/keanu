@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class Laplace {
 
+    private Laplace() {
+    }
+
     /**
      * Computer Generation of Statistical Distributions
      * by Richard Saucier
@@ -11,7 +14,9 @@ public class Laplace {
      * 5.1.8 page 25
      */
     public static double sample(double mu, double beta, Random random) {
-        assert (beta > 0.);
+        if (beta <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for beta: " + beta);
+        }
         if (random.nextDouble() > 0.5) {
             return mu + beta * Math.log(random.nextDouble());
         } else {

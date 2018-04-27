@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> implements Identifiable {
 
-    public static AtomicLong idGenerator = new AtomicLong(0L);
+    public static final AtomicLong idGenerator = new AtomicLong(0L);
 
     private String uuid = idGenerator.getAndIncrement() + "";
     private Set<Vertex<?>> children = new HashSet<>();

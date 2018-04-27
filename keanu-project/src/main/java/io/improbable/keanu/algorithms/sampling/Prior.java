@@ -12,6 +12,9 @@ import java.util.Map;
 
 public class Prior {
 
+    private Prior() {
+    }
+
     public static NetworkSamples sample(BayesNet bayesNet, List<? extends Vertex<?>> fromVertices, int sampleCount) {
 
         if (!bayesNet.getObservedVertices().isEmpty()) {

@@ -7,6 +7,9 @@ import java.util.stream.Collectors;
 
 public class TopologicalSort {
 
+    private TopologicalSort() {
+    }
+
     public static List<? extends Vertex<?>> sort(Collection<? extends Vertex<?>> vertices) {
 
         Map<Vertex<?>, Set<Vertex<?>>> dependencies = mapDependencies(vertices);

@@ -8,6 +8,9 @@ import java.util.Set;
 
 public class MarkovBlanket {
 
+    private MarkovBlanket() {
+    }
+
     public static Set<Vertex<?>> get(Vertex<?> aVertex) {
 
         Set<Vertex<?>> parents = getUpstreamProbabilisticVertices(aVertex);

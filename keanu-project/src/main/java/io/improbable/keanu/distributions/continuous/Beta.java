@@ -9,6 +9,9 @@ import static org.apache.commons.math3.special.Gamma.*;
 
 public class Beta {
 
+    private Beta() {
+    }
+
     /**
      * Computer Generation of Statistical Distributions
      * by Richard Saucier
@@ -27,8 +30,8 @@ public class Beta {
     }
 
     public static double pdf(double alpha, double beta, double x) {
-        double B = gamma(alpha) * gamma(beta) / gamma(alpha + beta);
-        return pow(x, alpha - 1) * pow(1 - x, beta - 1) / B;
+        double denominator = gamma(alpha) * gamma(beta) / gamma(alpha + beta);
+        return pow(x, alpha - 1) * pow(1 - x, beta - 1) / denominator;
     }
 
     public static Diff dPdf(double alpha, double beta, double x) {
@@ -36,12 +39,12 @@ public class Beta {
         double gammaAplusB = gamma(alpha + beta);
         double dPdx = -((pow(x, alpha - 2) * pow(1 - x, beta - 2) * (alpha * (x - 1) + (beta - 2) * x + 1) * gammaAplusB) / gammaAgammaB);
 
-        double pow1minusX_Bminus1 = pow(1 - x, beta - 1);
-        double powX_Aminus1 = pow(x, alpha - 1);
+        double pow1minusXToTheBminus1 = pow(1 - x, beta - 1);
+        double powXToTheAminus1 = pow(x, alpha - 1);
         double diagammaAplusB = digamma(alpha + beta);
-        double common_to_da_and_db = powX_Aminus1 * pow1minusX_Bminus1 * gammaAplusB;
-        double dPdAlpha = common_to_da_and_db * (diagammaAplusB + log(x) - digamma(alpha)) / gammaAgammaB;
-        double dPdBeta = common_to_da_and_db * (diagammaAplusB + log(1 - x) - digamma(beta)) / gammaAgammaB;
+        double commonToDaAndDb = powXToTheAminus1 * pow1minusXToTheBminus1 * gammaAplusB;
+        double dPdAlpha = commonToDaAndDb * (diagammaAplusB + log(x) - digamma(alpha)) / gammaAgammaB;
+        double dPdBeta = commonToDaAndDb * (diagammaAplusB + log(1 - x) - digamma(beta)) / gammaAgammaB;
 
         return new Diff(dPdAlpha, dPdBeta, dPdx);
     }

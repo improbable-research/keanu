@@ -12,6 +12,9 @@ import java.util.List;
 
 public class MultiModeDiscovery {
 
+    private MultiModeDiscovery() {
+    }
+
     public static List<NetworkState> findModesBySimulatedAnnealing(BayesNet network, int attempts, int samplesPerAttempt) {
 
         List<NetworkState> maxSamples = new ArrayList<>();

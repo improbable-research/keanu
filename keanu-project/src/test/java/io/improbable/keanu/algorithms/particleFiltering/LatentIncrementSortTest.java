@@ -30,7 +30,7 @@ public class LatentIncrementSortTest {
         gA.observe(0.1);
         fuzzySum.observe(1.0);
 
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> dependencies = LatentIncrementSort.sort(sigma.getConnectedGraph());
+        Map<Vertex<?>, Set<Vertex<?>>> dependencies = LatentIncrementSort.sort(sigma.getConnectedGraph());
 
         assertEquals(2, dependencies.size());
         assertEquals(1, dependencies.get(gA).size());
@@ -61,7 +61,7 @@ public class LatentIncrementSortTest {
         DoubleVertex g6 = new GaussianVertex(g5, sigma5);
         g6.observe(0.0);
 
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());
+        Map<Vertex<?>, Set<Vertex<?>>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());
 
         assertEquals(3, dependencies.size());
         assertEquals(1, dependencies.get(g1).size());

@@ -24,6 +24,9 @@ import static io.improbable.keanu.util.csv.pojo.ColumnDeserializer.convertToAppr
  */
 class PublicFieldMatcher {
 
+    private PublicFieldMatcher() {
+    }
+
     static <T> Optional<CsvColumnConsumer<T>> getFieldConsumer(String title, List<Field> potentialFields) {
 
         final Optional<Field> matchingField = findMatchingFieldName(title.trim(), potentialFields);
@@ -39,7 +42,7 @@ class PublicFieldMatcher {
             try {
                 matchingField.set(target, convertedValue);
             } catch (IllegalAccessException e) {
-                throw new RuntimeException(e);
+                e.printStackTrace();
             }
         };
     }
@@ -51,7 +54,7 @@ class PublicFieldMatcher {
     }
 
     private static boolean isNameMatch(Field field, String title) {
-        return field.getName().toLowerCase().equals(title.toLowerCase());
+        return field.getName().equalsIgnoreCase(title);
     }
 
     private static boolean hasCsvPropertyAnnotationWithName(Field field, String title) {

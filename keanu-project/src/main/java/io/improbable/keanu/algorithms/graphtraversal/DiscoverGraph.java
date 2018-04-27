@@ -9,6 +9,9 @@ import java.util.Set;
 
 public class DiscoverGraph {
 
+    private DiscoverGraph() {
+    }
+
     /**
      * This algorithm visits all vertices in a graph. It's memory
      * requirements is on the order of number of vertices in the graph

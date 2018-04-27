@@ -115,7 +115,7 @@ public class BayesNet {
             iteration++;
 
             if (iteration > attempts) {
-                throw new RuntimeException("Failed to find non-zero probability state");
+                throw new IllegalStateException("Failed to find non-zero probability state");
             }
         }
     }

@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
  */
 public class MetropolisHastings {
 
+    private MetropolisHastings() {
+    }
+
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<? extends Vertex<?>> fromVertices,
                                                      int sampleCount) {
@@ -31,7 +34,7 @@ public class MetropolisHastings {
                                                      final int sampleCount,
                                                      final Random random) {
         if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         Map<String, List<?>> samplesByVertex = new HashMap<>();
@@ -65,7 +68,7 @@ public class MetropolisHastings {
         final T oldValue = chosenVertex.getValue();
         final T proposedValue = chosenVertex.sample();
 
-        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), (id) -> chosenVertex.exploreSetting());
+        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);

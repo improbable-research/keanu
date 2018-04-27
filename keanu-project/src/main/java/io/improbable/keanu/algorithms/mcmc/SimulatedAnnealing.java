@@ -45,7 +45,7 @@ public class SimulatedAnnealing {
                                                  Random random) {
 
         if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         Map<String, ?> maxSamplesByVertex = new HashMap<>();
@@ -97,7 +97,7 @@ public class SimulatedAnnealing {
 
         final double minusK = Math.log(endT / startT) / iterations;
 
-        return (n) -> startT * Math.exp(minusK * n);
+        return n -> startT * Math.exp(minusK * n);
     }
 
 }

@@ -28,7 +28,7 @@ public class NonGradientOptimizer {
     public double optimize(int maxEvaluations, double boundsRange, List<Vertex<?>> outputVertices) {
 
         if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
@@ -40,7 +40,7 @@ public class NonGradientOptimizer {
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         double[] minBounds = new double[startPoint.length];

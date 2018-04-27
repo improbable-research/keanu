@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class Exponential {
 
+    private Exponential() {
+    }
+
     /**
      * Computer Generation of Statistical Distributions
      * by Richard Saucier
@@ -11,7 +14,9 @@ public class Exponential {
      * 5.1.8 page 20
      */
     public static double sample(double a, double b, Random random) {
-        assert (b > 0.0);
+        if (b <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for b");
+        }
         return a - b * Math.log(random.nextDouble());
     }
 

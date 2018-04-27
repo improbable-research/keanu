@@ -8,6 +8,9 @@ import static java.lang.Math.exp;
 
 public class ParticleFilter {
 
+    private ParticleFilter() {
+    }
+
     /***
      * A particle filtering approach is used to find probable values for the latent vertices of a Bayesian network,
      * given a set of observed vertices. This is done by incrementally increasing the proportion of the graph under
@@ -35,7 +38,7 @@ public class ParticleFilter {
     public static List<Particle> getProbableValues(Collection<? extends Vertex<?>> vertices, int numParticles,
                                                    int resamplingCycles, double resamplingProportion, Random random) {
 
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
+        Map<Vertex<?>, Set<Vertex<?>>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
         List<Vertex<?>> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
         List<Particle> particles = createEmptyParticles(numParticles);
 
