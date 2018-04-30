@@ -13,37 +13,37 @@ public class TestGraphGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(TestGraphGenerator.class);
 
-    static DoubleVertex addLinks(DoubleVertex end, AtomicInteger n, AtomicInteger m, int links) {
+    static DoubleVertex addLinks(DoubleVertex end, AtomicInteger opCount, AtomicInteger dualNumberCount, int links) {
 
         for (int i = 0; i < links; i++) {
-            DoubleVertex left = passThroughVertex(end, n, m, id -> log.info("OP on id:" + id));
-            DoubleVertex right = passThroughVertex(end, n, m, id -> log.info("OP on id:" + id));
-            end = sumVertex(left, right, n, m, id -> log.info("OP on id:" + id));
+            DoubleVertex left = passThroughVertex(end, opCount, dualNumberCount, id -> log.info("OP on id:" + id));
+            DoubleVertex right = passThroughVertex(end, opCount, dualNumberCount, id -> log.info("OP on id:" + id));
+            end = sumVertex(left, right, opCount, dualNumberCount, id -> log.info("OP on id:" + id));
         }
 
         return end;
     }
 
-    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger n, AtomicInteger m, Consumer<Long> onOp) {
+    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
         final long id = Vertex.idGenerator.get();
         return new DoubleUnaryOpLambda<>(from, (a) -> {
-            n.incrementAndGet();
+            opCount.incrementAndGet();
             onOp.accept(id);
             return a;
         }, (a) -> {
-            m.incrementAndGet();
+            dualNumberCount.incrementAndGet();
             return a.get(from);
         });
     }
 
-    static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger n, AtomicInteger m, Consumer<Long> onOp) {
+    static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
         final long id = Vertex.idGenerator.get();
         return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
-            n.incrementAndGet();
+            opCount.incrementAndGet();
             onOp.accept(id);
             return a + b;
         }, (a) -> {
-            m.incrementAndGet();
+            dualNumberCount.incrementAndGet();
             return a.get(left).add(a.get(right));
         } );
     }
