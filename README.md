@@ -6,9 +6,8 @@
 /_/ |_\___/\__,_/_/ /_/\__,_/  
 ```
 
-[![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status)](https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project)
 
-[![Build Status](https://travis-ci.org/improbable-research/keanu.svg?branch=develop)](https://travis-ci.org/improbable-research/keanu)
+[![Build Status](https://travis-ci.org/improbable-research/keanu.svg?branch=develop)](https://travis-ci.org/improbable-research/keanu) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status)](https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project)
 
 ## Overview
 
