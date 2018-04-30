@@ -11,7 +11,7 @@ public abstract class Vertex<T> implements Identifiable {
 
     public static final AtomicLong idGenerator = new AtomicLong(0L);
 
-    private transient String uuid = idGenerator.getAndIncrement() + "";
+    private String uuid = idGenerator.getAndIncrement() + "";
     private Set<Vertex> children = new HashSet<>();
     private Set<Vertex> parents = new HashSet<>();
     private T value;

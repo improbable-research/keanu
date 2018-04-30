@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class SinVertex extends DoubleUnaryOpVertex {
 
