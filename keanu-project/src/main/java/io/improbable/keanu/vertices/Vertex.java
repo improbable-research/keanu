@@ -23,7 +23,7 @@ public abstract class Vertex<T> implements Identifiable {
      * will differ from the probability by a constant.
      *
      * @param value The supplied value.
-     * @return The log prob.
+     * @return The natural log of the probability density at the supplied value
      */
     public abstract double logProb(T value);
 
@@ -35,6 +35,7 @@ public abstract class Vertex<T> implements Identifiable {
      * The partial derivatives of the natural log prob.
      *
      * @param value at a given value
+     * @return the partial derivatives of the log density
      */
     public abstract Map<String, Double> dLogProb(T value);
 
@@ -93,9 +94,10 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     /**
-     * A probabilistic vertex is defined as a vertex whose value is not
-     * derived from it's parents. However, the probability of the vertex's
-     * value may be dependent on it's parents values.
+     * @return True if the vertex is probabilistic, false otherwise.
+     * A probabilistic vertex is defined as a vertex whose value is
+     * not derived from it's parents. However, the probability of the
+     * vertex's value may be dependent on it's parents values.
      */
     public abstract boolean isProbabilistic();
 

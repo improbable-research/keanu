@@ -2,14 +2,14 @@ package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.8 page 20
+ */
 public class Exponential {
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.8 page 20
-     */
     public static double sample(double a, double b, Random random) {
         assert (b > 0.0);
         return a - b * Math.log(random.nextDouble());

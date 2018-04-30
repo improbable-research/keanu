@@ -7,14 +7,14 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static org.apache.commons.math3.special.Gamma.*;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.2 page 14
+ */
 public class Beta {
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.2 page 14
-     */
     public static double sample(double alpha, double beta, double xMin, double xMax, Random random) {
         double y1 = Gamma.sample(0.0, 1.0, alpha, random);
         double y2 = Gamma.sample(0.0, 1.0, beta, random);
