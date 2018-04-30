@@ -4,6 +4,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
+import java.util.Map;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -11,12 +12,12 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, Double> op;
-    protected final Supplier<DualNumber> dualNumberSupplier;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, Double> op, Supplier<DualNumber> dualNumberSupplier) {
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this.inputVertex = inputVertex;
         this.op = op;
-        this.dualNumberSupplier = dualNumberSupplier;
+        this.dualNumberSupplier = dualNumberCalculation;
         setParents(inputVertex);
     }
 
@@ -35,9 +36,9 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber getDualNumber() {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
-            return dualNumberSupplier.get();
+            return dualNumberSupplier.apply(dualNumbers);
         }
 
         throw new UnsupportedOperationException();

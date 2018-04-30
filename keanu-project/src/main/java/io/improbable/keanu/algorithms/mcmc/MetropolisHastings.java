@@ -23,10 +23,10 @@ public class MetropolisHastings {
     }
 
     /**
-     * @param bayesNet
+     * @param bayesNet     a bayesian network containing latent vertices
      * @param fromVertices the vertices to include in the returned samples
-     * @param sampleCount
-     * @param random
+     * @param sampleCount  number of samples to take using the algorithm
+     * @param random       the source of randomness
      * @return Samples for each vertex ordered by MCMC iteration
      */
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
@@ -34,7 +34,7 @@ public class MetropolisHastings {
                                                      final int sampleCount,
                                                      final Random random) {
         checkBayesNetInHealthyState(bayesNet);
-        
+
         Map<String, List<?>> samplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);

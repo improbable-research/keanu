@@ -62,7 +62,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber getDualNumber() {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.get();
         }

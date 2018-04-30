@@ -25,5 +25,4 @@ public class Uniform {
             return 0.;
         }
     }
-
 }

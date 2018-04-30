@@ -17,13 +17,14 @@ public class Gamma {
      * ARL-TR-2168 March 2000
      * 5.1.8 page 33
      */
+
     public static final double M_E = 0.577215664901532860606512090082;
 
     /**
      * @param a      location
      * @param theta  scale
      * @param k      shape
-     * @param random
+     * @param random source of randomness
      * @return a random number from the Gamma distribution
      */
     public static double sample(double a, double theta, double k, Random random) {

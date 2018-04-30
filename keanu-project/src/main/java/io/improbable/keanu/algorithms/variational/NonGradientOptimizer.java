@@ -64,6 +64,7 @@ public class NonGradientOptimizer {
 
     /**
      * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * @param boundsRange    bounding box around starting point
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
@@ -72,6 +73,7 @@ public class NonGradientOptimizer {
 
     /**
      * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * @param boundsRange    bounding box around starting point
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations, double boundsRange) {

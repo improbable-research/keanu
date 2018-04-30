@@ -18,6 +18,7 @@ public class Beta {
      * ARL-TR-2168 March 2000
      * 5.1.2 page 14
      */
+
     public static double sample(double alpha, double beta, double xMin, double xMax, Random random) {
         double y1 = Gamma.sample(0.0, 1.0, alpha, random);
         double y2 = Gamma.sample(0.0, 1.0, beta, random);

@@ -13,6 +13,7 @@ public class Laplace {
      * ARL-TR-2168 March 2000
      * 5.1.8 page 25
      */
+
     public static double sample(double mu, double beta, Random random) {
         if (beta <= 0.0) {
             throw new IllegalArgumentException("Invalid value for beta: " + beta);

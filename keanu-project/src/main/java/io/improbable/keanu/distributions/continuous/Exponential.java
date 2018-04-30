@@ -13,6 +13,7 @@ public class Exponential {
      * ARL-TR-2168 March 2000
      * 5.1.8 page 20
      */
+
     public static double sample(double a, double b, Random random) {
         if (b <= 0.0) {
             throw new IllegalArgumentException("Invalid value for b");
