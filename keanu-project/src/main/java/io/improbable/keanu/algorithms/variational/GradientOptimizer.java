@@ -35,8 +35,12 @@ public class GradientOptimizer {
     }
 
     /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     * This method is here to provide more fine grained control of optimization.
+     *
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @param optimizer      apache math optimizer to use for optimization
+     * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
         if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
@@ -45,12 +49,21 @@ public class GradientOptimizer {
         return optimize(maxEvaluations, bayesNet.getVerticesThatContributeToMasterP(), optimizer);
     }
 
+    /**
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @return the natural logarithm of the Maximum A Posteriori (MAP)
+     */
     public double maxAPosteriori(int maxEvaluations) {
         return maxAPosteriori(maxEvaluations, DEFAULT_OPTIMIZER);
     }
 
     /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * This method is here to provide more fine grained control of optimization.
+     *
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @param optimizer      apache math optimizer to use for optimization
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
@@ -60,6 +73,11 @@ public class GradientOptimizer {
         return optimize(maxEvaluations, bayesNet.getObservedVertices(), optimizer);
     }
 
+    /**
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @return the natural logarithm of the maximum likelihood
+     */
     public double maxLikelihood(int maxEvaluations) {
         return maxLikelihood(maxEvaluations, DEFAULT_OPTIMIZER);
     }

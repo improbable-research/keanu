@@ -26,24 +26,22 @@ public abstract class Vertex<T> implements Identifiable {
     public abstract double density(T value);
 
     /**
-     * Just a helper method for a common function
+     * @return the density at the vertex's current value
      */
     public double densityAtValue() {
         return density(getValue());
     }
 
     /**
-     * This is the value of the natural log of the probability density at the supplied value.
-     *
      * @param value The supplied value.
-     * @return The probability.
+     * @return The natural log of the probability density at the supplied value
      */
     public double logDensity(T value) {
         return Math.log(density(value));
     }
 
     /**
-     * Just a helper method for a common function
+     * @return the natural log of the density at the vertex's value
      */
     public double logDensityAtValue() {
         return logDensity(getValue());
@@ -63,6 +61,8 @@ public abstract class Vertex<T> implements Identifiable {
      * chain rule is used to calculate the derivative of the log of the density.
      * <p>
      * dlog(P)/dx = (dP/dx)*(1/P(x))
+     *
+     * @return the partial derivatives of the log density
      */
     public Map<String, Double> dlnDensityAtValue() {
 
@@ -127,9 +127,10 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     /**
-     * A probabilistic vertex is defined as a vertex whose value is not
-     * derived from it's parents. However, the probability of the vertex's
-     * value may be dependent on it's parents values.
+     * @return True if the vertex is probabilistic, false otherwise.
+     * A probabilistic vertex is defined as a vertex whose value is
+     * not derived from it's parents. However, the probability of the
+     * vertex's value may be dependent on it's parents values.
      */
     public abstract boolean isProbabilistic();
 

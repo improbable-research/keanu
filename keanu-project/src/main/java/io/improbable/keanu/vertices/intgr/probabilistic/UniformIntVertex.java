@@ -16,6 +16,7 @@ public class UniformIntVertex extends ProbabilisticInteger {
     /**
      * @param min The inclusive lower bound.
      * @param max The exclusive upper bound.
+     * @param random source of randomness
      */
     public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max, Random random) {
         this.min = min;

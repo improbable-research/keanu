@@ -4,6 +4,12 @@ import java.util.Random;
 
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.2.8 page 49
+ */
 public class Poisson {
     private final double mu;
     private final Random random;
@@ -17,12 +23,6 @@ public class Poisson {
         return poisson(mu, random);
     }
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.2.8 page 49
-     */
     public static int poisson(double mu, Random random) {
         assert (mu > 0.);
 
