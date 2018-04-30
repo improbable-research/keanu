@@ -136,11 +136,11 @@ public class ParticleFilter {
 
     public static class Particle {
 
-        private Map<Vertex<?>, Object> latentVertices = new HashMap<>();
-        private List<Vertex<?>> observedVertices = new ArrayList<>();
+        private Map<Vertex, Object> latentVertices = new HashMap<>();
+        private List<Vertex> observedVertices = new ArrayList<>();
         private double sumLogPOfSubgraph = 1.0;
 
-        public Map<Vertex<?>, Object> getLatentVertices() {
+        public Map<Vertex, Object> getLatentVertices() {
             return latentVertices;
         }
 
@@ -186,7 +186,7 @@ public class ParticleFilter {
             }
         }
 
-        private double sumLogP(Collection<Vertex<?>> vertices) {
+        private double sumLogP(Collection<Vertex> vertices) {
             return vertices.stream().mapToDouble(Vertex::logDensityAtValue).sum();
         }
     }

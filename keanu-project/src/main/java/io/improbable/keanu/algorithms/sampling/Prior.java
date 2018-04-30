@@ -47,7 +47,7 @@ public class Prior {
     }
 
     private static void addSampleForVertex(Vertex vertex, Map<String, List> samples) {
-        List samplesForVertex = (List) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<>());
+        List samplesForVertex = samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<>());
         samplesForVertex.add(vertex.getValue());
     }
 }
