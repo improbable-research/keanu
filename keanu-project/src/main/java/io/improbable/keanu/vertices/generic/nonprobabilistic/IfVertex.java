@@ -21,12 +21,6 @@ public class IfVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T lazyEval() {
-        setValue(op(predicate.lazyEval(), thn.lazyEval(), els.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public T getDerivedValue() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }

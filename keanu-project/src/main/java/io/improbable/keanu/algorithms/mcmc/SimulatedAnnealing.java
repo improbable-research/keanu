@@ -53,6 +53,8 @@ public class SimulatedAnnealing {
 
         Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 
+        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
+
         double logP = bayesNet.getLogOfMasterP();
         double maxLogP = logP;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
@@ -63,7 +65,7 @@ public class SimulatedAnnealing {
 
             double T = annealingSchedule.getT(sampleNum);
             Set<Vertex<?>> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, T, random);
+            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, T, setAndCascadeCache, random);
 
             if (logP > maxLogP) {
                 maxLogP = logP;

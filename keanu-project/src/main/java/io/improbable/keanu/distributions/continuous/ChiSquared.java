@@ -1,6 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
+
 import static org.apache.commons.math3.special.Gamma.gamma;
 
 public class ChiSquared {

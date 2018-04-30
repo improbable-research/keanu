@@ -41,6 +41,7 @@ public class PoissonVertexTest {
         assertEquals(sd, standardDeviation, epsilon);
     }
 
+
     @Test
     public void densityForValuesGreaterThanTwenty() {
         double mu = 25.0;

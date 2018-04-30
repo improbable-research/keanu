@@ -58,7 +58,7 @@ public class BoolVertexTest {
 
         double pV3True = orDensity(pV1, pV2);
 
-        assertEquals(priorProbTrue(v3, 1000000), pV3True, 0.001);
+        assertEquals(priorProbTrue(v3, 10000), pV3True, 0.01);
     }
 
     @Test
@@ -67,7 +67,7 @@ public class BoolVertexTest {
 
         double pV3True = andDensity(pV1, pV2);
 
-        assertEquals(priorProbTrue(v3, 1000000), pV3True, 0.001);
+        assertEquals(priorProbTrue(v3, 10000), pV3True, 0.01);
     }
 
     @Test
@@ -80,7 +80,7 @@ public class BoolVertexTest {
 
         double pV4True = ifDensity(pV1, pV2, pV3);
 
-        assertEquals(priorProbTrue(v4, 1000000), pV4True, 0.001);
+        assertEquals(priorProbTrue(v4, 10000), pV4True, 0.01);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class BoolVertexTest {
 
         CastBoolVertex a = new CastBoolVertex(f);
 
-        assertEquals(priorProbTrue(a, 1000000), p, 0.001);
+        assertEquals(priorProbTrue(a, 10000), p, 0.01);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class BoolVertexTest {
 
         BoolVertex a = f.and(tru).or(fal);
 
-        assertEquals(priorProbTrue(a, 1000000), p, 0.001);
+        assertEquals(priorProbTrue(a, 10000), p, 0.01);
     }
 
 
