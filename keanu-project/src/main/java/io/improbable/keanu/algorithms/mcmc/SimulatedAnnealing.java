@@ -9,13 +9,10 @@ import java.util.*;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
- * tend towards the maximum a posteriori (MAP)
+ * tend towards the Maximum A Posteriori (MAP)
  */
 public class SimulatedAnnealing {
 
-    /**
-     * Finds the MAP using the specified annealing schedule.
-     */
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule schedule) {
@@ -29,9 +26,6 @@ public class SimulatedAnnealing {
         return getMaxAPosteriori(bayesNet, sampleCount, schedule, random);
     }
 
-    /**
-     * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
-     */
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet, int sampleCount) {
 
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
@@ -39,6 +33,15 @@ public class SimulatedAnnealing {
         return getMaxAPosteriori(bayesNet, sampleCount, schedule, new Random());
     }
 
+    /**
+     * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
+     *
+     * @param bayesNet          a bayesian network containing latent vertices
+     * @param sampleCount       the number of samples to take
+     * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
+     * @param random            the source of randomness
+     * @return the NetworkState that represents the Max A Posteriori
+     */
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule annealingSchedule,
@@ -84,6 +87,10 @@ public class SimulatedAnnealing {
         ((Map<String, ? super T>) samples).put(vertex.getId(), vertex.getValue());
     }
 
+    /**
+     * An annealing schedule determines how T (temperature) changes as
+     * a function of the current iteration number (i.e. sample number)
+     */
     public interface AnnealingSchedule {
         double getT(int iteration);
     }
@@ -92,6 +99,7 @@ public class SimulatedAnnealing {
      * @param iterations the number of iterations annealing over
      * @param startT     the value of T at iteration 0
      * @param endT       the value of T at the last iteration
+     * @return the annealing schedule
      */
     public static AnnealingSchedule exponentialSchedule(int iterations, double startT, double endT) {
 

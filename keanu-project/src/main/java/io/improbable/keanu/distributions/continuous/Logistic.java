@@ -13,8 +13,8 @@ public class Logistic {
     /**
      * @param a      location parameter (any real number)
      * @param b      scale parameter (b grater than 0)
-     * @param random
-     * @return
+     * @param random source for sampling
+     * @return a sample from the distribution
      */
     public static double sample(double a, double b, Random random) {
         assert (b > 0.0);
@@ -24,8 +24,8 @@ public class Logistic {
     /**
      * @param a location parameter (any real number)
      * @param b scale parameter (b greater than 0)
-     * @param x
-     * @return
+     * @param x at value
+     * @return the density at x
      */
     public static double pdf(double a, double b, double x) {
         double exponential = Math.exp((x - a) / b);
@@ -41,8 +41,8 @@ public class Logistic {
     /**
      * @param a location parameter (any real number)
      * @param b scale parameter (b greater than 0)
-     * @param x
-     * @return
+     * @param x at value
+     * @return the partial derivatives at x
      */
     public static Diff dPdf(double a, double b, double x) {
         double expAOverB = Math.exp(a / b);

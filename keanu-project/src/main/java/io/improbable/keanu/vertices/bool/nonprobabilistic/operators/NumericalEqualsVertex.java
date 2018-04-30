@@ -3,15 +3,15 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
 
+/**
+ * Returns true if a vertex value is equal to another vertex value within an epsilon.
+ */
 public class NumericalEqualsVertex extends NonProbabilisticBool {
 
     protected Vertex<Number> a;
     protected Vertex<Number> b;
     private Vertex<Number> epsilon;
 
-    /**
-     * Returns true if a is within epsilon of b
-     */
     public NumericalEqualsVertex(Vertex<Number> a, Vertex<Number> b, Vertex<Number> epsilon) {
         this.a = a;
         this.b = b;

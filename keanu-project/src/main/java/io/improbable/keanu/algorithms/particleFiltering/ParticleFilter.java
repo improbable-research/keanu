@@ -29,7 +29,7 @@ public class ParticleFilter {
      * @param resamplingProportion the proportion of particles to cull (e.g. the 25% of least probably particles could
      *                             be culled)
      * @param random a random number generator
-     * @return
+     * @return a list of likely
      */
 
     public static List<Particle> getProbableValues(Collection<? extends Vertex<?>> vertices, int numParticles,

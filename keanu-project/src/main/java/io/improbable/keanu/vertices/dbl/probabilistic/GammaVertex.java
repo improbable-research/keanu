@@ -19,7 +19,7 @@ public class GammaVertex extends ProbabilisticDouble {
      * @param a      location
      * @param theta  scale
      * @param k      shape
-     * @param random
+     * @param random source for sampling
      */
     public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k, Random random) {
         this.a = a;
