@@ -84,7 +84,7 @@ public class BayesNet {
     public double getLogOfMasterP() {
         double sum = 0.0;
         for (Vertex<?> vertex : verticesThatContributeToMasterP) {
-            sum += vertex.logDensityAtValue();
+            sum += vertex.logProbAtValue();
         }
         return sum;
     }

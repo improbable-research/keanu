@@ -50,12 +50,12 @@ public class LaplaceVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logDensity(Double value) {
+    public double logProb(Double value) {
         return Laplace.logPdf(mu.getValue(), beta.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Double value) {
+    public Map<String, Double> dLogProb(Double value) {
         Laplace.Diff diff = Laplace.dlnPdf(mu.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(diff.dPdmu, diff.dPdbeta, diff.dPdx);
     }

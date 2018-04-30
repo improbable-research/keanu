@@ -70,8 +70,8 @@ public class MetropolisHastings {
 
         final double logPNew = logPOld - affectedVerticesLogPOld + affectedVerticesLogPNew;
 
-        final double pqxOld = chosenVertex.logDensity(oldValue);
-        final double pqxNew = chosenVertex.logDensity(proposedValue);
+        final double pqxOld = chosenVertex.logProb(oldValue);
+        final double pqxNew = chosenVertex.logProb(proposedValue);
 
         final double logr = (logPNew * (1.0 / T) + pqxOld) - (logPOld * (1.0 / T) + pqxNew);
         final double r = Math.exp(logr);
@@ -100,7 +100,7 @@ public class MetropolisHastings {
 
     static double sumLogP(Set<Vertex<?>> vertices) {
         return vertices.stream()
-                .mapToDouble(Vertex::logDensityAtValue)
+                .mapToDouble(Vertex::logProbAtValue)
                 .sum();
     }
 

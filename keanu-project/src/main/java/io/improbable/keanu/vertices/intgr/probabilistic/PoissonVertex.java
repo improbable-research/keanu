@@ -36,12 +36,12 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double logDensity(Integer value) {
+    public double logProb(Integer value) {
         return Math.log(Poisson.pdf(mu.getValue(), value));
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Integer value) {
+    public Map<String, Double> dLogProb(Integer value) {
         throw new UnsupportedOperationException();
     }
 

@@ -60,13 +60,13 @@ public class UniformIntVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double logDensity(Integer value) {
-        final double density = 1.0 / (max.getValue() - min.getValue());
-        return Math.log(density);
+    public double logProb(Integer value) {
+        final double probability = 1.0 / (max.getValue() - min.getValue());
+        return Math.log(probability);
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Integer value) {
+    public Map<String, Double> dLogProb(Integer value) {
         throw new UnsupportedOperationException();
     }
 

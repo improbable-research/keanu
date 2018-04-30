@@ -9,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
@@ -49,7 +48,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a);
-        double gradient = l.dLogDensityAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId());
         log.info("Gradient at a: " + gradient);
         assertEquals(gradient, 0, 0);
     }
@@ -60,7 +59,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a - 1.0);
-        double gradient = l.dLogDensityAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId());
         log.info("Gradient at x < a: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -71,13 +70,13 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a + 1.0);
-        double gradient = l.dLogDensityAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId());
         log.info("Gradient at x > a: " + gradient);
         assertTrue(gradient < 0);
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(0.), new ConstantDoubleVertex(1.));
         LogisticVertex l = new LogisticVertex(uniformA, new ConstantDoubleVertex(1.0));
 
@@ -97,7 +96,7 @@ public class LogisticVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
         LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.0), uniformB);
 

@@ -91,12 +91,12 @@ public class TriangularVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logDensity(Double value) {
+    public double logProb(Double value) {
         return Math.log(density(value));
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Double value) {
+    public Map<String, Double> dLogProb(Double value) {
         throw new UnsupportedOperationException();
     }
 

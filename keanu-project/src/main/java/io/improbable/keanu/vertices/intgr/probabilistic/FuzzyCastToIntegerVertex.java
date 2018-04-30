@@ -75,12 +75,12 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double logDensity(Integer value) {
+    public double logProb(Integer value) {
         return Math.log(density(value));
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Integer value) {
+    public Map<String, Double> dLogProb(Integer value) {
         int i = getValue();
         double x = input.getValue();
         double clampedX = getClampedInput();

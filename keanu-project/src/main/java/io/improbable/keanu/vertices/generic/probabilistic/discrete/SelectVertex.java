@@ -49,13 +49,13 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     @Override
-    public double logDensity(T value) {
-        final double density = selectableValues.get(value).getValue() / getSumOfProbabilities();
-        return Math.log(density);
+    public double logProb(T value) {
+        final double probability = selectableValues.get(value).getValue() / getSumOfProbabilities();
+        return Math.log(probability);
     }
 
     @Override
-    public Map<String, Double> dLogDensity(T value) {
+    public Map<String, Double> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

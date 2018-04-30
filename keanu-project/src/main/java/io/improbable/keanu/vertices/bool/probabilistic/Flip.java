@@ -8,42 +8,42 @@ import java.util.Random;
 
 public class Flip extends ProbabilisticBool {
 
-    private final Vertex<Double> probTrue;
+    private final Vertex<Double> probabilityTrue;
     private final Random random;
 
-    public Flip(Vertex<Double> probTrue, Random random) {
-        this.probTrue = probTrue;
+    public Flip(Vertex<Double> probabilityTrue, Random random) {
+        this.probabilityTrue = probabilityTrue;
         this.random = random;
         setValue(false);
-        setParents(probTrue);
+        setParents(probabilityTrue);
     }
 
-    public Flip(double probTrue, Random random) {
-        this(new ConstantDoubleVertex(probTrue), random);
+    public Flip(double probabilityTrue, Random random) {
+        this(new ConstantDoubleVertex(probabilityTrue), random);
     }
 
-    public Flip(double probTrue) {
-        this(new ConstantDoubleVertex(probTrue), new Random());
+    public Flip(double probabilityTrue) {
+        this(new ConstantDoubleVertex(probabilityTrue), new Random());
     }
 
-    public Vertex<Double> getProbTrue() {
-        return probTrue;
-    }
-
-    @Override
-    public double logDensity(Boolean value) {
-        final double density = value ? probTrue.getValue() : 1 - probTrue.getValue();
-        return Math.log(density);
+    public Vertex<Double> getProbabilityTrue() {
+        return probabilityTrue;
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Boolean value) {
+    public double logProb(Boolean value) {
+        final double probability = value ? probabilityTrue.getValue() : 1 - probabilityTrue.getValue();
+        return Math.log(probability);
+    }
+
+    @Override
+    public Map<String, Double> dLogProb(Boolean value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
     public Boolean sample() {
-        return random.nextDouble() < probTrue.getValue();
+        return random.nextDouble() < probabilityTrue.getValue();
     }
 
 }

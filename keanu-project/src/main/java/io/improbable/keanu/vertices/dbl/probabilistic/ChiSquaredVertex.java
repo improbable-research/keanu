@@ -37,12 +37,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logDensity(Double value) {
+    public double logProb(Double value) {
         return ChiSquared.logPdf(k.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Double value) {
+    public Map<String, Double> dLogProb(Double value) {
         throw new UnsupportedOperationException();
     }
 

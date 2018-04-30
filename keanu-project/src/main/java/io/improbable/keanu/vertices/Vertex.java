@@ -18,26 +18,28 @@ public abstract class Vertex<T> implements Identifiable {
     private boolean observed;
 
     /**
-     * This is the value of the natural log of the probability density at the supplied value.
+     * This is the value of the natural log probability at the supplied value. In the
+     * case of continuous vertices, this is actually the log of the density, which
+     * will differ from the probability by a constant.
      *
      * @param value The supplied value.
-     * @return The log probability.
+     * @return The log prob.
      */
-    public abstract double logDensity(T value);
+    public abstract double logProb(T value);
 
-    public double logDensityAtValue() {
-        return logDensity(getValue());
+    public double logProbAtValue() {
+        return logProb(getValue());
     }
 
     /**
-     * The partial derivatives of the natural log density.
+     * The partial derivatives of the natural log prob.
      *
      * @param value at a given value
      */
-    public abstract Map<String, Double> dLogDensity(T value);
+    public abstract Map<String, Double> dLogProb(T value);
 
-    public Map<String, Double> dLogDensityAtValue() {
-        return dLogDensity(getValue());
+    public Map<String, Double> dLogProbAtValue() {
+        return dLogProb(getValue());
     }
 
     /**

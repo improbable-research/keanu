@@ -47,14 +47,14 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void samplingMatchesPdf() {
+    public void samplingMatchesLogProb() {
         InverseGammaVertex gamma = new InverseGammaVertex(
                 new ConstantDoubleVertex(2.0),
                 new ConstantDoubleVertex(3.0),
                 random
         );
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 gamma,
                 100000,
                 2.0,
@@ -64,7 +64,7 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(
                 new ConstantDoubleVertex(1.0),
                 new ConstantDoubleVertex(4.0),
@@ -91,7 +91,7 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(
                 new ConstantDoubleVertex(1.0),
                 new ConstantDoubleVertex(3.0),

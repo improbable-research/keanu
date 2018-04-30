@@ -58,12 +58,12 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logDensity(Double value) {
+    public double logProb(Double value) {
         return Exponential.logPdf(a.getValue(), b.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Double value) {
+    public Map<String, Double> dLogProb(Double value) {
         Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }

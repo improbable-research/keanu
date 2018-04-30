@@ -50,13 +50,13 @@ public class ExponentialVertexTest {
         double b = 1.0;
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
         e.setValue(a);
-        double gradient = e.dLogDensityAtValue().get(e.getId());
+        double gradient = e.dLogProbAtValue().get(e.getId());
         log.info("Gradient at a: " + gradient);
         assertEquals(-1, gradient, 0);
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(0.), new ConstantDoubleVertex(1.));
         ExponentialVertex exp = new ExponentialVertex(uniformA, new ConstantDoubleVertex(1.0));
 
@@ -76,7 +76,7 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
         ExponentialVertex exp = new ExponentialVertex(new ConstantDoubleVertex(0.0), uniformB);
 

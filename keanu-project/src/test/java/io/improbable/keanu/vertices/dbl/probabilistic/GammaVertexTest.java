@@ -71,7 +71,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex a = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         GammaVertex g = new GammaVertex(a, new ConstantDoubleVertex(0.5), new ConstantDoubleVertex(1.0), random);
 
@@ -91,7 +91,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdtheta() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdtheta() {
         UniformVertex t = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         GammaVertex g = new GammaVertex(new ConstantDoubleVertex(0.5), t, new ConstantDoubleVertex(1.0), random);
 
@@ -111,7 +111,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdk() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdk() {
         UniformVertex k = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         GammaVertex g = new GammaVertex(new ConstantDoubleVertex(0.5), new ConstantDoubleVertex(1.0), k, random);
 
@@ -143,7 +143,7 @@ public class GammaVertexTest {
 
         for (double x = 0.1; x <= 1.0; x += 0.1) {
             double expected = Math.log(apache.density(x));
-            double density = g.logDensity(x);
+            double density = g.logProb(x);
             assertThat("   Density at " + x + " = " + density + " (expected = " + expected + ")",
                     expected, closeTo(density, 0.0001)
             );
@@ -161,9 +161,9 @@ public class GammaVertexTest {
         log.info("k = " + k + ", theta = " + theta + ":");
 
         for (double x = 0.01; x <= 1.0; x += 0.1) {
-            double approxExpected = (g.logDensity(x + DELTA) - g.logDensity(x - DELTA)) / (2 * DELTA);
+            double approxExpected = (g.logProb(x + DELTA) - g.logProb(x - DELTA)) / (2 * DELTA);
             g.setValue(x);
-            double actual = g.dLogDensityAtValue().get(g.getId());
+            double actual = g.dLogProbAtValue().get(g.getId());
             assertThat("   Gradient at " + x + " = " + actual + " (approx expected = " + approxExpected + ")",
                     approxExpected, closeTo(actual, 0.1)
             );
@@ -171,7 +171,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void samplingMatchesPdf() {
+    public void samplingMatchesLogProb() {
         GammaVertex gamma = new GammaVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(2.0),
@@ -179,7 +179,7 @@ public class GammaVertexTest {
                 random
         );
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 gamma,
                 100000,
                 2.0,

@@ -7,12 +7,12 @@ import java.util.Map;
 public abstract class NonProbabilistic<T> extends Vertex<T> {
 
     @Override
-    public double logDensity(T value) {
+    public double logProb(T value) {
         return this.getDerivedValue().equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
-    public Map<String, Double> dLogDensity(T value) {
+    public Map<String, Double> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

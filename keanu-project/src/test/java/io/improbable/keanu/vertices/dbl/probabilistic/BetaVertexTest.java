@@ -44,7 +44,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.5;
         b.setValue(value);
-        double gradient = b.dLogDensityAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId());
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(0, gradient, 0);
     }
@@ -54,7 +54,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.25;
         b.setValue(value);
-        double gradient = b.dLogDensityAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId());
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(1, Math.signum(gradient), 0);
     }
@@ -64,7 +64,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.75;
         b.setValue(value);
-        double gradient = b.dLogDensityAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId());
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(-1, Math.signum(gradient), 0);
     }
@@ -74,7 +74,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(1.5), random);
         double value = 0.5;
         b.setValue(value);
-        double gradient = b.dLogDensityAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId());
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(1, Math.signum(gradient), 0);
     }
@@ -84,16 +84,16 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0), random);
         double value = 0.5;
         b.setValue(value);
-        double gradient = b.dLogDensityAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId());
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(-1, Math.signum(gradient), 0);
     }
 
     @Test
-    public void sampleMatchesDensity() {
+    public void sampleMatchesLogProb() {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(2.0), random);
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 b,
                 1000000,
                 0.1,
@@ -104,7 +104,7 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0));
         BetaVertex beta = new BetaVertex(uniformA, new ConstantDoubleVertex(3.0), random);
 
@@ -130,7 +130,7 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0));
         BetaVertex beta = new BetaVertex(new ConstantDoubleVertex(1.0), uniformA, random);
 

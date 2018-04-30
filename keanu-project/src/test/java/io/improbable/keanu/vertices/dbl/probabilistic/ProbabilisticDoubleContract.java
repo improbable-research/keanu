@@ -17,9 +17,9 @@ import static org.junit.Assert.assertEquals;
 public class ProbabilisticDoubleContract {
 
     /**
-     * This method brute force verifies that a given vertex's sample method accurately reflects its density method.
+     * This method brute force verifies that a given vertex's sample method accurately reflects its logProb method.
      * This is done for a given range with a specified resolution (bucketSize). The error due to the approximate
-     * nature of the brute force technique will be larger where the gradient of the density is large as well.
+     * nature of the brute force technique will be larger where the gradient of the logProb is large as well.
      *
      * @param vertexUnderTest
      * @param sampleCount
@@ -27,7 +27,7 @@ public class ProbabilisticDoubleContract {
      * @param to
      * @param bucketSize
      */
-    public static void sampleMethodMatchesDensityMethod(Vertex<Double> vertexUnderTest,
+    public static void sampleMethodMatchesLogProbMethod(Vertex<Double> vertexUnderTest,
                                                         long sampleCount,
                                                         double from,
                                                         double to,
@@ -51,10 +51,10 @@ public class ProbabilisticDoubleContract {
             double percentage = (double) sampleBucket.getValue() / sampleCount;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = Math.exp(vertexUnderTest.logDensity(bucketCenter));
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucketCenter));
             double actual = percentage / bucketSize;
 
-            assertThat("Problem with density at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
+            assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
     }
 
@@ -116,16 +116,16 @@ public class ProbabilisticDoubleContract {
 
     public static void testGradientAtHyperParameterValue(double hyperParameterValue, Vertex<Double> hyperParameterVertex, double vertexValue, Vertex<Double> vertexUnderTest, double gradientDelta) {
         hyperParameterVertex.setAndCascade(hyperParameterValue - gradientDelta);
-        double lnDensityA1 = vertexUnderTest.logDensity(vertexValue);
+        double lnDensityA1 = vertexUnderTest.logProb(vertexValue);
 
         hyperParameterVertex.setAndCascade(hyperParameterValue + gradientDelta);
-        double lnDensityA2 = vertexUnderTest.logDensity(vertexValue);
+        double lnDensityA2 = vertexUnderTest.logProb(vertexValue);
 
         double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<String, Double> diffln = vertexUnderTest.dLogDensityAtValue();
+        Map<String, Double> diffln = vertexUnderTest.dLogProbAtValue();
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId());
 

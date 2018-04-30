@@ -22,12 +22,12 @@ public abstract class NonProbabilisticInteger extends IntegerVertex {
     }
 
     @Override
-    public double logDensity(Integer value) {
+    public double logProb(Integer value) {
         return this.getDerivedValue().equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Integer value) {
+    public Map<String, Double> dLogProb(Integer value) {
         throw new UnsupportedOperationException();
     }
 

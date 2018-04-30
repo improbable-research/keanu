@@ -67,7 +67,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logDensity(Double value) {
+    public double logProb(Double value) {
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
@@ -76,7 +76,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogDensity(Double value) {
+    public Map<String, Double> dLogProb(Double value) {
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
