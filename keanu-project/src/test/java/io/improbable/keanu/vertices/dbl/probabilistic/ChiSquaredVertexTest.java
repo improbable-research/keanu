@@ -66,14 +66,4 @@ public class ChiSquaredVertexTest {
         ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
     }
 
-    @Test
-    public void testLogDensityEqualsLogOfDensity() {
-        ChiSquaredVertex chi = new ChiSquaredVertex(1);
-        chi.setValue(0.0);
-        double density = chi.density(0.1);
-        double logDensity = chi.logDensity(0.1);
-
-        Assert.assertEquals(Math.log(density), logDensity, 0.001);
-    }
-
 }

@@ -41,7 +41,7 @@ public class GaussianVertexTest {
     public void gradientAtMuIsZero() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(0.0);
-        double gradient = g.dDensityAtValue().get(g.getId());
+        double gradient = g.dLogDensityAtValue().get(g.getId());
         log.info("Gradient at mu: " + gradient);
         assertEquals(0, gradient, 0);
     }
@@ -50,7 +50,7 @@ public class GaussianVertexTest {
     public void gradientBeforeMuIsPositive() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(-1.0);
-        double gradient = g.dDensityAtValue().get(g.getId());
+        double gradient = g.dLogDensityAtValue().get(g.getId());
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -59,24 +59,9 @@ public class GaussianVertexTest {
     public void gradientAfterMuIsNegative() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(1.0);
-        double gradient = g.dDensityAtValue().get(g.getId());
+        double gradient = g.dLogDensityAtValue().get(g.getId());
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient < 0);
-    }
-
-    @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(2.0), random);
-        double atValue = 0.5;
-        double logOfDensity = Math.log(g.density(atValue));
-        double logDensity = g.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(g, 0.5, 0.001);
     }
 
     @Test

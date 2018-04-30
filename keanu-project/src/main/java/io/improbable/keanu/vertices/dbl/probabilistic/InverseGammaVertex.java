@@ -56,22 +56,12 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return InverseGamma.pdf(a.getValue(), b.getValue(), value);
-    }
-
     public double logDensity(Double value) {
         return InverseGamma.logPdf(a.getValue(), b.getValue(), value);
     }
 
-    @Override
-    public Map<String, Double> dDensityAtValue() {
-        InverseGamma.Diff dP = InverseGamma.dPdf(a.getValue(), b.getValue(), getValue());
-        return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
-    }
-
-    public Map<String, Double> dlnDensityAtValue() {
-        InverseGamma.Diff dP = InverseGamma.dlnPdf(a.getValue(), b.getValue(), getValue());
+    public Map<String, Double> dLogDensity(Double value) {
+        InverseGamma.Diff dP = InverseGamma.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }
 

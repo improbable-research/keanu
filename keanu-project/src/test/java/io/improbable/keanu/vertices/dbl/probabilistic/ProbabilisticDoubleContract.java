@@ -51,7 +51,7 @@ public class ProbabilisticDoubleContract {
             double percentage = (double) sampleBucket.getValue() / sampleCount;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = vertexUnderTest.density(bucketCenter);
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logDensity(bucketCenter));
             double actual = percentage / bucketSize;
 
             assertThat("Problem with density at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
@@ -116,45 +116,21 @@ public class ProbabilisticDoubleContract {
 
     public static void testGradientAtHyperParameterValue(double hyperParameterValue, Vertex<Double> hyperParameterVertex, double vertexValue, Vertex<Double> vertexUnderTest, double gradientDelta) {
         hyperParameterVertex.setAndCascade(hyperParameterValue - gradientDelta);
-        double densityA1 = vertexUnderTest.density(vertexValue);
         double lnDensityA1 = vertexUnderTest.logDensity(vertexValue);
 
         hyperParameterVertex.setAndCascade(hyperParameterValue + gradientDelta);
-        double densityA2 = vertexUnderTest.density(vertexValue);
         double lnDensityA2 = vertexUnderTest.logDensity(vertexValue);
 
-        double diffDensityApproxExpected = (densityA2 - densityA1) / (2 * gradientDelta);
         double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<String, Double> diff = vertexUnderTest.dDensityAtValue();
-        Map<String, Double> diffln = vertexUnderTest.dlnDensityAtValue();
+        Map<String, Double> diffln = vertexUnderTest.dLogDensityAtValue();
 
-        double actualDiffDensity = diff.get(hyperParameterVertex.getId());
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId());
-
-        assertThat("Diff density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
-                diffDensityApproxExpected, closeTo(actualDiffDensity, 0.1));
 
         assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
                 diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
-    }
-
-    public static void diffLnDensityIsSameAsLogOfDiffDensity(Vertex<Double> vertexUnderTest,
-                                                             double value,
-                                                             double maxError) {
-        vertexUnderTest.setAndCascade(value);
-
-        Map<String, Double> dP = vertexUnderTest.dDensityAtValue();
-        Map<String, Double> dlnP = vertexUnderTest.dlnDensityAtValue();
-
-        final double density = vertexUnderTest.densityAtValue();
-        for (String vertexId : dP.keySet()) {
-            dP.put(vertexId, dP.get(vertexId) / density);
-        }
-
-        assertEquals(dP.get(vertexUnderTest.getId()), dlnP.get(vertexUnderTest.getId()), maxError);
     }
 
 }

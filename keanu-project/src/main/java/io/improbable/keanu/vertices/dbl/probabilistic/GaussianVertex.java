@@ -59,23 +59,13 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Gaussian.pdf(mu.getValue(), sigma.getValue(), value);
-    }
-
     public double logDensity(Double value) {
         return Gaussian.logPdf(mu.getValue(), sigma.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Gaussian.Diff dP = Gaussian.dPdf(mu.getValue(), sigma.getValue(), getValue());
-        return convertDualNumbersToDiff(dP.dPdmu, dP.dPdsigma, dP.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), getValue());
+    public Map<String, Double> dLogDensity(Double value) {
+        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 

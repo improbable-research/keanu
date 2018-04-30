@@ -64,27 +64,6 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        InverseGammaVertex inverted = new InverseGammaVertex(
-                new ConstantDoubleVertex(3.0),
-                new ConstantDoubleVertex(0.5),
-                random);
-        double atValue = 0.5;
-        double logOfDensity = Math.log(inverted.density(atValue));
-        double logDensity = inverted.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        InverseGammaVertex inverted = new InverseGammaVertex(
-                new ConstantDoubleVertex(3.0),
-                new ConstantDoubleVertex(0.5),
-                random);
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(inverted, 0.5, 0.001);
-    }
-
-    @Test
     public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(
                 new ConstantDoubleVertex(1.0),

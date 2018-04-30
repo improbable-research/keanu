@@ -32,7 +32,7 @@ public class LogProbGradient {
         //dlnDensityForProbabilisticVertex is the partial differentials of the natural
         //log of the fitness vertex's density w.r.t latent vertices. The key of the
         //map is the latent vertex's id.
-        final Map<String, Double> dlnDensityForProbabilisticVertex = probabilisticVertex.dlnDensityAtValue();
+        final Map<String, Double> dlnDensityForProbabilisticVertex = probabilisticVertex.dLogDensityAtValue();
 
         for (Map.Entry<String, Double> partialDiffLogPWrt : dlnDensityForProbabilisticVertex.entrySet()) {
             final String wrtLatentVertexId = partialDiffLogPWrt.getKey();

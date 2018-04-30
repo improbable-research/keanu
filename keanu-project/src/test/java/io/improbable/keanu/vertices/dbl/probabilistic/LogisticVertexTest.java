@@ -44,37 +44,12 @@ public class LogisticVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(2.0));
-        double atValue = 0.5;
-        double logOfDensity = Math.log(l.density(atValue));
-        double logDensity = l.logDensity(atValue);
-        assertEquals(logOfDensity, logDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.1), new ConstantDoubleVertex(1.0));
-        double atValue = 0.5;
-        l.setAndCascade(atValue);
-
-        Map<String, Double> dP = l.dDensityAtValue();
-        Map<String, Double> dlnP = l.dlnDensityAtValue();
-
-        final double density = l.densityAtValue();
-        for (String vertexId : dP.keySet()) {
-            dP.put(vertexId, dP.get(vertexId) / density);
-        }
-        assertEquals(dP.get(l.getId()), dlnP.get(l.getId()), 0.01);
-    }
-
-    @Test
     public void gradientAtAIsZero() {
         double a = 0.0;
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a);
-        double gradient = l.dDensityAtValue().get(l.getId());
+        double gradient = l.dLogDensityAtValue().get(l.getId());
         log.info("Gradient at a: " + gradient);
         assertEquals(gradient, 0, 0);
     }
@@ -85,7 +60,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a - 1.0);
-        double gradient = l.dDensityAtValue().get(l.getId());
+        double gradient = l.dLogDensityAtValue().get(l.getId());
         log.info("Gradient at x < a: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -96,7 +71,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a + 1.0);
-        double gradient = l.dDensityAtValue().get(l.getId());
+        double gradient = l.dLogDensityAtValue().get(l.getId());
         log.info("Gradient at x > a: " + gradient);
         assertTrue(gradient < 0);
     }

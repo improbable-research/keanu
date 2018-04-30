@@ -58,23 +58,13 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Logistic.pdf(a.getValue(), b.getValue(), value);
-    }
-
     public double logDensity(Double value) {
         return Logistic.logPdf(a.getValue(), b.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Logistic.Diff diff = Logistic.dPdf(a.getValue(), b.getValue(), getValue());
-        return convertDualNumbersToDiff(diff.dPda, diff.dPdb, diff.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Logistic.Diff diff = Logistic.dlnPdf(a.getValue(), b.getValue(), getValue());
+    public Map<String, Double> dLogDensity(Double value) {
+        Logistic.Diff diff = Logistic.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdb, diff.dPdx);
     }
 

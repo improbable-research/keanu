@@ -55,7 +55,7 @@ public class RejectionSampler {
 
     private static boolean matchesObservation(List<Vertex<?>> observedVertices) {
         return observedVertices.stream()
-                .allMatch(v -> v.densityAtValue() != 0.0);
+                .allMatch(v -> v.logDensityAtValue() != Double.NEGATIVE_INFINITY);
     }
 
     private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {

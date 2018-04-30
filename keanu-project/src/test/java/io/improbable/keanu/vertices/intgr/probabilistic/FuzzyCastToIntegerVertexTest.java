@@ -115,7 +115,7 @@ public class FuzzyCastToIntegerVertexTest {
         DoubleVertex input = new ConstantDoubleVertex(0.25);
 
         Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, new Random());
-        double density = fuzzyCast.densityAtValue();
+        double density = Math.exp(fuzzyCast.logDensityAtValue());
 
         log.info("Value = " + fuzzyCast.getValue() + ", density = " + density);
         assertEquals(1.0, density, 0.0);
@@ -153,16 +153,16 @@ public class FuzzyCastToIntegerVertexTest {
         fuzzy.setValue(observedValue);
 
         mu.setValue(mu1);
-        double density1 = fuzzy.densityAtValue();
-        double actual_dPdmu = fuzzy.dDensityAtValue().get(mu.getId());
+        double logDensity1 = fuzzy.logDensityAtValue();
+        double actual_dPdmu = fuzzy.dLogDensityAtValue().get(mu.getId());
 
         mu.setValue(mu2);
-        double density2 = fuzzy.densityAtValue();
+        double logDensity2 = fuzzy.logDensityAtValue();
 
-        double expected_dPdmu = (density2 - density1) / delta;
+        double expected_dPdmu = (logDensity2 - logDensity1) / delta;
 
         log.info("Expected = " + expected_dPdmu + ", Actual = " + actual_dPdmu);
-        assertEquals(expected_dPdmu, actual_dPdmu, 1e-5);
+        assertEquals(expected_dPdmu, actual_dPdmu, 1e-4);
     }
 
     @Test
@@ -182,16 +182,16 @@ public class FuzzyCastToIntegerVertexTest {
         fuzzy.setValue(observedValue);
 
         sigma.setValue(sigma1);
-        double density1 = fuzzy.densityAtValue();
-        double actual_dPdsigma = fuzzy.dDensityAtValue().get(sigma.getId());
+        double logDensity1 = fuzzy.logDensityAtValue();
+        double actual_dPdsigma = fuzzy.dLogDensityAtValue().get(sigma.getId());
 
         sigma.setValue(sigma2);
-        double density2 = fuzzy.densityAtValue();
+        double logDensity2 = fuzzy.logDensityAtValue();
 
-        double expected_dPdsigma = (density2 - density1) / delta;
+        double expected_dPdsigma = (logDensity2 - logDensity1) / delta;
 
         log.info("Expected: " + expected_dPdsigma + ", Actual: " + actual_dPdsigma);
-        assertEquals(expected_dPdsigma, actual_dPdsigma, 1e-5);
+        assertEquals(expected_dPdsigma, actual_dPdsigma, 1e-4);
     }
 
     @Test
@@ -212,7 +212,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         mu.setValue(mu1);
         double logDensity1 = fuzzy.logDensityAtValue();
-        double actual_dlnPdmu = fuzzy.dlnDensityAtValue().get(mu.getId());
+        double actual_dlnPdmu = fuzzy.dLogDensityAtValue().get(mu.getId());
 
         mu.setValue(mu2);
         double logDensity2 = fuzzy.logDensityAtValue();
@@ -241,7 +241,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         sigma.setValue(sigma1);
         double logDensity1 = fuzzy.logDensityAtValue();
-        double actual_dlnPdsigma = fuzzy.dlnDensityAtValue().get(sigma.getId());
+        double actual_dlnPdsigma = fuzzy.dLogDensityAtValue().get(sigma.getId());
 
         sigma.setValue(sigma2);
         double logDensity2 = fuzzy.logDensityAtValue();

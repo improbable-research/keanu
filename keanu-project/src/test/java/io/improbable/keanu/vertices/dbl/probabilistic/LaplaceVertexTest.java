@@ -57,15 +57,6 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        double atValue = 0.5;
-        double logOfDensity = Math.log(l.density(atValue));
-        double logDensity = l.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
     public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0), random);
@@ -104,13 +95,6 @@ public class LaplaceVertexTest {
                 vertexIncrement,
                 DELTA);
     }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(l, 0.5, 0.001);
-    }
-
 
     @Test
     public void inferHyperParamsFromSamples() {

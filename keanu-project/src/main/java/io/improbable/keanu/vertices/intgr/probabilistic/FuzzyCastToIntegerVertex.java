@@ -64,8 +64,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         return max;
     }
 
-    @Override
-    public double density(Integer value) {
+    private double density(Integer value) {
         double i = value;
         double x = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
@@ -76,20 +75,12 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        int i = getValue();
-        double x = input.getValue();
-        double clampedX = getClampedInput();
-        double sigma = fuzzinessSigma.getValue();
-
-        double dPdInput = clampedX == x ? dPdx(x, i, sigma) : 0.0;
-        double dPdSigma = dPdSigma(clampedX, i, sigma);
-
-        return convertDualNumbersToDiff(dPdInput, dPdSigma);
+    public double logDensity(Integer value) {
+        return Math.log(density(value));
     }
 
     @Override
-    public Map<String, Double> dlnDensityAtValue() {
+    public Map<String, Double> dLogDensity(Integer value) {
         int i = getValue();
         double x = input.getValue();
         double clampedX = getClampedInput();
@@ -98,7 +89,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         double dPdInput = clampedX == x ? dPdx(x, i, sigma) : 0.0;
         double dPdSigma = dPdSigma(clampedX, i, sigma);
 
-        double p = densityAtValue();
+        double p = density(value);
         double dlnPdInput = dPdInput / p;
         double dlnPdSigma = dPdSigma / p;
 
@@ -172,10 +163,6 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     private double N(double mu, double sigma) {
-        return n(mu, sigma) / Math.sqrt(2 * Math.PI * sigma * sigma);
-    }
-
-    private double n(double mu, double sigma) {
-        return Math.exp(-(mu * mu) / (2.0 * sigma * sigma));
+        return Gaussian.pdf(mu, sigma, 0);
     }
 }

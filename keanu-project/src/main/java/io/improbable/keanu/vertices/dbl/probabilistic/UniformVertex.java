@@ -59,12 +59,12 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Uniform.pdf(xMin.getValue(), xMax.getValue(), value);
+    public double logDensity(Double value) {
+        return Math.log(Uniform.pdf(xMin.getValue(), xMax.getValue(), value));
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogDensity(Double value) {
         double min = this.xMin.getValue();
         double max = this.xMax.getValue();
 

@@ -48,9 +48,9 @@ public class PoissonVertexTest {
 
         PoissonVertex poissonVertex = new PoissonVertex(mu, new Random(1));
 
-        double density = poissonVertex.density(19);
-        double densityThreshold = poissonVertex.density(20);
-        double densityAboveThreshold = poissonVertex.density(21);
+        double density = poissonVertex.logDensity(19);
+        double densityThreshold = poissonVertex.logDensity(20);
+        double densityAboveThreshold = poissonVertex.logDensity(21);
 
         assertTrue(densityAboveThreshold > densityThreshold && densityThreshold > density);
     }
