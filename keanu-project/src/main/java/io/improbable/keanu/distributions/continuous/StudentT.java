@@ -18,23 +18,78 @@ public class StudentT {
 		
 	}
 	
-	public static double sample(double v, double mu, double sigma, Random random) {
-		assert( v > 0. );
-		return Guassian.sample( mu, sigma, random) / sqrt( ChiSquared.sample(v, random) / v );
-		
-	}
-	
-	public static double pdf(double v, double x) {
-		final double halfVPlusOne = (v + 1.) / 2.;
-		final double halfV = v / 2.;
-		final double numerator = gamma(halfVPlusOne);
-		final double denominator = sqrt(v * PI) * gamma(halfV);
-		final double multiplier = pow(1. + pow((x, 2), -halfVPlusOne);
+	public static double pdf(double v, double t) {
+		double halfVPlusOne = (v + 1.) / 2.;
+		double halfV = v / 2.;
+		double numerator = gamma(halfVPlusOne);
+		double denominator = sqrt(v * PI) * gamma(halfV);
+		double multiplier = pow(1. + pow((t, 2), -halfVPlusOne);
 		
 		return (numerator / denominator) * multiplier;
 	}
 	
-	public static double pdf(double v, double mu, double sigma, double x) {
-		return 0.;
+	public static double logPdf(double v, double t) {
+		return log(pdf(v, t));
+	}
+	
+	// need the zero derivative of the digamma function
+	private static zeroDerivativeOfDigamma(double in) {
+		return in;
+	}
+	
+	public static Diff dPdf(double v, double t) {
+		double gammaHalfV = gamma(v / 2.);
+		double gammaVPlusHalf = gamma(v + 0.5);
+		double sqrtVPi = sqrt(v * PI);
+		double tSq = pow(t, 2);
+		double tSqDividedByVPlusOne = (tSq / v) + 1;
+		double sqrtVPiGammaVPlusHalf = sqrtVPi * gammaVPlusHalf;
+		double sqrtPiPowVThreeHalvesTimesGammaHalfV = sqrt(PI) * pow(v, 3./2.) * gammaHalfV;
+		
+		double zeroDerivativeOfDigammaHalfV = zeroDerivativeOfDigamma(v / 2.);
+		double zeroDerivativeOfDigammaVPlusHalf = zeroDerivativeOfDigamma(v + 0.5);
+		
+		double dPdv_multiplier = (pow(tSqDividedByVPlusOne, (-v - 1.) / 2.) * gammaVPlusHalff;
+		double dPdv_pt1 = -1. / (2. * sqrtPiPowVThreeHalvesTimesGammaHalfV);
+		double dPdv_pt2_numerator = -(tSq(-v - 1.) / (2. * pow(v, 2.) * tSqDividedByVPlusOne)) -
+				(0.5 * log(tSqDividedByVPlusOne));
+		double dPdv_pt2 = dPdv_pt2_numerator / sqrtVPiGammaVPlusHalf;
+		double dPdv_pt3 = zeroDerivativeOfDigammaHalfV / (2. * sqrtVPiGammaVPlusHalf);
+		double dPdv_pt4 = zeroDerivativeOfDigammaVPlusHalf / sqrtVPiGammaVPlusHalf;
+		double dPdv = dPdv_multiplier * (dPdv_pt1 + dPdv_pt2 - dPdv_pt3 + dPdv_pt4);
+		
+		double dPdt_numerator = (t * (-v - 1)) * pow(tSqDividedByVPlusOne, (0.5 * (-v -1)) - 1) * gammaVPlusHalf;
+		double dPdt_denominator = sqrtPiPowVThreeHalvesTimesGammaHalfV;
+		double dPdt = dPdt_numerator / dPdt_denominator;
+		
+		return new Diff(dPdv, dPdt);
+	}
+	
+	public static Diff dlnPdf(double v, double t) {
+		double tSq = pow(t, 2);
+		double tSqPlusV = tSq + v;
+		
+		double zeroDerivativeOfDigammaHalfV = zeroDerivativeOfDigamma(v / 2.);
+		double zeroDerivativeOfDigammaVPlusHalf = zeroDerivativeOfDigamma(v + 0.5);
+		
+		double digammaMultiplier = tSqPlusV * (zeroDerivativeOfDigammaHalfV - (2 * zeroDerivativeOfDigammaVPlusHalf));
+		
+		double numerator = (tSqPlusV * log(tSqPlusV / v)) + (tSqPlusV * digammaMultiplier) - tSq + 1;
+		double denominator = 2 * tSqPlusV;
+		
+		double dPdv = - numerator / denominator;
+		double dPdx = (-t * (v + 1.)) / (pow(t, 2.) + v);
+		
+		return new Diff(dPdv, dPdt);
+	}
+	
+	public static class Diff {
+		public double dPdv;
+		public double dPdt;
+		
+		public Diff(double dPdv, double dPdt) {
+			this.dPdv = dPdv;
+			this.dPdt = dPdt;
+		}
 	}
 }
