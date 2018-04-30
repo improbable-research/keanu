@@ -4,6 +4,7 @@ import java.util.Random;
 
 import static java.lang.Math.*;
 import static org.apache.commons.math3.special.Gamma.gamma;
+import static org.apache.commons.math3.special.Gamma.digamma;
 
 public class StudentT {
 	/**
@@ -32,9 +33,8 @@ public class StudentT {
 		return log(pdf(v, t));
 	}
 	
-	// need the zero derivative of the digamma function
 	private static zeroDerivativeOfDigamma(double in) {
-		return in;
+		return digamma(in);
 	}
 	
 	public static Diff dPdf(double v, double t) {
