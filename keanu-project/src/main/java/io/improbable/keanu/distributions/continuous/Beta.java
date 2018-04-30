@@ -50,8 +50,8 @@ public class Beta {
     }
 
     public static double logPdf(double alpha, double beta, double x) {
-        double B = logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta);
-        return (alpha - 1) * Math.log(x) + (beta - 1) * Math.log(1 - x) - B;
+        double betaFunction = logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta);
+        return (alpha - 1) * Math.log(x) + (beta - 1) * Math.log(1 - x) - betaFunction;
     }
 
     public static Diff dlnPdf(double alpha, double beta, double x) {

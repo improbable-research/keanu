@@ -63,9 +63,9 @@ public class SimulatedAnnealing {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
-            double T = annealingSchedule.getT(sampleNum);
+            double temperature = annealingSchedule.getTemperature(sampleNum);
             Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, T, setAndCascadeCache, random);
+            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, temperature, setAndCascadeCache, random);
 
             if (logP > maxLogP) {
                 maxLogP = logP;
@@ -85,7 +85,7 @@ public class SimulatedAnnealing {
     }
 
     public interface AnnealingSchedule {
-        double getT(int iteration);
+        double getTemperature(int iteration);
     }
 
     /**
