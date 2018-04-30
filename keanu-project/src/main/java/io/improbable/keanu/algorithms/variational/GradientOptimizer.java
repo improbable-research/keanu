@@ -40,7 +40,7 @@ public class GradientOptimizer {
      * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
      *                       indicating convergence failure.
      * @param optimizer      apache math optimizer to use for optimization
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
         if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
@@ -52,7 +52,7 @@ public class GradientOptimizer {
     /**
      * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
      *                       indicating convergence failure.
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations) {
         return maxAPosteriori(maxEvaluations, DEFAULT_OPTIMIZER);

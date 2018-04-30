@@ -39,7 +39,7 @@ public class SmoothUniformDistribution {
 
     /**
      * Will return samples between xMin and xMax as well as samples from the left and right shoulder.
-     * The width of the shoulder is determined by the edgeSharpness as a percentage of the body with,
+     * The width of the shoulder is determined by the edgeSharpness as a percentage of the body width,
      * which is (xMax - xMin).
      *
      * @param xMin min value from body

@@ -34,14 +34,14 @@ public abstract class Vertex<T> implements Identifiable {
 
     /**
      * @param value The supplied value.
-     * @return The value of the natural log of the probability density at the supplied value
+     * @return The natural log of the probability density at the supplied value
      */
     public double logDensity(T value) {
         return Math.log(density(value));
     }
 
     /**
-     * @return the log of the density at the vertex's value
+     * @return the natural log of the density at the vertex's value
      */
     public double logDensityAtValue() {
         return logDensity(getValue());

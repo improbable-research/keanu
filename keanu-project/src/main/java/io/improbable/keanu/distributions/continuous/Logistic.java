@@ -13,7 +13,7 @@ public class Logistic {
     /**
      * @param a      location parameter (any real number)
      * @param b      scale parameter (b grater than 0)
-     * @param random source for sampling
+     * @param random source or randomness
      * @return a sample from the distribution
      */
     public static double sample(double a, double b, Random random) {
