@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr;
 
 
 import io.improbable.keanu.kotlin.IntegerOperators;
+import io.improbable.keanu.vertices.DiscreteVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -14,7 +15,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 
 import java.util.function.Function;
 
-public abstract class IntegerVertex extends Vertex<Integer> implements IntegerOperators<IntegerVertex> {
+public abstract class IntegerVertex extends DiscreteVertex<Integer> implements IntegerOperators<IntegerVertex> {
 
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);

@@ -37,7 +37,7 @@ public class Poisson {
         return i - 1;
     }
 
-    public static double pdf(double mu, int k) {
+    public static double pmf(double mu, int k) {
         if (k >= 0 && k < 20) {
             return (Math.pow(mu, k) / factorial(k)) * Math.exp(-mu);
         } else if (k >= 20) {

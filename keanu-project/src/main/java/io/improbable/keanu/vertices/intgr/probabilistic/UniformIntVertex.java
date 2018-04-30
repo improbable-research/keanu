@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -62,12 +61,13 @@ public class UniformIntVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double density(Integer value) {
-        return 1.0 / (max.getValue() - min.getValue());
+    public double logPmf(Integer value) {
+        final double probability = 1.0 / (max.getValue() - min.getValue());
+        return Math.log(probability);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 
