@@ -58,23 +58,13 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Exponential.pdf(a.getValue(), b.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Exponential.logPdf(a.getValue(), b.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Exponential.Diff dP = Exponential.dPdf(a.getValue(), b.getValue(), getValue());
-        return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }
 

@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'io.improbable'
-version = '0.0.5'
+version = '0.0.6-SNAPSHOT'
 archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
@@ -121,6 +121,11 @@ task javadocJar(type: Jar) {
 task sourcesJar(type: Jar) {
     classifier = 'sources'
     from sourceSets.main.allSource
+}
+
+//Break build on javadoc warnings
+tasks.withType(Javadoc) {
+    options.addStringOption('Xwerror', '-quiet')
 }
 
 artifacts {

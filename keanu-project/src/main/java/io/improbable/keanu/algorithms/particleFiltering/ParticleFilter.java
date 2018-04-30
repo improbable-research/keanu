@@ -29,7 +29,7 @@ public class ParticleFilter {
      * @param resamplingProportion the proportion of particles to cull (e.g. the 25% of least probably particles could
      *                             be culled)
      * @param random a random number generator
-     * @return
+     * @return a list of particles representing the most probable found values of latent variables
      */
 
     public static List<Particle> getProbableValues(Collection<? extends Vertex<?>> vertices, int numParticles,
@@ -184,7 +184,7 @@ public class ParticleFilter {
         }
 
         private double sumLogP(Collection<Vertex<?>> vertices) {
-            return vertices.stream().mapToDouble(Vertex::logDensityAtValue).sum();
+            return vertices.stream().mapToDouble(Vertex::logProbAtValue).sum();
         }
     }
 }
