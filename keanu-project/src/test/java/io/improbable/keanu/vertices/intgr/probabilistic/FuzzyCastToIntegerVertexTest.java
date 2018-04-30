@@ -144,7 +144,7 @@ public class FuzzyCastToIntegerVertexTest {
         int max = 10;
 
         double mu1 = 4.0;
-        double delta = 0.0001;
+        double delta = 0.00001;
         double mu2 = mu1 + delta;
         int observedValue = 5;
 
@@ -162,7 +162,7 @@ public class FuzzyCastToIntegerVertexTest {
         double expected_dPdmu = (logDensity2 - logDensity1) / delta;
 
         log.info("Expected = " + expected_dPdmu + ", Actual = " + actual_dPdmu);
-        assertEquals(expected_dPdmu, actual_dPdmu, 1e-4);
+        assertEquals(expected_dPdmu, actual_dPdmu, 1e-5);
     }
 
     @Test
@@ -174,7 +174,7 @@ public class FuzzyCastToIntegerVertexTest {
         int observedValue = 5;
 
         double sigma1 = 2.0;
-        double delta = 0.0001;
+        double delta = 0.00001;
         double sigma2 = sigma1 + delta;
 
         DoubleVertex sigma = new UniformVertex(0d, 3d);
@@ -191,7 +191,7 @@ public class FuzzyCastToIntegerVertexTest {
         double expected_dPdsigma = (logDensity2 - logDensity1) / delta;
 
         log.info("Expected: " + expected_dPdsigma + ", Actual: " + actual_dPdsigma);
-        assertEquals(expected_dPdsigma, actual_dPdsigma, 1e-4);
+        assertEquals(expected_dPdsigma, actual_dPdsigma, 1e-5);
     }
 
     @Test

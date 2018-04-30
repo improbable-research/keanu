@@ -18,7 +18,7 @@ public abstract class Vertex<T> implements Identifiable {
     private boolean observed;
 
     /**
-     * This is the value of the natural log probability at the supplied value. In the
+     * This is the natural log of the probability at the supplied value. In the
      * case of continuous vertices, this is actually the log of the density, which
      * will differ from the probability by a constant.
      *

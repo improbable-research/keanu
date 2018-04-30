@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool;
 
+import io.improbable.keanu.vertices.DiscreteVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
@@ -12,7 +13,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
-public abstract class BoolVertex extends Vertex<Boolean> {
+public abstract class BoolVertex extends DiscreteVertex<Boolean> {
 
     public static final ConstantVertex<Boolean> TRUE = new ConstantVertex<>(true);
     public static final ConstantVertex<Boolean> FALSE = new ConstantVertex<>(false);

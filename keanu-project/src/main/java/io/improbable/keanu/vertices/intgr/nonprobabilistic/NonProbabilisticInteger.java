@@ -22,12 +22,12 @@ public abstract class NonProbabilisticInteger extends IntegerVertex {
     }
 
     @Override
-    public double logProb(Integer value) {
+    public double logPmf(Integer value) {
         return this.getDerivedValue().equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
-    public Map<String, Double> dLogProb(Integer value) {
+    public Map<String, Double> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 

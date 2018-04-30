@@ -56,11 +56,11 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logProb(Double value) {
+    public double logPdf(Double value) {
         return InverseGamma.logPdf(a.getValue(), b.getValue(), value);
     }
 
-    public Map<String, Double> dLogProb(Double value) {
+    public Map<String, Double> dLogPdf(Double value) {
         InverseGamma.Diff dP = InverseGamma.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }

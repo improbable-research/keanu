@@ -86,17 +86,17 @@ public class TriangularVertex extends ProbabilisticDouble {
         return xMax;
     }
 
-    private double density(Double value) {
+    private double pdf(Double value) {
         return Triangular.pdf(xMin.getValue(), xMax.getValue(), c.getValue(), value);
     }
 
     @Override
-    public double logProb(Double value) {
-        return Math.log(density(value));
+    public double logPdf(Double value) {
+        return Math.log(pdf(value));
     }
 
     @Override
-    public Map<String, Double> dLogProb(Double value) {
+    public Map<String, Double> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 
