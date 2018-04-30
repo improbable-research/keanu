@@ -20,12 +20,6 @@ public abstract class IntegerBinaryOpVertex extends NonProbabilisticInteger {
         return op(a.sample(), b.sample());
     }
 
-    @Override
-    public Integer lazyEval() {
-        setValue(op(a.lazyEval(), b.lazyEval()));
-        return getValue();
-    }
-
     public Integer getDerivedValue() {
         return op(a.getValue(), b.getValue());
     }

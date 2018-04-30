@@ -22,6 +22,11 @@ public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
     }
 
     @Override
+    public ArithmeticDouble nextConstant(double value) {
+        return new ArithmeticDouble(value);
+    }
+
+    @Override
     public ArithmeticDouble nextGaussian(ArithmeticDouble mu, ArithmeticDouble sigma) {
         double randomDouble = Gaussian.sample(mu.getValue(), sigma.getValue(), random);
         return new ArithmeticDouble(randomDouble);

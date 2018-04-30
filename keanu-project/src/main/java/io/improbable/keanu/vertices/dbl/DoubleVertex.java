@@ -10,9 +10,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Additi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -105,6 +106,31 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
 
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
+    }
+
+
+    public DoubleVertex log() {
+        return new LogVertex(this);
+    }
+
+    public DoubleVertex exp() {
+        return new ExpVertex(this);
+    }
+
+    public DoubleVertex sin() {
+        return new SinVertex(this);
+    }
+
+    public DoubleVertex cos() {
+        return new CosVertex(this);
+    }
+
+    public DoubleVertex asin() {
+        return new ArcSinVertex(this);
+    }
+
+    public DoubleVertex acos() {
+        return new ArcCosVertex(this);
     }
 
 }

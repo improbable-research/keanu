@@ -17,12 +17,6 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
         return op(inputVertex.sample());
     }
 
-    @Override
-    public Integer lazyEval() {
-        setValue(op(inputVertex.lazyEval()));
-        return getValue();
-    }
-
     public Integer getDerivedValue() {
         return op(inputVertex.getValue());
     }

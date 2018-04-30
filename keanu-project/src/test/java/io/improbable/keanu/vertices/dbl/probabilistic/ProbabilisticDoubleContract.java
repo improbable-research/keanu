@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -58,6 +61,28 @@ public class ProbabilisticDoubleContract {
     private static Double bucketCenter(Double x, double bucketSize, double from) {
         double bucketNumber = Math.floor((x - from) / bucketSize);
         return bucketNumber * bucketSize + bucketSize / 2 + from;
+    }
+
+    public static void samplingProducesRealisticMeanAndStandardDeviation(int numberOfSamples,
+                                                                         Vertex<Double> vertexUnderTest,
+                                                                         double expectedMean,
+                                                                         double expectedStandardDeviation,
+                                                                         double maxError) {
+        List<Double> samples = new ArrayList<>();
+
+        for (int i = 0; i < numberOfSamples; i++) {
+            double sample = vertexUnderTest.sample();
+            samples.add(sample);
+        }
+
+        SummaryStatistics stats = new SummaryStatistics();
+        samples.forEach(stats::addValue);
+
+        double mean = stats.getMean();
+        double sd = stats.getStandardDeviation();
+
+        assertThat("Problem with mean", expectedMean, closeTo(mean, maxError));
+        assertThat("Problem with standard deviation", expectedStandardDeviation, closeTo(sd, maxError));
     }
 
     public static void moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(double hyperParameterStartValue,

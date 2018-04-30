@@ -18,12 +18,6 @@ public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(op(inputVertex.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return op(inputVertex.getValue());
     }

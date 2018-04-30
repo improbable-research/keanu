@@ -69,7 +69,6 @@ public class ParticleFilter {
     }
 
 
-
     private static List<Particle> createEmptyParticles(int number) {
 
         List<Particle> emptyParticles = new ArrayList<>();

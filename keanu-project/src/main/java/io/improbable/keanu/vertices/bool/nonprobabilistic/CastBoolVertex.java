@@ -21,10 +21,5 @@ public class CastBoolVertex extends NonProbabilisticBool {
         return inputVertex.sample();
     }
 
-    @Override
-    public Boolean lazyEval() {
-        setValue(inputVertex.lazyEval());
-        return getValue();
-    }
 }
 

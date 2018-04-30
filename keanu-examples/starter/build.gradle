@@ -17,7 +17,7 @@ repositories {
 }
 
 dependencies {
-    compile project(":keanu-project")
+    compile group: 'io.improbable', name: 'keanu', version: '0.0.5'
 
     //testing
     testCompile 'junit:junit:4.12'

@@ -27,6 +27,19 @@ public class BetaVertexTest {
     }
 
     @Test
+    public void samplingProducesRealisticMeanAndStandardDeviation() {
+        int N = 100000;
+        double epsilon = 0.01;
+
+        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
+
+        double mean = 0.5;
+        double standardDeviation = Math.sqrt(9.0 / (36 * 7));
+
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, b, mean, standardDeviation, epsilon);
+    }
+
+    @Test
     public void equalAlphaAndBetaGivesZeroGradientAtCentre() {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.5;
