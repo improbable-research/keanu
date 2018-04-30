@@ -1,8 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+
+import java.util.Map;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
@@ -24,9 +27,9 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        DualNumber aDual = a.getDualNumber();
-        DualNumber bDual = b.getDualNumber();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        DualNumber aDual = dualNumbers.get(a);
+        DualNumber bDual = dualNumbers.get(b);
         return aDual.pow(bDual);
     }
 }
