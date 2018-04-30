@@ -14,13 +14,13 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     protected final Vertex<A> a;
     protected final Vertex<B> b;
     protected final BiFunction<A, B, Double> op;
-    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation;
 
     public DoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this.a = a;
         this.b = b;
         this.op = op;
-        this.dualNumberSupplier = dualNumberCalculation;
+        this.dualNumberCalculation = dualNumberCalculation;
         setParents(a, b);
     }
 
@@ -40,8 +40,8 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        if (dualNumberSupplier != null) {
-            return dualNumberSupplier.apply(dualNumbers);
+        if (dualNumberCalculation != null) {
+            return dualNumberCalculation.apply(dualNumbers);
         }
 
         throw new UnsupportedOperationException();

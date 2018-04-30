@@ -20,48 +20,16 @@ public class DualNumberPropagationTest {
     @Test
     public void doesNotPerformUnneccesaryDualNumberCalculations() {
         AtomicInteger n = new AtomicInteger(0);
+        AtomicInteger m = new AtomicInteger(0);
         DoubleVertex start = new SinVertex(Math.PI / 3);
 
         int links = 20;
-        DoubleVertex end = addLinks(start, n, links);
+        DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
 
         end.getDualNumber();
 
         //Does the right amount of work
-        assertEquals(3 * links, n.get());
-    }
-
-    private DoubleVertex addLinks(DoubleVertex end, AtomicInteger n, int links) {
-
-        for (int i = 0; i < links; i++) {
-            DoubleVertex left = passThroughVertex(end, n, id -> log.info("OP on id:" + id));
-            DoubleVertex right = passThroughVertex(end, n, id -> log.info("OP on id:" + id));
-            end = sumVertex(left, right, n, id -> log.info("OP on id:" + id));
-        }
-
-        return end;
-    }
-
-    private DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger n, Consumer<Long> onOp) {
-        final long id = Vertex.idGenerator.get();
-        return new DoubleUnaryOpLambda<>(from, (a) -> {
-            onOp.accept(id);
-            return a;
-        }, (a) -> {
-            n.incrementAndGet();
-            return a.get(from);
-        });
-    }
-
-    private DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger n, Consumer<Long> onOp) {
-        final long id = Vertex.idGenerator.get();
-        return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
-            onOp.accept(id);
-            return a + b;
-        }, (a) -> {
-            n.incrementAndGet();
-            return a.get(left).add(a.get(right));
-        } );
+        assertEquals(3 * links, m.get());
     }
 
 }
