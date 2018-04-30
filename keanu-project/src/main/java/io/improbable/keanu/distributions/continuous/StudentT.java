@@ -15,7 +15,7 @@ public class StudentT {
 	 */
 	public static double sample(double v, Random random) {
 		assert( v > 0. );
-		return Guassian.sample( 0., 1., random) / sqrt( ChiSquared.sample(v, random) / v );
+		return 1.; //Guassian.sample( 0., 1., random) / sqrt( ChiSquared.sample((int) v, random) / v );
 		
 	}
 	
@@ -24,7 +24,7 @@ public class StudentT {
 		double halfV = v / 2.;
 		double numerator = gamma(halfVPlusOne);
 		double denominator = sqrt(v * PI) * gamma(halfV);
-		double multiplier = pow(1. + pow((t, 2), -halfVPlusOne);
+		double multiplier = pow(1. + (pow(t, 2) / v), -halfVPlusOne);
 		
 		return (numerator / denominator) * multiplier;
 	}
@@ -33,7 +33,7 @@ public class StudentT {
 		return log(pdf(v, t));
 	}
 	
-	private static zeroDerivativeOfDigamma(double in) {
+	private static double zeroDerivativeOfDigamma(double in) {
 		return digamma(in);
 	}
 	
@@ -49,9 +49,9 @@ public class StudentT {
 		double zeroDerivativeOfDigammaHalfV = zeroDerivativeOfDigamma(v / 2.);
 		double zeroDerivativeOfDigammaVPlusHalf = zeroDerivativeOfDigamma(v + 0.5);
 		
-		double dPdv_multiplier = (pow(tSqDividedByVPlusOne, (-v - 1.) / 2.) * gammaVPlusHalff;
+		double dPdv_multiplier = pow(tSqDividedByVPlusOne, (-v - 1.) / 2.) * gammaVPlusHalf;
 		double dPdv_pt1 = -1. / (2. * sqrtPiPowVThreeHalvesTimesGammaHalfV);
-		double dPdv_pt2_numerator = -(tSq(-v - 1.) / (2. * pow(v, 2.) * tSqDividedByVPlusOne)) -
+		double dPdv_pt2_numerator = -(tSq * (-v - 1.) / (2. * pow(v, 2.) * tSqDividedByVPlusOne)) -
 				(0.5 * log(tSqDividedByVPlusOne));
 		double dPdv_pt2 = dPdv_pt2_numerator / sqrtVPiGammaVPlusHalf;
 		double dPdv_pt3 = zeroDerivativeOfDigammaHalfV / (2. * sqrtVPiGammaVPlusHalf);
@@ -78,7 +78,7 @@ public class StudentT {
 		double denominator = 2 * tSqPlusV;
 		
 		double dPdv = - numerator / denominator;
-		double dPdx = (-t * (v + 1.)) / (pow(t, 2.) + v);
+		double dPdt = (-t * (v + 1.)) / (pow(t, 2.) + v);
 		
 		return new Diff(dPdv, dPdt);
 	}
