@@ -2,7 +2,7 @@ package io.improbable.keanu.network.grouping;
 
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.network.grouping.continuousPointGroupers.ContinuousPointGrouper;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.ContinuousPointGrouper;
 
 import java.util.HashMap;
 import java.util.List;

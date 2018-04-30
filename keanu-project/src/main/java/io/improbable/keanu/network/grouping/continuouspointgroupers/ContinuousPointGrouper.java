@@ -1,4 +1,4 @@
-package io.improbable.keanu.network.grouping.continuousPointGroupers;
+package io.improbable.keanu.network.grouping.continuouspointgroupers;
 
 import io.improbable.keanu.network.grouping.ContinuousPoint;
 

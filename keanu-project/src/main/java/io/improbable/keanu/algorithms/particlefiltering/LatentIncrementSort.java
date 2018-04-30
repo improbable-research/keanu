@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.particleFiltering;
+package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.vertices.Vertex;
@@ -17,16 +17,16 @@ public class LatentIncrementSort {
      * @param vertices vertices to sort
      * @return Sorted observed vertices
      */
-    public static Map<Vertex<?>, Set<Vertex<?>>> sort(Collection<? extends Vertex<?>> vertices) {
+    public static Map<Vertex, Set<Vertex>> sort(Collection<? extends Vertex> vertices) {
 
-        Map<Vertex<?>, Set<Vertex<?>>> dependencies = getObservedVertexLatentDependencies(vertices);
-        Map<Vertex<?>, Set<Vertex<?>>> dependants = mapDependents(dependencies);
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> observedVertexOrder = new LinkedHashMap<>();
+        Map<Vertex, Set<Vertex>> dependencies = getObservedVertexLatentDependencies(vertices);
+        Map<Vertex, Set<Vertex>> dependants = mapDependents(dependencies);
+        LinkedHashMap<Vertex, Set<Vertex>> observedVertexOrder = new LinkedHashMap<>();
         List<Vertex<?>> verticesWithFewestDependencies;
 
         while (!(verticesWithFewestDependencies = getVerticesWithFewestDependencies(dependencies)).isEmpty()) {
-            Vertex<?> vertex = verticesWithFewestDependencies.get(0);
-            Set<Vertex<?>> vertexDependencies = dependencies.remove(vertex);
+            Vertex vertex = verticesWithFewestDependencies.get(0);
+            Set<Vertex> vertexDependencies = dependencies.remove(vertex);
             observedVertexOrder.put(vertex, vertexDependencies);
 
             for (Vertex<?> upstreamVertex : vertexDependencies) {
@@ -37,17 +37,17 @@ public class LatentIncrementSort {
         return observedVertexOrder;
     }
 
-    private static Map<Vertex<?>, Set<Vertex<?>>> getObservedVertexLatentDependencies(Collection<? extends Vertex<?>> vertices) {
+    private static Map<Vertex, Set<Vertex>> getObservedVertexLatentDependencies(Collection<? extends Vertex> vertices) {
 
-        Map<Vertex<?>, Set<Vertex<?>>> dependencies = TopologicalSort.mapDependencies(vertices);
-        Map<Vertex<?>, Set<Vertex<?>>> observedVertexLatentDependencies = new HashMap<>();
+        Map<Vertex, Set<Vertex>> dependencies = TopologicalSort.mapDependencies(vertices);
+        Map<Vertex, Set<Vertex>> observedVertexLatentDependencies = new HashMap<>();
 
-        for (Map.Entry<Vertex<?>, Set<Vertex<?>>> entry : dependencies.entrySet()) {
+        for (Map.Entry<Vertex, Set<Vertex>> entry : dependencies.entrySet()) {
             Vertex<?> vertex = entry.getKey();
 
             if (vertex.isObserved()) {
-                Set<Vertex<?>> vertexDependencies = entry.getValue();
-                Set<Vertex<?>> latentDependencies = getLatentDependencies(vertexDependencies);
+                Set<Vertex> vertexDependencies = entry.getValue();
+                Set<Vertex> latentDependencies = getLatentDependencies(vertexDependencies);
                 observedVertexLatentDependencies.put(vertex, latentDependencies);
             }
         }
@@ -55,16 +55,16 @@ public class LatentIncrementSort {
         return observedVertexLatentDependencies;
     }
 
-    private static Set<Vertex<?>> getLatentDependencies(Set<Vertex<?>> dependencies) {
+    private static Set<Vertex> getLatentDependencies(Set<Vertex> dependencies) {
         return dependencies.stream()
                 .filter(v -> v.isProbabilistic() && !v.isObserved())
                 .collect(Collectors.toSet());
     }
 
-    private static Map<Vertex<?>, Set<Vertex<?>>> mapDependents(Map<Vertex<?>, Set<Vertex<?>>> dependencies) {
+    private static Map<Vertex, Set<Vertex>> mapDependents(Map<Vertex, Set<Vertex>> dependencies) {
 
-        Map<Vertex<?>, Set<Vertex<?>>> dependants = new HashMap<>();
-        for (Map.Entry<Vertex<?>, Set<Vertex<?>>> entry : dependencies.entrySet()) {
+        Map<Vertex, Set<Vertex>> dependants = new HashMap<>();
+        for (Map.Entry<Vertex, Set<Vertex>> entry : dependencies.entrySet()) {
             Vertex<?> dependant = entry.getKey();
             for (Vertex<?> vertex : entry.getValue()) {
                 dependants.computeIfAbsent(vertex, v -> dependants.put(v, new HashSet<>()));
@@ -75,12 +75,12 @@ public class LatentIncrementSort {
         return dependants;
     }
 
-    private static List<Vertex<?>> getVerticesWithFewestDependencies(Map<Vertex<?>, Set<Vertex<?>>> dependencies) {
+    private static List<Vertex<?>> getVerticesWithFewestDependencies(Map<Vertex, Set<Vertex>> dependencies) {
 
         List<Vertex<?>> verticesWithFewestDependencies = new ArrayList<>();
         int minDependencies = Integer.MAX_VALUE;
 
-        for (Map.Entry<Vertex<?>, Set<Vertex<?>>> entry : dependencies.entrySet()) {
+        for (Map.Entry<Vertex, Set<Vertex>> entry : dependencies.entrySet()) {
             Vertex<?> v = entry.getKey();
             int dependsOn = entry.getValue().size();
             if (dependsOn < minDependencies) {
@@ -95,8 +95,8 @@ public class LatentIncrementSort {
         return verticesWithFewestDependencies;
     }
 
-    private static void removeDependencyFromOtherVertices(Vertex<?> vertex, Map<Vertex<?>, Set<Vertex<?>>> dependants,
-                                                          Map<Vertex<?>, Set<Vertex<?>>> dependencies) {
+    private static void removeDependencyFromOtherVertices(Vertex<?> vertex, Map<Vertex, Set<Vertex>> dependants,
+                                                          Map<Vertex, Set<Vertex>> dependencies) {
 
         dependants.get(vertex).forEach(dependant -> {
             if (dependencies.containsKey(dependant)) {

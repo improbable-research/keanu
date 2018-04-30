@@ -25,7 +25,7 @@ public class NonGradientOptimizer {
         bayesNet = new BayesNet(graph);
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex<?>> outputVertices) {
+    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");

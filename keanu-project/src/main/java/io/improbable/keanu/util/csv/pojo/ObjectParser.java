@@ -112,7 +112,7 @@ public class ObjectParser<T> {
 
             return target;
         } catch (IllegalAccessException | InstantiationException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 

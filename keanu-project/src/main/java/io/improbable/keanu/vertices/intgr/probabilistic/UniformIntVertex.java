@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;

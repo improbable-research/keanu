@@ -12,8 +12,8 @@ public abstract class Vertex<T> implements Identifiable {
     public static final AtomicLong idGenerator = new AtomicLong(0L);
 
     private String uuid = idGenerator.getAndIncrement() + "";
-    private Set<Vertex<?>> children = new HashSet<>();
-    private Set<Vertex<?>> parents = new HashSet<>();
+    private Set<Vertex> children = new HashSet<>();
+    private Set<Vertex> parents = new HashSet<>();
     private T value;
     private boolean observed;
 
@@ -210,7 +210,7 @@ public abstract class Vertex<T> implements Identifiable {
         return uuid;
     }
 
-    public Set<Vertex<?>> getChildren() {
+    public Set<Vertex> getChildren() {
         return children;
     }
 
@@ -236,7 +236,7 @@ public abstract class Vertex<T> implements Identifiable {
         parent.addChild(this);
     }
 
-    public Set<Vertex<?>> getParents() {
+    public Set<Vertex> getParents() {
         return this.parents;
     }
 
@@ -255,11 +255,11 @@ public abstract class Vertex<T> implements Identifiable {
         return uuid.hashCode();
     }
 
-    public Set<Vertex<?>> getConnectedGraph() {
+    public Set<Vertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 
-    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {

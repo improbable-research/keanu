@@ -69,7 +69,7 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex<?>> outputVertices,
+                            List<Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());

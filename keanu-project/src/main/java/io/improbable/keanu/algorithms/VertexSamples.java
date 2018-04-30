@@ -42,7 +42,7 @@ public class VertexSamples<T> {
         if (mode.isPresent()) {
             return mode.get();
         } else {
-            throw new RuntimeException("Vertex could not be found when trying to find the mode");
+            throw new IllegalStateException("Mode is undefined");
         }
     }
 

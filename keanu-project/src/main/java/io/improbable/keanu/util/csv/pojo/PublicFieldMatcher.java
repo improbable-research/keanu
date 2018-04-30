@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,7 +28,7 @@ import static io.improbable.keanu.util.csv.pojo.ColumnDeserializer.convertToAppr
  */
 class PublicFieldMatcher {
 
-    private final static Logger log = LoggerFactory.getLogger(PublicFieldMatcher.class);
+    private static final Logger log = LoggerFactory.getLogger(PublicFieldMatcher.class);
 
     private PublicFieldMatcher() {
     }
@@ -47,7 +48,7 @@ class PublicFieldMatcher {
             try {
                 matchingField.set(target, convertedValue);
             } catch (IllegalAccessException e) {
-                log.warn(e.getStackTrace().toString());
+                log.warn(Arrays.toString(e.getStackTrace()));
             }
         };
     }

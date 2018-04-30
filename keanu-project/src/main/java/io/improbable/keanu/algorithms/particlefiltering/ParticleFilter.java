@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.particleFiltering;
+package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.vertices.Vertex;
 
@@ -35,16 +35,16 @@ public class ParticleFilter {
      * @return
      */
 
-    public static List<Particle> getProbableValues(Collection<? extends Vertex<?>> vertices, int numParticles,
+    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices, int numParticles,
                                                    int resamplingCycles, double resamplingProportion, Random random) {
 
-        Map<Vertex<?>, Set<Vertex<?>>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
-        List<Vertex<?>> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
+        Map<Vertex, Set<Vertex>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
+        List<Vertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
         List<Particle> particles = createEmptyParticles(numParticles);
 
         for (int i = 0; i < observedVertexOrder.size(); i++) {
             Vertex<?> nextObsVertex = observedVertexOrder.get(i);
-            Set<Vertex<?>> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
+            Set<Vertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
             particles = updateParticles(nextObsVertex, vertexDeps, particles, numParticles, resamplingCycles,
                     resamplingProportion, random);
         }
@@ -52,7 +52,7 @@ public class ParticleFilter {
         return particles;
     }
 
-    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex, Set<Vertex<?>> vertexDeps,
+    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex, Set<Vertex> vertexDeps,
                                                   List<Particle> particles,
                                                   int numParticles, int resamplingCycles,
                                                   double resamplingProportion, Random random) {
@@ -83,7 +83,7 @@ public class ParticleFilter {
     }
 
     private static void addObservedVertexToParticles(List<Particle> particles, Vertex<?> observedVertex,
-                                                     Set<Vertex<?>> vertexDependencies) {
+                                                     Set<Vertex> vertexDependencies) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);

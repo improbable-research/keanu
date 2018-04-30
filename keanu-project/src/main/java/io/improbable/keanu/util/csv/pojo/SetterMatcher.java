@@ -31,7 +31,7 @@ class SetterMatcher {
             try {
                 method.invoke(target, convertedValue);
             } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         };
     }

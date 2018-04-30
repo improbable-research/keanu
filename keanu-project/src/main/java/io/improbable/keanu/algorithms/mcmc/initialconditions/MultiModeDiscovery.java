@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc.initialConditions;
+package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
@@ -19,7 +19,7 @@ public class MultiModeDiscovery {
 
         List<NetworkState> maxSamples = new ArrayList<>();
         VertexValuePropagation.cascadeUpdate(network.getObservedVertices());
-        List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
+        List<Vertex> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
 
         for (int i = 0; i < attempts; i++) {
             BayesNet.setFromSampleAndCascade(sortedByDependency);

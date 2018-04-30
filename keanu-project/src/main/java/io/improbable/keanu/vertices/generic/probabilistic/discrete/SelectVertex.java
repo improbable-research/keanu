@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 
-import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 

@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.particleFiltering;
+package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.e2e.regression.LinearRegression;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
