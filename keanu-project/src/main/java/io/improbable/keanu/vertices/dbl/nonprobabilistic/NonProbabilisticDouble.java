@@ -23,7 +23,7 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
 
     @Override
     public double logProb(Double value) {
-        return this.getDerivedValue().equals(value) ? 1.0 : 0.0;
+        return this.getDerivedValue().equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
