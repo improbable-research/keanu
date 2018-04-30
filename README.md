@@ -8,6 +8,8 @@
 
 [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status)](https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project)
 
+[![Build Status](https://travis-ci.org/improbable-research/keanu.svg?branch=develop)](https://travis-ci.org/improbable-research/keanu)
+
 ## Overview
 
 Keanu is a general purpose probabilistic programming library built in Java and developed by Improbable's research team.
