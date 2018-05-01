@@ -46,10 +46,10 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
     }
 
     public static class Condition {
-        private final boolean[] condition;
+        private final boolean[] conditions;
 
         public Condition(boolean[] condition) {
-            this.condition = condition;
+            this.conditions = condition;
         }
 
         @Override
@@ -59,12 +59,12 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
 
             Condition condition1 = (Condition) o;
 
-            return Arrays.equals(condition, condition1.condition);
+            return Arrays.equals(conditions, condition1.conditions);
         }
 
         @Override
         public int hashCode() {
-            return Arrays.hashCode(condition);
+            return Arrays.hashCode(conditions);
         }
     }
 

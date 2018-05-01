@@ -7,19 +7,22 @@ import java.util.stream.Collectors;
 
 public class TopologicalSort {
 
-    public static List<? extends Vertex<?>> sort(Collection<? extends Vertex<?>> vertices) {
+    private TopologicalSort() {
+    }
 
-        Map<Vertex<?>, Set<Vertex<?>>> dependencies = mapDependencies(vertices);
+    public static List<Vertex> sort(Collection<Vertex> vertices) {
+
+        Map<Vertex, Set<Vertex>> dependencies = mapDependencies(vertices);
 
         return vertices.stream().
                 sorted(Comparator.comparingInt(vertexA -> dependencies.get(vertexA).size()))
                 .collect(Collectors.toList());
     }
 
-    public static Map<Vertex<?>, Set<Vertex<?>>> mapDependencies(Collection<? extends Vertex<?>> vertices) {
+    public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {
 
-        Map<Vertex<?>, Set<Vertex<?>>> deps = new HashMap<>();
-        Set<Vertex<?>> verticesBeingSorted = new HashSet<>(vertices);
+        Map<Vertex, Set<Vertex>> deps = new HashMap<>();
+        Set<Vertex> verticesBeingSorted = new HashSet<>(vertices);
 
         for (Vertex<?> v : vertices) {
             if (!deps.containsKey(v)) {
@@ -30,7 +33,7 @@ public class TopologicalSort {
         return deps;
     }
 
-    private static void insertParentDependencies(Vertex<?> aVertex, Map<Vertex<?>, Set<Vertex<?>>> dependencies, Set<Vertex<?>> verticesToCount) {
+    private static void insertParentDependencies(Vertex<?> aVertex, Map<Vertex, Set<Vertex>> dependencies, Set<Vertex> verticesToCount) {
 
         dependencies.computeIfAbsent(aVertex, v -> new HashSet<>());
 
@@ -40,7 +43,7 @@ public class TopologicalSort {
                 insertParentDependencies(parent, dependencies, verticesToCount);
             }
 
-            final Set<Vertex<?>> parentDependencies = dependencies.get(parent);
+            final Set<Vertex> parentDependencies = dependencies.get(parent);
 
             dependencies.computeIfPresent(aVertex, (vertex, vertexDependencies) -> {
                 vertexDependencies.addAll(parentDependencies);

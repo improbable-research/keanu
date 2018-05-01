@@ -4,6 +4,9 @@ import io.improbable.keanu.vertices.Vertex;
 
 public class If {
 
+    private If() {
+    }
+
     public static IfThenBuilder isTrue(Vertex<Boolean> predicate) {
         return new IfThenBuilder(predicate);
     }

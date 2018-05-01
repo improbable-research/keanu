@@ -24,7 +24,9 @@ public class Poisson {
     }
 
     public static int poisson(double mu, Random random) {
-        assert (mu > 0.);
+        if (mu <= 0.) {
+            throw new IllegalArgumentException("Invalid value for mu: " + mu);
+        }
 
         double b = 1.;
         double stopB = Math.exp(-mu);

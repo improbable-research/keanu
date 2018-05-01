@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 
 import static java.util.Comparator.comparing;
@@ -33,11 +34,16 @@ public class VertexSamples<T> {
         Map<T, List<T>> groupedByValue = samples.stream()
                 .collect(groupingBy(v -> v));
 
-        return groupedByValue.entrySet().stream()
+        Optional<T> mode = groupedByValue.entrySet().stream()
                 .sorted(comparing(v -> -v.getValue().size()))
                 .map(Map.Entry::getKey)
-                .findFirst()
-                .get();
+                .findFirst();
+
+        if (mode.isPresent()) {
+            return mode.get();
+        } else {
+            throw new IllegalStateException("Mode is undefined");
+        }
     }
 
     public List<T> asList() {

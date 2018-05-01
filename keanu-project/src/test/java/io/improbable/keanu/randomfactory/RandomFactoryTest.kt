@@ -1,12 +1,11 @@
-package io.improbable.keanu.randomFactory
+package io.improbable.keanu.randomfactory
 
 import io.improbable.keanu.kotlin.ArithmeticDouble
 import io.improbable.keanu.kotlin.DoubleOperators
 import io.improbable.keanu.vertices.dbl.DoubleVertex
-import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase
 import org.junit.Test
 import java.util.*
-
 
 class RandomFactoryTest {
 
@@ -18,7 +17,7 @@ class RandomFactoryTest {
         val resultA: ArithmeticDouble = modelA.addGaussians(1.0, 1.0, 1.0)
         val resultB: DoubleVertex = modelB.addGaussians(1.0, 1.0, 1.0)
 
-        assertEquals(resultA.value, resultB.value, 0.0)
+        TestCase.assertEquals(resultA.value, resultB.value, 0.0)
     }
 
     @Test
@@ -38,7 +37,7 @@ class RandomFactoryTest {
         val meanA = sumA / num
         val meanB = sumB / num
 
-        assertEquals(meanA, meanB, 0.0)
+        TestCase.assertEquals(meanA, meanB, 0.0)
     }
 
     private fun getArithmeticDoubleTestModel(): SimpleModel<ArithmeticDouble> {

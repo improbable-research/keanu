@@ -32,7 +32,7 @@ public class Hamiltonian {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
-                                                     final List<? extends Vertex<?>> fromVertices,
+                                                     final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,
                                                      final double stepSize,
@@ -40,7 +40,7 @@ public class Hamiltonian {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
-        final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
+        final List<Vertex> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
@@ -136,11 +136,11 @@ public class Hamiltonian {
     }
 
     /**
-     * function Leapfrog(θ, r, )
-     * Set ˜r ← r + (eps/2)∇θL(θ)
-     * Set ˜θ ← θ + r˜
-     * Set ˜r ← r˜ + (eps/2)∇θL(˜θ)
-     * return ˜θ, r˜
+     * function Leapfrog(T, r)
+     * Set `r = r + (eps/2)dTL(T)
+     * Set `T = T + r`
+     * Set `r = r` + (eps/2)dTL(`T)
+     * return `T, r`
      *
      * @param latentVertices
      * @param gradient              gradient at current position
@@ -155,19 +155,19 @@ public class Hamiltonian {
                                                 final Map<String, Double> gradient,
                                                 final Map<String, Double> momentums,
                                                 final double stepSize,
-                                                final List<Vertex<?>> probabilisticVertices) {
+                                                final List<Vertex> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 
         Map<String, Double> momentumsAtHalfTimeStep = new HashMap<>();
 
-        //Set ˜r ← r + (eps/2)∇θL(θ)
+        //Set `r = r + (eps/2)dTL(T)
         for (Map.Entry<String, Double> vertexMomentum : momentums.entrySet()) {
             final double updatedMomentum = vertexMomentum.getValue() + halfTimeStep * gradient.get(vertexMomentum.getKey());
             momentumsAtHalfTimeStep.put(vertexMomentum.getKey(), updatedMomentum);
         }
 
-        //Set ˜θ ← θ + ˜r.
+        //Set `T = T + `r.
         for (Vertex<Double> latent : latentVertices) {
             final double nextPosition = position.get(latent.getId()) + halfTimeStep * momentumsAtHalfTimeStep.get(latent.getId());
             position.put(latent.getId(), nextPosition);
@@ -176,7 +176,7 @@ public class Hamiltonian {
 
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
-        //Set ˜r ← ˜r + (eps/2)∇θL(˜θ)
+        //Set `r = `r + (eps/2)dTL(`T)
         Map<String, Double> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
                 probabilisticVertices
         );
@@ -225,7 +225,7 @@ public class Hamiltonian {
      * @param sample
      * @param fromVertices
      */
-    private static void takeSample(Map<String, ?> sample, List<? extends Vertex<?>> fromVertices) {
+    private static void takeSample(Map<String, ?> sample, List<? extends Vertex> fromVertices) {
         for (Vertex<?> vertex : fromVertices) {
             putValue(vertex, sample);
         }
@@ -255,7 +255,7 @@ public class Hamiltonian {
      * @param samples
      * @param fromVertices vertices from which to create and save new sample.
      */
-    private static void addSampleFromVertices(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void addSampleFromVertices(Map<String, List<?>> samples, List<? extends Vertex> fromVertices) {
         for (Vertex<?> vertex : fromVertices) {
             addSampleForVertex(vertex.getId(), vertex.getValue(), samples);
         }

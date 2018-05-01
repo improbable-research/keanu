@@ -144,13 +144,11 @@ public class SmoothUniformDistribution {
     }
 
     private static double getCubeCoefficient(final double Sw, final double Bw) {
-        final double A = -2.0 / (Sw * Sw * Sw * (Sw + Bw));
-        return A;
+        return -2.0 / (Sw * Sw * Sw * (Sw + Bw));
     }
 
     private static double getSquareCoefficient(final double Sw, final double Bw) {
-        final double B = 3.0 / (Sw * Sw * (Sw + Bw));
-        return B;
+        return 3.0 / (Sw * Sw * (Sw + Bw));
     }
 
     private static double bodyHeight(double shoulderWidth, double bodyWidth) {

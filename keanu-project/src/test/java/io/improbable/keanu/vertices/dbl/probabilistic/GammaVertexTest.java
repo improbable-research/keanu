@@ -207,7 +207,7 @@ public class GammaVertexTest {
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),
                 aThetaK,
                 latentAThetaK,

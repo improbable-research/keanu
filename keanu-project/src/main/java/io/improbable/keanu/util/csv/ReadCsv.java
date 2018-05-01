@@ -10,6 +10,9 @@ import java.nio.file.Paths;
  */
 public class ReadCsv {
 
+    private ReadCsv() {
+    }
+
     /**
      * @param fileOnClassPath location relative to src/main/resources (or just the classpath)
      * @return a reader for the resource file

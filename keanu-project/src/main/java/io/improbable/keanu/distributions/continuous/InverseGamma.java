@@ -7,8 +7,13 @@ import static org.apache.commons.math3.special.Gamma.gamma;
 
 public class InverseGamma {
 
+    private InverseGamma() {
+    }
+
     public static double sample(double a, double b, Random random) {
-        assert (a > 0.0 && b > 0.0);
+        if (a <= 0.0 || b <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for a or b. a: " + a + ". b: " + b);
+        }
         return 1.0 / Gamma.sample(0.0, 1.0 / b, a, random);
     }
 
@@ -42,9 +47,9 @@ public class InverseGamma {
 
     public static class Diff {
 
-        public double dPda;
-        public double dPdb;
-        public double dPdx;
+        public final double dPda;
+        public final double dPdb;
+        public final double dPdx;
 
         public Diff(double dPda, double dPdb, double dPdx) {
             this.dPda = dPda;

@@ -130,7 +130,7 @@ public class InverseGammaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1), random),
                 alphaBeta,
                 latentAlphaBeta,

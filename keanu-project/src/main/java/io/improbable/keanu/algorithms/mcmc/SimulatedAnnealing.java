@@ -48,13 +48,13 @@ public class SimulatedAnnealing {
                                                  Random random) {
 
         if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         Map<String, ?> maxSamplesByVertex = new HashMap<>();
-        List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
+        List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
-        Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
+        Map<Vertex, Set<Vertex>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 
         Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
 
@@ -66,9 +66,9 @@ public class SimulatedAnnealing {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
-            double T = annealingSchedule.getT(sampleNum);
-            Set<Vertex<?>> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, T, setAndCascadeCache, random);
+            double temperature = annealingSchedule.getTemperature(sampleNum);
+            Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
+            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, temperature, setAndCascadeCache, random);
 
             if (logP > maxLogP) {
                 maxLogP = logP;
@@ -79,7 +79,7 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(maxSamplesByVertex);
     }
 
-    private static void setSamplesAsMax(Map<String, ?> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void setSamplesAsMax(Map<String, ?> samples, List<Vertex> fromVertices) {
         fromVertices.forEach(vertex -> setSampleForVertex(vertex, samples));
     }
 
@@ -92,7 +92,7 @@ public class SimulatedAnnealing {
      * a function of the current iteration number (i.e. sample number)
      */
     public interface AnnealingSchedule {
-        double getT(int iteration);
+        double getTemperature(int iteration);
     }
 
     /**
@@ -105,7 +105,7 @@ public class SimulatedAnnealing {
 
         final double minusK = Math.log(endT / startT) / iterations;
 
-        return (n) -> startT * Math.exp(minusK * n);
+        return n -> startT * Math.exp(minusK * n);
     }
 
 }

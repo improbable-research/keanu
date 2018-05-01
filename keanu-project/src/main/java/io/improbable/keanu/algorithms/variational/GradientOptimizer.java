@@ -9,6 +9,8 @@ import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.List;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class GradientOptimizer {
+
+    private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
     private static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
             NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
@@ -44,7 +48,7 @@ public class GradientOptimizer {
      */
     public double maxAPosteriori(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
         if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
-            throw new RuntimeException("Cannot find MAP of network without any probabilistic vertices");
+            throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
         return optimize(maxEvaluations, bayesNet.getVerticesThatContributeToMasterP(), optimizer);
     }
@@ -68,7 +72,7 @@ public class GradientOptimizer {
      */
     public double maxLikelihood(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
         if (bayesNet.getObservedVertices().isEmpty()) {
-            throw new RuntimeException("Cannot find max likelihood of network without any observations");
+            throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
         }
         return optimize(maxEvaluations, bayesNet.getObservedVertices(), optimizer);
     }
@@ -83,7 +87,7 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex<?>> outputVertices,
+                            List<Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());
@@ -95,7 +99,7 @@ public class GradientOptimizer {
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         warnIfGradientIsFlat(initialGradient);
@@ -122,7 +126,7 @@ public class GradientOptimizer {
     private void warnIfGradientIsFlat(double[] gradient) {
         double maxGradient = Arrays.stream(gradient).max().getAsDouble();
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
-            System.err.println("Warning: The initial gradient is very flat. The largest gradient is " + maxGradient);
+            log.warn("The initial gradient is very flat. The largest gradient is {}", maxGradient);
         }
     }
 }

@@ -8,10 +8,22 @@ import java.util.Random;
  * ARL-TR-2168 March 2000
  * 5.1.8 page 25
  */
+
 public class Laplace {
 
+    private Laplace() {
+    }
+
+    /**
+     * @param mu      location
+     * @param beta      shape
+     * @param random source of randomness
+     * @return a random number from the Laplace distribution
+     */
     public static double sample(double mu, double beta, Random random) {
-        assert (beta > 0.);
+        if (beta <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for beta: " + beta);
+        }
         if (random.nextDouble() > 0.5) {
             return mu + beta * Math.log(random.nextDouble());
         } else {

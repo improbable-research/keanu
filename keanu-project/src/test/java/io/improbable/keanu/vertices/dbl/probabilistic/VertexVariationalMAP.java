@@ -11,7 +11,7 @@ import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 
-public class VertexVariationalMAPTest {
+public class VertexVariationalMAP {
 
     public static void inferHyperParamsFromSamples(
             Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,

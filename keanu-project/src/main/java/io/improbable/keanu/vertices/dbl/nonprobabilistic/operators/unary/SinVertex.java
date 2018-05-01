@@ -4,10 +4,8 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
 
 import java.util.Map;
-import java.util.function.Consumer;
 
 public class SinVertex extends DoubleUnaryOpVertex {
 

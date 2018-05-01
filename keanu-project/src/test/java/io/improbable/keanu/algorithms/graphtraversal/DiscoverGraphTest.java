@@ -71,7 +71,7 @@ public class DiscoverGraphTest {
             end = left.plus(right);
         }
 
-        Set<Vertex<?>> connectedGraph = end.getConnectedGraph();
+        Set<Vertex> connectedGraph = end.getConnectedGraph();
 
         int expectedSize = 3 + 3 * links;
 
@@ -79,7 +79,7 @@ public class DiscoverGraphTest {
     }
 
     private void assertFindsAllVertices(Vertex<?> v) {
-        Set<Vertex<?>> vertices = DiscoverGraph.getEntireGraph(v);
+        Set<Vertex> vertices = DiscoverGraph.getEntireGraph(v);
         assertTrue(vertices.size() == allVertices.size());
         assertTrue(vertices.containsAll(allVertices));
     }
