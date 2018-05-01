@@ -64,7 +64,7 @@ public class SmoothUniformTest {
     }
 
     @Test
-    public void smoothUniformSampleMethodMatchesDensityMethod() {
+    public void smoothUniformSampleMethodMatchesLogProbMethod() {
 
         double edgeSharpness = 1.0;
         SmoothUniformVertex uniform = new SmoothUniformVertex(
@@ -79,7 +79,7 @@ public class SmoothUniformTest {
         double delta = 0.05;
         long N = 1000000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(uniform, N, from, to, delta, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(uniform, N, from, to, delta, 1e-2);
     }
 
 }

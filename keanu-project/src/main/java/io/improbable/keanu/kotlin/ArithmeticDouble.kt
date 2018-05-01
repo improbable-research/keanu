@@ -6,12 +6,12 @@ class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDouble> {
         return ArithmeticDouble(Math.exp(this.value))
     }
 
-    override fun pow(that: ArithmeticDouble): ArithmeticDouble {
-        return ArithmeticDouble(Math.pow(this.value, that.value))
+    override fun pow(exponent: ArithmeticDouble): ArithmeticDouble {
+        return ArithmeticDouble(Math.pow(this.value, exponent.value))
     }
 
-    override fun pow(value: Double): ArithmeticDouble {
-        return ArithmeticDouble(Math.pow(this.value, value))
+    override fun pow(exponent: Double): ArithmeticDouble {
+        return ArithmeticDouble(Math.pow(this.value, exponent))
     }
 
     override fun log(): ArithmeticDouble {

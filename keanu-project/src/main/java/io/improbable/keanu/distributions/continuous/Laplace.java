@@ -2,14 +2,14 @@ package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.8 page 25
+ */
 public class Laplace {
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.8 page 25
-     */
     public static double sample(double mu, double beta, Random random) {
         assert (beta > 0.);
         if (random.nextDouble() > 0.5) {

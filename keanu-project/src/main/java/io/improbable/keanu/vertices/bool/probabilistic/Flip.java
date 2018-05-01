@@ -31,12 +31,13 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public double density(Boolean value) {
-        return value ? probTrue.getValue() : 1 - probTrue.getValue();
+    public double logPmf(Boolean value) {
+        final double probability = value ? probTrue.getValue() : 1 - probTrue.getValue();
+        return Math.log(probability);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogPmf(Boolean value) {
         throw new UnsupportedOperationException();
     }
 

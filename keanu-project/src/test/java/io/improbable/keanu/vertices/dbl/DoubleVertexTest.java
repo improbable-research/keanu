@@ -59,7 +59,7 @@ public class DoubleVertexTest {
 
         Function<Double, Double> op = val -> val + 5;
 
-        DoubleVertex v3 = v1.lambda(op, () -> {
+        DoubleVertex v3 = v1.lambda(op, (a) -> {
             DualNumber v1Dual = v1.getDualNumber();
             return new DualNumber(op.apply(v1Dual.getValue()), v1Dual.getInfinitesimal());
         });
