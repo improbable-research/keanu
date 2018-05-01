@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -69,12 +69,12 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
-        Infinitesimal dPdInputsFromMu = a.getDualNumber().getInfinitesimal().multiplyBy(dPda);
-        Infinitesimal dPdInputsFromSigma = b.getDualNumber().getInfinitesimal().multiplyBy(dPdb);
-        Infinitesimal dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
+        PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
+        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
-        return dPdInputs.getInfinitesimals();
+        dPdInputs.putWithRespectTo(getId(), dPdx);
+        return dPdInputs.asMap();
     }
 
     @Override
