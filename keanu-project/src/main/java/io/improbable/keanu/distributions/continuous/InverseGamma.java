@@ -11,7 +11,7 @@ public class InverseGamma {
     }
 
     public static double sample(double a, double b, Random random) {
-        if (a < 0.0 || b < 0.0) {
+        if (a <= 0.0 || b <= 0.0) {
             throw new IllegalArgumentException("Invalid value for a or b. a: " + a + ". b: " + b);
         }
         return 1.0 / Gamma.sample(0.0, 1.0 / b, a, random);
