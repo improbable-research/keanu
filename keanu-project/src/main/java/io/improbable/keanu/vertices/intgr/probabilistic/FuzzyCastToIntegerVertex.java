@@ -152,8 +152,8 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
 
     private double dPdx(double x, int i, double sigma) {
         double p = density(i);
-        return -lambda(x, sigma) * (N(i + 0.5 - x, sigma) - N(i - 0.5 - x, sigma)
-                - p * (N(max.getValue() + 0.5 - x, sigma) - N(min.getValue() - 0.5 - x, sigma)));
+        return -lambda(x, sigma) * (n(i + 0.5 - x, sigma) - n(i - 0.5 - x, sigma)
+                - p * (n(max.getValue() + 0.5 - x, sigma) - n(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dPdSigma(double x, int i, double sigma) {
@@ -163,10 +163,10 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     private double dSdSigma(double x, double sigma) {
-        return (-x * N(x, sigma)) / sigma;
+        return (-x * n(x, sigma)) / sigma;
     }
 
-    private double N(double mu, double sigma) {
+    private double n(double mu, double sigma) {
         return Gaussian.pdf(mu, sigma, 0);
     }
 }

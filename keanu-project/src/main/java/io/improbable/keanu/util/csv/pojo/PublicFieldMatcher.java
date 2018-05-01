@@ -27,8 +27,6 @@ import static io.improbable.keanu.util.csv.pojo.ColumnDeserializer.convertToAppr
  */
 class PublicFieldMatcher {
 
-    private static final Logger log = LoggerFactory.getLogger(PublicFieldMatcher.class);
-
     private PublicFieldMatcher() {
     }
 
