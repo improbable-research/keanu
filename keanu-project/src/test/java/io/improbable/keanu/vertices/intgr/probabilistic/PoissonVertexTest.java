@@ -43,15 +43,15 @@ public class PoissonVertexTest {
 
 
     @Test
-    public void densityForValuesGreaterThanTwenty() {
+    public void logProbForValuesGreaterThanTwenty() {
         double mu = 25.0;
 
         PoissonVertex poissonVertex = new PoissonVertex(mu, new Random(1));
 
-        double density = poissonVertex.density(19);
-        double densityThreshold = poissonVertex.density(20);
-        double densityAboveThreshold = poissonVertex.density(21);
+        double logProb = poissonVertex.logProb(19);
+        double logProbThreshold = poissonVertex.logProb(20);
+        double logProbAboveThreshold = poissonVertex.logProb(21);
 
-        assertTrue(densityAboveThreshold > densityThreshold && densityThreshold > density);
+        assertTrue(logProbAboveThreshold > logProbThreshold && logProbThreshold > logProb);
     }
 }

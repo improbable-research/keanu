@@ -20,10 +20,10 @@ public class MetropolisHastings {
     }
 
     /**
-     * @param bayesNet
+     * @param bayesNet     a bayesian network containing latent vertices
      * @param fromVertices the vertices to include in the returned samples
-     * @param sampleCount
-     * @param random
+     * @param sampleCount  number of samples to take using the algorithm
+     * @param random       the source of randomness
      * @return Samples for each vertex ordered by MCMC iteration
      */
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
@@ -70,8 +70,8 @@ public class MetropolisHastings {
 
         final double logPNew = logPOld - affectedVerticesLogPOld + affectedVerticesLogPNew;
 
-        final double pqxOld = chosenVertex.logDensity(oldValue);
-        final double pqxNew = chosenVertex.logDensity(proposedValue);
+        final double pqxOld = chosenVertex.logProb(oldValue);
+        final double pqxNew = chosenVertex.logProb(proposedValue);
 
         final double logr = (logPNew * (1.0 / T) + pqxOld) - (logPOld * (1.0 / T) + pqxNew);
         final double r = Math.exp(logr);
@@ -100,7 +100,7 @@ public class MetropolisHastings {
 
     static double sumLogP(Set<Vertex<?>> vertices) {
         return vertices.stream()
-                .mapToDouble(Vertex::logDensityAtValue)
+                .mapToDouble(Vertex::logProbAtValue)
                 .sum();
     }
 

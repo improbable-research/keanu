@@ -1,8 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+
+import java.util.Map;
+import java.util.function.Consumer;
 
 public class SinVertex extends DoubleUnaryOpVertex {
 
@@ -20,7 +24,8 @@ public class SinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        return inputVertex.getDualNumber().sin();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        return dualNumbers.get(inputVertex).sin();
     }
+
 }

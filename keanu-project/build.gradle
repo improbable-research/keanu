@@ -123,6 +123,11 @@ task sourcesJar(type: Jar) {
     from sourceSets.main.allSource
 }
 
+//Break build on javadoc warnings
+tasks.withType(Javadoc) {
+    options.addStringOption('Xwerror', '-quiet')
+}
+
 artifacts {
     archives javadocJar, sourcesJar
 }

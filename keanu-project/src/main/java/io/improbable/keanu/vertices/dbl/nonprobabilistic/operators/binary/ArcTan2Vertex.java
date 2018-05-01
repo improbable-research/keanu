@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+
+import java.util.Map;
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
@@ -29,9 +32,9 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        DualNumber aDual = a.getDualNumber();
-        DualNumber bDual = b.getDualNumber();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        DualNumber aDual = dualNumbers.get(a);
+        DualNumber bDual = dualNumbers.get(b);
 
         double denominator = (Math.pow(b.getValue(), 2) * Math.pow(a.getValue(), 2));
 
