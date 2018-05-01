@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -52,7 +51,7 @@ public class ChiSquaredVertexTest {
     }
 
     @Test
-    public void chiSampleMethodMatchesDensityMethod() {
+    public void chiSampleMethodMatchesLogProbMethod() {
         Vertex<Double> vertex = new ChiSquaredVertex(
                 new ConstantIntegerVertex(2),
                 random
@@ -63,17 +62,7 @@ public class ChiSquaredVertexTest {
         double bucketSize = 0.05;
         long sampleCount = 100000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
-    }
-
-    @Test
-    public void testLogDensityEqualsLogOfDensity() {
-        ChiSquaredVertex chi = new ChiSquaredVertex(1);
-        chi.setValue(0.0);
-        double density = chi.density(0.1);
-        double logDensity = chi.logDensity(0.1);
-
-        Assert.assertEquals(Math.log(density), logDensity, 0.001);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
     }
 
 }

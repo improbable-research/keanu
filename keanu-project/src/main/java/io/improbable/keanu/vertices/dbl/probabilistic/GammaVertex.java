@@ -74,23 +74,13 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Gamma.pdf(a.getValue(), theta.getValue(), k.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Gamma.logPdf(a.getValue(), theta.getValue(), k.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Gamma.Diff diff = Gamma.dPdf(a.getValue(), theta.getValue(), k.getValue(), getValue());
-        return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
     }
 

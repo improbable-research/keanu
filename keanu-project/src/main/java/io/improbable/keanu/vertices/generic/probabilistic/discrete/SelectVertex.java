@@ -28,17 +28,17 @@ public class SelectVertex<T> extends Probabilistic<T> {
 
     @Override
     public T sample() {
-        double sumP = sumProbabilities();
+        double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;
 
-        if (sumP == 0.0) {
+        if (sumOfProbabilities == 0.0) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
 
         T value = null;
         for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
-            sum += entry.getValue().getValue() / sumP;
+            sum += entry.getValue().getValue() / sumOfProbabilities;
             if (p < sum) {
                 value = entry.getKey();
                 break;
@@ -52,21 +52,21 @@ public class SelectVertex<T> extends Probabilistic<T> {
         return value;
     }
 
-    @Override
-    public double density(T value) {
-        double sumP = sumProbabilities();
-        if (sumP == 0.0) {
+    public double logProb(T value) {
+        double sumOfProbabilities = getSumOfProbabilities();
+        if (sumOfProbabilities == 0.0) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
-        return selectableValues.get(value).getValue() / sumP;
+        final double probability = selectableValues.get(value).getValue() / sumOfProbabilities;
+        return Math.log(probability);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 
-    private double sumProbabilities() {
+    private double getSumOfProbabilities() {
         double sumP = 0.0;
         for (DoubleVertex p : selectableValues.values()) {
             sumP += p.getValue();

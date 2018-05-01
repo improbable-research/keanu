@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 
-import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbTrue;
+import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
 import static org.junit.Assert.assertEquals;
 
 public class RocketTest {
@@ -43,7 +43,7 @@ public class RocketTest {
                 .or(overHeatDueToResidualFuel)
                 .or(overHeatDueToBoth);
 
-        double probOfOverheat = priorProbTrue(overHeated, 10000);
+        double probOfOverheat = priorProbabilityTrue(overHeated, 10000);
         log.info("Prior Probability rocket overheats: " + probOfOverheat);
 
         Flip alarm1NotFalseNegative = new Flip(0.99, r);
@@ -54,10 +54,10 @@ public class RocketTest {
         Flip alarm2FalsePositive = new Flip(0.1, r);
         BoolVertex alarm2 = overHeated.and(alarm2NotFalseNegative).or(alarm2FalsePositive);
 
-        double probOfAlarm1 = priorProbTrue(alarm1, 10000);
+        double probOfAlarm1 = priorProbabilityTrue(alarm1, 10000);
         log.info("Prior Probability alarm1 sounds: " + probOfAlarm1);
 
-        double probOfAlarm2 = priorProbTrue(alarm2, 10000);
+        double probOfAlarm2 = priorProbabilityTrue(alarm2, 10000);
         log.info("Prior Probability alarm2 sounds: " + probOfAlarm2);
 
         alarm1.observe(true);

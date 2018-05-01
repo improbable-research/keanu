@@ -45,50 +45,18 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        ExponentialVertex e = new ExponentialVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(2.0));
-        double atValue = 0.5;
-        double logOfDensity = Math.log(e.density(atValue));
-        double logDensity = e.logDensity(atValue);
-        assertEquals(logOfDensity, logDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        ExponentialVertex e = new ExponentialVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(e, 0.5, 0.001);
-    }
-
-    @Test
     public void gradientAtAIsMinusOne() {
         double a = 0.0;
         double b = 1.0;
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
         e.setValue(a);
-        double gradient = e.dDensityAtValue().get(e.getId());
+        double gradient = e.dLogProbAtValue().get(e.getId());
         log.info("Gradient at a: " + gradient);
         assertEquals(-1, gradient, 0);
     }
 
     @Test
-    public void gradientContinuesToIncreaseAsValueIncreases() {
-        ExponentialVertex exponentialVertex = new ExponentialVertex(0, 1, new Random(1));
-        int n = 100;
-        double value = 0.0;
-        double step = 0.1;
-        exponentialVertex.setValue(value);
-        double initialGradient = exponentialVertex.dDensityAtValue().get(exponentialVertex.getId());
-
-        for (int i = 0; i < n; i++) {
-            exponentialVertex.setValue(value += step);
-            double gradient = exponentialVertex.dDensityAtValue().get(exponentialVertex.getId());
-            assertTrue(gradient > initialGradient);
-            initialGradient = gradient;
-        }
-    }
-
-    @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(0.), new ConstantDoubleVertex(1.));
         ExponentialVertex exp = new ExponentialVertex(uniformA, new ConstantDoubleVertex(1.0));
 
@@ -108,7 +76,7 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
         ExponentialVertex exp = new ExponentialVertex(new ConstantDoubleVertex(0.0), uniformB);
 

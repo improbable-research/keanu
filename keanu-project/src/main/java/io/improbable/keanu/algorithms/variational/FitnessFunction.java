@@ -38,7 +38,7 @@ public class FitnessFunction {
     protected double logOfTotalProbability() {
         double sum = 0.0;
         for (Vertex<?> vertex : probabilisticVertices) {
-            sum += vertex.logDensityAtValue();
+            sum += vertex.logProbAtValue();
         }
 
         return sum;

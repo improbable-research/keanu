@@ -187,7 +187,7 @@ public class ParticleFilter {
         }
 
         private double sumLogP(Collection<Vertex> vertices) {
-            return vertices.stream().mapToDouble(Vertex::logDensityAtValue).sum();
+            return vertices.stream().mapToDouble(Vertex::logProbAtValue).sum();
         }
     }
 }

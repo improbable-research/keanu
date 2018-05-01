@@ -18,62 +18,29 @@ public abstract class Vertex<T> implements Identifiable {
     private boolean observed;
 
     /**
-     * This is the value of the probability density at the supplied value.
+     * This is the natural log of the probability at the supplied value. In the
+     * case of continuous vertices, this is actually the log of the density, which
+     * will differ from the probability by a constant.
      *
-     * @param value The supplied value.
-     * @return The probability.
-     */
-    public abstract double density(T value);
-
-    /**
-     * @return the density at the vertex's current value
-     */
-    public double densityAtValue() {
-        return density(getValue());
-    }
-
-    /**
      * @param value The supplied value.
      * @return The natural log of the probability density at the supplied value
      */
-    public double logDensity(T value) {
-        return Math.log(density(value));
+    public abstract double logProb(T value);
+
+    public double logProbAtValue() {
+        return logProb(getValue());
     }
 
     /**
-     * @return the natural log of the density at the vertex's value
-     */
-    public double logDensityAtValue() {
-        return logDensity(getValue());
-    }
-
-    /**
-     * This returns the derivative of the density function with respect to
-     * any dependent vertices.
+     * The partial derivatives of the natural log prob.
      *
-     * @return a Map containing { dependent vertex Id -&gt; density slope w.r.t. dependent vertex}
-     */
-    public abstract Map<String, Double> dDensityAtValue();
-
-    /**
-     * This is the same as dDensityAtValue except for the log of the density. For numerical
-     * stability a vertex may chose to override this method but if not overridden, the
-     * chain rule is used to calculate the derivative of the log of the density.
-     * <p>
-     * dlog(P)/dx = (dP/dx)*(1/P(x))
-     *
+     * @param value at a given value
      * @return the partial derivatives of the log density
      */
-    public Map<String, Double> dlnDensityAtValue() {
+    public abstract Map<String, Double> dLogProb(T value);
 
-        final double density = densityAtValue();
-        Map<String, Double> dDensityAtValue = dDensityAtValue();
-        Map<String, Double> dLnDensity = new HashMap<>();
-        for (String vertexId : dDensityAtValue.keySet()) {
-            dLnDensity.put(vertexId, dDensityAtValue.get(vertexId) / density);
-        }
-
-        return dLnDensity;
+    public Map<String, Double> dLogProbAtValue() {
+        return dLogProb(getValue());
     }
 
     /**
