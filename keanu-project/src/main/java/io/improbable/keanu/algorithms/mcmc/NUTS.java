@@ -337,7 +337,7 @@ public class NUTS {
     private static double getLogProb(List<Vertex<?>> probabilisticVertices) {
         double sum = 0.0;
         for (Vertex<?> vertex : probabilisticVertices) {
-            sum += vertex.logDensityAtValue();
+            sum += vertex.logProbAtValue();
         }
         return sum;
     }
