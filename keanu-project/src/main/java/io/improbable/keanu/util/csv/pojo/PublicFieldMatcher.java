@@ -4,7 +4,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,7 +47,7 @@ class PublicFieldMatcher {
             try {
                 matchingField.set(target, convertedValue);
             } catch (IllegalAccessException e) {
-                log.warn(Arrays.toString(e.getStackTrace()));
+                throw new IllegalArgumentException(e);
             }
         };
     }

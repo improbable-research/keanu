@@ -3,25 +3,26 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Random;
 
 public class SelectVertex<T> extends Probabilistic<T> {
 
-    private final Map<T, DoubleVertex> selectableValues;
+    private final LinkedHashMap<T, DoubleVertex> selectableValues;
     private final Random random;
 
-    public SelectVertex(Map<T, DoubleVertex> selectableValues, Random random) {
+    public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues, Random random) {
         this.selectableValues = selectableValues;
         this.random = random;
         setParents(selectableValues.values());
     }
 
-    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
+    public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues) {
         this(selectableValues, new Random());
     }
 
-    public Map<T, DoubleVertex> getSelectableValues() {
+    public LinkedHashMap<T, DoubleVertex> getSelectableValues() {
         return selectableValues;
     }
 

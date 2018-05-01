@@ -21,7 +21,7 @@ public class Infinitesimal {
     }
 
     public Infinitesimal add(Infinitesimal toAdd) {
-        Map<String, Double> added = cloneInfinitesimals(infinitesimals);
+        Map<String, Double> added = copyInfinitesimals(infinitesimals);
 
         for (Map.Entry<String, Double> entry : toAdd.infinitesimals.entrySet()) {
             String k = entry.getKey();
@@ -33,7 +33,7 @@ public class Infinitesimal {
     }
 
     public Infinitesimal subtract(Infinitesimal toSubtract) {
-        Map<String, Double> subtracted = cloneInfinitesimals(infinitesimals);
+        Map<String, Double> subtracted = copyInfinitesimals(infinitesimals);
 
         for (Map.Entry<String, Double> entry : toSubtract.infinitesimals.entrySet()) {
             String k = entry.getKey();
@@ -73,10 +73,10 @@ public class Infinitesimal {
     }
 
     public Infinitesimal copy() {
-        return new Infinitesimal(cloneInfinitesimals(infinitesimals));
+        return new Infinitesimal(copyInfinitesimals(infinitesimals));
     }
 
-    private static Map<String, Double> cloneInfinitesimals(Map<String, Double> infinitesimals) {
+    private static Map<String, Double> copyInfinitesimals(Map<String, Double> infinitesimals) {
         Map<String, Double> clone = new HashMap<>();
         for (Map.Entry<String, Double> entry : infinitesimals.entrySet()) {
             clone.put(entry.getKey(), entry.getValue());
