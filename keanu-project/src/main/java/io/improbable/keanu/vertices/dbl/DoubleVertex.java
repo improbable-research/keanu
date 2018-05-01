@@ -21,7 +21,7 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
      * @param dualNumbers A Map that is guaranteed to contain the Dual Numbers of the parent of the vertex.
      * @return The Dual Number of the vertex.
      */
-    public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     public DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap();

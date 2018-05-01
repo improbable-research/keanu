@@ -34,6 +34,19 @@ public class SigmoidVertexTest {
     }
 
     @Test
+    public void sigmoidDualNumberCalculatedCorrectly() {
+        DoubleVertex input = new UniformVertex(0, 1);
+        input.setAndCascade(0.5);
+
+        DoubleVertex sigmoid = new SigmoidVertex(input);
+        double diffSigmoidWrtInput = sigmoid.getDualNumber().getInfinitesimal().getInfinitesimals().get(input.getId());
+
+        double expected = Math.exp(-input.getValue()) / Math.pow(Math.exp(-input.getValue()) + 1, 2);
+
+        assertEquals(expected, diffSigmoidWrtInput, 0.0001);
+    }
+
+    @Test
     public void canSolveSigmoidEquation() {
         //sigmoid(x) = 0.75
         //x = -log((1/0.75)-1) = 1.0986
