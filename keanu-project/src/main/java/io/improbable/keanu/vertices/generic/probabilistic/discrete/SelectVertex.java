@@ -9,20 +9,20 @@ import java.util.Random;
 
 public class SelectVertex<T> extends Probabilistic<T> {
 
-    private final LinkedHashMap<T, DoubleVertex> selectableValues;
+    private final Map<T, DoubleVertex> selectableValues;
     private final Random random;
 
-    public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues, Random random) {
-        this.selectableValues = selectableValues;
+    public SelectVertex(Map<T, DoubleVertex> selectableValues, Random random) {
+        this.selectableValues = new LinkedHashMap<>(selectableValues);
         this.random = random;
-        setParents(selectableValues.values());
+        setParents(this.selectableValues.values());
     }
 
-    public SelectVertex(LinkedHashMap<T, DoubleVertex> selectableValues) {
+    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
         this(selectableValues, new Random());
     }
 
-    public LinkedHashMap<T, DoubleVertex> getSelectableValues() {
+    public Map<T, DoubleVertex> getSelectableValues() {
         return selectableValues;
     }
 
