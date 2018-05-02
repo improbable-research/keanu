@@ -9,6 +9,9 @@ import java.util.Map;
 
 public class CPT {
 
+    private CPT() {
+    }
+
     private static final String WHEN_CONDITION_SIZE_MISMATCH = "The 'when' condition size does not match input count";
 
     @SafeVarargs

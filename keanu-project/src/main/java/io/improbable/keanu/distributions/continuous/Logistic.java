@@ -10,22 +10,27 @@ import java.util.Random;
  */
 public class Logistic {
 
+    private Logistic() {
+    }
+
     /**
      * @param a      location parameter (any real number)
      * @param b      scale parameter (b grater than 0)
-     * @param random
-     * @return
+     * @param random source or randomness
+     * @return a sample from the distribution
      */
     public static double sample(double a, double b, Random random) {
-        assert (b > 0.0);
+        if (b <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for beta: " + b);
+        }
         return a - b * Math.log(1. / random.nextDouble() - 1.);
     }
 
     /**
      * @param a location parameter (any real number)
      * @param b scale parameter (b greater than 0)
-     * @param x
-     * @return
+     * @param x at value
+     * @return the density at x
      */
     public static double pdf(double a, double b, double x) {
         double exponential = Math.exp((x - a) / b);
@@ -41,8 +46,8 @@ public class Logistic {
     /**
      * @param a location parameter (any real number)
      * @param b scale parameter (b greater than 0)
-     * @param x
-     * @return
+     * @param x at value
+     * @return the partial derivatives at x
      */
     public static Diff dPdf(double a, double b, double x) {
         double expAOverB = Math.exp(a / b);

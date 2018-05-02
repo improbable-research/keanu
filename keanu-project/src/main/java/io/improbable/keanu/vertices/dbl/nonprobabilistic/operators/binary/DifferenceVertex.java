@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+
+import java.util.Map;
 
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
@@ -10,9 +13,9 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        final DualNumber aDual = a.getDualNumber();
-        final DualNumber bDual = b.getDualNumber();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        final DualNumber aDual = dualNumbers.get(a);
+        final DualNumber bDual = dualNumbers.get(b);
         return aDual.subtract(bDual);
     }
 

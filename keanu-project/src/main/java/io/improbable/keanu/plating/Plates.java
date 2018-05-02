@@ -4,22 +4,22 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Plates {
-    private List<Plate> plates;
+    private List<Plate> containedPlates;
 
     public Plates(int reservedSize) {
-        plates = new ArrayList<>(reservedSize);
+        containedPlates = new ArrayList<>(reservedSize);
     }
 
     public int size() {
-        return plates.size();
+        return containedPlates.size();
     }
 
     public void add(Plate p) {
-        plates.add(p);
+        containedPlates.add(p);
     }
 
     public List<Plate> asList() {
-        return plates;
+        return containedPlates;
     }
 
 }

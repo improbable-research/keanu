@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc.initialConditions;
+package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.network.NetworkState;

@@ -9,6 +9,8 @@ import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -16,6 +18,8 @@ import java.util.List;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class GradientOptimizer {
+
+    private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
     private static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
             NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
@@ -35,37 +39,55 @@ public class GradientOptimizer {
     }
 
     /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     * This method is here to provide more fine grained control of optimization.
+     *
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @param optimizer      apache math optimizer to use for optimization
+     * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
         if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
-            throw new RuntimeException("Cannot find MAP of network without any probabilistic vertices");
+            throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
         return optimize(maxEvaluations, bayesNet.getVerticesThatContributeToMasterP(), optimizer);
     }
 
+    /**
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @return the natural logarithm of the Maximum A Posteriori (MAP)
+     */
     public double maxAPosteriori(int maxEvaluations) {
         return maxAPosteriori(maxEvaluations, DEFAULT_OPTIMIZER);
     }
 
     /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * This method is here to provide more fine grained control of optimization.
+     *
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @param optimizer      apache math optimizer to use for optimization
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
         if (bayesNet.getObservedVertices().isEmpty()) {
-            throw new RuntimeException("Cannot find max likelihood of network without any observations");
+            throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
         }
         return optimize(maxEvaluations, bayesNet.getObservedVertices(), optimizer);
     }
 
+    /**
+     * @param maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     *                       indicating convergence failure.
+     * @return the natural logarithm of the maximum likelihood
+     */
     public double maxLikelihood(int maxEvaluations) {
         return maxLikelihood(maxEvaluations, DEFAULT_OPTIMIZER);
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex<?>> outputVertices,
+                            List<Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());
@@ -77,7 +99,7 @@ public class GradientOptimizer {
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         warnIfGradientIsFlat(initialGradient);
@@ -104,7 +126,7 @@ public class GradientOptimizer {
     private void warnIfGradientIsFlat(double[] gradient) {
         double maxGradient = Arrays.stream(gradient).max().getAsDouble();
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
-            System.err.println("Warning: The initial gradient is very flat. The largest gradient is " + maxGradient);
+            log.warn("The initial gradient is very flat. The largest gradient is {}", maxGradient);
         }
     }
 }

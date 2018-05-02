@@ -9,6 +9,9 @@ import java.util.Set;
 
 public class DiscoverGraph {
 
+    private DiscoverGraph() {
+    }
+
     /**
      * This algorithm visits all vertices in a graph. It's memory
      * requirements is on the order of number of vertices in the graph
@@ -22,9 +25,9 @@ public class DiscoverGraph {
      * @return a set containing EVERY vertex in a graph that the
      * starting vertex is apart of.
      */
-    public static Set<Vertex<?>> getEntireGraph(Vertex<?> initialVertex) {
+    public static Set<Vertex> getEntireGraph(Vertex<?> initialVertex) {
 
-        Set<Vertex<?>> discoveredGraph = new HashSet<>();
+        Set<Vertex> discoveredGraph = new HashSet<>();
 
         Deque<Vertex<?>> stack = new ArrayDeque<>();
 

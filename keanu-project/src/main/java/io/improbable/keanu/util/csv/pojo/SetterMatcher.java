@@ -11,6 +11,9 @@ import java.util.Optional;
  */
 class SetterMatcher {
 
+    private SetterMatcher() {
+    }
+
     static <T> Optional<CsvColumnConsumer<T>> getSetterConsumer(String title, List<Method> potentialMethods) {
 
         final Optional<Method> matchingMethodMaybe = findMatchingSetter(title.trim(), potentialMethods);
@@ -28,7 +31,7 @@ class SetterMatcher {
             try {
                 method.invoke(target, convertedValue);
             } catch (InvocationTargetException | IllegalAccessException e) {
-                throw new RuntimeException(e);
+                throw new IllegalStateException(e);
             }
         };
     }
@@ -51,7 +54,7 @@ class SetterMatcher {
     }
 
     private static boolean titleMatchesSetterMethod(Method method, String title) {
-        return method.getName().toLowerCase().equals("set" + title.toLowerCase());
+        return method.getName().equalsIgnoreCase("set" + title);
     }
 
     private static boolean methodContainsPropertyAnnotation(Method method, String title) {

@@ -14,6 +14,9 @@ import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
+import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
+import static io.improbable.keanu.vertices.TestGraphGenerator.passThroughVertex;
+import static io.improbable.keanu.vertices.TestGraphGenerator.sumVertex;
 import static org.junit.Assert.assertEquals;
 
 public class VertexValuePropagationTest {
@@ -31,10 +34,11 @@ public class VertexValuePropagationTest {
     public void doesNotDoUnnecessaryOperations() {
 
         AtomicInteger n = new AtomicInteger(0);
+        AtomicInteger m = new AtomicInteger(0);
         DoubleVertex start = new GaussianVertex(0, 1, random);
 
         int links = 20;
-        DoubleVertex end = addLinks(start, n, links);
+        DoubleVertex end = addLinks(start, n, m, links);
 
         start.setAndCascade(2.0);
 
@@ -48,13 +52,14 @@ public class VertexValuePropagationTest {
     @Test
     public void doesNotPropagateThroughProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
+        AtomicInteger m = new AtomicInteger(0);
         DoubleVertex start = new GaussianVertex(0, 1, random);
 
-        DoubleVertex end = addLinks(start, n, 1);
+        DoubleVertex end = addLinks(start, n, m, 1);
 
         DoubleVertex nextLayerStart = new GaussianVertex(end, 1, random);
 
-        DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, 1);
+        DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
         start.setAndCascade(3.0);
 
@@ -68,15 +73,16 @@ public class VertexValuePropagationTest {
     @Test
     public void doesPropagateAroundProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
+        AtomicInteger m = new AtomicInteger(0);
         DoubleVertex firstLayerStart = new GaussianVertex(0, 1, random);
 
-        DoubleVertex firstLayerEnd = addLinks(firstLayerStart, n, 1);
+        DoubleVertex firstLayerEnd = addLinks(firstLayerStart, n, m, 1);
 
         DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1, random);
 
-        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, id -> log.info("OP on id: " + id));
-        DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, id -> log.info("OP on id: " + id));
-        DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, m,id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, m, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, m, id -> log.info("OP on id: " + id));
 
         secondLayerStart.setValue(2.0);
         firstLayerStart.setValue(3.0);
@@ -90,32 +96,4 @@ public class VertexValuePropagationTest {
         assertEquals(6, n.get());
     }
 
-    private DoubleVertex addLinks(DoubleVertex end, AtomicInteger n, int links) {
-
-        for (int i = 0; i < links; i++) {
-            DoubleVertex left = passThroughVertex(end, n, id -> log.info("OP on id: " + id));
-            DoubleVertex right = passThroughVertex(end, n, id -> log.info("OP on id: " + id));
-            end = sumVertex(left, right, n, id -> log.info("OP on id:" + id));
-        }
-
-        return end;
-    }
-
-    private DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger n, Consumer<Long> onOp) {
-        final long id = Vertex.idGenerator.get();
-        return new DoubleUnaryOpLambda<>(from, (a) -> {
-            n.incrementAndGet();
-            onOp.accept(id);
-            return a;
-        });
-    }
-
-    private DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger n, Consumer<Long> onOp) {
-        final long id = Vertex.idGenerator.get();
-        return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
-            n.incrementAndGet();
-            onOp.accept(id);
-            return a + b;
-        });
-    }
 }

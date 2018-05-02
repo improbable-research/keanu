@@ -50,12 +50,7 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Beta.pdf(alpha.getValue(), beta.getValue(), value);
-    }
-
-    @Override
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Beta.logPdf(alpha.getValue(), beta.getValue(), value);
     }
 
@@ -68,14 +63,8 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Beta.Diff dPdf = Beta.dPdf(alpha.getValue(), beta.getValue(), getValue());
-        return convertDualNumbersToDiff(dPdf.dPdAlpha, dPdf.dPdBeta, dPdf.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(dlnPdf.dPdAlpha, dlnPdf.dPdBeta, dlnPdf.dPdx);
     }
 

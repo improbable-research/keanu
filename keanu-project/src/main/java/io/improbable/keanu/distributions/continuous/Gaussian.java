@@ -4,6 +4,9 @@ import java.util.Random;
 
 public class Gaussian {
 
+    private Gaussian() {
+    }
+
     private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
     private static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
 

@@ -20,7 +20,7 @@ public class TopologicalSortTest {
         DoubleVertex B = new GaussianVertex(A, new ConstantDoubleVertex(1.0));
         DoubleVertex C = new GaussianVertex(B, new ConstantDoubleVertex(1.0));
 
-        List<? extends Vertex<?>> sorted = TopologicalSort.sort(Arrays.asList(C, B, A));
+        List<? extends Vertex> sorted = TopologicalSort.sort(Arrays.asList(C, B, A));
         List<Vertex<?>> expected = Arrays.asList(A, B, C);
 
         assertExactOrder(expected, sorted);
@@ -36,7 +36,7 @@ public class TopologicalSortTest {
 
         DoubleVertex D = new GaussianVertex(B, C);
 
-        List<? extends Vertex<?>> sorted = TopologicalSort.sort(Arrays.asList(D, C, B, A));
+        List<? extends Vertex> sorted = TopologicalSort.sort(Arrays.asList(D, C, B, A));
 
         assertTrue(sorted.size() == 4);
         assertTrue(sorted.get(0).equals(A));
@@ -54,8 +54,8 @@ public class TopologicalSortTest {
         DoubleVertex F = new GaussianVertex(D, new ConstantDoubleVertex(1.0));
         DoubleVertex G = new GaussianVertex(E, F);
 
-        List<Vertex<?>> vertices = Arrays.asList(F, B, G, C, E, A);
-        List<? extends Vertex<?>> sorted = TopologicalSort.sort(vertices);
+        List<Vertex> vertices = Arrays.asList(F, B, G, C, E, A);
+        List<? extends Vertex> sorted = TopologicalSort.sort(vertices);
 
         assertTrue(sorted.size() == vertices.size());
         assertTrue(sorted.get(0).equals(A));
@@ -78,8 +78,8 @@ public class TopologicalSortTest {
         DoubleVertex M = new GaussianVertex(J, new ConstantDoubleVertex(1.0));
         DoubleVertex L = new GaussianVertex(K, H);
 
-        List<Vertex<?>> vertices = Arrays.asList(H, B, L, I, F, E, A, G, D, J, K, M, C);
-        List<? extends Vertex<?>> sorted = TopologicalSort.sort(vertices);
+        List<Vertex> vertices = Arrays.asList(H, B, L, I, F, E, A, G, D, J, K, M, C);
+        List<? extends Vertex> sorted = TopologicalSort.sort(vertices);
 
         assertTrue(sorted.size() == vertices.size());
         assertTrue(sorted.get(3).equals(C));
@@ -87,7 +87,7 @@ public class TopologicalSortTest {
         assertTrue(sorted.get(5).equals(E));
     }
 
-    private void assertExactOrder(List<? extends Vertex<?>> expected, List<? extends Vertex<?>> actual) {
+    private void assertExactOrder(List<? extends Vertex<?>> expected, List<? extends Vertex> actual) {
         assertTrue(actual.size() == expected.size());
         for (int i = 0; i < actual.size(); i++) {
             assertTrue(actual.get(i).equals(expected.get(i)));

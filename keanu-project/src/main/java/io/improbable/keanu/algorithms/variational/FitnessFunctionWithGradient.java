@@ -9,7 +9,7 @@ import java.util.Map;
 
 public class FitnessFunctionWithGradient extends FitnessFunction {
 
-    public FitnessFunctionWithGradient(List<Vertex<?>> fitnessVertices, List<? extends Vertex<Double>> latentVertices) {
+    public FitnessFunctionWithGradient(List<Vertex> fitnessVertices, List<? extends Vertex<Double>> latentVertices) {
         super(fitnessVertices, latentVertices);
     }
 

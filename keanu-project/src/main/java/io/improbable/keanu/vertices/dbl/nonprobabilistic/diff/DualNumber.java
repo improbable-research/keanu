@@ -91,13 +91,13 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
     public DualNumber plus(double value) {
         double newValue = this.value + value;
-        Infinitesimal clonedInf = this.infinitesimal.clone();
+        Infinitesimal clonedInf = this.infinitesimal.copy();
         return new DualNumber(newValue, clonedInf);
     }
 
     public DualNumber minus(double value) {
         double newValue = this.value - value;
-        Infinitesimal clonedInf = this.infinitesimal.clone();
+        Infinitesimal clonedInf = this.infinitesimal.copy();
         return new DualNumber(newValue, clonedInf);
     }
 
