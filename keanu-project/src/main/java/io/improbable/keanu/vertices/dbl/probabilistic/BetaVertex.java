@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -63,18 +64,18 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogPdf(Double value) {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
         Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(dlnPdf.dPdAlpha, dlnPdf.dPdBeta, dlnPdf.dPdx);
     }
 
-    public Map<String, Double> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {
+    public Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {
         Infinitesimal dPdInputsFromAlpha = alpha.getDualNumber().getInfinitesimal().multiplyBy(dPdAlpha);
         Infinitesimal dPdInputsFromBeta = beta.getDualNumber().getInfinitesimal().multiplyBy(dPdBeta);
         Infinitesimal dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
         dPdInputs.getInfinitesimals().put(getId(), dPdx);
 
-        return dPdInputs.getInfinitesimals();
+        return DoubleTensor.fromScalars(dPdInputs.getInfinitesimals());
     }
 
     @Override

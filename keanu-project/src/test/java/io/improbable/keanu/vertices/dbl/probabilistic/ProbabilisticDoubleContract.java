@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.ArrayList;
@@ -139,9 +140,9 @@ public class ProbabilisticDoubleContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<String, Double> diffln = vertexUnderTest.dLogProbAtValue();
+        Map<String, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
 
-        double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId());
+        double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
         assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
                 diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);

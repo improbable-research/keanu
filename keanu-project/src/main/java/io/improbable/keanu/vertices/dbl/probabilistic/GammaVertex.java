@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -79,19 +80,19 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogPdf(Double value) {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
         Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
     }
 
-    private Map<String, Double> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
+    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
         Infinitesimal dPdInputsFromA = a.getDualNumber().getInfinitesimal().multiplyBy(dPda);
         Infinitesimal dPdInputsFromTheta = theta.getDualNumber().getInfinitesimal().multiplyBy(dPdtheta);
         Infinitesimal dPdInputsFromK = k.getDualNumber().getInfinitesimal().multiplyBy(dPdk);
         Infinitesimal dPdInputs = dPdInputsFromA.add(dPdInputsFromTheta).add(dPdInputsFromK);
         dPdInputs.getInfinitesimals().put(getId(), dPdx);
 
-        return dPdInputs.getInfinitesimals();
+        return DoubleTensor.fromScalars(dPdInputs.getInfinitesimals());
     }
 
     @Override

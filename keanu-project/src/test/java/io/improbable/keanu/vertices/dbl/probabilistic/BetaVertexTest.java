@@ -44,7 +44,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.5;
         b.setValue(value);
-        double gradient = b.dLogProbAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(0, gradient, 0);
     }
@@ -54,7 +54,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.25;
         b.setValue(value);
-        double gradient = b.dLogProbAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(1, Math.signum(gradient), 0);
     }
@@ -64,7 +64,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
         double value = 0.75;
         b.setValue(value);
-        double gradient = b.dLogProbAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(-1, Math.signum(gradient), 0);
     }
@@ -74,7 +74,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(1.5), random);
         double value = 0.5;
         b.setValue(value);
-        double gradient = b.dLogProbAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(1, Math.signum(gradient), 0);
     }
@@ -84,7 +84,7 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0), random);
         double value = 0.5;
         b.setValue(value);
-        double gradient = b.dLogProbAtValue().get(b.getId());
+        double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
         log.info("Gradient at " + value + ": " + gradient);
         assertEquals(-1, Math.signum(gradient), 0);
     }

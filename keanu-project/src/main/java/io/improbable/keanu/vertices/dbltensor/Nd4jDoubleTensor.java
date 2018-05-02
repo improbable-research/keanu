@@ -43,6 +43,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public double scalar() {
+        return tensor.getDouble(0);
+    }
+
+    @Override
     public DoubleTensor reciprocal() {
         return null;
     }

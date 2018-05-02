@@ -51,7 +51,7 @@ public class GradientOptimizer {
         if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
-        return optimize(maxEvaluations, bayesNet.getLatentAndObservedContinuousVertices(), optimizer);
+        return optimize(maxEvaluations, bayesNet.getLatentAndObservedVertices(), optimizer);
     }
 
     /**
@@ -75,7 +75,7 @@ public class GradientOptimizer {
         if (bayesNet.getObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
         }
-        return optimize(maxEvaluations, bayesNet.getContinuousObservedVertices(), optimizer);
+        return optimize(maxEvaluations, bayesNet.getObservedVertices(), optimizer);
     }
 
     /**
@@ -88,7 +88,7 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<ContinuousVertex<Double>> outputVertices,
+                            List<Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());

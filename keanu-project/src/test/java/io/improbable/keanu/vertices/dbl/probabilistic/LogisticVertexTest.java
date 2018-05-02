@@ -48,7 +48,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a);
-        double gradient = l.dLogProbAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
         log.info("Gradient at a: " + gradient);
         assertEquals(gradient, 0, 0);
     }
@@ -59,7 +59,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a - 1.0);
-        double gradient = l.dLogProbAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
         log.info("Gradient at x < a: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -70,7 +70,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a + 1.0);
-        double gradient = l.dLogProbAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
         log.info("Gradient at x > a: " + gradient);
         assertTrue(gradient < 0);
     }

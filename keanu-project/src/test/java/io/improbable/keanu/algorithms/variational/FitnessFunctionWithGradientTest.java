@@ -116,7 +116,7 @@ public class FitnessFunctionWithGradientTest {
     private void assert2DGradientEqualsApproxGradient(double[] topRight,
                                                       double[] bottomLeft,
                                                       double stepSize,
-                                                      List<? extends ContinuousVertex<Double>> probabilisticVertices,
+                                                      List<Vertex> probabilisticVertices,
                                                       List<?extends Vertex<Double>> latentVertices) {
 
         FitnessFunctionWithGradient f = new FitnessFunctionWithGradient(probabilisticVertices, latentVertices);

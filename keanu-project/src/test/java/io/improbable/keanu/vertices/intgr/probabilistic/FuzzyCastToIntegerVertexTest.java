@@ -161,7 +161,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         mu.setValue(mu1);
         double logDensity1 = fuzzy.logProbAtValue();
-        double actual_dPdmu = fuzzy.dLogProbAtValue().get(mu.getId());
+        double actual_dPdmu = fuzzy.dLogProbAtValue().get(mu.getId()).scalar();
 
         mu.setValue(mu2);
         double logDensity2 = fuzzy.logProbAtValue();
@@ -189,7 +189,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         sigma.setValue(sigma1);
         double logDensity1 = fuzzy.logProbAtValue();
-        double actual_dPdsigma = fuzzy.dLogProbAtValue().get(sigma.getId());
+        double actual_dPdsigma = fuzzy.dLogProbAtValue().get(sigma.getId()).scalar();
 
         sigma.setValue(sigma2);
         double logDensity2 = fuzzy.logProbAtValue();
@@ -217,7 +217,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         mu.setValue(mu1);
         double logDensity1 = fuzzy.logProbAtValue();
-        double actual_dlnPdmu = fuzzy.dLogProbAtValue().get(mu.getId());
+        double actual_dlnPdmu = fuzzy.dLogProbAtValue().get(mu.getId()).scalar();
 
         mu.setValue(mu2);
         double logDensity2 = fuzzy.logProbAtValue();
@@ -245,7 +245,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         sigma.setValue(sigma1);
         double logDensity1 = fuzzy.logProbAtValue();
-        double actual_dlnPdsigma = fuzzy.dLogProbAtValue().get(sigma.getId());
+        double actual_dlnPdsigma = fuzzy.dLogProbAtValue().get(sigma.getId()).scalar();
 
         sigma.setValue(sigma2);
         double logDensity2 = fuzzy.logProbAtValue();

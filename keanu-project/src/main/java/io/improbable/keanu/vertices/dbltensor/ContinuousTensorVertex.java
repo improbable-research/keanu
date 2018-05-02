@@ -15,10 +15,6 @@ public abstract class ContinuousTensorVertex<T> extends Vertex<T> {
         return dLogPdf(value);
     }
 
-    public Map<String, DoubleTensor> dLogProbAtValue() {
-        return dLogProb(getValue());
-    }
-
     public abstract double logPdf(T value);
 
     public abstract Map<String, DoubleTensor> dLogPdf(T value);

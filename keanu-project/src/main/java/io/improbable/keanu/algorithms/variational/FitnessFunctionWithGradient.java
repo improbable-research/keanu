@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 import org.apache.commons.math3.analysis.MultivariateFunction;
@@ -14,11 +13,11 @@ import static io.improbable.keanu.algorithms.variational.FitnessFunction.logOfTo
 
 public class FitnessFunctionWithGradient {
 
-    protected final List<? extends ContinuousVertex<Double>> probabilisticVertices;
+    protected final List<Vertex> probabilisticVertices;
     protected final List<? extends Vertex<Double>> latentVertices;
     protected final Map<String, Long> exploreSettingAll;
 
-    public FitnessFunctionWithGradient(List<? extends ContinuousVertex<Double>> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
                                        List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;

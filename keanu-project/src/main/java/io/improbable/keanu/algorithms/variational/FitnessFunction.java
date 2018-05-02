@@ -9,11 +9,11 @@ import java.util.Map;
 
 public class FitnessFunction {
 
-    protected final List<? extends Vertex> probabilisticVertices;
+    protected final List<Vertex> probabilisticVertices;
     protected final List<? extends Vertex<Double>> latentVertices;
     protected final Map<String, Long> exploreSettingAll;
 
-    public FitnessFunction(List<? extends Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
+    public FitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);

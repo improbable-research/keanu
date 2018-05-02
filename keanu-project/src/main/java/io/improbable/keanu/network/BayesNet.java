@@ -2,10 +2,10 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A wrapper around a collection of connected vertices.
@@ -13,60 +13,26 @@ import java.util.*;
 public class BayesNet {
 
     private final List<Vertex> latentAndObservedVertices;
-    private final List<ContinuousVertex<Double>> latentAndObservedContinuousVertices;
-    private final List<Vertex> latentAndObservedDiscreteVertices;
-
     private final List<Vertex> latentVertices;
-    private List<ContinuousVertex<Double>> continuousLatentVertices;
-    private List<Vertex> discreteLatentVertices;
-
     private final List<Vertex> observedVertices;
-    private List<ContinuousVertex<Double>> continuousObservedVertices;
-    private List<Vertex> discreteObservedVertices;
+
+    //Lazy evaluated
+    private List<Vertex<Double>> continuousLatentVertices;
+    private List<Vertex> discreteLatentVertices;
 
     public BayesNet(Set<? extends Vertex> vertices) {
 
-        continuousLatentVertices = new ArrayList<>();
-        discreteLatentVertices = new ArrayList<>();
+        latentAndObservedVertices = vertices.stream()
+                .filter(v -> v.isObserved() || v.isProbabilistic())
+                .collect(Collectors.toList());
 
-        continuousObservedVertices = new ArrayList<>();
-        discreteObservedVertices = new ArrayList<>();
+        observedVertices = latentAndObservedVertices.stream()
+                .filter(Vertex::isObserved)
+                .collect(Collectors.toList());
 
-        for (Vertex v : vertices) {
-            if (v.isObserved()) {
-                if (v instanceof ContinuousVertex) {
-                    continuousObservedVertices.add((ContinuousVertex<Double>) v);
-                } else {
-                    discreteObservedVertices.add(v);
-                }
-            } else if (v.isProbabilistic()) {
-                if (v instanceof ContinuousVertex) {
-                    continuousLatentVertices.add((ContinuousVertex<Double>) v);
-                } else {
-                    discreteLatentVertices.add(v);
-                }
-            }
-        }
-
-        observedVertices = new ArrayList<>();
-        observedVertices.addAll(continuousObservedVertices);
-        observedVertices.addAll(discreteObservedVertices);
-
-        latentVertices = new ArrayList<>();
-        latentVertices.addAll(continuousLatentVertices);
-        latentVertices.addAll(discreteLatentVertices);
-
-        latentAndObservedVertices = new ArrayList<>();
-        latentAndObservedVertices.addAll(latentVertices);
-        latentAndObservedVertices.addAll(observedVertices);
-
-        latentAndObservedContinuousVertices = new ArrayList<>();
-        latentAndObservedContinuousVertices.addAll(continuousLatentVertices);
-        latentAndObservedContinuousVertices.addAll(continuousObservedVertices);
-
-        latentAndObservedDiscreteVertices = new ArrayList<>();
-        latentAndObservedDiscreteVertices.addAll(discreteLatentVertices);
-        latentAndObservedDiscreteVertices.addAll(discreteObservedVertices);
+        latentVertices = latentAndObservedVertices.stream()
+                .filter(v -> !v.isObserved())
+                .collect(Collectors.toList());
     }
 
     public BayesNet(Collection<? extends Vertex> vertices) {
@@ -77,23 +43,23 @@ public class BayesNet {
         return latentAndObservedVertices;
     }
 
-    public List<ContinuousVertex<Double>> getLatentAndObservedContinuousVertices() {
-        return latentAndObservedContinuousVertices;
-    }
-
-    public List<Vertex> getLatentAndObservedDiscreteVertices() {
-        return latentAndObservedDiscreteVertices;
-    }
-
     public List<Vertex> getLatentVertices() {
         return latentVertices;
     }
 
-    public List<ContinuousVertex<Double>> getContinuousLatentVertices() {
+    public List<Vertex<Double>> getContinuousLatentVertices() {
+        if (continuousLatentVertices == null) {
+            splitContinuousAndDiscrete();
+        }
+
         return continuousLatentVertices;
     }
 
     public List<Vertex> getDiscreteLatentVertices() {
+        if (discreteLatentVertices == null) {
+            splitContinuousAndDiscrete();
+        }
+
         return discreteLatentVertices;
     }
 
@@ -101,12 +67,18 @@ public class BayesNet {
         return observedVertices;
     }
 
-    public List<ContinuousVertex<Double>> getContinuousObservedVertices() {
-        return continuousObservedVertices;
-    }
+    private void splitContinuousAndDiscrete() {
 
-    public List<Vertex> getDiscreteObservedVertices() {
-        return discreteObservedVertices;
+        continuousLatentVertices = new ArrayList<>();
+        discreteLatentVertices = new ArrayList<>();
+
+        for (Vertex<?> vertex : latentVertices) {
+            if (vertex.getValue() instanceof Double) {
+                continuousLatentVertices.add((Vertex<Double>) vertex);
+            } else {
+                discreteLatentVertices.add(vertex);
+            }
+        }
     }
 
     public double getLogOfMasterP() {
@@ -120,7 +92,6 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
-     *
      * @param attempts sampling attempts to get non-zero probability
      */
     public void probeForNonZeroMasterP(int attempts) {
