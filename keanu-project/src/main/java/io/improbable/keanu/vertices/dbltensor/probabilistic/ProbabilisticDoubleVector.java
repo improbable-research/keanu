@@ -1,8 +1,8 @@
-package io.improbable.keanu.vertices.dbl.tensor.probabilistic;
+package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.vertices.dbl.tensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.tensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbl.tensor.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
 
 public abstract class ProbabilisticDoubleVector extends DoubleTensorVertex {
 

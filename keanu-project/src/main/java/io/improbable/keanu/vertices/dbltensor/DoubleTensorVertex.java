@@ -1,10 +1,10 @@
-package io.improbable.keanu.vertices.dbl.tensor;
+package io.improbable.keanu.vertices.dbltensor;
 
 
-import io.improbable.keanu.vertices.dbl.tensor.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.tensor.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.tensor.nonprobabilistic.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.dbl.tensor.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.MultiplicationVertex;
 
 public abstract class DoubleTensorVertex extends TensorVertex<DoubleTensor> {
 

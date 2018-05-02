@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.tensor;
+package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;

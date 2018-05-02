@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.tensor;
+package io.improbable.keanu.vertices.dbltensor;
 
 import java.util.*;
 
