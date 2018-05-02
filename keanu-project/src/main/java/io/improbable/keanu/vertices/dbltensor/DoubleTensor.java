@@ -1,60 +1,28 @@
 package io.improbable.keanu.vertices.dbltensor;
 
-import org.nd4j.linalg.api.ndarray.INDArray;
+import io.improbable.keanu.kotlin.DoubleOperators;
 import org.nd4j.linalg.factory.Nd4j;
 
-public class DoubleTensor implements Tensor {
+public interface DoubleTensor extends Tensor, DoubleOperators<DoubleTensor> {
 
-    private INDArray tensor;
-
-    public DoubleTensor(double[] data, int[] shape) {
-        tensor = Nd4j.create(data, shape);
+    static DoubleTensor create(double[] values, int[] shape) {
+        return new Nd4jDoubleTensor(values, shape);
     }
 
-    @Override
-    public int getRank() {
-        return tensor.rank();
+    static DoubleTensor ones(int[] shape) {
+        return new Nd4jDoubleTensor(Nd4j.ones(shape));
     }
 
-    @Override
-    public int[] getShape() {
-        return tensor.shape();
+    static DoubleTensor zeros(int[] shape) {
+        return new Nd4jDoubleTensor(Nd4j.zeros(shape));
     }
 
-    @Override
-    public int getLength() {
-        return tensor.length();
-    }
+    double getValue(int[] index);
 
-    public double getValue(int[] index) {
-        return tensor.getDouble(index);
-    }
+    void setValue(double value, int[] index);
 
-    public void setValue(double value, int[] index) {
-        tensor.putScalar(index, value);
-    }
+    double sum();
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+    DoubleTensor reciprocal();
 
-        DoubleTensor that = (DoubleTensor) o;
-
-        return tensor.equals(that.tensor);
-    }
-
-    @Override
-    public int hashCode() {
-        return tensor.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return tensor.toString();
-    }
-
-    public double sum() {
-        return tensor.sumNumber().doubleValue();
-    }
 }

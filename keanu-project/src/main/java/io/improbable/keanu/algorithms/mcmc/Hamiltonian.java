@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
@@ -38,9 +39,9 @@ public class Hamiltonian {
                                                      final double stepSize,
                                                      final Random random) {
 
-        final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        final List<? extends Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        final List<ContinuousVertex<Double>> probabilisticVertices = bayesNet.getLatentAndObservedContinuousVertices();
         final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
-        final List<Vertex> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
@@ -50,7 +51,7 @@ public class Hamiltonian {
         Map<String, Double> positionBeforeLeapfrog = new HashMap<>();
 
         Map<String, Double> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-                bayesNet.getVerticesThatContributeToMasterP()
+                bayesNet.getLatentAndObservedContinuousVertices()
         );
         Map<String, Double> gradientBeforeLeapfrog = new HashMap<>();
 
@@ -113,13 +114,13 @@ public class Hamiltonian {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
+    private static void cachePosition(List<? extends Vertex<Double>> latentVertices, Map<String, Double> position) {
         for (Vertex<Double> vertex : latentVertices) {
             position.put(vertex.getId(), vertex.getValue());
         }
     }
 
-    private static Map<String, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
+    private static Map<String, Double> initializeMomentumForEachVertex(List<? extends Vertex> vertexes,
                                                                        Map<String, Double> momentums,
                                                                        Random random) {
         for (int i = 0; i < vertexes.size(); i++) {
@@ -149,13 +150,13 @@ public class Hamiltonian {
      * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
      * @return the gradient at the updated position
      */
-    private static Map<String, Double> leapfrog(final List<Vertex<Double>> latentVertices,
+    private static Map<String, Double> leapfrog(final List<? extends Vertex<Double>> latentVertices,
                                                 final Map<String, Long> latentSetAndCascadeCache,
                                                 final Map<String, Double> position,
                                                 final Map<String, Double> gradient,
                                                 final Map<String, Double> momentums,
                                                 final double stepSize,
-                                                final List<Vertex> probabilisticVertices) {
+                                                final List<? extends ContinuousVertex> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 

@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
 
 import java.util.Collections;
+import java.util.Map;
 
 public class ConstantVertex extends NonProbabilisticDoubleTensor {
 
@@ -12,7 +14,7 @@ public class ConstantVertex extends NonProbabilisticDoubleTensor {
     }
 
     @Override
-    public DualNumber getDualNumber() {
+    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return new DualNumber(getValue(), Collections.emptyMap());
     }
 

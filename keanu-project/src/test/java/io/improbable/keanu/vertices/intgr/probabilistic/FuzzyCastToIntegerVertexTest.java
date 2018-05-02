@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,13 @@ public class FuzzyCastToIntegerVertexTest {
 
     private final Logger log = LoggerFactory.getLogger(FuzzyCastToIntegerVertexTest.class);
 
+    private Random random;
+
+    @Before
+    public void setup() {
+        this.random = new Random(1);
+    }
+
     @Test
     public void evenlySamplesWithUniformInput() {
         int min = 5;
@@ -28,7 +36,7 @@ public class FuzzyCastToIntegerVertexTest {
         int num = 100000;
 
         // Input from 4.5 to 15.5 so that there is equal probability of rounding to all integers within range
-        DoubleVertex input = new UniformVertex(new ConstantDoubleVertex(4.5), new ConstantDoubleVertex(15.5));
+        DoubleVertex input = new UniformVertex(new ConstantDoubleVertex(4.5), new ConstantDoubleVertex(15.5), random);
         TreeMap<Integer, Integer> sampleFrequencies = sample(input, fuzzinessSigma, min, max, num);
 
         log.info("Sample frequencies:");
@@ -51,7 +59,7 @@ public class FuzzyCastToIntegerVertexTest {
         double fuzzinessSigma = 0.0;
         int num = 100000;
 
-        DoubleVertex input = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(20.0));
+        DoubleVertex input = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(20.0), random);
         TreeMap<Integer, Integer> sampleFrequencies = sample(input, fuzzinessSigma, min, max, num);
 
         log.info("Sample frequencies:");
@@ -114,7 +122,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         DoubleVertex input = new ConstantDoubleVertex(0.25);
 
-        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, new Random());
+        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, random);
         double density = Math.exp(fuzzyCast.logProbAtValue());
 
         log.info("Value = " + fuzzyCast.getValue() + ", density = " + density);
@@ -123,10 +131,10 @@ public class FuzzyCastToIntegerVertexTest {
 
     @Test
     public void calculateMuByObservingFuzzy() {
-        DoubleVertex mu = new UniformVertex(0, 10);
+        DoubleVertex mu = new UniformVertex(0, 10, random);
         DoubleVertex sigma = new ConstantDoubleVertex(1.);
 
-        FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma.getValue(), 0, 10, new Random());
+        FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma.getValue(), 0, 10, random);
         fuzzy.observe(6);
 
         BayesNet bayes = new BayesNet(fuzzy.getConnectedGraph());
@@ -138,7 +146,6 @@ public class FuzzyCastToIntegerVertexTest {
 
     @Test
     public void calculate_dP_dmu() {
-        Random random = new Random(1);
         double sigma = 1.;
         int min = 1;
         int max = 10;
@@ -148,7 +155,7 @@ public class FuzzyCastToIntegerVertexTest {
         double mu2 = mu1 + delta;
         int observedValue = 5;
 
-        DoubleVertex mu = new UniformVertex(min, max);
+        DoubleVertex mu = new UniformVertex(min, max, random);
         FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma, min, max, random);
         fuzzy.setValue(observedValue);
 
@@ -167,7 +174,6 @@ public class FuzzyCastToIntegerVertexTest {
 
     @Test
     public void calculate_dP_dsigma() {
-        Random random = new Random(1);
         IntegerVertex min = new ConstantIntegerVertex(1);
         IntegerVertex max = new ConstantIntegerVertex(10);
         DoubleVertex mu = new ConstantDoubleVertex(5d);
@@ -177,7 +183,7 @@ public class FuzzyCastToIntegerVertexTest {
         double delta = 0.00001;
         double sigma2 = sigma1 + delta;
 
-        DoubleVertex sigma = new UniformVertex(0d, 3d);
+        DoubleVertex sigma = new UniformVertex(0d, 3d, random);
         FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma, min, max, random);
         fuzzy.setValue(observedValue);
 
@@ -196,7 +202,6 @@ public class FuzzyCastToIntegerVertexTest {
 
     @Test
     public void calculate_dlnP_dmu() {
-        Random random = new Random(1);
         double sigma = 1.;
         int min = 1;
         int max = 10;
@@ -206,7 +211,7 @@ public class FuzzyCastToIntegerVertexTest {
         double mu2 = mu1 + delta;
         int observedValue = 5;
 
-        DoubleVertex mu = new UniformVertex(min, max);
+        DoubleVertex mu = new UniformVertex(min, max, random);
         FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma, min, max, random);
         fuzzy.setValue(observedValue);
 
@@ -225,7 +230,6 @@ public class FuzzyCastToIntegerVertexTest {
 
     @Test
     public void calculate_dlnP_dsigma() {
-        Random random = new Random(1);
         IntegerVertex min = new ConstantIntegerVertex(1);
         IntegerVertex max = new ConstantIntegerVertex(10);
         DoubleVertex mu = new ConstantDoubleVertex(5d);
@@ -235,7 +239,7 @@ public class FuzzyCastToIntegerVertexTest {
         double delta = 0.0001;
         double sigma2 = sigma1 + delta;
 
-        DoubleVertex sigma = new UniformVertex(0d, 3d);
+        DoubleVertex sigma = new UniformVertex(0d, 3d, random);
         FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma, min, max, random);
         fuzzy.setValue(observedValue);
 
@@ -254,7 +258,7 @@ public class FuzzyCastToIntegerVertexTest {
 
     private TreeMap<Integer, Integer> sample(DoubleVertex input, double fuzzinessSigma, int min, int max, int num) {
 
-        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, new Random());
+        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, random);
 
         TreeMap<Integer, Integer> sampleFrequencies = new TreeMap<>();
 

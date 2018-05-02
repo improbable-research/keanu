@@ -9,58 +9,58 @@ import java.util.Map;
 public class DualNumber {
 
     private DoubleTensor value;
-    private Infinitesimal infinitesimal;
+    private PartialDerivatives partialDerivatives;
 
-    public DualNumber(DoubleTensor value, Infinitesimal infinitesimal) {
+    public DualNumber(DoubleTensor value, PartialDerivatives partialDerivatives) {
         this.value = value;
-        this.infinitesimal = infinitesimal;
+        this.partialDerivatives = partialDerivatives;
     }
 
-    public DualNumber(DoubleTensor value, Map<String, DoubleTensor> infinitesimal) {
-        this(value, new Infinitesimal(infinitesimal));
+    public DualNumber(DoubleTensor value, Map<String, DoubleTensor> partialDerivatives) {
+        this(value, new PartialDerivatives(partialDerivatives));
     }
 
     public DualNumber(DoubleTensor value, String infinitesimalLabel) {
-        this(value, new Infinitesimal(Collections.singletonMap(infinitesimalLabel, 1.0)));
+        this(value, new PartialDerivatives(Collections.singletonMap(infinitesimalLabel, DoubleTensor.ones(value.getShape()))));
     }
 
     public DoubleTensor getValue() {
         return value;
     }
 
-    public Infinitesimal getInfinitesimal() {
-        return infinitesimal;
+    public PartialDerivatives getPartialDerivatives() {
+        return partialDerivatives;
     }
 
     public DualNumber add(DualNumber that) {
         // dc = da + db;
-        DoubleTensor newValue = this.value + that.value;
-        Infinitesimal newInf = this.infinitesimal.add(that.infinitesimal);
+        DoubleTensor newValue = this.value.plus(that.value);
+        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber subtract(DualNumber that) {
         // dc = da - db;
-        DoubleTensor newValue = this.value - that.value;
-        Infinitesimal newInf = this.infinitesimal.subtract(that.infinitesimal);
+        DoubleTensor newValue = this.value.minus(that.value);
+        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber multiplyBy(DualNumber that) {
         // dc = A * db + B * da;
-        DoubleTensor newValue = this.value * that.value;
-        Infinitesimal thisInfMultiplied = this.infinitesimal.multiplyBy(that.value);
-        Infinitesimal thatInfMultiplied = that.infinitesimal.multiplyBy(this.value);
-        Infinitesimal newInf = thisInfMultiplied.add(thatInfMultiplied);
+        DoubleTensor newValue = this.value.times(that.value);
+        PartialDerivatives thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
+        PartialDerivatives thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
+        PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber divideBy(DualNumber that) {
         // dc = (B * da - A * db) / B^2;
-        DoubleTensor newValue = this.value / that.value;
-        Infinitesimal thisInfMultiplied = this.infinitesimal.multiplyBy(that.value);
-        Infinitesimal thatInfMultiplied = that.infinitesimal.multiplyBy(this.value);
-        Infinitesimal newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value * that.value);
+        DoubleTensor newValue = this.value.div(that.value);
+        PartialDerivatives thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
+        PartialDerivatives thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
+        PartialDerivatives newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
         return new DualNumber(newValue, newInf);
     }
 
@@ -81,26 +81,26 @@ public class DualNumber {
     }
 
     public DualNumber plus(double value) {
-        double newValue = this.value + value;
-        Infinitesimal clonedInf = this.infinitesimal.clone();
+        DoubleTensor newValue = this.value.plus(value);
+        PartialDerivatives clonedInf = this.partialDerivatives.clone();
         return new DualNumber(newValue, clonedInf);
     }
 
     public DualNumber minus(double value) {
-        double newValue = this.value - value;
-        Infinitesimal clonedInf = this.infinitesimal.clone();
+        DoubleTensor newValue = this.value.minus(value);
+        PartialDerivatives clonedInf = this.partialDerivatives.clone();
         return new DualNumber(newValue, clonedInf);
     }
 
     public DualNumber times(double value) {
-        double newValue = this.value * value;
-        Infinitesimal newInf = this.infinitesimal.multiplyBy(value);
+        DoubleTensor newValue = this.value.times(value);
+        PartialDerivatives newInf = this.partialDerivatives.multiplyBy(value);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber div(double value) {
-        double newValue = this.value / value;
-        Infinitesimal newInf = this.infinitesimal.divideBy(value);
+        DoubleTensor newValue = this.value.div(value);
+        PartialDerivatives newInf = this.partialDerivatives.divideBy(value);
         return new DualNumber(newValue, newInf);
     }
 

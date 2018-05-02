@@ -1,7 +1,11 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.dbl.scaler.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
+
+import java.util.Map;
 
 public class MultiplicationVertex extends BinaryOpVertex {
 
@@ -9,12 +13,15 @@ public class MultiplicationVertex extends BinaryOpVertex {
         super(a, b);
     }
 
-    protected DualNumber getDualNumber(DualNumber aDual, DualNumber bDual) {
-        return aDual.multiplyBy(bDual);
+    @Override
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        DualNumber aDual = dualNumbers.get(a);
+        DualNumber bDual = dualNumbers.get(b);
+        return aDual.add(bDual);
     }
 
     @Override
-    protected Double op(Double a, Double b) {
-        return a * b;
+    protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
+        return a.times(b);
     }
 }

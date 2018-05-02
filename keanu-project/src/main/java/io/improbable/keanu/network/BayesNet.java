@@ -2,64 +2,98 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * A wrapper around a collection of connected vertices.
  */
 public class BayesNet {
 
-    private final List<Vertex> verticesThatContributeToMasterP;
-    private final List<Vertex> latentVertices;
-    private final List<Vertex> observedVertices;
+    private final List<Vertex> latentAndObservedVertices;
+    private final List<ContinuousVertex<Double>> latentAndObservedContinuousVertices;
+    private final List<Vertex> latentAndObservedDiscreteVertices;
 
-    //Lazy evaluated
-    private List<Vertex<Double>> continuousLatentVertices;
+    private final List<Vertex> latentVertices;
+    private List<ContinuousVertex<Double>> continuousLatentVertices;
     private List<Vertex> discreteLatentVertices;
+
+    private final List<Vertex> observedVertices;
+    private List<ContinuousVertex<Double>> continuousObservedVertices;
+    private List<Vertex> discreteObservedVertices;
 
     public BayesNet(Set<? extends Vertex> vertices) {
 
-        verticesThatContributeToMasterP = vertices.stream()
-                .filter(v -> v.isObserved() || v.isProbabilistic())
-                .collect(Collectors.toList());
+        continuousLatentVertices = new ArrayList<>();
+        discreteLatentVertices = new ArrayList<>();
 
-        observedVertices = verticesThatContributeToMasterP.stream()
-                .filter(Vertex::isObserved)
-                .collect(Collectors.toList());
+        continuousObservedVertices = new ArrayList<>();
+        discreteObservedVertices = new ArrayList<>();
 
-        latentVertices = verticesThatContributeToMasterP.stream()
-                .filter(v -> !v.isObserved())
-                .collect(Collectors.toList());
+        for (Vertex v : vertices) {
+            if (v.isObserved()) {
+                if (v instanceof ContinuousVertex) {
+                    continuousObservedVertices.add((ContinuousVertex<Double>) v);
+                } else {
+                    discreteObservedVertices.add(v);
+                }
+            } else if (v.isProbabilistic()) {
+                if (v instanceof ContinuousVertex) {
+                    continuousLatentVertices.add((ContinuousVertex<Double>) v);
+                } else {
+                    discreteLatentVertices.add(v);
+                }
+            }
+        }
+
+        observedVertices = new ArrayList<>();
+        observedVertices.addAll(continuousObservedVertices);
+        observedVertices.addAll(discreteObservedVertices);
+
+        latentVertices = new ArrayList<>();
+        latentVertices.addAll(continuousLatentVertices);
+        latentVertices.addAll(discreteLatentVertices);
+
+        latentAndObservedVertices = new ArrayList<>();
+        latentAndObservedVertices.addAll(latentVertices);
+        latentAndObservedVertices.addAll(observedVertices);
+
+        latentAndObservedContinuousVertices = new ArrayList<>();
+        latentAndObservedContinuousVertices.addAll(continuousLatentVertices);
+        latentAndObservedContinuousVertices.addAll(continuousObservedVertices);
+
+        latentAndObservedDiscreteVertices = new ArrayList<>();
+        latentAndObservedDiscreteVertices.addAll(discreteLatentVertices);
+        latentAndObservedDiscreteVertices.addAll(discreteObservedVertices);
     }
 
     public BayesNet(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public List<Vertex> getVerticesThatContributeToMasterP() {
-        return verticesThatContributeToMasterP;
+    public List<Vertex> getLatentAndObservedVertices() {
+        return latentAndObservedVertices;
+    }
+
+    public List<ContinuousVertex<Double>> getLatentAndObservedContinuousVertices() {
+        return latentAndObservedContinuousVertices;
+    }
+
+    public List<Vertex> getLatentAndObservedDiscreteVertices() {
+        return latentAndObservedDiscreteVertices;
     }
 
     public List<Vertex> getLatentVertices() {
         return latentVertices;
     }
 
-    public List<Vertex<Double>> getContinuousLatentVertices() {
-        if (continuousLatentVertices == null) {
-            splitContinuousAndDiscrete();
-        }
-
+    public List<ContinuousVertex<Double>> getContinuousLatentVertices() {
         return continuousLatentVertices;
     }
 
     public List<Vertex> getDiscreteLatentVertices() {
-        if (discreteLatentVertices == null) {
-            splitContinuousAndDiscrete();
-        }
-
         return discreteLatentVertices;
     }
 
@@ -67,23 +101,17 @@ public class BayesNet {
         return observedVertices;
     }
 
-    private void splitContinuousAndDiscrete() {
+    public List<ContinuousVertex<Double>> getContinuousObservedVertices() {
+        return continuousObservedVertices;
+    }
 
-        continuousLatentVertices = new ArrayList<>();
-        discreteLatentVertices = new ArrayList<>();
-
-        for (Vertex<?> vertex : latentVertices) {
-            if (vertex.getValue() instanceof Double) {
-                continuousLatentVertices.add((Vertex<Double>) vertex);
-            } else {
-                discreteLatentVertices.add(vertex);
-            }
-        }
+    public List<Vertex> getDiscreteObservedVertices() {
+        return discreteObservedVertices;
     }
 
     public double getLogOfMasterP() {
         double sum = 0.0;
-        for (Vertex<?> vertex : verticesThatContributeToMasterP) {
+        for (Vertex<?> vertex : latentAndObservedVertices) {
             sum += vertex.logProbAtValue();
         }
         return sum;
@@ -92,6 +120,7 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
+     *
      * @param attempts sampling attempts to get non-zero probability
      */
     public void probeForNonZeroMasterP(int attempts) {

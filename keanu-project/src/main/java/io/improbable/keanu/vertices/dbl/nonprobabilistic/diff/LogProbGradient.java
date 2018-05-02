@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.ContinuousVertex;
 
 import java.util.HashMap;
 import java.util.List;
@@ -15,17 +15,17 @@ public class LogProbGradient {
      * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
+    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<? extends ContinuousVertex> probabilisticVertices) {
         final Map<String, Double> diffOfLogWrt = new HashMap<>();
 
-        for (final Vertex<?> probabilisticVertex : probabilisticVertices) {
+        for (final ContinuousVertex<?> probabilisticVertex : probabilisticVertices) {
             getLogProbGradientWrtLatents(probabilisticVertex, diffOfLogWrt);
         }
 
         return diffOfLogWrt;
     }
 
-    public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex,
+    public static Map<String, Double> getLogProbGradientWrtLatents(final ContinuousVertex<?> probabilisticVertex,
                                                                    final Map<String, Double> diffOfLogProbWrt) {
         //Non-probabilistic vertices are non-differentiable
         if (!probabilisticVertex.isProbabilistic()) {
@@ -50,7 +50,7 @@ public class LogProbGradient {
         return diffOfLogProbWrt;
     }
 
-    public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex) {
+    public static Map<String, Double> getLogProbGradientWrtLatents(final ContinuousVertex<?> probabilisticVertex) {
         return getLogProbGradientWrtLatents(probabilisticVertex, new HashMap<>());
     }
 

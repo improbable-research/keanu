@@ -9,9 +9,12 @@ public abstract class DiscreteVertex<T> extends Vertex<T> {
         return logPmf(value);
     }
 
-    @Override
     public final Map<String, Double> dLogProb(T value) {
         return dLogPmf(value);
+    }
+
+    public final Map<String, Double> dLogProbAtValue() {
+        return dLogProb(getValue());
     }
 
     public abstract double logPmf(T value);

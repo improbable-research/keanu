@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -115,8 +116,8 @@ public class FitnessFunctionWithGradientTest {
     private void assert2DGradientEqualsApproxGradient(double[] topRight,
                                                       double[] bottomLeft,
                                                       double stepSize,
-                                                      List<Vertex> probabilisticVertices,
-                                                      List<Vertex<Double>> latentVertices) {
+                                                      List<? extends ContinuousVertex<Double>> probabilisticVertices,
+                                                      List<?extends Vertex<Double>> latentVertices) {
 
         FitnessFunctionWithGradient f = new FitnessFunctionWithGradient(probabilisticVertices, latentVertices);
 

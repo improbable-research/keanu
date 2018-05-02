@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -47,10 +48,10 @@ public class GradientOptimizer {
      * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
-        if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
+        if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
-        return optimize(maxEvaluations, bayesNet.getVerticesThatContributeToMasterP(), optimizer);
+        return optimize(maxEvaluations, bayesNet.getLatentAndObservedContinuousVertices(), optimizer);
     }
 
     /**
@@ -74,7 +75,7 @@ public class GradientOptimizer {
         if (bayesNet.getObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
         }
-        return optimize(maxEvaluations, bayesNet.getObservedVertices(), optimizer);
+        return optimize(maxEvaluations, bayesNet.getContinuousObservedVertices(), optimizer);
     }
 
     /**
@@ -87,7 +88,7 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex> outputVertices,
+                            List<ContinuousVertex<Double>> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());

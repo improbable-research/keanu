@@ -32,18 +32,6 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     /**
-     * The partial derivatives of the natural log prob.
-     *
-     * @param value at a given value
-     * @return the partial derivatives of the log density
-     */
-    public abstract Map<String, Double> dLogProb(T value);
-
-    public Map<String, Double> dLogProbAtValue() {
-        return dLogProb(getValue());
-    }
-
-    /**
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
      * this will always be the same value.
      */

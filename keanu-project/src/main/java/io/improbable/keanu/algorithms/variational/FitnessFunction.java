@@ -9,11 +9,11 @@ import java.util.Map;
 
 public class FitnessFunction {
 
-    protected final List<Vertex> probabilisticVertices;
+    protected final List<? extends Vertex> probabilisticVertices;
     protected final List<? extends Vertex<Double>> latentVertices;
     protected final Map<String, Long> exploreSettingAll;
 
-    public FitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
+    public FitnessFunction(List<? extends Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
@@ -22,7 +22,7 @@ public class FitnessFunction {
     public MultivariateFunction fitness() {
         return point -> {
             setAndCascadePoint(point);
-            return logOfTotalProbability();
+            return logOfTotalProbability(probabilisticVertices);
         };
     }
 
@@ -35,7 +35,7 @@ public class FitnessFunction {
         VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
     }
 
-    protected double logOfTotalProbability() {
+    public static double logOfTotalProbability(List<? extends Vertex> probabilisticVertices) {
         double sum = 0.0;
         for (Vertex<?> vertex : probabilisticVertices) {
             sum += vertex.logProbAtValue();

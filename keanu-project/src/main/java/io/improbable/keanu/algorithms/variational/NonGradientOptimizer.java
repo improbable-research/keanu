@@ -31,7 +31,7 @@ public class NonGradientOptimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        List<? extends Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         FitnessFunction fitnessFunction = new FitnessFunction(outputVertices, latentVertices);
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
@@ -68,7 +68,7 @@ public class NonGradientOptimizer {
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
-        return optimize(maxEvaluations, boundsRange, bayesNet.getVerticesThatContributeToMasterP());
+        return optimize(maxEvaluations, boundsRange, bayesNet.getLatentAndObservedVertices());
     }
 
     /**

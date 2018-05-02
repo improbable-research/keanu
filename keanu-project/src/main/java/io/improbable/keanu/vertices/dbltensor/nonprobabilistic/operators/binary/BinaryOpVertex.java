@@ -4,7 +4,6 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
 
 public abstract class BinaryOpVertex extends NonProbabilisticDoubleTensor {
 
@@ -32,8 +31,6 @@ public abstract class BinaryOpVertex extends NonProbabilisticDoubleTensor {
     public DoubleTensor getDerivedValue() {
         return op(a.getValue(), b.getValue());
     }
-
-    protected abstract DualNumber getDualNumber();
 
     protected abstract DoubleTensor op(DoubleTensor a, DoubleTensor b);
 

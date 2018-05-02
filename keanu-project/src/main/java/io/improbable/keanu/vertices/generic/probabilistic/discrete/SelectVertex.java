@@ -61,11 +61,6 @@ public class SelectVertex<T> extends Probabilistic<T> {
         return Math.log(probability);
     }
 
-    @Override
-    public Map<String, Double> dLogProb(T value) {
-        throw new UnsupportedOperationException();
-    }
-
     private double getSumOfProbabilities() {
         double sumP = 0.0;
         for (DoubleVertex p : selectableValues.values()) {

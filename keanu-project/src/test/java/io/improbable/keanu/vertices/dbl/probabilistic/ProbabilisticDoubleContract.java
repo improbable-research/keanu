@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -89,7 +90,7 @@ public class ProbabilisticDoubleContract {
                                                                                           double hyperParameterEndValue,
                                                                                           double hyperParameterValueIncrement,
                                                                                           Vertex<Double> hyperParameterVertex,
-                                                                                          Vertex<Double> vertexUnderTest,
+                                                                                          ContinuousVertex<Double> vertexUnderTest,
                                                                                           double vertexStartValue,
                                                                                           double vertexEndValue,
                                                                                           double vertexValueIncrement,
@@ -97,7 +98,15 @@ public class ProbabilisticDoubleContract {
 
         for (double value = vertexStartValue; value <= vertexEndValue; value += vertexValueIncrement) {
             vertexUnderTest.setAndCascade(value);
-            testGradientAcrossMultipleHyperParameterValues(hyperParameterStartValue, hyperParameterEndValue, hyperParameterValueIncrement, hyperParameterVertex, value, vertexUnderTest, gradientDelta);
+            testGradientAcrossMultipleHyperParameterValues(
+                    hyperParameterStartValue,
+                    hyperParameterEndValue,
+                    hyperParameterValueIncrement,
+                    hyperParameterVertex,
+                    value,
+                    vertexUnderTest,
+                    gradientDelta
+            );
         }
     }
 
@@ -106,7 +115,7 @@ public class ProbabilisticDoubleContract {
                                                                       double hyperParameterValueIncrement,
                                                                       Vertex<Double> hyperParameterVertex,
                                                                       double vertexValue,
-                                                                      Vertex<Double> vertexUnderTest,
+                                                                      ContinuousVertex<Double> vertexUnderTest,
                                                                       double gradientDelta) {
 
         for (double parameterValue = hyperParameterStartValue; parameterValue <= hyperParameterEndValue; parameterValue += hyperParameterValueIncrement) {
@@ -114,7 +123,12 @@ public class ProbabilisticDoubleContract {
         }
     }
 
-    public static void testGradientAtHyperParameterValue(double hyperParameterValue, Vertex<Double> hyperParameterVertex, double vertexValue, Vertex<Double> vertexUnderTest, double gradientDelta) {
+    public static void testGradientAtHyperParameterValue(double hyperParameterValue,
+                                                         Vertex<Double> hyperParameterVertex,
+                                                         double vertexValue,
+                                                         ContinuousVertex<Double> vertexUnderTest,
+                                                         double gradientDelta) {
+
         hyperParameterVertex.setAndCascade(hyperParameterValue - gradientDelta);
         double lnDensityA1 = vertexUnderTest.logProb(vertexValue);
 

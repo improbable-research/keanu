@@ -12,11 +12,6 @@ public abstract class NonProbabilistic<T> extends Vertex<T> {
     }
 
     @Override
-    public Map<String, Double> dLogProb(T value) {
-        throw new UnsupportedOperationException();
-    }
-
-    @Override
     public boolean isProbabilistic() {
         return false;
     }

@@ -23,7 +23,7 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
      */
     public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
-    public DualNumber getDualNumber() {
+    public final DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();
         stack.push(this);
@@ -41,7 +41,7 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatDualNumberIsNotCalculated) {
+                for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
                     if (vertex instanceof DoubleVertex) {
                         stack.push((DoubleVertex) vertex);
                     } else {
@@ -52,7 +52,18 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
             }
 
         }
+
         return dualNumbers.get(this);
+    }
+
+    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
+        Set<Vertex> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!dualNumbers.containsKey(next)){
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 
     public DoubleVertex minus(DoubleVertex that) {
@@ -164,16 +175,6 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
 
     public DoubleVertex acos() {
         return new ArcCosVertex(this);
-    }
-
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
-        Set<Vertex> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)){
-                notCalculatedParents.add(next);
-            }
-        }
-        return notCalculatedParents;
     }
 
 }
