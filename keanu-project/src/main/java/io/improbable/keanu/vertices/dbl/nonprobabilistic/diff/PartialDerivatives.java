@@ -28,6 +28,10 @@ public class PartialDerivatives {
         return derivativeWithRespectTo.getOrDefault(id, 0.0);
     }
 
+    public boolean isEmpty() {
+        return derivativeWithRespectTo.isEmpty();
+    }
+
     public Map<String, Double> asMap() {
         return derivativeWithRespectTo;
     }

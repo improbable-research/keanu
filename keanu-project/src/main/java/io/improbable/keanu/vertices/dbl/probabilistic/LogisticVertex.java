@@ -73,7 +73,10 @@ public class LogisticVertex extends ProbabilisticDouble {
         PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.putWithRespectTo(getId(), dPdx);
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
+
         return dPdInputs.asMap();
     }
 

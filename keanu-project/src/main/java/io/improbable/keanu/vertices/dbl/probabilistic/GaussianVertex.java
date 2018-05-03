@@ -74,7 +74,9 @@ public class GaussianVertex extends ProbabilisticDouble {
         PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.putWithRespectTo(getId(), dPdx);
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
         return dPdInputs.asMap();
     }

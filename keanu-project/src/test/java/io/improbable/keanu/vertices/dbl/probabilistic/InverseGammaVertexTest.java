@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class InverseGammaVertexTest {
 
@@ -115,6 +114,17 @@ public class InverseGammaVertexTest {
                 vertexEndValue,
                 vertexIncrement,
                 DELTA);
+    }
+
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        InverseGammaVertex vertexUnderTest = new InverseGammaVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test

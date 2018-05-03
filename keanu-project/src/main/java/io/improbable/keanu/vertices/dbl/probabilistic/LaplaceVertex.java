@@ -69,7 +69,10 @@ public class LaplaceVertex extends ProbabilisticDouble {
         PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
         PartialDerivatives dPdInputsFromSigma = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
-        dPdInputs.putWithRespectTo(getId(), dPdx);
+
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
         return dPdInputs.asMap();
     }

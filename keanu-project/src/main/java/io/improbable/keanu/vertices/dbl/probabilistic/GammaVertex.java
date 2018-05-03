@@ -89,7 +89,10 @@ public class GammaVertex extends ProbabilisticDouble {
         PartialDerivatives dPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dPdtheta);
         PartialDerivatives dPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dPdk);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromTheta).add(dPdInputsFromK);
-        dPdInputs.putWithRespectTo(getId(), dPdx);
+
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
         return dPdInputs.asMap();
     }
