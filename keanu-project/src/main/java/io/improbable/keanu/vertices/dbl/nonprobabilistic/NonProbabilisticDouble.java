@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.vertices.NonProbabilisticObservationException;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 
@@ -28,7 +27,7 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<String, Double> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 
