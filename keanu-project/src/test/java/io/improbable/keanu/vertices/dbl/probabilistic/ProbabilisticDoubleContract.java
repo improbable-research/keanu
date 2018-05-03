@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
@@ -92,7 +91,7 @@ public class ProbabilisticDoubleContract {
                                                                                           double hyperParameterEndValue,
                                                                                           double hyperParameterValueIncrement,
                                                                                           Vertex<Double> hyperParameterVertex,
-                                                                                          ContinuousVertex<Double> vertexUnderTest,
+                                                                                          Vertex<Double> vertexUnderTest,
                                                                                           double vertexStartValue,
                                                                                           double vertexEndValue,
                                                                                           double vertexValueIncrement,
@@ -117,18 +116,24 @@ public class ProbabilisticDoubleContract {
                                                                       double hyperParameterValueIncrement,
                                                                       Vertex<Double> hyperParameterVertex,
                                                                       double vertexValue,
-                                                                      ContinuousVertex<Double> vertexUnderTest,
+                                                                      Vertex<Double> vertexUnderTest,
                                                                       double gradientDelta) {
 
         for (double parameterValue = hyperParameterStartValue; parameterValue <= hyperParameterEndValue; parameterValue += hyperParameterValueIncrement) {
-            testGradientAtHyperParameterValue(parameterValue, hyperParameterVertex, vertexValue, vertexUnderTest, gradientDelta);
+            testGradientAtHyperParameterValue(
+                    parameterValue,
+                    hyperParameterVertex,
+                    vertexValue,
+                    vertexUnderTest,
+                    gradientDelta
+            );
         }
     }
 
     public static void testGradientAtHyperParameterValue(double hyperParameterValue,
                                                          Vertex<Double> hyperParameterVertex,
                                                          double vertexValue,
-                                                         ContinuousVertex<Double> vertexUnderTest,
+                                                         Vertex<Double> vertexUnderTest,
                                                          double gradientDelta) {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue - gradientDelta);

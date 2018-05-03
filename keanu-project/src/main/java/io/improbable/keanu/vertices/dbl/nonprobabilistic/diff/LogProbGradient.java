@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
@@ -17,7 +16,7 @@ public class LogProbGradient {
      * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<? extends Vertex> probabilisticVertices) {
+    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
         final Map<String, Double> diffOfLogWrt = new HashMap<>();
 
         for (final Vertex<?> probabilisticVertex : probabilisticVertices) {
@@ -52,7 +51,7 @@ public class LogProbGradient {
         return diffOfLogProbWrt;
     }
 
-    public static Map<String, Double> getLogProbGradientWrtLatents(final ContinuousVertex<?> probabilisticVertex) {
+    public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex) {
         return getLogProbGradientWrtLatents(probabilisticVertex, new HashMap<>());
     }
 
