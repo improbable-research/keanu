@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -66,7 +65,7 @@ public class PowerVertexTest {
     }
 
     @Test
-    public void calculateInfintesimal() {
+    public void calculatePartialDerivative() {
         DoubleVertex A = new UniformVertex(0, 10, random);
         A.setValue(4d);
         DoubleVertex B = new LogVertex(A);
@@ -74,11 +73,11 @@ public class PowerVertexTest {
         DoubleVertex APower = new PowerVertex(B, 3.);
         //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
 
-        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.0001);
+        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.0001);
     }
 
     @Test
-    public void calculateInfintesimalUsingVertexAsHyper() {
+    public void calculatePartialDerivativeUsingVertexAsHyper() {
         DoubleVertex A = new UniformVertex(0, 10, random);
         A.setValue(4d);
         DoubleVertex B = new LogVertex(A);
@@ -86,11 +85,11 @@ public class PowerVertexTest {
         DoubleVertex APower = new PowerVertex(B, new ConstantDoubleVertex(3.0));
         //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
 
-        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.0001);
+        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.0001);
     }
 
     @Test
-    public void calculateInfintesimalsWithRespectToAandB() {
+    public void calculatePartialDerivativesWithRespectToAandB() {
         UniformVertex A = new UniformVertex(1.0, 5.0, random);
         UniformVertex B = new UniformVertex(1.0, 10.0, random);
 
@@ -99,8 +98,8 @@ public class PowerVertexTest {
 
         PowerVertex P = new PowerVertex(A, B);
 
-        Assert.assertEquals((3 * Math.pow(4, 3 - 1)), P.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.001);
-        Assert.assertEquals(Math.pow(4, 3) * Math.log(4), P.getDualNumber().getInfinitesimal().getInfinitesimals().get(B.getId()), 0.001);
+        Assert.assertEquals((3 * Math.pow(4, 3 - 1)), P.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.001);
+        Assert.assertEquals(Math.pow(4, 3) * Math.log(4), P.getDualNumber().getPartialDerivatives().withRespectTo(B), 0.001);
     }
 
 }

@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
@@ -70,12 +70,12 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
-        Infinitesimal dPdInputsFromMu = a.getDualNumber().getInfinitesimal().multiplyBy(dPda);
-        Infinitesimal dPdInputsFromSigma = b.getDualNumber().getInfinitesimal().multiplyBy(dPdb);
-        Infinitesimal dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
+        PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
+        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
-        return DoubleTensor.fromScalars(dPdInputs.getInfinitesimals());
+        dPdInputs.putWithRespectTo(getId(), dPdx);
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
     @Override

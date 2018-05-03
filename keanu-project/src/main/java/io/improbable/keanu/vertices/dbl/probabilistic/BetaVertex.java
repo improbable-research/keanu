@@ -3,8 +3,8 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -70,12 +70,12 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     public Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {
-        Infinitesimal dPdInputsFromAlpha = alpha.getDualNumber().getInfinitesimal().multiplyBy(dPdAlpha);
-        Infinitesimal dPdInputsFromBeta = beta.getDualNumber().getInfinitesimal().multiplyBy(dPdBeta);
-        Infinitesimal dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
+        PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdAlpha);
+        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdBeta);
+        PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
+        dPdInputs.putWithRespectTo(getId(), dPdx);
 
-        return DoubleTensor.fromScalars(dPdInputs.getInfinitesimals());
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
     @Override
