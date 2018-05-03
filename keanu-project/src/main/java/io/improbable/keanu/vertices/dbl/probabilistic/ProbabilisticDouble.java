@@ -28,7 +28,11 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.createWithRespectToSelf(getId(), getValue());
+        if (isObserved()) {
+            return DualNumber.createConstant(getValue());
+        } else {
+            return DualNumber.createWithRespectToSelf(getId(), getValue());
+        }
     }
 
 }

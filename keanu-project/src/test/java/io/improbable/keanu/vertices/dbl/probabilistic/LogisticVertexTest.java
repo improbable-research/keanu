@@ -96,6 +96,17 @@ public class LogisticVertexTest {
     }
 
     @Test
+    public void isTreatedAsConstantWhenObserved() {
+        LogisticVertex vertexUnderTest = new LogisticVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
+    @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
         LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.0), uniformB);
