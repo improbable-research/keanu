@@ -11,8 +11,8 @@ public class NDGaussian {
     private NDGaussian() {
     }
 
-    public static DoubleTensor sample(DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
-        DoubleTensor unityGaussian = random.nextGaussian(mu.getShape());
+    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
+        DoubleTensor unityGaussian = random.nextGaussian(shape);
         return unityGaussian.times(sigma).plus(mu);
     }
 

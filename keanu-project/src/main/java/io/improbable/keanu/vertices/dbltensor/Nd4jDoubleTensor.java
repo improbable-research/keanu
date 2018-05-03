@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.ops.transforms.Transforms;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -49,27 +50,27 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor reciprocal() {
-        return null;
+        return new Nd4jDoubleTensor(tensor.rdiv(1.0));
     }
 
     @Override
     public DoubleTensor minus(double value) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.sub(value));
     }
 
     @Override
     public DoubleTensor plus(double value) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.add(value));
     }
 
     @Override
     public DoubleTensor times(double value) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.mul(value));
     }
 
     @Override
     public DoubleTensor div(double value) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.div(value));
     }
 
     @Override
@@ -84,57 +85,57 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor log() {
-        return null;
+        return new Nd4jDoubleTensor(Transforms.log(tensor));
     }
 
     @Override
     public DoubleTensor sin() {
-        return null;
+        return new Nd4jDoubleTensor(Transforms.sin(tensor));
     }
 
     @Override
     public DoubleTensor cos() {
-        return null;
+        return new Nd4jDoubleTensor(Transforms.cos(tensor));
     }
 
     @Override
     public DoubleTensor asin() {
-        return null;
+        return new Nd4jDoubleTensor(Transforms.asin(tensor));
     }
 
     @Override
     public DoubleTensor acos() {
-        return null;
+        return new Nd4jDoubleTensor(Transforms.acos(tensor));
     }
 
     @Override
     public DoubleTensor exp() {
-        return null;
+        return new Nd4jDoubleTensor(Transforms.exp(tensor));
     }
 
     @Override
     public DoubleTensor minus(DoubleTensor that) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.sub(((Nd4jDoubleTensor) that).tensor));
     }
 
     @Override
     public DoubleTensor plus(DoubleTensor that) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.add(((Nd4jDoubleTensor) that).tensor));
     }
 
     @Override
     public DoubleTensor times(DoubleTensor that) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.mul(((Nd4jDoubleTensor) that).tensor));
     }
 
     @Override
     public DoubleTensor div(DoubleTensor that) {
-        return null;
+        return new Nd4jDoubleTensor(tensor.div(((Nd4jDoubleTensor) that).tensor));
     }
 
     @Override
     public DoubleTensor unaryMinus() {
-        return null;
+        return new Nd4jDoubleTensor(tensor.neg());
     }
 
     @Override

@@ -13,6 +13,10 @@ public class ConstantVertex extends NonProbabilisticDoubleTensor {
         setValue(constant);
     }
 
+    public ConstantVertex(double constant) {
+        this(DoubleTensor.scalar(constant));
+    }
+
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return new DualNumber(getValue(), Collections.emptyMap());

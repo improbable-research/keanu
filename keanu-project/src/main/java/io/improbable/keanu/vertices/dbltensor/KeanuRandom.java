@@ -7,6 +7,10 @@ public class KeanuRandom {
 
     private final Random nd4jRandom;
 
+    public KeanuRandom(){
+        nd4jRandom = new DefaultRandom();
+    }
+
     public KeanuRandom(long seed) {
         nd4jRandom = new DefaultRandom(seed);
     }

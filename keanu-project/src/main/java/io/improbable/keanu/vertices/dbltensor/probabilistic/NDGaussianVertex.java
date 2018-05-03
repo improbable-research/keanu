@@ -23,7 +23,7 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
      * @param random source of randomness
      */
     public NDGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
-        if (mu.getValue().hasSameShapeAs(sigma.getValue())) {
+        if (!mu.getValue().hasSameShapeAs(sigma.getValue())) {
             throw new IllegalArgumentException("mu and sigma must match shape");
         }
 
@@ -72,7 +72,7 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample() {
-        return NDGaussian.sample(mu.getValue(), sigma.getValue(), random);
+        return NDGaussian.sample(getValue().getShape(), mu.getValue(), sigma.getValue(), random);
     }
 
 }

@@ -24,6 +24,10 @@ public interface DoubleTensor extends Tensor, DoubleOperators<DoubleTensor> {
         return new SimpleScalarTensor(scalarValue);
     }
 
+    static DoubleTensor nd4JScalar(double scalarValue) {
+        return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
+    }
+
     static Map<String, DoubleTensor> fromScalars(Map<String, Double> scalars) {
         Map<String, DoubleTensor> asTensors = new HashMap<>();
 
