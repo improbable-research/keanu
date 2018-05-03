@@ -31,12 +31,16 @@ class Thermometers {
     fun walk() {
 
         // Shortcut the tortured API for easy access to infinitesimals
-        var dE1_dU1 = thermo1err.dualNumber.infinitesimal.infinitesimals[u1.id]!!
-        var dE2_dU1 = thermo2err.dualNumber.infinitesimal.infinitesimals[u1.id]!!
-        var dE1_dU2 = thermo1err.dualNumber.infinitesimal.infinitesimals[u2.id]!!
-        var dE2_dU2 = thermo2err.dualNumber.infinitesimal.infinitesimals[u2.id]!!
-        var dE1_dU3 = thermo1err.dualNumber.infinitesimal.infinitesimals[u3.id]!!
-        var dE2_dU3 = thermo2err.dualNumber.infinitesimal.infinitesimals[u3.id]!!
+        thermo1err.lazyEval()
+        thermo2err.lazyEval()
+        var thermo1Infinitesimal = thermo1err.dualNumber.infinitesimal
+        var thermo2Infinitesimal = thermo2err.dualNumber.infinitesimal
+        var dE1_dU1 = thermo1Infinitesimal.infinitesimals.getOrDefault(u1.id, 0.0)!!
+        var dE2_dU1 = thermo2Infinitesimal.infinitesimals.getOrDefault(u1.id, 0.0)!!
+        var dE1_dU2 = thermo1Infinitesimal.infinitesimals.getOrDefault(u2.id, 0.0)!!
+        var dE2_dU2 = thermo2Infinitesimal.infinitesimals.getOrDefault(u2.id, 0.0)!!
+        var dE1_dU3 = thermo1Infinitesimal.infinitesimals.getOrDefault(u3.id, 0.0)!!
+        var dE2_dU3 = thermo2Infinitesimal.infinitesimals.getOrDefault(u3.id, 0.0)!!
 
         // Compute the step in uniform space
         var deltaU2 = (dE2_dU1/dE2_dU3 - dE1_dU1/dE1_dU3) / (dE1_dU2/dE1_dU3 - dE2_dU2/dE2_dU3)

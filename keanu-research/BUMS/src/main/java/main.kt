@@ -21,7 +21,7 @@ fun main(args : Array<String>) {
 fun getProposal(objective : Thermometers, iteration: Int) {
     val optimizer = NonLinearConjugateGradientOptimizer(
             NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-            SimpleValueChecker(1e-6, 1e-6)
+            SimpleValueChecker(1e-5, 1e-6)
     )
 
     if (iteration == 0) {
