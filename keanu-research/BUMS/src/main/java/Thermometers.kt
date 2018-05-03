@@ -1,9 +1,9 @@
 import io.improbable.keanu.network.BayesNet
 import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient
+import java.util.*
 import kotlin.math.sqrt
 
 class Thermometers {
@@ -17,6 +17,7 @@ class Thermometers {
     var thermo1err : DoubleVertex
     var thermo2err : DoubleVertex
     var net : BayesNet
+    var random = Random()
 
     constructor() {
         temp = logistic(u1, 20.0, 5.0)
@@ -35,25 +36,38 @@ class Thermometers {
         thermo2err.lazyEval()
         var thermo1Infinitesimal = thermo1err.dualNumber.infinitesimal
         var thermo2Infinitesimal = thermo2err.dualNumber.infinitesimal
-        var dE1_dU1 = thermo1Infinitesimal.infinitesimals.getOrDefault(u1.id, 0.0)!!
-        var dE2_dU1 = thermo2Infinitesimal.infinitesimals.getOrDefault(u1.id, 0.0)!!
-        var dE1_dU2 = thermo1Infinitesimal.infinitesimals.getOrDefault(u2.id, 0.0)!!
-        var dE2_dU2 = thermo2Infinitesimal.infinitesimals.getOrDefault(u2.id, 0.0)!!
-        var dE1_dU3 = thermo1Infinitesimal.infinitesimals.getOrDefault(u3.id, 0.0)!!
-        var dE2_dU3 = thermo2Infinitesimal.infinitesimals.getOrDefault(u3.id, 0.0)!!
+        var dE1_dU1 = thermo1Infinitesimal.infinitesimals.getOrDefault(u1.id, 1e-9)!!
+        var dE2_dU1 = thermo2Infinitesimal.infinitesimals.getOrDefault(u1.id, 1e-9)!!
+        var dE1_dU2 = thermo1Infinitesimal.infinitesimals.getOrDefault(u2.id, 1e-9)!!
+        var dE2_dU2 = thermo2Infinitesimal.infinitesimals.getOrDefault(u2.id, 1e-9)!!
+        var dE1_dU3 = thermo1Infinitesimal.infinitesimals.getOrDefault(u3.id, 1e-9)!!
+        var dE2_dU3 = thermo2Infinitesimal.infinitesimals.getOrDefault(u3.id, 1e-9)!!
 
         // Compute the step in uniform space
         var deltaU2 = (dE2_dU1/dE2_dU3 - dE1_dU1/dE1_dU3) / (dE1_dU2/dE1_dU3 - dE2_dU2/dE2_dU3)
         var deltaU3 = (dE2_dU1/dE2_dU2 - dE1_dU1/dE1_dU2) / (dE1_dU3/dE1_dU2 - dE2_dU3/dE2_dU2)
 
         // Draw a random step length
-        val sigma = 1 / sqrt(1 + deltaU2*deltaU2 + deltaU3*deltaU3)
-        val g = GaussianVertex(0.0, sigma)
+        var deltaS = 0.005 // Tang fudge factor
+        val sigma = deltaS * (1.0 / sqrt(1.0 + deltaU2*deltaU2 + deltaU3*deltaU3))
+        val g = random.nextGaussian() * sigma
+
+        // Print what's happening
+        println("g = " + g + " deltaU2 = " + deltaU2 + " deltau3 = " + deltaU3)
 
         // Increment our position in uniform space
-        u1.value += g.value
-        u2.value += g.value * deltaU2
-        u3.value += g.value * deltaU3
+        u1.value += g
+        u2.value += g * deltaU2
+        u3.value += g * deltaU3
+
+        // Clip over / undershoots
+        for (u in listOf(u1, u2, u3)) {
+            if (u.value > 1.0) {
+                u.value = 1.0
+            } else if (u.value < 0) {
+                u.value = 0.0
+            }
+        }
     }
 
     fun sample() {

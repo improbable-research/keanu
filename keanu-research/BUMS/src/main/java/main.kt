@@ -9,21 +9,18 @@ fun main(args : Array<String>) {
 
     val objective = Thermometers()
     val file = FileWriter("data.out")
-    for(i in 1..1000) {
+    for(i in 1..10000) {
         getProposal(objective, i)
         objective.walk()
         file.write("${objective.temp.value}\n")
-//        println("${objective.temp.value}")
+        println("${objective.temp.value}")
     }
     file.close()
 }
 
 fun getProposal(objective : Thermometers, iteration: Int) {
-    val optimizer = NonLinearConjugateGradientOptimizer(
-            NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-            SimpleValueChecker(1e-5, 1e-6)
-    )
-
+    val optimizer = NonLinearConjugateGradientOptimizer(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
+                                                        SimpleValueChecker(1e-6, 1e-6))
     if (iteration == 0) {
         objective.sample()
     }
