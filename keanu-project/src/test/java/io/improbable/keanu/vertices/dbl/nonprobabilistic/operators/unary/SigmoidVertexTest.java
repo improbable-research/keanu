@@ -39,7 +39,7 @@ public class SigmoidVertexTest {
         input.setAndCascade(0.5);
 
         DoubleVertex sigmoid = new SigmoidVertex(input);
-        double diffSigmoidWrtInput = sigmoid.getDualNumber().getInfinitesimal().getInfinitesimals().get(input.getId());
+        double diffSigmoidWrtInput = sigmoid.getDualNumber().getPartialDerivatives().withRespectTo(input);
 
         double expected = Math.exp(-input.getValue()) / Math.pow(Math.exp(-input.getValue()) + 1, 2);
 
