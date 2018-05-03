@@ -74,7 +74,7 @@ public class DualNumbersTest {
         DualNumber cDual = vC.getDualNumber();
 
         double C = cDual.getValue();
-        Map<String, Double> dc = cDual.getInfinitesimal().getInfinitesimals();
+        Map<String, Double> dc = cDual.getPartialDerivatives().asMap();
 
         double da = 0.00000001;
 
