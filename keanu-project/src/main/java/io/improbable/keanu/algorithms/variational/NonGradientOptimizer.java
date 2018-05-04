@@ -11,6 +11,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.List;
 
+import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class NonGradientOptimizer {
@@ -31,12 +32,12 @@ public class NonGradientOptimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<? extends Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        List<? extends Vertex> latentVertices = bayesNet.getContinuousLatentVertices();
         FitnessFunction fitnessFunction = new FitnessFunction(outputVertices, latentVertices);
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
 
-        double[] startPoint = currentPoint();
+        double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
@@ -56,7 +57,7 @@ public class NonGradientOptimizer {
                 new ObjectiveFunction(fitnessFunction.fitness()),
                 new SimpleBounds(minBounds, maxBounds),
                 MAXIMIZE,
-                new InitialGuess(currentPoint())
+                new InitialGuess(currentPoint(bayesNet.getContinuousLatentVertices()))
         );
 
         return pointValuePair.getValue();
@@ -78,14 +79,6 @@ public class NonGradientOptimizer {
      */
     public double maxLikelihood(int maxEvaluations, double boundsRange) {
         return optimize(maxEvaluations, boundsRange, bayesNet.getObservedVertices());
-    }
-
-    private double[] currentPoint() {
-        double[] point = new double[bayesNet.getContinuousLatentVertices().size()];
-        for (int i = 0; i < point.length; i++) {
-            point[i] = bayesNet.getContinuousLatentVertices().get(i).getValue();
-        }
-        return point;
     }
 
 }

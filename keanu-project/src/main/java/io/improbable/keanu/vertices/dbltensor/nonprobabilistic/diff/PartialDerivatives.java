@@ -61,7 +61,12 @@ public class PartialDerivatives {
 
         for (Map.Entry<String, DoubleTensor> entry : partialDerivatives.entrySet()) {
             String k = entry.getKey();
-            DoubleTensor v = entry.getValue().times(multiplier);
+            DoubleTensor v;
+            if (entry.getValue().isScalar() && !multiplier.isScalar()) {
+                v = entry.getValue().times(multiplier.sum());
+            } else {
+                v = entry.getValue().times(multiplier);
+            }
             multiplied.put(k, v);
         }
 

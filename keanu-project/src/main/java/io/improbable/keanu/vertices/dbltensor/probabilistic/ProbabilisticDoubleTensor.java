@@ -16,6 +16,9 @@ public abstract class ProbabilisticDoubleTensor extends DoubleTensorVertex {
 
     @Override
     public DoubleTensor lazyEval() {
+        if (!hasValue()) {
+            setValue(sample());
+        }
         return getValue();
     }
 

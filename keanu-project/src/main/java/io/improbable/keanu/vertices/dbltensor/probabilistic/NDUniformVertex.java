@@ -8,6 +8,8 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantVertex;
 
 import java.util.Map;
 
+import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
+import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
 import static java.util.Collections.singletonMap;
 
 public class NDUniformVertex extends ProbabilisticDoubleTensor {
@@ -16,27 +18,31 @@ public class NDUniformVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex xMax;
     private final KeanuRandom random;
 
-    public NDUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, KeanuRandom random) {
+    public NDUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, KeanuRandom random) {
+
+        checkParentShapes(shape, xMin.getValue(), xMax.getValue());
+
         this.xMin = xMin;
         this.xMax = xMax;
         this.random = random;
         setParents(xMin, xMax);
+        setValue(DoubleTensor.placeHolder(shape));
     }
 
     public NDUniformVertex(DoubleTensorVertex xMin, double xMax, KeanuRandom random) {
-        this(xMin, new ConstantVertex(xMax), random);
+        this(xMin.getValue().getShape(), xMin, new ConstantVertex(xMax), random);
     }
 
     public NDUniformVertex(double xMin, DoubleTensorVertex xMax, KeanuRandom random) {
-        this(new ConstantVertex(xMin), xMax, random);
+        this(xMax.getValue().getShape(), new ConstantVertex(xMin), xMax, random);
     }
 
     public NDUniformVertex(double xMin, double xMax, KeanuRandom random) {
-        this(new ConstantVertex(xMin), new ConstantVertex(xMax), random);
+        this(new int[]{1, 1}, new ConstantVertex(xMin), new ConstantVertex(xMax), random);
     }
 
     public NDUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
-        this(xMin, xMax, new KeanuRandom());
+        this(getShapeProposal(xMin.getValue(), xMax.getValue()), xMin, xMax, new KeanuRandom());
     }
 
     public NDUniformVertex(DoubleTensorVertex xMin, double xMax) {
@@ -44,11 +50,11 @@ public class NDUniformVertex extends ProbabilisticDoubleTensor {
     }
 
     public NDUniformVertex(double xMin, DoubleTensorVertex xMax) {
-        this(new ConstantVertex(xMin), xMax, new KeanuRandom());
+        this(xMax.getValue().getShape(), new ConstantVertex(xMin), xMax, new KeanuRandom());
     }
 
     public NDUniformVertex(double xMin, double xMax) {
-        this(new ConstantVertex(xMin), new ConstantVertex(xMax), new KeanuRandom());
+        this(new int[]{1, 1}, new ConstantVertex(xMin), new ConstantVertex(xMax), new KeanuRandom());
     }
 
     public DoubleTensorVertex getXMin() {

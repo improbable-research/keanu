@@ -26,7 +26,6 @@ public class TensorVertexVariationalMAP {
         DoubleTensorVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
 
         // GENERATE FAKE DATA
-        sourceVertex.setValue(DoubleTensor.zeros(new int[]{numSamples, 1}));
         DoubleTensor samples = sourceVertex.sample();
 
         DoubleTensorVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
@@ -47,7 +46,7 @@ public class TensorVertexVariationalMAP {
 
         GradientOptimizer g = new GradientOptimizer(inferNet);
 
-        g.maxAPosteriori(5000);
+        g.maxLikelihood(5000);
     }
 
 }

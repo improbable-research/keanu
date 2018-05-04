@@ -135,13 +135,108 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor reciprocalInPlace() {
+        return reciprocal();
+    }
+
+    @Override
+    public DoubleTensor minusInPlace(double value) {
+        return minusInPlace(value);
+    }
+
+    @Override
+    public DoubleTensor plusInPlace(double value) {
+        return plus(value);
+    }
+
+    @Override
+    public DoubleTensor timesInPlace(double value) {
+        return times(value);
+    }
+
+    @Override
+    public DoubleTensor divInPlace(double value) {
+        return div(value);
+    }
+
+    @Override
+    public DoubleTensor powInPlace(DoubleTensor exponent) {
+        return pow(exponent);
+    }
+
+    @Override
+    public DoubleTensor powInPlace(double exponent) {
+        return pow(exponent);
+    }
+
+    @Override
+    public DoubleTensor logInPlace() {
+        return log();
+    }
+
+    @Override
+    public DoubleTensor sinInPlace() {
+        return sin();
+    }
+
+    @Override
+    public DoubleTensor cosInPlace() {
+        return cos();
+    }
+
+    @Override
+    public DoubleTensor asinInPlace() {
+        return asin();
+    }
+
+    @Override
+    public DoubleTensor acosInPlace() {
+        return acos();
+    }
+
+    @Override
+    public DoubleTensor expInPlace() {
+        return exp();
+    }
+
+    @Override
+    public DoubleTensor minusInPlace(DoubleTensor that) {
+        return minus(that);
+    }
+
+    @Override
+    public DoubleTensor plusInPlace(DoubleTensor that) {
+        return plus(that);
+    }
+
+    @Override
+    public DoubleTensor timesInPlace(DoubleTensor that) {
+        return times(that);
+    }
+
+    @Override
+    public DoubleTensor divInPlace(DoubleTensor that) {
+        return div(that);
+    }
+
+    @Override
+    public DoubleTensor unaryMinusInPlace() {
+        return unaryMinus();
+    }
+
+    @Override
+    public double[] getLinearView() {
+        return new double[]{scalar};
+    }
+
+    @Override
     public int getRank() {
-        return 0;
+        return 2;
     }
 
     @Override
     public int[] getShape() {
-        return new int[0];
+        return new int[]{1, 1};
     }
 
     @Override

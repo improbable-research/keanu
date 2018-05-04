@@ -26,7 +26,7 @@ public class NDUniform {
 
     public static DoubleTensor pdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor x) {
 
-        DoubleTensor withinBounds = xMax.minus(xMin).reciprocal();
+        DoubleTensor withinBounds = xMax.minus(xMin).reciprocalInPlace();
 
         //TODO: zero out where out of bounds
         return withinBounds;

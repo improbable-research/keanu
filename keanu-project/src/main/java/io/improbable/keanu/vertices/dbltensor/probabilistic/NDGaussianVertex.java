@@ -8,6 +8,9 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDeriv
 
 import java.util.Map;
 
+import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
+import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
+
 public class NDGaussianVertex extends ProbabilisticDoubleTensor {
 
     private final DoubleTensorVertex mu;
@@ -15,29 +18,35 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
     private final KeanuRandom random;
 
     /**
-     * One to one constructor for mapping some shape of mu and sigma to
-     * a matching shaped gaussian.
+     * One mu or sigma or both driving an arbitrarily shaped tensor of Gaussian
      *
-     * @param mu     mu with same shape as desired Gaussian tensor
-     * @param sigma  sigma with same shape as desired Gasussian tensor
-     * @param random source of randomness
+     * @param shape  the desired shape of the vertex
+     * @param mu     the mu of the Gaussian with either the same shape as specified for this vertex or a scalar
+     * @param sigma  the sigma of the Gaussian with either the same shape as specified for this vertex or a scalar
+     * @param random the source of randomness
      */
-    public NDGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
-        if (!mu.getValue().hasSameShapeAs(sigma.getValue())) {
-            throw new IllegalArgumentException("mu and sigma must match shape");
-        }
+    public NDGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
+
+        checkParentShapes(shape, mu.getValue(), sigma.getValue());
 
         this.mu = mu;
         this.sigma = sigma;
         this.random = random;
         setParents(mu, sigma);
+        setValue(DoubleTensor.placeHolder(shape));
     }
 
-    //One mu or sigma or both driving an arbitrarily shaped tensor of gaussians
-//    public GaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma, Random random) {
-//
-//    }
-
+    /**
+     * One to one constructor for mapping some shape of mu and sigma to
+     * a matching shaped gaussian.
+     *
+     * @param mu     mu with same shape as desired Gaussian tensor or scalar
+     * @param sigma  sigma with same shape as desired Gaussian tensor or scalar
+     * @param random source of randomness
+     */
+    public NDGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
+        this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma, random);
+    }
 
     @Override
     public double logPdf(DoubleTensor value) {
@@ -65,7 +74,9 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
         PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.getPartialDerivatives().put(getId(), dPdx);
+        if(!this.isObserved()) {
+            dPdInputs.getPartialDerivatives().put(getId(), dPdx);
+        }
 
         return dPdInputs.getPartialDerivatives();
     }

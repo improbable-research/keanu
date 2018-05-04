@@ -12,7 +12,7 @@ public interface Tensor {
     int getLength();
 
     default boolean isScalar() {
-        return getRank() == 0;
+        return getLength() == 1;
     }
 
     default boolean isVector() {
@@ -24,6 +24,10 @@ public interface Tensor {
     }
 
     default boolean hasSameShapeAs(Tensor that) {
-        return Arrays.equals(this.getShape(), that.getShape());
+        return hasSameShapeAs(that.getShape());
+    }
+
+    default boolean hasSameShapeAs(int[] shape) {
+        return Arrays.equals(this.getShape(), shape);
     }
 }

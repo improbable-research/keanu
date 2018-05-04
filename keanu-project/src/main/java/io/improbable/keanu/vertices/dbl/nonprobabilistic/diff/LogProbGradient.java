@@ -16,8 +16,8 @@ public class LogProbGradient {
      * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
-        final Map<String, Double> diffOfLogWrt = new HashMap<>();
+    public static Map<String, DoubleTensor> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
+        final Map<String, DoubleTensor> diffOfLogWrt = new HashMap<>();
 
         for (final Vertex<?> probabilisticVertex : probabilisticVertices) {
             getLogProbGradientWrtLatents(probabilisticVertex, diffOfLogWrt);
@@ -26,8 +26,8 @@ public class LogProbGradient {
         return diffOfLogWrt;
     }
 
-    public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex,
-                                                                   final Map<String, Double> diffOfLogProbWrt) {
+    public static Map<String, DoubleTensor> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex,
+                                                                         final Map<String, DoubleTensor> diffOfLogProbWrt) {
         //Non-probabilistic vertices are non-differentiable
         if (!probabilisticVertex.isProbabilistic()) {
             return diffOfLogProbWrt;
@@ -40,18 +40,22 @@ public class LogProbGradient {
 
         for (Map.Entry<String, DoubleTensor> partialDiffLogPWrt : dlogProbForProbabilisticVertex.entrySet()) {
             final String wrtLatentVertexId = partialDiffLogPWrt.getKey();
-            final double partialDiffLogProbContribution = partialDiffLogPWrt.getValue().scalar();
+            final DoubleTensor partialDiffLogProbContribution = partialDiffLogPWrt.getValue();
 
             //partialDiffLogProbContribution is the contribution to the rate of change of
             //the natural log of the fitness vertex due to wrtLatentVertexId.
-            final double accumulatedDiffOfLogPWrtLatent = diffOfLogProbWrt.getOrDefault(wrtLatentVertexId, 0.0);
-            diffOfLogProbWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent + partialDiffLogProbContribution);
+            final DoubleTensor accumulatedDiffOfLogPWrtLatent = diffOfLogProbWrt.getOrDefault(
+                    wrtLatentVertexId,
+                    DoubleTensor.zeros(partialDiffLogProbContribution.getShape())
+            );
+
+            diffOfLogProbWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent.plusInPlace(partialDiffLogProbContribution));
         }
 
         return diffOfLogProbWrt;
     }
 
-    public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex) {
+    public static Map<String, DoubleTensor> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex) {
         return getLogProbGradientWrtLatents(probabilisticVertex, new HashMap<>());
     }
 

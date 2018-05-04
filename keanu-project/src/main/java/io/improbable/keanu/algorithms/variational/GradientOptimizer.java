@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesNet;
-import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -33,10 +33,6 @@ public class GradientOptimizer {
 
     public GradientOptimizer(BayesNet bayesNet) {
         this.bayesNet = bayesNet;
-    }
-
-    public GradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNet(graph);
     }
 
     /**
@@ -95,7 +91,7 @@ public class GradientOptimizer {
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
-        double[] startingPoint = currentPoint();
+        double[] startingPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
@@ -116,11 +112,28 @@ public class GradientOptimizer {
         return pointValuePair.getValue();
     }
 
-    private double[] currentPoint() {
-        double[] point = new double[bayesNet.getContinuousLatentVertices().size()];
-        for (int i = 0; i < point.length; i++) {
-            point[i] = bayesNet.getContinuousLatentVertices().get(i).getValue();
+    static double[] currentPoint(List<Vertex> continuousVertices) {
+
+        int totalLatentDimensions = 0;
+        for (Vertex vertex : continuousVertices) {
+            totalLatentDimensions += FitnessFunction.numDimensions(vertex);
         }
+
+        int position = 0;
+        double[] point = new double[totalLatentDimensions];
+
+        for (Vertex vertex : continuousVertices) {
+
+            if (vertex.getValue() instanceof DoubleTensor) {
+                double[] values = ((DoubleTensor) vertex.getValue()).getLinearView();
+                System.arraycopy(values, 0, point, position, values.length);
+                position += values.length;
+            } else {
+                point[position] = (double) vertex.getValue();
+                position++;
+            }
+        }
+
         return point;
     }
 

@@ -3,6 +3,7 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -17,7 +18,7 @@ public class BayesNet {
     private final List<Vertex> observedVertices;
 
     //Lazy evaluated
-    private List<Vertex<Double>> continuousLatentVertices;
+    private List<Vertex> continuousLatentVertices;
     private List<Vertex> discreteLatentVertices;
 
     public BayesNet(Set<? extends Vertex> vertices) {
@@ -47,7 +48,7 @@ public class BayesNet {
         return latentVertices;
     }
 
-    public List<Vertex<Double>> getContinuousLatentVertices() {
+    public List<Vertex> getContinuousLatentVertices() {
         if (continuousLatentVertices == null) {
             splitContinuousAndDiscrete();
         }
@@ -73,8 +74,8 @@ public class BayesNet {
         discreteLatentVertices = new ArrayList<>();
 
         for (Vertex<?> vertex : latentVertices) {
-            if (vertex.getValue() instanceof Double) {
-                continuousLatentVertices.add((Vertex<Double>) vertex);
+            if (vertex.getValue() instanceof Double || vertex.getValue() instanceof DoubleTensor) {
+                continuousLatentVertices.add(vertex);
             } else {
                 discreteLatentVertices.add(vertex);
             }
@@ -92,6 +93,7 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
+     *
      * @param attempts sampling attempts to get non-zero probability
      */
     public void probeForNonZeroMasterP(int attempts) {
