@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -18,16 +18,31 @@ public class LaplaceVertex extends ProbabilisticDouble {
         this.mu = mu;
         this.beta = beta;
         this.random = random;
-        setValue(sample());
         setParents(mu, beta);
+    }
+
+    public LaplaceVertex(DoubleVertex mu, double beta, Random random) {
+        this(mu, new ConstantDoubleVertex(beta), random);
+    }
+
+    public LaplaceVertex(double mu, DoubleVertex beta, Random random) {
+        this(new ConstantDoubleVertex(mu), beta, random);
+    }
+
+    public LaplaceVertex(double mu, double beta, Random random) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta), random);
     }
 
     public LaplaceVertex(DoubleVertex mu, DoubleVertex beta) {
         this(mu, beta, new Random());
     }
 
-    public LaplaceVertex(double mu, double beta, Random random) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta), random);
+    public LaplaceVertex(DoubleVertex mu, double beta) {
+        this(mu, new ConstantDoubleVertex(beta), new Random());
+    }
+
+    public LaplaceVertex(double mu, DoubleVertex beta) {
+        this(new ConstantDoubleVertex(mu), beta, new Random());
     }
 
     public LaplaceVertex(double mu, double beta) {
@@ -35,23 +50,13 @@ public class LaplaceVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Laplace.pdf(mu.getValue(), beta.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Laplace.logPdf(mu.getValue(), beta.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Laplace.Diff diff = Laplace.dPdf(mu.getValue(), beta.getValue(), getValue());
-        return convertDualNumbersToDiff(diff.dPdmu, diff.dPdbeta, diff.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Laplace.Diff diff = Laplace.dlnPdf(mu.getValue(), beta.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Laplace.Diff diff = Laplace.dlnPdf(mu.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(diff.dPdmu, diff.dPdbeta, diff.dPdx);
     }
 
@@ -61,12 +66,11 @@ public class LaplaceVertex extends ProbabilisticDouble {
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPdmu, double dPdbeta, double dPdx) {
-        Infinitesimal dPdInputsFromMu = mu.getDualNumber().getInfinitesimal().multiplyBy(dPdmu);
-        Infinitesimal dPdInputsFromSigma = beta.getDualNumber().getInfinitesimal().multiplyBy(dPdbeta);
-        Infinitesimal dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
+        PartialDerivatives dPdInputsFromSigma = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
+        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        dPdInputs.putWithRespectTo(getId(), dPdx);
 
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
-
-        return dPdInputs.getInfinitesimals();
+        return dPdInputs.asMap();
     }
 }

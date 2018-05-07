@@ -4,7 +4,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -34,7 +33,7 @@ public class ArcSinVertexTest {
         DoubleVertex pow = new PowerVertex(uniform, 3);
 
         ArcSinVertex aSine = new ArcSinVertex(pow);
-        double dArcSine = aSine.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId());
+        double dArcSine = aSine.getDualNumber().getPartialDerivatives().withRespectTo(uniform);
         //dArcSine = 1 / √(1 - (0.5^3)^2) * 3 * 0.5^2
         double expected = 1 / Math.sqrt(1 - Math.pow(Math.pow(uniform.getValue(), 3), 2)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
 

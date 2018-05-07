@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -18,8 +18,19 @@ public class GaussianVertex extends ProbabilisticDouble {
         this.mu = mu;
         this.sigma = sigma;
         this.random = random;
-        setValue(sample());
         setParents(mu, sigma);
+    }
+
+    public GaussianVertex(DoubleVertex mu, double sigma, Random random) {
+        this(mu, new ConstantDoubleVertex(sigma), random);
+    }
+
+    public GaussianVertex(double mu, DoubleVertex sigma, Random random) {
+        this(new ConstantDoubleVertex(mu), sigma, random);
+    }
+
+    public GaussianVertex(double mu, double sigma, Random random) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma), random);
     }
 
     public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
@@ -38,17 +49,6 @@ public class GaussianVertex extends ProbabilisticDouble {
         this(mu, new ConstantDoubleVertex(sigma), new Random());
     }
 
-    public GaussianVertex(double mu, double sigma, Random random) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma), random);
-    }
-
-    public GaussianVertex(double mu, DoubleVertex sigma, Random random) {
-        this(new ConstantDoubleVertex(mu), sigma, random);
-    }
-
-    public GaussianVertex(DoubleVertex mu, double sigma, Random random) {
-        this(mu, new ConstantDoubleVertex(sigma), random);
-    }
 
     public DoubleVertex getMu() {
         return mu;
@@ -59,34 +59,24 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Gaussian.pdf(mu.getValue(), sigma.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Gaussian.logPdf(mu.getValue(), sigma.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Gaussian.Diff dP = Gaussian.dPdf(mu.getValue(), sigma.getValue(), getValue());
-        return convertDualNumbersToDiff(dP.dPdmu, dP.dPdsigma, dP.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
-        Infinitesimal dPdInputsFromMu = mu.getDualNumber().getInfinitesimal().multiplyBy(dPdmu);
-        Infinitesimal dPdInputsFromSigma = sigma.getDualNumber().getInfinitesimal().multiplyBy(dPdsigma);
-        Infinitesimal dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
+        PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
+        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
+        dPdInputs.putWithRespectTo(getId(), dPdx);
 
-        return dPdInputs.getInfinitesimals();
+        return dPdInputs.asMap();
     }
 
     @Override

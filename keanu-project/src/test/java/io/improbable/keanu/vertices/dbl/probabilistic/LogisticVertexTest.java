@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -10,7 +9,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
@@ -35,49 +33,13 @@ public class LogisticVertexTest {
         double epsilon = 1e-2;
         double a = 0.0;
         double b = 1.0;
-        double expectedVariance = (Math.pow(Math.PI, 2) / 3) * Math.pow(b, 2);
+
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = l.sample();
-            samples.add(sample);
-        }
+        double mean = a;
+        double standardDeviation = Math.sqrt((Math.pow(Math.PI, 2) / 3) * Math.pow(b, 2));
 
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(mean, a, epsilon);
-        assertEquals(sd, Math.sqrt(expectedVariance), epsilon);
-    }
-
-    @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(2.0));
-        double atValue = 0.5;
-        double logOfDensity = Math.log(l.density(atValue));
-        double logDensity = l.logDensity(atValue);
-        assertEquals(logOfDensity, logDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.1), new ConstantDoubleVertex(1.0));
-        double atValue = 0.5;
-        l.setAndCascade(atValue);
-
-        Map<String, Double> dP = l.dDensityAtValue();
-        Map<String, Double> dlnP = l.dlnDensityAtValue();
-
-        final double density = l.densityAtValue();
-        for (String vertexId : dP.keySet()) {
-            dP.put(vertexId, dP.get(vertexId) / density);
-        }
-        assertEquals(dP.get(l.getId()), dlnP.get(l.getId()), 0.01);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, l, mean, standardDeviation, epsilon);
     }
 
     @Test
@@ -86,7 +48,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a);
-        double gradient = l.dDensityAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId());
         log.info("Gradient at a: " + gradient);
         assertEquals(gradient, 0, 0);
     }
@@ -97,7 +59,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a - 1.0);
-        double gradient = l.dDensityAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId());
         log.info("Gradient at x < a: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -108,13 +70,13 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a + 1.0);
-        double gradient = l.dDensityAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId());
         log.info("Gradient at x > a: " + gradient);
         assertTrue(gradient < 0);
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(0.), new ConstantDoubleVertex(1.));
         LogisticVertex l = new LogisticVertex(uniformA, new ConstantDoubleVertex(1.0));
 
@@ -134,7 +96,7 @@ public class LogisticVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
         LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.0), uniformB);
 
@@ -168,7 +130,7 @@ public class LogisticVertexTest {
         latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1), random),
                 AB,
                 latentAB,

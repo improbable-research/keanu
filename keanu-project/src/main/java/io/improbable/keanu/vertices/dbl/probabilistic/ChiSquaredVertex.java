@@ -19,6 +19,14 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
         setParents(k);
     }
 
+    public ChiSquaredVertex(IntegerVertex k) {
+        this(k, new Random());
+    }
+
+    public ChiSquaredVertex(int k, Random random) {
+        this(new ConstantIntegerVertex(k), random);
+    }
+
     public ChiSquaredVertex(int k) {
         this(new ConstantIntegerVertex(k), new Random());
     }
@@ -29,16 +37,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return ChiSquared.pdf(k.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return ChiSquared.logPdf(k.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 

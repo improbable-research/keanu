@@ -15,10 +15,10 @@ import static java.util.stream.Collectors.toMap;
  */
 public class NetworkSamples {
 
-    private final Map<String, ? extends List<?>> samplesByVertex;
+    private final Map<String, ? extends List> samplesByVertex;
     private final int size;
 
-    public NetworkSamples(Map<String, ? extends List<?>> samplesByVertex, int size) {
+    public NetworkSamples(Map<String, ? extends List> samplesByVertex, int size) {
         this.samplesByVertex = samplesByVertex;
         this.size = size;
     }
@@ -100,10 +100,10 @@ public class NetworkSamples {
 
     private static class SamplesBackedNetworkState implements NetworkState {
 
-        private final Map<String, ? extends List<?>> samplesByVertex;
+        private final Map<String, ? extends List> samplesByVertex;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<String, ? extends List<?>> samplesByVertex, int index) {
+        public SamplesBackedNetworkState(Map<String, ? extends List> samplesByVertex, int index) {
             this.samplesByVertex = samplesByVertex;
             this.index = index;
         }

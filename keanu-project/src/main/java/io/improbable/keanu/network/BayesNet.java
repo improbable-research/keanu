@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
@@ -11,15 +12,15 @@ import java.util.stream.Collectors;
  */
 public class BayesNet {
 
-    private final List<Vertex<?>> verticesThatContributeToMasterP;
-    private final List<Vertex<?>> latentVertices;
-    private final List<Vertex<?>> observedVertices;
+    private final List<Vertex> verticesThatContributeToMasterP;
+    private final List<Vertex> latentVertices;
+    private final List<Vertex> observedVertices;
 
     //Lazy evaluated
     private List<Vertex<Double>> continuousLatentVertices;
-    private List<Vertex<?>> discreteLatentVertices;
+    private List<Vertex> discreteLatentVertices;
 
-    public BayesNet(Set<? extends Vertex<?>> vertices) {
+    public BayesNet(Set<? extends Vertex> vertices) {
 
         verticesThatContributeToMasterP = vertices.stream()
                 .filter(v -> v.isObserved() || v.isProbabilistic())
@@ -34,15 +35,15 @@ public class BayesNet {
                 .collect(Collectors.toList());
     }
 
-    public BayesNet(Collection<? extends Vertex<?>> vertices) {
+    public BayesNet(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public List<Vertex<?>> getVerticesThatContributeToMasterP() {
+    public List<Vertex> getVerticesThatContributeToMasterP() {
         return verticesThatContributeToMasterP;
     }
 
-    public List<Vertex<?>> getLatentVertices() {
+    public List<Vertex> getLatentVertices() {
         return latentVertices;
     }
 
@@ -54,7 +55,7 @@ public class BayesNet {
         return continuousLatentVertices;
     }
 
-    public List<Vertex<?>> getDiscreteLatentVertices() {
+    public List<Vertex> getDiscreteLatentVertices() {
         if (discreteLatentVertices == null) {
             splitContinuousAndDiscrete();
         }
@@ -62,7 +63,7 @@ public class BayesNet {
         return discreteLatentVertices;
     }
 
-    public List<Vertex<?>> getObservedVertices() {
+    public List<Vertex> getObservedVertices() {
         return observedVertices;
     }
 
@@ -83,7 +84,7 @@ public class BayesNet {
     public double getLogOfMasterP() {
         double sum = 0.0;
         for (Vertex<?> vertex : verticesThatContributeToMasterP) {
-            sum += vertex.logDensityAtValue();
+            sum += vertex.logProbAtValue();
         }
         return sum;
     }
@@ -91,13 +92,13 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
-     *
+     * @param attempts sampling attempts to get non-zero probability
      */
     public void probeForNonZeroMasterP(int attempts) {
 
-        cascadeValues(observedVertices);
-        List<? extends Vertex<?>> sortedByDependency = TopologicalSort.sort(latentVertices);
-        sampleAndCascade(sortedByDependency);
+        VertexValuePropagation.cascadeUpdate(observedVertices);
+        List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
+        setFromSampleAndCascade(sortedByDependency);
 
         probeForNonZeroMasterP(sortedByDependency, attempts);
     }
@@ -106,15 +107,16 @@ public class BayesNet {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<? extends Vertex<?>> latentVertices, int attempts) {
+    private void probeForNonZeroMasterP(List<Vertex> latentVertices, int attempts) {
 
+        Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
-            sampleAndCascade(latentVertices);
+            setFromSampleAndCascade(latentVertices, setAndCascadeCache);
             iteration++;
 
             if (iteration > attempts) {
-                throw new RuntimeException("Failed to find non-zero probability state");
+                throw new IllegalStateException("Failed to find non-zero probability state");
             }
         }
     }
@@ -124,19 +126,19 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void sampleAndCascade(List<? extends Vertex<?>> vertices) {
-        vertices.forEach(BayesNet::sampleAndCascade);
+    public static void setFromSampleAndCascade(List<Vertex> vertices) {
+        setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static <T> void sampleAndCascade(Vertex<T> v) {
-        v.setAndCascade(v.sample());
+    public static void setFromSampleAndCascade(List<Vertex> vertices, Map<String, Long> setAndCascadeCache) {
+        for (Vertex<?> vertex : vertices) {
+            setValueFromSample(vertex);
+        }
+        VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
     }
 
-    public static void cascadeValues(List<? extends Vertex<?>> vertices) {
-        vertices.forEach(BayesNet::cascadeValue);
+    private static <T> void setValueFromSample(Vertex<T> vertex) {
+        vertex.setValue(vertex.sample());
     }
 
-    public static <T> void cascadeValue(Vertex<T> v) {
-        v.updateChildren();
-    }
 }

@@ -2,17 +2,28 @@ package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.24 page 37
+ */
 public class Triangular {
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.24 page 37
-     */
+    private Triangular() {
+    }
 
+    /**
+     * @param xMin      minimum x value
+     * @param xMax      maximum x value
+     * @param c          mode
+     * @param random source of randomness
+     * @return a random number from the Triangular distribution
+     */
     public static double sample(double xMin, double xMax, double c, Random random) {
-        assert (xMin <= xMax && xMin <= c && c <= xMax);
+        if (xMax > xMin || c > xMin || c > xMax) {
+            throw new IllegalArgumentException("Invalid value for xMax, xMin or c. xMax: " + xMax + ". xMin: " + xMin + ". c: " + c);
+        }
 
         double p = random.nextDouble();
         double q = 1.0 - p;

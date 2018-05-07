@@ -2,15 +2,24 @@ package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.8 page 48
+ */
 public class Uniform {
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.8 page 48
-     */
+    private Uniform() {
+    }
 
+
+    /**
+     * @param xMin      minimum x value
+     * @param xMax      maximum x value
+     * @param random source of randomness
+     * @return a random number from the Uniform distribution
+     */
     public static double sample(double xMin, double xMax, Random random) {
         return random.nextDouble() * (xMax - xMin) + xMin;
     }
@@ -22,5 +31,4 @@ public class Uniform {
             return 0.;
         }
     }
-
 }

@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -31,44 +30,18 @@ public class ExponentialVertexTest {
 
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
-        int N = (int) 1e6;
+        int N = 100000;
         double epsilon = 1e-2;
+
         double a = 0.0;
         double b = 0.5;
-        double expectedMean = Math.pow(1 / b, -1);
-        double expectedVariance = Math.pow(1 / b, -2);
+
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = e.sample();
-            samples.add(sample);
-        }
+        double mean = Math.pow(1 / b, -1);
+        double standardDeviation = Math.sqrt(Math.pow(1 / b, -2));
 
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(mean, expectedMean, epsilon);
-        assertEquals(sd, Math.sqrt(expectedVariance), epsilon);
-    }
-
-    @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        ExponentialVertex e = new ExponentialVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(2.0));
-        double atValue = 0.5;
-        double logOfDensity = Math.log(e.density(atValue));
-        double logDensity = e.logDensity(atValue);
-        assertEquals(logOfDensity, logDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        ExponentialVertex e = new ExponentialVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(e, 0.5, 0.001);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, e, mean, standardDeviation, epsilon);
     }
 
     @Test
@@ -77,30 +50,13 @@ public class ExponentialVertexTest {
         double b = 1.0;
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
         e.setValue(a);
-        double gradient = e.dDensityAtValue().get(e.getId());
+        double gradient = e.dLogProbAtValue().get(e.getId());
         log.info("Gradient at a: " + gradient);
         assertEquals(-1, gradient, 0);
     }
 
     @Test
-    public void gradientContinuesToIncreaseAsValueIncreases() {
-        ExponentialVertex exponentialVertex = new ExponentialVertex(0, 1, new Random(1));
-        int n = 100;
-        double value = 0.0;
-        double step = 0.1;
-        exponentialVertex.setValue(value);
-        double initialGradient = exponentialVertex.dDensityAtValue().get(exponentialVertex.getId());
-
-        for (int i = 0; i < n; i++) {
-            exponentialVertex.setValue(value += step);
-            double gradient = exponentialVertex.dDensityAtValue().get(exponentialVertex.getId());
-            assertTrue(gradient > initialGradient);
-            initialGradient = gradient;
-        }
-    }
-
-    @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(0.), new ConstantDoubleVertex(1.));
         ExponentialVertex exp = new ExponentialVertex(uniformA, new ConstantDoubleVertex(1.0));
 
@@ -120,7 +76,7 @@ public class ExponentialVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
         ExponentialVertex exp = new ExponentialVertex(new ConstantDoubleVertex(0.0), uniformB);
 
@@ -154,7 +110,7 @@ public class ExponentialVertexTest {
         latentAB.add(A);
         latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1), random),
                 AB,
                 latentAB,

@@ -2,7 +2,8 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -17,21 +18,41 @@ public class BetaVertex extends ProbabilisticDouble {
         this.alpha = alpha;
         this.beta = beta;
         this.random = random;
-        setValue(sample());
         setParents(alpha, beta);
+    }
+
+    public BetaVertex(DoubleVertex alpha, double beta, Random random) {
+        this(alpha, new ConstantDoubleVertex(beta), random);
+    }
+
+    public BetaVertex(double alpha, DoubleVertex beta, Random random) {
+        this(new ConstantDoubleVertex(alpha), beta, random);
+    }
+
+    public BetaVertex(double alpha, double beta, Random random) {
+        this(new ConstantDoubleVertex(alpha), beta, random);
     }
 
     public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this(alpha, beta, new Random());
     }
 
-    @Override
-    public double density(Double value) {
-        return Beta.pdf(alpha.getValue(), beta.getValue(), value);
+    public BetaVertex(DoubleVertex alpha, double beta) {
+        this(alpha, new ConstantDoubleVertex(beta), new Random());
+    }
+
+    public BetaVertex(double alpha, DoubleVertex beta) {
+        this(new ConstantDoubleVertex(alpha), beta, new Random());
+    }
+
+    public BetaVertex(double alpha, double beta) {
+        this(new ConstantDoubleVertex(alpha), beta, new Random());
     }
 
     @Override
-    public double logDensity(Double value) {  return Beta.logPdf(alpha.getValue(), beta.getValue(), value); }
+    public double logPdf(Double value) {
+        return Beta.logPdf(alpha.getValue(), beta.getValue(), value);
+    }
 
     public DoubleVertex getAlpha() {
         return alpha;
@@ -42,24 +63,18 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Beta.Diff dPdf = Beta.dPdf(alpha.getValue(), beta.getValue(), getValue());
-        return convertDualNumbersToDiff(dPdf.dPdAlpha, dPdf.dPdBeta, dPdf.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(dlnPdf.dPdAlpha, dlnPdf.dPdBeta, dlnPdf.dPdx);
     }
 
     public Map<String, Double> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {
-        Infinitesimal dPdInputsFromAlpha = alpha.getDualNumber().getInfinitesimal().multiplyBy(dPdAlpha);
-        Infinitesimal dPdInputsFromBeta = beta.getDualNumber().getInfinitesimal().multiplyBy(dPdBeta);
-        Infinitesimal dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
+        PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdAlpha);
+        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdBeta);
+        PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
+        dPdInputs.putWithRespectTo(getId(), dPdx);
 
-        return dPdInputs.getInfinitesimals();
+        return dPdInputs.asMap();
     }
 
     @Override

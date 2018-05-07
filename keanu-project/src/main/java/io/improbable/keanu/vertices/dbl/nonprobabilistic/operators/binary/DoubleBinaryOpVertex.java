@@ -21,12 +21,6 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(op(a.lazyEval(), b.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return op(a.getValue(), b.getValue());
     }

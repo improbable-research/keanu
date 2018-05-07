@@ -63,7 +63,7 @@ public class ObjectParser<T> {
         List<CsvColumnConsumer<T>> columnConsumers = getColumnConsumers(base, csvTitles, ignoreUnmatchedFields);
 
         return csvLinesAsTokens
-                .map((csvTokens) -> deserialize(csvTokens, columnConsumers, base));
+                .map(csvTokens -> deserialize(csvTokens, columnConsumers, base));
     }
 
     private static <T> List<CsvColumnConsumer<T>> getColumnConsumers(Class<T> base,
@@ -112,7 +112,7 @@ public class ObjectParser<T> {
 
             return target;
         } catch (IllegalAccessException | InstantiationException e) {
-            throw new RuntimeException(e);
+            throw new IllegalStateException(e);
         }
     }
 

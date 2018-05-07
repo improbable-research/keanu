@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -12,6 +12,12 @@ import java.util.Random;
 
 import static org.apache.commons.math3.special.Erf.erf;
 
+/**
+ * Takes a double and casts it to an integer with a user definable level of fuzziness over the value cast to. The range
+ * of potential integer values cast to is specified with a min and max (inclusive). The probability of casting to a
+ * given integer is represented as a Gaussian distribution centred on the input value, with a user specifiable sigma.
+ * e.g. a sigma value of 0 will guarantee casting to the nearest integer value with half up rounding.
+ */
 public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
 
     private DoubleVertex input;
@@ -21,19 +27,17 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     private Random random;
 
     /**
-     * Takes a double and casts it to an integer with a user definable level of fuzziness over the value cast to. The range
-     * of potential integer values cast to is specified with a min and max (inclusive). The probability of casting to a
-     * given integer is represented as a Gaussian distribution centred on the input value, with a use specifiable sigma.
-     * E.n., a sigma value of 0 will guarantee casting ot the nearest integer value with half up rounding.
-     *
-     * @param input
+     * @param input          vertex intended for casting
      * @param fuzzinessSigma fuzziness is represented as a Gaussian distribution with mu of the input value and this sigma.
      * @param min            inclusive
      * @param max            inclusive
-     * @param random
+     * @param random         source for randomness
      */
-    public FuzzyCastToIntegerVertex(DoubleVertex input, DoubleVertex fuzzinessSigma,
-                                    Vertex<Integer> min, Vertex<Integer> max, Random random) {
+    public FuzzyCastToIntegerVertex(DoubleVertex input,
+                                    DoubleVertex fuzzinessSigma,
+                                    Vertex<Integer> min,
+                                    Vertex<Integer> max,
+                                    Random random) {
 
         this.input = input;
         this.fuzzinessSigma = fuzzinessSigma;
@@ -41,12 +45,19 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         this.max = max;
         this.random = random;
         setParents(input, fuzzinessSigma, min, max);
-        setValue(sample());
     }
 
-    public FuzzyCastToIntegerVertex(DoubleVertex input, double fuzzinessSigma, int min, int max, Random random) {
-        this(input, new ConstantDoubleVertex(fuzzinessSigma), new ConstantIntegerVertex(min),
-                new ConstantIntegerVertex(max), random);
+    public FuzzyCastToIntegerVertex(DoubleVertex input,
+                                    double fuzzinessSigma,
+                                    int min,
+                                    int max,
+                                    Random random) {
+        this(input,
+                new ConstantDoubleVertex(fuzzinessSigma),
+                new ConstantIntegerVertex(min),
+                new ConstantIntegerVertex(max),
+                random
+        );
     }
 
     public DoubleVertex getInput() {
@@ -65,8 +76,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         return max;
     }
 
-    @Override
-    public double density(Integer value) {
+    private double density(Integer value) {
         double i = value;
         double x = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
@@ -77,29 +87,21 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        int i = getValue();
-        double x = input.getValue();
-        double clampedX = getClampedInput();
-        double sigma = fuzzinessSigma.getValue();
-
-        double dPdInput = clampedX == x? dPdx(x, i, sigma) : 0.0;
-        double dPdSigma = dPdSigma(clampedX, i, sigma);
-
-        return convertDualNumbersToDiff(dPdInput, dPdSigma);
+    public double logPmf(Integer value) {
+        return Math.log(density(value));
     }
 
     @Override
-    public Map<String, Double> dlnDensityAtValue() {
+    public Map<String, Double> dLogPmf(Integer value) {
         int i = getValue();
         double x = input.getValue();
         double clampedX = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
 
-        double dPdInput = clampedX == x? dPdx(x, i, sigma) : 0.0;
+        double dPdInput = clampedX == x ? dPdx(x, i, sigma) : 0.0;
         double dPdSigma = dPdSigma(clampedX, i, sigma);
 
-        double p = densityAtValue();
+        double p = density(value);
         double dlnPdInput = dPdInput / p;
         double dlnPdSigma = dPdSigma / p;
 
@@ -115,31 +117,29 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     private double sampleFuzzyDoubleInBounds() {
         double mu = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
-        int min = this.min.getValue();
-        int max = this.max.getValue();
 
         double doubleInBounds;
 
         do {
             doubleInBounds = Gaussian.sample(mu, sigma, random);
-        } while (doubleInBounds < (min - 0.5) || doubleInBounds > (max + 0.5 - 1e-10));
+        } while (doubleInBounds < (min.getValue() - 0.5) || doubleInBounds > (max.getValue() + 0.5 - 1e-10));
 
         return doubleInBounds;
     }
 
     private double getClampedInput() {
         double sigma = fuzzinessSigma.getValue();
-        double min = this.min.getValue() - sigma;
-        double max = this.max.getValue() + sigma;
-        return Math.min(Math.max(input.getValue(), min), max);
+        double minClamped = this.min.getValue() - sigma;
+        double maxClamped = this.max.getValue() + sigma;
+        return Math.min(Math.max(input.getValue(), minClamped), maxClamped);
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
-        Infinitesimal dPdInputsFromInput = input.getDualNumber().getInfinitesimal().multiplyBy(dPdInput);
-        Infinitesimal dPdInputsFromSigma = fuzzinessSigma.getDualNumber().getInfinitesimal().multiplyBy(dPdSigma);
-        Infinitesimal dPdInputs = dPdInputsFromInput.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromInput = input.getDualNumber().getPartialDerivatives().multiplyBy(dPdInput);
+        PartialDerivatives dPdInputsFromSigma = fuzzinessSigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdSigma);
+        PartialDerivatives dPdInputs = dPdInputsFromInput.add(dPdInputsFromSigma);
 
-        return dPdInputs.getInfinitesimals();
+        return dPdInputs.asMap();
     }
 
     private double s(double x, double sigma) {
@@ -147,36 +147,26 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     private double lambda(double x, double sigma) {
-        int max = this.max.getValue();
-        int min = this.min.getValue();
-        return 1.0 / (s(max + 0.5 - x, sigma) - s(min - 0.5 - x, sigma));
+        return 1.0 / (s(max.getValue() + 0.5 - x, sigma) - s(min.getValue() - 0.5 - x, sigma));
     }
 
     private double dPdx(double x, int i, double sigma) {
-        int max = this.max.getValue();
-        int min = this.min.getValue();
         double p = density(i);
-        return -lambda(x, sigma) * (N(i + 0.5 - x, sigma) - N(i - 0.5 - x, sigma)
-                - p * (N(max + 0.5 - x, sigma) - N(min - 0.5 - x, sigma)));
+        return -lambda(x, sigma) * (n(i + 0.5 - x, sigma) - n(i - 0.5 - x, sigma)
+                - p * (n(max.getValue() + 0.5 - x, sigma) - n(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dPdSigma(double x, int i, double sigma) {
-        int max = this.max.getValue();
-        int min = this.min.getValue();
         double p = density(i);
         return lambda(x, sigma) * (dSdSigma(i + 0.5 - x, sigma) - dSdSigma(i - 0.5 - x, sigma)
-                - p * (dSdSigma(max + 0.5 - x, sigma) - dSdSigma(min - 0.5 - x, sigma)));
+                - p * (dSdSigma(max.getValue() + 0.5 - x, sigma) - dSdSigma(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dSdSigma(double x, double sigma) {
-        return (-x * N(x, sigma)) / sigma;
-    }
-
-    private double N(double mu, double sigma) {
-        return n(mu, sigma) / Math.sqrt(2 * Math.PI * sigma * sigma);
+        return (-x * n(x, sigma)) / sigma;
     }
 
     private double n(double mu, double sigma) {
-        return Math.exp(-(mu * mu) / (2.0 * sigma * sigma));
+        return Gaussian.pdf(mu, sigma, 0);
     }
 }

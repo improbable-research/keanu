@@ -22,12 +22,12 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public double density(Double value) {
-        return this.getDerivedValue().equals(value) ? 1.0 : 0.0;
+    public double logPdf(Double value) {
+        return this.getDerivedValue().equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 

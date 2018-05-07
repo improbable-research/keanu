@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -33,69 +32,40 @@ public class GaussianVertexTest {
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;
         double epsilon = 0.01;
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), new Random(1));
+        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = g.sample();
-            samples.add(sample);
-        }
-
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(0.0, mean, epsilon);
-        assertEquals(1.0, sd, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, g, 0.0, 1.0, epsilon);
     }
 
     @Test
     public void gradientAtMuIsZero() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(0.0);
-        double gradient = g.dDensityAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId());
         log.info("Gradient at mu: " + gradient);
         assertEquals(0, gradient, 0);
     }
 
     @Test
     public void gradientBeforeMuIsPositive() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(-1.0);
-        double gradient = g.dDensityAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId());
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient > 0);
     }
 
     @Test
     public void gradientAfterMuIsNegative() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(1.0);
-        double gradient = g.dDensityAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId());
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient < 0);
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(2.0));
-        double atValue = 0.5;
-        double logOfDensity = Math.log(g.density(atValue));
-        double logDensity = g.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(g, 0.5, 0.001);
-    }
-
-    @Test
-    public void gaussianSampleMethodMatchesDensityMethod() {
+    public void gaussianSampleMethodMatchesLogProbMethod() {
 
         Random random = new Random(1);
 
@@ -110,13 +80,13 @@ public class GaussianVertexTest {
         double bucketSize = 0.05;
         long sampleCount = 1000000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0));
-        GaussianVertex gaussian = new GaussianVertex(uniformA, new ConstantDoubleVertex(3.0));
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
+        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0), random);
+        GaussianVertex gaussian = new GaussianVertex(uniformA, new ConstantDoubleVertex(3.0), random);
 
         double vertexStartValue = 0.0;
         double vertexEndValue = 5.0;
@@ -134,9 +104,9 @@ public class GaussianVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdsigma() {
-        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0));
-        GaussianVertex gaussian = new GaussianVertex(new ConstantDoubleVertex(3.0), uniformA);
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdsigma() {
+        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0), random);
+        GaussianVertex gaussian = new GaussianVertex(new ConstantDoubleVertex(3.0), uniformA, random);
 
         double vertexStartValue = 0.0;
         double vertexEndValue = 0.5;
@@ -167,7 +137,7 @@ public class GaussianVertexTest {
         latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muSigma,
                 latentMuSigma,

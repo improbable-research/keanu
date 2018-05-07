@@ -25,10 +25,10 @@ public class NonGradientOptimizer {
         bayesNet = new BayesNet(graph);
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex<?>> outputVertices) {
+    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
 
         if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
@@ -40,7 +40,7 @@ public class NonGradientOptimizer {
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         double[] minBounds = new double[startPoint.length];
@@ -64,6 +64,7 @@ public class NonGradientOptimizer {
 
     /**
      * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * @param boundsRange    bounding box around starting point
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
@@ -72,6 +73,7 @@ public class NonGradientOptimizer {
 
     /**
      * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * @param boundsRange    bounding box around starting point
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations, double boundsRange) {

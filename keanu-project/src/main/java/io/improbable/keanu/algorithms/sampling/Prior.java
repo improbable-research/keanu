@@ -12,14 +12,17 @@ import java.util.Map;
 
 public class Prior {
 
-    public static NetworkSamples sample(BayesNet bayesNet, List<? extends Vertex<?>> fromVertices, int sampleCount) {
+    private Prior() {
+    }
+
+    public static NetworkSamples sample(BayesNet bayesNet, List<? extends Vertex> fromVertices, int sampleCount) {
 
         if (!bayesNet.getObservedVertices().isEmpty()) {
             throw new IllegalStateException("Cannot sample prior from graph with observations");
         }
 
-        List<? extends Vertex<?>> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
-        Map<String, List<?>> samplesByVertex = new HashMap<>();
+        List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
+        Map<String, List> samplesByVertex = new HashMap<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
             nextSample(topologicallySorted);
@@ -29,7 +32,7 @@ public class Prior {
         return new NetworkSamples(samplesByVertex, sampleCount);
     }
 
-    private static void nextSample(List<? extends Vertex<?>> topologicallySorted) {
+    private static void nextSample(List<? extends Vertex> topologicallySorted) {
         for (Vertex<?> vertex : topologicallySorted) {
             setAndCascadeFromSample(vertex);
         }
@@ -39,12 +42,12 @@ public class Prior {
         vertex.setAndCascade(vertex.sample());
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void takeSamples(Map<String, List> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
-        List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
+    private static void addSampleForVertex(Vertex vertex, Map<String, List> samples) {
+        List samplesForVertex = samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<>());
         samplesForVertex.add(vertex.getValue());
     }
 }

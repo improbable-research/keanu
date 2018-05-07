@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -18,36 +18,35 @@ public class ExponentialVertex extends ProbabilisticDouble {
         this.a = a;
         this.b = b;
         this.random = random;
-        setValue(sample());
         setParents(a, b);
     }
 
-    public ExponentialVertex(DoubleVertex a, DoubleVertex b) {
-        this(a, b, new Random());
-    }
-
-    public ExponentialVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
-    }
-
-    public ExponentialVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b, new Random());
-    }
-
-    public ExponentialVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b), new Random());
-    }
-
-    public ExponentialVertex(double a, double b, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
+    public ExponentialVertex(DoubleVertex a, double b, Random random) {
+        this(a, new ConstantDoubleVertex(b), random);
     }
 
     public ExponentialVertex(double a, DoubleVertex b, Random random) {
         this(new ConstantDoubleVertex(a), b, random);
     }
 
-    public ExponentialVertex(DoubleVertex a, double b, Random random) {
-        this(a, new ConstantDoubleVertex(b), random);
+    public ExponentialVertex(double a, double b, Random random) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
+    }
+
+    public ExponentialVertex(DoubleVertex a, DoubleVertex b) {
+        this(a, b, new Random());
+    }
+
+    public ExponentialVertex(DoubleVertex a, double b) {
+        this(a, new ConstantDoubleVertex(b), new Random());
+    }
+
+    public ExponentialVertex(double a, DoubleVertex b) {
+        this(new ConstantDoubleVertex(a), b, new Random());
+    }
+
+    public ExponentialVertex(double a, double b) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
     }
 
     public DoubleVertex getA() {
@@ -59,21 +58,13 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Exponential.pdf(a.getValue(), b.getValue(), value);
-    }
-
-    public double logDensity(Double value) { return Exponential.logPdf(a.getValue(), b.getValue(), value); }
-
-    @Override
-    public Map<String, Double> dDensityAtValue() {
-        Exponential.Diff dP = Exponential.dPdf(a.getValue(), b.getValue(), getValue());
-        return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
+    public double logPdf(Double value) {
+        return Exponential.logPdf(a.getValue(), b.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), getValue());
+    public Map<String, Double> dLogPdf(Double value) {
+        Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }
 
@@ -83,12 +74,12 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
-        Infinitesimal dPdInputsFromMu = a.getDualNumber().getInfinitesimal().multiplyBy(dPda);
-        Infinitesimal dPdInputsFromSigma = b.getDualNumber().getInfinitesimal().multiplyBy(dPdb);
-        Infinitesimal dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
+        PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
+        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
-        return dPdInputs.getInfinitesimals();
+        dPdInputs.putWithRespectTo(getId(), dPdx);
+        return dPdInputs.asMap();
     }
 
 }

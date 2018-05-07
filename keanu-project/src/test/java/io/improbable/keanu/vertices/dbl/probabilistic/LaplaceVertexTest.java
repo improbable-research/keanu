@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -29,37 +28,26 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void laplaceSampleMethodMatchesDensityMethod() {
+    public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;
         double epsilon = 0.01;
         LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
 
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            double sample = l.sample();
-            samples.add(sample);
-        }
+        double mean = 0.0;
+        double standardDeviation = Math.sqrt(2);
 
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("Standard deviation: " + sd);
-        assertEquals(0.0, mean, epsilon);
-        assertEquals(Math.sqrt(2 * 1.0), sd, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, l, mean, standardDeviation, epsilon);
     }
 
     @Test
-    public void samplingMatchesPdf() {
+    public void samplingMatchesLogProb() {
         LaplaceVertex laplace = new LaplaceVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(1.0),
                 random
         );
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 laplace,
                 100000,
                 2.0,
@@ -69,16 +57,7 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        double atValue = 0.5;
-        double logOfDensity = Math.log(l.density(atValue));
-        double logDensity = l.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0), random);
 
@@ -98,7 +77,7 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdbeta() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform, random);
 
@@ -118,13 +97,6 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(l, 0.5, 0.001);
-    }
-
-
-    @Test
     public void inferHyperParamsFromSamples() {
 
         double trueMu = 0.0;
@@ -138,7 +110,7 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muBeta,
                 latentMuBeta,

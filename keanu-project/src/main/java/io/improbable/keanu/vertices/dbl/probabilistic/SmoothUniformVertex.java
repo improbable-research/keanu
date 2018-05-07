@@ -23,20 +23,35 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         this.xMax = xMax;
         this.edgeSharpness = edgeSharpness;
         this.random = random;
-        setValue(sample());
         setParents(xMin, xMax);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
-        this(xMin, xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+    public SmoothUniformVertex(DoubleVertex xMin, double xMax, Random random) {
+        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, random);
+    }
+
+    public SmoothUniformVertex(double xMin, DoubleVertex xMax, Random random) {
+        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS, random);
     }
 
     public SmoothUniformVertex(double xMin, double xMax, Random random) {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, random);
     }
 
+    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+        this(xMin, xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+    }
+
+    public SmoothUniformVertex(DoubleVertex xMin, double xMax) {
+        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, new Random());
+    }
+
+    public SmoothUniformVertex(double xMin, DoubleVertex xMax) {
+        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+    }
+
     public SmoothUniformVertex(double xMin, double xMax) {
-        this(xMin, xMax, new Random());
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, new Random());
     }
 
     public DoubleVertex getXMin() {
@@ -52,21 +67,24 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
+    public double logPdf(Double value) {
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
-        return SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
+        final double density = SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
+        return Math.log(density);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogPdf(Double value) {
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
-        final double dPdfdx = SmoothUniformDistribution.dPdfdx(min, max, shoulderWidth, this.getValue());
+        final double dPdfdx = SmoothUniformDistribution.dPdfdx(min, max, shoulderWidth, value);
+        final double density = SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
+        final double dlogPdfdx = dPdfdx / density;
 
-        return singletonMap(getId(), dPdfdx);
+        return singletonMap(getId(), dlogPdfdx);
     }
 
     @Override

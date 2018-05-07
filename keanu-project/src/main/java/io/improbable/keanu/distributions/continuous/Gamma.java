@@ -6,25 +6,32 @@ import static java.lang.Math.*;
 import static org.apache.commons.math3.special.Gamma.digamma;
 import static org.apache.commons.math3.special.Gamma.gamma;
 
+
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.8 page 33
+ */
+
 public class Gamma {
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.8 page 33
-     */
+    private Gamma() {
+    }
+
     public static final double M_E = 0.577215664901532860606512090082;
 
     /**
      * @param a      location
-     * @param theta      scale
+     * @param theta  scale
      * @param k      shape
-     * @param random
+     * @param random source of randomness
      * @return a random number from the Gamma distribution
      */
     public static double sample(double a, double theta, double k, Random random) {
-        assert (theta > 0. && k > 0.);
+        if (theta <= 0. || k <= 0.) {
+            throw new IllegalArgumentException("Invalid value for theta or k. Theta: " + theta + ". k: " + k);
+        }
         final double A = 1. / sqrt(2. * k - 1.);
         final double B = k - log(4.);
         final double Q = k + 1. / A;
@@ -33,16 +40,7 @@ public class Gamma {
         final double C = 1. + k / M_E;
 
         if (k < 1.) {
-            while (true) {
-                double p = C * random.nextDouble();
-                if (p > 1.) {
-                    double y = -log((C - p) / k);
-                    if (random.nextDouble() <= pow(y, k - 1.)) return a + theta * y;
-                } else {
-                    double y = pow(p, 1. / k);
-                    if (random.nextDouble() <= exp(-y)) return a + theta * y;
-                }
-            }
+            return sampleWhileKLessThanOne(C, k, a, theta, random);
         } else if (k == 1.0) return Exponential.sample(a, theta, random);
         else {
             while (true) {
@@ -66,14 +64,14 @@ public class Gamma {
     }
 
     public static Diff dPdf(double a, double theta, double k, double x) {
-        double powB_minusCminus1 = pow(theta, -k - 1);
+        double powBminusCminus1 = pow(theta, -k - 1);
         double expAminusXoverB = exp((a - x) / theta);
-        double powXminusA_Cminus2 = pow(x - a, k - 2);
+        double powXminusAToKminus2 = pow(x - a, k - 2);
         double gammaC = gamma(k);
-        double common_to_da_and_db = powB_minusCminus1 * expAminusXoverB * powXminusA_Cminus2;
+        double commonToDaAndDb = powBminusCminus1 * expAminusXoverB * powXminusAToKminus2;
 
-        double dPdx = (common_to_da_and_db * (a + (theta * (k - 1)) - x)) / gammaC;
-        double dPda = (common_to_da_and_db * (theta * (-k) + theta + x - a)) / gammaC;
+        double dPdx = (commonToDaAndDb * (a + (theta * (k - 1)) - x)) / gammaC;
+        double dPda = (commonToDaAndDb * (theta * (-k) + theta + x - a)) / gammaC;
         double dPdtheta = -(pow(theta, -k - 2) * expAminusXoverB * pow(x - a, k - 1) * (a + (theta * k) - x)) / gammaC;
         double dPdk = -(pow(theta, -k) * expAminusXoverB * pow(x - a, k - 1) * (-log(x - a) + log(theta) + digamma(k))) / gammaC;
 
@@ -82,10 +80,23 @@ public class Gamma {
 
     public static Diff dlnPdf(double a, double theta, double k, double x) {
         double dPdx = (k - 1) / (x - a) - (1 / theta);
-        double dPda = (k - 1) / (a - x)  + (1 / theta);
-        double dPdtheta = - ((a + (theta * k) - x) / Math.pow(theta, 2));
+        double dPda = (k - 1) / (a - x) + (1 / theta);
+        double dPdtheta = -((a + (theta * k) - x) / Math.pow(theta, 2));
         double dPdk = Math.log(x - a) - Math.log(theta) - digamma(k);
         return new Diff(dPda, dPdtheta, dPdk, dPdx);
+    }
+
+    private static double sampleWhileKLessThanOne(double c, double k, double a, double theta, Random random) {
+        while (true) {
+            double p = c * random.nextDouble();
+            if (p > 1.) {
+                double y = -log((c - p) / k);
+                if (random.nextDouble() <= pow(y, k - 1.)) return a + theta * y;
+            } else {
+                double y = pow(p, 1. / k);
+                if (random.nextDouble() <= exp(-y)) return a + theta * y;
+            }
+        }
     }
 
     public static class Diff {

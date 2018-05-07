@@ -19,16 +19,31 @@ public class UniformVertex extends ProbabilisticDouble {
         this.xMin = xMin;
         this.xMax = xMax;
         this.random = random;
-        setValue(sample());
         setParents(xMin, xMax);
+    }
+
+    public UniformVertex(DoubleVertex xMin, double xMax, Random random) {
+        this(xMin, new ConstantDoubleVertex(xMax), random);
+    }
+
+    public UniformVertex(double xMin, DoubleVertex xMax, Random random) {
+        this(new ConstantDoubleVertex(xMin), xMax, random);
+    }
+
+    public UniformVertex(double xMin, double xMax, Random random) {
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), random);
     }
 
     public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
         this(xMin, xMax, new Random());
     }
 
-    public UniformVertex(double xMin, double xMax, Random random) {
-        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), random);
+    public UniformVertex(DoubleVertex xMin, double xMax) {
+        this(xMin, xMax, new Random());
+    }
+
+    public UniformVertex(double xMin, DoubleVertex xMax) {
+        this(new ConstantDoubleVertex(xMin), xMax, new Random());
     }
 
     public UniformVertex(double xMin, double xMax) {
@@ -44,12 +59,12 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Uniform.pdf(xMin.getValue(), xMax.getValue(), value);
+    public double logPdf(Double value) {
+        return Math.log(Uniform.pdf(xMin.getValue(), xMax.getValue(), value));
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, Double> dLogPdf(Double value) {
         double min = this.xMin.getValue();
         double max = this.xMax.getValue();
 

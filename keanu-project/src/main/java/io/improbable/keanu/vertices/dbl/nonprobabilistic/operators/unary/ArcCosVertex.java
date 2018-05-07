@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+
+import java.util.Map;
 
 public class ArcCosVertex extends DoubleUnaryOpVertex {
 
@@ -21,10 +23,7 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        DualNumber inputDualNumber = inputVertex.getDualNumber();
-        double dArcCos = Math.PI / 2 - Math.asin(inputVertex.getValue());
-        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dArcCos);
-        return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        return dualNumbers.get(inputVertex).acos();
     }
 }

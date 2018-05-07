@@ -53,34 +53,34 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void orDensityIsCorrect() {
+    public void orProbabilityIsCorrect() {
         BoolVertex v3 = v1.or(v2);
 
-        double pV3True = orDensity(pV1, pV2);
+        double pV3True = orProbability(pV1, pV2);
 
-        assertEquals(priorProbTrue(v3, 1000000), pV3True, 0.001);
+        assertEquals(priorProbabilityTrue(v3, 10000), pV3True, 0.01);
     }
 
     @Test
-    public void andDensityIsCorrect() {
+    public void andProbabilityIsCorrect() {
         BoolVertex v3 = v1.and(v2);
 
-        double pV3True = andDensity(pV1, pV2);
+        double pV3True = andProbability(pV1, pV2);
 
-        assertEquals(priorProbTrue(v3, 1000000), pV3True, 0.001);
+        assertEquals(priorProbabilityTrue(v3, 10000), pV3True, 0.01);
     }
 
     @Test
-    public void ifDensityIsCorrect() {
+    public void ifProbabilityIsCorrect() {
 
         double pV3 = 0.1;
         Flip v3 = new Flip(pV3, random);
 
         Vertex<Boolean> v4 = If(v1, v2, v3);
 
-        double pV4True = ifDensity(pV1, pV2, pV3);
+        double pV4True = ifProbability(pV1, pV2, pV3);
 
-        assertEquals(priorProbTrue(v4, 1000000), pV4True, 0.001);
+        assertEquals(priorProbabilityTrue(v4, 10000), pV4True, 0.01);
     }
 
     @Test
@@ -91,7 +91,7 @@ public class BoolVertexTest {
 
         CastBoolVertex a = new CastBoolVertex(f);
 
-        assertEquals(priorProbTrue(a, 1000000), p, 0.001);
+        assertEquals(priorProbabilityTrue(a, 10000), p, 0.01);
     }
 
     @Test
@@ -104,26 +104,26 @@ public class BoolVertexTest {
 
         BoolVertex a = f.and(tru).or(fal);
 
-        assertEquals(priorProbTrue(a, 1000000), p, 0.001);
+        assertEquals(priorProbabilityTrue(a, 10000), p, 0.01);
     }
 
 
-    private double andDensity(double pA, double pB) {
+    private double andProbability(double pA, double pB) {
         return pA * pB;
     }
 
-    private double orDensity(double pA, double pB) {
+    private double orProbability(double pA, double pB) {
         return pA + pB - (pA * pB);
     }
 
-    private double ifDensity(double pThn, double pThnIsValue, double pElsIsValue) {
+    private double ifProbability(double pThn, double pThnIsValue, double pElsIsValue) {
         double pThnAndThnIsValue = pThn * pThnIsValue;
         double pElsAndElsIsValue = (1 - pThn) * pElsIsValue;
 
         return pThnAndThnIsValue + pElsAndElsIsValue;
     }
 
-    public static double priorProbTrue(Vertex<Boolean> vertex, int sampleCount) {
+    public static double priorProbabilityTrue(Vertex<Boolean> vertex, int sampleCount) {
         BayesNet net = new BayesNet(vertex.getConnectedGraph());
 
         NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount);

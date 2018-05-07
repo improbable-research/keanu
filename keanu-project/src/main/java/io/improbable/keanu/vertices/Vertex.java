@@ -2,79 +2,45 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.Identifiable;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> implements Identifiable {
 
-    //This is a temp fix for a larger problem
-    //TODO: SOL-1016
-    public static AtomicLong idGenerator = new AtomicLong(0L);
+    public static final AtomicLong idGenerator = new AtomicLong(0L);
 
     private String uuid = idGenerator.getAndIncrement() + "";
-    private Set<Vertex<?>> children = new HashSet<>();
-    private Set<Vertex<?>> parents = new HashSet<>();
+    private Set<Vertex> children = new HashSet<>();
+    private Set<Vertex> parents = new HashSet<>();
     private T value;
     private boolean observed;
 
     /**
-     * This is the value of the probability density at the supplied value.
+     * This is the natural log of the probability at the supplied value. In the
+     * case of continuous vertices, this is actually the log of the density, which
+     * will differ from the probability by a constant.
      *
      * @param value The supplied value.
-     * @return The probability.
+     * @return The natural log of the probability density at the supplied value
      */
-    public abstract double density(T value);
+    public abstract double logProb(T value);
 
-    /**
-     * Just a helper method for a common function
-     */
-    public double densityAtValue() {
-        return density(value);
+    public double logProbAtValue() {
+        return logProb(getValue());
     }
 
     /**
-     * This is the value of the natural log of the probability density at the supplied value.
+     * The partial derivatives of the natural log prob.
      *
-     * @param value The supplied value.
-     * @return The probability.
+     * @param value at a given value
+     * @return the partial derivatives of the log density
      */
-    public double logDensity(T value) {
-        return Math.log(density(value));
-    }
+    public abstract Map<String, Double> dLogProb(T value);
 
-    /**
-     * Just a helper method for a common function
-     */
-    public double logDensityAtValue() {
-        return logDensity(value);
-    }
-
-    /**
-     * This returns the derivative of the density function with respect to
-     * any dependent vertices.
-     *
-     * @return a Map containing { dependent vertex Id -&gt; density slope w.r.t. dependent vertex}
-     */
-    public abstract Map<String, Double> dDensityAtValue();
-
-    /**
-     * This is the same as dDensityAtValue except for the log of the density. For numerical
-     * stability a vertex may chose to override this method but if not overridden, the
-     * chain rule is used to calculate the derivative of the log of the density.
-     * <p>
-     * dlog(P)/dx = (dP/dx)*(1/P(x))
-     */
-    public Map<String, Double> dlnDensityAtValue() {
-
-        final double density = densityAtValue();
-        Map<String, Double> dDensityAtValue = dDensityAtValue();
-        Map<String, Double> dLnDensity = new HashMap<>();
-        for (String vertexId : dDensityAtValue.keySet()) {
-            dLnDensity.put(vertexId, dDensityAtValue.get(vertexId) / density);
-        }
-
-        return dLnDensity;
+    public Map<String, Double> dLogProbAtValue() {
+        return dLogProb(getValue());
     }
 
     /**
@@ -85,7 +51,7 @@ public abstract class Vertex<T> implements Identifiable {
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's
-     * current parent values.
+     * parent's current values.
      *
      * @return The updated value
      */
@@ -99,10 +65,39 @@ public abstract class Vertex<T> implements Identifiable {
      * @return The value at this vertex after recalculating any parent non-probabilistic
      * vertices.
      */
-    public abstract T lazyEval();
+    public T lazyEval() {
+        Deque<Vertex<?>> stack = new ArrayDeque<>();
+        stack.push(this);
+        Set<Vertex<?>> hasCalculated = new HashSet<>();
+
+        while (!stack.isEmpty()) {
+
+            Vertex<?> head = stack.peek();
+            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
+
+            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+
+                Vertex<?> top = stack.pop();
+                top.updateValue();
+                hasCalculated.add(top);
+
+            } else {
+
+                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                    stack.push(vertex);
+                }
+
+            }
+
+        }
+        return this.getValue();
+    }
 
     /**
-     * A probabilistic vertex is defined as a vertex that is probabilistic.
+     * @return True if the vertex is probabilistic, false otherwise.
+     * A probabilistic vertex is defined as a vertex whose value is
+     * not derived from it's parents. However, the probability of the
+     * vertex's value may be dependent on it's parents values.
      */
     public abstract boolean isProbabilistic();
 
@@ -118,29 +113,36 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     public T getValue() {
-        return value == null ? lazyEval() : value;
+        return !hasValue() ? lazyEval() : value;
+    }
+
+    public boolean hasValue() {
+        return value != null;
     }
 
     /**
      * This sets the value in this vertex and tells each child vertex about
      * the new change. This causes a cascading change of values if any of the
-     * children vertices are lambda vertices.
+     * children vertices are non-probabilistic vertices (e.g. mathematical operations).
      *
      * @param value The new value at this vertex
      */
     public void setAndCascade(T value) {
-        setValue(value);
-        updateChildren();
+        setAndCascade(value, exploreSetting());
     }
 
     /**
-     * This causes this vertex's value to propagate to child vertices.
+     * @param value    the new value at this vertex
+     * @param explored the results of previously exploring the graph, which
+     *                 allows the efficient propagation of this new value.
      */
-    public void updateChildren() {
-        for (Vertex<?> child : this.children) {
-            child.updateValue();
-            child.updateChildren();
-        }
+    public void setAndCascade(T value, Map<String, Long> explored) {
+        setValue(value);
+        VertexValuePropagation.cascadeUpdate(this, explored);
+    }
+
+    public Map<String, Long> exploreSetting() {
+        return VertexValuePropagation.exploreSetting(this);
     }
 
     /**
@@ -176,7 +178,7 @@ public abstract class Vertex<T> implements Identifiable {
         return uuid;
     }
 
-    public Set<Vertex<?>> getChildren() {
+    public Set<Vertex> getChildren() {
         return children;
     }
 
@@ -202,7 +204,7 @@ public abstract class Vertex<T> implements Identifiable {
         parent.addChild(this);
     }
 
-    public Set<Vertex<?>> getParents() {
+    public Set<Vertex> getParents() {
         return this.parents;
     }
 
@@ -221,7 +223,17 @@ public abstract class Vertex<T> implements Identifiable {
         return uuid.hashCode();
     }
 
-    public Set<Vertex<?>> getConnectedGraph() {
+    public Set<Vertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
+    }
+
+    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!calculated.contains(next)) {
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 }

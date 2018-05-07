@@ -2,16 +2,28 @@ package io.improbable.keanu.distributions.continuous;
 
 import java.util.Random;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.8 page 20
+ */
+
 public class Exponential {
 
+    private Exponential() {
+    }
+
     /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.8 page 20
+     * @param a      location
+     * @param b      shape
+     * @param random source of randomness
+     * @return a random number from the Exponential distribution
      */
     public static double sample(double a, double b, Random random) {
-        assert (b > 0.0);
+        if (b <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for b");
+        }
         return a - b * Math.log(random.nextDouble());
     }
 
@@ -28,15 +40,15 @@ public class Exponential {
         double bSquared = b * b;
 
         double dPda = exponent / bSquared;
-        double dPdb = - (exponent * (a + b - x)) / (Math.pow(b, 3));
-        double dPdx = - dPda;
+        double dPdb = -(exponent * (a + b - x)) / (Math.pow(b, 3));
+        double dPdx = -dPda;
         return new Diff(dPda, dPdb, dPdx);
     }
 
     public static Diff dlnPdf(double a, double b, double x) {
         double dPda = 1 / b;
-        double dPdb = - (a + b - x) / Math.pow(b, 2);
-        double dPdx = - dPda;
+        double dPdb = -(a + b - x) / Math.pow(b, 2);
+        double dPdx = -dPda;
         return new Diff(dPda, dPdb, dPdx);
     }
 

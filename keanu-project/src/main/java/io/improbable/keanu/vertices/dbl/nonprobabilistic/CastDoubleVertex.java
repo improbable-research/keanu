@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
+import java.util.Map;
+
 public class CastDoubleVertex extends NonProbabilisticDouble {
 
     private final Vertex<? extends Number> inputVertex;
@@ -18,18 +20,12 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(inputVertex.lazyEval().doubleValue());
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return inputVertex.getValue().doubleValue();
     }
 
     @Override
-    public DualNumber getDualNumber() {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         throw new UnsupportedOperationException("CastDoubleVertex is non-differentiable");
     }
 }

@@ -2,24 +2,58 @@ package io.improbable.keanu.vertices.dbl;
 
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
 
+import java.util.*;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
-public abstract class DoubleVertex extends Vertex<Double> implements DoubleOperators<DoubleVertex> {
+public abstract class DoubleVertex extends ContinuousVertex<Double> implements DoubleOperators<DoubleVertex> {
 
-    public abstract DualNumber getDualNumber();
+    /**
+     * Calculate the Dual Number of a DoubleVertex.
+     *
+     * @param dualNumbers A Map that is guaranteed to contain the Dual Numbers of the parent of the vertex.
+     * @return The Dual Number of the vertex.
+     */
+    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+
+    public DualNumber getDualNumber() {
+        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
+        Deque<DoubleVertex> stack = new ArrayDeque<>();
+        stack.push(this);
+
+        while (!stack.isEmpty()) {
+
+            DoubleVertex head = stack.peek();
+            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+
+            if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
+
+                DoubleVertex top = stack.pop();
+                DualNumber dual = top.calculateDualNumber(dualNumbers);
+                dualNumbers.put(top, dual);
+
+            } else {
+
+                for (Vertex<?> vertex : parentsThatDualNumberIsNotCalculated) {
+                    if (vertex instanceof DoubleVertex) {
+                        stack.push((DoubleVertex) vertex);
+                    } else {
+                        throw new IllegalArgumentException("Can only calculate Dual Numbers on a graph made of Doubles");
+                    }
+                }
+
+            }
+
+        }
+        return dualNumbers.get(this);
+    }
 
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
@@ -81,8 +115,8 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
         return new AbsVertex(this);
     }
 
-    public DoubleVertex lambda(Function<Double, Double> op, Supplier<DualNumber> dualNumberSupplier) {
-        return new DoubleUnaryOpLambda<>(this, op, dualNumberSupplier);
+    public DoubleVertex lambda(Function<Double, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation);
     }
 
 
@@ -105,6 +139,41 @@ public abstract class DoubleVertex extends Vertex<Double> implements DoubleOpera
 
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
+    }
+
+
+    public DoubleVertex log() {
+        return new LogVertex(this);
+    }
+
+    public DoubleVertex exp() {
+        return new ExpVertex(this);
+    }
+
+    public DoubleVertex sin() {
+        return new SinVertex(this);
+    }
+
+    public DoubleVertex cos() {
+        return new CosVertex(this);
+    }
+
+    public DoubleVertex asin() {
+        return new ArcSinVertex(this);
+    }
+
+    public DoubleVertex acos() {
+        return new ArcCosVertex(this);
+    }
+
+    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
+        Set<Vertex> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!dualNumbers.containsKey(next)){
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 
 }
