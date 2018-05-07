@@ -81,6 +81,20 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	@Test
+	public void dPdfTest() {
+		for (int i = 0; i < TEST_VALUES.length; i++) {
+			testDPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		}
+	}
+	
+	@Test
+	public void dLogPdfTest() {
+		for (int i = 0; i < TEST_VALUES.length; i++) {
+			testDLogPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		}
+	}
+	
 	private void testPdfAtGivenDegreesOfFreedom(double v) {
 		TDistribution apache = new TDistribution(v);
 		StudentTVertex studentT = new StudentTVertex(v, random);
@@ -99,6 +113,52 @@ public class StudentTVertexTest {
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected = apache.logDensity(t);
 			double actual = studentT.logPdf(t);
+			assertEquals(expected, actual, DELTA);
+		}
+	}
+	
+	private void testDPdfAtGivenDegreesOfFreedom(double v) {
+		StudentTVertex studentT = new StudentTVertex(v, random);
+		
+		for(double t = -4.5; t <= 4.5; t += 0.5) {
+			double expected;
+			double actual = studentT.dDensityAtValue(t).get(studentT.getId());
+			switch((int) v) {
+				case 1:
+					expected = -t / (sqrt(PI) * pow(pow(t, 2) + 1., 2));
+					break;
+				case 2:
+					expected = (-9 * t) / (2 * pow(pow(t, 2) + 2., 5. / 2.));
+					break;
+				case 3:
+					expected = (-45 * sqrt(3 / PI) * t) / pow(pow(t, 2) + 3, 3);
+					break;
+				default:
+					expected = 0.;
+			}
+			assertEquals(expected, actual, DELTA);
+		}
+	}
+	
+	private void testDLogPdfAtGivenDegreesOfFreedom(double v) {
+		StudentTVertex studentT = new StudentTVertex(v, random);
+		
+		for(double t = -4.5; t <= 4.5; t += 0.5) {
+			double expected;
+			double actual = studentT.dLogPdf(t).get(studentT.getId());
+			switch((int) v) {
+				case 1:
+					expected = (-2 * t) / (pow(t, 2) + 1.);
+					break;
+				case 2:
+					expected = (-3 * t) / (pow(t, 2) + 2.);
+					break;
+				case 3:
+					expected = (-4 * t) / (pow(t, 2) + 3.);
+					break;
+				default:
+					expected = 0.;
+			}
 			assertEquals(expected, actual, DELTA);
 		}
 	}

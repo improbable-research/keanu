@@ -65,19 +65,21 @@ public class StudentT {
 		return new Diff(dPdv, dPdt);
 	}
 	
-	public static Diff dlnPdf(double v, double t) {
+	public static Diff dLogPdf(double v, double t) {
 		double tSq = pow(t, 2);
 		double tSqPlusV = tSq + v;
 		
-		double zeroDerivativeOfDigammaHalfV = zeroDerivativeOfDigamma(v / 2.);
-		double zeroDerivativeOfDigammaVPlusHalf = zeroDerivativeOfDigamma(v + 0.5);
+		double digammaHalfV = zeroDerivativeOfDigamma(v / 2.);
+		double digammaVPlusHalf = zeroDerivativeOfDigamma((v + 1.) / 2.);
 		
-		double digammaMultiplier = tSqPlusV * (zeroDerivativeOfDigammaHalfV - (2 * zeroDerivativeOfDigammaVPlusHalf));
+		double digamma_pt = log(tSqPlusV / v) + digammaHalfV - digammaVPlusHalf;
+		double pt1 = -tSq * (digamma_pt - 1.);
+		double pt2 = v * (digamma_pt);
 		
-		double numerator = (tSqPlusV * log(tSqPlusV / v)) + (tSqPlusV * digammaMultiplier) - tSq + 1;
-		double denominator = 2 * tSqPlusV;
+		double numerator = pt1 + pt2 + 1;
+		double denominator = 2. * tSqPlusV;
 		
-		double dPdv = - numerator / denominator;
+		double dPdv = numerator / denominator;
 		double dPdt = (-t * (v + 1.)) / (pow(t, 2.) + v);
 		
 		return new Diff(dPdv, dPdt);

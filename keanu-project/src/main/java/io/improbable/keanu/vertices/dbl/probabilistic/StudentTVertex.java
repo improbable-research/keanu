@@ -37,14 +37,14 @@ public class StudentTVertex extends ProbabilisticDouble {
 	@Override
 	public double logPdf(Double value) { return StudentT.logPdf(v.getValue(), value); }
 	
-	public Map<String, Double> dDensityAtValue() {
-		StudentT.Diff diff = StudentT.dPdf(v.getValue(), getValue());
+	public Map<String, Double> dDensityAtValue(Double value) {
+		StudentT.Diff diff = StudentT.dPdf(v.getValue(), value);
 		return convertDualNumbersToDiff(diff.dPdv, diff.dPdt);
 	}
 	
 	@Override
 	public Map<String, Double> dLogPdf(Double value) {
-		StudentT.Diff diff = StudentT.dlnPdf(v.getValue(), getValue());
+		StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), value);
 		return convertDualNumbersToDiff(diff.dPdv, diff.dPdt);
 	}
 	
