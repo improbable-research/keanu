@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 import java.util.Random;
@@ -32,27 +32,28 @@ public class StudentTVertex extends ProbabilisticDouble {
 	
 	public DoubleVertex getV() { return v; }
 	
-	@Override
 	public double density(Double value) { return StudentT.pdf(v.getValue(), value); }
 	
 	@Override
+	public double logPdf(Double value) { return StudentT.logPdf(v.getValue(), value); }
+	
 	public Map<String, Double> dDensityAtValue() {
 		StudentT.Diff diff = StudentT.dPdf(v.getValue(), getValue());
 		return convertDualNumbersToDiff(diff.dPdv, diff.dPdt);
 	}
 	
 	@Override
-	public Map<String, Double> dlnDensityAtValue() {
+	public Map<String, Double> dLogPdf(Double value) {
 		StudentT.Diff diff = StudentT.dlnPdf(v.getValue(), getValue());
 		return convertDualNumbersToDiff(diff.dPdv, diff.dPdt);
 	}
 	
 	private Map<String, Double> convertDualNumbersToDiff(double dPdv, double dPdt) {
-		Infinitesimal dPdInputsFromV = v.getDualNumber().getInfinitesimal().multiplyBy(dPdv);
-		Infinitesimal dPdInputs = dPdInputsFromV;
-		dPdInputs.getInfinitesimals().put(getId(), dPdt);
+		PartialDerivatives dPdInputsFromV = v.getDualNumber().getPartialDerivatives().multiplyBy(dPdv);
+		PartialDerivatives dPdInputs = dPdInputsFromV;
+		dPdInputs.asMap().put(getId(), dPdt);
 		
-		return dPdInputs.getInfinitesimals();
+		return dPdInputs.asMap();
 	}
 	
 	@Override

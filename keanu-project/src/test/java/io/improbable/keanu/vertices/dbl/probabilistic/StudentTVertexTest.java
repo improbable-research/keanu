@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -73,6 +74,13 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	@Test
+	public void logPdfTest() {
+		for (int i = 0; i < TEST_VALUES.length; i++) {
+			testLogPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		}
+	}
+	
 	private void testPdfAtGivenDegreesOfFreedom(double v) {
 		TDistribution apache = new TDistribution(v);
 		StudentTVertex studentT = new StudentTVertex(v, random);
@@ -80,6 +88,17 @@ public class StudentTVertexTest {
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected = apache.density(t);
 			double actual = studentT.density(t);
+			assertEquals(expected, actual, DELTA);
+		}
+	}
+	
+	private void testLogPdfAtGivenDegreesOfFreedom(double v) {
+		TDistribution apache = new TDistribution(v);
+		StudentTVertex studentT = new StudentTVertex(v, random);
+		
+		for(double t = -4.5; t <= 4.5; t += 0.5) {
+			double expected = apache.logDensity(t);
+			double actual = studentT.logPdf(t);
 			assertEquals(expected, actual, DELTA);
 		}
 	}
