@@ -15,7 +15,7 @@ public class StudentT {
 	 */
 	public static double sample(double v, Random random) {
 		assert( v > 0. );
-		return 1.; //Guassian.sample( 0., 1., random) / sqrt( ChiSquared.sample((int) v, random) / v );
+		return Gaussian.sample( 0., 1., random) / sqrt( ChiSquared.sample((int) v, random) / v );
 		
 	}
 	
