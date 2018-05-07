@@ -125,13 +125,13 @@ public class StudentTVertexTest {
 			double actual = studentT.dDensityAtValue(t).get(studentT.getId());
 			switch((int) v) {
 				case 1:
-					expected = -t / (sqrt(PI) * pow(pow(t, 2) + 1., 2));
+					expected = (-2. * t) / (PI * pow(pow(t, 2) + 1., 2));
 					break;
 				case 2:
-					expected = (-9 * t) / (2 * pow(pow(t, 2) + 2., 5. / 2.));
+					expected = (-3. * t) / pow(pow(t, 2) + 2., 5. / 2.);
 					break;
 				case 3:
-					expected = (-45 * sqrt(3 / PI) * t) / pow(pow(t, 2) + 3, 3);
+					expected = (-24. * sqrt(3) * t) / (PI * pow(pow(t, 2) + 3., 3));
 					break;
 				default:
 					expected = 0.;

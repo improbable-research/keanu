@@ -39,27 +39,27 @@ public class StudentT {
 	
 	public static Diff dPdf(double v, double t) {
 		double gammaHalfV = gamma(v / 2.);
-		double gammaVPlusHalf = gamma(v + 0.5);
+		double gammaHalfVPlusOne = gamma((v + 1.) / 2.);
 		double sqrtVPi = sqrt(v * PI);
 		double tSq = pow(t, 2);
-		double tSqDividedByVPlusOne = (tSq / v) + 1;
-		double sqrtVPiGammaVPlusHalf = sqrtVPi * gammaVPlusHalf;
-		double sqrtPiPowVThreeHalvesTimesGammaHalfV = sqrt(PI) * pow(v, 3./2.) * gammaHalfV;
+		double tSqDividedByVPlusOne = (tSq / v) + 1.;
+		double sqrtVPiGammaHalfV = sqrtVPi * gammaHalfV;
+		double sqrtPiGammaHalfV = sqrt(PI) * gammaHalfV;
 		
 		double zeroDerivativeOfDigammaHalfV = zeroDerivativeOfDigamma(v / 2.);
-		double zeroDerivativeOfDigammaVPlusHalf = zeroDerivativeOfDigamma(v + 0.5);
+		double zeroDerivativeOfDigammaHalfVPlusOne = zeroDerivativeOfDigamma((v + 1.) / 2.);
 		
-		double dPdv_multiplier = pow(tSqDividedByVPlusOne, (-v - 1.) / 2.) * gammaVPlusHalf;
-		double dPdv_pt1 = -1. / (2. * sqrtPiPowVThreeHalvesTimesGammaHalfV);
+		double dPdv_multiplier = pow(tSqDividedByVPlusOne, (-v - 1.) / 2.) * gammaHalfVPlusOne;
+		double dPdv_pt1 = -1. / (2. * sqrtPiGammaHalfV * pow(v, 3. / 2.));
 		double dPdv_pt2_numerator = -(tSq * (-v - 1.) / (2. * pow(v, 2.) * tSqDividedByVPlusOne)) -
 				(0.5 * log(tSqDividedByVPlusOne));
-		double dPdv_pt2 = dPdv_pt2_numerator / sqrtVPiGammaVPlusHalf;
-		double dPdv_pt3 = zeroDerivativeOfDigammaHalfV / (2. * sqrtVPiGammaVPlusHalf);
-		double dPdv_pt4 = zeroDerivativeOfDigammaVPlusHalf / sqrtVPiGammaVPlusHalf;
+		double dPdv_pt2 = dPdv_pt2_numerator / sqrtVPiGammaHalfV;
+		double dPdv_pt3 = zeroDerivativeOfDigammaHalfV / (2. * sqrtVPiGammaHalfV);
+		double dPdv_pt4 = zeroDerivativeOfDigammaHalfVPlusOne / (2. * sqrtVPiGammaHalfV);
 		double dPdv = dPdv_multiplier * (dPdv_pt1 + dPdv_pt2 - dPdv_pt3 + dPdv_pt4);
 		
-		double dPdt_numerator = (t * (-v - 1)) * pow(tSqDividedByVPlusOne, (0.5 * (-v -1)) - 1) * gammaVPlusHalf;
-		double dPdt_denominator = sqrtPiPowVThreeHalvesTimesGammaHalfV;
+		double dPdt_numerator = (t * (-v - 1)) * pow(tSqDividedByVPlusOne, -v / 2.) * gammaHalfVPlusOne;
+		double dPdt_denominator = (tSq + v) * sqrt((tSq + v) / v) * sqrtVPiGammaHalfV;
 		double dPdt = dPdt_numerator / dPdt_denominator;
 		
 		return new Diff(dPdv, dPdt);
