@@ -20,7 +20,9 @@ public class NDGaussian {
         final DoubleTensor lnSigma = sigma.log();
         final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2);
         final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
-        return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
+        final DoubleTensor logPdf = xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
+
+        return logPdf;
     }
 
     public static Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {

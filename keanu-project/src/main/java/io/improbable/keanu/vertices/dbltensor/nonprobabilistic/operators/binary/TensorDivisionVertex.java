@@ -7,9 +7,9 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNu
 
 import java.util.Map;
 
-public class TensorMultiplicationVertex extends TensorBinaryOpVertex {
+public class TensorDivisionVertex extends TensorBinaryOpVertex {
 
-    public TensorMultiplicationVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
+    public TensorDivisionVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         super(a, b);
     }
 
@@ -17,11 +17,11 @@ public class TensorMultiplicationVertex extends TensorBinaryOpVertex {
     public TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
         TensorDualNumber aDual = dualNumbers.get(a);
         TensorDualNumber bDual = dualNumbers.get(b);
-        return aDual.times(bDual);
+        return aDual.divideBy(bDual);
     }
 
     @Override
     protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
-        return a.times(b);
+        return a.div(b);
     }
 }

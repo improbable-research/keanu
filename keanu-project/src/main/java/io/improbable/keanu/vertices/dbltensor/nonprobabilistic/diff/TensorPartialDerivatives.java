@@ -67,7 +67,7 @@ public class TensorPartialDerivatives {
             if (subtracted.containsKey(k)) {
                 subtracted.put(k, subtracted.get(k).minus(v));
             } else {
-                subtracted.put(k, v);
+                subtracted.put(k, v.unaryMinus());
             }
         }
 

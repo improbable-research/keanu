@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.junit.Before;
@@ -18,12 +19,13 @@ import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
-public class NDGaussianVertexTest {
+public class TensorGaussianVertexTest {
 
     private KeanuRandom random;
 
     @Before
     public void setup() {
+        System.setProperty("dtype", "double");
         random = new KeanuRandom(1);
     }
 
@@ -36,7 +38,7 @@ public class NDGaussianVertexTest {
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(new ConstantTensorVertex(0), new ConstantTensorVertex(1), new KeanuRandom(1));
 
         double expectedDensity = gaussianVertex.logPdf(0.5);
-        double actualDensity = ndGaussianVertex.logPdf(DoubleTensor.nd4JScalar(0.5));
+        double actualDensity = ndGaussianVertex.logPdf(Nd4jDoubleTensor.scalar(0.5));
 
         assertEquals(expectedDensity, actualDensity, 1e-5);
     }
@@ -76,13 +78,13 @@ public class NDGaussianVertexTest {
 
 
         TensorUniformVertex muTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        muTensor.setValue(DoubleTensor.nd4JScalar(0.0));
+        muTensor.setValue(Nd4jDoubleTensor.scalar(0.0));
 
         TensorUniformVertex sigmaTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        sigmaTensor.setValue(DoubleTensor.nd4JScalar(1.0));
+        sigmaTensor.setValue(Nd4jDoubleTensor.scalar(1.0));
 
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
-        Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(DoubleTensor.nd4JScalar(0.5));
+        Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(Nd4jDoubleTensor.scalar(0.5));
 
         assertEquals(expectedDerivatives.get(mu.getId()).scalar(), actualDerivatives.get(muTensor.getId()).scalar(), 1e-5);
         assertEquals(expectedDerivatives.get(sigma.getId()).scalar(), actualDerivatives.get(sigmaTensor.getId()).scalar(), 1e-5);
@@ -108,10 +110,10 @@ public class NDGaussianVertexTest {
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
         TensorUniformVertex muTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        muTensor.setValue(DoubleTensor.nd4JScalar(0.0));
+        muTensor.setValue(Nd4jDoubleTensor.scalar(0.0));
 
         TensorUniformVertex sigmaTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        sigmaTensor.setValue(DoubleTensor.nd4JScalar(1.0));
+        sigmaTensor.setValue(Nd4jDoubleTensor.scalar(1.0));
 
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
         Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(
@@ -133,8 +135,8 @@ public class NDGaussianVertexTest {
         double trueSigma = 2.0;
 
         List<DoubleTensorVertex> muSigma = new ArrayList<>();
-        muSigma.add(new ConstantTensorVertex(DoubleTensor.nd4JScalar(trueMu)));
-        muSigma.add(new ConstantTensorVertex(DoubleTensor.nd4JScalar(trueSigma)));
+        muSigma.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueMu)));
+        muSigma.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueSigma)));
 
         List<DoubleTensorVertex> latentMuSigma = new ArrayList<>();
         latentMuSigma.add(new TensorUniformVertex(0.01, 10.0, random));
@@ -144,8 +146,7 @@ public class NDGaussianVertexTest {
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
                 muSigma,
-                latentMuSigma,
-                numSamples
+                latentMuSigma
         );
     }
 }

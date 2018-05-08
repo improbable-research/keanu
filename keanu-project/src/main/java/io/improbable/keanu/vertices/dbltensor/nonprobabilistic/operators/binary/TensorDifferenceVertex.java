@@ -17,7 +17,7 @@ public class TensorDifferenceVertex extends TensorBinaryOpVertex {
     public TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
         TensorDualNumber aDual = dualNumbers.get(a);
         TensorDualNumber bDual = dualNumbers.get(b);
-        return aDual.subtract(bDual);
+        return aDual.minus(bDual);
     }
 
     protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {

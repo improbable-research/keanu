@@ -15,8 +15,7 @@ public class TensorVertexVariationalMAP {
     public static void inferHyperParamsFromSamples(
             Function<List<DoubleTensorVertex>, DoubleTensorVertex> vertexUnderTestCreator,
             List<DoubleTensorVertex> hyperParamsForSampling,
-            List<DoubleTensorVertex> latentsToInfer,
-            int numSamples) {
+            List<DoubleTensorVertex> latentsToInfer) {
 
         // SOURCE OF TRUTH
         DoubleTensorVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);

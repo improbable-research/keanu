@@ -27,10 +27,6 @@ public interface DoubleTensor extends Tensor {
         return new Nd4jDoubleTensor(shape);
     }
 
-    static DoubleTensor nd4JScalar(double scalarValue) {
-        return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
-    }
-
     static Map<String, DoubleTensor> fromScalars(Map<String, Double> scalars) {
         Map<String, DoubleTensor> asTensors = new HashMap<>();
 

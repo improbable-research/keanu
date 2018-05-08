@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 
 import java.util.Collections;
@@ -14,7 +15,7 @@ public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
     }
 
     public ConstantTensorVertex(double constant) {
-        this(DoubleTensor.nd4JScalar(constant));
+        this(Nd4jDoubleTensor.scalar(constant));
     }
 
     @Override

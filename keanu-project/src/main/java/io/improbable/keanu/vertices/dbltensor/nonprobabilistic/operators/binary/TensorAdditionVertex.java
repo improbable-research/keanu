@@ -17,7 +17,7 @@ public class TensorAdditionVertex extends TensorBinaryOpVertex {
     public TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
         TensorDualNumber aDual = dualNumbers.get(a);
         TensorDualNumber bDual = dualNumbers.get(b);
-        return aDual.add(bDual);
+        return aDual.plus(bDual);
     }
 
     @Override

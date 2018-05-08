@@ -11,10 +11,10 @@ import java.util.Map;
 public class TensorFitnessFunction {
 
     protected final List<Vertex> probabilisticVertices;
-    protected final List<? extends Vertex> latentVertices;
+    protected final List<? extends Vertex<DoubleTensor>> latentVertices;
     protected final Map<String, Long> exploreSettingAll;
 
-    public TensorFitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex> latentVertices) {
+    public TensorFitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<DoubleTensor>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
@@ -27,24 +27,18 @@ public class TensorFitnessFunction {
         };
     }
 
-    static void setAndCascadePoint(double[] point, List<? extends Vertex> latentVertices, Map<String, Long> exploreSettingAll) {
+    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices, Map<String, Long> exploreSettingAll) {
 
         int position = 0;
-        for (Vertex vertex : latentVertices) {
+        for (Vertex<DoubleTensor> vertex : latentVertices) {
 
             int dimensions = numDimensions(vertex);
 
-            if (vertex.getValue() instanceof DoubleTensor) {
-                double[] values = new double[dimensions];
+            double[] values = new double[dimensions];
+            System.arraycopy(point, position, values, 0, dimensions);
 
-                System.arraycopy(point, position, values, 0, values.length);
-
-                Vertex<DoubleTensor> castedVertex = ((Vertex<DoubleTensor>) vertex);
-                DoubleTensor newTensor = DoubleTensor.create(values, castedVertex.getValue().getShape());
-                castedVertex.setValue(newTensor);
-            } else {
-                ((Vertex<Double>) vertex).setValue(point[position]);
-            }
+            DoubleTensor newTensor = DoubleTensor.create(values, vertex.getValue().getShape());
+            vertex.setValue(newTensor);
 
             position += dimensions;
         }

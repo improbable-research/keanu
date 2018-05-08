@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.tensorVariational;
 
 import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -32,7 +33,7 @@ public class TensorNonGradientOptimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<? extends Vertex> latentVertices = bayesNet.getContinuousLatentVertices();
+        List<? extends Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
         TensorFitnessFunction fitnessFunction = new TensorFitnessFunction(outputVertices, latentVertices);
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);

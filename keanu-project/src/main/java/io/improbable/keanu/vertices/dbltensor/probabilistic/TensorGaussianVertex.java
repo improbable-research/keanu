@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.NDGaussian;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -48,6 +49,34 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
         this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma, random);
     }
 
+    public TensorGaussianVertex(DoubleTensorVertex mu, double sigma, KeanuRandom random) {
+        this(mu, new ConstantTensorVertex(sigma), random);
+    }
+
+    public TensorGaussianVertex(double mu, DoubleTensorVertex sigma, KeanuRandom random) {
+        this(new ConstantTensorVertex(mu), sigma, random);
+    }
+
+    public TensorGaussianVertex(double mu, double sigma, KeanuRandom random) {
+        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma), random);
+    }
+
+    public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma) {
+        this(mu, sigma, new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(double mu, double sigma) {
+        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma), new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(double mu, DoubleTensorVertex sigma) {
+        this(new ConstantTensorVertex(mu), sigma, new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(DoubleTensorVertex mu, double sigma) {
+        this(mu, new ConstantTensorVertex(sigma), new KeanuRandom());
+    }
+
     @Override
     public double logPdf(DoubleTensor value) {
 
@@ -74,7 +103,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
         TensorPartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
         TensorPartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        if(!this.isObserved()) {
+        if (!this.isObserved()) {
             dPdInputs.putWithRespectTo(getId(), dPdx);
         }
 

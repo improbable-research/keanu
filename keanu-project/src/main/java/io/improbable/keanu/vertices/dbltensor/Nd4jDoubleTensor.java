@@ -10,6 +10,14 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
     public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
 
+    public static Nd4jDoubleTensor scalar(double scalarValue) {
+        return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
+    }
+
+    public static DoubleTensor create(double[] values, int[] shape) {
+        return new Nd4jDoubleTensor(values, shape);
+    }
+
     private INDArray tensor;
     private int[] shape;
 
@@ -135,8 +143,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (that.isScalar() && !this.isScalar()) {
             return this.minus(thatArray.getDouble(0));
-        } else if (!that.isScalar() && this.isScalar()) {
-            return that.minus(this.scalar());
         } else {
             return new Nd4jDoubleTensor(tensor.sub(thatArray));
         }
@@ -148,8 +154,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (that.isScalar() && !this.isScalar()) {
             return this.plus(thatArray.getDouble(0));
-        } else if (!that.isScalar() && this.isScalar()) {
-            return that.plus(this.scalar());
         } else {
             return new Nd4jDoubleTensor(tensor.add(thatArray));
         }
@@ -161,8 +165,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (that.isScalar() && !this.isScalar()) {
             return this.times(thatArray.getDouble(0));
-        } else if (!that.isScalar() && this.isScalar()) {
-            return that.times(this.scalar());
         } else {
             return new Nd4jDoubleTensor(tensor.mul(thatArray));
         }
@@ -174,8 +176,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (that.isScalar() && !this.isScalar()) {
             return this.div(thatArray.getDouble(0));
-        } else if (!that.isScalar() && this.isScalar()) {
-            return that.div(this.scalar());
         } else {
             return new Nd4jDoubleTensor(tensor.div(thatArray));
         }
@@ -293,7 +293,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
-        //TODO: Should you be allowed to scalar * tensor in place?!?
         INDArray thatArray = unsafeGetNd4J(that);
         if (thatArray.isScalar()) {
             tensor.muli(thatArray.getDouble(0));
