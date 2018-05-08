@@ -74,22 +74,17 @@ public class NUTS {
 
             double u = random.nextDouble() * Math.exp(logOfMasterPreviously - 0.5 * dotProduct(momentumForward));
 
-            //tree height
-            int j = 0;
+            int treeHeight = 0;
+            int stopFlag = 1;
+            int acceptedLeapfrogCount = 1;
 
-            //stop flag
-            int s = 1;
-
-            //acceptable leapfrog count
-            int n = 1;
-
-            while (s == 1) {
+            while (stopFlag == 1) {
 
                 //build tree direction -1 = backwards OR 1 = forwards
-                int v = random.nextBoolean() ? 1 : -1;
+                int buildDirection = random.nextBoolean() ? 1 : -1;
 
                 BuiltTree builtTree;
-                if (v == -1) {
+                if (buildDirection == -1) {
                     builtTree = BuildTree(
                             latentVertices,
                             latentSetAndCascadeCache,
@@ -99,8 +94,8 @@ public class NUTS {
                             gradientBackward,
                             momentumBackward,
                             u,
-                            v,
-                            j,
+                            buildDirection,
+                            treeHeight,
                             epsilon,
                             random
                     );
@@ -120,8 +115,8 @@ public class NUTS {
                             gradientForward,
                             momentumForward,
                             u,
-                            v,
-                            j,
+                            buildDirection,
+                            treeHeight,
                             epsilon,
                             random
                     );
@@ -131,26 +126,26 @@ public class NUTS {
                     gradientForward = builtTree.gradientForward;
                 }
 
-                if (builtTree.sPrime == 1) {
-                    final double acceptanceProb = (double) builtTree.nPrime / n;
+                if (builtTree.stopFlag == 1) {
+                    final double acceptanceProb = (double) builtTree.acceptedLeapfrogCount / acceptedLeapfrogCount;
                     if (withProbability(acceptanceProb, random)) {
-                        position = builtTree.thetaPrime;
-                        gradient = builtTree.gradientAtThetaPrime;
-                        logOfMasterPreviously = builtTree.logOfMasterPAtThetaPrime;
-                        sample = builtTree.sampleAtThetaPrime;
+                        position = builtTree.acceptedPosition;
+                        gradient = builtTree.gradientAtAcceptedPosition;
+                        logOfMasterPreviously = builtTree.logOfMasterPAtAcceptedPosition;
+                        sample = builtTree.sampleAtAcceptedPosition;
                     }
                 }
 
-                n = n + builtTree.nPrime;
+                acceptedLeapfrogCount = acceptedLeapfrogCount + builtTree.acceptedLeapfrogCount;
 
-                s = builtTree.sPrime * isNotUTurning(
+                stopFlag = builtTree.stopFlag * isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
                         momentumBackward
                 );
 
-                j++;
+                treeHeight++;
 
             }
 
@@ -168,13 +163,13 @@ public class NUTS {
                                        Map<String, Double> gradient,
                                        Map<String, Double> momentum,
                                        double u,
-                                       int v,
-                                       int j,
+                                       int buildDirection,
+                                       int treeHeight,
                                        double epsilon,
                                        Random random
     ) {
 
-        if (j == 0) {
+        if (treeHeight == 0) {
             //Base case—take one leapfrog step in the direction v
 
             LeapFrogged leapfrog = leapfrog(
@@ -184,16 +179,16 @@ public class NUTS {
                     position,
                     gradient,
                     momentum,
-                    epsilon * v
+                    epsilon * buildDirection
             );
 
             final double logOfMasterPAfterLeapfrog = getLogProb(probabilisticVertices);
 
-            final double logMpMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
-            final int nPrime = u <= Math.exp(logMpMinusMomentum) ? 1 : 0;
-            final int sPrime = u < Math.exp(DELTA_MAX + logMpMinusMomentum) ? 1 : 0;
+            final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
+            final int acceptedLeapfrogCount = u <= Math.exp(logOfMasterPMinusMomentum) ? 1 : 0;
+            final int stopFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum) ? 1 : 0;
 
-            final Map<String, ?> sampleAtThetaPrime = takeSample(sampleFromVertices);
+            final Map<String, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 
             return new BuiltTree(
                     leapfrog.position,
@@ -207,9 +202,9 @@ public class NUTS {
                     leapfrog.position,
                     leapfrog.gradient,
                     logOfMasterPAfterLeapfrog,
-                    sampleAtThetaPrime,
-                    nPrime,
-                    sPrime
+                    sampleAtAcceptedPosition,
+                    acceptedLeapfrogCount,
+                    stopFlag
             );
 
         } else {
@@ -224,8 +219,8 @@ public class NUTS {
                     gradient,
                     momentum,
                     u,
-                    v,
-                    j - 1,
+                    buildDirection,
+                    treeHeight - 1,
                     epsilon,
                     random
             );
@@ -240,19 +235,19 @@ public class NUTS {
             Map<String, Double> momentumForward = leftTree.momentumForward;
             double logOfMasterPAtPositionForward = leftTree.logOfMasterPAtPositionForward;
 
-            Map<String, Double> thetaPrime = leftTree.thetaPrime;
-            Map<String, Double> gradientAtThetaPrime = leftTree.gradientAtThetaPrime;
-            double logOfMasterPAtThetaPrime = leftTree.logOfMasterPAtThetaPrime;
-            Map<String, ?> sampleAtThetaPrime = leftTree.sampleAtThetaPrime;
+            Map<String, Double> acceptedPosition = leftTree.acceptedPosition;
+            Map<String, Double> gradientAtAcceptedPosition = leftTree.gradientAtAcceptedPosition;
+            double logOfMasterPAtAcceptedPosition = leftTree.logOfMasterPAtAcceptedPosition;
+            Map<String, ?> sampleAtAcceptedPosition = leftTree.sampleAtAcceptedPosition;
 
-            int sPrime = leftTree.sPrime;
-            int nPrime = leftTree.nPrime;
+            int nextStopFlag = leftTree.stopFlag;
+            int nextAcceptedLeapfrogCount = leftTree.acceptedLeapfrogCount;
 
             //Should continue building right tree if left tree stop flag is 1
-            if (sPrime == 1) {
+            if (leftTree.stopFlag == 1) {
 
                 BuiltTree rightTree;
-                if (v == -1) {
+                if (buildDirection == -1) {
                     rightTree = BuildTree(
                             latentVertices,
                             latentSetAndCascadeCache,
@@ -262,8 +257,8 @@ public class NUTS {
                             leftTree.gradientBackward,
                             momentumBackward,
                             u,
-                            v,
-                            j - 1,
+                            buildDirection,
+                            treeHeight - 1,
                             epsilon,
                             random
                     );
@@ -283,8 +278,8 @@ public class NUTS {
                             leftTree.gradientForward,
                             momentumForward,
                             u,
-                            v,
-                            j - 1,
+                            buildDirection,
+                            treeHeight - 1,
                             epsilon,
                             random
                     );
@@ -295,23 +290,23 @@ public class NUTS {
                     logOfMasterPAtPositionForward = rightTree.logOfMasterPAtPositionForward;
                 }
 
-                double acceptThetaPrimeProbability = (double) rightTree.nPrime / (leftTree.nPrime + rightTree.nPrime);
+                double acceptRightTreeNextPositionProbability = (double) rightTree.acceptedLeapfrogCount / (leftTree.acceptedLeapfrogCount + rightTree.acceptedLeapfrogCount);
 
-                if (withProbability(acceptThetaPrimeProbability, random)) {
-                    thetaPrime = rightTree.thetaPrime;
-                    gradientAtThetaPrime = rightTree.gradientAtThetaPrime;
-                    logOfMasterPAtThetaPrime = rightTree.logOfMasterPAtThetaPrime;
-                    sampleAtThetaPrime = rightTree.sampleAtThetaPrime;
+                if (withProbability(acceptRightTreeNextPositionProbability, random)) {
+                    acceptedPosition = rightTree.acceptedPosition;
+                    gradientAtAcceptedPosition = rightTree.gradientAtAcceptedPosition;
+                    logOfMasterPAtAcceptedPosition = rightTree.logOfMasterPAtAcceptedPosition;
+                    sampleAtAcceptedPosition = rightTree.sampleAtAcceptedPosition;
                 }
 
-                sPrime = rightTree.sPrime * isNotUTurning(
+                nextStopFlag = rightTree.stopFlag * isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
                         momentumBackward
                 );
 
-                nPrime = nPrime + rightTree.nPrime;
+                nextAcceptedLeapfrogCount = nextAcceptedLeapfrogCount + rightTree.acceptedLeapfrogCount;
             }
 
             return new BuiltTree(
@@ -323,12 +318,12 @@ public class NUTS {
                     gradientForward,
                     momentumForward,
                     logOfMasterPAtPositionForward,
-                    thetaPrime,
-                    gradientAtThetaPrime,
-                    logOfMasterPAtThetaPrime,
-                    sampleAtThetaPrime,
-                    nPrime,
-                    sPrime
+                    acceptedPosition,
+                    gradientAtAcceptedPosition,
+                    logOfMasterPAtAcceptedPosition,
+                    sampleAtAcceptedPosition,
+                    nextAcceptedLeapfrogCount,
+                    nextStopFlag
             );
         }
 
@@ -373,14 +368,12 @@ public class NUTS {
         }
     }
 
-    private static Map<String, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
-                                                                       Map<String, Double> momentums,
-                                                                       Random random) {
-        for (int i = 0; i < vertexes.size(); i++) {
-            Vertex currentVertex = vertexes.get(i);
-            momentums.put(currentVertex.getId(), random.nextGaussian());
+    private static void initializeMomentumForEachVertex(List<Vertex<Double>> vertices,
+                                                        Map<String, Double> momentums,
+                                                        Random random) {
+        for (Vertex<Double> vertex : vertices) {
+            momentums.put(vertex.getId(), random.nextGaussian());
         }
-        return momentums;
     }
 
     private static void cache(Map<String, Double> from, Map<String, Double> to) {
@@ -389,52 +382,42 @@ public class NUTS {
         }
     }
 
-    /**
-     * function Leapfrog(θ, r, eps)
-     * Set ˜r ← r + (eps/2)∇θL(θ)
-     * Set ˜θ ← θ + r˜
-     * Set ˜r ← r˜ + (eps/2)∇θL(˜θ)
-     * return ˜θ, r˜
-     */
     private static LeapFrogged leapfrog(final List<Vertex<Double>> latentVertices,
                                         final Map<String, Long> latentSetAndCascadeCache,
                                         final List<Vertex> probabilisticVertices,
-                                        final Map<String, Double> theta,
+                                        final Map<String, Double> position,
                                         final Map<String, Double> gradient,
-                                        final Map<String, Double> r,
+                                        final Map<String, Double> momentum,
                                         final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<String, Double> rPrime = new HashMap<>();
-        Map<String, Double> thetaPrime = new HashMap<>();
+        Map<String, Double> nextMomentum = new HashMap<>();
+        Map<String, Double> nextPosition = new HashMap<>();
 
-        //Set r' ← r + (eps/2) * ∇θL(θ)
-        for (Map.Entry<String, Double> rEntry : r.entrySet()) {
+        for (Map.Entry<String, Double> rEntry : momentum.entrySet()) {
             final double updatedMomentum = rEntry.getValue() + halfTimeStep * gradient.get(rEntry.getKey());
-            rPrime.put(rEntry.getKey(), updatedMomentum);
+            nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
 
-        //Set θ' ← θ +eps * r'.
         for (Vertex<Double> latent : latentVertices) {
-            final double nextPosition = theta.get(latent.getId()) + halfTimeStep * rPrime.get(latent.getId());
-            thetaPrime.put(latent.getId(), nextPosition);
-            latent.setValue(nextPosition);
+            final double nextPositionForLatent = position.get(latent.getId()) + halfTimeStep * nextMomentum.get(latent.getId());
+            nextPosition.put(latent.getId(), nextPositionForLatent);
+            latent.setValue(nextPositionForLatent);
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
-        //Set r'' ← r' + (eps/2) * ∇θL(θ')
-        Map<String, Double> thetaPrimeGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
+        Map<String, Double> nextPositionGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
                 probabilisticVertices
         );
 
-        for (Map.Entry<String, Double> rPrimeEntry : rPrime.entrySet()) {
-            final double rDoublePrime = rPrimeEntry.getValue() + halfTimeStep * thetaPrimeGradient.get(rPrimeEntry.getKey());
-            rPrime.put(rPrimeEntry.getKey(), rDoublePrime);
+        for (Map.Entry<String, Double> nextMomentumForLatent : nextMomentum.entrySet()) {
+            final double nextNextMomentumForLatent = nextMomentumForLatent.getValue() + halfTimeStep * nextPositionGradient.get(nextMomentumForLatent.getKey());
+            nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
 
-        return new LeapFrogged(thetaPrime, rPrime, thetaPrimeGradient);
+        return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
     }
 
     private static double dotProduct(Map<String, Double> momentums) {
@@ -448,7 +431,7 @@ public class NUTS {
     /**
      * This is meant to be used for tracking a sample while building tree.
      *
-     * @param sampleFromVertices
+     * @param sampleFromVertices take samples from these vertices
      */
     private static Map<String, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
         Map<String, ?> sample = new HashMap<>();
@@ -463,9 +446,9 @@ public class NUTS {
     }
 
     /**
-     * This is used to save of the sample from the uniformly chosen thetaPrime position
+     * This is used to save of the sample from the uniformly chosen acceptedPosition position
      *
-     * @param samples
+     * @param samples      samples taken already
      * @param cachedSample a cached sample from before leapfrog
      */
     private static void addSampleFromCache(Map<String, List<?>> samples, Map<String, ?> cachedSample) {
@@ -480,13 +463,13 @@ public class NUTS {
     }
 
     private static class LeapFrogged {
-        public final Map<String, Double> position;
-        public final Map<String, Double> momentum;
-        public final Map<String, Double> gradient;
+        final Map<String, Double> position;
+        final Map<String, Double> momentum;
+        final Map<String, Double> gradient;
 
-        public LeapFrogged(Map<String, Double> position,
-                           Map<String, Double> momentum,
-                           Map<String, Double> gradient) {
+        LeapFrogged(Map<String, Double> position,
+                    Map<String, Double> momentum,
+                    Map<String, Double> gradient) {
             this.position = position;
             this.momentum = momentum;
             this.gradient = gradient;
@@ -495,35 +478,35 @@ public class NUTS {
 
     private static class BuiltTree {
 
-        public final Map<String, Double> positionBackward;
-        public final Map<String, Double> gradientBackward;
-        public final Map<String, Double> momentumBackward;
-        public final double logOfMasterPAtPositionBackward;
-        public final Map<String, Double> positionForward;
-        public final Map<String, Double> gradientForward;
-        public final Map<String, Double> momentumForward;
-        public final double logOfMasterPAtPositionForward;
-        public final Map<String, Double> thetaPrime;
-        public final Map<String, Double> gradientAtThetaPrime;
-        public final double logOfMasterPAtThetaPrime;
-        public final Map<String, ?> sampleAtThetaPrime;
-        public final int nPrime;
-        public final int sPrime;
+        final Map<String, Double> positionBackward;
+        final Map<String, Double> gradientBackward;
+        final Map<String, Double> momentumBackward;
+        final double logOfMasterPAtPositionBackward;
+        final Map<String, Double> positionForward;
+        final Map<String, Double> gradientForward;
+        final Map<String, Double> momentumForward;
+        final double logOfMasterPAtPositionForward;
+        final Map<String, Double> acceptedPosition;
+        final Map<String, Double> gradientAtAcceptedPosition;
+        final double logOfMasterPAtAcceptedPosition;
+        final Map<String, ?> sampleAtAcceptedPosition;
+        final int acceptedLeapfrogCount;
+        final int stopFlag;
 
-        public BuiltTree(Map<String, Double> positionBackward,
-                         Map<String, Double> gradientBackward,
-                         Map<String, Double> momentumBackward,
-                         double logOfMasterPAtPositionBackward,
-                         Map<String, Double> positionForward,
-                         Map<String, Double> gradientForward,
-                         Map<String, Double> momentumForward,
-                         double logOfMasterPAtPositionForward,
-                         Map<String, Double> thetaPrime,
-                         Map<String, Double> gradientAtThetaPrime,
-                         double logOfMasterPAtThetaPrime,
-                         Map<String, ?> sampleAtThetaPrime,
-                         int nPrime,
-                         int sPrime) {
+        BuiltTree(Map<String, Double> positionBackward,
+                  Map<String, Double> gradientBackward,
+                  Map<String, Double> momentumBackward,
+                  double logOfMasterPAtPositionBackward,
+                  Map<String, Double> positionForward,
+                  Map<String, Double> gradientForward,
+                  Map<String, Double> momentumForward,
+                  double logOfMasterPAtPositionForward,
+                  Map<String, Double> acceptedPosition,
+                  Map<String, Double> gradientAtAcceptedPosition,
+                  double logOfMasterPAtAcceptedPosition,
+                  Map<String, ?> sampleAtAcceptedPosition,
+                  int acceptedLeapfrogCount,
+                  int stopFlag) {
 
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
@@ -533,12 +516,12 @@ public class NUTS {
             this.gradientForward = gradientForward;
             this.momentumForward = momentumForward;
             this.logOfMasterPAtPositionForward = logOfMasterPAtPositionForward;
-            this.thetaPrime = thetaPrime;
-            this.gradientAtThetaPrime = gradientAtThetaPrime;
-            this.logOfMasterPAtThetaPrime = logOfMasterPAtThetaPrime;
-            this.sampleAtThetaPrime = sampleAtThetaPrime;
-            this.nPrime = nPrime;
-            this.sPrime = sPrime;
+            this.acceptedPosition = acceptedPosition;
+            this.gradientAtAcceptedPosition = gradientAtAcceptedPosition;
+            this.logOfMasterPAtAcceptedPosition = logOfMasterPAtAcceptedPosition;
+            this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
+            this.acceptedLeapfrogCount = acceptedLeapfrogCount;
+            this.stopFlag = stopFlag;
         }
     }
 
