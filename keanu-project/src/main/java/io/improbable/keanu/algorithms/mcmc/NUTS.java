@@ -75,10 +75,10 @@ public class NUTS {
             double u = random.nextDouble() * Math.exp(logOfMasterPreviously - 0.5 * dotProduct(momentumForward));
 
             int treeHeight = 0;
-            int stopFlag = 1;
+            boolean shouldContinueFlag = true;
             int acceptedLeapfrogCount = 1;
 
-            while (stopFlag == 1) {
+            while (shouldContinueFlag) {
 
                 //build tree direction -1 = backwards OR 1 = forwards
                 int buildDirection = random.nextBoolean() ? 1 : -1;
@@ -126,7 +126,7 @@ public class NUTS {
                     gradientForward = builtTree.gradientForward;
                 }
 
-                if (builtTree.stopFlag == 1) {
+                if (builtTree.shouldContinueFlag) {
                     final double acceptanceProb = (double) builtTree.acceptedLeapfrogCount / acceptedLeapfrogCount;
                     if (withProbability(acceptanceProb, random)) {
                         position = builtTree.acceptedPosition;
@@ -138,7 +138,7 @@ public class NUTS {
 
                 acceptedLeapfrogCount = acceptedLeapfrogCount + builtTree.acceptedLeapfrogCount;
 
-                stopFlag = builtTree.stopFlag * isNotUTurning(
+                shouldContinueFlag = builtTree.shouldContinueFlag && isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
@@ -146,7 +146,6 @@ public class NUTS {
                 );
 
                 treeHeight++;
-
             }
 
             addSampleFromCache(samples, sample);
@@ -170,7 +169,7 @@ public class NUTS {
     ) {
 
         if (treeHeight == 0) {
-            //Base case—take one leapfrog step in the direction v
+            //Base case—take one leapfrog step in the build direction
 
             LeapFrogged leapfrog = leapfrog(
                     latentVertices,
@@ -186,7 +185,7 @@ public class NUTS {
 
             final double logOfMasterPMinusMomentum = logOfMasterPAfterLeapfrog - 0.5 * dotProduct(leapfrog.momentum);
             final int acceptedLeapfrogCount = u <= Math.exp(logOfMasterPMinusMomentum) ? 1 : 0;
-            final int stopFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum) ? 1 : 0;
+            final boolean shouldContinueFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum);
 
             final Map<String, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 
@@ -204,7 +203,7 @@ public class NUTS {
                     logOfMasterPAfterLeapfrog,
                     sampleAtAcceptedPosition,
                     acceptedLeapfrogCount,
-                    stopFlag
+                    shouldContinueFlag
             );
 
         } else {
@@ -240,11 +239,11 @@ public class NUTS {
             double logOfMasterPAtAcceptedPosition = leftTree.logOfMasterPAtAcceptedPosition;
             Map<String, ?> sampleAtAcceptedPosition = leftTree.sampleAtAcceptedPosition;
 
-            int nextStopFlag = leftTree.stopFlag;
+            boolean nextShouldContinueFlag = leftTree.shouldContinueFlag;
             int nextAcceptedLeapfrogCount = leftTree.acceptedLeapfrogCount;
 
-            //Should continue building right tree if left tree stop flag is 1
-            if (leftTree.stopFlag == 1) {
+            //Should continue building right tree if left tree's shouldContinueFlag is true
+            if (leftTree.shouldContinueFlag) {
 
                 BuiltTree rightTree;
                 if (buildDirection == -1) {
@@ -299,7 +298,7 @@ public class NUTS {
                     sampleAtAcceptedPosition = rightTree.sampleAtAcceptedPosition;
                 }
 
-                nextStopFlag = rightTree.stopFlag * isNotUTurning(
+                nextShouldContinueFlag = rightTree.shouldContinueFlag && isNotUTurning(
                         positionForward,
                         positionBackward,
                         momentumForward,
@@ -323,7 +322,7 @@ public class NUTS {
                     logOfMasterPAtAcceptedPosition,
                     sampleAtAcceptedPosition,
                     nextAcceptedLeapfrogCount,
-                    nextStopFlag
+                    nextShouldContinueFlag
             );
         }
 
@@ -341,10 +340,10 @@ public class NUTS {
         return random.nextDouble() < probability;
     }
 
-    private static int isNotUTurning(Map<String, Double> positionForward,
-                                     Map<String, Double> positionBack,
-                                     Map<String, Double> momentumForward,
-                                     Map<String, Double> momentumBack) {
+    private static boolean isNotUTurning(Map<String, Double> positionForward,
+                                         Map<String, Double> positionBack,
+                                         Map<String, Double> momentumForward,
+                                         Map<String, Double> momentumBack) {
         double forward = 0.0;
         double backward = 0.0;
 
@@ -359,7 +358,7 @@ public class NUTS {
 
         boolean notTurning = forward >= 0.0 && backward >= 0.0;
 
-        return notTurning ? 1 : 0;
+        return notTurning;
     }
 
     private static void cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
@@ -491,7 +490,7 @@ public class NUTS {
         final double logOfMasterPAtAcceptedPosition;
         final Map<String, ?> sampleAtAcceptedPosition;
         final int acceptedLeapfrogCount;
-        final int stopFlag;
+        final boolean shouldContinueFlag;
 
         BuiltTree(Map<String, Double> positionBackward,
                   Map<String, Double> gradientBackward,
@@ -506,7 +505,7 @@ public class NUTS {
                   double logOfMasterPAtAcceptedPosition,
                   Map<String, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
-                  int stopFlag) {
+                  boolean shouldContinueFlag) {
 
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
@@ -521,7 +520,7 @@ public class NUTS {
             this.logOfMasterPAtAcceptedPosition = logOfMasterPAtAcceptedPosition;
             this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
             this.acceptedLeapfrogCount = acceptedLeapfrogCount;
-            this.stopFlag = stopFlag;
+            this.shouldContinueFlag = shouldContinueFlag;
         }
     }
 
