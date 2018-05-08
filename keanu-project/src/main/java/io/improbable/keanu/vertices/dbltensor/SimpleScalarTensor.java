@@ -14,16 +14,6 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
-    public int getRank() {
-        return 2;
-    }
-
-    @Override
-    public int[] getShape() {
-        return new int[]{1, 1};
-    }
-
-    @Override
     public int getLength() {
         return 1;
     }

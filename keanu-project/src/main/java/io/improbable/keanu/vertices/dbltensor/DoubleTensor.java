@@ -19,16 +19,6 @@ public interface DoubleTensor extends Tensor {
         return asTensors;
     }
 
-    static Map<String, Double> toScalars(Map<String, DoubleTensor> tensors) {
-        Map<String, Double> asTensors = new HashMap<>();
-
-        for (Map.Entry<String, DoubleTensor> entry : tensors.entrySet()) {
-            asTensors.put(entry.getKey(), entry.getValue().scalar());
-        }
-
-        return asTensors;
-    }
-
     double scalar();
 
 }
