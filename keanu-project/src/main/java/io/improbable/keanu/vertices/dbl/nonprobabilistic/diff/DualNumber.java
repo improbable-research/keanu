@@ -29,6 +29,10 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return partialDerivatives;
     }
 
+    public boolean isOfConstant(){
+        return partialDerivatives.isEmpty();
+    }
+
     public DualNumber add(DualNumber that) {
         // dc = da + db;
         double newValue = this.value + that.value;

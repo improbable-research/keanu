@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
@@ -65,6 +66,11 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public Map<String, Double> dLogPdf(Double value) {
+
+        if (isObserved()) {
+            return Collections.emptyMap();
+        }
+
         double min = this.xMin.getValue();
         double max = this.xMax.getValue();
 

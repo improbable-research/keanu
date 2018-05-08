@@ -70,7 +70,9 @@ public class InverseGammaVertex extends ProbabilisticDouble {
         PartialDerivatives dPdInputsFromB = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
 
-        dPdInputs.putWithRespectTo(getId(), dPdx);
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
         return dPdInputs.asMap();
     }

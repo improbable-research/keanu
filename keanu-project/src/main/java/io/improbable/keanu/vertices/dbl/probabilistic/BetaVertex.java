@@ -72,7 +72,10 @@ public class BetaVertex extends ProbabilisticDouble {
         PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdAlpha);
         PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdBeta);
         PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
-        dPdInputs.putWithRespectTo(getId(), dPdx);
+
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
         return dPdInputs.asMap();
     }
