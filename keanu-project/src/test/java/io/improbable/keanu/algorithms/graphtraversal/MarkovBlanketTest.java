@@ -19,7 +19,7 @@ public class MarkovBlanketTest {
         DoubleVertex B = new GaussianVertex(5.0, 1.0);
         DoubleVertex C = new GaussianVertex(A, B);
 
-        Set<Vertex<?>> blanket = MarkovBlanket.get(C);
+        Set<Vertex> blanket = MarkovBlanket.get(C);
 
         assertTrue(blanket.size() == 2);
         assertTrue(blanket.containsAll(Arrays.asList(A, B)));
@@ -36,7 +36,7 @@ public class MarkovBlanketTest {
         DoubleVertex F = new GaussianVertex(D, 1.0);
         DoubleVertex G = new GaussianVertex(E, F);
 
-        Set<Vertex<?>> blanket = MarkovBlanket.get(D);
+        Set<Vertex> blanket = MarkovBlanket.get(D);
 
         assertTrue(blanket.size() == 4);
         assertTrue(blanket.containsAll(Arrays.asList(B, C, F, G)));
@@ -53,7 +53,7 @@ public class MarkovBlanketTest {
         DoubleVertex F = new GaussianVertex(D, 1.0);
         DoubleVertex G = new GaussianVertex(E, F);
 
-        Set<Vertex<?>> blanket = MarkovBlanket.get(D);
+        Set<Vertex> blanket = MarkovBlanket.get(D);
 
         assertTrue(blanket.size() == 4);
         assertTrue(blanket.containsAll(Arrays.asList(B, C, F, E)));

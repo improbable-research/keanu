@@ -13,8 +13,11 @@ import java.util.stream.Collectors;
  */
 public class MetropolisHastings {
 
+    private MetropolisHastings() {
+    }
+
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
-                                                     List<? extends Vertex<?>> fromVertices,
+                                                     List<Vertex> fromVertices,
                                                      int sampleCount) {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, new Random());
     }
@@ -27,14 +30,14 @@ public class MetropolisHastings {
      * @return Samples for each vertex ordered by MCMC iteration
      */
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
-                                                     final List<? extends Vertex<?>> fromVertices,
+                                                     final List<Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final Random random) {
         checkBayesNetInHealthyState(bayesNet);
 
         Map<String, List<?>> samplesByVertex = new HashMap<>();
-        List<? extends Vertex<?>> latentVertices = bayesNet.getLatentVertices();
-        Map<Vertex<?>, Set<Vertex<?>>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
+        List<Vertex> latentVertices = bayesNet.getLatentVertices();
+        Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
         Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
 
@@ -42,7 +45,7 @@ public class MetropolisHastings {
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
-            Set<Vertex<?>> affectedVertices = affectedVerticesCache.get(chosenVertex);
+            Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
             logP = nextSample(chosenVertex, logP, affectedVertices, 1.0, setAndCascadeCache, random);
 
             takeSamples(samplesByVertex, fromVertices);
@@ -53,7 +56,7 @@ public class MetropolisHastings {
 
     static <T> double nextSample(final Vertex<T> chosenVertex,
                                  final double logPOld,
-                                 final Set<Vertex<?>> affectedVertices,
+                                 final Set<Vertex> affectedVertices,
                                  final double T,
                                  final Map<String, Map<String, Long>> setAndCascadeCache,
                                  final Random random) {
@@ -63,7 +66,7 @@ public class MetropolisHastings {
         final T oldValue = chosenVertex.getValue();
         final T proposedValue = chosenVertex.sample();
 
-        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), (id) -> chosenVertex.exploreSetting());
+        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);
@@ -86,25 +89,25 @@ public class MetropolisHastings {
         return logPNew;
     }
 
-    static Map<Vertex<?>, Set<Vertex<?>>> getVerticesAffectedByLatents(List<? extends Vertex<?>> latentVertices) {
+    static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<Vertex> latentVertices) {
         return latentVertices.stream()
                 .collect(Collectors.toMap(
                         v -> v,
                         v -> {
-                            Set<Vertex<?>> affectedVertices = new HashSet<>();
+                            Set<Vertex> affectedVertices = new HashSet<>();
                             affectedVertices.add(v);
                             affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
                             return affectedVertices;
                         }));
     }
 
-    static double sumLogP(Set<Vertex<?>> vertices) {
+    private static double sumLogP(Set<Vertex> vertices) {
         return vertices.stream()
                 .mapToDouble(Vertex::logProbAtValue)
                 .sum();
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void takeSamples(Map<String, List<?>> samples, List<Vertex> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
@@ -114,10 +117,10 @@ public class MetropolisHastings {
     }
 
     private static void checkBayesNetInHealthyState(BayesNet bayesNet) {
-        if (bayesNet.getVerticesThatContributeToMasterP().size() == 0) {
+        if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {
-            throw new RuntimeException("Cannot start optimizer on zero probability network");
+            throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
     }
 

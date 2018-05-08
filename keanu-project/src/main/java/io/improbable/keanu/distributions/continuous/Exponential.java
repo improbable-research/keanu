@@ -8,10 +8,22 @@ import java.util.Random;
  * ARL-TR-2168 March 2000
  * 5.1.8 page 20
  */
+
 public class Exponential {
 
+    private Exponential() {
+    }
+
+    /**
+     * @param a      location
+     * @param b      shape
+     * @param random source of randomness
+     * @return a random number from the Exponential distribution
+     */
     public static double sample(double a, double b, Random random) {
-        assert (b > 0.0);
+        if (b <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for b");
+        }
         return a - b * Math.log(random.nextDouble());
     }
 

@@ -1,7 +1,7 @@
 package io.improbable.keanu.network;
 
 import io.improbable.keanu.network.grouping.NetworkStateGrouper;
-import io.improbable.keanu.network.grouping.continuousPointGroupers.DBSCANContinuousPointGrouper;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
 import org.junit.Test;
 
 import java.util.*;

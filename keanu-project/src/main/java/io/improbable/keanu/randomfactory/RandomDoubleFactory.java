@@ -1,4 +1,4 @@
-package io.improbable.keanu.randomFactory;
+package io.improbable.keanu.randomfactory;
 
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.continuous.Uniform;

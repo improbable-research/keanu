@@ -10,6 +10,16 @@ import java.util.Random;
  */
 public class Uniform {
 
+    private Uniform() {
+    }
+
+
+    /**
+     * @param xMin      minimum x value
+     * @param xMax      maximum x value
+     * @param random source of randomness
+     * @return a random number from the Uniform distribution
+     */
     public static double sample(double xMin, double xMax, Random random) {
         return random.nextDouble() * (xMax - xMin) + xMin;
     }

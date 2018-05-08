@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class LaplaceVertexTest {
 
@@ -97,6 +96,17 @@ public class LaplaceVertexTest {
     }
 
     @Test
+    public void isTreatedAsConstantWhenObserved() {
+        LaplaceVertex vertexUnderTest = new LaplaceVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
+    @Test
     public void inferHyperParamsFromSamples() {
 
         double trueMu = 0.0;
@@ -110,7 +120,7 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muBeta,
                 latentMuBeta,

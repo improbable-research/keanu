@@ -1,4 +1,4 @@
-package io.improbable.keanu.randomFactory;
+package io.improbable.keanu.randomfactory;
 
 import java.util.Random;
 

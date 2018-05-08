@@ -171,6 +171,19 @@ public class GammaVertexTest {
     }
 
     @Test
+    public void isTreatedAsConstantWhenObserved() {
+        GammaVertex vertexUnderTest = new GammaVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                new ConstantDoubleVertex(1.0),
+                random
+        );
+
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
+    @Test
     public void samplingMatchesLogProb() {
         GammaVertex gamma = new GammaVertex(
                 new ConstantDoubleVertex(0.0),
@@ -207,7 +220,7 @@ public class GammaVertexTest {
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),
                 aThetaK,
                 latentAThetaK,

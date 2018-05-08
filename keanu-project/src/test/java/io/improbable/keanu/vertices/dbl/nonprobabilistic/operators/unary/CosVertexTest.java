@@ -33,7 +33,7 @@ public class CosVertexTest {
         DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
         CosVertex cos = new CosVertex(pow);
 
-        double dCos = cos.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniform.getId());
+        double dCos = cos.getDualNumber().getPartialDerivatives().withRespectTo(uniform);
         //dCos = -sin(5^3) * 3 * 5^2
         double expected = -Math.sin(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
 

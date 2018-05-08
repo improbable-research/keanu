@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.particleFiltering;
+package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.vertices.Vertex;
 
@@ -7,6 +7,9 @@ import java.util.*;
 import static java.lang.Math.exp;
 
 public class ParticleFilter {
+
+    private ParticleFilter() {
+    }
 
     /***
      * A particle filtering approach is used to find probable values for the latent vertices of a Bayesian network,
@@ -32,16 +35,16 @@ public class ParticleFilter {
      * @return a list of particles representing the most probable found values of latent variables
      */
 
-    public static List<Particle> getProbableValues(Collection<? extends Vertex<?>> vertices, int numParticles,
+    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices, int numParticles,
                                                    int resamplingCycles, double resamplingProportion, Random random) {
 
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
-        List<Vertex<?>> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
+        Map<Vertex, Set<Vertex>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
+        List<Vertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
         List<Particle> particles = createEmptyParticles(numParticles);
 
         for (int i = 0; i < observedVertexOrder.size(); i++) {
             Vertex<?> nextObsVertex = observedVertexOrder.get(i);
-            Set<Vertex<?>> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
+            Set<Vertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
             particles = updateParticles(nextObsVertex, vertexDeps, particles, numParticles, resamplingCycles,
                     resamplingProportion, random);
         }
@@ -49,7 +52,7 @@ public class ParticleFilter {
         return particles;
     }
 
-    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex, Set<Vertex<?>> vertexDeps,
+    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex, Set<Vertex> vertexDeps,
                                                   List<Particle> particles,
                                                   int numParticles, int resamplingCycles,
                                                   double resamplingProportion, Random random) {
@@ -80,7 +83,7 @@ public class ParticleFilter {
     }
 
     private static void addObservedVertexToParticles(List<Particle> particles, Vertex<?> observedVertex,
-                                                     Set<Vertex<?>> vertexDependencies) {
+                                                     Set<Vertex> vertexDependencies) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);
@@ -133,11 +136,11 @@ public class ParticleFilter {
 
     public static class Particle {
 
-        private Map<Vertex<?>, Object> latentVertices = new HashMap<>();
-        private List<Vertex<?>> observedVertices = new ArrayList<>();
+        private Map<Vertex, Object> latentVertices = new HashMap<>();
+        private List<Vertex> observedVertices = new ArrayList<>();
         private double sumLogPOfSubgraph = 1.0;
 
-        public Map<Vertex<?>, Object> getLatentVertices() {
+        public Map<Vertex, Object> getLatentVertices() {
             return latentVertices;
         }
 
@@ -183,7 +186,7 @@ public class ParticleFilter {
             }
         }
 
-        private double sumLogP(Collection<Vertex<?>> vertices) {
+        private double sumLogP(Collection<Vertex> vertices) {
             return vertices.stream().mapToDouble(Vertex::logProbAtValue).sum();
         }
     }

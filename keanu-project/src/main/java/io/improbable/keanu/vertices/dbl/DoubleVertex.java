@@ -21,17 +21,17 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
      * @param dualNumbers A Map that is guaranteed to contain the Dual Numbers of the parent of the vertex.
      * @return The Dual Number of the vertex.
      */
-    public abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
-    public DualNumber getDualNumber() {
-        Map<Vertex, DualNumber> dualNumbers = new HashMap();
+    public final DualNumber getDualNumber() {
+        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();
         stack.push(this);
 
         while (!stack.isEmpty()) {
 
             DoubleVertex head = stack.peek();
-            Set<Vertex<?>> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
 
@@ -41,18 +41,29 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatDualNumberIsNotCalculated) {
+                for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
                     if (vertex instanceof DoubleVertex) {
                         stack.push((DoubleVertex) vertex);
                     } else {
-                        throw new RuntimeException("Can only calculate Dual Numbers on a graph made of Doubles");
+                        throw new IllegalArgumentException("Can only calculate Dual Numbers on a graph made of Doubles");
                     }
                 }
 
             }
 
         }
+
         return dualNumbers.get(this);
+    }
+
+    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
+        Set<Vertex> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!dualNumbers.containsKey(next)){
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
     }
 
     public DoubleVertex minus(DoubleVertex that) {
@@ -164,16 +175,6 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
 
     public DoubleVertex acos() {
         return new ArcCosVertex(this);
-    }
-
-    private Set<Vertex<?>> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex<?>> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)){
-                notCalculatedParents.add(next);
-            }
-        }
-        return notCalculatedParents;
     }
 
 }

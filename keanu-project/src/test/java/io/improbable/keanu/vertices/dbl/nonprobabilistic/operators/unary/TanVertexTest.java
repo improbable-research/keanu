@@ -100,7 +100,7 @@ public class TanVertexTest {
 
         TanVertex tan = new TanVertex(uniformVertex);
 
-        double dTan = tan.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniformVertex.getId());
+        double dTan = tan.getDualNumber().getPartialDerivatives().withRespectTo(uniformVertex);
         //dTan = 1 / sec^2(x)
         double expected = 1 / (Math.pow(Math.cos(5.0), 2));
 

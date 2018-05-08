@@ -30,14 +30,14 @@ public class NUTS {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
-                                                     final List<? extends Vertex<?>> sampleFromVertices,
+                                                     final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,
                                                      final Random random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
-        final List<Vertex<?>> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
+        final List<Vertex> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
 
         final Map<String, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));
@@ -162,8 +162,8 @@ public class NUTS {
 
     private static BuiltTree BuildTree(List<Vertex<Double>> latentVertices,
                                        final Map<String, Long> latentSetAndCascadeCache,
-                                       List<Vertex<?>> probabilisticVertices,
-                                       final List<? extends Vertex<?>> sampleFromVertices,
+                                       List<Vertex> probabilisticVertices,
+                                       final List<? extends Vertex> sampleFromVertices,
                                        Map<String, Double> position,
                                        Map<String, Double> gradient,
                                        Map<String, Double> momentum,
@@ -334,7 +334,7 @@ public class NUTS {
 
     }
 
-    private static double getLogProb(List<Vertex<?>> probabilisticVertices) {
+    private static double getLogProb(List<Vertex> probabilisticVertices) {
         double sum = 0.0;
         for (Vertex<?> vertex : probabilisticVertices) {
             sum += vertex.logProbAtValue();
@@ -398,7 +398,7 @@ public class NUTS {
      */
     private static LeapFrogged leapfrog(final List<Vertex<Double>> latentVertices,
                                         final Map<String, Long> latentSetAndCascadeCache,
-                                        final List<Vertex<?>> probabilisticVertices,
+                                        final List<Vertex> probabilisticVertices,
                                         final Map<String, Double> theta,
                                         final Map<String, Double> gradient,
                                         final Map<String, Double> r,
@@ -450,9 +450,9 @@ public class NUTS {
      *
      * @param sampleFromVertices
      */
-    private static Map<String, ?> takeSample(List<? extends Vertex<?>> sampleFromVertices) {
+    private static Map<String, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
         Map<String, ?> sample = new HashMap<>();
-        for (Vertex<?> vertex : sampleFromVertices) {
+        for (Vertex vertex : sampleFromVertices) {
             putValue(vertex, sample);
         }
         return sample;

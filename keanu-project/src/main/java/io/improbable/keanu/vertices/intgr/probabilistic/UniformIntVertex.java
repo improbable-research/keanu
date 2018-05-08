@@ -24,14 +24,6 @@ public class UniformIntVertex extends ProbabilisticInteger {
         setParents(min, max);
     }
 
-    public UniformIntVertex(Vertex<Integer> min, int max, Random random) {
-        this(min, new ConstantIntegerVertex(max), new Random());
-    }
-
-    public UniformIntVertex(int min, Vertex<Integer> max, Random random) {
-        this(new ConstantIntegerVertex(min), max, new Random());
-    }
-
     public UniformIntVertex(int min, int max, Random random) {
         this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max), random);
     }

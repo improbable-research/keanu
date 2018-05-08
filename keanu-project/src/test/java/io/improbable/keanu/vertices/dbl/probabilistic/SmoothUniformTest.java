@@ -82,4 +82,16 @@ public class SmoothUniformTest {
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(uniform, N, from, to, delta, 1e-2);
     }
 
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        SmoothUniformVertex vertexUnderTest = new SmoothUniformVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                0.01,
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
 }

@@ -8,11 +8,14 @@ import java.util.Map;
 
 public class LogProbGradient {
 
+    private LogProbGradient() {
+    }
+
     /**
      * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex<?>> probabilisticVertices) {
+    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
         final Map<String, Double> diffOfLogWrt = new HashMap<>();
 
         for (final Vertex<?> probabilisticVertex : probabilisticVertices) {

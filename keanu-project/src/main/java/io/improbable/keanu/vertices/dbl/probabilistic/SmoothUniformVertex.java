@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.SmoothUniformDistribution;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
@@ -77,6 +78,11 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     @Override
     public Map<String, Double> dLogPdf(Double value) {
+
+        if (isObserved()) {
+            return Collections.emptyMap();
+        }
+
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);

@@ -3,7 +3,7 @@ plugins {
     id 'application'
 }
 
-mainClassName = "starter.Model"
+mainClassName = "com.example.starter.Model"
 
 group = 'improbable'
 version = '0.0.1'

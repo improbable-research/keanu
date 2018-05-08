@@ -50,7 +50,7 @@ public class ArcTan2VertexTest {
     }
 
     @Test
-    public void calculateInfintesimalsWithRespectToAandB() {
+    public void calculatePartialDerivativesWithRespectToAandB() {
         UniformVertex A = new UniformVertex(0, 1, random);
         UniformVertex B = new UniformVertex(0, 1, random);
 
@@ -60,8 +60,8 @@ public class ArcTan2VertexTest {
 
         ArcTan2Vertex arcTan2 = new ArcTan2Vertex(A, B);
 
-        assertEquals(bValue / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getInfinitesimal().getInfinitesimals().get(A.getId()), 0.001);
-        assertEquals(-0.5 / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getInfinitesimal().getInfinitesimals().get(B.getId()), 0.001);
+        assertEquals(bValue / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.001);
+        assertEquals(-0.5 / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(B), 0.001);
     }
 
 }

@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
 

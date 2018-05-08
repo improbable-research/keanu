@@ -1,4 +1,4 @@
-package io.improbable.keanu.randomFactory;
+package io.improbable.keanu.randomfactory;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;

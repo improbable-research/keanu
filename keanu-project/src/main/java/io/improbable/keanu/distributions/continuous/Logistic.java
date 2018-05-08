@@ -10,6 +10,9 @@ import java.util.Random;
  */
 public class Logistic {
 
+    private Logistic() {
+    }
+
     /**
      * @param a      location parameter (any real number)
      * @param b      scale parameter (b grater than 0)
@@ -17,7 +20,9 @@ public class Logistic {
      * @return a sample from the distribution
      */
     public static double sample(double a, double b, Random random) {
-        assert (b > 0.0);
+        if (b <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for beta: " + b);
+        }
         return a - b * Math.log(1. / random.nextDouble() - 1.);
     }
 

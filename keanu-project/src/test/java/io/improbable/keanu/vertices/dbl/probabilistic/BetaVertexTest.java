@@ -90,6 +90,16 @@ public class BetaVertexTest {
     }
 
     @Test
+    public void isTreatedAsConstantWhenObserved() {
+        BetaVertex vertexUnderTest = new BetaVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0), random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
+    @Test
     public void sampleMatchesLogProb() {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(2.0), random);
 
@@ -169,7 +179,7 @@ public class BetaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1), random),
                 alphaBeta,
                 latentAlphaBeta,
