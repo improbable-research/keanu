@@ -20,7 +20,7 @@ public interface DoubleTensor extends Tensor {
     }
 
     static DoubleTensor scalar(double scalarValue) {
-        return  nd4JScalar(scalarValue);
+        return new SimpleScalarTensor(scalarValue);
     }
 
     static DoubleTensor placeHolder(int[] shape) {
@@ -41,7 +41,7 @@ public interface DoubleTensor extends Tensor {
         return asTensors;
     }
 
-    static Map<String, Double> toScalars(Map<String, DoubleTensor> tensors ){
+    static Map<String, Double> toScalars(Map<String, DoubleTensor> tensors) {
         Map<String, Double> asTensors = new HashMap<>();
 
         for (Map.Entry<String, DoubleTensor> entry : tensors.entrySet()) {
@@ -51,9 +51,9 @@ public interface DoubleTensor extends Tensor {
         return asTensors;
     }
 
-    double getValue(int[] index);
+    double getValue(int... index);
 
-    void setValue(double value, int[] index);
+    void setValue(double value, int... index);
 
     double scalar();
 

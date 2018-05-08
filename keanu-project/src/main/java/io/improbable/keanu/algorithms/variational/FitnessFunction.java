@@ -2,7 +2,6 @@ package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
@@ -11,10 +10,10 @@ import java.util.Map;
 public class FitnessFunction {
 
     protected final List<Vertex> probabilisticVertices;
-    protected final List<? extends Vertex> latentVertices;
+    protected final List<? extends Vertex<Double>> latentVertices;
     protected final Map<String, Long> exploreSettingAll;
 
-    public FitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex> latentVertices) {
+    public FitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
@@ -22,43 +21,21 @@ public class FitnessFunction {
 
     public MultivariateFunction fitness() {
         return point -> {
-            setAndCascadePoint(point, latentVertices, exploreSettingAll);
-            return logOfTotalProbability(probabilisticVertices);
+            setAndCascadePoint(point);
+            return logOfTotalProbability();
         };
     }
 
-    static void setAndCascadePoint(double[] point, List<? extends Vertex> latentVertices, Map<String, Long> exploreSettingAll) {
-
-        int position = 0;
-        for (Vertex vertex : latentVertices) {
-
-            int dimensions = numDimensions(vertex);
-
-            if (vertex.getValue() instanceof DoubleTensor) {
-                double[] values = new double[dimensions];
-                System.arraycopy(point, position, values, 0, values.length);
-                Vertex<DoubleTensor> castedVertex = ((Vertex<DoubleTensor>) vertex);
-                DoubleTensor newTensor = DoubleTensor.create(values, castedVertex.getValue().getShape());
-                castedVertex.setValue(newTensor);
-            } else {
-                ((Vertex<Double>) vertex).setValue(point[position]);
-            }
-
-            position += dimensions;
+    protected void setAndCascadePoint(double[] point) {
+        for (int i = 0; i < point.length; i++) {
+            Vertex<Double> vertex = latentVertices.get(i);
+            vertex.setValue(point[i]);
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
     }
 
-    public static int numDimensions(Vertex vertex) {
-        if (vertex.getValue() instanceof DoubleTensor) {
-            return ((DoubleTensor) vertex.getValue()).getLength();
-        } else {
-            return 1;
-        }
-    }
-
-    public static double logOfTotalProbability(List<? extends Vertex> probabilisticVertices) {
+    protected double logOfTotalProbability() {
         double sum = 0.0;
         for (Vertex<?> vertex : probabilisticVertices) {
             sum += vertex.logProbAtValue();

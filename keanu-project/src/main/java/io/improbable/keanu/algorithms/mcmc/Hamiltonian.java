@@ -39,7 +39,7 @@ public class Hamiltonian {
                                                      final double stepSize,
                                                      final Random random) {
 
-        final List<Vertex> latentVertices = bayesNet.getContinuousLatentVertices();
+        final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
@@ -114,13 +114,13 @@ public class Hamiltonian {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void cachePosition(List<Vertex> latentVertices, Map<String, Double> position) {
+    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
         for (Vertex<Double> vertex : latentVertices) {
             position.put(vertex.getId(), vertex.getValue());
         }
     }
 
-    private static Map<String, Double> initializeMomentumForEachVertex(List<Vertex> vertexes,
+    private static Map<String, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
                                                                        Map<String, Double> momentums,
                                                                        Random random) {
         for (int i = 0; i < vertexes.size(); i++) {
@@ -150,7 +150,7 @@ public class Hamiltonian {
      * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
      * @return the gradient at the updated position
      */
-    private static Map<String, Double> leapfrog(final List<Vertex> latentVertices,
+    private static Map<String, Double> leapfrog(final List<Vertex<Double>> latentVertices,
                                                 final Map<String, Long> latentSetAndCascadeCache,
                                                 final Map<String, Double> position,
                                                 final Map<String, Double> gradient,

@@ -2,24 +2,24 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 
 import java.util.Collections;
 import java.util.Map;
 
-public class ConstantVertex extends NonProbabilisticDoubleTensor {
+public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
 
-    public ConstantVertex(DoubleTensor constant) {
+    public ConstantTensorVertex(DoubleTensor constant) {
         setValue(constant);
     }
 
-    public ConstantVertex(double constant) {
+    public ConstantTensorVertex(double constant) {
         this(DoubleTensor.nd4JScalar(constant));
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return new DualNumber(getValue(), Collections.emptyMap());
+    protected TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
+        return new TensorDualNumber(getValue(), Collections.emptyMap());
     }
 
     @Override

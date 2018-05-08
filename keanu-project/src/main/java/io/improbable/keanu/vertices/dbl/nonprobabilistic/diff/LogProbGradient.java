@@ -44,12 +44,13 @@ public class LogProbGradient {
 
             //partialDiffLogProbContribution is the contribution to the rate of change of
             //the natural log of the fitness vertex due to wrtLatentVertexId.
-            final DoubleTensor accumulatedDiffOfLogPWrtLatent = diffOfLogProbWrt.getOrDefault(
-                    wrtLatentVertexId,
-                    DoubleTensor.zeros(partialDiffLogProbContribution.getShape())
-            );
+            final DoubleTensor accumulatedDiffOfLogPWrtLatent = diffOfLogProbWrt.get(wrtLatentVertexId);
 
-            diffOfLogProbWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent.plusInPlace(partialDiffLogProbContribution));
+            if (accumulatedDiffOfLogPWrtLatent == null) {
+                diffOfLogProbWrt.put(wrtLatentVertexId, partialDiffLogProbContribution);
+            } else {
+                diffOfLogProbWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent.plus(partialDiffLogProbContribution));
+            }
         }
 
         return diffOfLogProbWrt;

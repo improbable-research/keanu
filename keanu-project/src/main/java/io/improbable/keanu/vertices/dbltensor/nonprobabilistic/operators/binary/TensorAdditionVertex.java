@@ -3,20 +3,20 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 
 import java.util.Map;
 
-public class AdditionVertex extends BinaryOpVertex {
+public class TensorAdditionVertex extends TensorBinaryOpVertex {
 
-    public AdditionVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
+    public TensorAdditionVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         super(a, b);
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber aDual = dualNumbers.get(a);
-        DualNumber bDual = dualNumbers.get(b);
+    public TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
+        TensorDualNumber aDual = dualNumbers.get(a);
+        TensorDualNumber bDual = dualNumbers.get(b);
         return aDual.add(bDual);
     }
 

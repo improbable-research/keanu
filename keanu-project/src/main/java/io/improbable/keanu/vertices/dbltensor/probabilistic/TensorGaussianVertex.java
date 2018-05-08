@@ -4,14 +4,14 @@ import io.improbable.keanu.distributions.tensors.continuous.NDGaussian;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
 
-public class NDGaussianVertex extends ProbabilisticDoubleTensor {
+public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
 
     private final DoubleTensorVertex mu;
     private final DoubleTensorVertex sigma;
@@ -25,7 +25,7 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
      * @param sigma  the sigma of the Gaussian with either the same shape as specified for this vertex or a scalar
      * @param random the source of randomness
      */
-    public NDGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
+    public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
 
         checkParentShapes(shape, mu.getValue(), sigma.getValue());
 
@@ -44,7 +44,7 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
      * @param sigma  sigma with same shape as desired Gaussian tensor or scalar
      * @param random source of randomness
      */
-    public NDGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
+    public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
         this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma, random);
     }
 
@@ -70,15 +70,15 @@ public class NDGaussianVertex extends ProbabilisticDoubleTensor {
                                                                DoubleTensor dPdsigma,
                                                                DoubleTensor dPdx) {
 
-        PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
-        PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
-        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        TensorPartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
+        TensorPartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
+        TensorPartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
         if(!this.isObserved()) {
-            dPdInputs.getPartialDerivatives().put(getId(), dPdx);
+            dPdInputs.putWithRespectTo(getId(), dPdx);
         }
 
-        return dPdInputs.getPartialDerivatives();
+        return dPdInputs.asMap();
     }
 
     @Override

@@ -2,29 +2,29 @@ package io.improbable.keanu.vertices.dbltensor;
 
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorAdditionVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDifferenceVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorMultiplicationVertex;
 
 import java.util.*;
 
 public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTensor> {
 
     public DoubleTensorVertex minus(DoubleTensorVertex that) {
-        return new DifferenceVertex(this, that);
+        return new TensorDifferenceVertex(this, that);
     }
 
     public DoubleTensorVertex plus(DoubleTensorVertex that) {
-        return new AdditionVertex(this, that);
+        return new TensorAdditionVertex(this, that);
     }
 
     public DoubleTensorVertex multiply(DoubleTensorVertex that) {
-        return new MultiplicationVertex(this, that);
+        return new TensorMultiplicationVertex(this, that);
     }
 
-    public final DualNumber getDualNumber() {
-        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
+    public final TensorDualNumber getDualNumber() {
+        Map<Vertex, TensorDualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleTensorVertex> stack = new ArrayDeque<>();
         stack.push(this);
 
@@ -36,7 +36,7 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
 
                 DoubleTensorVertex top = stack.pop();
-                DualNumber dual = top.calculateDualNumber(dualNumbers);
+                TensorDualNumber dual = top.calculateDualNumber(dualNumbers);
                 dualNumbers.put(top, dual);
 
             } else {
@@ -56,7 +56,7 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return dualNumbers.get(this);
     }
 
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
+    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, TensorDualNumber> dualNumbers, Set<Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!dualNumbers.containsKey(next)) {
@@ -66,6 +66,6 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return notCalculatedParents;
     }
 
-    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+    protected abstract TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers);
 
 }

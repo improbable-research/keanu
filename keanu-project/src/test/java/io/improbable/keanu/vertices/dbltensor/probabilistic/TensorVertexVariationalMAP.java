@@ -1,14 +1,10 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.distributions.tensors.continuous.NDGaussian;
-import io.improbable.keanu.network.BayesNet;
-import io.improbable.keanu.plating.PlateBuilder;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.algorithms.tensorVariational.TensorGradientOptimizer;
+import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
 
@@ -40,13 +36,13 @@ public class TensorVertexVariationalMAP {
     }
 
     private static void doInferenceOn(DoubleTensorVertex unknownVertex) {
-        BayesNet inferNet = new BayesNet(unknownVertex.getConnectedGraph());
+        TensorBayesNet inferNet = new TensorBayesNet(unknownVertex.getConnectedGraph());
 
         inferNet.probeForNonZeroMasterP(100);
 
-        GradientOptimizer g = new GradientOptimizer(inferNet);
+        TensorGradientOptimizer gradientOptimizer = new TensorGradientOptimizer(inferNet);
 
-        g.maxLikelihood(5000);
+        gradientOptimizer.maxLikelihood(5000);
     }
 
 }

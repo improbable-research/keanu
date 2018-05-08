@@ -3,6 +3,7 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -10,17 +11,17 @@ import java.util.stream.Collectors;
 /**
  * A wrapper around a collection of connected vertices.
  */
-public class BayesNet {
+public class TensorBayesNet {
 
     private final List<Vertex> latentAndObservedVertices;
     private final List<Vertex> latentVertices;
     private final List<Vertex> observedVertices;
 
     //Lazy evaluated
-    private List<Vertex<Double>> continuousLatentVertices;
+    private List<Vertex<DoubleTensor>> continuousLatentVertices;
     private List<Vertex> discreteLatentVertices;
 
-    public BayesNet(Set<? extends Vertex> vertices) {
+    public TensorBayesNet(Set<? extends Vertex> vertices) {
 
         latentAndObservedVertices = vertices.stream()
                 .filter(v -> v.isObserved() || v.isProbabilistic())
@@ -35,7 +36,7 @@ public class BayesNet {
                 .collect(Collectors.toList());
     }
 
-    public BayesNet(Collection<? extends Vertex> vertices) {
+    public TensorBayesNet(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
@@ -47,7 +48,7 @@ public class BayesNet {
         return latentVertices;
     }
 
-    public List<Vertex<Double>> getContinuousLatentVertices() {
+    public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
         if (continuousLatentVertices == null) {
             splitContinuousAndDiscrete();
         }
@@ -73,8 +74,8 @@ public class BayesNet {
         discreteLatentVertices = new ArrayList<>();
 
         for (Vertex<?> vertex : latentVertices) {
-            if (vertex.getValue() instanceof Double) {
-                continuousLatentVertices.add((Vertex<Double>) vertex);
+            if (vertex.getValue() instanceof DoubleTensor) {
+                continuousLatentVertices.add((Vertex<DoubleTensor>)vertex);
             } else {
                 discreteLatentVertices.add(vertex);
             }

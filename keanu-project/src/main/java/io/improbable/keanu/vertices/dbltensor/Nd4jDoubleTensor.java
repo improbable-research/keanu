@@ -7,6 +7,9 @@ import org.nd4j.linalg.util.ArrayUtil;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
+    public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
+    public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
+
     private INDArray tensor;
     private int[] shape;
 
@@ -39,11 +42,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return ArrayUtil.prod(shape);
     }
 
-    public double getValue(int[] index) {
+    public double getValue(int... index) {
         return tensor.getDouble(index);
     }
 
-    public void setValue(double value, int[] index) {
+    public void setValue(double value, int... index) {
         tensor.putScalar(index, value);
     }
 

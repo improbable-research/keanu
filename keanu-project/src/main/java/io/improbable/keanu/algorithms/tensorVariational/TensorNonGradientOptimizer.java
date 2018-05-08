@@ -1,6 +1,6 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.tensorVariational;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -11,18 +11,19 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.List;
 
+import static io.improbable.keanu.algorithms.tensorVariational.TensorGradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class NonGradientOptimizer {
+public class TensorNonGradientOptimizer {
 
-    private final BayesNet bayesNet;
+    private final TensorBayesNet bayesNet;
 
-    public NonGradientOptimizer(BayesNet bayesNet) {
+    public TensorNonGradientOptimizer(TensorBayesNet bayesNet) {
         this.bayesNet = bayesNet;
     }
 
-    public NonGradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNet(graph);
+    public TensorNonGradientOptimizer(List<Vertex<Double>> graph) {
+        bayesNet = new TensorBayesNet(graph);
     }
 
     public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
@@ -31,15 +32,15 @@ public class NonGradientOptimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
-        FitnessFunction fitnessFunction = new FitnessFunction(outputVertices, latentVertices);
+        List<? extends Vertex> latentVertices = bayesNet.getContinuousLatentVertices();
+        TensorFitnessFunction fitnessFunction = new TensorFitnessFunction(outputVertices, latentVertices);
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
 
-        double[] startPoint = currentPoint();
+        double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
-        if (FitnessFunction.isValidInitialFitness(initialFitness)) {
+        if (TensorFitnessFunction.isValidInitialFitness(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
@@ -56,7 +57,7 @@ public class NonGradientOptimizer {
                 new ObjectiveFunction(fitnessFunction.fitness()),
                 new SimpleBounds(minBounds, maxBounds),
                 MAXIMIZE,
-                new InitialGuess(currentPoint())
+                new InitialGuess(currentPoint(bayesNet.getContinuousLatentVertices()))
         );
 
         return pointValuePair.getValue();
@@ -78,14 +79,6 @@ public class NonGradientOptimizer {
      */
     public double maxLikelihood(int maxEvaluations, double boundsRange) {
         return optimize(maxEvaluations, boundsRange, bayesNet.getObservedVertices());
-    }
-
-    private double[] currentPoint() {
-        double[] point = new double[bayesNet.getContinuousLatentVertices().size()];
-        for (int i = 0; i < point.length; i++) {
-            point[i] = bayesNet.getContinuousLatentVertices().get(i).getValue();
-        }
-        return point;
     }
 
 }

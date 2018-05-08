@@ -5,12 +5,12 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;
 
-public abstract class BinaryOpVertex extends NonProbabilisticDoubleTensor {
+public abstract class TensorBinaryOpVertex extends NonProbabilisticDoubleTensor {
 
     protected final DoubleTensorVertex a;
     protected final DoubleTensorVertex b;
 
-    public BinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
+    public TensorBinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         this.a = a;
         this.b = b;
         setParents(a, b);
