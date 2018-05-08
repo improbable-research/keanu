@@ -41,7 +41,7 @@ public class GaussianVertexTest {
     public void gradientAtMuIsZero() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(0.0);
-        double gradient = g.dLogProbAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
         log.info("Gradient at mu: " + gradient);
         assertEquals(0, gradient, 0);
     }
@@ -50,7 +50,7 @@ public class GaussianVertexTest {
     public void gradientBeforeMuIsPositive() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(-1.0);
-        double gradient = g.dLogProbAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -59,7 +59,7 @@ public class GaussianVertexTest {
     public void gradientAfterMuIsNegative() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(1.0);
-        double gradient = g.dLogProbAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient < 0);
     }

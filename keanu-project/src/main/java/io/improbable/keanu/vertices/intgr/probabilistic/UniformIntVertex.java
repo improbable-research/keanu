@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -59,7 +60,7 @@ public class UniformIntVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Integer value) {
+    public Map<String, DoubleTensor> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 

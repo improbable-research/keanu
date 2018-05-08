@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -37,7 +38,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Boolean value) {
+    public Map<String, DoubleTensor> dLogPmf(Boolean value) {
         throw new UnsupportedOperationException();
     }
 

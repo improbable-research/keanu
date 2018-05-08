@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -63,7 +64,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogPdf(Double value) {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
         Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }
@@ -73,7 +74,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
         return Exponential.sample(a.getValue(), b.getValue(), random);
     }
 
-    private Map<String, Double> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
+    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
         PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
@@ -82,7 +83,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
             dPdInputs.putWithRespectTo(getId(), dPdx);
         }
 
-        return dPdInputs.asMap();
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
 }
