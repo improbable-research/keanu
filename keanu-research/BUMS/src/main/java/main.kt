@@ -6,17 +6,21 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 import java.io.FileWriter
 
 fun main(args : Array<String>) {
+    val writeToFile = false
+
+    var file :FileWriter? = null
+    if(writeToFile) file = FileWriter("data.out")
 
     val objective = Thermometers()
-    val file = FileWriter("data.out")
-    for(i in 1..10000) {
+    for(i in 1..1000) {
         getProposal(objective, i)
         objective.walk()
-        file.write("${objective.temp.value}\n")
+        file?.write("${objective.temp.value}\n")
         println("${objective.temp.value}")
     }
-    file.close()
+    file?.close()
 }
+
 
 fun getProposal(objective : Thermometers, iteration: Int) {
     val optimizer = NonLinearConjugateGradientOptimizer(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,

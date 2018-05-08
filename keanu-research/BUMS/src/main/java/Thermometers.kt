@@ -1,6 +1,7 @@
 import io.improbable.keanu.network.BayesNet
 import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient
 import java.util.*
@@ -34,6 +35,11 @@ class Thermometers {
         // Shortcut the tortured API for easy access to infinitesimals
         thermo1err.lazyEval()
         thermo2err.lazyEval()
+
+        var dE1 = Vector3D(
+                thermo1err.dualNumber.
+        )
+
         var thermo1Infinitesimal = thermo1err.dualNumber.infinitesimal
         var thermo2Infinitesimal = thermo2err.dualNumber.infinitesimal
         var dE1_dU1 = thermo1Infinitesimal.infinitesimals.getOrDefault(u1.id, 1e-9)!!
