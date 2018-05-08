@@ -6,37 +6,31 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 import java.io.FileWriter
 
 fun main(args : Array<String>) {
-    val writeToFile = false
-
-    var file :FileWriter? = null
-    if(writeToFile) file = FileWriter("data.out")
-
-    val objective = Thermometers()
-    for(i in 1..1000) {
-        getProposal(objective, i)
-        objective.walk()
-        file?.write("${objective.temp.value}\n")
-        println("${objective.temp.value}")
-    }
-    file?.close()
+    val thermo = Thermometers()
+    printManifold()
+//    val writeToFile = true
+//
+//    var file :FileWriter? = null
+//    if(writeToFile) file = FileWriter("data.out")
+//
+//    val sampler = BUMSampler()
+//    for(i in 1..40000) {
+//        sampler.sample()
+//        file?.write("${sampler.model3d.temp.value}\n")
+//        println("${sampler.model3d.temp.value}")
+//    }
+//    file?.close()
 }
 
 
-fun getProposal(objective : Thermometers, iteration: Int) {
-    val optimizer = NonLinearConjugateGradientOptimizer(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-                                                        SimpleValueChecker(1e-6, 1e-6))
-    if (iteration == 0) {
-        objective.sample()
+fun printManifold() {
+    val model = Thermometers()
+    model.sample()
+    val opt = GraphOptimiser(arrayOf(model.u2, model.u3), model.err)
+   for(T in (170..919).map({i -> i/1000.0})) {
+       model.u1.value = T
+       model.err.lazyEval()
+       opt.minimise()
+       println("${model.u1.value} ${model.u2.value} ${model.u3.value}")
     }
-
-    val startPoint = doubleArrayOf(objective.u1.value, objective.u2.value, objective.u3.value)
-
-    val optimal = optimizer.optimize(
-            MaxEval(4000),
-            objective.fitness(),
-            objective.gradient(),
-            GoalType.MINIMIZE,
-            InitialGuess(startPoint)
-    )
-    objective.setState(optimal.point)
 }

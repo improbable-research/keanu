@@ -8,9 +8,9 @@ import java.util.*
 import kotlin.math.sqrt
 
 class Thermometers {
-    var u1 = UniformVertex(0.0,1.0)
-    var u2 = UniformVertex(0.0,1.0)
-    var u3 = UniformVertex(0.0,1.0)
+    var u1 : DoubleVertex
+    var u2 : DoubleVertex
+    var u3 : DoubleVertex
     var err : DoubleVertex
     var temp : DoubleVertex
     var thermo1 : DoubleVertex
@@ -20,61 +20,26 @@ class Thermometers {
     var net : BayesNet
     var random = Random()
 
-    constructor() {
+    constructor() : this(
+            UniformVertex(0.0, 1.0),
+            UniformVertex(0.0, 1.0),
+            UniformVertex(0.0, 1.0)
+    )
+
+    constructor(u1 : DoubleVertex, u2 : DoubleVertex, u3 : DoubleVertex) {
+        this.u1 = u1
+        this.u2 = u2
+        this.u3 = u3
         temp = logistic(u1, 20.0, 5.0)
         thermo1   = logistic(u2, temp, 1.0)
         thermo2   = logistic(u3, temp, 1.0)
         thermo1err = thermo1 - 22.0
         thermo2err = thermo2 - 23.0
         err = thermo1err*thermo1err + thermo2err*thermo2err
-        net = BayesNet(listOf(u1,u2,u3,temp,thermo1,thermo2,err))
+//        net = BayesNet(listOf(u1,u2,u3,temp,thermo1,thermo2,err))
+        net = BayesNet(err.connectedGraph)
     }
 
-    fun walk() {
-
-        // Shortcut the tortured API for easy access to infinitesimals
-        thermo1err.lazyEval()
-        thermo2err.lazyEval()
-
-        var dE1 = Vector3D(
-                thermo1err.dualNumber.
-        )
-
-        var thermo1Infinitesimal = thermo1err.dualNumber.infinitesimal
-        var thermo2Infinitesimal = thermo2err.dualNumber.infinitesimal
-        var dE1_dU1 = thermo1Infinitesimal.infinitesimals.getOrDefault(u1.id, 1e-9)!!
-        var dE2_dU1 = thermo2Infinitesimal.infinitesimals.getOrDefault(u1.id, 1e-9)!!
-        var dE1_dU2 = thermo1Infinitesimal.infinitesimals.getOrDefault(u2.id, 1e-9)!!
-        var dE2_dU2 = thermo2Infinitesimal.infinitesimals.getOrDefault(u2.id, 1e-9)!!
-        var dE1_dU3 = thermo1Infinitesimal.infinitesimals.getOrDefault(u3.id, 1e-9)!!
-        var dE2_dU3 = thermo2Infinitesimal.infinitesimals.getOrDefault(u3.id, 1e-9)!!
-
-        // Compute the step in uniform space
-        var deltaU2 = (dE2_dU1/dE2_dU3 - dE1_dU1/dE1_dU3) / (dE1_dU2/dE1_dU3 - dE2_dU2/dE2_dU3)
-        var deltaU3 = (dE2_dU1/dE2_dU2 - dE1_dU1/dE1_dU2) / (dE1_dU3/dE1_dU2 - dE2_dU3/dE2_dU2)
-
-        // Draw a random step length
-        var deltaS = 0.005 // Tang fudge factor
-        val sigma = deltaS * (1.0 / sqrt(1.0 + deltaU2*deltaU2 + deltaU3*deltaU3))
-        val g = random.nextGaussian() * sigma
-
-        // Print what's happening
-        println("g = " + g + " deltaU2 = " + deltaU2 + " deltau3 = " + deltaU3)
-
-        // Increment our position in uniform space
-        u1.value += g
-        u2.value += g * deltaU2
-        u3.value += g * deltaU3
-
-        // Clip over / undershoots
-        for (u in listOf(u1, u2, u3)) {
-            if (u.value > 1.0) {
-                u.value = 1.0
-            } else if (u.value < 0) {
-                u.value = 0.0
-            }
-        }
-    }
 
     fun sample() {
         u1.value = u1.sample()
@@ -83,11 +48,30 @@ class Thermometers {
         err.lazyEval()
     }
 
+
+    fun projectToUnitHypercube() {
+        if(u1.value > 0.99) u1.value = 2.0-u1.value
+        if(u2.value > 0.99) u2.value = 2.0-u2.value
+        if(u3.value > 0.99) u3.value = 2.0-u3.value
+        if(u1.value < 0.01) u1.value = -u1.value
+        if(u2.value < 0.01) u2.value = -u2.value
+        if(u3.value < 0.01) u3.value = -u3.value
+    }
+
     fun setState(doubles : DoubleArray) {
         u1.value = doubles[0]
         u2.value = doubles[1]
         u3.value = doubles[2]
+        projectToUnitHypercube()
         err.lazyEval()
+    }
+
+    fun setState(vec : Vector3D) {
+        setState(vec.toArray())
+    }
+
+    fun getState() : Vector3D {
+        return Vector3D(u1.value, u2.value, u3.value)
     }
 
     fun fitness() : ObjectiveFunction {
@@ -101,15 +85,12 @@ class Thermometers {
     fun gradient() : ObjectiveFunctionGradient {
         return ObjectiveFunctionGradient({doubles ->
             setState(doubles)
-            val grad = doubleArrayOf(
-                    err.dualNumber.infinitesimal.infinitesimals[u1.id]!!,
-                    err.dualNumber.infinitesimal.infinitesimals[u2.id]!!,
-                    err.dualNumber.infinitesimal.infinitesimals[u3.id]!!
+            doubleArrayOf(
+                    err.dualNumber.partialDerivatives.withRespectTo(u1),
+                    err.dualNumber.partialDerivatives.withRespectTo(u2),
+                    err.dualNumber.partialDerivatives.withRespectTo(u3)
             )
-//            println("Gradient = ${grad[0]}, ${grad[1]}, ${grad[2]}")
-            grad
         })
     }
-
 
 }
