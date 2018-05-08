@@ -61,7 +61,7 @@ public class DoubleVertexTest {
 
         DoubleVertex v3 = v1.lambda(op, (a) -> {
             DualNumber v1Dual = v1.getDualNumber();
-            return new DualNumber(op.apply(v1Dual.getValue()), v1Dual.getInfinitesimal());
+            return new DualNumber(op.apply(v1Dual.getValue()), v1Dual.getPartialDerivatives());
         });
 
         v3.lazyEval();

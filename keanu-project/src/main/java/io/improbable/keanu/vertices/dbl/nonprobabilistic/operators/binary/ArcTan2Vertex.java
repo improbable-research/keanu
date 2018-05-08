@@ -4,7 +4,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 
@@ -38,9 +38,9 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
         double denominator = (Math.pow(b.getValue(), 2) * Math.pow(a.getValue(), 2));
 
-        Infinitesimal thisInfA = aDual.getInfinitesimal().multiplyBy(b.getValue() / denominator);
-        Infinitesimal thisInfB = bDual.getInfinitesimal().multiplyBy(-(a.getValue() / denominator));
-        Infinitesimal newInf = thisInfA.add(thisInfB);
+        PartialDerivatives thisInfA = aDual.getPartialDerivatives().multiplyBy(b.getValue() / denominator);
+        PartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy(-(a.getValue() / denominator));
+        PartialDerivatives newInf = thisInfA.add(thisInfB);
         return new DualNumber(op(a.getValue(), b.getValue()), newInf);
     }
 

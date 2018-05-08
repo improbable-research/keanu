@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.ArrayList;
@@ -13,6 +14,8 @@ import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProbabilisticDoubleContract {
 
@@ -97,7 +100,15 @@ public class ProbabilisticDoubleContract {
 
         for (double value = vertexStartValue; value <= vertexEndValue; value += vertexValueIncrement) {
             vertexUnderTest.setAndCascade(value);
-            testGradientAcrossMultipleHyperParameterValues(hyperParameterStartValue, hyperParameterEndValue, hyperParameterValueIncrement, hyperParameterVertex, value, vertexUnderTest, gradientDelta);
+            testGradientAcrossMultipleHyperParameterValues(
+                    hyperParameterStartValue,
+                    hyperParameterEndValue,
+                    hyperParameterValueIncrement,
+                    hyperParameterVertex,
+                    value,
+                    vertexUnderTest,
+                    gradientDelta
+            );
         }
     }
 
@@ -131,6 +142,16 @@ public class ProbabilisticDoubleContract {
 
         assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
                 diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
+    }
+
+    public static void isTreatedAsConstantWhenObserved(DoubleVertex vertexUnderTest) {
+        vertexUnderTest.observe(1.0);
+        assertTrue(vertexUnderTest.getDualNumber().isOfConstant());
+    }
+
+    public static void hasNoGradientWithRespectToItsValueWhenObserved(DoubleVertex vertexUnderTest) {
+        vertexUnderTest.observe(1.0);
+        assertNull(vertexUnderTest.dLogProb(1.0).get(vertexUnderTest.getId()));
     }
 
 }

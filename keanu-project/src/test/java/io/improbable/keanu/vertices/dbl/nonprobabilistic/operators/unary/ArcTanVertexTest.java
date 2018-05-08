@@ -31,7 +31,7 @@ public class ArcTanVertexTest {
 
         ArcTanVertex arcTan = new ArcTanVertex(uniformVertex);
 
-        double dArcTan = arcTan.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniformVertex.getId());
+        double dArcTan = arcTan.getDualNumber().getPartialDerivatives().withRespectTo(uniformVertex);
         //dArcTan = 1 / (1 + x^2)
         double expected = 1 / (1 + Math.pow(5.0, 2));
 

@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -135,11 +135,11 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     private Map<String, Double> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
-        Infinitesimal dPdInputsFromInput = input.getDualNumber().getInfinitesimal().multiplyBy(dPdInput);
-        Infinitesimal dPdInputsFromSigma = fuzzinessSigma.getDualNumber().getInfinitesimal().multiplyBy(dPdSigma);
-        Infinitesimal dPdInputs = dPdInputsFromInput.add(dPdInputsFromSigma);
+        PartialDerivatives dPdInputsFromInput = input.getDualNumber().getPartialDerivatives().multiplyBy(dPdInput);
+        PartialDerivatives dPdInputsFromSigma = fuzzinessSigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdSigma);
+        PartialDerivatives dPdInputs = dPdInputsFromInput.add(dPdInputsFromSigma);
 
-        return dPdInputs.getInfinitesimals();
+        return dPdInputs.asMap();
     }
 
     private double s(double x, double sigma) {

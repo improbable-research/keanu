@@ -1,13 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -92,7 +90,7 @@ public class TanVertexTest {
         gradientOptimizer.maxLikelihood(1500);
 
         DoubleVertex absTan = new AbsVertex(unknownConstant);
-        assertEquals(Math.PI / 2, absTan.getValue() % Math.PI,0.001);
+        assertEquals(Math.PI / 2, absTan.getValue() % Math.PI, 0.001);
     }
 
     @Test
@@ -102,7 +100,7 @@ public class TanVertexTest {
 
         TanVertex tan = new TanVertex(uniformVertex);
 
-        double dTan = tan.getDualNumber().getInfinitesimal().getInfinitesimals().get(uniformVertex.getId());
+        double dTan = tan.getDualNumber().getPartialDerivatives().withRespectTo(uniformVertex);
         //dTan = 1 / sec^2(x)
         double expected = 1 / (Math.pow(Math.cos(5.0), 2));
 
