@@ -7,7 +7,7 @@ public class KeanuRandom {
 
     private final Random nd4jRandom;
 
-    public KeanuRandom(){
+    public KeanuRandom() {
         nd4jRandom = new DefaultRandom();
     }
 

@@ -24,7 +24,7 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return new TensorMultiplicationVertex(this, that);
     }
 
-    public DoubleTensorVertex divideBy(DoubleTensorVertex that){
+    public DoubleTensorVertex divideBy(DoubleTensorVertex that) {
         return new TensorDivisionVertex(this, that);
     }
 
