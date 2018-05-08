@@ -29,7 +29,11 @@ public abstract class ProbabilisticDoubleTensor extends DoubleTensorVertex {
 
     @Override
     protected TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
-        return new TensorDualNumber(getValue(), getId());
+        if (isObserved()) {
+            return TensorDualNumber.createConstant(getValue());
+        } else {
+            return TensorDualNumber.createWithRespectToSelf(getId(), getValue());
+        }
     }
 
 }

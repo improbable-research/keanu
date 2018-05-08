@@ -41,6 +41,10 @@ dependencies {
 
 }
 
+test {
+    systemProperty "dtype" , 'double'
+}
+
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
 if (!hasProperty('nexusUser')) {
     ext.nexusUser = ''

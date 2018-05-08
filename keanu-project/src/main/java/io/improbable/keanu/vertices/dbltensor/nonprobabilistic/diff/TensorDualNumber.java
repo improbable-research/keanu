@@ -7,6 +7,14 @@ import java.util.Map;
 
 public class TensorDualNumber {
 
+    public static TensorDualNumber createConstant(DoubleTensor value) {
+        return new TensorDualNumber(value, TensorPartialDerivatives.OF_CONSTANT);
+    }
+
+    public static TensorDualNumber createWithRespectToSelf(String withRespectTo, DoubleTensor value) {
+        return new TensorDualNumber(value, TensorPartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
+    }
+
     private DoubleTensor value;
     private TensorPartialDerivatives partialDerivatives;
 
@@ -29,6 +37,10 @@ public class TensorDualNumber {
 
     public TensorPartialDerivatives getPartialDerivatives() {
         return partialDerivatives;
+    }
+
+    public boolean isOfConstant() {
+        return partialDerivatives.isEmpty();
     }
 
     public TensorDualNumber add(TensorDualNumber that) {

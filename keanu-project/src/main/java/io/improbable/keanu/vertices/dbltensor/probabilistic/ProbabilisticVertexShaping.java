@@ -28,7 +28,7 @@ public class ProbabilisticVertexShaping {
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(tensors);
 
         if (nonScalarShapes.isEmpty()) {
-            return new int[0];
+            return new int[]{1, 1};
         } else if (nonScalarShapes.size() == 1) {
             return nonScalarShapes.iterator().next().getShape();
         } else {

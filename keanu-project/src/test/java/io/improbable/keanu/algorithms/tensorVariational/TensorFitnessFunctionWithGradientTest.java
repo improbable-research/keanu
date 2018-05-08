@@ -21,7 +21,6 @@ public class TensorFitnessFunctionWithGradientTest {
 
     @Before
     public void setup() {
-        System.setProperty("dtype", "double");
         this.random = new KeanuRandom(1);
     }
 

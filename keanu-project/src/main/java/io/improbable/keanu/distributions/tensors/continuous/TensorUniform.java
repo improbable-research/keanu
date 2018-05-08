@@ -9,9 +9,9 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
  * ARL-TR-2168 March 2000
  * 5.1.8 page 48
  */
-public class NDUniform {
+public class TensorUniform {
 
-    private NDUniform() {
+    private TensorUniform() {
     }
 
     /**

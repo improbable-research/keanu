@@ -3,12 +3,12 @@ package io.improbable.keanu.distributions.tensors.continuous;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-public class NDGaussian {
+public class TensorGaussian {
 
     private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
     private static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
 
-    private NDGaussian() {
+    private TensorGaussian() {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
@@ -20,9 +20,7 @@ public class NDGaussian {
         final DoubleTensor lnSigma = sigma.log();
         final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2);
         final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
-        final DoubleTensor logPdf = xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
-
-        return logPdf;
+        return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
     public static Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {

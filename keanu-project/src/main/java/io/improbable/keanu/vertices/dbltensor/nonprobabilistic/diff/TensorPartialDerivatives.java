@@ -4,10 +4,17 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class TensorPartialDerivatives {
+
+    public static TensorPartialDerivatives OF_CONSTANT = new TensorPartialDerivatives(Collections.emptyMap());
+
+    public static TensorPartialDerivatives withRespectToSelf(String withRespectTo, int[] shape) {
+        return new TensorPartialDerivatives(Collections.singletonMap(withRespectTo, DoubleTensor.ones(shape)));
+    }
 
     private Map<String, DoubleTensor> derivativeWithRespectTo;
 
