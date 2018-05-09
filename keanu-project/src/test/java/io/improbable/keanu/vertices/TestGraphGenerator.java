@@ -45,7 +45,7 @@ public class TestGraphGenerator {
         }, (a) -> {
             dualNumberCount.incrementAndGet();
             return a.get(left).add(a.get(right));
-        } );
+        });
     }
 
 }

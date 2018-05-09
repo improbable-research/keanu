@@ -59,7 +59,7 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
     private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)){
+            if (!dualNumbers.containsKey(next)) {
                 notCalculatedParents.add(next);
             }
         }
