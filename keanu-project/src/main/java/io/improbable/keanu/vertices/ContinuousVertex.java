@@ -17,6 +17,7 @@ public abstract class ContinuousVertex<T> extends Vertex<T> {
      * @param value at a given value
      * @return the partial derivatives of the log density
      */
+    @Override
     public final Map<String, DoubleTensor> dLogProb(T value) {
         return dLogPdf(value);
     }

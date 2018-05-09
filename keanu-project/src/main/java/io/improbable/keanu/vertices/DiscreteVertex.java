@@ -11,6 +11,7 @@ public abstract class DiscreteVertex<T> extends Vertex<T> {
         return logPmf(value);
     }
 
+    @Override
     public final Map<String, DoubleTensor> dLogProb(T value) {
         return dLogPmf(value);
     }
