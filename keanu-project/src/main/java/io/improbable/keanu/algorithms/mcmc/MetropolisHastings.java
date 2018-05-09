@@ -17,7 +17,7 @@ public class MetropolisHastings {
     }
 
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
-                                                     List<Vertex> fromVertices,
+                                                     List<? extends Vertex> fromVertices,
                                                      int sampleCount) {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, new Random());
     }
@@ -30,7 +30,7 @@ public class MetropolisHastings {
      * @return Samples for each vertex ordered by MCMC iteration
      */
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
-                                                     final List<Vertex> fromVertices,
+                                                     final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final Random random) {
         checkBayesNetInHealthyState(bayesNet);
@@ -89,7 +89,7 @@ public class MetropolisHastings {
         return logPNew;
     }
 
-    static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<Vertex> latentVertices) {
+    static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices) {
         return latentVertices.stream()
                 .collect(Collectors.toMap(
                         v -> v,
@@ -107,8 +107,8 @@ public class MetropolisHastings {
                 .sum();
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
+    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex> fromVertices) {
+        fromVertices.forEach(vertex -> addSampleForVertex((Vertex<?>) vertex, samples));
     }
 
     private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {

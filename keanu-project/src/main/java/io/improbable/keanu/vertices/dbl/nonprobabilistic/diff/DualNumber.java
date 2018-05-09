@@ -29,7 +29,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return partialDerivatives;
     }
 
-    public boolean isOfConstant(){
+    public boolean isOfConstant() {
         return partialDerivatives.isEmpty();
     }
 
