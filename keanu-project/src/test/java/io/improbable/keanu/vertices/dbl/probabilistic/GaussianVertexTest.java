@@ -41,7 +41,7 @@ public class GaussianVertexTest {
     public void gradientAtMuIsZero() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(0.0);
-        double gradient = g.dLogProbAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
         log.info("Gradient at mu: " + gradient);
         assertEquals(0, gradient, 0);
     }
@@ -50,7 +50,7 @@ public class GaussianVertexTest {
     public void gradientBeforeMuIsPositive() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(-1.0);
-        double gradient = g.dLogProbAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -59,9 +59,20 @@ public class GaussianVertexTest {
     public void gradientAfterMuIsNegative() {
         GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         g.setValue(1.0);
-        double gradient = g.dLogProbAtValue().get(g.getId());
+        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient < 0);
+    }
+
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        GaussianVertex vertexUnderTest = new GaussianVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test
@@ -134,14 +145,14 @@ public class GaussianVertexTest {
         muSigma.add(new ConstantDoubleVertex(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
-        latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0, random));
-        latentMuSigma.add(new SmoothUniformVertex(0.01, 10.0, random));
+        latentMuSigma.add(new SmoothUniformVertex(-10.0, 10.0, random));
+        latentMuSigma.add(new SmoothUniformVertex(-10.0, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muSigma,
                 latentMuSigma,
-                1000
+                2000
         );
     }
 }

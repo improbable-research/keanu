@@ -48,7 +48,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a);
-        double gradient = l.dLogProbAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
         log.info("Gradient at a: " + gradient);
         assertEquals(gradient, 0, 0);
     }
@@ -59,7 +59,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a - 1.0);
-        double gradient = l.dLogProbAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
         log.info("Gradient at x < a: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -70,7 +70,7 @@ public class LogisticVertexTest {
         double b = 0.5;
         LogisticVertex l = new LogisticVertex(a, b, new Random(1));
         l.setValue(a + 1.0);
-        double gradient = l.dLogProbAtValue().get(l.getId());
+        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
         log.info("Gradient at x > a: " + gradient);
         assertTrue(gradient < 0);
     }
@@ -93,6 +93,17 @@ public class LogisticVertexTest {
                 vertexEndValue,
                 vertexIncrement,
                 DELTA);
+    }
+
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        LogisticVertex vertexUnderTest = new LogisticVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test

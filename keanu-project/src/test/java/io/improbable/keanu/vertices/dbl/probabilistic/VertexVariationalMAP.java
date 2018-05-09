@@ -51,7 +51,7 @@ public class VertexVariationalMAP {
 
         GradientOptimizer g = new GradientOptimizer(inferNet);
 
-        g.maxAPosteriori(5000);
+        g.maxLikelihood(5000);
     }
 
     private static List<Double> getSamples(DoubleVertex knownVertex, int numSamples) {

@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class ExponentialVertexTest {
@@ -50,9 +49,20 @@ public class ExponentialVertexTest {
         double b = 1.0;
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
         e.setValue(a);
-        double gradient = e.dLogProbAtValue().get(e.getId());
+        double gradient = e.dLogProbAtValue().get(e.getId()).scalar();
         log.info("Gradient at a: " + gradient);
         assertEquals(-1, gradient, 0);
+    }
+
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        ExponentialVertex vertexUnderTest = new ExponentialVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test

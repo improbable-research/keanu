@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -41,7 +42,7 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Integer value) {
+    public Map<String, DoubleTensor> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 

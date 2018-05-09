@@ -3,7 +3,9 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.SmoothUniformDistribution;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Random;
 
@@ -76,7 +78,12 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogPdf(Double value) {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
+
+        if (isObserved()) {
+            return Collections.emptyMap();
+        }
+
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
@@ -84,7 +91,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final double density = SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
         final double dlogPdfdx = dPdfdx / density;
 
-        return singletonMap(getId(), dlogPdfdx);
+        return DoubleTensor.fromScalars(singletonMap(getId(), dlogPdfdx));
     }
 
     @Override

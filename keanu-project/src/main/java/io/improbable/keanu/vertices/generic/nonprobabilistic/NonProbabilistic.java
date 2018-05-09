@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public abstract class NonProbabilistic<T> extends Vertex<T> {
     }
 
     @Override
-    public Map<String, Double> dLogProb(T value) {
+    public Map<String, DoubleTensor> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

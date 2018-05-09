@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -92,7 +93,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Integer value) {
+    public Map<String, DoubleTensor> dLogPmf(Integer value) {
         int i = getValue();
         double x = input.getValue();
         double clampedX = getClampedInput();
@@ -134,12 +135,12 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         return Math.min(Math.max(input.getValue(), minClamped), maxClamped);
     }
 
-    private Map<String, Double> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
+    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
         PartialDerivatives dPdInputsFromInput = input.getDualNumber().getPartialDerivatives().multiplyBy(dPdInput);
         PartialDerivatives dPdInputsFromSigma = fuzzinessSigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdSigma);
         PartialDerivatives dPdInputs = dPdInputsFromInput.add(dPdInputsFromSigma);
 
-        return dPdInputs.asMap();
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
     private double s(double x, double sigma) {

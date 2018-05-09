@@ -163,11 +163,24 @@ public class GammaVertexTest {
         for (double x = 0.01; x <= 1.0; x += 0.1) {
             double approxExpected = (g.logProb(x + DELTA) - g.logProb(x - DELTA)) / (2 * DELTA);
             g.setValue(x);
-            double actual = g.dLogProbAtValue().get(g.getId());
+            double actual = g.dLogProbAtValue().get(g.getId()).scalar();
             assertThat("   Gradient at " + x + " = " + actual + " (approx expected = " + approxExpected + ")",
                     approxExpected, closeTo(actual, 0.1)
             );
         }
+    }
+
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        GammaVertex vertexUnderTest = new GammaVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                new ConstantDoubleVertex(1.0),
+                random
+        );
+
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test
