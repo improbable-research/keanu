@@ -84,58 +84,27 @@ public class NUTS {
                 //build tree direction -1 = backwards OR 1 = forwards
                 int buildDirection = random.nextBoolean() ? 1 : -1;
 
-                BuiltTree otherHalfTree;
-                if (buildDirection == -1) {
-
-                    otherHalfTree = buildTree(
-                            latentVertices,
-                            latentSetAndCascadeCache,
-                            probabilisticVertices,
-                            sampleFromVertices,
-                            tree.positionBackward,
-                            tree.gradientBackward,
-                            tree.momentumBackward,
-                            u,
-                            buildDirection,
-                            treeHeight,
-                            epsilon,
-                            random
-                    );
-
-                    tree.positionBackward = otherHalfTree.positionBackward;
-                    tree.momentumBackward = otherHalfTree.momentumBackward;
-                    tree.gradientBackward = otherHalfTree.gradientBackward;
-
-                } else {
-
-                    otherHalfTree = buildTree(
-                            latentVertices,
-                            latentSetAndCascadeCache,
-                            probabilisticVertices,
-                            sampleFromVertices,
-                            tree.positionForward,
-                            tree.gradientForward,
-                            tree.momentumForward,
-                            u,
-                            buildDirection,
-                            treeHeight,
-                            epsilon,
-                            random
-                    );
-
-                    tree.positionForward = otherHalfTree.positionForward;
-                    tree.momentumForward = otherHalfTree.momentumForward;
-                    tree.gradientForward = otherHalfTree.gradientForward;
-                }
+                BuiltTree otherHalfTree = buildOtherHalfOfTree(
+                        tree,
+                        latentVertices,
+                        latentSetAndCascadeCache,
+                        probabilisticVertices,
+                        sampleFromVertices,
+                        u,
+                        buildDirection,
+                        treeHeight,
+                        epsilon,
+                        random
+                );
 
                 if (otherHalfTree.shouldContinueFlag) {
                     final double acceptanceProb = (double) otherHalfTree.acceptedLeapfrogCount / tree.acceptedLeapfrogCount;
-                    if (withProbability(acceptanceProb, random)) {
-                        tree.acceptedPosition = otherHalfTree.acceptedPosition;
-                        tree.gradientAtAcceptedPosition = otherHalfTree.gradientAtAcceptedPosition;
-                        tree.logOfMasterPAtAcceptedPosition = otherHalfTree.logOfMasterPAtAcceptedPosition;
-                        tree.sampleAtAcceptedPosition = otherHalfTree.sampleAtAcceptedPosition;
-                    }
+
+                    acceptOtherPositionWithProbability(
+                            acceptanceProb,
+                            tree, otherHalfTree,
+                            random
+                    );
                 }
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
@@ -161,6 +130,64 @@ public class NUTS {
         return new NetworkSamples(samples, sampleCount);
     }
 
+    private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
+                                                  List<Vertex<Double>> latentVertices,
+                                                  final Map<String, Long> latentSetAndCascadeCache,
+                                                  List<Vertex> probabilisticVertices,
+                                                  final List<? extends Vertex> sampleFromVertices,
+                                                  double u,
+                                                  int buildDirection,
+                                                  int treeHeight,
+                                                  double epsilon,
+                                                  Random random) {
+
+        BuiltTree otherHalfTree;
+        if (buildDirection == -1) {
+
+            otherHalfTree = buildTree(
+                    latentVertices,
+                    latentSetAndCascadeCache,
+                    probabilisticVertices,
+                    sampleFromVertices,
+                    currentTree.positionBackward,
+                    currentTree.gradientBackward,
+                    currentTree.momentumBackward,
+                    u,
+                    buildDirection,
+                    treeHeight,
+                    epsilon,
+                    random
+            );
+
+            currentTree.positionBackward = otherHalfTree.positionBackward;
+            currentTree.momentumBackward = otherHalfTree.momentumBackward;
+            currentTree.gradientBackward = otherHalfTree.gradientBackward;
+
+        } else {
+
+            otherHalfTree = buildTree(
+                    latentVertices,
+                    latentSetAndCascadeCache,
+                    probabilisticVertices,
+                    sampleFromVertices,
+                    currentTree.positionForward,
+                    currentTree.gradientForward,
+                    currentTree.momentumForward,
+                    u,
+                    buildDirection,
+                    treeHeight,
+                    epsilon,
+                    random
+            );
+
+            currentTree.positionForward = otherHalfTree.positionForward;
+            currentTree.momentumForward = otherHalfTree.momentumForward;
+            currentTree.gradientForward = otherHalfTree.gradientForward;
+        }
+
+        return otherHalfTree;
+    }
+
     private static BuiltTree buildTree(List<Vertex<Double>> latentVertices,
                                        final Map<String, Long> latentSetAndCascadeCache,
                                        List<Vertex> probabilisticVertices,
@@ -172,9 +199,7 @@ public class NUTS {
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
-                                       Random random
-    ) {
-
+                                       Random random) {
         if (treeHeight == 0) {
 
             //Base case—take one leapfrog step in the build direction
@@ -212,56 +237,26 @@ public class NUTS {
             //Should continue building other half if first half's shouldContinueFlag is true
             if (tree.shouldContinueFlag) {
 
-                BuiltTree otherHalfTree;
-                if (buildDirection == -1) {
-                    otherHalfTree = buildTree(
-                            latentVertices,
-                            latentSetAndCascadeCache,
-                            probabilisticVertices,
-                            sampleFromVertices,
-                            tree.positionBackward,
-                            tree.gradientBackward,
-                            tree.momentumBackward,
-                            u,
-                            buildDirection,
-                            treeHeight - 1,
-                            epsilon,
-                            random
-                    );
+                BuiltTree otherHalfTree = buildOtherHalfOfTree(
+                        tree,
+                        latentVertices,
+                        latentSetAndCascadeCache,
+                        probabilisticVertices,
+                        sampleFromVertices,
+                        u,
+                        buildDirection,
+                        treeHeight - 1,
+                        epsilon,
+                        random
+                );
 
-                    tree.positionBackward = otherHalfTree.positionBackward;
-                    tree.gradientBackward = otherHalfTree.gradientBackward;
-                    tree.momentumBackward = otherHalfTree.momentumBackward;
+                double acceptOtherTreePositionProbability = (double) otherHalfTree.acceptedLeapfrogCount / (tree.acceptedLeapfrogCount + otherHalfTree.acceptedLeapfrogCount);
 
-                } else {
-                    otherHalfTree = buildTree(
-                            latentVertices,
-                            latentSetAndCascadeCache,
-                            probabilisticVertices,
-                            sampleFromVertices,
-                            tree.positionForward,
-                            tree.gradientForward,
-                            tree.momentumForward,
-                            u,
-                            buildDirection,
-                            treeHeight - 1,
-                            epsilon,
-                            random
-                    );
-
-                    tree.positionForward = otherHalfTree.positionForward;
-                    tree.gradientForward = otherHalfTree.gradientForward;
-                    tree.momentumForward = otherHalfTree.momentumForward;
-                }
-
-                double acceptRightTreeNextPositionProbability = (double) otherHalfTree.acceptedLeapfrogCount / (tree.acceptedLeapfrogCount + otherHalfTree.acceptedLeapfrogCount);
-
-                if (withProbability(acceptRightTreeNextPositionProbability, random)) {
-                    tree.acceptedPosition = otherHalfTree.acceptedPosition;
-                    tree.gradientAtAcceptedPosition = otherHalfTree.gradientAtAcceptedPosition;
-                    tree.logOfMasterPAtAcceptedPosition = otherHalfTree.logOfMasterPAtAcceptedPosition;
-                    tree.sampleAtAcceptedPosition = otherHalfTree.sampleAtAcceptedPosition;
-                }
+                acceptOtherPositionWithProbability(
+                        acceptOtherTreePositionProbability,
+                        tree, otherHalfTree,
+                        random
+                );
 
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
                         tree.positionForward,
@@ -329,6 +324,18 @@ public class NUTS {
             sum += vertex.logProbAtValue();
         }
         return sum;
+    }
+
+    private static void acceptOtherPositionWithProbability(double probability,
+                                                           BuiltTree tree,
+                                                           BuiltTree otherTree,
+                                                           Random random) {
+        if (withProbability(probability, random)) {
+            tree.acceptedPosition = otherTree.acceptedPosition;
+            tree.gradientAtAcceptedPosition = otherTree.gradientAtAcceptedPosition;
+            tree.logOfMasterPAtAcceptedPosition = otherTree.logOfMasterPAtAcceptedPosition;
+            tree.sampleAtAcceptedPosition = otherTree.sampleAtAcceptedPosition;
+        }
     }
 
     private static boolean withProbability(double probability, Random random) {
