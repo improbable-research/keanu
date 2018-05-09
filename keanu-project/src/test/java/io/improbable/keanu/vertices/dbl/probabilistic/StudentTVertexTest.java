@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
@@ -18,23 +19,13 @@ import static junit.framework.TestCase.assertEquals;
 /**
  *
  */
-public class StudentTVertexTest {
-	
-	private static final double DELTA = 0.0001;
-	
-	private static int POS_V = 0;
+public class StudentTVertexTest {	private static final double DELTA = 0.0001;	private static int POS_V = 0;
 	private static int POS_MEAN = 1;
 	private static int POS_SD = 2; // standard deviation
-	private static final double[] TEST_VALUES = new double[]{
-			1.0, 2.0, 3.0
+	private static final int[] TEST_VALUES_OF_V = new int[]{
+			1, 2, 3
 	};
-	
-	private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);
-	
-	private Random random;
-	private double mu = 0.;
-	private double sigma = 1.;
-	
+	private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);	private Random random;
 	/**
 	 *
 	 */
@@ -42,7 +33,6 @@ public class StudentTVertexTest {
 	public void setup() {
 		random = new Random(1);
 	}
-	
 	/**
 	 * Test the StudentTVertex -> StudentT -> sample()
 	 */
@@ -54,7 +44,7 @@ public class StudentTVertexTest {
 				{2., 0., 4.5}
 		};
 		for (int i = 0; i < test_values.length; i++) {
-			double v = test_values[i][POS_V];
+			int v = (int) test_values[i][POS_V];
 			StudentTVertex studentT = new StudentTVertex(v, random);
 			
 			List<Double> samples = new ArrayList<>();
@@ -75,52 +65,47 @@ public class StudentTVertexTest {
 			Assert.assertEquals(test_values[i][POS_SD], sd, 0.1);
 		}
 	}
-	
 	/**
 	 * Test the StudentT Probability Density Function
 	 */
 	@Test
 	public void pdfTest() {
-		for (int i = 0; i < TEST_VALUES.length; i++) {
-			testPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		for (int i = 0; i < TEST_VALUES_OF_V.length; i++) {
+			testPdfAtGivenDegreesOfFreedom(TEST_VALUES_OF_V[i]);
 		}
 	}
-	
 	/**
 	 * Test the Log of the StudentT Probability Density Function
 	 */
 	@Test
 	public void logPdfTest() {
-		for (int i = 0; i < TEST_VALUES.length; i++) {
-			testLogPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		for (int i = 0; i < TEST_VALUES_OF_V.length; i++) {
+			testLogPdfAtGivenDegreesOfFreedom(TEST_VALUES_OF_V[i]);
 		}
 	}
-	
 	/**
 	 * Test the differential of the StudentT Probability Density Function
 	 */
 	@Test
 	public void dPdfTest() {
-		for (int i = 0; i < TEST_VALUES.length; i++) {
-			testDPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		for (int i = 0; i < TEST_VALUES_OF_V.length; i++) {
+			testDPdfAtGivenDegreesOfFreedom(TEST_VALUES_OF_V[i]);
 		}
 	}
-	
 	/**
 	 * Test the differential of the log of the StudentT Probability Density Function
 	 */
 	@Test
 	public void dLogPdfTest() {
-		for (int i = 0; i < TEST_VALUES.length; i++) {
-			testDLogPdfAtGivenDegreesOfFreedom(TEST_VALUES[i]);
+		for (int i = 0; i < TEST_VALUES_OF_V.length; i++) {
+			testDLogPdfAtGivenDegreesOfFreedom(TEST_VALUES_OF_V[i]);
 		}
 	}
-	
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 */
-	private void testPdfAtGivenDegreesOfFreedom(double v) {
+	private void testPdfAtGivenDegreesOfFreedom(int v) {
 		TDistribution apache = new TDistribution(v);
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		
@@ -130,12 +115,11 @@ public class StudentTVertexTest {
 			assertEquals(expected, actual, DELTA);
 		}
 	}
-	
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 */
-	private void testLogPdfAtGivenDegreesOfFreedom(double v) {
+	private void testLogPdfAtGivenDegreesOfFreedom(int v) {
 		TDistribution apache = new TDistribution(v);
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		
@@ -145,18 +129,17 @@ public class StudentTVertexTest {
 			assertEquals(expected, actual, DELTA);
 		}
 	}
-	
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 */
-	private void testDPdfAtGivenDegreesOfFreedom(double v) {
+	private void testDPdfAtGivenDegreesOfFreedom(int v) {
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected;
-			double actual = studentT.dDensityAtValue(t).get(studentT.getId());
-			switch((int) v) {
+			DoubleTensor actual = studentT.dDensityAtValue(t).get(studentT.getId());
+			switch(v) {
 				case 1:
 					expected = (-2. * t) / (PI * pow(pow(t, 2) + 1., 2));
 					break;
@@ -172,29 +155,28 @@ public class StudentTVertexTest {
 			assertEquals(expected, actual, DELTA);
 		}
 	}
-	
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 */
-	private void testDLogPdfAtGivenDegreesOfFreedom(double v) {
+	private void testDLogPdfAtGivenDegreesOfFreedom(int v) {
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
-			double expected;
-			double actual = studentT.dLogPdf(t).get(studentT.getId());
-			switch((int) v) {
+			DoubleTensor expected;
+			DoubleTensor actual = studentT.dLogPdf(t).get(studentT.getId());
+			switch(v) {
 				case 1:
-					expected = (-2 * t) / (pow(t, 2) + 1.);
+					expected = DoubleTensor.scalar((-2 * t) / (pow(t, 2) + 1.));
 					break;
 				case 2:
-					expected = (-3 * t) / (pow(t, 2) + 2.);
+					expected = DoubleTensor.scalar((-3 * t) / (pow(t, 2) + 2.));
 					break;
 				case 3:
-					expected = (-4 * t) / (pow(t, 2) + 3.);
+					expected = DoubleTensor.scalar((-4 * t) / (pow(t, 2) + 3.));
 					break;
 				default:
-					expected = 0.;
+					expected = DoubleTensor.scalar(0.);
 			}
 			assertEquals(expected, actual, DELTA);
 		}
