@@ -68,7 +68,7 @@ public class NonGradientOptimizer {
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
-        return optimize(maxEvaluations, boundsRange, bayesNet.getVerticesThatContributeToMasterP());
+        return optimize(maxEvaluations, boundsRange, bayesNet.getLatentAndObservedVertices());
     }
 
     /**

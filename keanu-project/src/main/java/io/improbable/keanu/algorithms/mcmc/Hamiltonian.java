@@ -40,7 +40,7 @@ public class Hamiltonian {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
-        final List<Vertex> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
+        final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
         final Map<String, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
@@ -50,7 +50,7 @@ public class Hamiltonian {
         Map<String, Double> positionBeforeLeapfrog = new HashMap<>();
 
         Map<String, Double> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-                bayesNet.getVerticesThatContributeToMasterP()
+                bayesNet.getLatentAndObservedVertices()
         );
         Map<String, Double> gradientBeforeLeapfrog = new HashMap<>();
 

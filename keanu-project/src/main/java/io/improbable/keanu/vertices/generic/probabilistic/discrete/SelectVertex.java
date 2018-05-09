@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 
 import java.util.LinkedHashMap;
@@ -62,7 +63,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     @Override
-    public Map<String, Double> dLogProb(T value) {
+    public Map<String, DoubleTensor> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

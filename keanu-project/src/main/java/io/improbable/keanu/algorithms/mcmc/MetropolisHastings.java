@@ -117,7 +117,7 @@ public class MetropolisHastings {
     }
 
     private static void checkBayesNetInHealthyState(BayesNet bayesNet) {
-        if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
+        if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.vertices.NonProbabilisticObservationException;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 import java.util.Map;
@@ -27,7 +28,7 @@ public abstract class NonProbabilisticInteger extends IntegerVertex {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Integer value) {
+    public Map<String, DoubleTensor> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 
