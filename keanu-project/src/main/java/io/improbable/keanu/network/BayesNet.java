@@ -108,7 +108,7 @@ public class BayesNet {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<Vertex> latentVertices, int attempts) {
+    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts) {
 
         Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
@@ -127,11 +127,11 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices, Map<String, Long> setAndCascadeCache) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, Map<String, Long> setAndCascadeCache) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }

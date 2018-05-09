@@ -16,7 +16,7 @@ public class LogProbGradient {
      * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<String, DoubleTensor> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
+    public static Map<String, DoubleTensor> getJointLogProbGradientWrtLatents(List<? extends Vertex> probabilisticVertices) {
         final Map<String, DoubleTensor> diffOfLogWrt = new HashMap<>();
 
         for (final Vertex<?> probabilisticVertex : probabilisticVertices) {

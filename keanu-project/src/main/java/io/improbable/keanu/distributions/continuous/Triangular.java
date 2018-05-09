@@ -14,9 +14,9 @@ public class Triangular {
     }
 
     /**
-     * @param xMin      minimum x value
-     * @param xMax      maximum x value
-     * @param c          mode
+     * @param xMin   minimum x value
+     * @param xMax   maximum x value
+     * @param c      mode
      * @param random source of randomness
      * @return a random number from the Triangular distribution
      */

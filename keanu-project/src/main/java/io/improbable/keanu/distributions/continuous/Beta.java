@@ -20,10 +20,10 @@ public class Beta {
     }
 
     /**
-     * @param alpha location
-     * @param beta shape
-     * @param xMin minimum x
-     * @param xMax source of randomness
+     * @param alpha  location
+     * @param beta   shape
+     * @param xMin   minimum x
+     * @param xMax   source of randomness
      * @param random source of randomness
      * @return a random number from the Beta distribution
      */
