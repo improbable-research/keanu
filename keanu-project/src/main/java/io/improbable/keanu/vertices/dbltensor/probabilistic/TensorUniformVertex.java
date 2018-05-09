@@ -71,7 +71,7 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return TensorUniform.pdf(xMin.getValue(), xMax.getValue(), value).log().sum();
+        return TensorUniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
     }
 
     @Override

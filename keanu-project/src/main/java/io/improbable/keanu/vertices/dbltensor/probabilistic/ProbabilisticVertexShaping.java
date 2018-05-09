@@ -9,6 +9,13 @@ import java.util.Set;
 
 public class ProbabilisticVertexShaping {
 
+    /**
+     * This is a common function to check that a vertex's parent tensors are either
+     * the same shape of the vertex in question OR scalar.
+     *
+     * @param shape   the shape of the vertex being checked
+     * @param tensors the tensors of the parent vertices
+     */
     public static void checkParentShapes(int[] shape, DoubleTensor... tensors) {
 
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(tensors);
@@ -24,6 +31,12 @@ public class ProbabilisticVertexShaping {
         }
     }
 
+    /**
+     * This implies a vertex's tensor shape based on it's parents tensor shapes.
+     *
+     * @param tensors the parent tensors of the vertex that needs it's shape implied.
+     * @return a suggested shape for the vertex given it's parent vertices shapes.
+     */
     public static int[] getShapeProposal(DoubleTensor... tensors) {
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(tensors);
 

@@ -24,11 +24,12 @@ public class TensorUniform {
         return random.nextDouble(xMax.getShape()).times(xMax.minus(xMin)).plus(xMin);
     }
 
-    public static DoubleTensor pdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor x) {
+    public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor x) {
 
-        DoubleTensor withinBounds = xMax.minus(xMin).reciprocalInPlace();
+        DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
+
 
         //TODO: zero out where out of bounds
-        return withinBounds;
+        return logOfWithinBounds;
     }
 }
