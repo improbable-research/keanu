@@ -75,7 +75,7 @@ public class VertexValuePropagation {
         cascadeUpdate(vertices, exploreSetting(vertices));
     }
 
-    public static void cascadeUpdate(List<Vertex> vertices) {
+    public static void cascadeUpdate(List<? extends Vertex> vertices) {
         cascadeUpdate(vertices, exploreSetting(vertices));
     }
 

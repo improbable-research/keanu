@@ -10,7 +10,7 @@ public class TopologicalSort {
     private TopologicalSort() {
     }
 
-    public static List<Vertex> sort(Collection<Vertex> vertices) {
+    public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
 
         Map<Vertex, Set<Vertex>> dependencies = mapDependencies(vertices);
 
