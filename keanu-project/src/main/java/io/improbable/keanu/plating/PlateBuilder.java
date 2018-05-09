@@ -31,7 +31,7 @@ public class PlateBuilder<T> {
     /**
      * Build a fixed number of plates without additional data
      *
-     * @param count
+     * @param count count
      * @return A builder with count set
      */
     public FromCount count(int count) {
@@ -41,7 +41,7 @@ public class PlateBuilder<T> {
     /**
      * Build an unspecified number of plates with data from an iterator
      *
-     * @param iterator
+     * @param iterator iterator
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator) {
@@ -51,7 +51,7 @@ public class PlateBuilder<T> {
     /**
      * Build a number of plates with data from an iterator
      *
-     * @param iterator
+     * @param iterator iterator
      * @param sizeHint A hint of the iterator cardinality. Does not need to be exact
      * @return A builder with data set
      */
@@ -76,7 +76,7 @@ public class PlateBuilder<T> {
         /**
          * Set the Plate factory method, taking no additional data
          *
-         * @param factory
+         * @param factory a plate factory
          * @return A builder with count and plate factory set
          */
         public FromCountFactory withFactory(Consumer<Plate> factory) {
@@ -103,7 +103,7 @@ public class PlateBuilder<T> {
         /**
          * Set the Plate factory method, taking additional data
          *
-         * @param factory
+         * @param factory a plate factory
          * @return A builder with data and plate factory set
          */
         public FromDataFactory withFactory(BiConsumer<Plate, T> factory) {

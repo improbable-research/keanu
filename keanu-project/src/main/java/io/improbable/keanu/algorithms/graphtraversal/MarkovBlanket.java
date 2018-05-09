@@ -8,13 +8,16 @@ import java.util.Set;
 
 public class MarkovBlanket {
 
-    public static Set<Vertex<?>> get(Vertex<?> aVertex) {
+    private MarkovBlanket() {
+    }
 
-        Set<Vertex<?>> parents = getUpstreamProbabilisticVertices(aVertex);
-        Set<Vertex<?>> children = getDownstreamProbabilisticVertices(aVertex);
-        Set<Vertex<?>> childrensParents = getUpstreamProbabilisticVertices(children);
+    public static Set<Vertex> get(Vertex<?> aVertex) {
 
-        Set<Vertex<?>> blanket = new HashSet<>();
+        Set<Vertex> parents = getUpstreamProbabilisticVertices(aVertex);
+        Set<Vertex> children = getDownstreamProbabilisticVertices(aVertex);
+        Set<Vertex> childrensParents = getUpstreamProbabilisticVertices(children);
+
+        Set<Vertex> blanket = new HashSet<>();
         blanket.addAll(parents);
         blanket.addAll(children);
         blanket.addAll(childrensParents);
@@ -24,11 +27,11 @@ public class MarkovBlanket {
         return blanket;
     }
 
-    public static Set<Vertex<?>> getUpstreamProbabilisticVertices(Vertex<?> aVertex) {
+    private static Set<Vertex> getUpstreamProbabilisticVertices(Vertex<?> aVertex) {
         return getUpstreamProbabilisticVertices(aVertex, new HashSet<>(), new HashSet<>());
     }
 
-    private static Set<Vertex<?>> getUpstreamProbabilisticVertices(Vertex<?> aVertex, Set<Vertex<?>> probabilistic, Set<Vertex<?>> visited) {
+    private static Set<Vertex> getUpstreamProbabilisticVertices(Vertex<?> aVertex, Set<Vertex> probabilistic, Set<Vertex> visited) {
         visited.add(aVertex);
 
         aVertex.getParents().forEach(parent -> {
@@ -44,10 +47,10 @@ public class MarkovBlanket {
         return probabilistic;
     }
 
-    public static Set<Vertex<?>> getUpstreamProbabilisticVertices(Collection<Vertex<?>> vertices) {
+    private static Set<Vertex> getUpstreamProbabilisticVertices(Collection<Vertex> vertices) {
 
-        Set<Vertex<?>> visited = new HashSet<>();
-        Set<Vertex<?>> probabilistic = new HashSet<>();
+        Set<Vertex> visited = new HashSet<>();
+        Set<Vertex> probabilistic = new HashSet<>();
 
         for (Vertex<?> vertex : vertices) {
             getUpstreamProbabilisticVertices(vertex, probabilistic, visited);
@@ -56,11 +59,11 @@ public class MarkovBlanket {
         return probabilistic;
     }
 
-    public static Set<Vertex<?>> getDownstreamProbabilisticVertices(Vertex<?> aVertex) {
+    public static Set<Vertex> getDownstreamProbabilisticVertices(Vertex<?> aVertex) {
         return getDownstreamProbabilisticVertices(aVertex, new HashSet<>(), new HashSet<>());
     }
 
-    private static Set<Vertex<?>> getDownstreamProbabilisticVertices(Vertex<?> aVertex, Set<Vertex<?>> probabilistic, Set<Vertex<?>> visited) {
+    private static Set<Vertex> getDownstreamProbabilisticVertices(Vertex<?> aVertex, Set<Vertex> probabilistic, Set<Vertex> visited) {
         visited.add(aVertex);
 
         aVertex.getChildren().forEach(child -> {

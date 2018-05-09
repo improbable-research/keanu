@@ -10,11 +10,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 
 public class GammaVertexTest {
     private final Logger log = LoggerFactory.getLogger(GammaVertexTest.class);
@@ -71,7 +71,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex a = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         GammaVertex g = new GammaVertex(a, new ConstantDoubleVertex(0.5), new ConstantDoubleVertex(1.0), random);
 
@@ -91,7 +91,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdtheta() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdtheta() {
         UniformVertex t = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         GammaVertex g = new GammaVertex(new ConstantDoubleVertex(0.5), t, new ConstantDoubleVertex(1.0), random);
 
@@ -111,7 +111,7 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdk() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdk() {
         UniformVertex k = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
         GammaVertex g = new GammaVertex(new ConstantDoubleVertex(0.5), new ConstantDoubleVertex(1.0), k, random);
 
@@ -130,29 +130,6 @@ public class GammaVertexTest {
                 DELTA);
     }
 
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        GammaVertex g = new GammaVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(2.0),
-                new ConstantDoubleVertex(1.0),
-                random
-        );
-
-        double atValue = 0.5;
-        g.setAndCascade(atValue);
-
-        Map<String, Double> dP = g.dDensityAtValue();
-        Map<String, Double> dlnP = g.dlnDensityAtValue();
-
-        final double density = g.densityAtValue();
-        for (String vertexId : dP.keySet()) {
-            dP.put(vertexId, dP.get(vertexId) / density);
-        }
-
-        assertEquals(dP.get(g.getId()), dlnP.get(g.getId()), 0.01);
-    }
-
     private void testPdfAtPercentiles(double theta, double k) {
         GammaVertex g = new GammaVertex(
                 new ConstantDoubleVertex(0.0),
@@ -164,11 +141,12 @@ public class GammaVertexTest {
         GammaDistribution apache = new GammaDistribution(k, theta);
         log.info("k = " + k + ", theta = " + theta + ":");
 
-        for (double x = 0.0; x <= 1.0; x += 0.1) {
-            double expected = apache.density(x);
-            double density = g.density(x);
-            log.info("   Density at " + x + " = " + density + " (expected = " + expected + ")");
-            assertEquals(expected, density, 0.0001);
+        for (double x = 0.1; x <= 1.0; x += 0.1) {
+            double expected = Math.log(apache.density(x));
+            double density = g.logProb(x);
+            assertThat("   Density at " + x + " = " + density + " (expected = " + expected + ")",
+                    expected, closeTo(density, 0.0001)
+            );
         }
     }
 
@@ -183,31 +161,30 @@ public class GammaVertexTest {
         log.info("k = " + k + ", theta = " + theta + ":");
 
         for (double x = 0.01; x <= 1.0; x += 0.1) {
-            double approxExpected = (g.density(x + DELTA) - g.density(x - DELTA)) / (2 * DELTA);
+            double approxExpected = (g.logProb(x + DELTA) - g.logProb(x - DELTA)) / (2 * DELTA);
             g.setValue(x);
-            double actual = g.dDensityAtValue().get(g.getId());
-            log.info("   Gradient at " + x + " = " + actual + " (approx expected = " + approxExpected + ")");
-            assertEquals(approxExpected, actual, 0.1);
+            double actual = g.dLogProbAtValue().get(g.getId()).scalar();
+            assertThat("   Gradient at " + x + " = " + actual + " (approx expected = " + approxExpected + ")",
+                    approxExpected, closeTo(actual, 0.1)
+            );
         }
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        GammaVertex g = new GammaVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(2.0),
+    public void isTreatedAsConstantWhenObserved() {
+        GammaVertex vertexUnderTest = new GammaVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
                 new ConstantDoubleVertex(1.0),
                 random
         );
 
-        double atValue = 0.5;
-        double logOfDensity = Math.log(g.density(atValue));
-        double logDensity = g.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test
-    public void samplingMatchesPdf() {
+    public void samplingMatchesLogProb() {
         GammaVertex gamma = new GammaVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(2.0),
@@ -215,7 +192,7 @@ public class GammaVertexTest {
                 random
         );
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 gamma,
                 100000,
                 2.0,
@@ -243,7 +220,7 @@ public class GammaVertexTest {
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),
                 aThetaK,
                 latentAThetaK,

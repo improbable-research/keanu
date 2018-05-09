@@ -4,6 +4,12 @@ import java.util.Random;
 
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
+/**
+ * Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.2.8 page 49
+ */
 public class Poisson {
     private final double mu;
     private final Random random;
@@ -17,14 +23,10 @@ public class Poisson {
         return poisson(mu, random);
     }
 
-    /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.2.8 page 49
-     */
     public static int poisson(double mu, Random random) {
-        assert (mu > 0.);
+        if (mu <= 0.) {
+            throw new IllegalArgumentException("Invalid value for mu: " + mu);
+        }
 
         double b = 1.;
         double stopB = Math.exp(-mu);
@@ -37,7 +39,7 @@ public class Poisson {
         return i - 1;
     }
 
-    public static double pdf(double mu, int k) {
+    public static double pmf(double mu, int k) {
         if (k >= 0 && k < 20) {
             return (Math.pow(mu, k) / factorial(k)) * Math.exp(-mu);
         } else if (k >= 20) {

@@ -3,77 +3,45 @@ package io.improbable.keanu.vertices;
 import io.improbable.keanu.Identifiable;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> implements Identifiable {
 
-    public static AtomicLong idGenerator = new AtomicLong(0L);
+    public static final AtomicLong idGenerator = new AtomicLong(0L);
 
     private String uuid = idGenerator.getAndIncrement() + "";
-    private Set<Vertex<?>> children = new HashSet<>();
-    private Set<Vertex<?>> parents = new HashSet<>();
+    private Set<Vertex> children = new HashSet<>();
+    private Set<Vertex> parents = new HashSet<>();
     private T value;
     private boolean observed;
 
     /**
-     * This is the value of the probability density at the supplied value.
+     * This is the natural log of the probability at the supplied value. In the
+     * case of continuous vertices, this is actually the log of the density, which
+     * will differ from the probability by a constant.
      *
      * @param value The supplied value.
-     * @return The probability.
+     * @return The natural log of the probability density at the supplied value
      */
-    public abstract double density(T value);
+    public abstract double logProb(T value);
 
-    /**
-     * Just a helper method for a common function
-     */
-    public double densityAtValue() {
-        return density(getValue());
+    public double logProbAtValue() {
+        return logProb(getValue());
     }
 
     /**
-     * This is the value of the natural log of the probability density at the supplied value.
+     * The partial derivatives of the natural log prob.
      *
-     * @param value The supplied value.
-     * @return The probability.
+     * @param value at a given value
+     * @return the partial derivatives of the log density
      */
-    public double logDensity(T value) {
-        return Math.log(density(value));
-    }
+    public abstract Map<String, DoubleTensor> dLogProb(T value);
 
-    /**
-     * Just a helper method for a common function
-     */
-    public double logDensityAtValue() {
-        return logDensity(getValue());
-    }
-
-    /**
-     * This returns the derivative of the density function with respect to
-     * any dependent vertices.
-     *
-     * @return a Map containing { dependent vertex Id -&gt; density slope w.r.t. dependent vertex}
-     */
-    public abstract Map<String, Double> dDensityAtValue();
-
-    /**
-     * This is the same as dDensityAtValue except for the log of the density. For numerical
-     * stability a vertex may chose to override this method but if not overridden, the
-     * chain rule is used to calculate the derivative of the log of the density.
-     * <p>
-     * dlog(P)/dx = (dP/dx)*(1/P(x))
-     */
-    public Map<String, Double> dlnDensityAtValue() {
-
-        final double density = densityAtValue();
-        Map<String, Double> dDensityAtValue = dDensityAtValue();
-        Map<String, Double> dLnDensity = new HashMap<>();
-        for (String vertexId : dDensityAtValue.keySet()) {
-            dLnDensity.put(vertexId, dDensityAtValue.get(vertexId) / density);
-        }
-
-        return dLnDensity;
+    public Map<String, DoubleTensor> dLogProbAtValue() {
+        return dLogProb(getValue());
     }
 
     /**
@@ -127,9 +95,10 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     /**
-     * A probabilistic vertex is defined as a vertex whose value is not
-     * derived from it's parents. However, the probability of the vertex's
-     * value may be dependent on it's parents values.
+     * @return True if the vertex is probabilistic, false otherwise.
+     * A probabilistic vertex is defined as a vertex whose value is
+     * not derived from it's parents. However, the probability of the
+     * vertex's value may be dependent on it's parents values.
      */
     public abstract boolean isProbabilistic();
 
@@ -210,7 +179,7 @@ public abstract class Vertex<T> implements Identifiable {
         return uuid;
     }
 
-    public Set<Vertex<?>> getChildren() {
+    public Set<Vertex> getChildren() {
         return children;
     }
 
@@ -236,7 +205,7 @@ public abstract class Vertex<T> implements Identifiable {
         parent.addChild(this);
     }
 
-    public Set<Vertex<?>> getParents() {
+    public Set<Vertex> getParents() {
         return this.parents;
     }
 
@@ -255,11 +224,11 @@ public abstract class Vertex<T> implements Identifiable {
         return uuid.hashCode();
     }
 
-    public Set<Vertex<?>> getConnectedGraph() {
+    public Set<Vertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 
-    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {

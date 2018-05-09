@@ -1,4 +1,4 @@
-package io.improbable.keanu.randomFactory;
+package io.improbable.keanu.randomfactory;
 
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.continuous.Uniform;
@@ -19,6 +19,11 @@ public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
     public ArithmeticDouble nextDouble(double min, double max) {
         double randomDouble = Uniform.sample(min, max, random);
         return new ArithmeticDouble(randomDouble);
+    }
+
+    @Override
+    public ArithmeticDouble nextConstant(double value) {
+        return new ArithmeticDouble(value);
     }
 
     @Override

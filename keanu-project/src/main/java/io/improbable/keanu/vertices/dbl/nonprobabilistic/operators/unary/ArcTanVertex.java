@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Map;
 
 public class ArcTanVertex extends DoubleUnaryOpVertex {
 
@@ -21,10 +24,10 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber getDualNumber() {
-        DualNumber inputDualNumber = inputVertex.getDualNumber();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        DualNumber inputDualNumber = dualNumbers.get(inputVertex);
         double dArcTan = 1 / (1 + Math.pow(inputVertex.getValue(), 2));
-        Infinitesimal outputInfinitesimal = inputDualNumber.getInfinitesimal().multiplyBy(dArcTan);
-        return new DualNumber(op(inputVertex.getValue()), outputInfinitesimal);
+        PartialDerivatives outputPartialDerivative = inputDualNumber.getPartialDerivatives().multiplyBy(dArcTan);
+        return new DualNumber(op(inputVertex.getValue()), outputPartialDerivative);
     }
 }

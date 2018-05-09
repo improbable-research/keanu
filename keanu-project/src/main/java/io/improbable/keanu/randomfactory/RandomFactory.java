@@ -1,4 +1,4 @@
-package io.improbable.keanu.randomFactory;
+package io.improbable.keanu.randomfactory;
 
 import java.util.Random;
 
@@ -7,6 +7,8 @@ public interface RandomFactory<T> {
     void setRandom(Random random);
 
     T nextDouble(double min, double max);
+
+    T nextConstant(double value);
 
     T nextGaussian(T mu, T sigma);
 

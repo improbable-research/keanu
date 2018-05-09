@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.HashMap;
 import java.util.List;
@@ -8,11 +9,14 @@ import java.util.Map;
 
 public class LogProbGradient {
 
+    private LogProbGradient() {
+    }
+
     /**
-     * @param probabilisticVertices
+     * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex<?>> probabilisticVertices) {
+    public static Map<String, Double> getJointLogProbGradientWrtLatents(List<Vertex> probabilisticVertices) {
         final Map<String, Double> diffOfLogWrt = new HashMap<>();
 
         for (final Vertex<?> probabilisticVertex : probabilisticVertices) {
@@ -23,28 +27,28 @@ public class LogProbGradient {
     }
 
     public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex,
-                                                                   final Map<String, Double> diffOfLogWrt) {
+                                                                   final Map<String, Double> diffOfLogProbWrt) {
         //Non-probabilistic vertices are non-differentiable
         if (!probabilisticVertex.isProbabilistic()) {
-            return diffOfLogWrt;
+            return diffOfLogProbWrt;
         }
 
-        //dlnDensityForProbabilisticVertex is the partial differentials of the natural
-        //log of the fitness vertex's density w.r.t latent vertices. The key of the
+        //dlogProbForProbabilisticVertex is the partial differentials of the natural
+        //log of the fitness vertex's probability w.r.t latent vertices. The key of the
         //map is the latent vertex's id.
-        final Map<String, Double> dlnDensityForProbabilisticVertex = probabilisticVertex.dlnDensityAtValue();
+        final Map<String, DoubleTensor> dlogProbForProbabilisticVertex = probabilisticVertex.dLogProbAtValue();
 
-        for (Map.Entry<String, Double> partialDiffLogPWrt : dlnDensityForProbabilisticVertex.entrySet()) {
+        for (Map.Entry<String, DoubleTensor> partialDiffLogPWrt : dlogProbForProbabilisticVertex.entrySet()) {
             final String wrtLatentVertexId = partialDiffLogPWrt.getKey();
-            final double partialDiffLogPContribution = partialDiffLogPWrt.getValue();
+            final double partialDiffLogProbContribution = partialDiffLogPWrt.getValue().scalar();
 
-            //partialDiffLogPContribution is the contribution to the rate of change of
+            //partialDiffLogProbContribution is the contribution to the rate of change of
             //the natural log of the fitness vertex due to wrtLatentVertexId.
-            final double accumulatedDiffOfLogPWrtLatent = diffOfLogWrt.getOrDefault(wrtLatentVertexId, 0.0);
-            diffOfLogWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent + partialDiffLogPContribution);
+            final double accumulatedDiffOfLogPWrtLatent = diffOfLogProbWrt.getOrDefault(wrtLatentVertexId, 0.0);
+            diffOfLogProbWrt.put(wrtLatentVertexId, accumulatedDiffOfLogPWrtLatent + partialDiffLogProbContribution);
         }
 
-        return diffOfLogWrt;
+        return diffOfLogProbWrt;
     }
 
     public static Map<String, Double> getLogProbGradientWrtLatents(final Vertex<?> probabilisticVertex) {

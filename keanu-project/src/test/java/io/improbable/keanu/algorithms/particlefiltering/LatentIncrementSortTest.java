@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.particleFiltering;
+package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -30,7 +30,7 @@ public class LatentIncrementSortTest {
         gA.observe(0.1);
         fuzzySum.observe(1.0);
 
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> dependencies = LatentIncrementSort.sort(sigma.getConnectedGraph());
+        Map<Vertex, Set<Vertex>> dependencies = LatentIncrementSort.sort(sigma.getConnectedGraph());
 
         assertEquals(2, dependencies.size());
         assertEquals(1, dependencies.get(gA).size());
@@ -61,7 +61,7 @@ public class LatentIncrementSortTest {
         DoubleVertex g6 = new GaussianVertex(g5, sigma5);
         g6.observe(0.0);
 
-        LinkedHashMap<Vertex<?>, Set<Vertex<?>>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());
+        Map<Vertex, Set<Vertex>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());
 
         assertEquals(3, dependencies.size());
         assertEquals(1, dependencies.get(g1).size());
@@ -80,7 +80,7 @@ public class LatentIncrementSortTest {
 
         List<Vertex<?>> expectedOrder = Arrays.asList(g1, g3, g6);
         int idx = 0;
-        for (Map.Entry<Vertex<?>, Set<Vertex<?>>> entry : dependencies.entrySet()) {
+        for (Map.Entry<Vertex, Set<Vertex>> entry : dependencies.entrySet()) {
             assertEquals(entry.getKey(), expectedOrder.get(idx));
             idx++;
         }

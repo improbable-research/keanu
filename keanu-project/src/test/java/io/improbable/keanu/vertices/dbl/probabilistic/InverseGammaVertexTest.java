@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class InverseGammaVertexTest {
 
@@ -47,14 +46,14 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void samplingMatchesPdf() {
+    public void samplingMatchesLogProb() {
         InverseGammaVertex gamma = new InverseGammaVertex(
                 new ConstantDoubleVertex(2.0),
                 new ConstantDoubleVertex(3.0),
                 random
         );
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 gamma,
                 100000,
                 2.0,
@@ -64,28 +63,7 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        InverseGammaVertex inverted = new InverseGammaVertex(
-                new ConstantDoubleVertex(3.0),
-                new ConstantDoubleVertex(0.5),
-                random);
-        double atValue = 0.5;
-        double logOfDensity = Math.log(inverted.density(atValue));
-        double logDensity = inverted.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        InverseGammaVertex inverted = new InverseGammaVertex(
-                new ConstantDoubleVertex(3.0),
-                new ConstantDoubleVertex(0.5),
-                random);
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(inverted, 0.5, 0.001);
-    }
-
-    @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPda() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(
                 new ConstantDoubleVertex(1.0),
                 new ConstantDoubleVertex(4.0),
@@ -112,7 +90,7 @@ public class InverseGammaVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdb() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(
                 new ConstantDoubleVertex(1.0),
                 new ConstantDoubleVertex(3.0),
@@ -139,6 +117,17 @@ public class InverseGammaVertexTest {
     }
 
     @Test
+    public void isTreatedAsConstantWhenObserved() {
+        InverseGammaVertex vertexUnderTest = new InverseGammaVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
+    @Test
     public void inferHyperParamsFromSamples() {
         double trueAlpha = 3.0;
         double trueBeta = 0.5;
@@ -151,7 +140,7 @@ public class InverseGammaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1), random),
                 alphaBeta,
                 latentAlphaBeta,

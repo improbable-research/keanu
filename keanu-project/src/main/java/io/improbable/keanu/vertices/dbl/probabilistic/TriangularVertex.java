@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -86,13 +87,17 @@ public class TriangularVertex extends ProbabilisticDouble {
         return xMax;
     }
 
-    @Override
-    public double density(Double value) {
+    private double pdf(Double value) {
         return Triangular.pdf(xMin.getValue(), xMax.getValue(), c.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public double logPdf(Double value) {
+        return Math.log(pdf(value));
+    }
+
+    @Override
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 

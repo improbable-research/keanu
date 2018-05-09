@@ -6,8 +6,13 @@ import static org.apache.commons.math3.special.Gamma.gamma;
 
 public class ChiSquared {
 
+    private ChiSquared() {
+    }
+
     public static double sample(int k, Random random) {
-        assert (k >= 1);
+        if (k < 1) {
+            throw new IllegalArgumentException("Invalid value of k: " + k);
+        }
         return Gamma.sample(0.0, 2.0, 0.5 * (double) k, random);
     }
 
@@ -23,7 +28,9 @@ public class ChiSquared {
     }
 
     public static double logPdf(int k, double x) {
-        assert (x > 0);
+        if (x <= 0) {
+            throw new IllegalArgumentException("Invalid value of x: " + x);
+        }
         double halfK = (double) k / 2;
         double numerator = ((halfK - 1) * Math.log(x)) - (x / 2);
         double denominator = (halfK * Math.log(2) + Math.log(gamma(halfK)));

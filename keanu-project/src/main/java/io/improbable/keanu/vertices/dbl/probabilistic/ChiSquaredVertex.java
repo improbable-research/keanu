@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.ChiSquared;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
@@ -15,7 +16,6 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     public ChiSquaredVertex(IntegerVertex k, Random random) {
         this.k = k;
         this.random = random;
-        setValue(sample());
         setParents(k);
     }
 
@@ -37,16 +37,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return ChiSquared.pdf(k.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return ChiSquared.logPdf(k.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 

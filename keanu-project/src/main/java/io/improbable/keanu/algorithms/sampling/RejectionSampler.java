@@ -12,7 +12,10 @@ import java.util.function.Supplier;
 
 public class RejectionSampler {
 
-    public static double getPosteriorProbability(List<? extends Vertex<?>> latentVertices, List<Vertex<?>> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
+    private RejectionSampler() {
+    }
+
+    public static double getPosteriorProbability(List<? extends Vertex> latentVertices, List<Vertex> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
         int matchedSampleCount = 0;
         int success = 0;
 
@@ -26,7 +29,11 @@ public class RejectionSampler {
             }
         }
 
-        return success / (double) matchedSampleCount;
+        if (matchedSampleCount == 0) {
+            throw new IllegalStateException("No samples are matching.");
+        } else {
+            return success / (double) matchedSampleCount;
+        }
     }
 
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet, List<Vertex<?>> fromVertices, int sampleCount) {
@@ -45,7 +52,7 @@ public class RejectionSampler {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void sampleLatents(List<? extends Vertex<?>> latents) {
+    private static void sampleLatents(List<? extends Vertex> latents) {
         latents.forEach(RejectionSampler::setFromSample);
     }
 
@@ -53,9 +60,9 @@ public class RejectionSampler {
         v.setAndCascade(v.sample());
     }
 
-    private static boolean matchesObservation(List<Vertex<?>> observedVertices) {
+    private static boolean matchesObservation(List<Vertex> observedVertices) {
         return observedVertices.stream()
-                .allMatch(v -> v.densityAtValue() != 0.0);
+                .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
     }
 
     private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {

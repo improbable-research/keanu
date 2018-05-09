@@ -12,7 +12,6 @@ import java.util.List;
 import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class LaplaceVertexTest {
 
@@ -40,14 +39,14 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void samplingMatchesPdf() {
+    public void samplingMatchesLogProb() {
         LaplaceVertex laplace = new LaplaceVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(1.0),
                 random
         );
 
-        ProbabilisticDoubleContract.sampleMethodMatchesDensityMethod(
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 laplace,
                 100000,
                 2.0,
@@ -57,16 +56,7 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void logDensityIsSameAsLogOfDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        double atValue = 0.5;
-        double logOfDensity = Math.log(l.density(atValue));
-        double logDensity = l.logDensity(atValue);
-        assertEquals(logDensity, logOfDensity, 0.01);
-    }
-
-    @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdmu() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0), random);
 
@@ -86,7 +76,7 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void dDensityMatchesFiniteDifferenceCalculationFordPdbeta() {
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
         UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
         LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform, random);
 
@@ -106,11 +96,15 @@ public class LaplaceVertexTest {
     }
 
     @Test
-    public void diffLnDensityIsSameAsLogOfDiffDensity() {
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        ProbabilisticDoubleContract.diffLnDensityIsSameAsLogOfDiffDensity(l, 0.5, 0.001);
+    public void isTreatedAsConstantWhenObserved() {
+        LaplaceVertex vertexUnderTest = new LaplaceVertex(
+                new UniformVertex(0.0, 1.0),
+                new ConstantDoubleVertex(3.0),
+                random
+        );
+        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
-
 
     @Test
     public void inferHyperParamsFromSamples() {
@@ -126,7 +120,7 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
-        VertexVariationalMAPTest.inferHyperParamsFromSamples(
+        VertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muBeta,
                 latentMuBeta,

@@ -3,7 +3,8 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -59,34 +60,26 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Gaussian.pdf(mu.getValue(), sigma.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Gaussian.logPdf(mu.getValue(), sigma.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Gaussian.Diff dP = Gaussian.dPdf(mu.getValue(), sigma.getValue(), getValue());
-        return convertDualNumbersToDiff(dP.dPdmu, dP.dPdsigma, dP.dPdx);
-    }
-
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), getValue());
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
+        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
-    private Map<String, Double> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
-        Infinitesimal dPdInputsFromMu = mu.getDualNumber().getInfinitesimal().multiplyBy(dPdmu);
-        Infinitesimal dPdInputsFromSigma = sigma.getDualNumber().getInfinitesimal().multiplyBy(dPdsigma);
-        Infinitesimal dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
+        PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
+        PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
+        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
-        return dPdInputs.getInfinitesimals();
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
     @Override

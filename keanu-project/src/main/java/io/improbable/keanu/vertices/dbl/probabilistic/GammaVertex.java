@@ -3,7 +3,8 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.Infinitesimal;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -19,7 +20,7 @@ public class GammaVertex extends ProbabilisticDouble {
      * @param a      location
      * @param theta  scale
      * @param k      shape
-     * @param random
+     * @param random source for sampling
      */
     public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k, Random random) {
         this.a = a;
@@ -74,34 +75,27 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double density(Double value) {
-        return Gamma.pdf(a.getValue(), theta.getValue(), k.getValue(), value);
-    }
-
-    public double logDensity(Double value) {
+    public double logPdf(Double value) {
         return Gamma.logPdf(a.getValue(), theta.getValue(), k.getValue(), value);
     }
 
     @Override
-    public Map<String, Double> dDensityAtValue() {
-        Gamma.Diff diff = Gamma.dPdf(a.getValue(), theta.getValue(), k.getValue(), getValue());
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
+        Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
     }
 
-    @Override
-    public Map<String, Double> dlnDensityAtValue() {
-        Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), getValue());
-        return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
-    }
+    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
+        PartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
+        PartialDerivatives dPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dPdtheta);
+        PartialDerivatives dPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dPdk);
+        PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromTheta).add(dPdInputsFromK);
 
-    private Map<String, Double> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
-        Infinitesimal dPdInputsFromA = a.getDualNumber().getInfinitesimal().multiplyBy(dPda);
-        Infinitesimal dPdInputsFromTheta = theta.getDualNumber().getInfinitesimal().multiplyBy(dPdtheta);
-        Infinitesimal dPdInputsFromK = k.getDualNumber().getInfinitesimal().multiplyBy(dPdk);
-        Infinitesimal dPdInputs = dPdInputsFromA.add(dPdInputsFromTheta).add(dPdInputsFromK);
-        dPdInputs.getInfinitesimals().put(getId(), dPdx);
+        if (!isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
 
-        return dPdInputs.getInfinitesimals();
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
     @Override
