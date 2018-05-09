@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'io.improbable'
-version = '0.0.6'
+version = '0.0.7-SNAPSHOT'
 archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
