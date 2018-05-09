@@ -15,6 +15,9 @@ import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
 
+/**
+ *
+ */
 public class StudentTVertexTest {
 	
 	private static final double DELTA = 0.0001;
@@ -32,11 +35,17 @@ public class StudentTVertexTest {
 	private double mu = 0.;
 	private double sigma = 1.;
 	
+	/**
+	 *
+	 */
 	@Before
 	public void setup() {
 		random = new Random(1);
 	}
 	
+	/**
+	 * Test the StudentTVertex -> StudentT -> sample()
+	 */
 	@Test
 	public void sampleTest() {
 		int N = 10000000;
@@ -67,6 +76,9 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 * Test the StudentT Probability Density Function
+	 */
 	@Test
 	public void pdfTest() {
 		for (int i = 0; i < TEST_VALUES.length; i++) {
@@ -74,6 +86,9 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 * Test the Log of the StudentT Probability Density Function
+	 */
 	@Test
 	public void logPdfTest() {
 		for (int i = 0; i < TEST_VALUES.length; i++) {
@@ -81,6 +96,9 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 * Test the differential of the StudentT Probability Density Function
+	 */
 	@Test
 	public void dPdfTest() {
 		for (int i = 0; i < TEST_VALUES.length; i++) {
@@ -88,6 +106,9 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 * Test the differential of the log of the StudentT Probability Density Function
+	 */
 	@Test
 	public void dLogPdfTest() {
 		for (int i = 0; i < TEST_VALUES.length; i++) {
@@ -95,6 +116,10 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 */
 	private void testPdfAtGivenDegreesOfFreedom(double v) {
 		TDistribution apache = new TDistribution(v);
 		StudentTVertex studentT = new StudentTVertex(v, random);
@@ -106,6 +131,10 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 */
 	private void testLogPdfAtGivenDegreesOfFreedom(double v) {
 		TDistribution apache = new TDistribution(v);
 		StudentTVertex studentT = new StudentTVertex(v, random);
@@ -117,6 +146,10 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 */
 	private void testDPdfAtGivenDegreesOfFreedom(double v) {
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		
@@ -140,6 +173,10 @@ public class StudentTVertexTest {
 		}
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 */
 	private void testDLogPdfAtGivenDegreesOfFreedom(double v) {
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		

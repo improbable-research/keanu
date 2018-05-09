@@ -6,12 +6,21 @@ import static java.lang.Math.*;
 import static org.apache.commons.math3.special.Gamma.gamma;
 import static org.apache.commons.math3.special.Gamma.digamma;
 
+/**
+ * Student T Distribution
+ * https://en.wikipedia.org/wiki/Student%27s_t-distribution#Sampling_distribution
+ *
+ */
 public class StudentT {
 	/**
 	 * Computer Generation of Statistical Distributions
 	 * by Richard Saucier
 	 * ARL-TR-2168 March 2000
 	 * 5.1.23 page 36
+	 *
+	 * @param v Degrees of Freedom
+	 * @param random
+	 * @return
 	 */
 	public static double sample(double v, Random random) {
 		assert( v > 0. );
@@ -19,6 +28,12 @@ public class StudentT {
 		
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 * @param t
+	 * @return
+	 */
 	public static double pdf(double v, double t) {
 		double halfVPlusOne = (v + 1.) / 2.;
 		double halfV = v / 2.;
@@ -29,14 +44,31 @@ public class StudentT {
 		return (numerator / denominator) * multiplier;
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 * @param t
+	 * @return
+	 */
 	public static double logPdf(double v, double t) {
 		return log(pdf(v, t));
 	}
 	
+	/**
+	 *
+	 * @param in
+	 * @return
+	 */
 	private static double zeroDerivativeOfDigamma(double in) {
 		return digamma(in);
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 * @param t
+	 * @return
+	 */
 	public static Diff dPdf(double v, double t) {
 		double gammaHalfV = gamma(v / 2.);
 		double gammaHalfVPlusOne = gamma((v + 1.) / 2.);
@@ -65,6 +97,12 @@ public class StudentT {
 		return new Diff(dPdv, dPdt);
 	}
 	
+	/**
+	 *
+	 * @param v Degrees of Freedom
+	 * @param t
+	 * @return
+	 */
 	public static Diff dLogPdf(double v, double t) {
 		double tSq = pow(t, 2);
 		double tSqPlusV = tSq + v;
@@ -85,6 +123,9 @@ public class StudentT {
 		return new Diff(dPdv, dPdt);
 	}
 	
+	/**
+	 * Differential Equation Class to store result of d/dv and d/dt
+	 */
 	public static class Diff {
 		public double dPdv;
 		public double dPdt;
