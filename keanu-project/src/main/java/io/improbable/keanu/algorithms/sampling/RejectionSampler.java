@@ -15,7 +15,7 @@ public class RejectionSampler {
     private RejectionSampler() {
     }
 
-    public static double getPosteriorProbability(List<? extends Vertex> latentVertices, List<Vertex> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
+    public static double getPosteriorProbability(List<? extends Vertex> latentVertices, List<? extends Vertex> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
         int matchedSampleCount = 0;
         int success = 0;
 
@@ -60,7 +60,7 @@ public class RejectionSampler {
         v.setAndCascade(v.sample());
     }
 
-    private static boolean matchesObservation(List<Vertex> observedVertices) {
+    private static boolean matchesObservation(List<? extends Vertex> observedVertices) {
         return observedVertices.stream()
                 .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
     }

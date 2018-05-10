@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 import java.util.Random;
@@ -79,12 +80,12 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogPdf(Double value) {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
         Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
     }
 
-    private Map<String, Double> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
+    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
         PartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         PartialDerivatives dPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dPdtheta);
         PartialDerivatives dPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dPdk);
@@ -94,7 +95,7 @@ public class GammaVertex extends ProbabilisticDouble {
             dPdInputs.putWithRespectTo(getId(), dPdx);
         }
 
-        return dPdInputs.asMap();
+        return DoubleTensor.fromScalars(dPdInputs.asMap());
     }
 
     @Override

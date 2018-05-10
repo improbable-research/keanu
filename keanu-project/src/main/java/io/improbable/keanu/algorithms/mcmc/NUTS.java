@@ -37,7 +37,7 @@ public class NUTS {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
-        final List<Vertex> probabilisticVertices = bayesNet.getVerticesThatContributeToMasterP();
+        final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
         final Map<String, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));

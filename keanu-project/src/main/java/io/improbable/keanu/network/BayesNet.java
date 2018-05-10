@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  */
 public class BayesNet {
 
-    private final List<Vertex> verticesThatContributeToMasterP;
+    private final List<Vertex> latentAndObservedVertices;
     private final List<Vertex> latentVertices;
     private final List<Vertex> observedVertices;
 
@@ -22,15 +22,15 @@ public class BayesNet {
 
     public BayesNet(Set<? extends Vertex> vertices) {
 
-        verticesThatContributeToMasterP = vertices.stream()
+        latentAndObservedVertices = vertices.stream()
                 .filter(v -> v.isObserved() || v.isProbabilistic())
                 .collect(Collectors.toList());
 
-        observedVertices = verticesThatContributeToMasterP.stream()
+        observedVertices = latentAndObservedVertices.stream()
                 .filter(Vertex::isObserved)
                 .collect(Collectors.toList());
 
-        latentVertices = verticesThatContributeToMasterP.stream()
+        latentVertices = latentAndObservedVertices.stream()
                 .filter(v -> !v.isObserved())
                 .collect(Collectors.toList());
     }
@@ -39,8 +39,8 @@ public class BayesNet {
         this(new HashSet<>(vertices));
     }
 
-    public List<Vertex> getVerticesThatContributeToMasterP() {
-        return verticesThatContributeToMasterP;
+    public List<Vertex> getLatentAndObservedVertices() {
+        return latentAndObservedVertices;
     }
 
     public List<Vertex> getLatentVertices() {
@@ -83,7 +83,7 @@ public class BayesNet {
 
     public double getLogOfMasterP() {
         double sum = 0.0;
-        for (Vertex<?> vertex : verticesThatContributeToMasterP) {
+        for (Vertex<?> vertex : latentAndObservedVertices) {
             sum += vertex.logProbAtValue();
         }
         return sum;
@@ -92,6 +92,7 @@ public class BayesNet {
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
+     *
      * @param attempts sampling attempts to get non-zero probability
      */
     public void probeForNonZeroMasterP(int attempts) {
@@ -107,7 +108,7 @@ public class BayesNet {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<Vertex> latentVertices, int attempts) {
+    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts) {
 
         Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
@@ -126,11 +127,11 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices, Map<String, Long> setAndCascadeCache) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, Map<String, Long> setAndCascadeCache) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }

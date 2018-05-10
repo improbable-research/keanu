@@ -47,10 +47,10 @@ public class GradientOptimizer {
      * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, NonLinearConjugateGradientOptimizer optimizer) {
-        if (bayesNet.getVerticesThatContributeToMasterP().isEmpty()) {
+        if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
-        return optimize(maxEvaluations, bayesNet.getVerticesThatContributeToMasterP(), optimizer);
+        return optimize(maxEvaluations, bayesNet.getLatentAndObservedVertices(), optimizer);
     }
 
     /**
@@ -87,7 +87,7 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex> outputVertices,
+                            List<? extends Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());

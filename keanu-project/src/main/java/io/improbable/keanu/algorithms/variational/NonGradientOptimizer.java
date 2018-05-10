@@ -25,7 +25,7 @@ public class NonGradientOptimizer {
         bayesNet = new BayesNet(graph);
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+    public double optimize(int maxEvaluations, double boundsRange, List<? extends Vertex> outputVertices) {
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -68,7 +68,7 @@ public class NonGradientOptimizer {
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
-        return optimize(maxEvaluations, boundsRange, bayesNet.getVerticesThatContributeToMasterP());
+        return optimize(maxEvaluations, boundsRange, bayesNet.getLatentAndObservedVertices());
     }
 
     /**

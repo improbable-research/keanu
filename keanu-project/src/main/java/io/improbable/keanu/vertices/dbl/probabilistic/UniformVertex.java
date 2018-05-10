@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Collections;
 import java.util.Map;
@@ -65,7 +66,7 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, Double> dLogPdf(Double value) {
+    public Map<String, DoubleTensor> dLogPdf(Double value) {
 
         if (isObserved()) {
             return Collections.emptyMap();
@@ -75,11 +76,11 @@ public class UniformVertex extends ProbabilisticDouble {
         double max = this.xMax.getValue();
 
         if (this.getValue() <= min) {
-            return singletonMap(getId(), Double.POSITIVE_INFINITY);
+            return DoubleTensor.fromScalars(singletonMap(getId(), Double.POSITIVE_INFINITY));
         } else if (this.getValue() >= max) {
-            return singletonMap(getId(), Double.NEGATIVE_INFINITY);
+            return DoubleTensor.fromScalars(singletonMap(getId(), Double.NEGATIVE_INFINITY));
         } else {
-            return singletonMap(getId(), 0.0);
+            return DoubleTensor.fromScalars(singletonMap(getId(), 0.0));
         }
     }
 

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -13,8 +14,8 @@ public class UniformIntVertex extends ProbabilisticInteger {
     private Random random;
 
     /**
-     * @param min The inclusive lower bound.
-     * @param max The exclusive upper bound.
+     * @param min    The inclusive lower bound.
+     * @param max    The exclusive upper bound.
      * @param random source of randomness
      */
     public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max, Random random) {
@@ -59,7 +60,7 @@ public class UniformIntVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Integer value) {
+    public Map<String, DoubleTensor> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 

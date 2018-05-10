@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices;
 import io.improbable.keanu.Identifiable;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,9 +38,9 @@ public abstract class Vertex<T> implements Identifiable {
      * @param value at a given value
      * @return the partial derivatives of the log density
      */
-    public abstract Map<String, Double> dLogProb(T value);
+    public abstract Map<String, DoubleTensor> dLogProb(T value);
 
-    public Map<String, Double> dLogProbAtValue() {
+    public Map<String, DoubleTensor> dLogProbAtValue() {
         return dLogProb(getValue());
     }
 
@@ -186,7 +187,7 @@ public abstract class Vertex<T> implements Identifiable {
         children.add(v);
     }
 
-    public void setParents(Collection<? extends Vertex<?>> parents) {
+    public void setParents(Collection<? extends Vertex> parents) {
         this.parents = new HashSet<>();
         addParents(parents);
     }
@@ -195,7 +196,7 @@ public abstract class Vertex<T> implements Identifiable {
         setParents(Arrays.asList(parents));
     }
 
-    public void addParents(Collection<? extends Vertex<?>> parents) {
+    public void addParents(Collection<? extends Vertex> parents) {
         parents.forEach(this::addParent);
     }
 

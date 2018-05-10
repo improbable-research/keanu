@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
 
@@ -12,7 +13,7 @@ public abstract class NonProbabilisticBool extends BoolVertex {
     }
 
     @Override
-    public Map<String, Double> dLogPmf(Boolean value) {
+    public Map<String, DoubleTensor> dLogPmf(Boolean value) {
         throw new UnsupportedOperationException();
     }
 

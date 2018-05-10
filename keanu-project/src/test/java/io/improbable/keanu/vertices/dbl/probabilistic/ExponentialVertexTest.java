@@ -49,7 +49,7 @@ public class ExponentialVertexTest {
         double b = 1.0;
         ExponentialVertex e = new ExponentialVertex(a, b, new Random(1));
         e.setValue(a);
-        double gradient = e.dLogProbAtValue().get(e.getId());
+        double gradient = e.dLogProbAtValue().get(e.getId()).scalar();
         log.info("Gradient at a: " + gradient);
         assertEquals(-1, gradient, 0);
     }

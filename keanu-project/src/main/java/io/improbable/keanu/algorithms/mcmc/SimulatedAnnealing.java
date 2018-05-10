@@ -79,8 +79,8 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(maxSamplesByVertex);
     }
 
-    private static void setSamplesAsMax(Map<String, ?> samples, List<Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> setSampleForVertex(vertex, samples));
+    private static void setSamplesAsMax(Map<String, ?> samples, List<? extends Vertex> fromVertices) {
+        fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
     }
 
     private static <T> void setSampleForVertex(Vertex<T> vertex, Map<String, ?> samples) {
