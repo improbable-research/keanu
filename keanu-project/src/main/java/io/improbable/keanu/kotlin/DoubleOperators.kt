@@ -3,10 +3,10 @@ package io.improbable.keanu.kotlin
 
 interface DoubleOperators<T> : Operators<T> {
 
-    operator fun minus(value: Double): T
-    operator fun plus(value: Double): T
-    operator fun times(value: Double): T
-    operator fun div(value: Double): T
+    operator fun minus(that: Double): T
+    operator fun plus(that: Double): T
+    operator fun times(that: Double): T
+    operator fun div(that: Double): T
     fun pow(exponent: T): T
     fun pow(exponent: Double): T
     fun log(): T
