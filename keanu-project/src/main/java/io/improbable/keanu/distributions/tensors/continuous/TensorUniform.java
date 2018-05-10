@@ -27,9 +27,9 @@ public class TensorUniform {
     public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor x) {
 
         DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
+        logOfWithinBounds.applyWhere(x.getGreaterThanMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds.applyWhere(x.getLessThanOrEqualToMask(xMin), Double.NEGATIVE_INFINITY);
 
-
-        //TODO: zero out where out of bounds
         return logOfWithinBounds;
     }
 }

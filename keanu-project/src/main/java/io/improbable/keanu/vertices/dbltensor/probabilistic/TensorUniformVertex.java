@@ -18,6 +18,12 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex xMax;
     private final KeanuRandom random;
 
+    /**
+     * @param shape  desired tensor shape
+     * @param xMin   inclusive
+     * @param xMax   exclusive
+     * @param random source of randomness
+     */
     public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, KeanuRandom random) {
 
         checkParentShapes(shape, xMin.getValue(), xMax.getValue());
@@ -76,8 +82,12 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public Map<String, DoubleTensor> dLogPdf(DoubleTensor value) {
-        //TODO: add infinite gradient where invalid
-        return singletonMap(getId(), DoubleTensor.zeros(this.xMax.getValue().getShape()));
+
+        DoubleTensor dlogPdf = DoubleTensor.zeros(this.xMax.getValue().getShape());
+        dlogPdf.applyWhere(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
+        dlogPdf.applyWhere(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
+
+        return singletonMap(getId(), dlogPdf);
     }
 
     @Override

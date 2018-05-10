@@ -1,7 +1,11 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
 
@@ -336,6 +340,62 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor unaryMinusInPlace() {
         tensor.negi();
+        return this;
+    }
+
+    @Override
+    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
+        INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
+        INDArray mask = tensor.dup();
+
+        if (greaterThanThisArray.isScalar()) {
+            Nd4j.getExecutioner().exec(
+                    new OldGreaterThan(mask, Nd4j.ones(mask.shape()).mul(greaterThanThisArray.getDouble(0)), mask, mask.length())
+            );
+        } else {
+            Nd4j.getExecutioner().exec(
+                    new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
+            );
+        }
+
+        return new Nd4jDoubleTensor(mask);
+    }
+
+    @Override
+    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualToThis) {
+        INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
+        INDArray mask = tensor.dup();
+
+        if (lessThanOrEqualToThisArray.isScalar()) {
+            Nd4j.getExecutioner().exec(
+                    new OldLessThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(lessThanOrEqualToThisArray.getDouble(0)), mask, mask.length())
+            );
+        } else {
+            Nd4j.getExecutioner().exec(
+                    new OldLessThanOrEqual(mask, lessThanOrEqualToThisArray, mask, mask.length())
+            );
+        }
+
+        return new Nd4jDoubleTensor(mask);
+    }
+
+    @Override
+    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+
+        INDArray maskDup = unsafeGetNd4J(withMask).dup();
+
+        if (value == 0.0) {
+            tensor.muli(maskDup);
+        } else {
+            Nd4j.getExecutioner().exec(
+                    new CompareAndSet(maskDup, value, Conditions.equals(1.0))
+            );
+
+            Nd4j.getExecutioner().exec(
+                    new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
+            );
+        }
+
         return this;
     }
 

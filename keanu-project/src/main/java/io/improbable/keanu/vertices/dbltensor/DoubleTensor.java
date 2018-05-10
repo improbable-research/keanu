@@ -91,6 +91,12 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor unaryMinus();
 
+    DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis);
+
+    DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
+
+    DoubleTensor applyWhere(DoubleTensor withMask, double value);
+
     //In place Ops and Transforms
     DoubleTensor reciprocalInPlace();
 

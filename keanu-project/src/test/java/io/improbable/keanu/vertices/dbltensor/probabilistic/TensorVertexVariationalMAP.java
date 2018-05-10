@@ -41,7 +41,7 @@ public class TensorVertexVariationalMAP {
 
         TensorGradientOptimizer gradientOptimizer = new TensorGradientOptimizer(inferNet);
 
-        gradientOptimizer.maxLikelihood(5000);
+        gradientOptimizer.maxAPosteriori(5000);
     }
 
 }

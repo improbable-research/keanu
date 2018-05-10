@@ -135,6 +135,30 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
+        if (greaterThanThis.isScalar()) {
+            return new SimpleScalarTensor(scalar > greaterThanThis.scalar() ? 1 : 0);
+        }
+        throw new IllegalArgumentException("Only scalar tensors supported");
+    }
+
+    @Override
+    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
+        if (lessThanThis.isScalar()) {
+            return new SimpleScalarTensor(scalar <= lessThanThis.scalar() ? 1 : 0);
+        }
+        throw new IllegalArgumentException("Only scalar tensors supported");
+    }
+
+    @Override
+    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+        if (withMask.isScalar()) {
+            return new SimpleScalarTensor(withMask.scalar() == 1.0 ? value : scalar);
+        }
+        throw new IllegalArgumentException("Only scalar tensors supported");
+    }
+
+    @Override
     public DoubleTensor reciprocalInPlace() {
         return reciprocal();
     }

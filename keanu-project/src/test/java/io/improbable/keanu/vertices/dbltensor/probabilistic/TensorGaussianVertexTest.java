@@ -217,13 +217,13 @@ public class TensorGaussianVertexTest {
 
         List<DoubleTensorVertex> latentMuSigma = new ArrayList<>();
         TensorUniformVertex latentMu = new TensorUniformVertex(0.01, 10.0, random);
-        latentMu.setAndCascade(Nd4jDoubleTensor.scalar(9.0));
+        latentMu.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
         TensorUniformVertex latentSigma = new TensorUniformVertex(0.01, 10.0, random);
-        latentSigma.setAndCascade(Nd4jDoubleTensor.scalar(9.0));
+        latentSigma.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
         latentMuSigma.add(latentMu);
         latentMuSigma.add(latentSigma);
 
-        int numSamples = 170000;
+        int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
                 muSigma,
