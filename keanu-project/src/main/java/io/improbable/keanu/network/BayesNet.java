@@ -98,10 +98,14 @@ public class BayesNet {
     public void probeForNonZeroMasterP(int attempts) {
 
         VertexValuePropagation.cascadeUpdate(observedVertices);
-        List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
-        setFromSampleAndCascade(sortedByDependency);
 
-        probeForNonZeroMasterP(sortedByDependency, attempts);
+        if(isInImpossibleState()) {
+
+            List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
+            setFromSampleAndCascade(sortedByDependency);
+
+            probeForNonZeroMasterP(sortedByDependency, attempts);
+        }
     }
 
     /**

@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbltensor;
 
-import org.nd4j.linalg.factory.Nd4j;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,11 +10,11 @@ public interface DoubleTensor extends Tensor {
     }
 
     static DoubleTensor ones(int[] shape) {
-        return new Nd4jDoubleTensor(Nd4j.ones(shape));
+        return Nd4jDoubleTensor.ones(shape);
     }
 
     static DoubleTensor zeros(int[] shape) {
-        return new Nd4jDoubleTensor(Nd4j.zeros(shape));
+        return Nd4jDoubleTensor.zeros(shape);
     }
 
     static DoubleTensor scalar(double scalarValue) {

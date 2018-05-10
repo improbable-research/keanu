@@ -223,7 +223,7 @@ public class TensorGaussianVertexTest {
         latentMuSigma.add(latentMu);
         latentMuSigma.add(latentSigma);
 
-        int numSamples = 2000;
+        int numSamples = 170000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
                 hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
                 muSigma,

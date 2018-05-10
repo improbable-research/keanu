@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.tensorVariational;
+package io.improbable.keanu.algorithms.tensorvariational;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,14 +11,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.tensorVariational.TensorFitnessFunction.logOfTotalProbability;
+import static io.improbable.keanu.algorithms.tensorvariational.TensorFitnessFunction.logOfTotalProbability;
 
 
 public class TensorFitnessFunctionWithGradient {
 
-    protected final List<Vertex> probabilisticVertices;
-    protected final List<? extends Vertex<DoubleTensor>> latentVertices;
-    protected final Map<String, Long> exploreSettingAll;
+    private final List<Vertex> probabilisticVertices;
+    private final List<? extends Vertex<DoubleTensor>> latentVertices;
+    private final Map<String, Long> exploreSettingAll;
 
     public TensorFitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
                                              List<? extends Vertex<DoubleTensor>> latentVertices) {
@@ -45,7 +45,7 @@ public class TensorFitnessFunctionWithGradient {
         };
     }
 
-    static double[] alignGradientsToAppropriateIndex(Map<String /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
+    private static double[] alignGradientsToAppropriateIndex(Map<String /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
                                                      List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();

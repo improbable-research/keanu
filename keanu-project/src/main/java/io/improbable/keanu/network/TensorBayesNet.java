@@ -75,7 +75,7 @@ public class TensorBayesNet {
 
         for (Vertex<?> vertex : latentVertices) {
             if (vertex.getValue() instanceof DoubleTensor) {
-                continuousLatentVertices.add((Vertex<DoubleTensor>)vertex);
+                continuousLatentVertices.add((Vertex<DoubleTensor>) vertex);
             } else {
                 discreteLatentVertices.add(vertex);
             }
@@ -99,10 +99,14 @@ public class TensorBayesNet {
     public void probeForNonZeroMasterP(int attempts) {
 
         VertexValuePropagation.cascadeUpdate(observedVertices);
-        List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
-        setFromSampleAndCascade(sortedByDependency);
 
-        probeForNonZeroMasterP(sortedByDependency, attempts);
+        if (isInImpossibleState()) {
+
+            List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
+            setFromSampleAndCascade(sortedByDependency);
+
+            probeForNonZeroMasterP(sortedByDependency, attempts);
+        }
     }
 
     /**

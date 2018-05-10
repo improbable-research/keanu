@@ -21,7 +21,7 @@ public class TensorUniform {
      * @return a random number from the Uniform distribution
      */
     public static DoubleTensor sample(DoubleTensor xMin, DoubleTensor xMax, KeanuRandom random) {
-        return random.nextDouble(xMax.getShape()).times(xMax.minus(xMin)).plus(xMin);
+        return random.nextDouble(xMax.getShape()).timesInPlace(xMax.minus(xMin)).plusInPlace(xMin);
     }
 
     public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor x) {

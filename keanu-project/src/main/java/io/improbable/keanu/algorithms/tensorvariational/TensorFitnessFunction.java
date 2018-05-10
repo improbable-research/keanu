@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.tensorVariational;
+package io.improbable.keanu.algorithms.tensorvariational;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
@@ -10,9 +10,9 @@ import java.util.Map;
 
 public class TensorFitnessFunction {
 
-    protected final List<Vertex> probabilisticVertices;
-    protected final List<? extends Vertex<DoubleTensor>> latentVertices;
-    protected final Map<String, Long> exploreSettingAll;
+    private final List<Vertex> probabilisticVertices;
+    private final List<? extends Vertex<DoubleTensor>> latentVertices;
+    private final Map<String, Long> exploreSettingAll;
 
     public TensorFitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<DoubleTensor>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;

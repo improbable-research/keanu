@@ -1,11 +1,16 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
+
+    static {
+        System.setProperty("dtype", "double");
+    }
 
     public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
     public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
@@ -16,6 +21,14 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public static Nd4jDoubleTensor create(double[] values, int[] shape) {
         return new Nd4jDoubleTensor(values, shape);
+    }
+
+    public static Nd4jDoubleTensor ones(int[] shape) {
+        return new Nd4jDoubleTensor(Nd4j.ones(shape));
+    }
+
+    public static Nd4jDoubleTensor zeros(int[] shape) {
+        return new Nd4jDoubleTensor(Nd4j.zeros(shape));
     }
 
     private INDArray tensor;

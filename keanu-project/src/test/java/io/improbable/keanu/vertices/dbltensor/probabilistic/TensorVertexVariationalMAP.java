@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.algorithms.tensorVariational.TensorGradientOptimizer;
+import io.improbable.keanu.algorithms.tensorvariational.TensorGradientOptimizer;
 import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;

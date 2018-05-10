@@ -5,6 +5,10 @@ import org.nd4j.linalg.api.rng.Random;
 
 public class KeanuRandom {
 
+    static {
+        System.setProperty("dtype", "double");
+    }
+
     private final Random nd4jRandom;
 
     public KeanuRandom() {

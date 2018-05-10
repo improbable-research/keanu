@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.tensorVariational;
+package io.improbable.keanu.algorithms.tensorvariational;
 
 import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.Vertex;
@@ -12,7 +12,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.List;
 
-import static io.improbable.keanu.algorithms.tensorVariational.TensorGradientOptimizer.currentPoint;
+import static io.improbable.keanu.algorithms.tensorvariational.TensorGradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class TensorNonGradientOptimizer {
