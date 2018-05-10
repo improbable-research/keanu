@@ -6,6 +6,7 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
 
@@ -45,9 +46,9 @@ public class NUTS {
         Map<String, Double> position = new HashMap<>();
         cachePosition(latentVertices, position);
 
-        Map<String, Double> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
+        Map<String, Double> gradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
                 probabilisticVertices
-        );
+        ));
 
         Map<String, Double> momentum = new HashMap<>();
 
@@ -407,9 +408,9 @@ public class NUTS {
 
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
-        Map<String, Double> nextPositionGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
+        Map<String, Double> nextPositionGradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
                 probabilisticVertices
-        );
+        ));
 
         for (Map.Entry<String, Double> nextMomentumForLatent : nextMomentum.entrySet()) {
             final double nextNextMomentumForLatent = nextMomentumForLatent.getValue() + halfTimeStep * nextPositionGradient.get(nextMomentumForLatent.getKey());
