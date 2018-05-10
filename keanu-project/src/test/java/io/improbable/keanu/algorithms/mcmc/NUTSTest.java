@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.util.Random;
 
-public class HamiltonianTest {
+public class NUTSTest {
 
     private Random random;
 
@@ -23,12 +23,11 @@ public class HamiltonianTest {
         double sigma = 1.0;
         BayesNet simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
-        NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
+        NetworkSamples posteriorSamples = NUTS.getPosteriorSamples(
                 simpleGaussian,
                 simpleGaussian.getLatentVertices(),
                 1000,
-                20,
-                0.15,
+                0.1,
                 random
         );
 
@@ -42,11 +41,10 @@ public class HamiltonianTest {
 
         BayesNet bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0, random);
 
-        NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
+        NetworkSamples posteriorSamples = NUTS.getPosteriorSamples(
                 bayesNet,
                 bayesNet.getLatentVertices(),
                 2000,
-                20,
                 0.1,
                 random
         );
@@ -59,14 +57,12 @@ public class HamiltonianTest {
 
     @Test
     public void samplesFromDonut() {
-
         BayesNet donutBayesNet = MCMCTestDistributions.create2DDonutDistribution(random);
 
-        NetworkSamples samples = Hamiltonian.getPosteriorSamples(
+        NetworkSamples samples = NUTS.getPosteriorSamples(
                 donutBayesNet,
                 donutBayesNet.getLatentVertices(),
-                2500,
-                10,
+                1000,
                 0.05,
                 random
         );
@@ -77,3 +73,4 @@ public class HamiltonianTest {
         MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
     }
 }
+
