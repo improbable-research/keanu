@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.cpu.nativecpu.NDArray;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -107,10 +106,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor pow(DoubleTensor exponent) {
-        INDArray exponentArray = unsafeGetNd4J(exponent);
-        if (exponentArray.isScalar()) {
-            return pow(exponentArray.getDouble(0));
+        if (exponent.isScalar()) {
+            return pow(exponent.scalar());
         } else {
+            INDArray exponentArray = unsafeGetNd4J(exponent);
             return new Nd4jDoubleTensor(Transforms.pow(tensor, exponentArray));
         }
     }
@@ -152,52 +151,52 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor minus(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
 
         if (that.isScalar() && !this.isScalar()) {
-            return this.minus(thatArray.getDouble(0));
+            return this.minus(that.scalar());
         } else if (!that.isScalar() && this.isScalar()) {
             return that.unaryMinus().plusInPlace(this);
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             return new Nd4jDoubleTensor(tensor.sub(thatArray));
         }
     }
 
     @Override
     public DoubleTensor plus(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
 
         if (that.isScalar() && !this.isScalar()) {
-            return this.plus(thatArray.getDouble(0));
+            return this.plus(that.scalar());
         } else if (!that.isScalar() && this.isScalar()) {
             return that.plus(this.scalar());
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             return new Nd4jDoubleTensor(tensor.add(thatArray));
         }
     }
 
     @Override
     public DoubleTensor times(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
 
         if (that.isScalar() && !this.isScalar()) {
-            return this.times(thatArray.getDouble(0));
+            return this.times(that.scalar());
         } else if (!that.isScalar() && this.isScalar()) {
             return that.times(this.scalar());
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             return new Nd4jDoubleTensor(tensor.mul(thatArray));
         }
     }
 
     @Override
     public DoubleTensor div(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
 
         if (that.isScalar() && !this.isScalar()) {
             return this.div(that.scalar());
         } else if (!that.isScalar() && this.isScalar()) {
             return that.reciprocal().timesInPlace(this);
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             return new Nd4jDoubleTensor(tensor.div(thatArray));
         }
     }
@@ -239,10 +238,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor powInPlace(DoubleTensor exponent) {
-        INDArray exponentArray = unsafeGetNd4J(exponent);
-        if (exponentArray.isScalar()) {
-            Transforms.pow(tensor, exponentArray.getDouble(0), false);
+        if (exponent.isScalar()) {
+            Transforms.pow(tensor, exponent.scalar(), false);
         } else {
+            INDArray exponentArray = unsafeGetNd4J(exponent);
             Transforms.pow(tensor, exponentArray, false);
         }
         return this;
@@ -292,10 +291,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
-        if (thatArray.isScalar()) {
-            tensor.subi(thatArray.getDouble(0));
+        if (that.isScalar()) {
+            tensor.subi(that.scalar());
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             tensor.subi(thatArray);
         }
         return this;
@@ -303,10 +302,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
-        if (thatArray.isScalar()) {
-            tensor.addi(thatArray.getDouble(0));
+        if (that.isScalar()) {
+            tensor.addi(that.scalar());
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             tensor.addi(thatArray);
         }
         return this;
@@ -314,10 +313,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
-        if (thatArray.isScalar()) {
-            tensor.muli(thatArray.getDouble(0));
+        if (that.isScalar()) {
+            tensor.muli(that.scalar());
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             tensor.muli(thatArray);
         }
         return this;
@@ -325,10 +324,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
-        INDArray thatArray = unsafeGetNd4J(that);
-        if (thatArray.isScalar()) {
-            tensor.divi(thatArray.getDouble(0));
+        if (that.isScalar()) {
+            tensor.divi(that.scalar());
         } else {
+            INDArray thatArray = unsafeGetNd4J(that);
             tensor.divi(thatArray);
         }
         return this;
