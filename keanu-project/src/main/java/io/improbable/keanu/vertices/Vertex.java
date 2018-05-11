@@ -187,7 +187,7 @@ public abstract class Vertex<T> implements Identifiable {
         children.add(v);
     }
 
-    public void setParents(Collection<? extends Vertex<?>> parents) {
+    public void setParents(Collection<? extends Vertex> parents) {
         this.parents = new HashSet<>();
         addParents(parents);
     }
@@ -196,7 +196,7 @@ public abstract class Vertex<T> implements Identifiable {
         setParents(Arrays.asList(parents));
     }
 
-    public void addParents(Collection<? extends Vertex<?>> parents) {
+    public void addParents(Collection<? extends Vertex> parents) {
         parents.forEach(this::addParent);
     }
 

@@ -15,8 +15,8 @@ public class Laplace {
     }
 
     /**
-     * @param mu      location
-     * @param beta      shape
+     * @param mu     location
+     * @param beta   shape
      * @param random source of randomness
      * @return a random number from the Laplace distribution
      */

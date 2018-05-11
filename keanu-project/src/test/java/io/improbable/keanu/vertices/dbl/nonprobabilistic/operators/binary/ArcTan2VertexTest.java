@@ -61,7 +61,7 @@ public class ArcTan2VertexTest {
         ArcTan2Vertex arcTan2 = new ArcTan2Vertex(A, B);
 
         assertEquals(bValue / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.001);
-        assertEquals(- 0.5 / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(B), 0.001);
+        assertEquals(-0.5 / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(B), 0.001);
     }
 
 }

@@ -15,8 +15,8 @@ public class Uniform {
 
 
     /**
-     * @param xMin      minimum x value
-     * @param xMax      maximum x value
+     * @param xMin   minimum x value
+     * @param xMax   maximum x value
      * @param random source of randomness
      * @return a random number from the Uniform distribution
      */

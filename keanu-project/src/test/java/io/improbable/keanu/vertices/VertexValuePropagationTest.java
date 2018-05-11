@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,11 +10,8 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 
-import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
-import static io.improbable.keanu.vertices.TestGraphGenerator.passThroughVertex;
-import static io.improbable.keanu.vertices.TestGraphGenerator.sumVertex;
+import static io.improbable.keanu.vertices.TestGraphGenerator.*;
 import static org.junit.Assert.assertEquals;
 
 public class VertexValuePropagationTest {
@@ -80,7 +75,7 @@ public class VertexValuePropagationTest {
 
         DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1, random);
 
-        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, m,id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, m, id -> log.info("OP on id: " + id));
         DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, m, id -> log.info("OP on id: " + id));
         DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, m, id -> log.info("OP on id: " + id));
 

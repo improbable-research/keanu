@@ -155,7 +155,7 @@ public class Hamiltonian {
                                                 final Map<String, Double> gradient,
                                                 final Map<String, Double> momentums,
                                                 final double stepSize,
-                                                final List<Vertex> probabilisticVertices) {
+                                                final List<? extends Vertex> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 
