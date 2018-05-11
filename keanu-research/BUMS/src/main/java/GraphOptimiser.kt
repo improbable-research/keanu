@@ -27,7 +27,7 @@ open class GraphOptimiser(val state : Array<DoubleVertex>, val objective : Doubl
 
     fun optimise(goal : GoalType, maxEvals: Int) {
         val optimizer = NonLinearConjugateGradientOptimizer(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-                SimpleValueChecker(1e-6, 1e-6))
+                SimpleValueChecker(1e-11, 1e-11))
 
         val startPoint = DoubleArray(state.size, { i -> state[i].value })
 
@@ -41,14 +41,14 @@ open class GraphOptimiser(val state : Array<DoubleVertex>, val objective : Doubl
         setState(optimal.point)
     }
 
-    fun fitness() : ObjectiveFunction {
+    open fun fitness() : ObjectiveFunction {
         return ObjectiveFunction({doubles ->
             setState(doubles)
             objective.value
         })
     }
 
-    fun gradient() : ObjectiveFunctionGradient {
+    open fun gradient() : ObjectiveFunctionGradient {
         return ObjectiveFunctionGradient({doubles ->
             setState(doubles)
             DoubleArray(state.size, {

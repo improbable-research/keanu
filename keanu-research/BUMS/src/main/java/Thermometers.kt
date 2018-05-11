@@ -7,7 +7,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient
 import java.util.*
 import kotlin.math.sqrt
 
-class Thermometers {
+open class Thermometers {
     var u1 : DoubleVertex
     var u2 : DoubleVertex
     var u3 : DoubleVertex
@@ -50,12 +50,12 @@ class Thermometers {
 
 
     fun projectToUnitHypercube() {
-        if(u1.value > 0.99) u1.value = 2.0-u1.value
-        if(u2.value > 0.99) u2.value = 2.0-u2.value
-        if(u3.value > 0.99) u3.value = 2.0-u3.value
-        if(u1.value < 0.01) u1.value = -u1.value
-        if(u2.value < 0.01) u2.value = -u2.value
-        if(u3.value < 0.01) u3.value = -u3.value
+        if(u1.value > 1.0) u1.value = 2.0-u1.value
+        if(u2.value > 1.0) u2.value = 2.0-u2.value
+        if(u3.value > 1.0) u3.value = 2.0-u3.value
+        if(u1.value < 0.0) u1.value = -u1.value
+        if(u2.value < 0.0) u2.value = -u2.value
+        if(u3.value < 0.0) u3.value = -u3.value
     }
 
     fun setState(doubles : DoubleArray) {

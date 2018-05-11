@@ -1,25 +1,27 @@
-import org.apache.commons.math3.optim.InitialGuess
-import org.apache.commons.math3.optim.MaxEval
-import org.apache.commons.math3.optim.SimpleValueChecker
-import org.apache.commons.math3.optim.nonlinear.scalar.GoalType
-import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer
+import com.sun.org.apache.xpath.internal.operations.Bool
 import java.io.FileWriter
+import java.lang.Math.abs
 
 fun main(args : Array<String>) {
-    val thermo = Thermometers()
-    printManifold()
-//    val writeToFile = true
-//
-//    var file :FileWriter? = null
-//    if(writeToFile) file = FileWriter("data.out")
-//
-//    val sampler = BUMSampler()
-//    for(i in 1..40000) {
-//        sampler.sample()
-//        file?.write("${sampler.model3d.temp.value}\n")
-//        println("${sampler.model3d.temp.value}")
-//    }
-//    file?.close()
+//    printManifold()
+//    walkManifold()
+    BUMSample(true)
+}
+
+fun BUMSample(writeToFile : Boolean) {
+
+    var file :FileWriter? = null
+    if(writeToFile) file = FileWriter("data.out")
+
+    val sampler = BUMSampler()
+    for(i in 1..5000) {
+        sampler.sample()
+        sampler.modelSphere.temp.lazyEval()
+        file?.write("${sampler.modelSphere.temp.value}\n")
+        println("${sampler.modelSphere.temp.value}")
+    }
+    file?.close()
+
 }
 
 
@@ -32,5 +34,22 @@ fun printManifold() {
        model.err.lazyEval()
        opt.minimise()
        println("${model.u1.value} ${model.u2.value} ${model.u3.value}")
+    }
+}
+
+fun walkManifold() {
+    val sampler = BUMSampler()
+    sampler.modelSphere.sample()
+    val opt = GraphOptimiser(arrayOf(sampler.modelSphere.u2, sampler.modelSphere.u3), sampler.modelSphere.err)
+    sampler.modelSphere.u1.value = 0.25
+    sampler.modelSphere.err.lazyEval()
+    opt.minimise()
+    println("${sampler.modelSphere.u1.value} ${sampler.modelSphere.u2.value} ${sampler.modelSphere.u3.value}")
+    for(i in 1..500) {
+        sampler.walk(0.005)
+        sampler.modelSphere.err.lazyEval()
+//        println("${sampler.modelSphere.u1.value} ${sampler.modelSphere.u2.value} ${sampler.modelSphere.u3.value} ${sampler.modelSphere.err.value}")
+//        println("${sampler.modelSphere.u1.value} ${sampler.modelSphere.u2.value} ${sampler.modelSphere.u3.value}")
+        println("${sampler.modelSphere.temp.value}")
     }
 }
