@@ -23,7 +23,7 @@ public class StudentT {
 	 * @return sample of Student T distribution
 	 */
 	public static double sample(int v, Random random) {
-		if(v > 0) {
+		if(v <= 0) {
 			throw new IllegalArgumentException("Invalid degrees of freedom (v), expect v > 0");
 		}
 		return Gaussian.sample( 0., 1., random) / sqrt( ChiSquared.sample((int) v, random) / v );

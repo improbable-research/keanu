@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -70,9 +71,11 @@ public class StudentTVertex extends ProbabilisticDouble {
 	 * @param t random variable
 	 * @return Differential of the Probability Density of t
 	 */
-	public Map<String, DoubleTensor> dDensityAtValue(Double t) {
+	public Map<String, DoubleTensor> dPdf(Double t) {
 		StudentT.Diff diff = StudentT.dPdf(v.getValue(), t);
-		return convertDualNumbersToDiff(diff.dPdt);
+		Map<String, DoubleTensor> m = new HashMap<>();
+		m.put(getId(), DoubleTensor.scalar(diff.dPdt));
+		return m;
 	}
 	/**
 	 *
@@ -82,7 +85,9 @@ public class StudentTVertex extends ProbabilisticDouble {
 	@Override
 	public Map<String, DoubleTensor> dLogPdf(Double t) {
 		StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
-		return null; //convertDualNumbersToDiff(diff.dPdt);
+		Map<String, DoubleTensor> m = new HashMap<>();
+		m.put(getId(), DoubleTensor.scalar(diff.dPdt));
+		return m;
 	}
 	/**
 	 *

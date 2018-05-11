@@ -38,31 +38,25 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 	 */
 	@Test
 	public void sampleTest() {
-		int N = 10000000;
+		int N = 10 * 1000 * 1000;
+		double sample_delta = 0.1;
 		double[][] test_values = {
 				// v, mean, sd
 				{2., 0., 4.5}
 		};
 		for (int i = 0; i < test_values.length; i++) {
 			int v = (int) test_values[i][POS_V];
+//			TDistribution apache = new TDistribution(v);
 			StudentTVertex studentT = new StudentTVertex(v, random);
 			
-			List<Double> samples = new ArrayList<>();
+//			List<Double> apache_samples = new ArrayList<>();
+			List<Double> student_samples = new ArrayList<>();
 			for (int j = 0; j < N; j++) {
-				double sample = studentT.sample();
-				samples.add(sample);
+//				apache_samples.add(apache.sample());
+				student_samples.add(studentT.sample());
 			}
-			
-			SummaryStatistics stats = new SummaryStatistics();
-			samples.forEach(stats::addValue);
-			
-			double mean = stats.getMean();
-			double sd = stats.getStandardDeviation();
-			log.trace("Degrees of freedom: " + v);
-			log.trace("Mean: " + mean);
-			log.trace("Standard deviation: " + sd);
-			Assert.assertEquals(test_values[i][POS_MEAN], mean, 0.1);
-			Assert.assertEquals(test_values[i][POS_SD], sd, 0.1);
+//			testSampleMeanAndStdDeviation(v, test_values[i][POS_MEAN], test_values[i][POS_SD], apache_samples, sample_delta);
+			testSampleMeanAndStdDeviation(v, test_values[i][POS_MEAN], test_values[i][POS_SD], student_samples, sample_delta);
 		}
 	}
 	/**
@@ -101,6 +95,18 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 			testDLogPdfAtGivenDegreesOfFreedom(TEST_VALUES_OF_V[i]);
 		}
 	}
+	private void testSampleMeanAndStdDeviation(int v, double expected_mean, double expected_sd, List<Double> samples, double delta) {
+		SummaryStatistics stats = new SummaryStatistics();
+		samples.forEach(stats::addValue);
+		
+		double mean = stats.getMean();
+		double sd = stats.getStandardDeviation();
+		log.trace("Degrees of freedom: " + v);
+		log.trace("Mean: " + mean);
+		log.trace("Standard deviation: " + sd);
+		Assert.assertEquals(expected_mean, mean, delta);
+		Assert.assertEquals(expected_sd, sd, delta);
+	}
 	/**
 	 *
 	 * @param v Degrees of Freedom
@@ -138,7 +144,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected;
-			DoubleTensor actual = studentT.dDensityAtValue(t).get(studentT.getId());
+			double actual = studentT.dPdf(t).get(studentT.getId()).scalar();
 			switch(v) {
 				case 1:
 					expected = (-2. * t) / (PI * pow(pow(t, 2) + 1., 2));
@@ -163,20 +169,20 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 		StudentTVertex studentT = new StudentTVertex(v, random);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
-			DoubleTensor expected;
-			DoubleTensor actual = studentT.dLogPdf(t).get(studentT.getId());
+			double expected;
+			double actual = studentT.dLogPdf(t).get(studentT.getId()).scalar();
 			switch(v) {
 				case 1:
-					expected = DoubleTensor.scalar((-2 * t) / (pow(t, 2) + 1.));
+					expected = (-2 * t) / (pow(t, 2) + 1.);
 					break;
 				case 2:
-					expected = DoubleTensor.scalar((-3 * t) / (pow(t, 2) + 2.));
+					expected = (-3 * t) / (pow(t, 2) + 2.);
 					break;
 				case 3:
-					expected = DoubleTensor.scalar((-4 * t) / (pow(t, 2) + 3.));
+					expected = (-4 * t) / (pow(t, 2) + 3.);
 					break;
 				default:
-					expected = DoubleTensor.scalar(0.);
+					expected = 0.;
 			}
 			assertEquals(expected, actual, DELTA);
 		}
