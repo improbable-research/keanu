@@ -11,38 +11,27 @@ public class UniformIntVertex extends ProbabilisticInteger {
 
     private Vertex<Integer> min;
     private Vertex<Integer> max;
-    private Random random;
 
     /**
-     * @param min    The inclusive lower bound.
-     * @param max    The exclusive upper bound.
-     * @param random source of randomness
+     * @param min The inclusive lower bound.
+     * @param max The exclusive upper bound.
      */
-    public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max, Random random) {
+    public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max) {
         this.min = min;
         this.max = max;
-        this.random = random;
         setParents(min, max);
-    }
-
-    public UniformIntVertex(int min, int max, Random random) {
-        this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max), random);
-    }
-
-    public UniformIntVertex(Vertex<Integer> min, Vertex<Integer> max) {
-        this(min, max, new Random());
-    }
-
-    public UniformIntVertex(Vertex<Integer> min, int max) {
-        this(min, new ConstantIntegerVertex(max), new Random());
-    }
-
-    public UniformIntVertex(int min, Vertex<Integer> max) {
-        this(new ConstantIntegerVertex(min), max, new Random());
     }
 
     public UniformIntVertex(int min, int max) {
         this(new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
+    }
+
+    public UniformIntVertex(Vertex<Integer> min, int max) {
+        this(min, new ConstantIntegerVertex(max));
+    }
+
+    public UniformIntVertex(int min, Vertex<Integer> max) {
+        this(new ConstantIntegerVertex(min), max);
     }
 
     public Vertex<Integer> getMin() {

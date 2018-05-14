@@ -4,8 +4,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +26,7 @@ public class LaplaceVertexTest {
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;
         double epsilon = 0.01;
-        LaplaceVertex laplaceVertex = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        LaplaceVertex laplaceVertex = new LaplaceVertex(0.0, 1.0);
 
         double mean = 0.0;
         double standardDeviation = Math.sqrt(2);
@@ -45,11 +43,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void samplingMatchesLogProb() {
-        LaplaceVertex laplaceVertex = new LaplaceVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(1.0),
-                random
-        );
+        LaplaceVertex laplaceVertex = new LaplaceVertex(0.0, 1.0);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 laplaceVertex,
@@ -64,8 +58,8 @@ public class LaplaceVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
-        LaplaceVertex laplace = new LaplaceVertex(uniform, new ConstantDoubleVertex(1.0), random);
+        UniformVertex uniform = new UniformVertex(0.0, 3.0);
+        LaplaceVertex laplace = new LaplaceVertex(uniform, 1.0);
 
         double vertexStartValue = 2.0;
         double vertexEndValue = 5.0;
@@ -85,8 +79,8 @@ public class LaplaceVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
-        UniformVertex uniform = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
-        LaplaceVertex laplace = new LaplaceVertex(new ConstantDoubleVertex(0.0), uniform, random);
+        UniformVertex uniform = new UniformVertex(0.0, 3.0);
+        LaplaceVertex laplace = new LaplaceVertex(0.0, uniform);
 
         double vertexStartValue = -5.0;
         double vertexEndValue = 5.0;
@@ -108,8 +102,7 @@ public class LaplaceVertexTest {
     public void isTreatedAsConstantWhenObserved() {
         LaplaceVertex vertexUnderTest = new LaplaceVertex(
                 new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                random
+                3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -130,7 +123,7 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
+                hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1)),
                 muBeta,
                 latentMuBeta,
                 1000,

@@ -26,10 +26,10 @@ public class SimulatedAnnealingTest {
     @Before
     public void setup() {
         random = new Random(1);
-        A = new GaussianVertex(5, 1, random);
-        B = new GaussianVertex(2, 1, random);
+        A = new GaussianVertex(5, 1);
+        B = new GaussianVertex(2, 1);
         C = A.plus(B);
-        D = new GaussianVertex(C, 1, random);
+        D = new GaussianVertex(C, 1);
         D.observe(7.5);
     }
 

@@ -30,7 +30,7 @@ public class MultiplexerVertexTest {
 
         IntegerVertex selectorOrigin = new ConstantIntegerVertex(0);
         IntegerVertex selectorBound = new ConstantIntegerVertex(2);
-        IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound, random);
+        IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound);
         Map<TestEnum, Double> expected = new HashMap<>();
         expected.put(TestEnum.A, 0.25);
         expected.put(TestEnum.B, 0.25);
@@ -40,12 +40,12 @@ public class MultiplexerVertexTest {
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
         optionGroup1.put(TestEnum.A, new ConstantDoubleVertex(0.5));
         optionGroup1.put(TestEnum.B, new ConstantDoubleVertex(0.5));
-        SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1, random);
+        SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
         optionGroup2.put(TestEnum.C, new ConstantDoubleVertex(0.5));
         optionGroup2.put(TestEnum.D, new ConstantDoubleVertex(0.5));
-        SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2, random);
+        SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2);
 
         MultiplexerVertex<TestEnum> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 

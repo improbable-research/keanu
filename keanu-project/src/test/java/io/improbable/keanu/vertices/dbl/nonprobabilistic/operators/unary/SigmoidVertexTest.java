@@ -15,13 +15,6 @@ import static org.junit.Assert.assertEquals;
 
 public class SigmoidVertexTest {
 
-    private Random random;
-
-    @Before
-    public void setup() {
-        random = new Random(1);
-    }
-
     @Test
     public void sigmoidOpIsCalculatedCorrectly() {
         ConstantDoubleVertex x = new ConstantDoubleVertex(3.0);
@@ -51,12 +44,12 @@ public class SigmoidVertexTest {
         //sigmoid(x) = 0.75
         //x = -log((1/0.75)-1) = 1.0986
 
-        DoubleVertex unknownX = new UniformVertex(0.0, 10.0, random);
+        DoubleVertex unknownX = new UniformVertex(0.0, 10.0);
         unknownX.setAndCascade(5.0);
 
         SigmoidVertex sigmoid = new SigmoidVertex(unknownX);
 
-        GaussianVertex observableSigmoid = new GaussianVertex(sigmoid, 1.0, random);
+        GaussianVertex observableSigmoid = new GaussianVertex(sigmoid, 1.0);
         observableSigmoid.observe(0.75);
 
         BayesNet bayesNet = new BayesNet(unknownX.getConnectedGraph());

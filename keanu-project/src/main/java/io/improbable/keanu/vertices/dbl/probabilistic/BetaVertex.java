@@ -13,41 +13,23 @@ public class BetaVertex extends ProbabilisticDouble {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
-    private final Random random;
 
-    public BetaVertex(DoubleVertex alpha, DoubleVertex beta, Random random) {
+    public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this.alpha = alpha;
         this.beta = beta;
-        this.random = random;
         setParents(alpha, beta);
     }
 
-    public BetaVertex(DoubleVertex alpha, double beta, Random random) {
-        this(alpha, new ConstantDoubleVertex(beta), random);
-    }
-
-    public BetaVertex(double alpha, DoubleVertex beta, Random random) {
-        this(new ConstantDoubleVertex(alpha), beta, random);
-    }
-
-    public BetaVertex(double alpha, double beta, Random random) {
-        this(new ConstantDoubleVertex(alpha), beta, random);
-    }
-
-    public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
-        this(alpha, beta, new Random());
-    }
-
     public BetaVertex(DoubleVertex alpha, double beta) {
-        this(alpha, new ConstantDoubleVertex(beta), new Random());
+        this(alpha, new ConstantDoubleVertex(beta));
     }
 
     public BetaVertex(double alpha, DoubleVertex beta) {
-        this(new ConstantDoubleVertex(alpha), beta, new Random());
+        this(new ConstantDoubleVertex(alpha), beta);
     }
 
     public BetaVertex(double alpha, double beta) {
-        this(new ConstantDoubleVertex(alpha), beta, new Random());
+        this(new ConstantDoubleVertex(alpha), beta);
     }
 
     @Override

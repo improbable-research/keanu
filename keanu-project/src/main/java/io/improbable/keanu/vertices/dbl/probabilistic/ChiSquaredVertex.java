@@ -11,24 +11,14 @@ import java.util.Random;
 public class ChiSquaredVertex extends ProbabilisticDouble {
 
     private IntegerVertex k;
-    private Random random;
 
-    public ChiSquaredVertex(IntegerVertex k, Random random) {
+    public ChiSquaredVertex(IntegerVertex k) {
         this.k = k;
-        this.random = random;
         setParents(k);
     }
 
-    public ChiSquaredVertex(IntegerVertex k) {
-        this(k, new Random());
-    }
-
-    public ChiSquaredVertex(int k, Random random) {
-        this(new ConstantIntegerVertex(k), random);
-    }
-
     public ChiSquaredVertex(int k) {
-        this(new ConstantIntegerVertex(k), new Random());
+        this(new ConstantIntegerVertex(k));
     }
 
     @Override

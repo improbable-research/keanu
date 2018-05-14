@@ -31,7 +31,7 @@ public class BetaVertexTest {
         int N = 100000;
         double epsilon = 0.01;
 
-        BetaVertex betaVertex = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
+        BetaVertex betaVertex = new BetaVertex(3.0, 3.0);
 
         double mean = 0.5;
         double standardDeviation = Math.sqrt(9.0 / (36 * 7));
@@ -48,7 +48,7 @@ public class BetaVertexTest {
 
     @Test
     public void equalAlphaAndBetaGivesZeroGradientAtCentre() {
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
+        BetaVertex b = new BetaVertex(3.0, 3.0);
         double value = 0.5;
         b.setValue(value);
         double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
@@ -58,7 +58,7 @@ public class BetaVertexTest {
 
     @Test
     public void equalAlphaAndBetaGivesPositiveGradientBeforeCentre() {
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
+        BetaVertex b = new BetaVertex(3.0, 3.0);
         double value = 0.25;
         b.setValue(value);
         double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
@@ -68,7 +68,7 @@ public class BetaVertexTest {
 
     @Test
     public void equalAlphaAndBetaGivesNegativeGradientAfterCentre() {
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
+        BetaVertex b = new BetaVertex(3.0, 3.0);
         double value = 0.75;
         b.setValue(value);
         double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
@@ -78,7 +78,7 @@ public class BetaVertexTest {
 
     @Test
     public void alphaGreaterThanBetaGivesPositiveGradientAtCentre() {
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(1.5), random);
+        BetaVertex b = new BetaVertex(3.0, 1.5);
         double value = 0.5;
         b.setValue(value);
         double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
@@ -88,7 +88,7 @@ public class BetaVertexTest {
 
     @Test
     public void alphaLessThanBetaGivesNegativeGradientAtCentre() {
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0), random);
+        BetaVertex b = new BetaVertex(1.5, 3.0);
         double value = 0.5;
         b.setValue(value);
         double gradient = b.dLogProbAtValue().get(b.getId()).scalar();
@@ -100,7 +100,7 @@ public class BetaVertexTest {
     public void isTreatedAsConstantWhenObserved() {
         BetaVertex vertexUnderTest = new BetaVertex(
                 new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0), random
+                3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -108,7 +108,7 @@ public class BetaVertexTest {
 
     @Test
     public void sampleMatchesLogProb() {
-        BetaVertex betaVertex = new BetaVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(2.0), random);
+        BetaVertex betaVertex = new BetaVertex(2.0, 2.0);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
                 betaVertex,
@@ -123,8 +123,8 @@ public class BetaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0));
-        BetaVertex beta = new BetaVertex(uniformA, new ConstantDoubleVertex(3.0), random);
+        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        BetaVertex beta = new BetaVertex(uniformA, 3.0);
 
         double vertexStartValue = 0.1;
         double vertexEndValue = 0.9;
@@ -149,8 +149,8 @@ public class BetaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        UniformVertex uniformA = new UniformVertex(new ConstantDoubleVertex(1.5), new ConstantDoubleVertex(3.0));
-        BetaVertex beta = new BetaVertex(new ConstantDoubleVertex(1.0), uniformA, random);
+        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        BetaVertex beta = new BetaVertex(1.0, uniformA);
 
         double vertexStartValue = 0.1;
         double vertexEndValue = 0.9;
@@ -184,11 +184,11 @@ public class BetaVertexTest {
         alphaBeta.add(new ConstantDoubleVertex(trueBeta));
 
         List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
-        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
-        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
+        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1), random),
+                hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1)),
                 alphaBeta,
                 latentAlphaBeta,
                 1000,

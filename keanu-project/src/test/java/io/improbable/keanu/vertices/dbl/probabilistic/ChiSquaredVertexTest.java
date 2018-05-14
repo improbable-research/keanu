@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +29,7 @@ public class ChiSquaredVertexTest {
         int N = 100000;
         double epsilon = 0.1;
         int k = 10;
-        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(new ConstantIntegerVertex(k), new Random(1));
+        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(k);
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
@@ -52,10 +51,7 @@ public class ChiSquaredVertexTest {
 
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
-        Vertex<Double> vertex = new ChiSquaredVertex(
-                new ConstantIntegerVertex(2),
-                random
-        );
+        Vertex<Double> vertex = new ChiSquaredVertex(2);
 
         double from = 2;
         double to = 4;

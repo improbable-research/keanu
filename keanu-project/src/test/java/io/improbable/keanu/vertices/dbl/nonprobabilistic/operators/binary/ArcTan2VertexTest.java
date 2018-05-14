@@ -11,13 +11,6 @@ import static org.junit.Assert.assertEquals;
 
 public class ArcTan2VertexTest {
 
-    private Random random;
-
-    @Before
-    public void setup() {
-        random = new Random(1);
-    }
-
     @Test
     public void arcTan2OpIsCalculatedCorrectly() {
         ConstantDoubleVertex y = new ConstantDoubleVertex(1.0);
@@ -51,8 +44,8 @@ public class ArcTan2VertexTest {
 
     @Test
     public void calculatePartialDerivativesWithRespectToAandB() {
-        UniformVertex A = new UniformVertex(0, 1, random);
-        UniformVertex B = new UniformVertex(0, 1, random);
+        UniformVertex A = new UniformVertex(0, 1);
+        UniformVertex B = new UniformVertex(0, 1);
 
         A.setValue(0.5);
         double bValue = Math.sqrt(3) / 2.0;

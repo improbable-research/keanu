@@ -22,7 +22,7 @@ public class PoissonVertexTest {
         double epsilon = 0.1;
         Double mu = 10.0;
         Random random = new Random(1);
-        PoissonVertex testPoissonVertex = new PoissonVertex(new ConstantDoubleVertex(mu), new Random(1));
+        PoissonVertex testPoissonVertex = new PoissonVertex(mu);
 
         List<Integer> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
@@ -47,7 +47,7 @@ public class PoissonVertexTest {
     public void logProbForValuesGreaterThanTwenty() {
         double mu = 25.0;
 
-        PoissonVertex poissonVertex = new PoissonVertex(mu, new Random(1));
+        PoissonVertex poissonVertex = new PoissonVertex(mu);
 
         double logProb = poissonVertex.logProb(19);
         double logProbThreshold = poissonVertex.logProb(20);

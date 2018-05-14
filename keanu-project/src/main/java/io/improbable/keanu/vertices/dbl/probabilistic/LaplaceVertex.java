@@ -13,41 +13,23 @@ public class LaplaceVertex extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
-    private final Random random;
 
-    public LaplaceVertex(DoubleVertex mu, DoubleVertex beta, Random random) {
+    public LaplaceVertex(DoubleVertex mu, DoubleVertex beta) {
         this.mu = mu;
         this.beta = beta;
-        this.random = random;
         setParents(mu, beta);
     }
 
-    public LaplaceVertex(DoubleVertex mu, double beta, Random random) {
-        this(mu, new ConstantDoubleVertex(beta), random);
-    }
-
-    public LaplaceVertex(double mu, DoubleVertex beta, Random random) {
-        this(new ConstantDoubleVertex(mu), beta, random);
-    }
-
-    public LaplaceVertex(double mu, double beta, Random random) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta), random);
-    }
-
-    public LaplaceVertex(DoubleVertex mu, DoubleVertex beta) {
-        this(mu, beta, new Random());
-    }
-
     public LaplaceVertex(DoubleVertex mu, double beta) {
-        this(mu, new ConstantDoubleVertex(beta), new Random());
+        this(mu, new ConstantDoubleVertex(beta));
     }
 
     public LaplaceVertex(double mu, DoubleVertex beta) {
-        this(new ConstantDoubleVertex(mu), beta, new Random());
+        this(new ConstantDoubleVertex(mu), beta);
     }
 
     public LaplaceVertex(double mu, double beta) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta), new Random());
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(beta));
     }
 
     @Override

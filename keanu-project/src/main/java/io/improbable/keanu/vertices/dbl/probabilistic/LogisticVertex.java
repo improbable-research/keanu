@@ -13,41 +13,23 @@ public class LogisticVertex extends ProbabilisticDouble {
 
     private final DoubleVertex a;
     private final DoubleVertex b;
-    private final Random random;
 
-    public LogisticVertex(DoubleVertex a, DoubleVertex b, Random random) {
+    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
         this.a = a;
         this.b = b;
-        this.random = random;
         setParents(a, b);
     }
 
-    public LogisticVertex(DoubleVertex a, double b, Random random) {
-        this(a, new ConstantDoubleVertex(b), random);
-    }
-
-    public LogisticVertex(double a, DoubleVertex b, Random random) {
-        this(new ConstantDoubleVertex(a), b, random);
-    }
-
-    public LogisticVertex(double a, double b, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
-    }
-
-    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
-        this(a, b, new Random());
-    }
-
     public LogisticVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b), new Random());
+        this(a, new ConstantDoubleVertex(b));
     }
 
     public LogisticVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b, new Random());
+        this(new ConstantDoubleVertex(a), b);
     }
 
     public LogisticVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
     }
 
     public DoubleVertex getA() {

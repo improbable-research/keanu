@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -18,9 +17,8 @@ public class DoubleVertexTest {
 
     @Before
     public void setup() {
-        Random random = new Random(1);
-        v1 = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        v2 = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        v1 = new GaussianVertex(0.0, 1.0);
+        v2 = new GaussianVertex(0.0, 1.0);
 
         v1.setValue(1.0);
         v2.setValue(2.0);

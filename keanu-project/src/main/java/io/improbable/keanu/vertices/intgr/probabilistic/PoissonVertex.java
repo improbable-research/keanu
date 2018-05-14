@@ -11,25 +11,15 @@ import java.util.Random;
 
 public class PoissonVertex extends ProbabilisticInteger {
 
-    private final Random random;
     private final DoubleVertex mu;
 
-    public PoissonVertex(DoubleVertex mu, Random random) {
+    public PoissonVertex(DoubleVertex mu) {
         this.mu = mu;
-        this.random = random;
         setParents(mu);
     }
 
-    public PoissonVertex(double mu, Random random) {
-        this(new ConstantDoubleVertex(mu), random);
-    }
-
-    public PoissonVertex(DoubleVertex mu) {
-        this(mu, new Random());
-    }
-
     public PoissonVertex(double mu) {
-        this(new ConstantDoubleVertex(mu), new Random());
+        this(new ConstantDoubleVertex(mu));
     }
 
     public Vertex<Double> getMu() {

@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Before;
@@ -31,9 +30,9 @@ public class MultimodalSimulatedAnnealingTest {
     @Test
     public void findsBothModesForContinuousNetwork() {
 
-        DoubleVertex A = new UniformVertex(new ConstantDoubleVertex(-3.0), new ConstantDoubleVertex(3.0), random);
+        DoubleVertex A = new UniformVertex(-3.0, 3.0);
         DoubleVertex B = A.multiply(A);
-        DoubleVertex C = new GaussianVertex(B, 1.5, random);
+        DoubleVertex C = new GaussianVertex(B, 1.5);
         C.observe(4.0);
 
         BayesNet network = new BayesNet(A.getConnectedGraph());
@@ -49,17 +48,17 @@ public class MultimodalSimulatedAnnealingTest {
     @Test
     public void findsModesForDiscreteContinuousHybridNetwork() {
 
-        DoubleVertex A = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(3.0), random);
+        DoubleVertex A = new UniformVertex(0.0, 3.0);
         DoubleVertex B = A.multiply(A);
 
-        DoubleVertex C = new UniformVertex(new ConstantDoubleVertex(-3.0), new ConstantDoubleVertex(0.0), random);
+        DoubleVertex C = new UniformVertex(-3.0, 0.0);
         DoubleVertex D = C.multiply(C);
 
         BoolVertex E = new Flip(0.5);
 
         Vertex<Double> F = If(E, B, D);
 
-        DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5, random);
+        DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
         G.observe(4.0);
 
         BayesNet network = new BayesNet(A.getConnectedGraph());

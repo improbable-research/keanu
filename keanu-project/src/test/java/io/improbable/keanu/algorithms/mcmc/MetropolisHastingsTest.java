@@ -30,13 +30,13 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesContinuousPrior() {
 
-        DoubleVertex A = new GaussianVertex(20.0, 1.0, random);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0, random);
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
 
         A.setValue(20.0);
         B.setAndCascade(20.0);
 
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), new ConstantDoubleVertex(1.0), random);
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), new ConstantDoubleVertex(1.0));
 
         Cobserved.observe(46.0);
 

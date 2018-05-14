@@ -13,43 +13,24 @@ public class GaussianVertex extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    private final Random random;
 
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma, Random random) {
+    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
         this.mu = mu;
         this.sigma = sigma;
-        this.random = random;
         setParents(mu, sigma);
     }
 
-    public GaussianVertex(DoubleVertex mu, double sigma, Random random) {
-        this(mu, new ConstantDoubleVertex(sigma), random);
-    }
-
-    public GaussianVertex(double mu, DoubleVertex sigma, Random random) {
-        this(new ConstantDoubleVertex(mu), sigma, random);
-    }
-
-    public GaussianVertex(double mu, double sigma, Random random) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma), random);
-    }
-
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
-        this(mu, sigma, new Random());
-    }
-
-    public GaussianVertex(double mu, double sigma) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma), new Random());
+    public GaussianVertex(DoubleVertex mu, double sigma) {
+        this(mu, new ConstantDoubleVertex(sigma));
     }
 
     public GaussianVertex(double mu, DoubleVertex sigma) {
-        this(new ConstantDoubleVertex(mu), sigma, new Random());
+        this(new ConstantDoubleVertex(mu), sigma);
     }
 
-    public GaussianVertex(DoubleVertex mu, double sigma) {
-        this(mu, new ConstantDoubleVertex(sigma), new Random());
+    public GaussianVertex(double mu, double sigma) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
-
 
     public DoubleVertex getMu() {
         return mu;

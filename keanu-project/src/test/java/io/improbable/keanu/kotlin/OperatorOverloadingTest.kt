@@ -15,8 +15,6 @@ import java.util.*
 
 class OperatorOverloadingTest {
 
-    private val random = Random(1)
-
     @Test
     fun doubleVertexPlus() {
         val a = GaussianVertex(0.0, 1.0)
@@ -55,8 +53,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexPlus() {
-        val a = PoissonVertex(1.0, random)
-        val b = PoissonVertex(2.0, random)
+        val a = PoissonVertex(1.0)
+        val b = PoissonVertex(2.0)
 
         val e1 = a.value + b.value
         val r1 = a + b
@@ -127,8 +125,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexMinus() {
-        val a = PoissonVertex(1.0, random)
-        val b = PoissonVertex(2.0, random)
+        val a = PoissonVertex(1.0)
+        val b = PoissonVertex(2.0)
 
         val e1 = a.value - b.value
         val r1 = a - b
@@ -181,7 +179,7 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexUnaryMinus() {
-        val a = PoissonVertex(1.0, random)
+        val a = PoissonVertex(1.0)
 
         val e1 = -a.value
         val r1 = -a
@@ -231,8 +229,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexTimes() {
-        val a = PoissonVertex(1.0, random)
-        val b = PoissonVertex(2.0, random)
+        val a = PoissonVertex(1.0)
+        val b = PoissonVertex(2.0)
 
         val e1 = a.value * b.value
         val r1 = a * b
@@ -304,7 +302,7 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexDivide() {
-        val a = PoissonVertex(1.0, random)
+        val a = PoissonVertex(1.0)
         val b = ConstantIntegerVertex(2)
 
         val e1 = a.value / b.value
@@ -315,8 +313,8 @@ class OperatorOverloadingTest {
         val r2 = a / 2
         assertEquals(e2, r2.value)
 
-        val e3 = 2 / a.value
-        val r3 = 2 / a
+        val e3 = 2 / (a.value + 1)
+        val r3 = 2 / (a + 1)
         assertEquals(e3, r3.value)
     }
 
@@ -371,8 +369,8 @@ class OperatorOverloadingTest {
     @Test
     fun integerVertexNestedOperators() {
         val a = 4
-        val b = PoissonVertex(1.0, random)
-        val c = PoissonVertex(2.0, random)
+        val b = PoissonVertex(1.0)
+        val c = PoissonVertex(2.0)
         val d = ConstantIntegerVertex(1)
         val e = UniformIntVertex(1, 10)
         val f = 10

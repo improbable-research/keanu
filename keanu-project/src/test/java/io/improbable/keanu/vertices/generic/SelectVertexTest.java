@@ -85,7 +85,7 @@ public class SelectVertexTest {
     private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
                                                        Random random) {
 
-        SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues, random);
+        SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues);
 
         LinkedHashMap<TestEnum, Integer> sampleFrequencies = new LinkedHashMap<>();
         sampleFrequencies.put(TestEnum.A, 0);

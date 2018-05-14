@@ -18,42 +18,40 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
     private final double edgeSharpness;
-    private final Random random;
 
-    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness, Random random) {
+    public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         this.xMin = xMin;
         this.xMax = xMax;
         this.edgeSharpness = edgeSharpness;
-        this.random = random;
         setParents(xMin, xMax);
     }
 
-    public SmoothUniformVertex(DoubleVertex xMin, double xMax, Random random) {
-        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, random);
+    public SmoothUniformVertex(DoubleVertex xMin, double xMax, double edgeSharpness) {
+        this(xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(double xMin, DoubleVertex xMax, Random random) {
-        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS, random);
+    public SmoothUniformVertex(double xMin, DoubleVertex xMax, double edgeSharpness) {
+        this(new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
     }
 
-    public SmoothUniformVertex(double xMin, double xMax, Random random) {
-        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, random);
+    public SmoothUniformVertex(double xMin, double xMax, double edgeSharpness) {
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
     public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
-        this(xMin, xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+        this(xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
     public SmoothUniformVertex(DoubleVertex xMin, double xMax) {
-        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, new Random());
+        this(xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     public SmoothUniformVertex(double xMin, DoubleVertex xMax) {
-        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS, new Random());
+        this(new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
     public SmoothUniformVertex(double xMin, double xMax) {
-        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS, new Random());
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     public DoubleVertex getXMin() {

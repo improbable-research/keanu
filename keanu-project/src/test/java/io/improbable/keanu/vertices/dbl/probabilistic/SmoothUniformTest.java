@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -27,8 +26,8 @@ public class SmoothUniformTest {
     @Test
     public void optimizerMovesAwayFromLeftShoulder() {
 
-        A = new SmoothUniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1000.), 0.05, random);
-        B = new SmoothUniformVertex(0, 1000, random);
+        A = new SmoothUniformVertex(0.0, 1000., 0.05);
+        B = new SmoothUniformVertex(0, 1000);
         C = A.plus(B);
         CObserved = new GaussianVertex(C, 0.2);
 
@@ -43,8 +42,8 @@ public class SmoothUniformTest {
     @Test
     public void optimizerMovesAwayFromRightShoulder() {
 
-        A = new SmoothUniformVertex(-1000, 0, random);
-        B = new SmoothUniformVertex(-1000, 0, random);
+        A = new SmoothUniformVertex(-1000, 0);
+        B = new SmoothUniformVertex(-1000, 0);
         C = A.plus(B);
         CObserved = new GaussianVertex(C, 0.2);
 
@@ -68,10 +67,9 @@ public class SmoothUniformTest {
 
         double edgeSharpness = 1.0;
         SmoothUniformVertex uniform = new SmoothUniformVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(1.0),
-                edgeSharpness,
-                random
+                0.0,
+                1.0,
+                edgeSharpness
         );
 
         double from = -1;
@@ -94,9 +92,8 @@ public class SmoothUniformTest {
     public void isTreatedAsConstantWhenObserved() {
         SmoothUniformVertex vertexUnderTest = new SmoothUniformVertex(
                 new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                0.01,
-                random
+                3.0,
+                0.01
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);

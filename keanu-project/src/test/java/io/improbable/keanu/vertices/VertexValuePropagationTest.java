@@ -18,19 +18,12 @@ public class VertexValuePropagationTest {
 
     private final Logger log = LoggerFactory.getLogger(VertexValuePropagationTest.class);
 
-    Random random;
-
-    @Before
-    public void setup() {
-        random = new Random(1);
-    }
-
     @Test
     public void doesNotDoUnnecessaryOperations() {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new GaussianVertex(0, 1, random);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
         int links = 20;
         DoubleVertex end = addLinks(start, n, m, links);
@@ -48,11 +41,11 @@ public class VertexValuePropagationTest {
     public void doesNotPropagateThroughProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new GaussianVertex(0, 1, random);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
         DoubleVertex end = addLinks(start, n, m, 1);
 
-        DoubleVertex nextLayerStart = new GaussianVertex(end, 1, random);
+        DoubleVertex nextLayerStart = new GaussianVertex(end, 1);
 
         DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
@@ -69,11 +62,11 @@ public class VertexValuePropagationTest {
     public void doesPropagateAroundProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex firstLayerStart = new GaussianVertex(0, 1, random);
+        DoubleVertex firstLayerStart = new GaussianVertex(0, 1);
 
         DoubleVertex firstLayerEnd = addLinks(firstLayerStart, n, m, 1);
 
-        DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1, random);
+        DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1);
 
         DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, m, id -> log.info("OP on id: " + id));
         DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, m, id -> log.info("OP on id: " + id));

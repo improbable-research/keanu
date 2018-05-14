@@ -49,7 +49,7 @@ public class IntegerVertexTest {
 
     @Test
     public void doesObserve() {
-        PoissonVertex testIntegerVertex = new PoissonVertex(new ConstantDoubleVertex(1.0), new Random(1));
+        PoissonVertex testIntegerVertex = new PoissonVertex(new ConstantDoubleVertex(1.0));
         testIntegerVertex.lazyEval();
         testIntegerVertex.observe(5);
 

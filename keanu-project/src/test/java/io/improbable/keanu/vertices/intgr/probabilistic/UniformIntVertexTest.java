@@ -27,8 +27,8 @@ public class UniformIntVertexTest {
 
         UniformIntVertex testUniformVertex = new UniformIntVertex(
                 new ConstantIntegerVertex(lowerBound),
-                new ConstantIntegerVertex(upperBound),
-                new Random(1));
+                new ConstantIntegerVertex(upperBound)
+        );
 
         for (int i = 0; i < N; i++) {
             Integer sample = testUniformVertex.sample(random);

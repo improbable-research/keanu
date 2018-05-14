@@ -25,39 +25,33 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     private DoubleVertex fuzzinessSigma;
     private Vertex<Integer> min;
     private Vertex<Integer> max;
-    private Random random;
 
     /**
      * @param input          vertex intended for casting
      * @param fuzzinessSigma fuzziness is represented as a Gaussian distribution with mu of the input value and this sigma.
      * @param min            inclusive
      * @param max            inclusive
-     * @param random         source for randomness
      */
     public FuzzyCastToIntegerVertex(DoubleVertex input,
                                     DoubleVertex fuzzinessSigma,
                                     Vertex<Integer> min,
-                                    Vertex<Integer> max,
-                                    Random random) {
+                                    Vertex<Integer> max) {
 
         this.input = input;
         this.fuzzinessSigma = fuzzinessSigma;
         this.min = min;
         this.max = max;
-        this.random = random;
         setParents(input, fuzzinessSigma, min, max);
     }
 
     public FuzzyCastToIntegerVertex(DoubleVertex input,
                                     double fuzzinessSigma,
                                     int min,
-                                    int max,
-                                    Random random) {
+                                    int max) {
         this(input,
                 new ConstantDoubleVertex(fuzzinessSigma),
                 new ConstantIntegerVertex(min),
-                new ConstantIntegerVertex(max),
-                random
+                new ConstantIntegerVertex(max)
         );
     }
 
@@ -111,11 +105,11 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
 
     @Override
     public Integer sample(Random random) {
-        double fuzzyDouble = sampleFuzzyDoubleInBounds();
+        double fuzzyDouble = sampleFuzzyDoubleInBounds(random);
         return (int) Math.round(fuzzyDouble);
     }
 
-    private double sampleFuzzyDoubleInBounds() {
+    private double sampleFuzzyDoubleInBounds(Random random) {
         double mu = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
 

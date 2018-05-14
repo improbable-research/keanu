@@ -15,13 +15,6 @@ import static junit.framework.TestCase.assertTrue;
 
 public class LatentIncrementSortTest {
 
-    private Random random;
-
-    @Before
-    public void setup(){
-        this.random = new Random(1);
-    }
-
     @Test
     public void simpleGraph() {
         DoubleVertex muA = new ConstantDoubleVertex(0.0);
