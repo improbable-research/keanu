@@ -13,7 +13,7 @@ public abstract class NonProbabilisticBool extends BoolVertex {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPmf(Boolean value) {
+    public Map<Long, DoubleTensor> dLogPmf(Boolean value) {
         throw new UnsupportedOperationException();
     }
 

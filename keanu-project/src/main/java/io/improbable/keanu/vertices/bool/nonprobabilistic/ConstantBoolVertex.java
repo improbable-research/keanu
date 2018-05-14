@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
-import io.improbable.keanu.vertices.Constant;
-
-public class ConstantBoolVertex extends NonProbabilisticBool implements Constant<Boolean> {
+public class ConstantBoolVertex extends NonProbabilisticBool {
 
     public ConstantBoolVertex(Boolean constant) {
         setValue(constant);

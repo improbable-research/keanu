@@ -42,7 +42,7 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPmf(Integer value) {
+    public Map<Long, DoubleTensor> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 
