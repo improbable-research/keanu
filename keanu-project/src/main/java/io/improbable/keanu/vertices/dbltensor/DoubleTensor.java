@@ -36,13 +36,13 @@ public interface DoubleTensor extends Tensor {
     }
 
     static Map<String, Double> toScalars(Map<String, DoubleTensor> tensors) {
-        Map<String, Double> asTensors = new HashMap<>();
+        Map<String, Double> asScalars = new HashMap<>();
 
         for (Map.Entry<String, DoubleTensor> entry : tensors.entrySet()) {
-            asTensors.put(entry.getKey(), entry.getValue().scalar());
+            asScalars.put(entry.getKey(), entry.getValue().scalar());
         }
 
-        return asTensors;
+        return asScalars;
     }
 
     double getValue(int... index);
@@ -97,7 +97,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor applyWhere(DoubleTensor withMask, double value);
 
-    //In place Ops and Transforms
+    //In place Ops and Transforms. These mutate the source vertex (i.e. this).
+
     DoubleTensor reciprocalInPlace();
 
     DoubleTensor minusInPlace(double value);

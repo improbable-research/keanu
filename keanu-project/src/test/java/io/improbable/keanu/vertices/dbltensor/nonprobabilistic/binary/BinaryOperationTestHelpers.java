@@ -12,7 +12,7 @@ import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertEquals;
 
-public class BinaryOperationHelper {
+public class BinaryOperationTestHelpers {
 
     public static void operatesOnTwoScalarVertexValues(double aValue,
                                                        double bValue,

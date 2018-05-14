@@ -167,4 +167,16 @@ public class ProbabilisticDoubleTensorContract {
         assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest.getId()));
     }
 
+    public static void matchesKnownLogDensityOfVector(DoubleTensorVertex vertexUnderTest, double[] vector, double expectedLogDensity) {
+
+        double actualDensity = vertexUnderTest.logPdf(DoubleTensor.create(vector, new int[]{vector.length, 1}));
+        assertEquals(expectedLogDensity, actualDensity, 1e-5);
+    }
+
+    public static void matchesKnownLogDensityOfScalar(DoubleTensorVertex vertexUnderTest, double scalar, double expectedLogDensity) {
+
+        double actualDensity = vertexUnderTest.logPdf(Nd4jDoubleTensor.scalar(scalar));
+        assertEquals(expectedLogDensity, actualDensity, 1e-5);
+    }
+
 }

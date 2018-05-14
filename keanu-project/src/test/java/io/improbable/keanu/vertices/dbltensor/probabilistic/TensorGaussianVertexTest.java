@@ -36,12 +36,11 @@ public class TensorGaussianVertexTest {
 
         GaussianVertex gaussianVertex = new GaussianVertex(0, 1, new Random(1));
 
-        TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(new ConstantTensorVertex(0), new ConstantTensorVertex(1), new KeanuRandom(1));
+        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(0, 1, new KeanuRandom(1));
 
         double expectedDensity = gaussianVertex.logPdf(0.5);
-        double actualDensity = ndGaussianVertex.logPdf(Nd4jDoubleTensor.scalar(0.5));
 
-        assertEquals(expectedDensity, actualDensity, 1e-5);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, 0.5, expectedDensity);
     }
 
     @Test
@@ -53,13 +52,10 @@ public class TensorGaussianVertexTest {
         GaussianVertex gaussianVertexA = new GaussianVertex(mu, sigma, random);
         GaussianVertex gaussianVertexB = new GaussianVertex(mu, sigma, random);
 
-        double expectedDensity = gaussianVertexA.logPdf(0.25) + gaussianVertexB.logPdf(-0.75);
+        double expectedLogDensity = gaussianVertexA.logPdf(0.25) + gaussianVertexB.logPdf(-0.75);
+        TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(0, 1, new KeanuRandom(1));
 
-        TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(new ConstantTensorVertex(0), new ConstantTensorVertex(1), new KeanuRandom(1));
-
-        double actualDensity = ndGaussianVertex.logPdf(DoubleTensor.create(new double[]{0.25, -0.75}, new int[]{2, 1}));
-
-        assertEquals(expectedDensity, actualDensity, 1e-5);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndGaussianVertex, new double[]{0.25, -0.75}, expectedLogDensity);
     }
 
     @Test
@@ -87,9 +83,11 @@ public class TensorGaussianVertexTest {
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
         Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(Nd4jDoubleTensor.scalar(0.5));
 
-        assertEquals(expectedDerivatives.get(mu.getId()).scalar(), actualDerivatives.get(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(expectedDerivatives.get(sigma.getId()).scalar(), actualDerivatives.get(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(expectedDerivatives.get(gaussianVertex.getId()).scalar(), actualDerivatives.get(ndGaussianVertex.getId()).scalar(), 1e-5);
+        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+
+        assertEquals(expectedDerivatives.get(mu.getId()).scalar(), actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
+        assertEquals(expectedDerivatives.get(sigma.getId()).scalar(), actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
+        assertEquals(expectedDerivatives.get(gaussianVertex.getId()).scalar(), actual.withRespectTo(ndGaussianVertex.getId()).scalar(), 1e-5);
     }
 
     @Test
@@ -118,15 +116,15 @@ public class TensorGaussianVertexTest {
 
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
         Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(
-                DoubleTensor.create(new double[]{0.25, -0.75}, new int[]{2, 1})
+            DoubleTensor.create(new double[]{0.25, -0.75}, new int[]{2, 1})
         );
 
         TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
 
-        assertEquals(expected.withRespectTo(mu.getId()).scalar(), actualDerivatives.get(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(expected.withRespectTo(sigma.getId()).scalar(), actualDerivatives.get(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(expected.withRespectTo(gaussianVertexA.getId()).scalar(), actualDerivatives.get(ndGaussianVertex.getId()).getValue(0), 1e-5);
-        assertEquals(expected.withRespectTo(gaussianVertexB.getId()).scalar(), actualDerivatives.get(ndGaussianVertex.getId()).getValue(1), 1e-5);
+        assertEquals(expected.withRespectTo(mu.getId()).scalar(), actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
+        assertEquals(expected.withRespectTo(sigma.getId()).scalar(), actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
+        assertEquals(expected.withRespectTo(gaussianVertexA.getId()).scalar(), actual.withRespectTo(ndGaussianVertex.getId()).getValue(0), 1e-5);
+        assertEquals(expected.withRespectTo(gaussianVertexB.getId()).scalar(), actual.withRespectTo(ndGaussianVertex.getId()).getValue(1), 1e-5);
     }
 
     @Test
@@ -134,9 +132,9 @@ public class TensorGaussianVertexTest {
         TensorUniformVertex mu = new TensorUniformVertex(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         TensorGaussianVertex vertexUnderTest = new TensorGaussianVertex(
-                mu,
-                new ConstantTensorVertex(3.0),
-                random
+            mu,
+            new ConstantTensorVertex(3.0),
+            random
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -153,15 +151,15 @@ public class TensorGaussianVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                Nd4jDoubleTensor.scalar(1.0),
-                Nd4jDoubleTensor.scalar(1.5),
-                0.1,
-                uniformA,
-                gaussian,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            Nd4jDoubleTensor.scalar(1.0),
+            Nd4jDoubleTensor.scalar(1.5),
+            0.1,
+            uniformA,
+            gaussian,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -174,15 +172,15 @@ public class TensorGaussianVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                Nd4jDoubleTensor.scalar(1.0),
-                Nd4jDoubleTensor.scalar(3.0),
-                0.1,
-                uniformA,
-                gaussian,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            Nd4jDoubleTensor.scalar(1.0),
+            Nd4jDoubleTensor.scalar(3.0),
+            0.1,
+            uniformA,
+            gaussian,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -192,10 +190,10 @@ public class TensorGaussianVertexTest {
 
         int sampleCount = 1000000;
         TensorGaussianVertex vertex = new TensorGaussianVertex(
-                new int[]{sampleCount, 1},
-                new ConstantTensorVertex(0.0),
-                new ConstantTensorVertex(2.0),
-                random
+            new int[]{sampleCount, 1},
+            new ConstantTensorVertex(0.0),
+            new ConstantTensorVertex(2.0),
+            random
         );
 
         double from = -4;
@@ -225,9 +223,9 @@ public class TensorGaussianVertexTest {
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
-                muSigma,
-                latentMuSigma
+            hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
+            muSigma,
+            latentMuSigma
         );
     }
 }

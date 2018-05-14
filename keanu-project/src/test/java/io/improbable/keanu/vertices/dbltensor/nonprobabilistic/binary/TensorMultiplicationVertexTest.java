@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary.BinaryOperationHelper.*;
+import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary.BinaryOperationTestHelpers.*;
 
 public class TensorMultiplicationVertexTest {
 

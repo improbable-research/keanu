@@ -16,7 +16,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
-    public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
 
     public static Nd4jDoubleTensor scalar(double scalarValue) {
         return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
@@ -345,16 +344,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
-        INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
+
         INDArray mask = tensor.dup();
 
-        if (greaterThanThisArray.isScalar()) {
+        if (greaterThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                    new OldGreaterThan(mask, Nd4j.ones(mask.shape()).mul(greaterThanThisArray.getDouble(0)), mask, mask.length())
+                new OldGreaterThan(mask, Nd4j.ones(mask.shape()).mul(greaterThanThis.scalar()), mask, mask.length())
             );
         } else {
+            INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
             Nd4j.getExecutioner().exec(
-                    new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
+                new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
             );
         }
 
@@ -363,16 +363,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualToThis) {
-        INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
+
         INDArray mask = tensor.dup();
 
-        if (lessThanOrEqualToThisArray.isScalar()) {
+        if (lessThanOrEqualToThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                    new OldLessThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(lessThanOrEqualToThisArray.getDouble(0)), mask, mask.length())
+                new OldLessThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(lessThanOrEqualToThis.scalar()), mask, mask.length())
             );
         } else {
+            INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
             Nd4j.getExecutioner().exec(
-                    new OldLessThanOrEqual(mask, lessThanOrEqualToThisArray, mask, mask.length())
+                new OldLessThanOrEqual(mask, lessThanOrEqualToThisArray, mask, mask.length())
             );
         }
 
@@ -388,11 +389,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             tensor.muli(maskDup);
         } else {
             Nd4j.getExecutioner().exec(
-                    new CompareAndSet(maskDup, value, Conditions.equals(1.0))
+                new CompareAndSet(maskDup, value, Conditions.equals(1.0))
             );
 
             Nd4j.getExecutioner().exec(
-                    new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
+                new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
             );
         }
 

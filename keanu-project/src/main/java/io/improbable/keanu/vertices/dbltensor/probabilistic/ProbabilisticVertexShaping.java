@@ -1,13 +1,15 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.TensorShape;
 
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
 public class ProbabilisticVertexShaping {
+
+    private ProbabilisticVertexShaping(){
+    }
 
     /**
      * This is a common function to check that a vertex's parent tensors are either
@@ -25,8 +27,12 @@ public class ProbabilisticVertexShaping {
             boolean moreThanOneNonScalarShape = nonScalarShapes.size() > 1;
             boolean nonScalarShapeDoesNotMatchProposal = !Arrays.equals(nonScalarShapes.iterator().next().getShape(), shape);
 
-            if (moreThanOneNonScalarShape || nonScalarShapeDoesNotMatchProposal) {
-                throw new IllegalArgumentException("invalid hyper parameter shapes");
+            if (moreThanOneNonScalarShape) {
+                throw new IllegalArgumentException("More than a single non-scalar parent shape");
+            }
+
+            if (nonScalarShapeDoesNotMatchProposal) {
+                throw new IllegalArgumentException("Proposed shape does not match parent shapes");
             }
         }
     }
@@ -57,5 +63,33 @@ public class ProbabilisticVertexShaping {
             }
         }
         return nonScalarShapes;
+    }
+
+    private static class TensorShape {
+
+        private int[] shape;
+
+        public TensorShape(int[] shape) {
+            this.shape = shape;
+        }
+
+        public int[] getShape() {
+            return shape;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            TensorShape that = (TensorShape) o;
+
+            return Arrays.equals(shape, that.shape);
+        }
+
+        @Override
+        public int hashCode() {
+            return Arrays.hashCode(shape);
+        }
     }
 }
