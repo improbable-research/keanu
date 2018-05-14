@@ -57,4 +57,4 @@ Interested in more technical examples? Explore [Examples](keanu-docs/examples.md
 
 ## Hiring
 
-Interesting in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)
+Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)
