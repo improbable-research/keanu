@@ -95,25 +95,25 @@ public class BayesNet {
      *
      * @param attempts sampling attempts to get non-zero probability
      */
-    public void probeForNonZeroMasterP(int attempts) {
+    public void probeForNonZeroMasterP(int attempts, Random random) {
 
         VertexValuePropagation.cascadeUpdate(observedVertices);
         List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
-        setFromSampleAndCascade(sortedByDependency);
+        setFromSampleAndCascade(sortedByDependency, random);
 
-        probeForNonZeroMasterP(sortedByDependency, attempts);
+        probeForNonZeroMasterP(sortedByDependency, attempts, random);
     }
 
     /**
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts) {
+    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts, Random random) {
 
         Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
-            setFromSampleAndCascade(latentVertices, setAndCascadeCache);
+            setFromSampleAndCascade(latentVertices, setAndCascadeCache, random);
             iteration++;
 
             if (iteration > attempts) {
@@ -127,19 +127,21 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
-        setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, Random random) {
+        setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices), random);
     }
 
-    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, Map<String, Long> setAndCascadeCache) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices,
+                                               Map<String, Long> setAndCascadeCache,
+                                               Random random) {
         for (Vertex<?> vertex : vertices) {
-            setValueFromSample(vertex);
+            setValueFromSample(vertex, random);
         }
         VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
     }
 
-    private static <T> void setValueFromSample(Vertex<T> vertex) {
-        vertex.setValue(vertex.sample());
+    private static <T> void setValueFromSample(Vertex<T> vertex, Random random) {
+        vertex.setValue(vertex.sample(random));
     }
 
 }

@@ -13,21 +13,25 @@ import java.util.Random;
 import static org.junit.Assert.*;
 
 public class UniformIntVertexTest {
-    int N = 100000;
-    double epsilon = 0.01;
-    Integer lowerBound = 10;
-    Integer upperBound = 20;
-    List<Integer> samples = new ArrayList<>();
+    private int N = 100000;
+    private double epsilon = 0.01;
+    private Integer lowerBound = 10;
+    private Integer upperBound = 20;
+    private List<Integer> samples = new ArrayList<>();
+    private Random random;
 
     @Before
     public void setup() {
+
+        random = new Random(1);
+
         UniformIntVertex testUniformVertex = new UniformIntVertex(
                 new ConstantIntegerVertex(lowerBound),
                 new ConstantIntegerVertex(upperBound),
                 new Random(1));
 
         for (int i = 0; i < N; i++) {
-            Integer sample = testUniformVertex.sample();
+            Integer sample = testUniformVertex.sample(random);
             samples.add(sample);
         }
     }

@@ -37,7 +37,7 @@ public class MultimodalSimulatedAnnealingTest {
         C.observe(4.0);
 
         BayesNet network = new BayesNet(A.getConnectedGraph());
-        List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000);
+        List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
         boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) + 2) < 0.01);
         boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) - 2) < 0.01);
@@ -55,7 +55,7 @@ public class MultimodalSimulatedAnnealingTest {
         DoubleVertex C = new UniformVertex(new ConstantDoubleVertex(-3.0), new ConstantDoubleVertex(0.0), random);
         DoubleVertex D = C.multiply(C);
 
-        BoolVertex E = new Flip(0.5, random);
+        BoolVertex E = new Flip(0.5);
 
         Vertex<Double> F = If(E, B, D);
 
@@ -63,7 +63,7 @@ public class MultimodalSimulatedAnnealingTest {
         G.observe(4.0);
 
         BayesNet network = new BayesNet(A.getConnectedGraph());
-        List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000);
+        List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
         boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) - 2) < 0.01);
         boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(C) + 2) < 0.01);

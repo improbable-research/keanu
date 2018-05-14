@@ -52,19 +52,22 @@ public class ParticleFilter {
         return particles;
     }
 
-    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex, Set<Vertex> vertexDeps,
+    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex,
+                                                  Set<Vertex> vertexDeps,
                                                   List<Particle> particles,
-                                                  int numParticles, int resamplingCycles,
-                                                  double resamplingProportion, Random random) {
+                                                  int numParticles,
+                                                  int resamplingCycles,
+                                                  double resamplingProportion,
+                                                  Random random) {
 
         List<Particle> updatedParticles = sampleAndCopy(particles, numParticles, random);
-        addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps);
+        addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps, random);
 
         for (int i = 0; i < resamplingCycles; i++) {
             updatedParticles = removeWorstParticles(updatedParticles, resamplingProportion);
             int numToSample = numParticles - updatedParticles.size();
             List<Particle> sampledParticles = sampleAndCopy(particles, numToSample, random);
-            addObservedVertexToParticles(sampledParticles, nextObservedVertex, vertexDeps);
+            addObservedVertexToParticles(sampledParticles, nextObservedVertex, vertexDeps, random);
             updatedParticles.addAll(sampledParticles);
         }
 
@@ -82,21 +85,23 @@ public class ParticleFilter {
         return emptyParticles;
     }
 
-    private static void addObservedVertexToParticles(List<Particle> particles, Vertex<?> observedVertex,
-                                                     Set<Vertex> vertexDependencies) {
+    private static void addObservedVertexToParticles(List<Particle> particles,
+                                                     Vertex<?> observedVertex,
+                                                     Set<Vertex> vertexDependencies,
+                                                     Random random) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);
             for (Vertex<?> latentVertex : vertexDependencies) {
-                sampleValueAndAddToParticle(latentVertex, particle);
+                sampleValueAndAddToParticle(latentVertex, particle, random);
             }
 
             particle.updateSumLogPOfSubgraph();
         }
     }
 
-    private static <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle) {
-        T sample = vertex.sample();
+    private static <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle, Random random) {
+        T sample = vertex.sample(random);
         particle.addLatentVertex(vertex, sample);
     }
 

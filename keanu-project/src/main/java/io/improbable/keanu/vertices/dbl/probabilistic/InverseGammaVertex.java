@@ -52,7 +52,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return InverseGamma.sample(a.getValue(), b.getValue(), random);
     }
 

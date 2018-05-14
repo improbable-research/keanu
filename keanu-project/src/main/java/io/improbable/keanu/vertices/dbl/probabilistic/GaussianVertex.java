@@ -83,7 +83,7 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Gaussian.sample(mu.getValue(), sigma.getValue(), random);
     }
 

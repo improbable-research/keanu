@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.*;
@@ -14,7 +15,12 @@ import static junit.framework.TestCase.assertTrue;
 
 public class LatentIncrementSortTest {
 
-    private Random random = new Random();
+    private Random random;
+
+    @Before
+    public void setup(){
+        this.random = new Random(1);
+    }
 
     @Test
     public void simpleGraph() {

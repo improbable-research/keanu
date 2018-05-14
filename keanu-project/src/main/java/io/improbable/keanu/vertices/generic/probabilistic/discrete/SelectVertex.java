@@ -28,7 +28,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     @Override
-    public T sample() {
+    public T sample(Random random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;

@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,11 +18,17 @@ import static org.junit.Assert.assertEquals;
 public class BinaryOpVertexTest {
     private final Logger log = LoggerFactory.getLogger(BinaryOpVertexTest.class);
 
+    private Random random;
+
+    @Before
+    public void setup() {
+        this.random = new Random(1);
+    }
+
     @Test
     public void basicTest() {
-        Random r = new Random(1);
-        Flip flip = new Flip(new ConstantDoubleVertex(0.5), r);
-        GaussianVertex gaus = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), r);
+        Flip flip = new Flip(0.5);
+        GaussianVertex gaus = new GaussianVertex(0.0, 1.0, random);
         BinaryOpLambda<Boolean, Double, Double> custom = new BinaryOpLambda<>(flip, gaus, (Boolean f, Double g) -> {
             if (f) {
                 return g;
@@ -34,7 +40,7 @@ public class BinaryOpVertexTest {
         int N = 1000000;
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            samples.add(custom.sample());
+            samples.add(custom.sample(random));
         }
 
         SummaryStatistics stats = new SummaryStatistics();

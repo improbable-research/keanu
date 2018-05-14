@@ -10,7 +10,7 @@ import java.util.*
 class RandomFactoryTest {
 
     @Test
-    fun test() {
+    fun arithmeticAndVertexModelsAreEquivalent() {
         val modelA = getArithmeticDoubleTestModel()
         val modelB = getDoubleVertexTestModel()
 
@@ -43,12 +43,14 @@ class RandomFactoryTest {
     private fun getArithmeticDoubleTestModel(): SimpleModel<ArithmeticDouble> {
         val arithmeticDoubleFactory = RandomDoubleFactory()
         arithmeticDoubleFactory.setRandom(Random(1))
+
         return SimpleModel<ArithmeticDouble>(arithmeticDoubleFactory)
     }
 
     private fun getDoubleVertexTestModel(): SimpleModel<DoubleVertex> {
         val doubleVertexFactory = DoubleVertexFactory()
         doubleVertexFactory.setRandom(Random(1))
+        
         return SimpleModel<DoubleVertex>(doubleVertexFactory)
     }
 

@@ -70,7 +70,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Exponential.sample(a.getValue(), b.getValue(), random);
     }
 

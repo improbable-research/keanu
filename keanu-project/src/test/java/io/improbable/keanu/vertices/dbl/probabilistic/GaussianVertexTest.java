@@ -32,34 +32,41 @@ public class GaussianVertexTest {
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;
         double epsilon = 0.01;
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        GaussianVertex gaussianVertex = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
 
-        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, g, 0.0, 1.0, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
+                N,
+                gaussianVertex,
+                0.0,
+                1.0,
+                epsilon,
+                random
+        );
     }
 
     @Test
     public void gradientAtMuIsZero() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        g.setValue(0.0);
-        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
+        GaussianVertex gaussianVertex = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        gaussianVertex.setValue(0.0);
+        double gradient = gaussianVertex.dLogProbAtValue().get(gaussianVertex.getId()).scalar();
         log.info("Gradient at mu: " + gradient);
         assertEquals(0, gradient, 0);
     }
 
     @Test
     public void gradientBeforeMuIsPositive() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        g.setValue(-1.0);
-        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
+        GaussianVertex gaussianVertex = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        gaussianVertex.setValue(-1.0);
+        double gradient = gaussianVertex.dLogProbAtValue().get(gaussianVertex.getId()).scalar();
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient > 0);
     }
 
     @Test
     public void gradientAfterMuIsNegative() {
-        GaussianVertex g = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
-        g.setValue(1.0);
-        double gradient = g.dLogProbAtValue().get(g.getId()).scalar();
+        GaussianVertex gaussianVertex = new GaussianVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        gaussianVertex.setValue(1.0);
+        double gradient = gaussianVertex.dLogProbAtValue().get(gaussianVertex.getId()).scalar();
         log.info("Gradient after mu: " + gradient);
         assertTrue(gradient < 0);
     }
@@ -78,8 +85,6 @@ public class GaussianVertexTest {
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
 
-        Random random = new Random(1);
-
         Vertex<Double> vertex = new GaussianVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(2.0),
@@ -91,7 +96,15 @@ public class GaussianVertexTest {
         double bucketSize = 0.05;
         long sampleCount = 1000000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
+                vertex,
+                sampleCount,
+                from,
+                to,
+                bucketSize,
+                1e-2,
+                random
+        );
     }
 
     @Test
@@ -111,7 +124,8 @@ public class GaussianVertexTest {
                 vertexStartValue,
                 vertexEndValue,
                 vertexIncrement,
-                DELTA);
+                DELTA
+        );
     }
 
     @Test
@@ -131,7 +145,8 @@ public class GaussianVertexTest {
                 vertexStartValue,
                 vertexEndValue,
                 vertexIncrement,
-                DELTA);
+                DELTA
+        );
     }
 
     @Test
@@ -152,7 +167,8 @@ public class GaussianVertexTest {
                 hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muSigma,
                 latentMuSigma,
-                2000
+                2000,
+                random
         );
     }
 }

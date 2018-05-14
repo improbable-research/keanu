@@ -26,10 +26,11 @@ public class MultiplexerVertexTest {
 
     @Test
     public void multiplexerGivesReasonableDistributionOfSamples() {
-        Random selectorRandom = new Random(1);
+        Random random = new Random(1);
+
         IntegerVertex selectorOrigin = new ConstantIntegerVertex(0);
         IntegerVertex selectorBound = new ConstantIntegerVertex(2);
-        IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound, selectorRandom);
+        IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound, random);
         Map<TestEnum, Double> expected = new HashMap<>();
         expected.put(TestEnum.A, 0.25);
         expected.put(TestEnum.B, 0.25);
@@ -39,14 +40,12 @@ public class MultiplexerVertexTest {
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
         optionGroup1.put(TestEnum.A, new ConstantDoubleVertex(0.5));
         optionGroup1.put(TestEnum.B, new ConstantDoubleVertex(0.5));
-        Random r1 = new Random(1);
-        SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1, r1);
+        SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1, random);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
         optionGroup2.put(TestEnum.C, new ConstantDoubleVertex(0.5));
         optionGroup2.put(TestEnum.D, new ConstantDoubleVertex(0.5));
-        Random r2 = new Random(1);
-        SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2, r2);
+        SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2, random);
 
         MultiplexerVertex<TestEnum> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 
@@ -57,10 +56,10 @@ public class MultiplexerVertexTest {
         frequencies.put(TestEnum.D, 0);
 
         for (int i = 0; i < N; i++) {
-            selectorControlVertex.setValue(selectorControlVertex.sample());
-            select1.setValue(select1.sample());
-            select2.setValue(select2.sample());
-            TestEnum s = multiplexerVertex.sample();
+            selectorControlVertex.setValue(selectorControlVertex.sample(random));
+            select1.setValue(select1.sample(random));
+            select2.setValue(select2.sample(random));
+            TestEnum s = multiplexerVertex.sample(random);
             frequencies.put(s, frequencies.get(s) + 1);
         }
 

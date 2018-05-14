@@ -31,12 +31,19 @@ public class BetaVertexTest {
         int N = 100000;
         double epsilon = 0.01;
 
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
+        BetaVertex betaVertex = new BetaVertex(new ConstantDoubleVertex(3.0), new ConstantDoubleVertex(3.0), random);
 
         double mean = 0.5;
         double standardDeviation = Math.sqrt(9.0 / (36 * 7));
 
-        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, b, mean, standardDeviation, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
+                N,
+                betaVertex,
+                mean,
+                standardDeviation,
+                epsilon,
+                random
+        );
     }
 
     @Test
@@ -101,15 +108,16 @@ public class BetaVertexTest {
 
     @Test
     public void sampleMatchesLogProb() {
-        BetaVertex b = new BetaVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(2.0), random);
+        BetaVertex betaVertex = new BetaVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(2.0), random);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                b,
+                betaVertex,
                 1000000,
                 0.1,
                 0.9,
                 .05,
-                0.01
+                0.01,
+                random
         );
     }
 
@@ -183,7 +191,8 @@ public class BetaVertexTest {
                 hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1), random),
                 alphaBeta,
                 latentAlphaBeta,
-                1000
+                1000,
+                random
         );
     }
 }

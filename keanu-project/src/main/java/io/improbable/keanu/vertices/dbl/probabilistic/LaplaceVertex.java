@@ -62,7 +62,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Laplace.sample(mu.getValue(), beta.getValue(), random);
     }
 

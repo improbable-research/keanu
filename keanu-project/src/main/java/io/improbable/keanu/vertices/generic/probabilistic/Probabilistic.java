@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.generic.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.concurrent.ThreadLocalRandom;
+
 public abstract class Probabilistic<T> extends Vertex<T> {
 
     @Override
@@ -12,7 +14,7 @@ public abstract class Probabilistic<T> extends Vertex<T> {
     @Override
     public T lazyEval() {
         if (!hasValue()) {
-            setValue(sample());
+            setValue(sample(ThreadLocalRandom.current()));
         }
         return getValue();
     }

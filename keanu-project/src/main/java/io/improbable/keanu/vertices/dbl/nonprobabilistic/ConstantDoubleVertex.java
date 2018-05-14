@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
+import java.util.Random;
 
 public class ConstantDoubleVertex extends NonProbabilisticDouble implements Constant<Double> {
 
@@ -18,7 +19,7 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble implements Cons
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return getValue();
     }
 

@@ -110,7 +110,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample() {
+    public Integer sample(Random random) {
         double fuzzyDouble = sampleFuzzyDoubleInBounds();
         return (int) Math.round(fuzzyDouble);
     }

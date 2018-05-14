@@ -95,7 +95,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return SmoothUniformDistribution.sample(xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
     }
 

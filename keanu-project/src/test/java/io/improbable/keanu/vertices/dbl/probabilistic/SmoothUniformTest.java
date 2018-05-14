@@ -79,7 +79,15 @@ public class SmoothUniformTest {
         double delta = 0.05;
         long N = 1000000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(uniform, N, from, to, delta, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
+                uniform,
+                N,
+                from,
+                to,
+                delta,
+                1e-2,
+                random
+        );
     }
 
     @Test

@@ -82,7 +82,7 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Beta.sample(alpha.getValue(), beta.getValue(), 0, 1, random);
     }
 

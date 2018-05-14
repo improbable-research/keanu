@@ -19,7 +19,6 @@ public class BoolReduceVertex extends NonProbabilisticBool {
         this.inputs = new ArrayList<>(input);
         this.reduceFunction = reduceFunction;
         setParents(inputs);
-
     }
 
     public BoolReduceVertex(BiFunction<Boolean, Boolean, Boolean> f, Vertex<Boolean>... input) {
@@ -27,8 +26,8 @@ public class BoolReduceVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample() {
-        return applyReduce(Vertex::sample);
+    public Boolean sample(Random random) {
+        return applyReduce((vertex) -> vertex.sample(random));
     }
 
     @Override

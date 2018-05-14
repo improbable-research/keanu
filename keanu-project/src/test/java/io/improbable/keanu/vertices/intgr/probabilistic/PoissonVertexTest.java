@@ -21,11 +21,12 @@ public class PoissonVertexTest {
         int N = 100000;
         double epsilon = 0.1;
         Double mu = 10.0;
+        Random random = new Random(1);
         PoissonVertex testPoissonVertex = new PoissonVertex(new ConstantDoubleVertex(mu), new Random(1));
 
         List<Integer> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            Integer sample = testPoissonVertex.sample();
+            Integer sample = testPoissonVertex.sample(random);
             samples.add(sample);
         }
 

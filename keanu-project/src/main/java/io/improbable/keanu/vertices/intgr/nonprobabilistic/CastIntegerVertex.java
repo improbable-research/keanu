@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.Random;
+
 public class CastIntegerVertex extends NonProbabilisticInteger {
 
     private final Vertex<Integer> inputVertex;
@@ -12,8 +14,8 @@ public class CastIntegerVertex extends NonProbabilisticInteger {
     }
 
     @Override
-    public Integer sample() {
-        return inputVertex.sample();
+    public Integer sample(Random random) {
+        return inputVertex.sample(random);
     }
 
     @Override

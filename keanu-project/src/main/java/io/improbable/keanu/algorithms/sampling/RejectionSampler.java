@@ -4,10 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Supplier;
 
 public class RejectionSampler {
@@ -15,12 +12,16 @@ public class RejectionSampler {
     private RejectionSampler() {
     }
 
-    public static double getPosteriorProbability(List<? extends Vertex> latentVertices, List<? extends Vertex> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
+    public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
+                                                 List<? extends Vertex> observedVertices,
+                                                 Supplier<Boolean> isSuccess,
+                                                 int sampleCount,
+                                                 Random random) {
         int matchedSampleCount = 0;
         int success = 0;
 
         while (matchedSampleCount < sampleCount) {
-            sampleLatents(latentVertices);
+            sampleLatents(latentVertices, random);
             if (matchesObservation(observedVertices)) {
                 matchedSampleCount++;
                 if (isSuccess.get()) {
@@ -36,13 +37,16 @@ public class RejectionSampler {
         }
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet, List<Vertex<?>> fromVertices, int sampleCount) {
+    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
+                                                     List<Vertex<?>> fromVertices,
+                                                     int sampleCount,
+                                                     Random random) {
 
         Map<String, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;
 
         while (acceptedCount < sampleCount) {
-            sampleLatents(bayesNet.getLatentVertices());
+            sampleLatents(bayesNet.getLatentVertices(), random);
             if (matchesObservation(bayesNet.getObservedVertices())) {
                 takeSamples(samples, fromVertices);
                 acceptedCount++;
@@ -52,12 +56,12 @@ public class RejectionSampler {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void sampleLatents(List<? extends Vertex> latents) {
-        latents.forEach(RejectionSampler::setFromSample);
+    private static void sampleLatents(List<? extends Vertex> latents, Random random) {
+        latents.forEach(vertex -> setFromSample((Vertex<?>) vertex, random));
     }
 
-    private static <T> void setFromSample(Vertex<T> v) {
-        v.setAndCascade(v.sample());
+    private static <T> void setFromSample(Vertex<T> v, Random random) {
+        v.setAndCascade(v.sample(random));
     }
 
     private static boolean matchesObservation(List<? extends Vertex> observedVertices) {

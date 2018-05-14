@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
+import java.util.Random;
+
 public class MultiplexerVertex<T> extends NonProbabilistic<T> {
 
     private final IntegerVertex selectorControlVertex;
@@ -16,7 +18,7 @@ public class MultiplexerVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T sample() {
+    public T sample(Random random) {
         return getDerivedValue();
     }
 

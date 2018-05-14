@@ -32,7 +32,7 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return ChiSquared.sample(k.getValue(), random);
     }
 

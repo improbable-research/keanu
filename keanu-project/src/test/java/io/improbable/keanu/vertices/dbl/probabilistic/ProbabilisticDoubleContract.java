@@ -8,6 +8,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
@@ -34,14 +35,15 @@ public class ProbabilisticDoubleContract {
                                                         double from,
                                                         double to,
                                                         double bucketSize,
-                                                        double maxError) {
+                                                        double maxError,
+                                                        Random random) {
         double bucketCount = ((to - from) / bucketSize);
 
         if (bucketCount != (int) bucketCount) {
             throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
         }
 
-        Map<Double, Long> histogram = Stream.generate(vertexUnderTest::sample)
+        Map<Double, Long> histogram = Stream.generate(() -> vertexUnderTest.sample(random))
                 .limit(sampleCount)
                 .filter(value -> value >= from && value <= to)
                 .collect(groupingBy(
@@ -69,11 +71,12 @@ public class ProbabilisticDoubleContract {
                                                                          Vertex<Double> vertexUnderTest,
                                                                          double expectedMean,
                                                                          double expectedStandardDeviation,
-                                                                         double maxError) {
+                                                                         double maxError,
+                                                                         Random random) {
         List<Double> samples = new ArrayList<>();
 
         for (int i = 0; i < numberOfSamples; i++) {
-            double sample = vertexUnderTest.sample();
+            double sample = vertexUnderTest.sample(random);
             samples.add(sample);
         }
 

@@ -64,7 +64,7 @@ public class MetropolisHastings {
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
 
         final T oldValue = chosenVertex.getValue();
-        final T proposedValue = chosenVertex.sample();
+        final T proposedValue = chosenVertex.sample(random);
 
         Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);

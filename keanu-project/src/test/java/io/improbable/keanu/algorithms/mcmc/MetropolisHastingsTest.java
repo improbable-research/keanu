@@ -41,7 +41,7 @@ public class MetropolisHastingsTest {
         Cobserved.observe(46.0);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroMasterP(100);
+        bayesNet.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
                 bayesNet,
@@ -64,16 +64,16 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesSimpleDiscretePrior() {
 
-        Flip A = new Flip(0.5, random);
+        Flip A = new Flip(0.5);
 
         DoubleVertex B = new DoubleUnaryOpLambda<>(A, val -> val ? 0.9 : 0.1);
 
-        Flip C = new Flip(B, random);
+        Flip C = new Flip(B);
 
         C.observe(true);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
-        bayesNet.probeForNonZeroMasterP(100);
+        bayesNet.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
                 bayesNet,
@@ -90,18 +90,18 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesComplexDiscretePrior() {
 
-        Flip A = new Flip(0.5, random);
-        Flip B = new Flip(0.5, random);
+        Flip A = new Flip(0.5);
+        Flip B = new Flip(0.5);
 
         BoolVertex C = A.or(B);
         DoubleVertex D = new DoubleUnaryOpLambda<>(C, val -> val ? 0.9 : 0.1);
 
-        Flip E = new Flip(D, random);
+        Flip E = new Flip(D);
 
         E.observe(true);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C, D, E));
-        bayesNet.probeForNonZeroMasterP(100);
+        bayesNet.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
                 bayesNet,
@@ -118,13 +118,13 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesFromPriorWithObservedDeterministic() {
 
-        Flip A = new Flip(0.5, random);
-        Flip B = new Flip(0.5, random);
+        Flip A = new Flip(0.5);
+        Flip B = new Flip(0.5);
         BoolVertex C = A.or(B);
         C.observe(false);
 
         BayesNet net = new BayesNet(A.getConnectedGraph());
-        net.probeForNonZeroMasterP(100);
+        net.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
                 net,

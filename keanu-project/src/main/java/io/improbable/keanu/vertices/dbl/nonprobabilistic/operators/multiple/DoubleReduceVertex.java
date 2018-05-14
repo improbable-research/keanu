@@ -35,8 +35,8 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
-        return applyReduce(Vertex::sample);
+    public Double sample(Random random) {
+        return applyReduce(vertex -> vertex.sample(random));
     }
 
     @Override

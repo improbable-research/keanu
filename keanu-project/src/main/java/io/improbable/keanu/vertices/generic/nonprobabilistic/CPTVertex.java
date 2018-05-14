@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.function.Function;
 
 public class CPTVertex<T> extends NonProbabilistic<T> {
@@ -23,9 +24,9 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T sample() {
-        final Condition condition = getCondition(Vertex::sample);
-        return conditions.getOrDefault(condition, defaultResult).sample();
+    public T sample(Random random) {
+        final Condition condition = getCondition((vertex) -> vertex.sample(random));
+        return conditions.getOrDefault(condition, defaultResult).sample(random);
     }
 
     @Override

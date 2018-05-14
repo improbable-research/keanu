@@ -82,7 +82,7 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Logistic.sample(a.getValue(), b.getValue(), random);
     }
 }

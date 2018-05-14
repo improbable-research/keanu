@@ -34,7 +34,7 @@ public class ChiSquaredVertexTest {
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            double sample = testChiVertex.sample();
+            double sample = testChiVertex.sample(random);
             samples.add(sample);
         }
 
@@ -62,7 +62,15 @@ public class ChiSquaredVertexTest {
         double bucketSize = 0.05;
         long sampleCount = 100000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
+                vertex,
+                sampleCount,
+                from,
+                to,
+                bucketSize,
+                1e-2,
+                random
+        );
     }
 
 }

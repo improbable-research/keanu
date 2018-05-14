@@ -4,6 +4,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 
+import java.util.Random;
+
 public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
 
     protected final DoubleVertex a;
@@ -16,8 +18,8 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
-        return op(a.sample(), b.sample());
+    public Double sample(Random random) {
+        return op(a.sample(random), b.sample(random));
     }
 
     @Override

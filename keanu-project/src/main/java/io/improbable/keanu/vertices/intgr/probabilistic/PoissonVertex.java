@@ -47,7 +47,7 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample() {
-        return new Poisson(mu.getValue(), random).sample();
+    public Integer sample(Random random) {
+        return Poisson.sample(mu.getValue(), random);
     }
 }

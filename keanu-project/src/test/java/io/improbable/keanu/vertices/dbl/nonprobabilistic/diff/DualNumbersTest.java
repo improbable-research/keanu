@@ -21,7 +21,7 @@ public class DualNumbersTest {
 
     @Before
     public void setup() {
-        random = new Random();
+        random = new Random(1);
         vA = new GaussianVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(0.0), random);
         vB = new GaussianVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(0.0), random);
     }

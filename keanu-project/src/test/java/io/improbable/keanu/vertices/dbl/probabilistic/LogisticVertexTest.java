@@ -34,21 +34,28 @@ public class LogisticVertexTest {
         double a = 0.0;
         double b = 1.0;
 
-        LogisticVertex l = new LogisticVertex(a, b, new Random(1));
+        LogisticVertex logisticVertex = new LogisticVertex(a, b, random);
 
         double mean = a;
         double standardDeviation = Math.sqrt((Math.pow(Math.PI, 2) / 3) * Math.pow(b, 2));
 
-        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, l, mean, standardDeviation, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
+                N,
+                logisticVertex,
+                mean,
+                standardDeviation,
+                epsilon,
+                random
+        );
     }
 
     @Test
     public void gradientAtAIsZero() {
         double a = 0.0;
         double b = 0.5;
-        LogisticVertex l = new LogisticVertex(a, b, new Random(1));
-        l.setValue(a);
-        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
+        LogisticVertex logisticVertex = new LogisticVertex(a, b, new Random(1));
+        logisticVertex.setValue(a);
+        double gradient = logisticVertex.dLogProbAtValue().get(logisticVertex.getId()).scalar();
         log.info("Gradient at a: " + gradient);
         assertEquals(gradient, 0, 0);
     }
@@ -57,9 +64,9 @@ public class LogisticVertexTest {
     public void gradientBeforeAIsPositive() {
         double a = 0.0;
         double b = 0.5;
-        LogisticVertex l = new LogisticVertex(a, b, new Random(1));
-        l.setValue(a - 1.0);
-        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
+        LogisticVertex logisticVertex = new LogisticVertex(a, b, new Random(1));
+        logisticVertex.setValue(a - 1.0);
+        double gradient = logisticVertex.dLogProbAtValue().get(logisticVertex.getId()).scalar();
         log.info("Gradient at x < a: " + gradient);
         assertTrue(gradient > 0);
     }
@@ -68,9 +75,9 @@ public class LogisticVertexTest {
     public void gradientAfterAIsNegative() {
         double a = 0.0;
         double b = 0.5;
-        LogisticVertex l = new LogisticVertex(a, b, new Random(1));
-        l.setValue(a + 1.0);
-        double gradient = l.dLogProbAtValue().get(l.getId()).scalar();
+        LogisticVertex logisticVertex = new LogisticVertex(a, b, new Random(1));
+        logisticVertex.setValue(a + 1.0);
+        double gradient = logisticVertex.dLogProbAtValue().get(logisticVertex.getId()).scalar();
         log.info("Gradient at x > a: " + gradient);
         assertTrue(gradient < 0);
     }
@@ -92,7 +99,8 @@ public class LogisticVertexTest {
                 vertexStartValue,
                 vertexEndValue,
                 vertexIncrement,
-                DELTA);
+                DELTA
+        );
     }
 
     @Test
@@ -109,7 +117,7 @@ public class LogisticVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.));
-        LogisticVertex l = new LogisticVertex(new ConstantDoubleVertex(0.0), uniformB);
+        LogisticVertex logisticVertex = new LogisticVertex(new ConstantDoubleVertex(0.0), uniformB);
 
         double vertexStartValue = 0.5;
         double vertexEndValue = 1.0;
@@ -120,7 +128,7 @@ public class LogisticVertexTest {
                 3.0,
                 0.1,
                 uniformB,
-                l,
+                logisticVertex,
                 vertexStartValue,
                 vertexEndValue,
                 vertexIncrement,
@@ -145,7 +153,8 @@ public class LogisticVertexTest {
                 hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1), random),
                 AB,
                 latentAB,
-                1000
+                1000,
+                random
         );
     }
 

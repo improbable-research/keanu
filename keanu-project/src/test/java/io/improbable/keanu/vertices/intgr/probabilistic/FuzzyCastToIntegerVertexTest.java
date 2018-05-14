@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +20,13 @@ import static org.junit.Assert.assertEquals;
 public class FuzzyCastToIntegerVertexTest {
 
     private final Logger log = LoggerFactory.getLogger(FuzzyCastToIntegerVertexTest.class);
+
+    private Random random;
+
+    @Before
+    public void setup(){
+        this.random = new Random(1);
+    }
 
     @Test
     public void evenlySamplesWithUniformInput() {
@@ -114,7 +122,7 @@ public class FuzzyCastToIntegerVertexTest {
 
         DoubleVertex input = new ConstantDoubleVertex(0.25);
 
-        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, new Random());
+        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, random);
         double density = Math.exp(fuzzyCast.logProbAtValue());
 
         log.info("Value = " + fuzzyCast.getValue() + ", density = " + density);
@@ -126,7 +134,7 @@ public class FuzzyCastToIntegerVertexTest {
         DoubleVertex mu = new UniformVertex(0, 10);
         DoubleVertex sigma = new ConstantDoubleVertex(1.);
 
-        FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma.getValue(), 0, 10, new Random());
+        FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma.getValue(), 0, 10, random);
         fuzzy.observe(6);
 
         BayesNet bayes = new BayesNet(fuzzy.getConnectedGraph());
@@ -254,13 +262,13 @@ public class FuzzyCastToIntegerVertexTest {
 
     private TreeMap<Integer, Integer> sample(DoubleVertex input, double fuzzinessSigma, int min, int max, int num) {
 
-        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, new Random());
+        Vertex<Integer> fuzzyCast = new FuzzyCastToIntegerVertex(input, fuzzinessSigma, min, max, random);
 
         TreeMap<Integer, Integer> sampleFrequencies = new TreeMap<>();
 
         for (int i = 0; i < num; i++) {
-            input.setValue(input.sample());
-            int sample = fuzzyCast.sample();
+            input.setValue(input.sample(random));
+            int sample = fuzzyCast.sample(random);
             sampleFrequencies.computeIfAbsent(sample, s -> sampleFrequencies.put(s, 0));
             sampleFrequencies.put(sample, sampleFrequencies.get(sample) + 1);
         }

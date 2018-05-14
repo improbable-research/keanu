@@ -99,7 +99,7 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Gamma.sample(a.getValue(), theta.getValue(), k.getValue(), random);
     }
 

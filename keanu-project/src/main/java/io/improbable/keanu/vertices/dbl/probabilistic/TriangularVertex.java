@@ -102,7 +102,7 @@ public class TriangularVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Triangular.sample(xMin.getValue(), xMax.getValue(), c.getValue(), random);
     }
 

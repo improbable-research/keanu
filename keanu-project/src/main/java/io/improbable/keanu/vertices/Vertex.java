@@ -48,7 +48,7 @@ public abstract class Vertex<T> implements Identifiable {
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
      * this will always be the same value.
      */
-    public abstract T sample();
+    public abstract T sample(Random random);
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's

@@ -4,6 +4,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
+import java.util.Random;
 
 public class CastDoubleVertex extends NonProbabilisticDouble {
 
@@ -15,8 +16,8 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
-        return inputVertex.sample().doubleValue();
+    public Double sample(Random random) {
+        return inputVertex.sample(random).doubleValue();
     }
 
     @Override

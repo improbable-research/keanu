@@ -17,8 +17,6 @@ public class LaplaceVertexTest {
 
     private static final double DELTA = 0.0001;
 
-    private final Logger log = LoggerFactory.getLogger(LaplaceVertexTest.class);
-
     private Random random;
 
     @Before
@@ -30,29 +28,38 @@ public class LaplaceVertexTest {
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;
         double epsilon = 0.01;
-        LaplaceVertex l = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
+        LaplaceVertex laplaceVertex = new LaplaceVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0), random);
 
         double mean = 0.0;
         double standardDeviation = Math.sqrt(2);
 
-        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, l, mean, standardDeviation, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
+                N,
+                laplaceVertex,
+                mean,
+                standardDeviation,
+                epsilon,
+                random
+        );
     }
 
     @Test
     public void samplingMatchesLogProb() {
-        LaplaceVertex laplace = new LaplaceVertex(
+        LaplaceVertex laplaceVertex = new LaplaceVertex(
                 new ConstantDoubleVertex(0.0),
                 new ConstantDoubleVertex(1.0),
                 random
         );
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                laplace,
+                laplaceVertex,
                 100000,
                 2.0,
                 10.0,
                 0.1,
-                0.01);
+                0.01,
+                random
+        );
     }
 
     @Test
@@ -72,7 +79,8 @@ public class LaplaceVertexTest {
                 vertexStartValue,
                 vertexEndValue,
                 vertexIncrement,
-                DELTA);
+                DELTA
+        );
     }
 
     @Test
@@ -92,7 +100,8 @@ public class LaplaceVertexTest {
                 vertexStartValue,
                 vertexEndValue,
                 vertexIncrement,
-                DELTA);
+                DELTA
+        );
     }
 
     @Test
@@ -124,7 +133,8 @@ public class LaplaceVertexTest {
                 hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
                 muBeta,
                 latentMuBeta,
-                1000
+                1000,
+                random
         );
     }
 }

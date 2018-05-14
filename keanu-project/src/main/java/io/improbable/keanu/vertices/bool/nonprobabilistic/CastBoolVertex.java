@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.Random;
+
 public class CastBoolVertex extends NonProbabilisticBool {
 
     private final Vertex<Boolean> inputVertex;
@@ -17,8 +19,8 @@ public class CastBoolVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample() {
-        return inputVertex.sample();
+    public Boolean sample(Random random) {
+        return inputVertex.sample(random);
     }
 
 }

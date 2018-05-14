@@ -42,7 +42,14 @@ public class InverseGammaVertexTest {
         double mean = beta / (alpha - 1.0);
         double standardDeviation = Math.sqrt(Math.pow(beta, 2) / (Math.pow(alpha - 1, 2) * (alpha - 2)));
 
-        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(N, inverted, mean, standardDeviation, epsilon);
+        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
+                N,
+                inverted,
+                mean,
+                standardDeviation,
+                epsilon,
+                random
+        );
     }
 
     @Test
@@ -59,7 +66,9 @@ public class InverseGammaVertexTest {
                 2.0,
                 10.0,
                 0.1,
-                0.01);
+                0.01,
+                random
+        );
     }
 
     @Test
@@ -144,7 +153,8 @@ public class InverseGammaVertexTest {
                 hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1), random),
                 alphaBeta,
                 latentAlphaBeta,
-                10000
+                10000,
+                random
         );
     }
 }

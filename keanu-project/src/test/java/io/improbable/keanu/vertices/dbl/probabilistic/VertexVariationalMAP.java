@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
@@ -17,13 +18,14 @@ public class VertexVariationalMAP {
             Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
             List<DoubleVertex> hyperParamsForSampling,
             List<DoubleVertex> latentsToInfer,
-            int numSamples) {
+            int numSamples,
+            Random random) {
 
         // SOURCE OF TRUTH
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
 
         // GENERATE FAKE DATA
-        List<Double> samples = getSamples(sourceVertex, numSamples);
+        List<Double> samples = getSamples(sourceVertex, numSamples, random);
 
         // OBSERVE
         new PlateBuilder<Double>()
@@ -37,28 +39,28 @@ public class VertexVariationalMAP {
                 }).build();
 
         // INFER HYPER PARAMETERS
-        doInferenceOn(latentsToInfer.get(0));
+        doInferenceOn(latentsToInfer.get(0), random);
 
         for (int i = 0; i < latentsToInfer.size(); i++) {
             assertEquals(hyperParamsForSampling.get(i).getValue(), latentsToInfer.get(i).getValue(), 0.1);
         }
     }
 
-    private static void doInferenceOn(DoubleVertex unknownVertex) {
+    private static void doInferenceOn(DoubleVertex unknownVertex, Random random) {
         BayesNet inferNet = new BayesNet(unknownVertex.getConnectedGraph());
 
-        inferNet.probeForNonZeroMasterP(100);
+        inferNet.probeForNonZeroMasterP(100, random);
 
         GradientOptimizer g = new GradientOptimizer(inferNet);
 
         g.maxLikelihood(5000);
     }
 
-    private static List<Double> getSamples(DoubleVertex knownVertex, int numSamples) {
+    private static List<Double> getSamples(DoubleVertex knownVertex, int numSamples, Random random) {
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < numSamples; i++) {
-            samples.add(knownVertex.sample());
+            samples.add(knownVertex.sample(random));
         }
 
         return samples;

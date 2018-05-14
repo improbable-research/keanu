@@ -44,8 +44,14 @@ public class ParticleFilteringTest {
         double resamplingProportion = 0.5;
 
 
-        List<ParticleFilter.Particle> particles = ParticleFilter.getProbableValues(temperature.getConnectedGraph(),
-                numParticles, resamplingCycles, resamplingProportion, new Random());
+        List<ParticleFilter.Particle> particles = ParticleFilter.getProbableValues(
+                temperature.getConnectedGraph(),
+                numParticles,
+                resamplingCycles,
+                resamplingProportion,
+                new Random(1)
+        );
+
         particles.sort(ParticleFilter.Particle::sortDescending);
         ParticleFilter.Particle p = particles.get(0);
 

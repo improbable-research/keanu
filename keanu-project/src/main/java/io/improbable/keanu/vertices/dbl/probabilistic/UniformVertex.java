@@ -85,7 +85,7 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(Random random) {
         return Uniform.sample(xMin.getValue(), xMax.getValue(), random);
     }
 

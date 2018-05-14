@@ -65,7 +65,7 @@ public class UniformIntVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample() {
+    public Integer sample(Random random) {
         return min.getValue() + random.nextInt(max.getValue() - min.getValue());
     }
 }
