@@ -5,4 +5,4 @@ addons:
   sonarcloud:
     organization: "improbable-keanu"
 script:
-  - 'if [ "$TRAVIS_PULL_REQUEST" = "false" ]; then sonar-scanner; fi'
+  - 'if [[ ! -z $SONAR_TOKEN ]]; then sonar-scanner; fi'
