@@ -19,7 +19,7 @@ public class MetropolisHastings {
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<? extends Vertex> fromVertices,
                                                      int sampleCount) {
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, Vertex.getDefaultRandom());
     }
 
     /**

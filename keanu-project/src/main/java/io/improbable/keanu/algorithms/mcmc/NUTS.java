@@ -26,7 +26,7 @@ public class NUTS {
                                                      final int sampleCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, Vertex.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,

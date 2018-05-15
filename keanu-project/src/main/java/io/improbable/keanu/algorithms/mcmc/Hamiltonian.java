@@ -28,7 +28,7 @@ public class Hamiltonian {
                                                      final int leapFrogCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, Vertex.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,

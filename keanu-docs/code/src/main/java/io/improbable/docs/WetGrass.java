@@ -32,8 +32,7 @@ public class WetGrass {
         NetworkSamples posteriorSamples = RejectionSampler.getPosteriorSamples(
                 new BayesNet(wetGrass.getConnectedGraph()),
                 Arrays.asList(sprinkler, rain),
-                100000,
-                new Random(1)
+                100000
         );
 
         double probabilityOfRainGivenWetGrass = posteriorSamples.get(rain).probability(isRaining -> isRaining == true);

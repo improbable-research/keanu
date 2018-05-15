@@ -20,7 +20,7 @@ public abstract class Vertex<T> {
 
         if (randomSeed != null) {
             final long seed = Long.parseLong(randomSeed);
-            defaultRandom.set(new Random(seed));
+            setDefaultRandomSeed(seed);
         }
     }
 
@@ -80,7 +80,7 @@ public abstract class Vertex<T> {
      */
     public abstract T sample(Random random);
 
-    public T sample() {
+    public T sampleUsingDefaultRandom() {
         return sample(getDefaultRandom());
     }
 

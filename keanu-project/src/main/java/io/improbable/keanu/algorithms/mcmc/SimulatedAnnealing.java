@@ -16,7 +16,7 @@ public class SimulatedAnnealing {
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule schedule) {
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, new Random());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule, Vertex.getDefaultRandom());
     }
 
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
@@ -30,7 +30,7 @@ public class SimulatedAnnealing {
 
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
 
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, new Random());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule, Vertex.getDefaultRandom());
     }
 
     /**

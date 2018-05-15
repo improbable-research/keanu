@@ -39,6 +39,12 @@ public class RejectionSampler {
 
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<Vertex<?>> fromVertices,
+                                                     int sampleCount) {
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, Vertex.getDefaultRandom());
+    }
+
+    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
+                                                     List<Vertex<?>> fromVertices,
                                                      int sampleCount,
                                                      Random random) {
 
@@ -66,7 +72,7 @@ public class RejectionSampler {
 
     private static boolean matchesObservation(List<? extends Vertex> observedVertices) {
         return observedVertices.stream()
-                .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
+            .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
