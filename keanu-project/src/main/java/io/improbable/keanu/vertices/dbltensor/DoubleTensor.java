@@ -9,10 +9,10 @@ public interface DoubleTensor extends Tensor {
         return new SimpleScalarTensor(scalarValue);
     }
 
-    static Map<String, DoubleTensor> fromScalars(Map<String, Double> scalars) {
-        Map<String, DoubleTensor> asTensors = new HashMap<>();
+    static Map<Long, DoubleTensor> fromScalars(Map<Long, Double> scalars) {
+        Map<Long, DoubleTensor> asTensors = new HashMap<>();
 
-        for (Map.Entry<String, Double> entry : scalars.entrySet()) {
+        for (Map.Entry<Long, Double> entry : scalars.entrySet()) {
             asTensors.put(entry.getKey(), DoubleTensor.scalar(entry.getValue()));
         }
 

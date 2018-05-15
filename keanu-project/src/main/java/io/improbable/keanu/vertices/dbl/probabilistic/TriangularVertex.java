@@ -67,7 +67,7 @@ public class TriangularVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 

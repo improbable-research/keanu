@@ -46,12 +46,12 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(dlnPdf.dPdAlpha, dlnPdf.dPdBeta, dlnPdf.dPdx);
     }
 
-    public Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {
+    public Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {
         PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdAlpha);
         PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdBeta);
         PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);

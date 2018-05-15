@@ -42,7 +42,7 @@ public class RejectionSampler {
                                                      int sampleCount,
                                                      Random random) {
 
-        Map<String, List<?>> samples = new HashMap<>();
+        Map<Long, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;
 
         while (acceptedCount < sampleCount) {
@@ -69,11 +69,11 @@ public class RejectionSampler {
                 .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
+    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<Long, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
     }

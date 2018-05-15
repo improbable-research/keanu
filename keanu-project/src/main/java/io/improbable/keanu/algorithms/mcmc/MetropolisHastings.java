@@ -35,11 +35,11 @@ public class MetropolisHastings {
                                                      final Random random) {
         checkBayesNetInHealthyState(bayesNet);
 
-        Map<String, List<?>> samplesByVertex = new HashMap<>();
+        Map<Long, List<?>> samplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
-        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
+        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
 
         double logP = bayesNet.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
@@ -58,7 +58,7 @@ public class MetropolisHastings {
                                  final double logPOld,
                                  final Set<Vertex> affectedVertices,
                                  final double T,
-                                 final Map<String, Map<String, Long>> setAndCascadeCache,
+                                 final Map<Long, Map<Long, Long>> setAndCascadeCache,
                                  final Random random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
@@ -66,7 +66,7 @@ public class MetropolisHastings {
         final T oldValue = chosenVertex.getValue();
         final T proposedValue = chosenVertex.sample(random);
 
-        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
+        Map<Long, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);
@@ -107,11 +107,11 @@ public class MetropolisHastings {
                 .sum();
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex> fromVertices) {
+    private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
+    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<Long, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
     }

@@ -65,12 +65,12 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Gamma.Diff diff = Gamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdtheta, diff.dPdk, diff.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdtheta, double dPdk, double dPdx) {
         PartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         PartialDerivatives dPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dPdtheta);
         PartialDerivatives dPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dPdk);

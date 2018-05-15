@@ -46,12 +46,12 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
         PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
         PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);

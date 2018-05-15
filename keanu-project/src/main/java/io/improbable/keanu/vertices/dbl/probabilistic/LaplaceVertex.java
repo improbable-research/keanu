@@ -38,7 +38,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Laplace.Diff diff = Laplace.dlnPdf(mu.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(diff.dPdmu, diff.dPdbeta, diff.dPdx);
     }
@@ -48,7 +48,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
         return Laplace.sample(mu.getValue(), beta.getValue(), random);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdbeta, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdbeta, double dPdx) {
         PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
         PartialDerivatives dPdInputsFromSigma = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);

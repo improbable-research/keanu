@@ -5,4 +5,4 @@ addons:
   sonarcloud:
     organization: "improbable-keanu"
 script:
-  - sonar-scanner
+  - 'if [[ ! -z $SONAR_TOKEN ]]; then sonar-scanner; fi'

@@ -87,7 +87,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPmf(Integer value) {
+    public Map<Long, DoubleTensor> dLogPmf(Integer value) {
         int i = getValue();
         double x = input.getValue();
         double clampedX = getClampedInput();
@@ -129,7 +129,7 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
         return Math.min(Math.max(input.getValue(), minClamped), maxClamped);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPdInput, double dPdSigma) {
         PartialDerivatives dPdInputsFromInput = input.getDualNumber().getPartialDerivatives().multiplyBy(dPdInput);
         PartialDerivatives dPdInputsFromSigma = fuzzinessSigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdSigma);
         PartialDerivatives dPdInputs = dPdInputsFromInput.add(dPdInputsFromSigma);

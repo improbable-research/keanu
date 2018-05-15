@@ -22,7 +22,7 @@ public class Prior {
         }
 
         List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
-        Map<String, List> samplesByVertex = new HashMap<>();
+        Map<Long, List> samplesByVertex = new HashMap<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
             nextSample(topologicallySorted, random);
@@ -42,11 +42,11 @@ public class Prior {
         vertex.setAndCascade(vertex.sample(random));
     }
 
-    private static void takeSamples(Map<String, List> samples, List<? extends Vertex> fromVertices) {
+    private static void takeSamples(Map<Long, List> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
-    private static void addSampleForVertex(Vertex vertex, Map<String, List> samples) {
+    private static void addSampleForVertex(Vertex vertex, Map<Long, List> samples) {
         List samplesForVertex = samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<>());
         samplesForVertex.add(vertex.getValue());
     }
