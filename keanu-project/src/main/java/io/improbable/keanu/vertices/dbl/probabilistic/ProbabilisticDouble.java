@@ -5,7 +5,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
-import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class ProbabilisticDouble extends DoubleVertex {
 
@@ -17,7 +16,7 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     @Override
     public Double lazyEval() {
         if (!hasValue()) {
-            setValue(sample(ThreadLocalRandom.current()));
+            setValue(sample(Vertex.DEFAULT_RANDOM_SUPPLIER.get()));
         }
         return getValue();
     }

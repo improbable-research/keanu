@@ -40,6 +40,10 @@ dependencies {
 
 }
 
+test {
+    systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
+}
+
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
 if (!hasProperty('nexusUser')) {
     ext.nexusUser = ''

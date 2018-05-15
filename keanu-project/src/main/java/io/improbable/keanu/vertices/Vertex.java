@@ -5,13 +5,28 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.function.Supplier;
 
 public abstract class Vertex<T> {
 
-    public static final AtomicLong idGenerator = new AtomicLong(0L);
+    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
+    public static final Supplier<Random> DEFAULT_RANDOM_SUPPLIER;
 
-    private long uuid = idGenerator.getAndIncrement();
+    static {
+        String randomSeed = System.getProperty("io.improbable.keanu.defaultRandom.seed");
+
+        if (randomSeed != null) {
+            final long seed = Long.parseLong(randomSeed);
+            final Random defaultRandom = new Random(seed);
+            DEFAULT_RANDOM_SUPPLIER = () -> defaultRandom;
+        } else {
+            DEFAULT_RANDOM_SUPPLIER = ThreadLocalRandom::current;
+        }
+    }
+
+    private long uuid = ID_GENERATOR.getAndIncrement();
     private Set<Vertex> children = new HashSet<>();
     private Set<Vertex> parents = new HashSet<>();
     private T value;

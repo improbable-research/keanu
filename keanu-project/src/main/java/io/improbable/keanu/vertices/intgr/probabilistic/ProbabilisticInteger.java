@@ -1,8 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-
-import java.util.concurrent.ThreadLocalRandom;
 
 public abstract class ProbabilisticInteger extends IntegerVertex {
 
@@ -14,7 +13,7 @@ public abstract class ProbabilisticInteger extends IntegerVertex {
     @Override
     public Integer lazyEval() {
         if (!hasValue()) {
-            setValue(sample(ThreadLocalRandom.current()));
+            setValue(sample(Vertex.DEFAULT_RANDOM_SUPPLIER.get()));
         }
         return getValue();
     }
