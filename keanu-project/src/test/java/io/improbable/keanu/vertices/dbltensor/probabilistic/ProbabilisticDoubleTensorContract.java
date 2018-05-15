@@ -44,12 +44,12 @@ public class ProbabilisticDoubleTensorContract {
         double[] samples = vertexUnderTest.sample().getLinearView();
 
         Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample().getLinearView())
-                .filter(value -> value >= from && value <= to)
-                .boxed()
-                .collect(groupingBy(
-                        x -> bucketCenter(x, bucketSize, from),
-                        counting()
-                ));
+            .filter(value -> value >= from && value <= to)
+            .boxed()
+            .collect(groupingBy(
+                x -> bucketCenter(x, bucketSize, from),
+                counting()
+            ));
 
         for (Map.Entry<Double, Long> sampleBucket : histogram.entrySet()) {
             double percentage = (double) sampleBucket.getValue() / samples.length;
@@ -102,13 +102,13 @@ public class ProbabilisticDoubleTensorContract {
         for (DoubleTensor value = vertexStartValue; value.scalar() <= vertexEndValue.scalar(); value.plusInPlace(vertexValueIncrement)) {
             vertexUnderTest.setAndCascade(value);
             testGradientAcrossMultipleHyperParameterValues(
-                    hyperParameterStartValue,
-                    hyperParameterEndValue,
-                    hyperParameterValueIncrement,
-                    hyperParameterVertex,
-                    value,
-                    vertexUnderTest,
-                    gradientDelta
+                hyperParameterStartValue,
+                hyperParameterEndValue,
+                hyperParameterValueIncrement,
+                hyperParameterVertex,
+                value,
+                vertexUnderTest,
+                gradientDelta
             );
         }
     }
@@ -123,11 +123,11 @@ public class ProbabilisticDoubleTensorContract {
 
         for (DoubleTensor parameterValue = hyperParameterStartValue; parameterValue.scalar() <= hyperParameterEndValue.scalar(); parameterValue.plusInPlace(hyperParameterValueIncrement)) {
             testGradientAtHyperParameterValue(
-                    parameterValue,
-                    hyperParameterVertex,
-                    vertexValue,
-                    vertexUnderTest,
-                    gradientDelta
+                parameterValue,
+                hyperParameterVertex,
+                vertexValue,
+                vertexUnderTest,
+                gradientDelta
             );
         }
     }
@@ -153,7 +153,7 @@ public class ProbabilisticDoubleTensorContract {
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
         assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
-                diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
+            diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
     public static void isTreatedAsConstantWhenObserved(DoubleTensorVertex vertexUnderTest) {

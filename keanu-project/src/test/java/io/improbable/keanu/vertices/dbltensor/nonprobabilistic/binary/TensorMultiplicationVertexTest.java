@@ -20,21 +20,21 @@ public class TensorMultiplicationVertexTest {
     @Test
     public void multipliesTwoMatrixVertexValues() {
         operatesOnTwo2x2MatrixVertexValues(
-                new double[]{1.0, 2.0, 3.0, 4.0},
-                new double[]{2.0, 3.0, 4.0, 5.0},
-                new double[]{2.0, 6.0, 12.0, 20.0},
-                DoubleTensorVertex::multiply
+            new double[]{1.0, 2.0, 3.0, 4.0},
+            new double[]{2.0, 3.0, 4.0, 5.0},
+            new double[]{2.0, 6.0, 12.0, 20.0},
+            DoubleTensorVertex::multiply
         );
     }
 
     @Test
     public void calculatesDualNumberOfTwoMatricesElementWiseMultiplied() {
         calculatesDualNumberOfTwoMatricesElementWiseOperator(
-                new double[]{1.0, 2.0, 3.0, 4.0},
-                new double[]{2.0, 3.0, 4.0, 5.0},
-                new double[]{2.0, 3.0, 4.0, 5.0},
-                new double[]{1.0, 2.0, 3.0, 4.0},
-                DoubleTensorVertex::multiply
+            new double[]{1.0, 2.0, 3.0, 4.0},
+            new double[]{2.0, 3.0, 4.0, 5.0},
+            new double[]{2.0, 3.0, 4.0, 5.0},
+            new double[]{1.0, 2.0, 3.0, 4.0},
+            DoubleTensorVertex::multiply
         );
     }
 }

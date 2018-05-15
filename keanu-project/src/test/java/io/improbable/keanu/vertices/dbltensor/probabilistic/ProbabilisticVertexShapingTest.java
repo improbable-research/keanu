@@ -48,12 +48,12 @@ public class ProbabilisticVertexShapingTest {
     }
 
     @Test
-    public void acceptsMatchingParentsShape(){
+    public void acceptsMatchingParentsShape() {
         ProbabilisticVertexShaping.checkParentShapes(new int[]{2, 2}, twoByTwo1, scalar0);
     }
 
     @Test
-    public void acceptsNonScalarToScalarParentShape(){
+    public void acceptsNonScalarToScalarParentShape() {
         ProbabilisticVertexShaping.checkParentShapes(new int[]{2, 4}, scalar3, scalar0);
     }
 }

@@ -96,8 +96,8 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,
-                                                               DoubleTensor dPdsigma,
-                                                               DoubleTensor dPdx) {
+                                                             DoubleTensor dPdsigma,
+                                                             DoubleTensor dPdx) {
 
         TensorPartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
         TensorPartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);

@@ -8,7 +8,7 @@ import java.util.Set;
 
 public class ProbabilisticVertexShaping {
 
-    private ProbabilisticVertexShaping(){
+    private ProbabilisticVertexShaping() {
     }
 
     /**

@@ -13,9 +13,9 @@ import static org.junit.Assert.assertEquals;
 public class TensorVertexVariationalMAP {
 
     public static void inferHyperParamsFromSamples(
-            Function<List<DoubleTensorVertex>, DoubleTensorVertex> vertexUnderTestCreator,
-            List<DoubleTensorVertex> hyperParamsForSampling,
-            List<DoubleTensorVertex> latentsToInfer) {
+        Function<List<DoubleTensorVertex>, DoubleTensorVertex> vertexUnderTestCreator,
+        List<DoubleTensorVertex> hyperParamsForSampling,
+        List<DoubleTensorVertex> latentsToInfer) {
 
         // SOURCE OF TRUTH
         DoubleTensorVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
