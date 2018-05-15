@@ -24,7 +24,7 @@ public class KeanuRandomTest {
 
     @Test
     public void canSampleFromGamma() {
-        KeanuRandom keanuRandom = new KeanuRandom();
+        KeanuRandom keanuRandom = new KeanuRandom(1);
         DoubleTensor gamma = keanuRandom.nextGamma(matrixA.getShape(), matrixA, matrixB, matrixC, random);
     }
 

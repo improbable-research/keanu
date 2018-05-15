@@ -44,13 +44,13 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         TensorGamma.Diff dlnP = TensorGamma.dlnPdf(a.getValue(), theta.getValue(), k.getValue(), value);
 
         return convertDualNumbersToDiff(dlnP.dPda, dlnP.dPdtheta, dlnP.dPdk, dlnP.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
                                                                DoubleTensor dPdtheta,
                                                                DoubleTensor dPdk,
                                                                DoubleTensor dPdx) {

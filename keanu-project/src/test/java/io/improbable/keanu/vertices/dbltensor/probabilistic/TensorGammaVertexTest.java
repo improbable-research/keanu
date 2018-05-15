@@ -1,14 +1,17 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
+import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import org.junit.Test;
+
+import java.util.Random;
 
 public class TensorGammaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        
+        GammaVertex gamma = new GammaVertex(0.5, 1, 1.5, new Random(1));
     }
 
     @Test
