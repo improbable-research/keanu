@@ -16,7 +16,7 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     @Override
     public Double lazyEval() {
         if (!hasValue()) {
-            setValue(sample(Vertex.DEFAULT_RANDOM_SUPPLIER.get()));
+            setValue(sample());
         }
         return getValue();
     }

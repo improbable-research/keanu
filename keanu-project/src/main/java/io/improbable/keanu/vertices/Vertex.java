@@ -7,23 +7,38 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.function.Supplier;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Vertex<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
-    public static final Supplier<Random> DEFAULT_RANDOM_SUPPLIER;
+
+    private static AtomicReference<Random> defaultRandom = new AtomicReference<>();
 
     static {
         String randomSeed = System.getProperty("io.improbable.keanu.defaultRandom.seed");
 
         if (randomSeed != null) {
             final long seed = Long.parseLong(randomSeed);
-            final Random defaultRandom = new Random(seed);
-            DEFAULT_RANDOM_SUPPLIER = () -> defaultRandom;
-        } else {
-            DEFAULT_RANDOM_SUPPLIER = ThreadLocalRandom::current;
+            defaultRandom.set(new Random(seed));
         }
+    }
+
+    public static Random getDefaultRandom() {
+        Random random = defaultRandom.get();
+        if (random == null) {
+            return ThreadLocalRandom.current();
+        } else {
+            return random;
+        }
+    }
+
+    public static void setDefaultRandomSeed(long seed){
+        defaultRandom.set(new Random(seed));
+    }
+
+    public static void setDefaultRandomToThreadLocal(){
+        defaultRandom.set(null);
     }
 
     private long uuid = ID_GENERATOR.getAndIncrement();
@@ -64,6 +79,10 @@ public abstract class Vertex<T> {
      * this will always be the same value.
      */
     public abstract T sample(Random random);
+
+    public T sample() {
+        return sample(getDefaultRandom());
+    }
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's

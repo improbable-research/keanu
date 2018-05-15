@@ -12,7 +12,7 @@ public abstract class Probabilistic<T> extends Vertex<T> {
     @Override
     public T lazyEval() {
         if (!hasValue()) {
-            setValue(sample(Vertex.DEFAULT_RANDOM_SUPPLIER.get()));
+            setValue(sample());
         }
         return getValue();
     }
