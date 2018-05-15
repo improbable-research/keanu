@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.CPT;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Arrays;
+import java.util.Random;
 
 public class WetGrass {
 
@@ -31,7 +32,8 @@ public class WetGrass {
         NetworkSamples posteriorSamples = RejectionSampler.getPosteriorSamples(
                 new BayesNet(wetGrass.getConnectedGraph()),
                 Arrays.asList(sprinkler, rain),
-                100000
+                100000,
+                new Random(1)
         );
 
         double probabilityOfRainGivenWetGrass = posteriorSamples.get(rain).probability(isRaining -> isRaining == true);

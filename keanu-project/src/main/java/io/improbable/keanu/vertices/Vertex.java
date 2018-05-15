@@ -45,6 +45,7 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     /**
+     * @param random source of randomness
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
      * this will always be the same value.
      */

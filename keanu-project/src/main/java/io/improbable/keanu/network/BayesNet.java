@@ -94,6 +94,7 @@ public class BayesNet {
      * by naively sampling vertices in order of data dependency
      *
      * @param attempts sampling attempts to get non-zero probability
+     * @param random random source for sampling
      */
     public void probeForNonZeroMasterP(int attempts, Random random) {
 

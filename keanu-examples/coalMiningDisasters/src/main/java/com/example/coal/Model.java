@@ -6,7 +6,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
@@ -56,9 +55,9 @@ public class Model {
 
         startYearVertex = new ConstantVertex<>(data.startYear);
         endYearVertex = new ConstantVertex<>(data.endYear + 1);
-        switchpoint = new UniformIntVertex(startYearVertex, endYearVertex, r);
-        earlyRate = new ExponentialVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(1.0), r);
-        lateRate = new ExponentialVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(1.0), r);
+        switchpoint = new UniformIntVertex(startYearVertex, endYearVertex);
+        earlyRate = new ExponentialVertex(1.0, 1.0);
+        lateRate = new ExponentialVertex(1.0, 1.0);
 
         Stream<IfVertex<Double>> rates = IntStream.range(data.startYear, data.endYear).boxed()
                 .map(ConstantVertex::new)
@@ -72,7 +71,7 @@ public class Model {
 
         disasters = rates
                 .map(CastDoubleVertex::new)
-                .map(rate -> new PoissonVertex(rate, r))
+                .map(PoissonVertex::new)
                 .collect(Collectors.toList());
 
         IntStream.range(0, disasters.size()).forEach(i -> {
