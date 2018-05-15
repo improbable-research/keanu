@@ -92,8 +92,8 @@ public class BetaVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         BetaVertex vertexUnderTest = new BetaVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0), random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0), random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -104,12 +104,12 @@ public class BetaVertexTest {
         BetaVertex b = new BetaVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(2.0), random);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                b,
-                1000000,
-                0.1,
-                0.9,
-                .05,
-                0.01
+            b,
+            1000000,
+            0.1,
+            0.9,
+            .05,
+            0.01
         );
     }
 
@@ -127,15 +127,15 @@ public class BetaVertexTest {
         double alphaIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                alphaStart,
-                alphaEnd,
-                alphaIncrement,
-                uniformA,
-                beta,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            alphaStart,
+            alphaEnd,
+            alphaIncrement,
+            uniformA,
+            beta,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
@@ -153,15 +153,15 @@ public class BetaVertexTest {
         double betaIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                betaStart,
-                betaEnd,
-                betaIncrement,
-                uniformA,
-                beta,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            betaStart,
+            betaEnd,
+            betaIncrement,
+            uniformA,
+            beta,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
@@ -180,10 +180,10 @@ public class BetaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1), random),
-                alphaBeta,
-                latentAlphaBeta,
-                1000
+            hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1), random),
+            alphaBeta,
+            latentAlphaBeta,
+            1000
         );
     }
 }

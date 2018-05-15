@@ -50,12 +50,12 @@ public class MCMCTestDistributions {
     public static void samplesMatchesSumOfGaussians(double expected, List<Double> sampleA, List<Double> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }

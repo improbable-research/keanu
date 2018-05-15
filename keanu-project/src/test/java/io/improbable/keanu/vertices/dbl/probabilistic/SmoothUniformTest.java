@@ -68,10 +68,10 @@ public class SmoothUniformTest {
 
         double edgeSharpness = 1.0;
         SmoothUniformVertex uniform = new SmoothUniformVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(1.0),
-                edgeSharpness,
-                random
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(1.0),
+            edgeSharpness,
+            random
         );
 
         double from = -1;
@@ -85,10 +85,10 @@ public class SmoothUniformTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         SmoothUniformVertex vertexUnderTest = new SmoothUniformVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                0.01,
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            0.01,
+            random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);

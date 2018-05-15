@@ -16,9 +16,9 @@ public class ObjectParserWithSetterMethodTest {
     @Before
     public void setup() {
         data = Arrays.asList(
-                Arrays.asList("5", "A", "0.11", "0.1", "true"),
-                Arrays.asList("12", "6", "0.22", "0.2", "false"),
-                Arrays.asList("04", "L", "0.33", "0.3", "true")
+            Arrays.asList("5", "A", "0.11", "0.1", "true"),
+            Arrays.asList("12", "6", "0.22", "0.2", "false"),
+            Arrays.asList("04", "L", "0.33", "0.3", "true")
         );
     }
 
@@ -27,15 +27,15 @@ public class ObjectParserWithSetterMethodTest {
         List<String> titles = Arrays.asList("myInt", "myString", "myDouble", "myFloat", "myBoolean");
 
         List<TestPOJOWithSettersClass> output = ObjectParser.parse(
-                TestPOJOWithSettersClass.class,
-                data.stream(),
-                titles
+            TestPOJOWithSettersClass.class,
+            data.stream(),
+            titles
         ).collect(toList());
 
         assertEquals(output, Arrays.asList(
-                new TestPOJOWithSettersClass(5, "A", 0.11d, 0.1f, true),
-                new TestPOJOWithSettersClass(12, "6", 0.22d, 0.2f, false),
-                new TestPOJOWithSettersClass(4, "L", 0.33d, 0.3f, true)
+            new TestPOJOWithSettersClass(5, "A", 0.11d, 0.1f, true),
+            new TestPOJOWithSettersClass(12, "6", 0.22d, 0.2f, false),
+            new TestPOJOWithSettersClass(4, "L", 0.33d, 0.3f, true)
         ));
     }
 

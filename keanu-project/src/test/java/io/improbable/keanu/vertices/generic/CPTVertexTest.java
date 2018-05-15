@@ -18,8 +18,8 @@ public class CPTVertexTest {
         BoolVertex A = new Flip(0.2);
 
         CPTVertex<Boolean> cpt = CPT.of(A)
-                .when(true).then(TRUE)
-                .orDefault(FALSE);
+            .when(true).then(TRUE)
+            .orDefault(FALSE);
 
         A.setAndCascade(false);
         assertEquals(false, cpt.getValue().booleanValue());
@@ -35,10 +35,10 @@ public class CPTVertexTest {
         BoolVertex B = new Flip(0.5);
 
         CPTVertex<Boolean> cpt = CPT.of(A, B)
-                .when(true, true).then(FALSE)
-                .when(false, true).then(TRUE)
-                .when(true, false).then(TRUE)
-                .orDefault(FALSE);
+            .when(true, true).then(FALSE)
+            .when(false, true).then(TRUE)
+            .when(true, false).then(TRUE)
+            .orDefault(FALSE);
 
         A.setAndCascade(true);
         B.setAndCascade(true);

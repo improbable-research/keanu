@@ -34,9 +34,9 @@ public class InverseGammaVertexTest {
         double beta = .5;
 
         InverseGammaVertex inverted = new InverseGammaVertex(
-                new ConstantDoubleVertex(alpha),
-                new ConstantDoubleVertex(beta),
-                random
+            new ConstantDoubleVertex(alpha),
+            new ConstantDoubleVertex(beta),
+            random
         );
 
         double mean = beta / (alpha - 1.0);
@@ -48,80 +48,80 @@ public class InverseGammaVertexTest {
     @Test
     public void samplingMatchesLogProb() {
         InverseGammaVertex gamma = new InverseGammaVertex(
-                new ConstantDoubleVertex(2.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new ConstantDoubleVertex(2.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                gamma,
-                100000,
-                2.0,
-                10.0,
-                0.1,
-                0.01);
+            gamma,
+            100000,
+            2.0,
+            10.0,
+            0.1,
+            0.01);
     }
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = new UniformVertex(
-                new ConstantDoubleVertex(1.0),
-                new ConstantDoubleVertex(4.0),
-                random);
+            new ConstantDoubleVertex(1.0),
+            new ConstantDoubleVertex(4.0),
+            random);
 
         InverseGammaVertex inverted = new InverseGammaVertex(
-                uniformA,
-                new ConstantDoubleVertex(1.0),
-                random);
+            uniformA,
+            new ConstantDoubleVertex(1.0),
+            random);
 
         double vertexStartValue = 0.5;
         double vertexEndValue = 3.0;
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                2.0,
-                0.1,
-                uniformA,
-                inverted,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            2.0,
+            0.1,
+            uniformA,
+            inverted,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformB = new UniformVertex(
-                new ConstantDoubleVertex(1.0),
-                new ConstantDoubleVertex(3.0),
-                random);
+            new ConstantDoubleVertex(1.0),
+            new ConstantDoubleVertex(3.0),
+            random);
 
         InverseGammaVertex inverted = new InverseGammaVertex(
-                new ConstantDoubleVertex(2.0),
-                uniformB,
-                random);
+            new ConstantDoubleVertex(2.0),
+            uniformB,
+            random);
 
         double vertexStartValue = 0.5;
         double vertexEndValue = 3.0;
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                3.0,
-                0.1,
-                uniformB,
-                inverted,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            3.0,
+            0.1,
+            uniformB,
+            inverted,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         InverseGammaVertex vertexUnderTest = new InverseGammaVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -141,10 +141,10 @@ public class InverseGammaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1), random),
-                alphaBeta,
-                latentAlphaBeta,
-                10000
+            hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1), random),
+            alphaBeta,
+            latentAlphaBeta,
+            10000
         );
     }
 }

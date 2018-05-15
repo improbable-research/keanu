@@ -46,7 +46,7 @@ public class TensorFitnessFunctionWithGradient {
     }
 
     private static double[] alignGradientsToAppropriateIndex(Map<Long /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
-                                                     List<? extends Vertex<DoubleTensor>> latentVertices) {
+                                                             List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();
         for (Vertex<DoubleTensor> vertex : latentVertices) {

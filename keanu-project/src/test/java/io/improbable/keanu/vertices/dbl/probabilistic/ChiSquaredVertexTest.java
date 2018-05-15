@@ -53,8 +53,8 @@ public class ChiSquaredVertexTest {
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
         Vertex<Double> vertex = new ChiSquaredVertex(
-                new ConstantIntegerVertex(2),
-                random
+            new ConstantIntegerVertex(2),
+            random
         );
 
         double from = 2;

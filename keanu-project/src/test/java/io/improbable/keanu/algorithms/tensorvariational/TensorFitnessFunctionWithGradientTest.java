@@ -43,11 +43,11 @@ public class TensorFitnessFunctionWithGradientTest {
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
         assert2DGradientEqualsApproxGradient(
-                new double[]{5, 5},
-                new double[]{0, 0},
-                0.1,
-                Arrays.asList(A, B, cObservation, dObservation),
-                Arrays.asList(A, B)
+            new double[]{5, 5},
+            new double[]{0, 0},
+            0.1,
+            Arrays.asList(A, B, cObservation, dObservation),
+            Arrays.asList(A, B)
         );
     }
 
@@ -70,11 +70,11 @@ public class TensorFitnessFunctionWithGradientTest {
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
         assert2DGradientEqualsApproxGradient(
-                new double[]{10, 10},
-                new double[]{2, 2},
-                0.1,
-                Arrays.asList(A, B, cObservation, dObservation),
-                Arrays.asList(A, B)
+            new double[]{10, 10},
+            new double[]{2, 2},
+            0.1,
+            Arrays.asList(A, B, cObservation, dObservation),
+            Arrays.asList(A, B)
         );
     }
 
@@ -100,11 +100,11 @@ public class TensorFitnessFunctionWithGradientTest {
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
         assert2DGradientEqualsApproxGradient(
-                new double[]{5, 5},
-                new double[]{0.1, 0.1},
-                0.1,
-                Arrays.asList(A, B, eObservation, fObservation),
-                Arrays.asList(A, B)
+            new double[]{5, 5},
+            new double[]{0.1, 0.1},
+            0.1,
+            Arrays.asList(A, B, eObservation, fObservation),
+            Arrays.asList(A, B)
         );
     }
 

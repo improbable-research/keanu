@@ -67,9 +67,9 @@ public class GaussianVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         GaussianVertex vertexUnderTest = new GaussianVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -81,9 +81,9 @@ public class GaussianVertexTest {
         Random random = new Random(1);
 
         Vertex<Double> vertex = new GaussianVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(2.0),
-                random
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(2.0),
+            random
         );
 
         double from = -4;
@@ -104,14 +104,14 @@ public class GaussianVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                1.5,
-                0.1,
-                uniformA,
-                gaussian,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            1.5,
+            0.1,
+            uniformA,
+            gaussian,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -124,14 +124,14 @@ public class GaussianVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                3.0,
-                0.1,
-                uniformA,
-                gaussian,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            3.0,
+            0.1,
+            uniformA,
+            gaussian,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -149,10 +149,10 @@ public class GaussianVertexTest {
         latentMuSigma.add(new SmoothUniformVertex(-10.0, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1), random),
-                muSigma,
-                latentMuSigma,
-                2000
+            hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1), random),
+            muSigma,
+            latentMuSigma,
+            2000
         );
     }
 }

@@ -44,17 +44,17 @@ public class RejectionSamplerTest {
     public void posteriorProbabilityMatchesBayesRule() {
 
         double v1ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
-                asList(v1, v2),
-                singletonList(v3),
-                v1::getValue,
-                10000
+            asList(v1, v2),
+            singletonList(v3),
+            v1::getValue,
+            10000
         );
 
         double v2ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
-                asList(v1, v2),
-                singletonList(v3),
-                v2::getValue,
-                10000
+            asList(v1, v2),
+            singletonList(v3),
+            v2::getValue,
+            10000
         );
 
         assertEquals(v1ProbTrueAccordingToBayes, v1ProbTrueAccordingToAlgo, 0.01);
@@ -65,9 +65,9 @@ public class RejectionSamplerTest {
     public void posteriorSamplesMatchesBayesRule() {
 
         NetworkSamples samplesAccordingToAlgo = RejectionSampler.getPosteriorSamples(
-                new BayesNet(v1.getConnectedGraph()),
-                asList(v1, v2),
-                10000
+            new BayesNet(v1.getConnectedGraph()),
+            asList(v1, v2),
+            10000
         );
 
         double v1ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v1).probability(sample -> sample);

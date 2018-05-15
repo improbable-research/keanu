@@ -31,8 +31,8 @@ public class TensorGaussian {
         final DoubleTensor dlnP_dmu = xMinusMu.div(variance);
         final DoubleTensor dlnP_dx = dlnP_dmu.unaryMinus();
         final DoubleTensor dlnP_dsigma = xMinusMu.powInPlace(2)
-                .divInPlace(variance.timesInPlace(sigma))
-                .minusInPlace(sigma.reciprocal());
+            .divInPlace(variance.timesInPlace(sigma))
+            .minusInPlace(sigma.reciprocal());
 
         return new Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
     }

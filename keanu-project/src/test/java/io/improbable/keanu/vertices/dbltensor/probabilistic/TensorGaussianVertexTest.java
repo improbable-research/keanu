@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
@@ -15,7 +13,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import java.util.function.Supplier;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
@@ -34,97 +32,58 @@ public class TensorGaussianVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        GaussianVertex gaussianVertex = new GaussianVertex(0, 1, new Random(1));
-
         TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(0, 1, new KeanuRandom(1));
-
-        double expectedDensity = gaussianVertex.logPdf(0.5);
-
+        double expectedDensity = Gaussian.logPdf(0.0, 1.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        Random random = new Random(1);
-        ConstantDoubleVertex mu = new ConstantDoubleVertex(0.0);
-        ConstantDoubleVertex sigma = new ConstantDoubleVertex(1.0);
-        GaussianVertex gaussianVertexA = new GaussianVertex(mu, sigma, random);
-        GaussianVertex gaussianVertexB = new GaussianVertex(mu, sigma, random);
-
-        double expectedLogDensity = gaussianVertexA.logPdf(0.25) + gaussianVertexB.logPdf(-0.75);
+        double expectedLogDensity = Gaussian.logPdf(0.0, 1.0, 0.25) + Gaussian.logPdf(0.0, 1.0, -0.75);
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(0, 1, new KeanuRandom(1));
-
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndGaussianVertex, new double[]{0.25, -0.75}, expectedLogDensity);
     }
 
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
 
-        Random random = new Random(1);
-        UniformVertex mu = new UniformVertex(0.0, 1.0, random);
-        mu.setValue(0.0);
-
-        UniformVertex sigma = new UniformVertex(0.0, 1.0, random);
-        sigma.setValue(1.0);
-
-        GaussianVertex gaussianVertex = new GaussianVertex(mu, sigma, random);
-        Map<Long, DoubleTensor> expectedDerivatives = gaussianVertex.dLogPdf(0.5);
+        Gaussian.Diff gaussianLogDiff = Gaussian.dlnPdf(0.0, 1.0, 0.5);
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
 
+        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        muTensor.setValue(0.0);
 
-        TensorUniformVertex muTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        muTensor.setValue(Nd4jDoubleTensor.scalar(0.0));
+        TensorUniformVertex sigmaTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        sigmaTensor.setValue(1.0);
 
-        TensorUniformVertex sigmaTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        sigmaTensor.setValue(Nd4jDoubleTensor.scalar(1.0));
-
-        TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
-        Map<Long, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(Nd4jDoubleTensor.scalar(0.5));
+        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, keanuRandom);
+        Map<Long, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5);
 
         TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
 
-        assertEquals(expectedDerivatives.get(mu.getId()).scalar(), actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(expectedDerivatives.get(sigma.getId()).scalar(), actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(expectedDerivatives.get(gaussianVertex.getId()).scalar(), actual.withRespectTo(ndGaussianVertex.getId()).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdmu, actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdsigma, actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdx, actual.withRespectTo(tensorGaussianVertex.getId()).scalar(), 1e-5);
     }
 
     @Test
     public void matchesKnownDerivativeLogDensityOfVector() {
 
-        Random random = new Random(1);
-        UniformVertex mu = new UniformVertex(0.0, 1.0, random);
-        mu.setValue(0.0);
-
-        UniformVertex sigma = new UniformVertex(0.0, 1.0, random);
-        sigma.setValue(1.0);
-
-        GaussianVertex gaussianVertexA = new GaussianVertex(mu, sigma, random);
-        GaussianVertex gaussianVertexB = new GaussianVertex(mu, sigma, random);
-        TensorPartialDerivatives expectedDerivativesA = new TensorPartialDerivatives(gaussianVertexA.dLogPdf(0.25));
-        TensorPartialDerivatives expectedDerivativesB = new TensorPartialDerivatives(gaussianVertexB.dLogPdf(-0.75));
-
-        TensorPartialDerivatives expected = expectedDerivativesA.add(expectedDerivativesB);
+        double[] vector = new double[]{0.25, -0.75, 0.1, -2, 1.3};
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
-        TensorUniformVertex muTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        muTensor.setValue(Nd4jDoubleTensor.scalar(0.0));
 
-        TensorUniformVertex sigmaTensor = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), keanuRandom);
-        sigmaTensor.setValue(Nd4jDoubleTensor.scalar(1.0));
+        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        muTensor.setValue(0.0);
 
-        TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
-        Map<Long, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(
-            DoubleTensor.create(new double[]{0.25, -0.75}, new int[]{2, 1})
-        );
+        TensorUniformVertex sigmaTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        sigmaTensor.setValue(1.0);
 
-        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorGaussianVertex(muTensor, sigmaTensor, keanuRandom);
 
-        assertEquals(expected.withRespectTo(mu.getId()).scalar(), actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(expected.withRespectTo(sigma.getId()).scalar(), actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(expected.withRespectTo(gaussianVertexA.getId()).scalar(), actual.withRespectTo(ndGaussianVertex.getId()).getValue(0), 1e-5);
-        assertEquals(expected.withRespectTo(gaussianVertexB.getId()).scalar(), actual.withRespectTo(ndGaussianVertex.getId()).getValue(1), 1e-5);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test

@@ -19,7 +19,7 @@ class SetterMatcher {
         final Optional<Method> matchingMethodMaybe = findMatchingSetter(title.trim(), potentialMethods);
 
         return matchingMethodMaybe
-                .map(SetterMatcher::createColumnConsumerForMethod);
+            .map(SetterMatcher::createColumnConsumerForMethod);
     }
 
     private static <T> CsvColumnConsumer<T> createColumnConsumerForMethod(Method method) {
@@ -44,9 +44,9 @@ class SetterMatcher {
      */
     private static Optional<Method> findMatchingSetter(final String title, final List<Method> potentials) {
         return potentials.stream()
-                .filter(SetterMatcher::methodTakesOnlyOneArgument)
-                .filter(method -> titleMatchesSetterMethod(method, title) || methodContainsPropertyAnnotation(method, title))
-                .findFirst();
+            .filter(SetterMatcher::methodTakesOnlyOneArgument)
+            .filter(method -> titleMatchesSetterMethod(method, title) || methodContainsPropertyAnnotation(method, title))
+            .findFirst();
     }
 
     private static boolean methodTakesOnlyOneArgument(Method method) {

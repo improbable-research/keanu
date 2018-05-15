@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
-import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
@@ -98,11 +97,11 @@ public class TensorGradientOptimizer {
         warnIfGradientIsFlat(initialGradient);
 
         PointValuePair pointValuePair = optimizer.optimize(
-                new MaxEval(maxEvaluations),
-                fitness,
-                gradient,
-                MAXIMIZE,
-                new InitialGuess(startingPoint)
+            new MaxEval(maxEvaluations),
+            fitness,
+            gradient,
+            MAXIMIZE,
+            new InitialGuess(startingPoint)
         );
 
         return pointValuePair.getValue();

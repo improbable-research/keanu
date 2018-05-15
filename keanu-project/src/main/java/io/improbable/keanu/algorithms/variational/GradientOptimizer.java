@@ -22,8 +22,8 @@ public class GradientOptimizer {
     private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
     public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
-            NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-            new SimpleValueChecker(1e-8, 1e-8)
+        NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
+        new SimpleValueChecker(1e-8, 1e-8)
     );
 
     private static final double FLAT_GRADIENT = 1e-16;
@@ -105,11 +105,11 @@ public class GradientOptimizer {
         warnIfGradientIsFlat(initialGradient);
 
         PointValuePair pointValuePair = optimizer.optimize(
-                new MaxEval(maxEvaluations),
-                fitness,
-                gradient,
-                MAXIMIZE,
-                new InitialGuess(startingPoint)
+            new MaxEval(maxEvaluations),
+            fitness,
+            gradient,
+            MAXIMIZE,
+            new InitialGuess(startingPoint)
         );
 
         return pointValuePair.getValue();

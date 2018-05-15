@@ -155,9 +155,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor minus(DoubleTensor that) {
 
-        if (that.isScalar() && !this.isScalar()) {
+        if (that.isScalar()) {
             return this.minus(that.scalar());
-        } else if (!that.isScalar() && this.isScalar()) {
+        } else if (this.isScalar()) {
             return that.unaryMinus().plusInPlace(this);
         } else {
             INDArray thatArray = unsafeGetNd4J(that);
@@ -168,9 +168,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor plus(DoubleTensor that) {
 
-        if (that.isScalar() && !this.isScalar()) {
+        if (that.isScalar()) {
             return this.plus(that.scalar());
-        } else if (!that.isScalar() && this.isScalar()) {
+        } else if (this.isScalar()) {
             return that.plus(this.scalar());
         } else {
             INDArray thatArray = unsafeGetNd4J(that);
@@ -181,9 +181,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor times(DoubleTensor that) {
 
-        if (that.isScalar() && !this.isScalar()) {
+        if (that.isScalar()) {
             return this.times(that.scalar());
-        } else if (!that.isScalar() && this.isScalar()) {
+        } else if (this.isScalar()) {
             return that.times(this.scalar());
         } else {
             INDArray thatArray = unsafeGetNd4J(that);
@@ -194,9 +194,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor div(DoubleTensor that) {
 
-        if (that.isScalar() && !this.isScalar()) {
+        if (that.isScalar()) {
             return this.div(that.scalar());
-        } else if (!that.isScalar() && this.isScalar()) {
+        } else if (this.isScalar()) {
             return that.reciprocal().timesInPlace(this);
         } else {
             INDArray thatArray = unsafeGetNd4J(that);
