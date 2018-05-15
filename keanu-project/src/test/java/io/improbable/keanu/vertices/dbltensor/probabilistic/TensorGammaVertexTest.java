@@ -128,11 +128,6 @@ public class TensorGammaVertexTest {
 
 
     @Test
-    public void isTreatedAsConstantWhenObserved() {
-        TensorUniformVertex a = new TensorUniformVertex()
-    }
-
-    @Test
     public void gammaSampledMethodMatchesLogProbMethod() {
         KeanuRandom random = new KeanuRandom(1);
 
