@@ -21,7 +21,7 @@ public class GradientOptimizer {
 
     private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
-    private static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
+    public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
             NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
             new SimpleValueChecker(1e-8, 1e-8)
     );

@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.tensorvariational;
 
+import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
@@ -22,10 +23,10 @@ public class TensorGradientOptimizer {
 
     private final Logger log = LoggerFactory.getLogger(TensorGradientOptimizer.class);
 
-    private static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
-            NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-            new SimpleValueChecker(1e-8, 1e-8)
-    );
+//    private static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
+//            NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
+//            new SimpleValueChecker(1e-8, 1e-8)
+//    );
 
     private static final double FLAT_GRADIENT = 1e-16;
 
@@ -56,7 +57,7 @@ public class TensorGradientOptimizer {
      * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations) {
-        return maxAPosteriori(maxEvaluations, DEFAULT_OPTIMIZER);
+        return maxAPosteriori(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     /**
@@ -80,7 +81,7 @@ public class TensorGradientOptimizer {
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations) {
-        return maxLikelihood(maxEvaluations, DEFAULT_OPTIMIZER);
+        return maxLikelihood(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     private double optimize(int maxEvaluations,
