@@ -4,6 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorGamma;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -31,6 +32,10 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
 
     public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, DoubleTensorVertex k, KeanuRandom random) {
         this(getShapeProposal(a.getValue(), theta.getValue(), k.getValue()), a, theta, k, random);
+    }
+
+    public TensorGammaVertex(double a, double theta, double k, KeanuRandom random) {
+        this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), new ConstantTensorVertex(k), random);
     }
 
     @Override
