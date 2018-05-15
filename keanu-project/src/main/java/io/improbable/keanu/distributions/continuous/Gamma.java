@@ -19,7 +19,7 @@ public class Gamma {
     private Gamma() {
     }
 
-    public static final double M_E = 0.577215664901532860606512090082;
+    private static final double M_E = 0.577215664901532860606512090082;
 
     /**
      * @param a      location

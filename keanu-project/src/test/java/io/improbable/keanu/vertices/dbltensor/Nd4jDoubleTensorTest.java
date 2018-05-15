@@ -1,7 +1,12 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertArrayEquals;
 
@@ -20,6 +25,8 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canElementWiseMultiplyMatrix() {
+        System.out.println(matrixA.getRank());
+        System.out.println(matrixA.getValue(0,1));
         DoubleTensor result = matrixA.times(matrixB);
         assertArrayEquals(new double[]{1, 4, 9, 16}, result.getLinearView(), 0.0);
     }

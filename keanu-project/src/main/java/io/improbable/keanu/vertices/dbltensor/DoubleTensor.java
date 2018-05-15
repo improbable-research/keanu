@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbltensor;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public interface DoubleTensor extends Tensor {
 
@@ -53,6 +54,8 @@ public interface DoubleTensor extends Tensor {
 
     double sum();
 
+    DoubleTensor apply(Function<Double, Double> f);
+
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();
@@ -68,6 +71,8 @@ public interface DoubleTensor extends Tensor {
     DoubleTensor pow(DoubleTensor exponent);
 
     DoubleTensor pow(double exponent);
+
+    DoubleTensor sqrt();
 
     DoubleTensor log();
 

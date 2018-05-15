@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import java.util.function.Function;
+
 public class SimpleScalarTensor implements DoubleTensor {
 
     private double scalar;
@@ -21,6 +23,11 @@ public class SimpleScalarTensor implements DoubleTensor {
     @Override
     public double sum() {
         return scalar;
+    }
+
+    @Override
+    public DoubleTensor apply(Function<Double, Double> f) {
+        return new SimpleScalarTensor(f.apply(scalar));
     }
 
     @Override
@@ -65,6 +72,11 @@ public class SimpleScalarTensor implements DoubleTensor {
     @Override
     public DoubleTensor pow(double exponent) {
         return new SimpleScalarTensor(Math.pow(scalar, exponent));
+    }
+
+    @Override
+    public DoubleTensor sqrt() {
+        return pow(0.5);
     }
 
     @Override

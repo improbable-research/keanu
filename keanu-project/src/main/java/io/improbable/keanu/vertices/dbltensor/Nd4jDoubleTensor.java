@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
@@ -8,6 +9,14 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
+import org.nd4j.linalg.util.BigDecimalMath;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -78,6 +87,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor apply(Function<Double, Double> function) {
+        Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
+        List<Double> values = Arrays.asList(tensorValues);
+        List<Double> functionApplied = values.stream().map(function::apply).collect(Collectors.toList());
+        for (int i = 0; i < functionApplied.size(); i++) {
+            tensor.putScalar(i, functionApplied.get(i));
+        }
+        return new Nd4jDoubleTensor(tensor);
+    }
+
+    @Override
     public double scalar() {
         return tensor.getDouble(0);
     }
@@ -120,6 +140,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor pow(double exponent) {
         return new Nd4jDoubleTensor(Transforms.pow(tensor, exponent));
+    }
+
+    @Override
+    public DoubleTensor sqrt() {
+        return pow(0.5);
     }
 
     @Override
