@@ -2,21 +2,31 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
 import java.util.Random;
 
+import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
 
 public class TensorGammaVertexTest {
+
+    private KeanuRandom random;
+
+    private static final double DELTA = 0.0001;
+
+    @Before
+    public void setup() {
+        random = new KeanuRandom(1);
+    }
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
@@ -126,6 +136,41 @@ public class TensorGammaVertexTest {
         assertEquals(expected.withRespectTo(gammaB.getId()).scalar(), actual.withRespectTo(tensorGammaVertex.getId()).getValue(1), 1e-5);
     }
 
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        TensorUniformVertex a = new TensorUniformVertex(1.0, 2.0);
+        a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        TensorGammaVertex vertexUnderTest = new TensorGammaVertex(
+            a,
+            new ConstantTensorVertex(1.5),
+            new ConstantTensorVertex(5.0),
+            random
+        );
+        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+    }
+
+    @Test
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
+        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), random);
+        TensorGammaVertex gamma = new TensorGammaVertex(uniformA, new ConstantTensorVertex(2.0), new ConstantTensorVertex(3.0), random);
+
+        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.);
+        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(1.5);
+        double vertexIncrement = 0.1;
+
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            Nd4jDoubleTensor.scalar(0.1),
+            Nd4jDoubleTensor.scalar(1.0),
+            0.1,
+            uniformA,
+            gamma,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
+    }
 
     @Test
     public void gammaSampledMethodMatchesLogProbMethod() {

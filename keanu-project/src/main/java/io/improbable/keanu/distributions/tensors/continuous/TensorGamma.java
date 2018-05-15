@@ -8,8 +8,6 @@ import java.util.Random;
 
 public class TensorGamma {
 
-    private static final double M_E = 0.577215664901532860606512090082;
-
     private TensorGamma() {
     }
 
@@ -20,9 +18,8 @@ public class TensorGamma {
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
         final DoubleTensor aMinusXOverTheta = a.minus(x).div(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
-        final DoubleTensor lnXMinusAToKMinus1 = (x.minus(a).pow(k.minus(1.))).log();
-        final DoubleTensor top = aMinusXOverTheta.minus(kLnTheta).plus(lnXMinusAToKMinus1);
-        return top.div(k.apply(Gamma::gamma));
+        final DoubleTensor lnXMinusAToKMinus1 = ((x.minus(a).pow(k.minus(1.))).div(k.apply(Gamma::gamma))).log();
+        return aMinusXOverTheta.minus(kLnTheta).plus(lnXMinusAToKMinus1);
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {

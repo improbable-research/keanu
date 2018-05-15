@@ -51,6 +51,7 @@ public class KeanuRandom {
                 )
             );
         }
+
         double[] gammaSamples = gammaValues.stream().mapToDouble(d -> d).toArray();
         return Nd4jDoubleTensor.create(gammaSamples, shape);
     }
