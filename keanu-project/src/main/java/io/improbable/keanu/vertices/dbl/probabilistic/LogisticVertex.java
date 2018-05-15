@@ -64,12 +64,12 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Logistic.Diff diff = Logistic.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdb, diff.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
         PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);

@@ -51,12 +51,12 @@ public class SimulatedAnnealing {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<String, ?> maxSamplesByVertex = new HashMap<>();
+        Map<Long, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
         Map<Vertex, Set<Vertex>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 
-        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
+        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
 
         double logP = bayesNet.getLogOfMasterP();
         double maxLogP = logP;
@@ -79,12 +79,12 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(maxSamplesByVertex);
     }
 
-    private static void setSamplesAsMax(Map<String, ?> samples, List<? extends Vertex> fromVertices) {
+    private static void setSamplesAsMax(Map<Long, ?> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<String, ?> samples) {
-        ((Map<String, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<Long, ?> samples) {
+        ((Map<Long, ? super T>) samples).put(vertex.getId(), vertex.getValue());
     }
 
     /**

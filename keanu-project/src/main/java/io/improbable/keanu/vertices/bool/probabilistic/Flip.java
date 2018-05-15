@@ -38,7 +38,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPmf(Boolean value) {
+    public Map<Long, DoubleTensor> dLogPmf(Boolean value) {
         throw new UnsupportedOperationException();
     }
 

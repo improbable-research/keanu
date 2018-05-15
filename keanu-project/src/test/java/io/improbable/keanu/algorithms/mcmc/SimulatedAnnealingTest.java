@@ -40,14 +40,14 @@ public class SimulatedAnnealingTest {
         network.probeForNonZeroMasterP(100);
 
         NetworkState maxAPosterioriSamples = SimulatedAnnealing.getMaxAPosteriori(network, 10000, random);
-        Map<String, ?> maxValuesFromVariational = findMAPWithOptimizer();
+        Map<Long, ?> maxValuesFromVariational = findMAPWithOptimizer();
 
-        for (String id : maxAPosterioriSamples.getVertexIds()) {
+        for (long id : maxAPosterioriSamples.getVertexIds()) {
             assertEquals((Double) maxValuesFromVariational.get(id), maxAPosterioriSamples.get(id), 0.01);
         }
     }
 
-    private Map<String, ?> findMAPWithOptimizer() {
+    private Map<Long, ?> findMAPWithOptimizer() {
         BayesNet network = new BayesNet(A.getConnectedGraph());
         network.probeForNonZeroMasterP(100);
 

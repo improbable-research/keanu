@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.Identifiable;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
@@ -8,11 +7,11 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class Vertex<T> implements Identifiable {
+public abstract class Vertex<T> {
 
     public static final AtomicLong idGenerator = new AtomicLong(0L);
 
-    private String uuid = idGenerator.getAndIncrement() + "";
+    private long uuid = idGenerator.getAndIncrement();
     private Set<Vertex> children = new HashSet<>();
     private Set<Vertex> parents = new HashSet<>();
     private T value;
@@ -38,9 +37,9 @@ public abstract class Vertex<T> implements Identifiable {
      * @param value at a given value
      * @return the partial derivatives of the log density
      */
-    public abstract Map<String, DoubleTensor> dLogProb(T value);
+    public abstract Map<Long, DoubleTensor> dLogProb(T value);
 
-    public Map<String, DoubleTensor> dLogProbAtValue() {
+    public Map<Long, DoubleTensor> dLogProbAtValue() {
         return dLogProb(getValue());
     }
 
@@ -137,12 +136,12 @@ public abstract class Vertex<T> implements Identifiable {
      * @param explored the results of previously exploring the graph, which
      *                 allows the efficient propagation of this new value.
      */
-    public void setAndCascade(T value, Map<String, Long> explored) {
+    public void setAndCascade(T value, Map<Long, Long> explored) {
         setValue(value);
         VertexValuePropagation.cascadeUpdate(this, explored);
     }
 
-    public Map<String, Long> exploreSetting() {
+    public Map<Long, Long> exploreSetting() {
         return VertexValuePropagation.exploreSetting(this);
     }
 
@@ -175,7 +174,7 @@ public abstract class Vertex<T> implements Identifiable {
         return observed;
     }
 
-    public String getId() {
+    public long getId() {
         return uuid;
     }
 
@@ -216,12 +215,12 @@ public abstract class Vertex<T> implements Identifiable {
 
         Vertex<?> vertex = (Vertex<?>) o;
 
-        return uuid.equals(vertex.uuid);
+        return uuid == vertex.uuid;
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return (int) (uuid ^ (uuid >>> 32));
     }
 
     public Set<Vertex> getConnectedGraph() {

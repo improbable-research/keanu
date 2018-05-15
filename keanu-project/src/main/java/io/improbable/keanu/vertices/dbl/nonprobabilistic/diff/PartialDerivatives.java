@@ -10,13 +10,13 @@ public class PartialDerivatives {
 
     public static PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
 
-    public static PartialDerivatives withRespectToSelf(String withRespectTo) {
+    public static PartialDerivatives withRespectToSelf(long withRespectTo) {
         return new PartialDerivatives(Collections.singletonMap(withRespectTo, 1.0));
     }
 
-    private Map<String, Double> derivativeWithRespectTo;
+    private Map<Long, Double> derivativeWithRespectTo;
 
-    private PartialDerivatives(Map<String, Double> derivativeWithRespectTo) {
+    private PartialDerivatives(Map<Long, Double> derivativeWithRespectTo) {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
     }
 
@@ -24,7 +24,7 @@ public class PartialDerivatives {
         return withRespectTo(vertex.getId());
     }
 
-    public Double withRespectTo(String id) {
+    public Double withRespectTo(long id) {
         return derivativeWithRespectTo.getOrDefault(id, 0.0);
     }
 
@@ -32,19 +32,19 @@ public class PartialDerivatives {
         return derivativeWithRespectTo.isEmpty();
     }
 
-    public Map<String, Double> asMap() {
+    public Map<Long, Double> asMap() {
         return derivativeWithRespectTo;
     }
 
-    public void putWithRespectTo(String id, Double value) {
+    public void putWithRespectTo(long id, Double value) {
         derivativeWithRespectTo.put(id, value);
     }
 
     public PartialDerivatives add(PartialDerivatives toAdd) {
-        Map<String, Double> added = copyPartialDerivatives(derivativeWithRespectTo);
+        Map<Long, Double> added = copyPartialDerivatives(derivativeWithRespectTo);
 
-        for (Map.Entry<String, Double> entry : toAdd.derivativeWithRespectTo.entrySet()) {
-            String key = entry.getKey();
+        for (Map.Entry<Long, Double> entry : toAdd.derivativeWithRespectTo.entrySet()) {
+            long key = entry.getKey();
             added.put(key, added.getOrDefault(key, 0.0) + entry.getValue());
         }
 
@@ -52,10 +52,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives subtract(PartialDerivatives toSubtract) {
-        Map<String, Double> subtracted = copyPartialDerivatives(derivativeWithRespectTo);
+        Map<Long, Double> subtracted = copyPartialDerivatives(derivativeWithRespectTo);
 
-        for (Map.Entry<String, Double> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
-            String key = entry.getKey();
+        for (Map.Entry<Long, Double> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
+            long key = entry.getKey();
             subtracted.put(key, subtracted.getOrDefault(key, 0.0) - entry.getValue());
         }
 
@@ -63,9 +63,9 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives multiplyBy(double multiplier) {
-        Map<String, Double> multiplied = new HashMap<>();
+        Map<Long, Double> multiplied = new HashMap<>();
 
-        for (Map.Entry<String, Double> entry : derivativeWithRespectTo.entrySet()) {
+        for (Map.Entry<Long, Double> entry : derivativeWithRespectTo.entrySet()) {
             multiplied.put(
                     entry.getKey(),
                     entry.getValue() * multiplier
@@ -80,9 +80,9 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives powerTo(double power) {
-        Map<String, Double> powered = new HashMap<>();
+        Map<Long, Double> powered = new HashMap<>();
 
-        for (Map.Entry<String, Double> entry : derivativeWithRespectTo.entrySet()) {
+        for (Map.Entry<Long, Double> entry : derivativeWithRespectTo.entrySet()) {
             powered.put(
                     entry.getKey(),
                     Math.pow(entry.getValue(), power)
@@ -96,7 +96,7 @@ public class PartialDerivatives {
         return new PartialDerivatives(copyPartialDerivatives(derivativeWithRespectTo));
     }
 
-    private static Map<String, Double> copyPartialDerivatives(Map<String, Double> partialDerivatives) {
+    private static Map<Long, Double> copyPartialDerivatives(Map<Long, Double> partialDerivatives) {
         return new HashMap<>(partialDerivatives);
     }
 }

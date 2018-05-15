@@ -11,7 +11,7 @@ public class FitnessFunction {
 
     protected final List<? extends Vertex> probabilisticVertices;
     protected final List<? extends Vertex<Double>> latentVertices;
-    protected final Map<String, Long> exploreSettingAll;
+    protected final Map<Long, Long> exploreSettingAll;
 
     public FitnessFunction(List<? extends Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
