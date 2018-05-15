@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.vertices.Constant;
-
-public class ConstantVertex<T> extends NonProbabilistic<T> implements Constant<T> {
+public class ConstantVertex<T> extends NonProbabilistic<T> {
 
     public ConstantVertex(T value) {
         setValue(value);

@@ -25,20 +25,20 @@ public interface DoubleTensor extends Tensor {
         return new Nd4jDoubleTensor(shape);
     }
 
-    static Map<String, DoubleTensor> fromScalars(Map<String, Double> scalars) {
-        Map<String, DoubleTensor> asTensors = new HashMap<>();
+    static Map<Long, DoubleTensor> fromScalars(Map<Long, Double> scalars) {
+        Map<Long, DoubleTensor> asTensors = new HashMap<>();
 
-        for (Map.Entry<String, Double> entry : scalars.entrySet()) {
+        for (Map.Entry<Long, Double> entry : scalars.entrySet()) {
             asTensors.put(entry.getKey(), DoubleTensor.scalar(entry.getValue()));
         }
 
         return asTensors;
     }
 
-    static Map<String, Double> toScalars(Map<String, DoubleTensor> tensors) {
-        Map<String, Double> asScalars = new HashMap<>();
+    static Map<Long, Double> toScalars(Map<Long, DoubleTensor> tensors) {
+        Map<Long, Double> asScalars = new HashMap<>();
 
-        for (Map.Entry<String, DoubleTensor> entry : tensors.entrySet()) {
+        for (Map.Entry<Long, DoubleTensor> entry : tensors.entrySet()) {
             asScalars.put(entry.getKey(), entry.getValue().scalar());
         }
 

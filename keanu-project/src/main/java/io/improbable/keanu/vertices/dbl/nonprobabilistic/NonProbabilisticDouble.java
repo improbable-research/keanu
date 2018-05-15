@@ -28,7 +28,7 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 

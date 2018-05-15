@@ -11,7 +11,7 @@ public class TensorDualNumber {
         return new TensorDualNumber(value, TensorPartialDerivatives.OF_CONSTANT);
     }
 
-    public static TensorDualNumber createWithRespectToSelf(String withRespectTo, DoubleTensor value) {
+    public static TensorDualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
         return new TensorDualNumber(value, TensorPartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
@@ -23,11 +23,11 @@ public class TensorDualNumber {
         this.partialDerivatives = partialDerivatives;
     }
 
-    public TensorDualNumber(DoubleTensor value, Map<String, DoubleTensor> partialDerivatives) {
+    public TensorDualNumber(DoubleTensor value, Map<Long, DoubleTensor> partialDerivatives) {
         this(value, new TensorPartialDerivatives(partialDerivatives));
     }
 
-    public TensorDualNumber(DoubleTensor value, String infinitesimalLabel) {
+    public TensorDualNumber(DoubleTensor value, long infinitesimalLabel) {
         this(value, new TensorPartialDerivatives(Collections.singletonMap(infinitesimalLabel, DoubleTensor.ones(value.getShape()))));
     }
 

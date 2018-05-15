@@ -11,11 +11,11 @@ public abstract class ContinuousTensorVertex<T> extends Vertex<T> {
         return logPdf(value);
     }
 
-    public Map<String, DoubleTensor> dLogProb(T value) {
+    public Map<Long, DoubleTensor> dLogProb(T value) {
         return dLogPdf(value);
     }
 
     public abstract double logPdf(T value);
 
-    public abstract Map<String, DoubleTensor> dLogPdf(T value);
+    public abstract Map<Long, DoubleTensor> dLogPdf(T value);
 }

@@ -69,7 +69,7 @@ public class TensorGaussianVertexTest {
         sigma.setValue(1.0);
 
         GaussianVertex gaussianVertex = new GaussianVertex(mu, sigma, random);
-        Map<String, DoubleTensor> expectedDerivatives = gaussianVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> expectedDerivatives = gaussianVertex.dLogPdf(0.5);
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
 
@@ -81,7 +81,7 @@ public class TensorGaussianVertexTest {
         sigmaTensor.setValue(Nd4jDoubleTensor.scalar(1.0));
 
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
-        Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(Nd4jDoubleTensor.scalar(0.5));
+        Map<Long, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(Nd4jDoubleTensor.scalar(0.5));
 
         TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
 
@@ -115,7 +115,7 @@ public class TensorGaussianVertexTest {
         sigmaTensor.setValue(Nd4jDoubleTensor.scalar(1.0));
 
         TensorGaussianVertex ndGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, new KeanuRandom(1));
-        Map<String, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(
+        Map<Long, DoubleTensor> actualDerivatives = ndGaussianVertex.dLogPdf(
             DoubleTensor.create(new double[]{0.25, -0.75}, new int[]{2, 1})
         );
 

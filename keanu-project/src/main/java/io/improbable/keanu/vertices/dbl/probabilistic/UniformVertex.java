@@ -66,7 +66,7 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
 
         if (isObserved()) {
             return Collections.emptyMap();

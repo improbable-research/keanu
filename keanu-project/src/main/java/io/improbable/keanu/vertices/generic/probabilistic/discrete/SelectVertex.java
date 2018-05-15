@@ -63,7 +63,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogProb(T value) {
+    public Map<Long, DoubleTensor> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

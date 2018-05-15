@@ -148,7 +148,7 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<String, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
+        Map<Long, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 

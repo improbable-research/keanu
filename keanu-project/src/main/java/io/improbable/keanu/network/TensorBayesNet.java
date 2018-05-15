@@ -115,7 +115,7 @@ public class TensorBayesNet {
      */
     private void probeForNonZeroMasterP(List<Vertex> latentVertices, int attempts) {
 
-        Map<String, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
+        Map<Long, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
             setFromSampleAndCascade(latentVertices, setAndCascadeCache);
@@ -136,7 +136,7 @@ public class TensorBayesNet {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices, Map<String, Long> setAndCascadeCache) {
+    public static void setFromSampleAndCascade(List<Vertex> vertices, Map<Long, Long> setAndCascadeCache) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }

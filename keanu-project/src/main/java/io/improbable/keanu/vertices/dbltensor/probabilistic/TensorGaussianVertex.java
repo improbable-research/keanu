@@ -89,13 +89,13 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         TensorGaussian.Diff dlnP = TensorGaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
 
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,
                                                                DoubleTensor dPdsigma,
                                                                DoubleTensor dPdx) {
 

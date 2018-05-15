@@ -18,7 +18,7 @@ public class TensorFitnessFunctionWithGradient {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
-    private final Map<String, Long> exploreSettingAll;
+    private final Map<Long, Long> exploreSettingAll;
 
     public TensorFitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
                                              List<? extends Vertex<DoubleTensor>> latentVertices) {
@@ -32,7 +32,7 @@ public class TensorFitnessFunctionWithGradient {
 
             TensorFitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
 
-            Map<String, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
+            Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
             return alignGradientsToAppropriateIndex(diffs, latentVertices);
         };
@@ -45,7 +45,7 @@ public class TensorFitnessFunctionWithGradient {
         };
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<String /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
+    private static double[] alignGradientsToAppropriateIndex(Map<Long /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
                                                      List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();

@@ -12,7 +12,7 @@ public class TensorFitnessFunction {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
-    private final Map<String, Long> exploreSettingAll;
+    private final Map<Long, Long> exploreSettingAll;
 
     public TensorFitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<DoubleTensor>> latentVertices) {
         this.probabilisticVertices = probabilisticVertices;
@@ -27,7 +27,7 @@ public class TensorFitnessFunction {
         };
     }
 
-    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices, Map<String, Long> exploreSettingAll) {
+    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices, Map<Long, Long> exploreSettingAll) {
 
         int position = 0;
         for (Vertex<DoubleTensor> vertex : latentVertices) {

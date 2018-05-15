@@ -12,18 +12,18 @@ public class TensorPartialDerivatives {
 
     public static TensorPartialDerivatives OF_CONSTANT = new TensorPartialDerivatives(Collections.emptyMap());
 
-    public static TensorPartialDerivatives withRespectToSelf(String withRespectTo, int[] shape) {
+    public static TensorPartialDerivatives withRespectToSelf(long withRespectTo, int[] shape) {
         return new TensorPartialDerivatives(Collections.singletonMap(withRespectTo, DoubleTensor.ones(shape)));
     }
 
-    private Map<String, DoubleTensor> derivativeWithRespectTo;
+    private Map<Long, DoubleTensor> derivativeWithRespectTo;
 
-    public TensorPartialDerivatives(String label, DoubleTensor derivativeWithRespectTo) {
+    public TensorPartialDerivatives(long id, DoubleTensor derivativeWithRespectTo) {
         this.derivativeWithRespectTo = new HashMap<>();
-        this.derivativeWithRespectTo.put(label, derivativeWithRespectTo);
+        this.derivativeWithRespectTo.put(id, derivativeWithRespectTo);
     }
 
-    public TensorPartialDerivatives(Map<String, DoubleTensor> derivativeWithRespectTo) {
+    public TensorPartialDerivatives(Map<Long, DoubleTensor> derivativeWithRespectTo) {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
     }
 
@@ -31,7 +31,7 @@ public class TensorPartialDerivatives {
         return withRespectTo(vertex.getId());
     }
 
-    public DoubleTensor withRespectTo(String id) {
+    public DoubleTensor withRespectTo(long id) {
         return derivativeWithRespectTo.getOrDefault(id, Nd4jDoubleTensor.ZERO_SCALAR);
     }
 
@@ -39,19 +39,19 @@ public class TensorPartialDerivatives {
         return derivativeWithRespectTo.isEmpty();
     }
 
-    public Map<String, DoubleTensor> asMap() {
+    public Map<Long, DoubleTensor> asMap() {
         return derivativeWithRespectTo;
     }
 
-    public void putWithRespectTo(String id, DoubleTensor value) {
+    public void putWithRespectTo(long id, DoubleTensor value) {
         derivativeWithRespectTo.put(id, value);
     }
 
     public TensorPartialDerivatives add(TensorPartialDerivatives toAdd) {
-        Map<String, DoubleTensor> added = cloneInfinitesimals(derivativeWithRespectTo);
+        Map<Long, DoubleTensor> added = cloneInfinitesimals(derivativeWithRespectTo);
 
-        for (Map.Entry<String, DoubleTensor> entry : toAdd.derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : toAdd.derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
             if (added.containsKey(k)) {
@@ -65,10 +65,10 @@ public class TensorPartialDerivatives {
     }
 
     public TensorPartialDerivatives subtract(TensorPartialDerivatives toSubtract) {
-        Map<String, DoubleTensor> subtracted = cloneInfinitesimals(derivativeWithRespectTo);
+        Map<Long, DoubleTensor> subtracted = cloneInfinitesimals(derivativeWithRespectTo);
 
-        for (Map.Entry<String, DoubleTensor> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
             if (subtracted.containsKey(k)) {
@@ -82,10 +82,10 @@ public class TensorPartialDerivatives {
     }
 
     public TensorPartialDerivatives multiplyBy(DoubleTensor multiplier) {
-        Map<String, DoubleTensor> multiplied = new HashMap<>();
+        Map<Long, DoubleTensor> multiplied = new HashMap<>();
 
-        for (Map.Entry<String, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v;
             if (entry.getValue().isScalar() && !multiplier.isScalar()) {
                 v = entry.getValue().times(multiplier.sum());
@@ -99,10 +99,10 @@ public class TensorPartialDerivatives {
     }
 
     public TensorPartialDerivatives multiplyBy(double multiplier) {
-        Map<String, DoubleTensor> multiplied = new HashMap<>();
+        Map<Long, DoubleTensor> multiplied = new HashMap<>();
 
-        for (Map.Entry<String, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v = entry.getValue().times(multiplier);
             multiplied.put(k, v);
         }
@@ -111,10 +111,10 @@ public class TensorPartialDerivatives {
     }
 
     public TensorPartialDerivatives divideBy(DoubleTensor divisor) {
-        Map<String, DoubleTensor> divided = new HashMap<>();
+        Map<Long, DoubleTensor> divided = new HashMap<>();
 
-        for (Map.Entry<String, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v = entry.getValue().div(divisor);
             divided.put(k, v);
         }
@@ -123,10 +123,10 @@ public class TensorPartialDerivatives {
     }
 
     public TensorPartialDerivatives divideBy(double divisor) {
-        Map<String, DoubleTensor> divided = new HashMap<>();
+        Map<Long, DoubleTensor> divided = new HashMap<>();
 
-        for (Map.Entry<String, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v = entry.getValue().div(divisor);
             divided.put(k, v);
         }
@@ -135,10 +135,10 @@ public class TensorPartialDerivatives {
     }
 
     public TensorPartialDerivatives powerTo(double power) {
-        Map<String, DoubleTensor> powered = new HashMap<>();
+        Map<Long, DoubleTensor> powered = new HashMap<>();
 
-        for (Map.Entry<String, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            String k = entry.getKey();
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
             DoubleTensor v = entry.getValue().pow(power);
             powered.put(k, v);
         }
@@ -150,9 +150,9 @@ public class TensorPartialDerivatives {
         return new TensorPartialDerivatives(cloneInfinitesimals(derivativeWithRespectTo));
     }
 
-    private static Map<String, DoubleTensor> cloneInfinitesimals(Map<String, DoubleTensor> infinitesimals) {
-        Map<String, DoubleTensor> clone = new HashMap<>();
-        for (Map.Entry<String, DoubleTensor> entry : infinitesimals.entrySet()) {
+    private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {
+        Map<Long, DoubleTensor> clone = new HashMap<>();
+        for (Map.Entry<Long, DoubleTensor> entry : infinitesimals.entrySet()) {
             clone.put(entry.getKey(), entry.getValue());
         }
         return clone;
