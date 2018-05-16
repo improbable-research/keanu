@@ -76,11 +76,11 @@ public class UniformVertex extends ProbabilisticDouble {
         double max = this.xMax.getValue();
 
         if (this.getValue() <= min) {
-            return DoubleTensor.fromScalars(singletonMap(getId(), Double.POSITIVE_INFINITY));
+            return singletonMap(getId(), DoubleTensor.scalar(Double.POSITIVE_INFINITY));
         } else if (this.getValue() >= max) {
-            return DoubleTensor.fromScalars(singletonMap(getId(), Double.NEGATIVE_INFINITY));
+            return singletonMap(getId(), DoubleTensor.scalar(Double.NEGATIVE_INFINITY));
         } else {
-            return DoubleTensor.fromScalars(singletonMap(getId(), 0.0));
+            return singletonMap(getId(), DoubleTensor.scalar(0.0));
         }
     }
 

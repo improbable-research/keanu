@@ -57,9 +57,9 @@ public class ExponentialVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         ExponentialVertex vertexUnderTest = new ExponentialVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -75,14 +75,14 @@ public class ExponentialVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                0.5,
-                0.1,
-                uniformA,
-                exp,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            0.5,
+            0.1,
+            uniformA,
+            exp,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -95,14 +95,14 @@ public class ExponentialVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                3.0,
-                0.1,
-                uniformB,
-                exp,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            3.0,
+            0.1,
+            uniformB,
+            exp,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -121,10 +121,10 @@ public class ExponentialVertexTest {
         latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1), random),
-                AB,
-                latentAB,
-                10000
+            hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1), random),
+            AB,
+            latentAB,
+            10000
         );
     }
 

@@ -55,6 +55,6 @@ public class SimulatedAnnealingTest {
         graphOptimizer.maxAPosteriori(1000);
 
         return network.getLatentVertices().stream()
-                .collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
+            .collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
     }
 }

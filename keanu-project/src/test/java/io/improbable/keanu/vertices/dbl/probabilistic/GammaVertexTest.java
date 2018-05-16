@@ -22,14 +22,14 @@ public class GammaVertexTest {
     private static final double DELTA = 0.0001;
 
     private static final double[][] TEST_VALUES = new double[][]{
-            {2.0, 1.0},
-            {2.0, 2.0},
-            {2.0, 3.0},
-            {1.0, 5.0},
-            {0.5, 9.0},
-            {1.0, 7.5},
-            {1.5, 7.5},
-            {1.0, 0.5}
+        {2.0, 1.0},
+        {2.0, 2.0},
+        {2.0, 3.0},
+        {1.0, 5.0},
+        {0.5, 9.0},
+        {1.0, 7.5},
+        {1.5, 7.5},
+        {1.0, 0.5}
     };
 
     private Random random;
@@ -80,14 +80,14 @@ public class GammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                1.0,
-                0.1,
-                a,
-                g,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            1.0,
+            0.1,
+            a,
+            g,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -100,14 +100,14 @@ public class GammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.1,
-                1.0,
-                0.1,
-                t,
-                g,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            1.0,
+            0.1,
+            t,
+            g,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -120,22 +120,22 @@ public class GammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.5,
-                2.5,
-                0.1,
-                k,
-                g,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            2.5,
+            0.1,
+            k,
+            g,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     private void testPdfAtPercentiles(double theta, double k) {
         GammaVertex g = new GammaVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(theta),
-                new ConstantDoubleVertex(k),
-                random
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(theta),
+            new ConstantDoubleVertex(k),
+            random
         );
 
         GammaDistribution apache = new GammaDistribution(k, theta);
@@ -145,17 +145,17 @@ public class GammaVertexTest {
             double expected = Math.log(apache.density(x));
             double density = g.logProb(x);
             assertThat("   Density at " + x + " = " + density + " (expected = " + expected + ")",
-                    expected, closeTo(density, 0.0001)
+                expected, closeTo(density, 0.0001)
             );
         }
     }
 
     private void testdPdxAtPercentiles(double theta, double k) {
         GammaVertex g = new GammaVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(theta),
-                new ConstantDoubleVertex(k),
-                random
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(theta),
+            new ConstantDoubleVertex(k),
+            random
         );
 
         log.info("k = " + k + ", theta = " + theta + ":");
@@ -165,7 +165,7 @@ public class GammaVertexTest {
             g.setValue(x);
             double actual = g.dLogProbAtValue().get(g.getId()).scalar();
             assertThat("   Gradient at " + x + " = " + actual + " (approx expected = " + approxExpected + ")",
-                    approxExpected, closeTo(actual, 0.1)
+                approxExpected, closeTo(actual, 0.1)
             );
         }
     }
@@ -173,10 +173,10 @@ public class GammaVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         GammaVertex vertexUnderTest = new GammaVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                new ConstantDoubleVertex(1.0),
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            new ConstantDoubleVertex(1.0),
+            random
         );
 
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -186,19 +186,19 @@ public class GammaVertexTest {
     @Test
     public void samplingMatchesLogProb() {
         GammaVertex gamma = new GammaVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(2.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(2.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                gamma,
-                100000,
-                2.0,
-                10.0,
-                0.1,
-                0.01);
+            gamma,
+            100000,
+            2.0,
+            10.0,
+            0.1,
+            0.01);
     }
 
     @Test
@@ -221,10 +221,10 @@ public class GammaVertexTest {
         latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),
-                aThetaK,
-                latentAThetaK,
-                2000
+            hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2), random),
+            aThetaK,
+            latentAThetaK,
+            2000
         );
     }
 

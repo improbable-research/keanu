@@ -24,12 +24,12 @@ public class HamiltonianTest {
         BayesNet simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
-                simpleGaussian,
-                simpleGaussian.getLatentVertices(),
-                1000,
-                20,
-                0.15,
-                random
+            simpleGaussian,
+            simpleGaussian.getLatentVertices(),
+            1000,
+            20,
+            0.15,
+            random
         );
 
         Vertex<Double> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
@@ -43,12 +43,12 @@ public class HamiltonianTest {
         BayesNet bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0, random);
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
-                bayesNet,
-                bayesNet.getLatentVertices(),
-                2000,
-                20,
-                0.1,
-                random
+            bayesNet,
+            bayesNet.getLatentVertices(),
+            2000,
+            20,
+            0.1,
+            random
         );
 
         Vertex<Double> A = bayesNet.getContinuousLatentVertices().get(0);
@@ -63,12 +63,12 @@ public class HamiltonianTest {
         BayesNet donutBayesNet = MCMCTestDistributions.create2DDonutDistribution(random);
 
         NetworkSamples samples = Hamiltonian.getPosteriorSamples(
-                donutBayesNet,
-                donutBayesNet.getLatentVertices(),
-                2500,
-                10,
-                0.05,
-                random
+            donutBayesNet,
+            donutBayesNet.getLatentVertices(),
+            2500,
+            10,
+            0.05,
+            random
         );
 
         Vertex<Double> A = donutBayesNet.getContinuousLatentVertices().get(0);

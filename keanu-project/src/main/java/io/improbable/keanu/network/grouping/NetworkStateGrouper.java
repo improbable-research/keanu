@@ -39,21 +39,21 @@ public class NetworkStateGrouper {
 
 
         Map<DiscretePoint, List<NetworkState>> statesGroupedByDiscretePoint = networkStates.stream()
-                .collect(groupingBy(state -> toDiscretePoint(state, discreteVertexIds)));
+            .collect(groupingBy(state -> toDiscretePoint(state, discreteVertexIds)));
 
         Map<DiscretePoint, List<List<ContinuousPoint>>> continuousPointsGroupedByDiscretePoint = statesGroupedByDiscretePoint.entrySet().stream()
-                .collect(
-                        toMap(
-                                Map.Entry::getKey,
-                                e -> continuousPointGrouper.groupContinuousPoints(
-                                        toContinuousPoints(e.getValue(), continuousVertexIds)
-                                )
-                        )
-                );
+            .collect(
+                toMap(
+                    Map.Entry::getKey,
+                    e -> continuousPointGrouper.groupContinuousPoints(
+                        toContinuousPoints(e.getValue(), continuousVertexIds)
+                    )
+                )
+            );
 
         return continuousPointsGroupedByDiscretePoint.entrySet().stream()
-                .flatMap(e -> toListOfNetworkStates(e.getKey(), e.getValue(), discreteVertexIds, continuousVertexIds))
-                .collect(toList());
+            .flatMap(e -> toListOfNetworkStates(e.getKey(), e.getValue(), discreteVertexIds, continuousVertexIds))
+            .collect(toList());
     }
 
     private Stream<List<NetworkState>> toListOfNetworkStates(DiscretePoint discretePoint,
@@ -64,7 +64,7 @@ public class NetworkStateGrouper {
         Map<Long, ?> discreteValues = fromDiscretePoint(discretePoint, discreteVertexIds);
 
         return continuousPoints.stream()
-                .map(groupedPoints -> toNetworkState(discreteValues, groupedPoints, continuousVertexIds));
+            .map(groupedPoints -> toNetworkState(discreteValues, groupedPoints, continuousVertexIds));
     }
 
     private List<NetworkState> toNetworkState(Map<Long, ?> discreteValues, List<ContinuousPoint> continuousPoints, List<Long> continuousVertexIds) {
@@ -97,8 +97,8 @@ public class NetworkStateGrouper {
 
     private List<ContinuousPoint> toContinuousPoints(List<NetworkState> networkStates, List<Long> continuousVertexIds) {
         return networkStates.stream()
-                .map(p -> toContinuousPoint(p, continuousVertexIds))
-                .collect(toList());
+            .map(p -> toContinuousPoint(p, continuousVertexIds))
+            .collect(toList());
     }
 
     private ContinuousPoint toContinuousPoint(NetworkState networkState, List<Long> continuousVertexIds) {

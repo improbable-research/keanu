@@ -54,10 +54,10 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
                                     int max,
                                     Random random) {
         this(input,
-                new ConstantDoubleVertex(fuzzinessSigma),
-                new ConstantIntegerVertex(min),
-                new ConstantIntegerVertex(max),
-                random
+            new ConstantDoubleVertex(fuzzinessSigma),
+            new ConstantIntegerVertex(min),
+            new ConstantIntegerVertex(max),
+            random
         );
     }
 
@@ -154,13 +154,13 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     private double dPdx(double x, int i, double sigma) {
         double p = density(i);
         return -lambda(x, sigma) * (n(i + 0.5 - x, sigma) - n(i - 0.5 - x, sigma)
-                - p * (n(max.getValue() + 0.5 - x, sigma) - n(min.getValue() - 0.5 - x, sigma)));
+            - p * (n(max.getValue() + 0.5 - x, sigma) - n(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dPdSigma(double x, int i, double sigma) {
         double p = density(i);
         return lambda(x, sigma) * (dSdSigma(i + 0.5 - x, sigma) - dSdSigma(i - 0.5 - x, sigma)
-                - p * (dSdSigma(max.getValue() + 0.5 - x, sigma) - dSdSigma(min.getValue() - 0.5 - x, sigma)));
+            - p * (dSdSigma(max.getValue() + 0.5 - x, sigma) - dSdSigma(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dSdSigma(double x, double sigma) {

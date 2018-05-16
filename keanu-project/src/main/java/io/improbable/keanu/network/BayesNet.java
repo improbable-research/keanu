@@ -23,16 +23,16 @@ public class BayesNet {
     public BayesNet(Set<? extends Vertex> vertices) {
 
         latentAndObservedVertices = vertices.stream()
-                .filter(v -> v.isObserved() || v.isProbabilistic())
-                .collect(Collectors.toList());
+            .filter(v -> v.isObserved() || v.isProbabilistic())
+            .collect(Collectors.toList());
 
         observedVertices = latentAndObservedVertices.stream()
-                .filter(Vertex::isObserved)
-                .collect(Collectors.toList());
+            .filter(Vertex::isObserved)
+            .collect(Collectors.toList());
 
         latentVertices = latentAndObservedVertices.stream()
-                .filter(v -> !v.isObserved())
-                .collect(Collectors.toList());
+            .filter(v -> !v.isObserved())
+            .collect(Collectors.toList());
     }
 
     public BayesNet(Collection<? extends Vertex> vertices) {
@@ -98,10 +98,14 @@ public class BayesNet {
     public void probeForNonZeroMasterP(int attempts) {
 
         VertexValuePropagation.cascadeUpdate(observedVertices);
-        List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
-        setFromSampleAndCascade(sortedByDependency);
 
-        probeForNonZeroMasterP(sortedByDependency, attempts);
+        if (isInImpossibleState()) {
+
+            List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
+            setFromSampleAndCascade(sortedByDependency);
+
+            probeForNonZeroMasterP(sortedByDependency, attempts);
+        }
     }
 
     /**

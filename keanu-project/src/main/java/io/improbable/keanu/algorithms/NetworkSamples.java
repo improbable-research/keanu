@@ -46,10 +46,10 @@ public class NetworkSamples {
     public NetworkSamples drop(int dropCount) {
 
         final Map<Long, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().subList(dropCount, size))
-                );
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().subList(dropCount, size))
+            );
 
         return new NetworkSamples(withSamplesDropped, size - dropCount);
     }
@@ -57,11 +57,11 @@ public class NetworkSamples {
     public NetworkSamples downSample(final int downSampleInterval) {
 
         final Map<Long, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        e -> downSample(e.getValue(), downSampleInterval)
-                        )
-                );
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> downSample(e.getValue(), downSampleInterval)
+                )
+            );
 
         return new NetworkSamples(withSamplesDownSampled, size / downSampleInterval);
     }
@@ -84,8 +84,8 @@ public class NetworkSamples {
     public double probability(Function<NetworkState, Boolean> predicate) {
         List<NetworkState> networkStates = toNetworkStates();
         long trueCount = networkStates.parallelStream()
-                .filter(predicate::apply)
-                .count();
+            .filter(predicate::apply)
+            .count();
 
         return (double) trueCount / networkStates.size();
     }

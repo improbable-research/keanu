@@ -33,15 +33,15 @@ public class RocketTest {
 
         Vertex<Boolean> bothCauseOverheat = new Flip(0.95, r);
         Vertex<Boolean> overHeatDueToBoth = residualFuel
-                .and(oRingFailure)
-                .and(bothCauseOverheat);
+            .and(oRingFailure)
+            .and(bothCauseOverheat);
 
         Flip overHeatDueToOther = new Flip(0.001, r);
 
         BoolVertex overHeated = overHeatDueToOther
-                .or(overHeatDueToORing)
-                .or(overHeatDueToResidualFuel)
-                .or(overHeatDueToBoth);
+            .or(overHeatDueToORing)
+            .or(overHeatDueToResidualFuel)
+            .or(overHeatDueToBoth);
 
         double probOfOverheat = priorProbabilityTrue(overHeated, 10000);
         log.info("Prior Probability rocket overheats: " + probOfOverheat);

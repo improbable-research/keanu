@@ -91,7 +91,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final double density = SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
         final double dlogPdfdx = dPdfdx / density;
 
-        return DoubleTensor.fromScalars(singletonMap(getId(), dlogPdfdx));
+        return singletonMap(getId(), DoubleTensor.scalar(dlogPdfdx));
     }
 
     @Override

@@ -57,8 +57,8 @@ public class LatentIncrementSort {
 
     private static Set<Vertex> getLatentDependencies(Set<Vertex> dependencies) {
         return dependencies.stream()
-                .filter(v -> v.isProbabilistic() && !v.isObserved())
-                .collect(Collectors.toSet());
+            .filter(v -> v.isProbabilistic() && !v.isObserved())
+            .collect(Collectors.toSet());
     }
 
     private static Map<Vertex, Set<Vertex>> mapDependents(Map<Vertex, Set<Vertex>> dependencies) {

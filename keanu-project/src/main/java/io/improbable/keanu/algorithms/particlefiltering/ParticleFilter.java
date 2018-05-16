@@ -46,7 +46,7 @@ public class ParticleFilter {
             Vertex<?> nextObsVertex = observedVertexOrder.get(i);
             Set<Vertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
             particles = updateParticles(nextObsVertex, vertexDeps, particles, numParticles, resamplingCycles,
-                    resamplingProportion, random);
+                resamplingProportion, random);
         }
 
         return particles;

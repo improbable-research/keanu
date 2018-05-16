@@ -39,7 +39,7 @@ public abstract class Vertex<T> {
      */
     public abstract Map<Long, DoubleTensor> dLogProb(T value);
 
-    public Map<Long, DoubleTensor> dLogProbAtValue() {
+    public final Map<Long, DoubleTensor> dLogProbAtValue() {
         return dLogProb(getValue());
     }
 
