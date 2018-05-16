@@ -11,8 +11,6 @@ public interface Tensor {
 
     int getLength();
 
-    boolean isShapePlaceholder();
-
     default boolean isScalar() {
         return getLength() == 1;
     }

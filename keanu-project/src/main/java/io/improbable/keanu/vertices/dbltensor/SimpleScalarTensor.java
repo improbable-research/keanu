@@ -280,8 +280,4 @@ public class SimpleScalarTensor implements DoubleTensor {
         return 1;
     }
 
-    @Override
-    public boolean isShapePlaceholder() {
-        return false;
-    }
 }

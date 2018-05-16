@@ -60,15 +60,15 @@ public class KeanuRandom {
         return possibleIndexes;
     }
 
-    private void iterate(int count, int length, int[] size, int[] res, List<List<Integer>> dimensions) {
+    private void iterate(int count, int length, int[] size, int[] result, List<List<Integer>> dimensions) {
         if (count >= length) {
-            Integer[] result = ArrayUtils.toObject(res);
-            dimensions.add(Arrays.asList(result));
+            Integer[] res = ArrayUtils.toObject(result);
+            dimensions.add(Arrays.asList(res));
             return;
         }
         for (int i = 0; i < size[count]; i++) {
-            res[count] = i;
-            iterate(count + 1, length, size, res, dimensions);
+            result[count] = i;
+            iterate(count + 1, length, size, result, dimensions);
         }
     }
 
