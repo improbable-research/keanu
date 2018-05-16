@@ -89,12 +89,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor apply(Function<Double, Double> function) {
         Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
+        INDArray tensorCopy = tensor.dup();
         List<Double> values = Arrays.asList(tensorValues);
         List<Double> functionApplied = values.stream().map(function::apply).collect(Collectors.toList());
         for (int i = 0; i < functionApplied.size(); i++) {
-            tensor.putScalar(i, functionApplied.get(i));
+            tensorCopy.putScalar(i, functionApplied.get(i));
         }
-        return new Nd4jDoubleTensor(tensor);
+        return new Nd4jDoubleTensor(tensorCopy);
     }
 
     @Override
