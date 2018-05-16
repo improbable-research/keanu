@@ -5,11 +5,15 @@ import java.util.Arrays;
 
 public interface Tensor {
 
+    int[] SCALAR_SHAPE = new int[]{1, 1};
+
     int getRank();
 
     int[] getShape();
 
     int getLength();
+
+    boolean isShapePlaceholder();
 
     default boolean isScalar() {
         return getLength() == 1;

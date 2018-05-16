@@ -9,8 +9,8 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartia
 
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
 
@@ -28,7 +28,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
      */
     public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
 
-        checkParentShapes(shape, mu.getValue(), sigma.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getValue(), sigma.getValue());
 
         this.mu = mu;
         this.sigma = sigma;
@@ -46,7 +46,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
      * @param random source of randomness
      */
     public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
-        this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma, random);
+        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getValue(), sigma.getValue()), mu, sigma, random);
     }
 
     public TensorGaussianVertex(DoubleTensorVertex mu, double sigma, KeanuRandom random) {
@@ -75,6 +75,34 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
 
     public TensorGaussianVertex(DoubleTensorVertex mu, double sigma) {
         this(mu, new ConstantTensorVertex(sigma), new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, double sigma, KeanuRandom random) {
+        this(shape, mu, new ConstantTensorVertex(sigma), random);
+    }
+
+    public TensorGaussianVertex(int[] shape, double mu, DoubleTensorVertex sigma, KeanuRandom random) {
+        this(shape, new ConstantTensorVertex(mu), sigma, random);
+    }
+
+    public TensorGaussianVertex(int[] shape, double mu, double sigma, KeanuRandom random) {
+        this(shape, new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma), random);
+    }
+
+    public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma) {
+        this(shape, mu, sigma, new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(int[] shape, double mu, double sigma) {
+        this(shape, new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma), new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(int[] shape, double mu, DoubleTensorVertex sigma) {
+        this(shape, new ConstantTensorVertex(mu), sigma, new KeanuRandom());
+    }
+
+    public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, double sigma) {
+        this(shape, mu, new ConstantTensorVertex(sigma), new KeanuRandom());
     }
 
     @Override
@@ -112,7 +140,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample() {
-        return TensorGaussian.sample(getValue().getShape(), mu.getValue(), sigma.getValue(), random);
+        return TensorGaussian.sample(getShape(), mu.getValue(), sigma.getValue(), random);
     }
 
 }

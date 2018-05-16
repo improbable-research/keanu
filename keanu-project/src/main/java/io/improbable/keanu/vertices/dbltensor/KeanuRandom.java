@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices.dbltensor;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
 
+import java.util.Arrays;
+
 public class KeanuRandom {
 
     static {
@@ -20,10 +22,26 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextDouble(int[] shape) {
-        return new Nd4jDoubleTensor(nd4jRandom.nextDouble(shape));
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(nextDouble());
+        } else {
+            return new Nd4jDoubleTensor(nd4jRandom.nextDouble(shape));
+        }
+    }
+
+    public double nextDouble() {
+        return nd4jRandom.nextDouble();
     }
 
     public DoubleTensor nextGaussian(int[] shape) {
-        return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(nextGaussian());
+        } else {
+            return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
+        }
+    }
+
+    public double nextGaussian() {
+        return nd4jRandom.nextGaussian();
     }
 }

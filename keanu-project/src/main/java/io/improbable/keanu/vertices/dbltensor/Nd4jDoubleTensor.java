@@ -65,6 +65,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return ArrayUtil.prod(shape);
     }
 
+    @Override
+    public boolean isShapePlaceholder() {
+        return tensor == null;
+    }
+
     public double getValue(int... index) {
         return tensor.getDouble(index);
     }
@@ -381,7 +386,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+    public DoubleTensor applyWhereInPlace(DoubleTensor withMask, double value) {
 
         INDArray maskDup = unsafeGetNd4J(withMask).dup();
 

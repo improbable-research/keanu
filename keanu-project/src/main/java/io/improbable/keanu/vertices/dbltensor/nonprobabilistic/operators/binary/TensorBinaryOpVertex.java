@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.TensorShapeValidation;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;
 
 public abstract class TensorBinaryOpVertex extends NonProbabilisticDoubleTensor {
@@ -11,9 +12,11 @@ public abstract class TensorBinaryOpVertex extends NonProbabilisticDoubleTensor 
     protected final DoubleTensorVertex b;
 
     public TensorBinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
+        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getValue(), b.getValue());
         this.a = a;
         this.b = b;
         setParents(a, b);
+        setValue(DoubleTensor.placeHolder(resultShape));
     }
 
     @Override
