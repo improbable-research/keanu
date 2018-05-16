@@ -54,11 +54,11 @@ public class TensorNonGradientOptimizer {
         }
 
         PointValuePair pointValuePair = optimizer.optimize(
-                new MaxEval(maxEvaluations),
-                new ObjectiveFunction(fitnessFunction.fitness()),
-                new SimpleBounds(minBounds, maxBounds),
-                MAXIMIZE,
-                new InitialGuess(currentPoint(bayesNet.getContinuousLatentVertices()))
+            new MaxEval(maxEvaluations),
+            new ObjectiveFunction(fitnessFunction.fitness()),
+            new SimpleBounds(minBounds, maxBounds),
+            MAXIMIZE,
+            new InitialGuess(currentPoint(bayesNet.getContinuousLatentVertices()))
         );
 
         return pointValuePair.getValue();

@@ -16,11 +16,11 @@ public class Person {
                   Vertex<Boolean> toiletInfected) {
 
         BoolVertex ingestedPathogen =
-                didEatOysters.and(oystersInfected).or(
-                        didEatLamb.and(lambInfected).or(
-                                didEatPoo.and(toiletInfected)
-                        )
-                );
+            didEatOysters.and(oystersInfected).or(
+                didEatLamb.and(lambInfected).or(
+                    didEatPoo.and(toiletInfected)
+                )
+            );
 
         DoubleUnaryOpLambda<Boolean> pIll = new DoubleUnaryOpLambda<>(ingestedPathogen, (i) -> i ? 0.9 : 0.01);
         isIll = new Flip(pIll, FoodPoisoningTest.rand);

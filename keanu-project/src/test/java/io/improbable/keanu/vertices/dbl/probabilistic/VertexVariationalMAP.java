@@ -14,10 +14,10 @@ import static org.junit.Assert.assertEquals;
 public class VertexVariationalMAP {
 
     public static void inferHyperParamsFromSamples(
-            Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
-            List<DoubleVertex> hyperParamsForSampling,
-            List<DoubleVertex> latentsToInfer,
-            int numSamples) {
+        Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
+        List<DoubleVertex> hyperParamsForSampling,
+        List<DoubleVertex> latentsToInfer,
+        int numSamples) {
 
         // SOURCE OF TRUTH
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
@@ -27,14 +27,14 @@ public class VertexVariationalMAP {
 
         // OBSERVE
         new PlateBuilder<Double>()
-                .fromIterator(samples.iterator())
-                .withFactory((plate, sample) -> {
+            .fromIterator(samples.iterator())
+            .withFactory((plate, sample) -> {
 
-                    DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
+                DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
 
-                    observedDistribution.observe(sample);
+                observedDistribution.observe(sample);
 
-                }).build();
+            }).build();
 
         // INFER HYPER PARAMETERS
         doInferenceOn(latentsToInfer.get(0));

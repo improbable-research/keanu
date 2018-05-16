@@ -41,18 +41,18 @@ public class LaplaceVertexTest {
     @Test
     public void samplingMatchesLogProb() {
         LaplaceVertex laplace = new LaplaceVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(1.0),
-                random
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(1.0),
+            random
         );
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                laplace,
-                100000,
-                2.0,
-                10.0,
-                0.1,
-                0.01);
+            laplace,
+            100000,
+            2.0,
+            10.0,
+            0.1,
+            0.01);
     }
 
     @Test
@@ -65,14 +65,14 @@ public class LaplaceVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                2.0,
-                0.1,
-                uniform,
-                laplace,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            2.0,
+            0.1,
+            uniform,
+            laplace,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -85,22 +85,22 @@ public class LaplaceVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(2.0,
-                3.0,
-                0.1,
-                uniform,
-                laplace,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            3.0,
+            0.1,
+            uniform,
+            laplace,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         LaplaceVertex vertexUnderTest = new LaplaceVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -121,10 +121,10 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
-                muBeta,
-                latentMuBeta,
-                1000
+            hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1), random),
+            muBeta,
+            latentMuBeta,
+            1000
         );
     }
 }

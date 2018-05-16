@@ -40,11 +40,11 @@ public class FoodPoisoningTest {
             Flip didEatPoo = plate.add("didEatPoo", new Flip(0.4, rand));
 
             BoolVertex ingestedPathogen =
-                    didEatOysters.and(infectedOysters).or(
-                            didEatLamb.and(infectedLamb).or(
-                                    didEatPoo.and(infectedToilet)
-                            )
-                    );
+                didEatOysters.and(infectedOysters).or(
+                    didEatLamb.and(infectedLamb).or(
+                        didEatPoo.and(infectedToilet)
+                    )
+                );
 
             DoubleUnaryOpLambda<Boolean> pIll = plate.add("pIll", new DoubleUnaryOpLambda<>(ingestedPathogen, (i) -> i ? 0.9 : 0.01));
 
@@ -52,9 +52,9 @@ public class FoodPoisoningTest {
         };
 
         Plates personPlates = new PlateBuilder()
-                .count(peopleCount)
-                .withFactory(personMaker)
-                .build();
+            .count(peopleCount)
+            .withFactory(personMaker)
+            .build();
 
         infectedOysters.observe(oystersAreInfected);
         infectedLamb.observe(lambIsInfected);

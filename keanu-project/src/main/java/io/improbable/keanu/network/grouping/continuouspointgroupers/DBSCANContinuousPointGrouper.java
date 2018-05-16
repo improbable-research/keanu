@@ -25,7 +25,7 @@ public class DBSCANContinuousPointGrouper implements ContinuousPointGrouper {
         List<Cluster<ContinuousPoint>> clusters = kmeansClusterer.cluster(points);
 
         return clusters.stream()
-                .map(Cluster::getPoints)
-                .collect(toList());
+            .map(Cluster::getPoints)
+            .collect(toList());
     }
 }

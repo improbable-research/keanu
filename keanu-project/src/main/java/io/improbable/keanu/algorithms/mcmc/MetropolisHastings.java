@@ -91,20 +91,20 @@ public class MetropolisHastings {
 
     static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices) {
         return latentVertices.stream()
-                .collect(Collectors.toMap(
-                        v -> v,
-                        v -> {
-                            Set<Vertex> affectedVertices = new HashSet<>();
-                            affectedVertices.add(v);
-                            affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
-                            return affectedVertices;
-                        }));
+            .collect(Collectors.toMap(
+                v -> v,
+                v -> {
+                    Set<Vertex> affectedVertices = new HashSet<>();
+                    affectedVertices.add(v);
+                    affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
+                    return affectedVertices;
+                }));
     }
 
     private static double sumLogP(Set<Vertex> vertices) {
         return vertices.stream()
-                .mapToDouble(Vertex::logProbAtValue)
-                .sum();
+            .mapToDouble(Vertex::logProbAtValue)
+            .sum();
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {

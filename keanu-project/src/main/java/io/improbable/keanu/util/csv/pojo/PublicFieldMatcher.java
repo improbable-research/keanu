@@ -32,7 +32,7 @@ class PublicFieldMatcher {
         final Optional<Field> matchingField = findMatchingFieldName(title.trim(), potentialFields);
 
         return matchingField
-                .map(PublicFieldMatcher::createColumnConsumerForField);
+            .map(PublicFieldMatcher::createColumnConsumerForField);
     }
 
     private static <T> CsvColumnConsumer<T> createColumnConsumerForField(Field matchingField) {
@@ -49,8 +49,8 @@ class PublicFieldMatcher {
 
     private static Optional<Field> findMatchingFieldName(String title, List<Field> potentials) {
         return potentials.stream()
-                .filter(field -> isNameMatch(field, title) || hasCsvPropertyAnnotationWithName(field, title))
-                .findFirst();
+            .filter(field -> isNameMatch(field, title) || hasCsvPropertyAnnotationWithName(field, title))
+            .findFirst();
     }
 
     private static boolean isNameMatch(Field field, String title) {

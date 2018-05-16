@@ -85,22 +85,22 @@ public class LogisticVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                0.9,
-                0.1,
-                uniformA,
-                l,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            0.9,
+            0.1,
+            uniformA,
+            l,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         LogisticVertex vertexUnderTest = new LogisticVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                random
+            new UniformVertex(0.0, 1.0),
+            new ConstantDoubleVertex(3.0),
+            random
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -116,15 +116,15 @@ public class LogisticVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                0.5,
-                3.0,
-                0.1,
-                uniformB,
-                l,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            0.5,
+            3.0,
+            0.1,
+            uniformB,
+            l,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -142,10 +142,10 @@ public class LogisticVertexTest {
         latentAB.add(new SmoothUniformVertex(0.01, 10.0, random));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1), random),
-                AB,
-                latentAB,
-                1000
+            hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1), random),
+            AB,
+            latentAB,
+            1000
         );
     }
 

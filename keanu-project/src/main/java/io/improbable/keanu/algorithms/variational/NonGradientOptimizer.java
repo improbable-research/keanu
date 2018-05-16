@@ -52,11 +52,11 @@ public class NonGradientOptimizer {
         }
 
         PointValuePair pointValuePair = optimizer.optimize(
-                new MaxEval(maxEvaluations),
-                new ObjectiveFunction(fitnessFunction.fitness()),
-                new SimpleBounds(minBounds, maxBounds),
-                MAXIMIZE,
-                new InitialGuess(currentPoint())
+            new MaxEval(maxEvaluations),
+            new ObjectiveFunction(fitnessFunction.fitness()),
+            new SimpleBounds(minBounds, maxBounds),
+            MAXIMIZE,
+            new InitialGuess(currentPoint())
         );
 
         return pointValuePair.getValue();

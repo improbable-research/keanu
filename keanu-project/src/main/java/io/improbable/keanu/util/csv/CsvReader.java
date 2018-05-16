@@ -63,7 +63,7 @@ public class CsvReader {
         }
 
         return bufferedReader.lines()
-                .map(this::splitLine);
+            .map(this::splitLine);
     }
 
     public <T> ObjectParser<T> as(Class<T> clazz) {

@@ -67,8 +67,8 @@ public class PartialDerivatives {
 
         for (Map.Entry<Long, Double> entry : derivativeWithRespectTo.entrySet()) {
             multiplied.put(
-                    entry.getKey(),
-                    entry.getValue() * multiplier
+                entry.getKey(),
+                entry.getValue() * multiplier
             );
         }
 
@@ -84,8 +84,8 @@ public class PartialDerivatives {
 
         for (Map.Entry<Long, Double> entry : derivativeWithRespectTo.entrySet()) {
             powered.put(
-                    entry.getKey(),
-                    Math.pow(entry.getValue(), power)
+                entry.getKey(),
+                Math.pow(entry.getValue(), power)
             );
         }
 

@@ -45,7 +45,7 @@ public class ParticleFilteringTest {
 
 
         List<ParticleFilter.Particle> particles = ParticleFilter.getProbableValues(temperature.getConnectedGraph(),
-                numParticles, resamplingCycles, resamplingProportion, new Random());
+            numParticles, resamplingCycles, resamplingProportion, new Random());
         particles.sort(ParticleFilter.Particle::sortDescending);
         ParticleFilter.Particle p = particles.get(0);
 

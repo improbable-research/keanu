@@ -73,4 +73,24 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
 
     protected abstract TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers);
 
+    public void setValue(Double value) {
+        super.setValue(DoubleTensor.scalar(value));
+    }
+
+    public double logPdf(double value) {
+        if (this.getValue().isScalar()) {
+            return this.logPdf(DoubleTensor.scalar(value));
+        } else {
+            throw new IllegalArgumentException("Vertex is not scalar");
+        }
+    }
+
+    public Map<Long, DoubleTensor> dLogPdf(double value) {
+        if (this.getValue().isScalar()) {
+            return this.dLogPdf(DoubleTensor.scalar(value));
+        } else {
+            throw new IllegalArgumentException("Vertex is not scalar");
+        }
+    }
+
 }

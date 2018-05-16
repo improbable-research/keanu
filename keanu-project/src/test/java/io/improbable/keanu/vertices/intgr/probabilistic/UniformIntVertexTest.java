@@ -22,9 +22,9 @@ public class UniformIntVertexTest {
     @Before
     public void setup() {
         UniformIntVertex testUniformVertex = new UniformIntVertex(
-                new ConstantIntegerVertex(lowerBound),
-                new ConstantIntegerVertex(upperBound),
-                new Random(1));
+            new ConstantIntegerVertex(lowerBound),
+            new ConstantIntegerVertex(upperBound),
+            new Random(1));
 
         for (int i = 0; i < N; i++) {
             Integer sample = testUniformVertex.sample();

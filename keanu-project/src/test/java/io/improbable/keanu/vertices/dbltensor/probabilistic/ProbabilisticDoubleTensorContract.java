@@ -4,12 +4,11 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
+import java.util.function.Supplier;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
@@ -177,6 +176,40 @@ public class ProbabilisticDoubleTensorContract {
 
         double actualDensity = vertexUnderTest.logPdf(Nd4jDoubleTensor.scalar(scalar));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
+    }
+
+    public static void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<DoubleTensorVertex> vertexUnderTestSupplier) {
+
+        DoubleTensorVertex[] scalarVertices = new DoubleTensorVertex[vector.length];
+        TensorPartialDerivatives tensorPartialDerivatives = new TensorPartialDerivatives(new HashMap<>());
+
+        for (int i = 0; i < vector.length; i++) {
+
+            scalarVertices[i] = vertexUnderTestSupplier.get();
+
+            tensorPartialDerivatives = tensorPartialDerivatives.add(
+                new TensorPartialDerivatives(
+                    scalarVertices[i].dLogPdf(vector[i])
+                )
+            );
+        }
+
+        DoubleTensorVertex tensorVertex = vertexUnderTestSupplier.get();
+
+        Map<Long, DoubleTensor> actualDerivatives = tensorVertex.dLogPdf(
+            DoubleTensor.create(vector, new int[]{vector.length, 1})
+        );
+
+        HashSet<Long> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
+        hyperParameterVertices.remove(tensorVertex.getId());
+
+        for (Long id : hyperParameterVertices) {
+            assertEquals(tensorPartialDerivatives.withRespectTo(id).scalar(), actualDerivatives.get(id).scalar(), 1e-5);
+        }
+
+        for (int i = 0; i < vector.length; i++) {
+            assertEquals(tensorPartialDerivatives.withRespectTo(scalarVertices[i]).scalar(), actualDerivatives.get(tensorVertex.getId()).getValue(i), 1e-5);
+        }
     }
 
 }

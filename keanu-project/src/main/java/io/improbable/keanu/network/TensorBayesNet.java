@@ -24,16 +24,16 @@ public class TensorBayesNet {
     public TensorBayesNet(Set<? extends Vertex> vertices) {
 
         latentAndObservedVertices = vertices.stream()
-                .filter(v -> v.isObserved() || v.isProbabilistic())
-                .collect(Collectors.toList());
+            .filter(v -> v.isObserved() || v.isProbabilistic())
+            .collect(Collectors.toList());
 
         observedVertices = latentAndObservedVertices.stream()
-                .filter(Vertex::isObserved)
-                .collect(Collectors.toList());
+            .filter(Vertex::isObserved)
+            .collect(Collectors.toList());
 
         latentVertices = latentAndObservedVertices.stream()
-                .filter(v -> !v.isObserved())
-                .collect(Collectors.toList());
+            .filter(v -> !v.isObserved())
+            .collect(Collectors.toList());
     }
 
     public TensorBayesNet(Collection<? extends Vertex> vertices) {
