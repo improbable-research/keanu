@@ -74,6 +74,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return ArrayUtil.prod(shape);
     }
 
+    @Override
+    public boolean isShapePlaceholder() {
+        return tensor == null;
+    }
+
     public double getValue(int... index) {
         return tensor.getDouble(index);
     }

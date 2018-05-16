@@ -4,15 +4,13 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
 
-import java.util.Random;
-
 public class TensorGamma {
 
     private TensorGamma() {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k, KeanuRandom random) {
-        return random.nextGamma(shape, a, theta, k, new Random());
+        return random.nextGamma(shape, a, theta, k);
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {

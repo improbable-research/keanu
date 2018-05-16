@@ -204,9 +204,9 @@ public class GammaVertexTest {
     @Test
     public void inferHyperParamsFromSamples() {
 
-        double trueA = 0.0;
-        double trueTheta = 3.0;
-        double trueK = 2.0;
+        double trueA = 0.;
+        double trueTheta = 2.0;
+        double trueK = 7.5;
 
         DoubleVertex a = new ConstantDoubleVertex(trueA);
 

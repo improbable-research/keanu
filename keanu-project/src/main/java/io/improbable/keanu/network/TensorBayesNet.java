@@ -102,6 +102,7 @@ public class TensorBayesNet {
 
         if (isInImpossibleState()) {
 
+            System.out.println("Zero prob");
             List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
             setFromSampleAndCascade(sortedByDependency);
 

@@ -279,4 +279,9 @@ public class SimpleScalarTensor implements DoubleTensor {
     public int getLength() {
         return 1;
     }
+
+    @Override
+    public boolean isShapePlaceholder() {
+        return false;
+    }
 }

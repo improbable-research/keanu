@@ -74,6 +74,6 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample() {
-        return TensorGamma.sample(getValue().getShape(), a.getValue(), theta.getValue(), k.getValue(), random);
+        return TensorGamma.sample(getShape(), a.getValue(), theta.getValue(), k.getValue(), random);
     }
 }

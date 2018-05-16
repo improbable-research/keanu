@@ -11,6 +11,8 @@ public interface Tensor {
 
     int getLength();
 
+    boolean isShapePlaceholder();
+
     default boolean isScalar() {
         return getLength() == 1;
     }
@@ -30,4 +32,5 @@ public interface Tensor {
     default boolean hasSameShapeAs(int[] shape) {
         return Arrays.equals(this.getShape(), shape);
     }
+
 }

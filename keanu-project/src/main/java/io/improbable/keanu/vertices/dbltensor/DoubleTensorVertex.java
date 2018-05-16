@@ -93,4 +93,29 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         }
     }
 
+    public void setAndCascade(Double value) {
+        super.setAndCascade(DoubleTensor.scalar(value));
+    }
+
+    public void setAndCascade(Double value, Map<Long, Long> explored) {
+        super.setAndCascade(DoubleTensor.scalar(value), explored);
+    }
+
+    public void observe(Double value) {
+        super.observe(DoubleTensor.scalar(value));
+    }
+
+    /**
+     * TODO: Move this up to the Vertex base class when everything has been tensorized
+     * @return true there is a tensor present and that tensor is more than just a shape placeholder
+     */
+    @Override
+    public boolean hasValue() {
+        return value != null && !value.isShapePlaceholder();
+    }
+
+    public int[] getShape(){
+        return value.getShape();
+    }
+
 }
