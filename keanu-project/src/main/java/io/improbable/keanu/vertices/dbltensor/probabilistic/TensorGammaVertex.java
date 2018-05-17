@@ -19,6 +19,15 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex k;
     private final KeanuRandom random;
 
+    /**
+     * One a, theta or k or all three driving an arbitrarily shaped tensor of Gamma
+     *
+     * @param shape the desired shape of the vertex
+     * @param a      the a of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param theta  the theta of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param k      the k of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param random the source of randomness
+     */
     public TensorGammaVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex theta, DoubleTensorVertex k, KeanuRandom random) {
         checkParentShapes(shape, a.getValue(), theta.getValue(), k.getValue());
 
@@ -30,6 +39,15 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    /**
+     * One to one constructor for mapping some shape of a, theta and k to
+     * a matching shaped gamma.
+     *
+     * @param a      the a of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param theta  the theta of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param k      the k of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param random the source of randomness
+     */
     public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, DoubleTensorVertex k, KeanuRandom random) {
         this(getShapeProposal(a.getValue(), theta.getValue(), k.getValue()), a, theta, k, random);
     }
