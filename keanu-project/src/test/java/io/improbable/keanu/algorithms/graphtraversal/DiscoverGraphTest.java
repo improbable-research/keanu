@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;

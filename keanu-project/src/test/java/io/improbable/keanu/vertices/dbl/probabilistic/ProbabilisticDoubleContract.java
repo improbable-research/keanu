@@ -3,12 +3,12 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;

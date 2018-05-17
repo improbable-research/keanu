@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Function;
 
 public class CPTVertex<T> extends NonProbabilistic<T> {

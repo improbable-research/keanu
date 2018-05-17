@@ -56,11 +56,11 @@ public class KeanuRandom {
         return nd4jRandom.nextGaussian();
     }
 
-    public boolean nextBoolean(){
+    public boolean nextBoolean() {
         return nd4jRandom.nextBoolean();
     }
 
-    public int nextInt(int maxExclusive){
+    public int nextInt(int maxExclusive) {
         return nd4jRandom.nextInt(maxExclusive);
     }
 }

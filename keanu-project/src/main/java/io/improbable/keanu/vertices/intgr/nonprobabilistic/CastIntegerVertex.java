@@ -3,8 +3,6 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public class CastIntegerVertex extends NonProbabilisticInteger {
 
     private final Vertex<Integer> inputVertex;

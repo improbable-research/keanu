@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVer
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
-import java.util.Random;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
@@ -21,9 +20,9 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
     /**
      * One mu or sigma or both driving an arbitrarily shaped tensor of Gaussian
      *
-     * @param shape  the desired shape of the vertex
-     * @param mu     the mu of the Gaussian with either the same shape as specified for this vertex or a scalar
-     * @param sigma  the sigma of the Gaussian with either the same shape as specified for this vertex or a scalar
+     * @param shape the desired shape of the vertex
+     * @param mu    the mu of the Gaussian with either the same shape as specified for this vertex or a scalar
+     * @param sigma the sigma of the Gaussian with either the same shape as specified for this vertex or a scalar
      */
     public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma) {
 
@@ -39,8 +38,8 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
      * One to one constructor for mapping some shape of mu and sigma to
      * a matching shaped gaussian.
      *
-     * @param mu     mu with same shape as desired Gaussian tensor or scalar
-     * @param sigma  sigma with same shape as desired Gaussian tensor or scalar
+     * @param mu    mu with same shape as desired Gaussian tensor or scalar
+     * @param sigma sigma with same shape as desired Gaussian tensor or scalar
      */
     public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma) {
         this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma);

@@ -9,7 +9,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm 3: "Efficient NUTS".

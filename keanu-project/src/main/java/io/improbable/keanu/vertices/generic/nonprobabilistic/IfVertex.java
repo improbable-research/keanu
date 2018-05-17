@@ -3,8 +3,6 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public class IfVertex<T> extends NonProbabilistic<T> {
 
     private final Vertex<Boolean> predicate;

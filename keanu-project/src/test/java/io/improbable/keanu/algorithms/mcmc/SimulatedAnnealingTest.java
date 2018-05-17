@@ -6,11 +6,11 @@ import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertEquals;

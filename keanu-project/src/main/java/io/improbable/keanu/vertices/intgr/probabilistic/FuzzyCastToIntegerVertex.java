@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
-import java.util.Random;
 
 import static org.apache.commons.math3.special.Erf.erf;
 

@@ -4,8 +4,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import java.util.Random;
-
 public class MultiplexerVertex<T> extends NonProbabilistic<T> {
 
     private final IntegerVertex selectorControlVertex;

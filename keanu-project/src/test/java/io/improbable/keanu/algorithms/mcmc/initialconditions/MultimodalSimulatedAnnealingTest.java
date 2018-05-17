@@ -14,7 +14,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.List;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.bool.BoolVertex.If;
 import static org.junit.Assert.assertTrue;

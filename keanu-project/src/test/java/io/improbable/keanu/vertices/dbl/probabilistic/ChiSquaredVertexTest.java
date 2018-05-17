@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
@@ -60,13 +59,13 @@ public class ChiSquaredVertexTest {
         long sampleCount = 100000;
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                vertex,
-                sampleCount,
-                from,
-                to,
-                bucketSize,
-                1e-2,
-                random
+            vertex,
+            sampleCount,
+            from,
+            to,
+            bucketSize,
+            1e-2,
+            random
         );
     }
 

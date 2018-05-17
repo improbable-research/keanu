@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
@@ -37,12 +37,12 @@ public class BetaVertexTest {
         double standardDeviation = Math.sqrt(9.0 / (36 * 7));
 
         ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-                N,
-                betaVertex,
-                mean,
-                standardDeviation,
-                epsilon,
-                random
+            N,
+            betaVertex,
+            mean,
+            standardDeviation,
+            epsilon,
+            random
         );
     }
 
@@ -99,8 +99,8 @@ public class BetaVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         BetaVertex vertexUnderTest = new BetaVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0
+            new UniformVertex(0.0, 1.0),
+            3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -111,13 +111,13 @@ public class BetaVertexTest {
         BetaVertex betaVertex = new BetaVertex(2.0, 2.0);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                betaVertex,
-                1000000,
-                0.1,
-                0.9,
-                .05,
-                0.01,
-                random
+            betaVertex,
+            1000000,
+            0.1,
+            0.9,
+            .05,
+            0.01,
+            random
         );
     }
 
@@ -188,11 +188,11 @@ public class BetaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1)),
-                alphaBeta,
-                latentAlphaBeta,
-                1000,
-                random
+            hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1)),
+            alphaBeta,
+            latentAlphaBeta,
+            1000,
+            random
         );
     }
 }

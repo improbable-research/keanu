@@ -2,8 +2,6 @@ package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
 /**

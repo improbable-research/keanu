@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVer
 import java.util.Map;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
 import static java.util.Collections.singletonMap;
 
 public class TensorUniformVertex extends ProbabilisticDoubleTensor {
@@ -18,9 +17,9 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex xMax;
 
     /**
-     * @param shape  desired tensor shape
-     * @param xMin   inclusive
-     * @param xMax   exclusive
+     * @param shape desired tensor shape
+     * @param xMin  inclusive
+     * @param xMax  exclusive
      */
     public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
 

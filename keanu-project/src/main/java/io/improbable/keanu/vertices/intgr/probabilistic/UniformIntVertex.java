@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
-import java.util.Random;
 
 public class UniformIntVertex extends ProbabilisticInteger {
 

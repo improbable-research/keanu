@@ -4,10 +4,10 @@ import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.List;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;

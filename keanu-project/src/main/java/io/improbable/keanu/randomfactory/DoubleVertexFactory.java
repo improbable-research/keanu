@@ -6,8 +6,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 
     private KeanuRandom random = new KeanuRandom();
@@ -31,7 +29,7 @@ public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 
     @Override
     public GaussianVertex nextGaussian(double mu, double sigma) {
-        GaussianVertex gaussianVertex =  new GaussianVertex(mu, sigma);
+        GaussianVertex gaussianVertex = new GaussianVertex(mu, sigma);
         gaussianVertex.setValue(gaussianVertex.sample(random));
         return gaussianVertex;
     }
@@ -45,14 +43,14 @@ public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 
     @Override
     public GaussianVertex nextGaussian(DoubleVertex mu, DoubleVertex sigma) {
-        GaussianVertex gaussianVertex =  new GaussianVertex(mu, sigma);
+        GaussianVertex gaussianVertex = new GaussianVertex(mu, sigma);
         gaussianVertex.setValue(gaussianVertex.sample(random));
         return gaussianVertex;
     }
 
     @Override
     public DoubleVertex nextGaussian(double mu, DoubleVertex sigma) {
-        GaussianVertex gaussianVertex =  new GaussianVertex(mu, sigma);
+        GaussianVertex gaussianVertex = new GaussianVertex(mu, sigma);
         gaussianVertex.setValue(gaussianVertex.sample(random));
         return gaussianVertex;
     }

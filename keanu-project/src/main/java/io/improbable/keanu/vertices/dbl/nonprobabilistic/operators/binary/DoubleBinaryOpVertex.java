@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {

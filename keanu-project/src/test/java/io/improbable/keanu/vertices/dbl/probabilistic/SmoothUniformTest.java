@@ -3,10 +3,9 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
-
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static junit.framework.TestCase.assertEquals;
 

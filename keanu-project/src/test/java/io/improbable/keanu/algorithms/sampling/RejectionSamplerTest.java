@@ -4,10 +4,9 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
-
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -45,19 +44,19 @@ public class RejectionSamplerTest {
     public void posteriorProbabilityMatchesBayesRule() {
 
         double v1ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
-                asList(v1, v2),
-                singletonList(v3),
-                v1::getValue,
-                10000,
-                random
+            asList(v1, v2),
+            singletonList(v3),
+            v1::getValue,
+            10000,
+            random
         );
 
         double v2ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
-                asList(v1, v2),
-                singletonList(v3),
-                v2::getValue,
-                10000,
-                random
+            asList(v1, v2),
+            singletonList(v3),
+            v2::getValue,
+            10000,
+            random
         );
 
         assertEquals(v1ProbTrueAccordingToBayes, v1ProbTrueAccordingToAlgo, 0.01);
@@ -68,10 +67,10 @@ public class RejectionSamplerTest {
     public void posteriorSamplesMatchesBayesRule() {
 
         NetworkSamples samplesAccordingToAlgo = RejectionSampler.getPosteriorSamples(
-                new BayesNet(v1.getConnectedGraph()),
-                asList(v1, v2),
-                10000,
-                random
+            new BayesNet(v1.getConnectedGraph()),
+            asList(v1, v2),
+            10000,
+            random
         );
 
         double v1ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v1).probability(sample -> sample);

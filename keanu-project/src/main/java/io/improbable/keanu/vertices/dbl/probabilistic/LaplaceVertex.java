@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class LaplaceVertex extends ProbabilisticDouble {
 

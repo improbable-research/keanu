@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public class CastBoolVertex extends NonProbabilisticBool {

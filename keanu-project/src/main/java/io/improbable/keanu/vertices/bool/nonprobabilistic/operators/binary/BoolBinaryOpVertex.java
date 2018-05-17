@@ -4,8 +4,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public abstract class BoolBinaryOpVertex<A, B> extends NonProbabilisticBool {
 
     protected final Vertex<A> a;

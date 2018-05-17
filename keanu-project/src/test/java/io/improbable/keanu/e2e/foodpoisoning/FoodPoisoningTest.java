@@ -10,10 +10,10 @@ import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;

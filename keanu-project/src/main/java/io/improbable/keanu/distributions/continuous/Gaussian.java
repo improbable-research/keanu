@@ -2,8 +2,6 @@ package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public class Gaussian {
 
     private Gaussian() {

@@ -5,8 +5,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
-import java.util.Random;
-
 public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
 
     protected final Vertex<IN> inputVertex;

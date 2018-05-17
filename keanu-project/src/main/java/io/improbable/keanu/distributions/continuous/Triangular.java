@@ -2,8 +2,6 @@ package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 /**
  * Computer Generation of Statistical Distributions
  * by Richard Saucier

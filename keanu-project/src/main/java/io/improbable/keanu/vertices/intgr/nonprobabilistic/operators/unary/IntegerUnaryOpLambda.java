@@ -4,7 +4,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
 
-import java.util.Random;
 import java.util.function.Function;
 
 public class IntegerUnaryOpLambda<IN> extends NonProbabilisticInteger {

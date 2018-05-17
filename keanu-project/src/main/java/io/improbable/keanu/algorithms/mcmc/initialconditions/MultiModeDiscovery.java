@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 public class MultiModeDiscovery {
 

@@ -5,11 +5,10 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
 import static org.junit.Assert.assertEquals;
@@ -66,26 +65,26 @@ public class RocketTest {
         BayesNet net = new BayesNet(oRingFailure.getConnectedGraph());
 
         double posteriorProbOfORingFailure = RejectionSampler.getPosteriorProbability(
-                net.getLatentVertices(),
-                net.getObservedVertices(),
-                () -> oRingFailure.getValue() == true,
-                10000,
-                random
+            net.getLatentVertices(),
+            net.getObservedVertices(),
+            () -> oRingFailure.getValue() == true,
+            10000,
+            random
         );
         double posteriorProbOfResidualFuel = RejectionSampler.getPosteriorProbability(
-                net.getLatentVertices(),
-                net.getObservedVertices(),
-                () -> residualFuel.getValue() == true,
-                10000,
-                random
+            net.getLatentVertices(),
+            net.getObservedVertices(),
+            () -> residualFuel.getValue() == true,
+            10000,
+            random
         );
 
         double posteriorProbOfAlarm1FalsePositive = RejectionSampler.getPosteriorProbability(
-                net.getLatentVertices(),
-                net.getObservedVertices(),
-                () -> alarm1FalsePositive.getValue() == true,
-                10000,
-                random
+            net.getLatentVertices(),
+            net.getObservedVertices(),
+            () -> alarm1FalsePositive.getValue() == true,
+            10000,
+            random
         );
 
         log.info("Probability that there is an ORing failure given the evidence: " + posteriorProbOfORingFailure);

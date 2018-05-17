@@ -5,8 +5,6 @@ import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.kotlin.ArithmeticDouble;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
 
     private KeanuRandom random = new KeanuRandom();

@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class SelectVertex<T> extends Probabilistic<T> {
 

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -9,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
@@ -41,12 +41,12 @@ public class ExponentialVertexTest {
         double standardDeviation = Math.sqrt(Math.pow(1 / b, -2));
 
         ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-                N,
-                e,
-                mean,
-                standardDeviation,
-                epsilon,
-                random
+            N,
+            e,
+            mean,
+            standardDeviation,
+            epsilon,
+            random
         );
     }
 
@@ -64,8 +64,8 @@ public class ExponentialVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         ExponentialVertex vertexUnderTest = new ExponentialVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0
+            new UniformVertex(0.0, 1.0),
+            3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -81,14 +81,14 @@ public class ExponentialVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                0.5,
-                0.1,
-                uniformA,
-                exponentialVertex,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            0.5,
+            0.1,
+            uniformA,
+            exponentialVertex,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -101,14 +101,14 @@ public class ExponentialVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                3.0,
-                0.1,
-                uniformB,
-                exponentialVertex,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            3.0,
+            0.1,
+            uniformB,
+            exponentialVertex,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -127,11 +127,11 @@ public class ExponentialVertexTest {
         latentAB.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1)),
-                AB,
-                latentAB,
-                10000,
-                random
+            hyperParams -> new ExponentialVertex(hyperParams.get(0), hyperParams.get(1)),
+            AB,
+            latentAB,
+            10000,
+            random
         );
     }
 

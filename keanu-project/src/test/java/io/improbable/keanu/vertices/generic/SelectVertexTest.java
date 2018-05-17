@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,7 +24,7 @@ public class SelectVertexTest {
     private KeanuRandom random;
 
     @Before
-    public void setup(){
+    public void setup() {
         random = new KeanuRandom(1);
     }
 

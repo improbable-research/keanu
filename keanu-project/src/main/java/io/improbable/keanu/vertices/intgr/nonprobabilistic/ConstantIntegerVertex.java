@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 public class ConstantIntegerVertex extends NonProbabilisticInteger {
 
     public ConstantIntegerVertex(Integer constant) {

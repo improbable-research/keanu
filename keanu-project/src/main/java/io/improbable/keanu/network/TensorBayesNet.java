@@ -96,7 +96,7 @@ public class TensorBayesNet {
      * by naively sampling vertices in order of data dependency
      *
      * @param attempts sampling attempts to get non-zero probability
-     * @param random source of randomness for sampling
+     * @param random   source of randomness for sampling
      */
     public void probeForNonZeroMasterP(int attempts, KeanuRandom random) {
 

@@ -2,8 +2,6 @@ package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges
  * at max and min smoothed by attaching a sigmoid as shoulders.

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public abstract class ProbabilisticInteger extends IntegerVertex {

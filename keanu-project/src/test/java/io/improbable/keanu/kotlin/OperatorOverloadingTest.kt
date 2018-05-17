@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
 import junit.framework.TestCase.assertEquals
 import org.junit.Test
-import java.util.*
 
 
 class OperatorOverloadingTest {

@@ -2,8 +2,6 @@ package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Random;
-
 import static org.apache.commons.math3.special.Gamma.digamma;
 import static org.apache.commons.math3.special.Gamma.gamma;
 
