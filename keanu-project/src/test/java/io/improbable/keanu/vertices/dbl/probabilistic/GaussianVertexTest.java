@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
@@ -21,11 +21,11 @@ public class GaussianVertexTest {
 
     private static final double DELTA = 0.0001;
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -35,12 +35,12 @@ public class GaussianVertexTest {
         GaussianVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
 
         ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-                N,
-                gaussianVertex,
-                0.0,
-                1.0,
-                epsilon,
-                random
+            N,
+            gaussianVertex,
+            0.0,
+            1.0,
+            epsilon,
+            random
         );
     }
 
@@ -74,8 +74,8 @@ public class GaussianVertexTest {
     @Test
     public void isTreatedAsConstantWhenObserved() {
         GaussianVertex vertexUnderTest = new GaussianVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0
+            new UniformVertex(0.0, 1.0),
+            3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -92,13 +92,13 @@ public class GaussianVertexTest {
         long sampleCount = 1000000;
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                vertex,
-                sampleCount,
-                from,
-                to,
-                bucketSize,
-                1e-2,
-                random
+            vertex,
+            sampleCount,
+            from,
+            to,
+            bucketSize,
+            1e-2,
+            random
         );
     }
 
@@ -112,14 +112,14 @@ public class GaussianVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                1.5,
-                0.1,
-                uniformA,
-                gaussian,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            1.5,
+            0.1,
+            uniformA,
+            gaussian,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
@@ -133,14 +133,14 @@ public class GaussianVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                3.0,
-                0.1,
-                uniformA,
-                gaussian,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            3.0,
+            0.1,
+            uniformA,
+            gaussian,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
@@ -164,11 +164,11 @@ public class GaussianVertexTest {
         latentMuSigma.add(latentSigma);
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1)),
-                muSigma,
-                latentMuSigma,
-                2000,
-                random
+            hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1)),
+            muSigma,
+            latentMuSigma,
+            2000,
+            random
         );
     }
 }

@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.Map;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public class Flip extends ProbabilisticBool {
 
@@ -37,7 +37,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public Boolean sample(Random random) {
+    public Boolean sample(KeanuRandom random) {
         return random.nextDouble() < probTrue.getValue();
     }
 

@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
@@ -15,11 +15,11 @@ public class LaplaceVertexTest {
 
     private static final double DELTA = 0.0001;
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -32,12 +32,12 @@ public class LaplaceVertexTest {
         double standardDeviation = Math.sqrt(2);
 
         ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-                N,
-                laplaceVertex,
-                mean,
-                standardDeviation,
-                epsilon,
-                random
+            N,
+            laplaceVertex,
+            mean,
+            standardDeviation,
+            epsilon,
+            random
         );
     }
 
@@ -46,13 +46,13 @@ public class LaplaceVertexTest {
         LaplaceVertex laplaceVertex = new LaplaceVertex(0.0, 1.0);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                laplaceVertex,
-                100000,
-                2.0,
-                10.0,
-                0.1,
-                0.01,
-                random
+            laplaceVertex,
+            100000,
+            2.0,
+            10.0,
+            0.1,
+            0.01,
+            random
         );
     }
 
@@ -66,14 +66,14 @@ public class LaplaceVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                2.0,
-                0.1,
-                uniform,
-                laplace,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            2.0,
+            0.1,
+            uniform,
+            laplace,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
@@ -87,22 +87,22 @@ public class LaplaceVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(2.0,
-                3.0,
-                0.1,
-                uniform,
-                laplace,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            3.0,
+            0.1,
+            uniform,
+            laplace,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         LaplaceVertex vertexUnderTest = new LaplaceVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0
+            new UniformVertex(0.0, 1.0),
+            3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -123,11 +123,11 @@ public class LaplaceVertexTest {
         latentMuBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1)),
-                muBeta,
-                latentMuBeta,
-                1000,
-                random
+            hyperParams -> new LaplaceVertex(hyperParams.get(0), hyperParams.get(1)),
+            muBeta,
+            latentMuBeta,
+            1000,
+            random
         );
     }
 }

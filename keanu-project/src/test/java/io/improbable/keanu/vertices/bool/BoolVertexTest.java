@@ -11,7 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.bool.BoolVertex.If;
 import static org.junit.Assert.assertEquals;
@@ -19,7 +19,7 @@ import static org.junit.Assert.assertTrue;
 
 public class BoolVertexTest {
 
-    private Random random;
+    private KeanuRandom random;
     private Flip v1;
     private Flip v2;
     private double pV2 = 0.4;
@@ -27,7 +27,7 @@ public class BoolVertexTest {
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
         v1 = new Flip(pV1);
         v2 = new Flip(pV2);
     }
@@ -123,7 +123,7 @@ public class BoolVertexTest {
         return pThnAndThnIsValue + pElsAndElsIsValue;
     }
 
-    public static double priorProbabilityTrue(Vertex<Boolean> vertex, int sampleCount, Random random) {
+    public static double priorProbabilityTrue(Vertex<Boolean> vertex, int sampleCount, KeanuRandom random) {
         BayesNet net = new BayesNet(vertex.getConnectedGraph());
 
         NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount, random);

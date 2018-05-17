@@ -8,7 +8,7 @@ import org.junit.Test;
 
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
@@ -17,11 +17,11 @@ public class BooleanMultipleOperatorTest {
     private List<Vertex<Boolean>> allTrue = buildVertexList(15, 15);
     private List<Vertex<Boolean>> allMixed = buildVertexList(18, 10);
     private List<Vertex<Boolean>> allFalse = buildVertexList(15, 0);
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        this.random = new Random(1);
+        this.random = new KeanuRandom(1);
     }
 
     @Test

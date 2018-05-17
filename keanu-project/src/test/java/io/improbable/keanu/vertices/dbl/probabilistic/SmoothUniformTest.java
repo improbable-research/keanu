@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -16,11 +16,11 @@ public class SmoothUniformTest {
     DoubleVertex B;
     DoubleVertex C;
     DoubleVertex CObserved;
-    Random random;
+    KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -67,9 +67,9 @@ public class SmoothUniformTest {
 
         double edgeSharpness = 1.0;
         SmoothUniformVertex uniform = new SmoothUniformVertex(
-                0.0,
-                1.0,
-                edgeSharpness
+            0.0,
+            1.0,
+            edgeSharpness
         );
 
         double from = -1;
@@ -78,22 +78,22 @@ public class SmoothUniformTest {
         long N = 1000000;
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                uniform,
-                N,
-                from,
-                to,
-                delta,
-                1e-2,
-                random
+            uniform,
+            N,
+            from,
+            to,
+            delta,
+            1e-2,
+            random
         );
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         SmoothUniformVertex vertexUnderTest = new SmoothUniformVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0,
-                0.01
+            new UniformVertex(0.0, 1.0),
+            3.0,
+            0.01
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);

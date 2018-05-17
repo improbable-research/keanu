@@ -6,6 +6,7 @@ import io.improbable.keanu.algorithms.mcmc.SimulatedAnnealing;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +20,7 @@ public class MultiModeDiscovery {
     public static List<NetworkState> findModesBySimulatedAnnealing(BayesNet network,
                                                                    int attempts,
                                                                    int samplesPerAttempt,
-                                                                   Random random) {
+                                                                   KeanuRandom random) {
 
         List<NetworkState> maxSamples = new ArrayList<>();
         VertexValuePropagation.cascadeUpdate(network.getObservedVertices());

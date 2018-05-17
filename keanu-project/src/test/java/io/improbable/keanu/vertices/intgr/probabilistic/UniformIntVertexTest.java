@@ -8,7 +8,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.*;
 
@@ -18,16 +18,16 @@ public class UniformIntVertexTest {
     private Integer lowerBound = 10;
     private Integer upperBound = 20;
     private List<Integer> samples = new ArrayList<>();
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
 
-        random = new Random(1);
+        random = new KeanuRandom(1);
 
         UniformIntVertex testUniformVertex = new UniformIntVertex(
-                new ConstantIntegerVertex(lowerBound),
-                new ConstantIntegerVertex(upperBound)
+            new ConstantIntegerVertex(lowerBound),
+            new ConstantIntegerVertex(upperBound)
         );
 
         for (int i = 0; i < N; i++) {

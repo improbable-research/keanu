@@ -1,5 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+
 import java.util.Random;
 
 public class Gaussian {
@@ -10,7 +12,7 @@ public class Gaussian {
     private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
     private static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
 
-    public static double sample(double mu, double sigma, Random random) {
+    public static double sample(double mu, double sigma, KeanuRandom random) {
         final double u1 = random.nextDouble();
         final double u2 = random.nextDouble();
         final double w = Math.sqrt(-2.0 * Math.log(u1));

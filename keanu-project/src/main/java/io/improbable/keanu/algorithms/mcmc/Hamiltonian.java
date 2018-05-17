@@ -6,6 +6,8 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 
@@ -28,7 +30,7 @@ public class Hamiltonian {
                                                      final int leapFrogCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, Vertex.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
@@ -36,7 +38,7 @@ public class Hamiltonian {
                                                      final int sampleCount,
                                                      final int leapFrogCount,
                                                      final double stepSize,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
@@ -49,9 +51,9 @@ public class Hamiltonian {
         cachePosition(latentVertices, position);
         Map<Long, Double> positionBeforeLeapfrog = new HashMap<>();
 
-        Map<Long, Double> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-                bayesNet.getLatentAndObservedVertices()
-        );
+        Map<Long, Double> gradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
+            bayesNet.getLatentAndObservedVertices()
+        ));
         Map<Long, Double> gradientBeforeLeapfrog = new HashMap<>();
 
         final Map<Long, Double> momentum = new HashMap<>();
@@ -73,23 +75,23 @@ public class Hamiltonian {
 
             for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
                 gradient = leapfrog(
-                        latentVertices,
-                        latentSetAndCascadeCache,
-                        position,
-                        gradient,
-                        momentum,
-                        stepSize,
-                        probabilisticVertices
+                    latentVertices,
+                    latentSetAndCascadeCache,
+                    position,
+                    gradient,
+                    momentum,
+                    stepSize,
+                    probabilisticVertices
                 );
             }
 
             final double logOfMasterPAfterLeapfrog = bayesNet.getLogOfMasterP();
 
             final double likelihoodOfLeapfrog = getLikelihoodOfLeapfrog(
-                    logOfMasterPAfterLeapfrog,
-                    logOfMasterPBeforeLeapfrog,
-                    momentum,
-                    momentumBeforeLeapfrog
+                logOfMasterPAfterLeapfrog,
+                logOfMasterPBeforeLeapfrog,
+                momentum,
+                momentumBeforeLeapfrog
             );
 
             if (shouldReject(likelihoodOfLeapfrog, random)) {
@@ -120,8 +122,8 @@ public class Hamiltonian {
     }
 
     private static Map<Long, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
-                                                                       Map<Long, Double> momentums,
-                                                                       Random random) {
+                                                                     Map<Long, Double> momentums,
+                                                                     KeanuRandom random) {
         for (int i = 0; i < vertexes.size(); i++) {
             Vertex currentVertex = vertexes.get(i);
             momentums.put(currentVertex.getId(), random.nextGaussian());
@@ -150,12 +152,12 @@ public class Hamiltonian {
      * @return the gradient at the updated position
      */
     private static Map<Long, Double> leapfrog(final List<Vertex<Double>> latentVertices,
-                                                final Map<Long, Long> latentSetAndCascadeCache,
-                                                final Map<Long, Double> position,
-                                                final Map<Long, Double> gradient,
-                                                final Map<Long, Double> momentums,
-                                                final double stepSize,
-                                                final List<? extends Vertex> probabilisticVertices) {
+                                              final Map<Long, Long> latentSetAndCascadeCache,
+                                              final Map<Long, Double> position,
+                                              final Map<Long, Double> gradient,
+                                              final Map<Long, Double> momentums,
+                                              final double stepSize,
+                                              final List<? extends Vertex> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 
@@ -177,9 +179,9 @@ public class Hamiltonian {
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
         //Set `r = `r + (eps/2)dTL(`T)
-        Map<Long, Double> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-                probabilisticVertices
-        );
+        Map<Long, Double> newGradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
+            probabilisticVertices
+        ));
 
         for (Map.Entry<Long, Double> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
             final double updatedMomentum = halfTimeStepMomentum.getValue() + halfTimeStep * newGradient.get(halfTimeStepMomentum.getKey());
@@ -206,7 +208,7 @@ public class Hamiltonian {
         return Math.min(likelihoodOfLeapfrog, 1.0);
     }
 
-    private static boolean shouldReject(double likelihood, Random random) {
+    private static boolean shouldReject(double likelihood, KeanuRandom random) {
         return likelihood < random.nextDouble();
     }
 

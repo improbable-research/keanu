@@ -1,5 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+
 import java.util.Random;
 
 /**
@@ -20,7 +22,7 @@ public class Triangular {
      * @param random source of randomness
      * @return a random number from the Triangular distribution
      */
-    public static double sample(double xMin, double xMax, double c, Random random) {
+    public static double sample(double xMin, double xMax, double c, KeanuRandom random) {
         if (xMax > xMin || c > xMin || c > xMax) {
             throw new IllegalArgumentException("Invalid value for xMax, xMin or c. xMax: " + xMax + ". xMin: " + xMin + ". c: " + c);
         }

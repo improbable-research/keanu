@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static java.lang.Math.exp;
 import static org.junit.Assert.assertTrue;
@@ -45,11 +45,11 @@ public class ParticleFilteringTest {
 
 
         List<ParticleFilter.Particle> particles = ParticleFilter.getProbableValues(
-                temperature.getConnectedGraph(),
-                numParticles,
-                resamplingCycles,
-                resamplingProportion,
-                new Random(1)
+            temperature.getConnectedGraph(),
+            numParticles,
+            resamplingCycles,
+            resamplingProportion,
+            new KeanuRandom(1)
         );
 
         particles.sort(ParticleFilter.Particle::sortDescending);

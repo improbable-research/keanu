@@ -43,7 +43,7 @@ public class Vizer {
         boolean urls = false;
 
         JFreeChart chart = ChartFactory.createHistogram(plotTitle, xAxis, yAxis,
-                dataset, orientation, show, toolTips, urls);
+            dataset, orientation, show, toolTips, urls);
 
         chart.setBackgroundPaint(Color.white);
 
@@ -77,11 +77,11 @@ public class Vizer {
         switch (plotType) {
             case SCATTER:
                 chart = ChartFactory.createScatterPlot(plotTitle, xAxis, yAxis,
-                        collection, orientation, show, toolTips, urls);
+                    collection, orientation, show, toolTips, urls);
                 break;
             default:
                 chart = ChartFactory.createXYAreaChart(plotTitle, xAxis, yAxis,
-                        collection, orientation, show, toolTips, urls);
+                    collection, orientation, show, toolTips, urls);
                 break;
 
         }
@@ -94,8 +94,8 @@ public class Vizer {
     private static JFreeChart createPlot(List<Double> y) {
 
         List<Double> x = IntStream.range(0, y.size())
-                .asDoubleStream().boxed()
-                .collect(Collectors.toList());
+            .asDoubleStream().boxed()
+            .collect(Collectors.toList());
 
         return createPlot(x, y, PlotType.AREA_CHART);
     }

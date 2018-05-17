@@ -7,24 +7,24 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 public class InverseGammaVertexTest {
 
-    private Random random;
+    private KeanuRandom random;
 
     private static final double DELTA = 0.001;
 
     @Before
     public void setup() {
-        random = new Random(3);
+        random = new KeanuRandom(3);
     }
 
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
-        int N = 100000;
+        int N = 120000;
         double epsilon = 0.01;
         double alpha = 3.0;
         double beta = .5;
@@ -35,12 +35,12 @@ public class InverseGammaVertexTest {
         double standardDeviation = Math.sqrt(Math.pow(beta, 2) / (Math.pow(alpha - 1, 2) * (alpha - 2)));
 
         ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-                N,
-                inverted,
-                mean,
-                standardDeviation,
-                epsilon,
-                random
+            N,
+            inverted,
+            mean,
+            standardDeviation,
+            epsilon,
+            random
         );
     }
 
@@ -49,13 +49,13 @@ public class InverseGammaVertexTest {
         InverseGammaVertex gamma = new InverseGammaVertex(2.0, 3.0);
 
         ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-                gamma,
-                100000,
-                2.0,
-                10.0,
-                0.1,
-                0.01,
-                random
+            gamma,
+            100000,
+            2.0,
+            10.0,
+            0.1,
+            0.01,
+            random
         );
     }
 
@@ -70,14 +70,14 @@ public class InverseGammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                2.0,
-                0.1,
-                uniformA,
-                inverted,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            2.0,
+            0.1,
+            uniformA,
+            inverted,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -91,21 +91,21 @@ public class InverseGammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(1.0,
-                3.0,
-                0.1,
-                uniformB,
-                inverted,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            3.0,
+            0.1,
+            uniformB,
+            inverted,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         InverseGammaVertex vertexUnderTest = new InverseGammaVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0
+            new UniformVertex(0.0, 1.0),
+            3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -125,11 +125,11 @@ public class InverseGammaVertexTest {
         latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1)),
-                alphaBeta,
-                latentAlphaBeta,
-                10000,
-                random
+            hyperParams -> new InverseGammaVertex(hyperParams.get(0), hyperParams.get(1)),
+            alphaBeta,
+            latentAlphaBeta,
+            10000,
+            random
         );
     }
 }

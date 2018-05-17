@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
@@ -29,7 +29,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double sample(Random random) {
+    public Double sample(KeanuRandom random) {
         return op.apply(a.sample(random), b.sample(random));
     }
 

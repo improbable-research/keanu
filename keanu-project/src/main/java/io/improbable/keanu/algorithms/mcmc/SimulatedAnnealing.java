@@ -4,6 +4,7 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 
@@ -16,12 +17,12 @@ public class SimulatedAnnealing {
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule schedule) {
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, Vertex.getDefaultRandom());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
                                                  int sampleCount,
-                                                 Random random) {
+                                                 KeanuRandom random) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
         return getMaxAPosteriori(bayesNet, sampleCount, schedule, random);
     }
@@ -30,7 +31,7 @@ public class SimulatedAnnealing {
 
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
 
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, Vertex.getDefaultRandom());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -45,7 +46,7 @@ public class SimulatedAnnealing {
     public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule annealingSchedule,
-                                                 Random random) {
+                                                 KeanuRandom random) {
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");

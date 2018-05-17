@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
 import java.util.Random;
@@ -44,7 +45,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample(Random random) {
+    public Double sample(KeanuRandom random) {
         return Laplace.sample(mu.getValue(), beta.getValue(), random);
     }
 

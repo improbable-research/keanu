@@ -19,8 +19,8 @@ public class IfVertexTest {
         BoolVertex predicate = new Flip(0.5);
 
         IfVertex<Boolean> ifIsTrue = If.isTrue(predicate)
-                .then(TRUE)
-                .orElse(FALSE);
+            .then(TRUE)
+            .orElse(FALSE);
 
         predicate.setAndCascade(true);
         assertTrue(ifIsTrue.getValue());

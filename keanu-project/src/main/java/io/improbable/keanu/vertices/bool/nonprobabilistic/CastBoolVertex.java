@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public class CastBoolVertex extends NonProbabilisticBool {
 
@@ -19,7 +19,7 @@ public class CastBoolVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample(Random random) {
+    public Boolean sample(KeanuRandom random) {
         return inputVertex.sample(random);
     }
 

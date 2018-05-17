@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
@@ -19,11 +19,11 @@ public class BetaVertexTest {
 
     private static final double DELTA = 0.0001;
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -135,15 +135,15 @@ public class BetaVertexTest {
         double alphaIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                alphaStart,
-                alphaEnd,
-                alphaIncrement,
-                uniformA,
-                beta,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            alphaStart,
+            alphaEnd,
+            alphaIncrement,
+            uniformA,
+            beta,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
@@ -161,15 +161,15 @@ public class BetaVertexTest {
         double betaIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                betaStart,
-                betaEnd,
-                betaIncrement,
-                uniformA,
-                beta,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            betaStart,
+            betaEnd,
+            betaIncrement,
+            uniformA,
+            beta,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 

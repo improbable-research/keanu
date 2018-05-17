@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Returns true if a vertex value is equal to another vertex value within an epsilon.
@@ -22,7 +22,7 @@ public class NumericalEqualsVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample(Random random) {
+    public Boolean sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random), epsilon.sample(random));
     }
 

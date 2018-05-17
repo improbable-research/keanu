@@ -3,15 +3,16 @@ package io.improbable.keanu.randomfactory;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.kotlin.ArithmeticDouble;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Random;
 
 public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
 
-    private Random random = new Random();
+    private KeanuRandom random = new KeanuRandom();
 
     @Override
-    public void setRandom(Random random) {
+    public void setRandom(KeanuRandom random) {
         this.random = random;
     }
 

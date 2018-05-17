@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -20,11 +20,11 @@ public class RejectionSamplerTest {
     private BoolVertex v3;
     private double v1ProbTrueAccordingToBayes;
     private double v2ProbTrueAccordingToBayes;
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
 
         double v1ProbTrue = 0.4;
         double v2ProbTrue = 0.8;

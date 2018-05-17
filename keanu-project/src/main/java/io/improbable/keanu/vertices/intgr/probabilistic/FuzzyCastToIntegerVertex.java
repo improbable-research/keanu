@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -49,9 +50,9 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
                                     int min,
                                     int max) {
         this(input,
-                new ConstantDoubleVertex(fuzzinessSigma),
-                new ConstantIntegerVertex(min),
-                new ConstantIntegerVertex(max)
+            new ConstantDoubleVertex(fuzzinessSigma),
+            new ConstantIntegerVertex(min),
+            new ConstantIntegerVertex(max)
         );
     }
 
@@ -104,12 +105,12 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample(Random random) {
+    public Integer sample(KeanuRandom random) {
         double fuzzyDouble = sampleFuzzyDoubleInBounds(random);
         return (int) Math.round(fuzzyDouble);
     }
 
-    private double sampleFuzzyDoubleInBounds(Random random) {
+    private double sampleFuzzyDoubleInBounds(KeanuRandom random) {
         double mu = getClampedInput();
         double sigma = fuzzinessSigma.getValue();
 
@@ -148,13 +149,13 @@ public class FuzzyCastToIntegerVertex extends ProbabilisticInteger {
     private double dPdx(double x, int i, double sigma) {
         double p = density(i);
         return -lambda(x, sigma) * (n(i + 0.5 - x, sigma) - n(i - 0.5 - x, sigma)
-                - p * (n(max.getValue() + 0.5 - x, sigma) - n(min.getValue() - 0.5 - x, sigma)));
+            - p * (n(max.getValue() + 0.5 - x, sigma) - n(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dPdSigma(double x, int i, double sigma) {
         double p = density(i);
         return lambda(x, sigma) * (dSdSigma(i + 0.5 - x, sigma) - dSdSigma(i - 0.5 - x, sigma)
-                - p * (dSdSigma(max.getValue() + 0.5 - x, sigma) - dSdSigma(min.getValue() - 0.5 - x, sigma)));
+            - p * (dSdSigma(max.getValue() + 0.5 - x, sigma) - dSdSigma(min.getValue() - 0.5 - x, sigma)));
     }
 
     private double dSdSigma(double x, double sigma) {

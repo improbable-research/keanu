@@ -10,14 +10,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.stream.Collectors;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class SimulatedAnnealingTest {
 
-    private Random random;
+    private KeanuRandom random;
     private DoubleVertex A;
     private DoubleVertex B;
     private DoubleVertex C;
@@ -25,7 +25,7 @@ public class SimulatedAnnealingTest {
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
         A = new GaussianVertex(5, 1);
         B = new GaussianVertex(2, 1);
         C = A.plus(B);
@@ -55,6 +55,6 @@ public class SimulatedAnnealingTest {
         graphOptimizer.maxAPosteriori(1000);
 
         return network.getLatentVertices().stream()
-                .collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
+            .collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
     }
 }

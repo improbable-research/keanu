@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
@@ -21,11 +21,11 @@ public class SelectVertexTest {
     private static double epsilon = 0.01;
     private static int N = 100000;
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup(){
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -83,7 +83,7 @@ public class SelectVertexTest {
     }
 
     private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
-                                                       Random random) {
+                                                       KeanuRandom random) {
 
         SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues);
 

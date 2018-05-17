@@ -3,6 +3,7 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,16 +24,16 @@ public class BayesNet {
     public BayesNet(Set<? extends Vertex> vertices) {
 
         latentAndObservedVertices = vertices.stream()
-                .filter(v -> v.isObserved() || v.isProbabilistic())
-                .collect(Collectors.toList());
+            .filter(v -> v.isObserved() || v.isProbabilistic())
+            .collect(Collectors.toList());
 
         observedVertices = latentAndObservedVertices.stream()
-                .filter(Vertex::isObserved)
-                .collect(Collectors.toList());
+            .filter(Vertex::isObserved)
+            .collect(Collectors.toList());
 
         latentVertices = latentAndObservedVertices.stream()
-                .filter(v -> !v.isObserved())
-                .collect(Collectors.toList());
+            .filter(v -> !v.isObserved())
+            .collect(Collectors.toList());
     }
 
     public BayesNet(Collection<? extends Vertex> vertices) {
@@ -96,20 +97,24 @@ public class BayesNet {
      * @param attempts sampling attempts to get non-zero probability
      * @param random random source for sampling
      */
-    public void probeForNonZeroMasterP(int attempts, Random random) {
+    public void probeForNonZeroMasterP(int attempts, KeanuRandom random) {
 
         VertexValuePropagation.cascadeUpdate(observedVertices);
-        List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
-        setFromSampleAndCascade(sortedByDependency, random);
 
-        probeForNonZeroMasterP(sortedByDependency, attempts, random);
+        if (isInImpossibleState()) {
+
+            List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
+            setFromSampleAndCascade(sortedByDependency, random);
+
+            probeForNonZeroMasterP(sortedByDependency, attempts, random);
+        }
     }
 
     /**
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts, Random random) {
+    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts, KeanuRandom random) {
 
         Map<Long, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
@@ -128,20 +133,20 @@ public class BayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, Random random) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices), random);
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices,
                                                Map<Long, Long> setAndCascadeCache,
-                                               Random random) {
+                                               KeanuRandom random) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex, random);
         }
         VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
     }
 
-    private static <T> void setValueFromSample(Vertex<T> vertex, Random random) {
+    private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
         vertex.setValue(vertex.sample(random));
     }
 

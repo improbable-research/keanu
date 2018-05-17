@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static junit.framework.TestCase.assertTrue;
@@ -20,11 +20,11 @@ public class LogisticVertexTest {
 
     private static final double DELTA = 0.0001;
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -40,12 +40,12 @@ public class LogisticVertexTest {
         double standardDeviation = Math.sqrt((Math.pow(Math.PI, 2) / 3) * Math.pow(b, 2));
 
         ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-                N,
-                logisticVertex,
-                mean,
-                standardDeviation,
-                epsilon,
-                random
+            N,
+            logisticVertex,
+            mean,
+            standardDeviation,
+            epsilon,
+            random
         );
     }
 
@@ -92,22 +92,22 @@ public class LogisticVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-                0.9,
-                0.1,
-                uniformA,
-                l,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA
+            0.9,
+            0.1,
+            uniformA,
+            l,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA
         );
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         LogisticVertex vertexUnderTest = new LogisticVertex(
-                new UniformVertex(0.0, 1.0),
-                3.0
+            new UniformVertex(0.0, 1.0),
+            3.0
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -123,15 +123,15 @@ public class LogisticVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-                0.5,
-                3.0,
-                0.1,
-                uniformB,
-                logisticVertex,
-                vertexStartValue,
-                vertexEndValue,
-                vertexIncrement,
-                DELTA);
+            0.5,
+            3.0,
+            0.1,
+            uniformB,
+            logisticVertex,
+            vertexStartValue,
+            vertexEndValue,
+            vertexIncrement,
+            DELTA);
     }
 
     @Test
@@ -149,11 +149,11 @@ public class LogisticVertexTest {
         latentAB.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
-                hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1)),
-                AB,
-                latentAB,
-                1000,
-                random
+            hyperParams -> new LogisticVertex(hyperParams.get(0), hyperParams.get(1)),
+            AB,
+            latentAB,
+            1000,
+            random
         );
     }
 

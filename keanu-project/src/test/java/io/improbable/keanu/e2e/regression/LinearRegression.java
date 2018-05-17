@@ -13,14 +13,14 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
 public class LinearRegression {
     private final Logger log = LoggerFactory.getLogger(LinearRegression.class);
 
-    private Random random;
+    private KeanuRandom random;
 
     private class Point {
         public final double y;
@@ -34,7 +34,7 @@ public class LinearRegression {
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test

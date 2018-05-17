@@ -2,8 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
 
@@ -15,7 +14,7 @@ public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double sample(Random random) {
+    public Double sample(KeanuRandom random) {
         return op(inputVertex.sample(random));
     }
 

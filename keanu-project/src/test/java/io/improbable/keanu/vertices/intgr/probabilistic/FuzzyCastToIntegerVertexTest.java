@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.junit.Before;
@@ -21,11 +22,11 @@ public class FuzzyCastToIntegerVertexTest {
 
     private final Logger log = LoggerFactory.getLogger(FuzzyCastToIntegerVertexTest.class);
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup(){
-        this.random = new Random(1);
+        this.random = new KeanuRandom(1);
     }
 
     @Test

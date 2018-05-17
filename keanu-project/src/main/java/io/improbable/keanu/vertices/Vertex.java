@@ -3,43 +3,14 @@ package io.improbable.keanu.vertices;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
-import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class Vertex<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
-
-    private static AtomicReference<Random> defaultRandom = new AtomicReference<>();
-
-    static {
-        String randomSeed = System.getProperty("io.improbable.keanu.defaultRandom.seed");
-
-        if (randomSeed != null) {
-            final long seed = Long.parseLong(randomSeed);
-            setDefaultRandomSeed(seed);
-        }
-    }
-
-    public static Random getDefaultRandom() {
-        Random random = defaultRandom.get();
-        if (random == null) {
-            return ThreadLocalRandom.current();
-        } else {
-            return random;
-        }
-    }
-
-    public static void setDefaultRandomSeed(long seed){
-        defaultRandom.set(new Random(seed));
-    }
-
-    public static void setDefaultRandomToThreadLocal(){
-        defaultRandom.set(null);
-    }
 
     private long uuid = ID_GENERATOR.getAndIncrement();
     private Set<Vertex> children = new HashSet<>();
@@ -69,7 +40,7 @@ public abstract class Vertex<T> {
      */
     public abstract Map<Long, DoubleTensor> dLogProb(T value);
 
-    public Map<Long, DoubleTensor> dLogProbAtValue() {
+    public final Map<Long, DoubleTensor> dLogProbAtValue() {
         return dLogProb(getValue());
     }
 
@@ -78,10 +49,10 @@ public abstract class Vertex<T> {
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
      * this will always be the same value.
      */
-    public abstract T sample(Random random);
+    public abstract T sample(KeanuRandom random);
 
     public T sampleUsingDefaultRandom() {
-        return sample(getDefaultRandom());
+        return sample(KeanuRandom.getDefaultRandom());
     }
 
     /**

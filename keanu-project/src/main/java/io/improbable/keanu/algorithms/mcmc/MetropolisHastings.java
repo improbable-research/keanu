@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class MetropolisHastings {
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<? extends Vertex> fromVertices,
                                                      int sampleCount) {
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, Vertex.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -32,7 +33,7 @@ public class MetropolisHastings {
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
                                                      final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
         checkBayesNetInHealthyState(bayesNet);
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
@@ -59,7 +60,7 @@ public class MetropolisHastings {
                                  final Set<Vertex> affectedVertices,
                                  final double T,
                                  final Map<Long, Map<Long, Long>> setAndCascadeCache,
-                                 final Random random) {
+                                 final KeanuRandom random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
 
@@ -91,20 +92,20 @@ public class MetropolisHastings {
 
     static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices) {
         return latentVertices.stream()
-                .collect(Collectors.toMap(
-                        v -> v,
-                        v -> {
-                            Set<Vertex> affectedVertices = new HashSet<>();
-                            affectedVertices.add(v);
-                            affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
-                            return affectedVertices;
-                        }));
+            .collect(Collectors.toMap(
+                v -> v,
+                v -> {
+                    Set<Vertex> affectedVertices = new HashSet<>();
+                    affectedVertices.add(v);
+                    affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
+                    return affectedVertices;
+                }));
     }
 
     private static double sumLogP(Set<Vertex> vertices) {
         return vertices.stream()
-                .mapToDouble(Vertex::logProbAtValue)
-                .sum();
+            .mapToDouble(Vertex::logProbAtValue)
+            .sum();
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {

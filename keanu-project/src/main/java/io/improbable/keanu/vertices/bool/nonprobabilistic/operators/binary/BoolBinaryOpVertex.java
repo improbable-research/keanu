@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Random;
 
@@ -17,7 +18,7 @@ public abstract class BoolBinaryOpVertex<A, B> extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample(Random random) {
+    public Boolean sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
     }
 

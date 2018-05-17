@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
 import java.util.Random;
@@ -37,7 +38,7 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample(Random random) {
+    public Integer sample(KeanuRandom random) {
         return Poisson.sample(mu.getValue(), random);
     }
 }

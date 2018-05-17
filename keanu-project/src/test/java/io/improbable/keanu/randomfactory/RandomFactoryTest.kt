@@ -3,9 +3,9 @@ package io.improbable.keanu.randomfactory
 import io.improbable.keanu.kotlin.ArithmeticDouble
 import io.improbable.keanu.kotlin.DoubleOperators
 import io.improbable.keanu.vertices.dbl.DoubleVertex
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom
 import junit.framework.TestCase
 import org.junit.Test
-import java.util.*
 
 class RandomFactoryTest {
 
@@ -42,15 +42,15 @@ class RandomFactoryTest {
 
     private fun getArithmeticDoubleTestModel(): SimpleModel<ArithmeticDouble> {
         val arithmeticDoubleFactory = RandomDoubleFactory()
-        arithmeticDoubleFactory.setRandom(Random(1))
+        arithmeticDoubleFactory.setRandom(KeanuRandom(1))
 
         return SimpleModel<ArithmeticDouble>(arithmeticDoubleFactory)
     }
 
     private fun getDoubleVertexTestModel(): SimpleModel<DoubleVertex> {
         val doubleVertexFactory = DoubleVertexFactory()
-        doubleVertexFactory.setRandom(Random(1))
-        
+        doubleVertexFactory.setRandom(KeanuRandom(1))
+
         return SimpleModel<DoubleVertex>(doubleVertexFactory)
     }
 

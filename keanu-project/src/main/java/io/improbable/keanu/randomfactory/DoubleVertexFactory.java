@@ -4,15 +4,16 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Random;
 
 public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 
-    private Random random = new Random();
+    private KeanuRandom random = new KeanuRandom();
 
     @Override
-    public void setRandom(Random random) {
+    public void setRandom(KeanuRandom random) {
         this.random = random;
     }
 

@@ -7,6 +7,7 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
@@ -37,7 +38,7 @@ public class Model {
         System.out.println("Switch year found: " + switchYear);
     }
 
-    private final Random r;
+    private final KeanuRandom random;
 
     final ConstantVertex<Integer> startYearVertex;
     final ConstantVertex<Integer> endYearVertex;
@@ -51,7 +52,7 @@ public class Model {
 
     public Model(Data data) {
         this.data = data;
-        r = new Random(1);
+        random = new KeanuRandom(1);
 
         startYearVertex = new ConstantVertex<>(data.startYear);
         endYearVertex = new ConstantVertex<>(data.endYear + 1);
@@ -87,7 +88,7 @@ public class Model {
     public void run() {
         BayesNet net = new BayesNet(switchpoint.getConnectedGraph());
         Integer numSamples = 50000;
-        NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), numSamples, r);
+        NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), numSamples, random);
 
         Integer dropCount = 1000;
         results = posteriorDistSamples.drop(dropCount).downSample(5);

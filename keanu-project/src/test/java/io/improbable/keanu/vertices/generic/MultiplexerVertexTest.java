@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
@@ -26,7 +26,7 @@ public class MultiplexerVertexTest {
 
     @Test
     public void multiplexerGivesReasonableDistributionOfSamples() {
-        Random random = new Random(1);
+        KeanuRandom random = new KeanuRandom(1);
 
         IntegerVertex selectorOrigin = new ConstantIntegerVertex(0);
         IntegerVertex selectorBound = new ConstantIntegerVertex(2);

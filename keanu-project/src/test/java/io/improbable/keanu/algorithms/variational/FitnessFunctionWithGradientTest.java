@@ -33,11 +33,11 @@ public class FitnessFunctionWithGradientTest {
         dObservation.observe(3.0);
 
         assert2DGradientEqualsApproxGradient(
-                new double[]{5, 5},
-                new double[]{0, 0},
-                0.1,
-                Arrays.asList(A, B, cObservation, dObservation),
-                Arrays.asList(A, B)
+            new double[]{5, 5},
+            new double[]{0, 0},
+            0.1,
+            Arrays.asList(A, B, cObservation, dObservation),
+            Arrays.asList(A, B)
         );
     }
 
@@ -60,11 +60,11 @@ public class FitnessFunctionWithGradientTest {
         dObservation.observe(18.0);
 
         assert2DGradientEqualsApproxGradient(
-                new double[]{10, 10},
-                new double[]{2, 2},
-                0.1,
-                Arrays.asList(A, B, cObservation, dObservation),
-                Arrays.asList(A, B)
+            new double[]{10, 10},
+            new double[]{2, 2},
+            0.1,
+            Arrays.asList(A, B, cObservation, dObservation),
+            Arrays.asList(A, B)
         );
     }
 
@@ -90,11 +90,11 @@ public class FitnessFunctionWithGradientTest {
         fObservation.observe(1.0);
 
         assert2DGradientEqualsApproxGradient(
-                new double[]{5, 5},
-                new double[]{0.1, 0.1},
-                0.1,
-                Arrays.asList(A, B, eObservation, fObservation),
-                Arrays.asList(A, B)
+            new double[]{5, 5},
+            new double[]{0.1, 0.1},
+            0.1,
+            Arrays.asList(A, B, eObservation, fObservation),
+            Arrays.asList(A, B)
         );
     }
 
@@ -108,7 +108,7 @@ public class FitnessFunctionWithGradientTest {
                                                       double[] bottomLeft,
                                                       double stepSize,
                                                       List<Vertex> probabilisticVertices,
-                                                      List<Vertex<Double>> latentVertices) {
+                                                      List<? extends Vertex<Double>> latentVertices) {
 
         FitnessFunctionWithGradient f = new FitnessFunctionWithGradient(probabilisticVertices, latentVertices);
 

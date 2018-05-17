@@ -14,17 +14,17 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.OptionalDouble;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
 public class MetropolisHastingsTest {
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -44,19 +44,19 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
-                bayesNet,
-                Arrays.asList(A, B),
-                100000,
-                random
+            bayesNet,
+            Arrays.asList(A, B),
+            100000,
+            random
         );
 
         OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         OptionalDouble averagePosteriorB = posteriorSamples.get(B).asList().stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         assertEquals(44.0, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
@@ -76,10 +76,10 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
-                bayesNet,
-                Collections.singletonList(A),
-                10000,
-                random
+            bayesNet,
+            Collections.singletonList(A),
+            10000,
+            random
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v);
@@ -104,10 +104,10 @@ public class MetropolisHastingsTest {
         bayesNet.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
-                bayesNet,
-                Collections.singletonList(A),
-                100000,
-                random
+            bayesNet,
+            Collections.singletonList(A),
+            100000,
+            random
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v);
@@ -127,10 +127,10 @@ public class MetropolisHastingsTest {
         net.probeForNonZeroMasterP(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
-                net,
-                Collections.singletonList(A),
-                10000,
-                random
+            net,
+            Collections.singletonList(A),
+            10000,
+            random
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v);

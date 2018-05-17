@@ -2,11 +2,11 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
-import java.util.Random;
 
 public class ChiSquaredVertex extends ProbabilisticDouble {
 
@@ -22,7 +22,7 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample(Random random) {
+    public Double sample(KeanuRandom random) {
         return ChiSquared.sample(k.getValue(), random);
     }
 

@@ -8,7 +8,7 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.counting;
@@ -36,7 +36,7 @@ public class ProbabilisticDoubleContract {
                                                         double to,
                                                         double bucketSize,
                                                         double maxError,
-                                                        Random random) {
+                                                        KeanuRandom random) {
         double bucketCount = ((to - from) / bucketSize);
 
         if (bucketCount != (int) bucketCount) {
@@ -44,12 +44,12 @@ public class ProbabilisticDoubleContract {
         }
 
         Map<Double, Long> histogram = Stream.generate(() -> vertexUnderTest.sample(random))
-                .limit(sampleCount)
-                .filter(value -> value >= from && value <= to)
-                .collect(groupingBy(
-                        x -> bucketCenter(x, bucketSize, from),
-                        counting()
-                ));
+            .limit(sampleCount)
+            .filter(value -> value >= from && value <= to)
+            .collect(groupingBy(
+                x -> bucketCenter(x, bucketSize, from),
+                counting()
+            ));
 
         for (Map.Entry<Double, Long> sampleBucket : histogram.entrySet()) {
             double percentage = (double) sampleBucket.getValue() / sampleCount;
@@ -72,7 +72,7 @@ public class ProbabilisticDoubleContract {
                                                                          double expectedMean,
                                                                          double expectedStandardDeviation,
                                                                          double maxError,
-                                                                         Random random) {
+                                                                         KeanuRandom random) {
         List<Double> samples = new ArrayList<>();
 
         for (int i = 0; i < numberOfSamples; i++) {
@@ -87,7 +87,7 @@ public class ProbabilisticDoubleContract {
         double sd = stats.getStandardDeviation();
 
         assertThat("Problem with mean", expectedMean, closeTo(mean, maxError));
-        assertThat("Problem with standard deviation", expectedStandardDeviation, closeTo(sd, maxError));
+        assertThat("Problem with standard deviation", sd, closeTo(expectedStandardDeviation, maxError));
     }
 
     public static void moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(double hyperParameterStartValue,
@@ -103,13 +103,13 @@ public class ProbabilisticDoubleContract {
         for (double value = vertexStartValue; value <= vertexEndValue; value += vertexValueIncrement) {
             vertexUnderTest.setAndCascade(value);
             testGradientAcrossMultipleHyperParameterValues(
-                    hyperParameterStartValue,
-                    hyperParameterEndValue,
-                    hyperParameterValueIncrement,
-                    hyperParameterVertex,
-                    value,
-                    vertexUnderTest,
-                    gradientDelta
+                hyperParameterStartValue,
+                hyperParameterEndValue,
+                hyperParameterValueIncrement,
+                hyperParameterVertex,
+                value,
+                vertexUnderTest,
+                gradientDelta
             );
         }
     }
@@ -123,11 +123,22 @@ public class ProbabilisticDoubleContract {
                                                                       double gradientDelta) {
 
         for (double parameterValue = hyperParameterStartValue; parameterValue <= hyperParameterEndValue; parameterValue += hyperParameterValueIncrement) {
-            testGradientAtHyperParameterValue(parameterValue, hyperParameterVertex, vertexValue, vertexUnderTest, gradientDelta);
+            testGradientAtHyperParameterValue(
+                parameterValue,
+                hyperParameterVertex,
+                vertexValue,
+                vertexUnderTest,
+                gradientDelta
+            );
         }
     }
 
-    public static void testGradientAtHyperParameterValue(double hyperParameterValue, Vertex<Double> hyperParameterVertex, double vertexValue, Vertex<Double> vertexUnderTest, double gradientDelta) {
+    public static void testGradientAtHyperParameterValue(double hyperParameterValue,
+                                                         Vertex<Double> hyperParameterVertex,
+                                                         double vertexValue,
+                                                         Vertex<Double> vertexUnderTest,
+                                                         double gradientDelta) {
+
         hyperParameterVertex.setAndCascade(hyperParameterValue - gradientDelta);
         double lnDensityA1 = vertexUnderTest.logProb(vertexValue);
 
@@ -143,7 +154,7 @@ public class ProbabilisticDoubleContract {
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
         assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
-                diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
+            diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
     public static void isTreatedAsConstantWhenObserved(DoubleVertex vertexUnderTest) {

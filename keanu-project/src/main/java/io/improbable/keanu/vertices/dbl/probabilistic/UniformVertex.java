@@ -4,10 +4,10 @@ import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Random;
 
 import static java.util.Collections.singletonMap;
 
@@ -58,16 +58,16 @@ public class UniformVertex extends ProbabilisticDouble {
         double max = this.xMax.getValue();
 
         if (this.getValue() <= min) {
-            return DoubleTensor.fromScalars(singletonMap(getId(), Double.POSITIVE_INFINITY));
+            return singletonMap(getId(), DoubleTensor.scalar(Double.POSITIVE_INFINITY));
         } else if (this.getValue() >= max) {
-            return DoubleTensor.fromScalars(singletonMap(getId(), Double.NEGATIVE_INFINITY));
+            return singletonMap(getId(), DoubleTensor.scalar(Double.NEGATIVE_INFINITY));
         } else {
-            return DoubleTensor.fromScalars(singletonMap(getId(), 0.0));
+            return singletonMap(getId(), DoubleTensor.scalar(0.0));
         }
     }
 
     @Override
-    public Double sample(Random random) {
+    public Double sample(KeanuRandom random) {
         return Uniform.sample(xMin.getValue(), xMax.getValue(), random);
     }
 

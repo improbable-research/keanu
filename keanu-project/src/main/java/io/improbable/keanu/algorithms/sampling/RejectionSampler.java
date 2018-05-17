@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.sampling;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -16,7 +17,7 @@ public class RejectionSampler {
                                                  List<? extends Vertex> observedVertices,
                                                  Supplier<Boolean> isSuccess,
                                                  int sampleCount,
-                                                 Random random) {
+                                                 KeanuRandom random) {
         int matchedSampleCount = 0;
         int success = 0;
 
@@ -40,13 +41,13 @@ public class RejectionSampler {
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount) {
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, Vertex.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount,
-                                                     Random random) {
+                                                     KeanuRandom random) {
 
         Map<Long, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;
@@ -62,11 +63,11 @@ public class RejectionSampler {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void sampleLatents(List<? extends Vertex> latents, Random random) {
+    private static void sampleLatents(List<? extends Vertex> latents, KeanuRandom random) {
         latents.forEach(vertex -> setFromSample((Vertex<?>) vertex, random));
     }
 
-    private static <T> void setFromSample(Vertex<T> v, Random random) {
+    private static <T> void setFromSample(Vertex<T> v, KeanuRandom random) {
         v.setAndCascade(v.sample(random));
     }
 

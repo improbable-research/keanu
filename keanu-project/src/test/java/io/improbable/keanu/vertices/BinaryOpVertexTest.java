@@ -11,18 +11,18 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 
 public class BinaryOpVertexTest {
     private final Logger log = LoggerFactory.getLogger(BinaryOpVertexTest.class);
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        this.random = new Random(1);
+        this.random = new KeanuRandom(1);
     }
 
     @Test

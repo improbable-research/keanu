@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;

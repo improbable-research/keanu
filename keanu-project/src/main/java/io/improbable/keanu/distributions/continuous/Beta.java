@@ -1,6 +1,8 @@
 package io.improbable.keanu.distributions.continuous;
 
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+
 import java.util.Random;
 
 import static java.lang.Math.log;
@@ -27,7 +29,7 @@ public class Beta {
      * @param random source of randomness
      * @return a random number from the Beta distribution
      */
-    public static double sample(double alpha, double beta, double xMin, double xMax, Random random) {
+    public static double sample(double alpha, double beta, double xMin, double xMax, KeanuRandom random) {
         double y1 = Gamma.sample(0.0, 1.0, alpha, random);
         double y2 = Gamma.sample(0.0, 1.0, beta, random);
 

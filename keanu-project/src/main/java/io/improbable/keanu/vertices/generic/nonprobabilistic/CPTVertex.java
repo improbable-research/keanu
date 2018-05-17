@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Arrays;
 import java.util.List;
@@ -24,7 +25,7 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T sample(Random random) {
+    public T sample(KeanuRandom random) {
         final Condition condition = getCondition((vertex) -> vertex.sample(random));
         return conditions.getOrDefault(condition, defaultResult).sample(random);
     }

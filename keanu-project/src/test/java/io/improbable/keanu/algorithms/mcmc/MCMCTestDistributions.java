@@ -9,14 +9,14 @@ import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesNet createSimpleGaussian(double mu, double sigma, Random random) {
+    public static BayesNet createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
         GaussianVertex A = new GaussianVertex(mu, sigma);
         A.setAndCascade(mu + 0.5 * sigma);
         BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
@@ -32,7 +32,7 @@ public class MCMCTestDistributions {
         assertEquals(sigma, stats.getStandardDeviation(), 0.1);
     }
 
-    public static BayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum, Random random) {
+    public static BayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum, KeanuRandom random) {
 
         DoubleVertex A = new GaussianVertex(mu, sigma);
         DoubleVertex B = new GaussianVertex(mu, sigma);
@@ -50,17 +50,17 @@ public class MCMCTestDistributions {
     public static void samplesMatchesSumOfGaussians(double expected, List<Double> sampleA, List<Double> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static BayesNet create2DDonutDistribution(Random random) {
+    public static BayesNet create2DDonutDistribution(KeanuRandom random) {
         DoubleVertex A = new GaussianVertex(0, 1);
         DoubleVertex B = new GaussianVertex(0, 1);
 

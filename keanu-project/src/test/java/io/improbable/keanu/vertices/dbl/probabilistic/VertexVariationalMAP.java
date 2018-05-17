@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
@@ -15,11 +15,11 @@ import static org.junit.Assert.assertEquals;
 public class VertexVariationalMAP {
 
     public static void inferHyperParamsFromSamples(
-            Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
-            List<DoubleVertex> hyperParamsForSampling,
-            List<DoubleVertex> latentsToInfer,
-            int numSamples,
-            Random random) {
+        Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
+        List<DoubleVertex> hyperParamsForSampling,
+        List<DoubleVertex> latentsToInfer,
+        int numSamples,
+        KeanuRandom random) {
 
         // SOURCE OF TRUTH
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
@@ -29,14 +29,14 @@ public class VertexVariationalMAP {
 
         // OBSERVE
         new PlateBuilder<Double>()
-                .fromIterator(samples.iterator())
-                .withFactory((plate, sample) -> {
+            .fromIterator(samples.iterator())
+            .withFactory((plate, sample) -> {
 
-                    DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
+                DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
 
-                    observedDistribution.observe(sample);
+                observedDistribution.observe(sample);
 
-                }).build();
+            }).build();
 
         // INFER HYPER PARAMETERS
         doInferenceOn(latentsToInfer.get(0), random);
@@ -46,7 +46,7 @@ public class VertexVariationalMAP {
         }
     }
 
-    private static void doInferenceOn(DoubleVertex unknownVertex, Random random) {
+    private static void doInferenceOn(DoubleVertex unknownVertex, KeanuRandom random) {
         BayesNet inferNet = new BayesNet(unknownVertex.getConnectedGraph());
 
         inferNet.probeForNonZeroMasterP(100, random);
@@ -56,7 +56,7 @@ public class VertexVariationalMAP {
         g.maxAPosteriori(5000);
     }
 
-    private static List<Double> getSamples(DoubleVertex knownVertex, int numSamples, Random random) {
+    private static List<Double> getSamples(DoubleVertex knownVertex, int numSamples, KeanuRandom random) {
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < numSamples; i++) {

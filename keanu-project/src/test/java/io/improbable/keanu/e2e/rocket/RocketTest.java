@@ -9,7 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
 import static org.junit.Assert.assertEquals;
@@ -20,7 +20,7 @@ public class RocketTest {
     @Test
     public void shouldYouLaunch() {
 
-        Random random = new Random(1);
+        KeanuRandom random = new KeanuRandom(1);
         Flip oRingFailure = new Flip(0.001);
 
         Vertex<Boolean> oRingFailureCausesOverheat = new Flip(0.94);
@@ -33,15 +33,15 @@ public class RocketTest {
 
         Vertex<Boolean> bothCauseOverheat = new Flip(0.95);
         Vertex<Boolean> overHeatDueToBoth = residualFuel
-                .and(oRingFailure)
-                .and(bothCauseOverheat);
+            .and(oRingFailure)
+            .and(bothCauseOverheat);
 
         Flip overHeatDueToOther = new Flip(0.001);
 
         BoolVertex overHeated = overHeatDueToOther
-                .or(overHeatDueToORing)
-                .or(overHeatDueToResidualFuel)
-                .or(overHeatDueToBoth);
+            .or(overHeatDueToORing)
+            .or(overHeatDueToResidualFuel)
+            .or(overHeatDueToBoth);
 
         double probOfOverheat = priorProbabilityTrue(overHeated, 10000, random);
         log.info("Prior Probability rocket overheats: " + probOfOverheat);

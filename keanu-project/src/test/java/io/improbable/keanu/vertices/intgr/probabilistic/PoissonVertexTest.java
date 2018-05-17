@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -21,7 +21,7 @@ public class PoissonVertexTest {
         int N = 100000;
         double epsilon = 0.1;
         Double mu = 10.0;
-        Random random = new Random(1);
+        KeanuRandom random = new KeanuRandom(1);
         PoissonVertex testPoissonVertex = new PoissonVertex(mu);
 
         List<Integer> samples = new ArrayList<>();

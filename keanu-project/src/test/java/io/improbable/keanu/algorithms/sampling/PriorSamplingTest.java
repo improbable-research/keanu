@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -16,11 +16,11 @@ public class PriorSamplingTest {
     private DoubleVertex A;
     private DoubleVertex B;
     private DoubleVertex C;
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
         A = new GaussianVertex(100.0, 1);
         B = new GaussianVertex(A, 1);
         C = new GaussianVertex(B, 1);

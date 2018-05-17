@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.Map;
@@ -54,7 +55,7 @@ public class UniformIntVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample(Random random) {
+    public Integer sample(KeanuRandom random) {
         return min.getValue() + random.nextInt(max.getValue() - min.getValue());
     }
 }

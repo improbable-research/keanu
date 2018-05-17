@@ -1,5 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+
 import java.util.Random;
 
 import static java.lang.Math.*;
@@ -28,7 +30,7 @@ public class Gamma {
      * @param random source of randomness
      * @return a random number from the Gamma distribution
      */
-    public static double sample(double a, double theta, double k, Random random) {
+    public static double sample(double a, double theta, double k, KeanuRandom random) {
         if (theta <= 0. || k <= 0.) {
             throw new IllegalArgumentException("Invalid value for theta or k. Theta: " + theta + ". k: " + k);
         }
@@ -86,7 +88,7 @@ public class Gamma {
         return new Diff(dPda, dPdtheta, dPdk, dPdx);
     }
 
-    private static double sampleWhileKLessThanOne(double c, double k, double a, double theta, Random random) {
+    private static double sampleWhileKLessThanOne(double c, double k, double a, double theta, KeanuRandom random) {
         while (true) {
             double p = c * random.nextDouble();
             if (p > 1.) {

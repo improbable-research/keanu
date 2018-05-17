@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -26,7 +27,7 @@ public class BoolReduceVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample(Random random) {
+    public Boolean sample(KeanuRandom random) {
         return applyReduce((vertex) -> vertex.sample(random));
     }
 

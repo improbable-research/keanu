@@ -1,5 +1,7 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+
 import java.util.Random;
 
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
@@ -12,7 +14,7 @@ import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
  */
 public class Poisson {
 
-    public static int sample(double mu, Random random) {
+    public static int sample(double mu, KeanuRandom random) {
         if (mu <= 0.) {
             throw new IllegalArgumentException("Invalid value for mu: " + mu);
         }
