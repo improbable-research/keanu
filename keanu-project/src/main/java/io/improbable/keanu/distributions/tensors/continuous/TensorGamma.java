@@ -14,21 +14,23 @@ public class TensorGamma {
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
-        final DoubleTensor aMinusXOverTheta = a.minus(x).div(theta);
+        final DoubleTensor aMinusXOverTheta = a.minus(x).divInPlace(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
-        final DoubleTensor lnXMinusAToKMinus1 = ((x.minus(a).pow(k.minus(1.))).div(k.apply(Gamma::gamma))).log();
-        return aMinusXOverTheta.minus(kLnTheta).plus(lnXMinusAToKMinus1);
+        final DoubleTensor xMinusA = x.minus(a).powInPlace(k.minus(1));
+        final DoubleTensor lnXMinusAToKMinus1 = ((xMinusA).divInPlace(k.apply(Gamma::gamma))).logInPlace();
+        return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
         final DoubleTensor xMinusA = x.minus(a);
+        final DoubleTensor aMinusX = a.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
         final DoubleTensor oneOverTheta = theta.reciprocal();
 
         final DoubleTensor dPdx = kMinus1.div(xMinusA).minus(oneOverTheta);
-        final DoubleTensor dPda = kMinus1.div(a.minus(x)).plus(oneOverTheta);
-        final DoubleTensor dPdtheta = a.plus(theta.times(k)).minus(x).div(theta.pow(2.)).unaryMinus();
-        final DoubleTensor dPdk = xMinusA.log().minus(theta.log()).minus(k.apply(Gamma::digamma));
+        final DoubleTensor dPda = kMinus1.div(aMinusX).plus(oneOverTheta);
+        final DoubleTensor dPdtheta = theta.times(k).plusInPlace(a).minus(x).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(Gamma::digamma));
 
         return new Diff(dPda, dPdtheta, dPdk, dPdx);
     }
