@@ -6,20 +6,20 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 public class TensorExponential {
 
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor b, KeanuRandom random) {
-        return a.minus(b).times(random.nextDouble(shape).log());
+        return a.minus(b).times(random.nextDouble(shape).logInPlace());
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor negXMinusA = x.minus(a).unaryMinus();
-        final DoubleTensor negxMinusADivB = negXMinusA.div(b);
-        final DoubleTensor logOfWithinBounds = negxMinusADivB.minus(b.log());
+        final DoubleTensor negXMinusA = x.minus(a).unaryMinusInPlace();
+        final DoubleTensor negxMinusADivB = negXMinusA.divInPlace(b);
+        final DoubleTensor logOfWithinBounds = negxMinusADivB.minusInPlace(b.log());
         logOfWithinBounds.applyWhere(a.getLessThanMask(x), 0.0);
         return logOfWithinBounds;
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
         final DoubleTensor dPda = b.reciprocal();
-        final DoubleTensor dPdb = x.minus(a).minus(b).div(b.pow(2));
+        final DoubleTensor dPdb = x.minus(a).minus(b).divInPlace(b.pow(2));
         return new Diff(dPda, dPdb, b.reciprocal().unaryMinus());
     }
 

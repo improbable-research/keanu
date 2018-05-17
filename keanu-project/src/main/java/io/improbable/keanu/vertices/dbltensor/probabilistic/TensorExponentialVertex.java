@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
@@ -92,7 +93,6 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         TensorExponential.Diff dlnP = TensorExponential.dlnPdf(a.getValue(), b.getValue(), value);
-
         return convertDualNumbersToDiff(dlnP.dPda, dlnP.dPdb, dlnP.dPdx);
     }
 
