@@ -50,8 +50,32 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
         this(getShapeProposal(a.getValue(), b.getValue()), a, b, random);
     }
 
+    public TensorExponentialVertex(DoubleTensorVertex a, double b, KeanuRandom random) {
+        this(a, new ConstantTensorVertex(b), random);
+    }
+
+    public TensorExponentialVertex(double a, DoubleTensorVertex b, KeanuRandom random) {
+        this(a, new ConstantTensorVertex(b), random);
+    }
+
     public TensorExponentialVertex(double a, double b, KeanuRandom random) {
         this(new ConstantTensorVertex(a), new ConstantTensorVertex(b), random);
+    }
+
+    public TensorExponentialVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
+        this(getShapeProposal(a.getValue(), b.getValue()), a, b, new KeanuRandom());
+    }
+
+    public TensorExponentialVertex(DoubleTensorVertex a, double b) {
+        this(a, new ConstantTensorVertex(b), new KeanuRandom());
+    }
+
+    public TensorExponentialVertex(double a, DoubleTensorVertex b) {
+        this(a, new ConstantTensorVertex(b), new KeanuRandom());
+    }
+
+    public TensorExponentialVertex(double a, double b) {
+        this(new ConstantTensorVertex(a), new ConstantTensorVertex(b), new KeanuRandom());
     }
 
     @Override
