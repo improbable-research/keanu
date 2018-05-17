@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -16,10 +17,10 @@ import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesNet createSimpleGaussian(double mu, double sigma, Random random) {
+    public static BayesNetDoubleAsContinuous createSimpleGaussian(double mu, double sigma, Random random) {
         GaussianVertex A = new GaussianVertex(mu, sigma, random);
         A.setAndCascade(mu + 0.5 * sigma);
-        BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
         return bayesNet;
     }
 
@@ -32,7 +33,7 @@ public class MCMCTestDistributions {
         assertEquals(sigma, stats.getStandardDeviation(), 0.1);
     }
 
-    public static BayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum, Random random) {
+    public static BayesNetDoubleAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum, Random random) {
 
         DoubleVertex A = new GaussianVertex(mu, sigma, random);
         DoubleVertex B = new GaussianVertex(mu, sigma, random);
@@ -43,7 +44,7 @@ public class MCMCTestDistributions {
         A.setAndCascade(mu);
         B.setAndCascade(mu);
 
-        BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(Arrays.asList(A, B, C));
         return bayesNet;
     }
 
@@ -60,7 +61,7 @@ public class MCMCTestDistributions {
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static BayesNet create2DDonutDistribution(Random random) {
+    public static BayesNetDoubleAsContinuous create2DDonutDistribution(Random random) {
         DoubleVertex A = new GaussianVertex(0, 1, random);
         DoubleVertex B = new GaussianVertex(0, 1, random);
 
@@ -70,7 +71,7 @@ public class MCMCTestDistributions {
         A.setAndCascade(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
-        BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, D));
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(Arrays.asList(A, B, D));
         return bayesNet;
     }
 

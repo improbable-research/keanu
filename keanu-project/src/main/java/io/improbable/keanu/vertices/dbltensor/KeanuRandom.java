@@ -5,7 +5,7 @@ import org.nd4j.linalg.api.rng.Random;
 
 import java.util.Arrays;
 
-public class KeanuRandom {
+public class KeanuRandom extends java.util.Random {
 
     static {
         System.setProperty("dtype", "double");

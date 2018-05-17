@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
@@ -16,7 +16,7 @@ public class MetropolisHastings {
     private MetropolisHastings() {
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                                      List<? extends Vertex> fromVertices,
                                                      int sampleCount) {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, new Random());
@@ -29,7 +29,7 @@ public class MetropolisHastings {
      * @param random       the source of randomness
      * @return Samples for each vertex ordered by MCMC iteration
      */
-    public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final Random random) {
@@ -116,7 +116,7 @@ public class MetropolisHastings {
         samplesForVertex.add(vertex.getValue());
     }
 
-    private static void checkBayesNetInHealthyState(BayesNet bayesNet) {
+    private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
         if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {

@@ -3,13 +3,14 @@ package io.improbable.keanu.e2e.foodpoisoning;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Test;
 
 import java.util.Random;
@@ -26,10 +27,10 @@ public class FoodPoisoningTest {
     private Flip infectedToilet = new Flip(0.1, rand);
 
     public NetworkSamples sample(int n) {
-        BayesNet myNet = new BayesNet(infectedOysters.getConnectedGraph());
+        BayesianNetwork myNet = new BayesianNetwork(infectedOysters.getConnectedGraph());
         myNet.probeForNonZeroMasterP(100);
         assertNotEquals(Double.NEGATIVE_INFINITY, myNet.getLogOfMasterP());
-        return MetropolisHastings.getPosteriorSamples(myNet, myNet.getLatentVertices(), n, rand);
+        return MetropolisHastings.getPosteriorSamples(myNet, myNet.getLatentVertices(), n, new KeanuRandom());
     }
 
     public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {

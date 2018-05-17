@@ -1,7 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
@@ -48,7 +49,7 @@ public class LinearRegression {
         m.setAndCascade(1.0);
         b.setAndCascade(-5.0);
 
-        BayesNet bayesNet = new BayesNet(m.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(m.getConnectedGraph());
         runGradientOptimizer(bayesNet, 10000, 10000);
 
         log.info("M = " + m.getValue() + ", B = " + b.getValue());
@@ -75,7 +76,7 @@ public class LinearRegression {
             dProb.observe(p.y);
         }
 
-        runGradientOptimizer(new BayesNet(a.getConnectedGraph()), 1000, 10000);
+        runGradientOptimizer(new BayesNetDoubleAsContinuous(a.getConnectedGraph()), 1000, 10000);
 
         log.info("A = " + a.getValue() + ", B = " + b.getValue() + ", C = " + c.getValue());
         assertEquals(expectedA, a.getValue(), 0.01);
@@ -83,7 +84,7 @@ public class LinearRegression {
         assertEquals(expectedC, c.getValue(), 0.01);
     }
 
-    private void runGradientOptimizer(BayesNet bayesNet, int findStartStateAttempts, int maxEvaluations) {
+    private void runGradientOptimizer(BayesNetDoubleAsContinuous bayesNet, int findStartStateAttempts, int maxEvaluations) {
         log.info("Preparing graph");
         bayesNet.probeForNonZeroMasterP(findStartStateAttempts);
         log.info("Running optimizer");

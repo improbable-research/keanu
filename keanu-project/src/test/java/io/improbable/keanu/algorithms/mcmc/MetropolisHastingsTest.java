@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -40,7 +40,7 @@ public class MetropolisHastingsTest {
 
         Cobserved.observe(46.0);
 
-        BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroMasterP(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
@@ -72,7 +72,7 @@ public class MetropolisHastingsTest {
 
         C.observe(true);
 
-        BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C));
         bayesNet.probeForNonZeroMasterP(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
@@ -100,7 +100,7 @@ public class MetropolisHastingsTest {
 
         E.observe(true);
 
-        BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C, D, E));
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C, D, E));
         bayesNet.probeForNonZeroMasterP(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
@@ -123,7 +123,7 @@ public class MetropolisHastingsTest {
         BoolVertex C = A.or(B);
         C.observe(false);
 
-        BayesNet net = new BayesNet(A.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
         net.probeForNonZeroMasterP(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(

@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ public class Prior {
     private Prior() {
     }
 
-    public static NetworkSamples sample(BayesNet bayesNet, List<? extends Vertex> fromVertices, int sampleCount) {
+    public static NetworkSamples sample(BayesianNetwork bayesNet, List<? extends Vertex> fromVertices, int sampleCount) {
 
         if (!bayesNet.getObservedVertices().isEmpty()) {
             throw new IllegalStateException("Cannot sample prior from graph with observations");

@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.algorithms.tensorvariational.TensorGradientOptimizer;
-import io.improbable.keanu.network.TensorBayesNet;
+import io.improbable.keanu.algorithms.variational.tensor.TensorGradientOptimizer;
+import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 
@@ -35,7 +35,7 @@ public class TensorVertexVariationalMAP {
     }
 
     private static void doInferenceOn(DoubleTensorVertex unknownVertex) {
-        TensorBayesNet inferNet = new TensorBayesNet(unknownVertex.getConnectedGraph());
+        BayesNetTensorAsContinuous inferNet = new BayesNetTensorAsContinuous(unknownVertex.getConnectedGraph());
 
         inferNet.probeForNonZeroMasterP(100);
 

@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import org.junit.Before;
@@ -58,7 +59,7 @@ public class SmoothUniformTest {
     }
 
     private void shouldFind(double expected) {
-        GradientOptimizer optimizer = new GradientOptimizer(new BayesNet(A.getConnectedGraph()));
+        GradientOptimizer optimizer = new GradientOptimizer(new BayesNetDoubleAsContinuous(A.getConnectedGraph()));
         optimizer.maxAPosteriori(1000);
         assertEquals(expected, C.getValue(), 0.001);
     }

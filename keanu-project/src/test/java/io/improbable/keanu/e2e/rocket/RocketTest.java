@@ -1,7 +1,7 @@
 package io.improbable.keanu.e2e.rocket;
 
 import io.improbable.keanu.algorithms.sampling.RejectionSampler;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
@@ -63,7 +63,7 @@ public class RocketTest {
         alarm1.observe(true);
         alarm2.observe(false);
 
-        BayesNet net = new BayesNet(oRingFailure.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
 
         double posteriorProbOfORingFailure = RejectionSampler.getPosteriorProbability(net.getLatentVertices(), net.getObservedVertices(), () -> oRingFailure.getValue() == true, 10000);
         double posteriorProbOfResidualFuel = RejectionSampler.getPosteriorProbability(net.getLatentVertices(), net.getObservedVertices(), () -> residualFuel.getValue() == true, 10000);

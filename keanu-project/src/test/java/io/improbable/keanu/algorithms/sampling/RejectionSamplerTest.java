@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import org.junit.Before;
@@ -65,7 +65,7 @@ public class RejectionSamplerTest {
     public void posteriorSamplesMatchesBayesRule() {
 
         NetworkSamples samplesAccordingToAlgo = RejectionSampler.getPosteriorSamples(
-            new BayesNet(v1.getConnectedGraph()),
+            new BayesianNetwork(v1.getConnectedGraph()),
             asList(v1, v2),
             10000
         );

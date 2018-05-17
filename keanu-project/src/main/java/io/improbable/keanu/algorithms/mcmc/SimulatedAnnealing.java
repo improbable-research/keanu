@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
@@ -13,20 +13,20 @@ import java.util.*;
  */
 public class SimulatedAnnealing {
 
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule schedule) {
         return getMaxAPosteriori(bayesNet, sampleCount, schedule, new Random());
     }
 
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                                  int sampleCount,
                                                  Random random) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
         return getMaxAPosteriori(bayesNet, sampleCount, schedule, random);
     }
 
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet, int sampleCount) {
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet, int sampleCount) {
 
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
 
@@ -42,7 +42,7 @@ public class SimulatedAnnealing {
      * @param random            the source of randomness
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule annealingSchedule,
                                                  Random random) {

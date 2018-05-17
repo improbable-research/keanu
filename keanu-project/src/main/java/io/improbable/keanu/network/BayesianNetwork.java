@@ -3,25 +3,17 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-/**
- * A wrapper around a collection of connected vertices.
- */
-public class TensorBayesNet {
+public class BayesianNetwork {
 
     private final List<Vertex> latentAndObservedVertices;
     private final List<Vertex> latentVertices;
     private final List<Vertex> observedVertices;
 
-    //Lazy evaluated
-    private List<Vertex<DoubleTensor>> continuousLatentVertices;
-    private List<Vertex> discreteLatentVertices;
-
-    public TensorBayesNet(Set<? extends Vertex> vertices) {
+    public BayesianNetwork(Set<? extends Vertex> vertices) {
 
         latentAndObservedVertices = vertices.stream()
             .filter(v -> v.isObserved() || v.isProbabilistic())
@@ -36,7 +28,7 @@ public class TensorBayesNet {
             .collect(Collectors.toList());
     }
 
-    public TensorBayesNet(Collection<? extends Vertex> vertices) {
+    public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
@@ -48,38 +40,8 @@ public class TensorBayesNet {
         return latentVertices;
     }
 
-    public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
-        if (continuousLatentVertices == null) {
-            splitContinuousAndDiscrete();
-        }
-
-        return continuousLatentVertices;
-    }
-
-    public List<Vertex> getDiscreteLatentVertices() {
-        if (discreteLatentVertices == null) {
-            splitContinuousAndDiscrete();
-        }
-
-        return discreteLatentVertices;
-    }
-
-    public List<Vertex> getObservedVertices() {
+    public List<Vertex> getObservedVertices(){
         return observedVertices;
-    }
-
-    private void splitContinuousAndDiscrete() {
-
-        continuousLatentVertices = new ArrayList<>();
-        discreteLatentVertices = new ArrayList<>();
-
-        for (Vertex<?> vertex : latentVertices) {
-            if (vertex.getValue() instanceof DoubleTensor) {
-                continuousLatentVertices.add((Vertex<DoubleTensor>) vertex);
-            } else {
-                discreteLatentVertices.add(vertex);
-            }
-        }
     }
 
     public double getLogOfMasterP() {
@@ -113,7 +75,7 @@ public class TensorBayesNet {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<Vertex> latentVertices, int attempts) {
+    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts) {
 
         Map<Long, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
@@ -132,11 +94,11 @@ public class TensorBayesNet {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices));
     }
 
-    public static void setFromSampleAndCascade(List<Vertex> vertices, Map<Long, Long> setAndCascadeCache) {
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices, Map<Long, Long> setAndCascadeCache) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex);
         }

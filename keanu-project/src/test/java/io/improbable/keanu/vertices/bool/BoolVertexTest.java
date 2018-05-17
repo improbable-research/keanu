@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.bool;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.Prior;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
@@ -124,7 +124,7 @@ public class BoolVertexTest {
     }
 
     public static double priorProbabilityTrue(Vertex<Boolean> vertex, int sampleCount) {
-        BayesNet net = new BayesNet(vertex.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
 
         NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount);
         return samples.get(vertex).probability(val -> val);

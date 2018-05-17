@@ -1,7 +1,8 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -36,7 +37,7 @@ public class SimulatedAnnealingTest {
     @Test
     public void findsMaxAposterioriWithAnnealing() {
 
-        BayesNet network = new BayesNet(A.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroMasterP(100);
 
         NetworkState maxAPosterioriSamples = SimulatedAnnealing.getMaxAPosteriori(network, 10000, random);
@@ -48,7 +49,7 @@ public class SimulatedAnnealingTest {
     }
 
     private Map<Long, ?> findMAPWithOptimizer() {
-        BayesNet network = new BayesNet(A.getConnectedGraph());
+        BayesNetDoubleAsContinuous network = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
         network.probeForNonZeroMasterP(100);
 
         GradientOptimizer graphOptimizer = new GradientOptimizer(network);

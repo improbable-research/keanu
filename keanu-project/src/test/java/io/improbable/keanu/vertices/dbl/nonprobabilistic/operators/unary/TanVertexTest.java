@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -50,7 +51,7 @@ public class TanVertexTest {
         GaussianVertex observableTan = new GaussianVertex(tan, 1.0, random);
         observableTan.observe(-1.0);
 
-        BayesNet bayesNet = new BayesNet(unknownTheta.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(unknownTheta.getConnectedGraph());
         GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesNet);
 
         gradientOptimizer.maxLikelihood(5000);
@@ -84,7 +85,7 @@ public class TanVertexTest {
             observableCosOverSin.observe(data.get(j - 1));
         }
 
-        BayesNet bayesNet = new BayesNet(unknownConstant.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(unknownConstant.getConnectedGraph());
         GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesNet);
 
         gradientOptimizer.maxLikelihood(1500);

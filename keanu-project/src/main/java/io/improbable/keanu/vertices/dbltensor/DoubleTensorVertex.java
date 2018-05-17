@@ -74,19 +74,19 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
     protected abstract TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers);
 
     public void setValue(Double value) {
-        super.setValue(DoubleTensor.scalar(value));
+        super.setValue(DoubleTensor.create(value, getShape()));
     }
 
     public void setAndCascade(Double value) {
-        super.setAndCascade(DoubleTensor.scalar(value));
+        super.setAndCascade(DoubleTensor.create(value, getShape()));
     }
 
     public void setAndCascade(Double value, Map<Long, Long> explored) {
-        super.setAndCascade(DoubleTensor.scalar(value), explored);
+        super.setAndCascade(DoubleTensor.create(value, getShape()), explored);
     }
 
     public void observe(Double value) {
-        super.observe(DoubleTensor.scalar(value));
+        super.observe(DoubleTensor.create(value, getShape()));
     }
 
     public double logPdf(double value) {

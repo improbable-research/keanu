@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
@@ -15,7 +15,10 @@ public class RejectionSampler {
     private RejectionSampler() {
     }
 
-    public static double getPosteriorProbability(List<? extends Vertex> latentVertices, List<? extends Vertex> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
+    public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
+                                                 List<? extends Vertex> observedVertices,
+                                                 Supplier<Boolean> isSuccess,
+                                                 int sampleCount) {
         int matchedSampleCount = 0;
         int success = 0;
 
@@ -36,7 +39,9 @@ public class RejectionSampler {
         }
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet, List<Vertex<?>> fromVertices, int sampleCount) {
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
+                                                     List<Vertex<?>> fromVertices,
+                                                     int sampleCount) {
 
         Map<Long, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;

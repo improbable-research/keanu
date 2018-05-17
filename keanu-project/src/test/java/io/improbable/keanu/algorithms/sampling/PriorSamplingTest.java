@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
@@ -25,7 +25,7 @@ public class PriorSamplingTest {
     @Test
     public void samplesFromPriorWithMultiMarkovBlanketNetwork() {
 
-        BayesNet net = new BayesNet(C.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
 
         final int sampleCount = 10000;
         NetworkSamples samples = Prior.sample(net, net.getLatentVertices(), sampleCount);
@@ -40,7 +40,7 @@ public class PriorSamplingTest {
     public void doesNotSamplePriorFromNetWithObservations() {
 
         B.observe(95.0);
-        BayesNet net = new BayesNet(C.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
 
         final int sampleCount = 10000;
         Prior.sample(net, net.getLatentVertices(), sampleCount);

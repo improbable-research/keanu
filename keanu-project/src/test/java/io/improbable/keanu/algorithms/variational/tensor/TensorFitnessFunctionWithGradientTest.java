@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.tensorvariational;
+package io.improbable.keanu.algorithms.variational.tensor;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;

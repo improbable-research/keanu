@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -28,14 +29,14 @@ public class GradientOptimizer {
 
     private static final double FLAT_GRADIENT = 1e-16;
 
-    private final BayesNet bayesNet;
+    private final BayesNetDoubleAsContinuous bayesNet;
 
-    public GradientOptimizer(BayesNet bayesNet) {
+    public GradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
     }
 
     public GradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNet(graph);
+        bayesNet = new BayesNetDoubleAsContinuous(graph);
     }
 
     /**
