@@ -13,20 +13,20 @@ public class TensorLaplace {
     }
 
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
-        final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().div(beta);
-        final DoubleTensor logTwoBeta = beta.times(2).log();
-        return muMinusXAbsNegDivBeta.plus(logTwoBeta).unaryMinus();
+        final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).absInPlace().divInPlace(beta);
+        final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
+        return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
     }
 
     public static Diff dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
-        final DoubleTensor muMinusX = x.unaryMinus().plus(mu);
+        final DoubleTensor muMinusX = x.unaryMinus().plusInPlace(mu);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
         final DoubleTensor denominator = muMinusXAbs.times(beta);
 
-        final DoubleTensor dPdx = muMinusX.div(denominator);
-        final DoubleTensor dPdMu = x.minus(mu).div(denominator);
-        final DoubleTensor dPdBeta = muMinusXAbs.minus(beta).div(beta.pow(2));
+        final DoubleTensor dPdx = muMinusX.divInPlace(denominator);
+        final DoubleTensor dPdMu = x.minus(mu).divInPlace(denominator);
+        final DoubleTensor dPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
         return new Diff(dPdMu, dPdBeta, dPdx);
     }
