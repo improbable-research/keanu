@@ -14,7 +14,6 @@ import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -61,19 +60,19 @@ public class Model {
         lateRate = new ExponentialVertex(1.0, 1.0);
 
         Stream<IfVertex<Double>> rates = IntStream.range(data.startYear, data.endYear).boxed()
-                .map(ConstantVertex::new)
-                .map(year -> {
-                    GreaterThanVertex<Integer, Integer> switchpointGreaterThanYear = new GreaterThanVertex<>(
-                            switchpoint,
-                            year
-                    );
-                    return new IfVertex<>(switchpointGreaterThanYear, earlyRate, lateRate);
-                });
+            .map(ConstantVertex::new)
+            .map(year -> {
+                GreaterThanVertex<Integer, Integer> switchpointGreaterThanYear = new GreaterThanVertex<>(
+                    switchpoint,
+                    year
+                );
+                return new IfVertex<>(switchpointGreaterThanYear, earlyRate, lateRate);
+            });
 
         disasters = rates
-                .map(CastDoubleVertex::new)
-                .map(PoissonVertex::new)
-                .collect(Collectors.toList());
+            .map(CastDoubleVertex::new)
+            .map(PoissonVertex::new)
+            .collect(Collectors.toList());
 
         IntStream.range(0, disasters.size()).forEach(i -> {
             Integer year = data.startYear + i;

@@ -14,7 +14,7 @@ public class Data {
 
     public List<CsvLine> csvLines;
 
-    public Data(List<CsvLine> csvLines){
+    public Data(List<CsvLine> csvLines) {
         this.csvLines = csvLines;
     }
 
@@ -29,7 +29,6 @@ public class Data {
     }
 
     /**
-     *
      * @param fileName the name of the csv file in the resource folder
      * @return a Data object with the contents of the csv file
      */
@@ -37,10 +36,10 @@ public class Data {
 
         //Load a csv file from src/main/resources
         List<CsvLine> csvLines = ReadCsv
-                .fromResources(fileName)
-                .expectHeader(true)
-                .as(CsvLine.class)
-                .asList();
+            .fromResources(fileName)
+            .expectHeader(true)
+            .as(CsvLine.class)
+            .asList();
 
         //create new Data object from csv
         return new Data(csvLines);
