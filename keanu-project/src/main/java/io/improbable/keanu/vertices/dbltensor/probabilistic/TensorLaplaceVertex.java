@@ -99,8 +99,8 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
                                                              DoubleTensor dPdx) {
 
         TensorPartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
-        TensorPartialDerivatives dPdInputsFromSigma = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
-        TensorPartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
+        TensorPartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
+        TensorPartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromBeta);
 
         if (!this.isObserved()) {
             dPdInputs.putWithRespectTo(getId(), dPdx);
