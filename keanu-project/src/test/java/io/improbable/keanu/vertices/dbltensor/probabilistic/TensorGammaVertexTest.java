@@ -200,10 +200,10 @@ public class TensorGammaVertexTest {
         double trueTheta = 2.0;
         double trueK = 3.0;
 
-        DoubleTensorVertex constA = new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueA));
-        DoubleTensorVertex constA2 = new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueA));
-        DoubleTensorVertex constTheta = new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueTheta));
-        DoubleTensorVertex constK = new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueK));
+        DoubleTensorVertex constA = new ConstantTensorVertex(trueA);
+        DoubleTensorVertex constA2 = new ConstantTensorVertex(trueA);
+        DoubleTensorVertex constTheta = new ConstantTensorVertex(trueTheta);
+        DoubleTensorVertex constK = new ConstantTensorVertex(trueK);
 
         List<DoubleTensorVertex> aThetaK = new ArrayList<>();
         aThetaK.add(constA);
