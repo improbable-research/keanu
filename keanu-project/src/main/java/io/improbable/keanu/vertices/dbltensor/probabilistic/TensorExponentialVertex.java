@@ -1,8 +1,12 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
+import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
+import io.improbable.keanu.distributions.tensors.continuous.TensorGaussian;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
 
@@ -46,19 +50,46 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
         this(getShapeProposal(a.getValue(), b.getValue()), a, b, random);
     }
 
+    public TensorExponentialVertex(double a, double b, KeanuRandom random) {
+        this(new ConstantTensorVertex(a), new ConstantTensorVertex(b), random);
+    }
+
     @Override
     public double logPdf(DoubleTensor value) {
-        return 0;
+
+        DoubleTensor aValues = a.getValue();
+        DoubleTensor bValues = b.getValue();
+
+        DoubleTensor logPdfs = TensorExponential.logPdf(aValues, bValues, value);
+
+        return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        return null;
+        TensorExponential.Diff dlnP = TensorExponential.dlnPdf(a.getValue(), b.getValue(), value);
+
+        return convertDualNumbersToDiff(dlnP.dPda, dlnP.dPdb, dlnP.dPdx);
+    }
+
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
+                                                             DoubleTensor dPdb,
+                                                             DoubleTensor dPdx) {
+
+        TensorPartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
+        TensorPartialDerivatives dPdInputsFromB = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
+        TensorPartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
+
+        if (!this.isObserved()) {
+            dPdInputs.putWithRespectTo(getId(), dPdx);
+        }
+
+        return dPdInputs.asMap();
     }
 
     @Override
     public DoubleTensor sample() {
-        return null;
+        return TensorExponential.sample(getValue().getShape(), a.getValue(), b.getValue(), random);
     }
 }
 
