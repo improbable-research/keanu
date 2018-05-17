@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 
 import java.util.Map;
@@ -17,7 +18,7 @@ public abstract class ProbabilisticDoubleTensor extends DoubleTensorVertex {
     @Override
     public DoubleTensor lazyEval() {
         if (!hasValue()) {
-            setValue(sample());
+            setValue(sample(KeanuRandom.getDefaultRandom()));
         }
         return getValue();
     }

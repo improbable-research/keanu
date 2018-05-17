@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ public class MetropolisHastings {
     public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
                                                      List<? extends Vertex> fromVertices,
                                                      int sampleCount) {
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -32,7 +33,7 @@ public class MetropolisHastings {
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
                                                      final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
         checkBayesNetInHealthyState(bayesNet);
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
@@ -59,12 +60,12 @@ public class MetropolisHastings {
                                  final Set<Vertex> affectedVertices,
                                  final double T,
                                  final Map<Long, Map<Long, Long>> setAndCascadeCache,
-                                 final Random random) {
+                                 final KeanuRandom random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
 
         final T oldValue = chosenVertex.getValue();
-        final T proposedValue = chosenVertex.sample();
+        final T proposedValue = chosenVertex.sample(random);
 
         Map<Long, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);

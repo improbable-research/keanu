@@ -7,8 +7,12 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Hamiltonian Monte Carlo is a method for obtaining samples from a probability
@@ -29,7 +33,7 @@ public class Hamiltonian {
                                                      final int leapFrogCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
@@ -37,7 +41,7 @@ public class Hamiltonian {
                                                      final int sampleCount,
                                                      final int leapFrogCount,
                                                      final double stepSize,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
@@ -122,7 +126,7 @@ public class Hamiltonian {
 
     private static Map<Long, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
                                                                      Map<Long, Double> momentums,
-                                                                     Random random) {
+                                                                     KeanuRandom random) {
         for (int i = 0; i < vertexes.size(); i++) {
             Vertex currentVertex = vertexes.get(i);
             momentums.put(currentVertex.getId(), random.nextGaussian());
@@ -207,7 +211,7 @@ public class Hamiltonian {
         return Math.min(likelihoodOfLeapfrog, 1.0);
     }
 
-    private static boolean shouldReject(double likelihood, Random random) {
+    private static boolean shouldReject(double likelihood, KeanuRandom random) {
         return likelihood < random.nextDouble();
     }
 

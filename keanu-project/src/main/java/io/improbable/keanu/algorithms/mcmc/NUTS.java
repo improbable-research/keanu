@@ -7,8 +7,12 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm 3: "Efficient NUTS".
@@ -27,14 +31,14 @@ public class NUTS {
                                                      final int sampleCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
@@ -140,7 +144,7 @@ public class NUTS {
                                                   int buildDirection,
                                                   int treeHeight,
                                                   double epsilon,
-                                                  Random random) {
+                                                  KeanuRandom random) {
 
         BuiltTree otherHalfTree;
         if (buildDirection == -1) {
@@ -200,7 +204,7 @@ public class NUTS {
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
-                                       Random random) {
+                                       KeanuRandom random) {
         if (treeHeight == 0) {
 
             //Base case—take one leapfrog step in the build direction
@@ -330,7 +334,7 @@ public class NUTS {
     private static void acceptOtherPositionWithProbability(double probability,
                                                            BuiltTree tree,
                                                            BuiltTree otherTree,
-                                                           Random random) {
+                                                           KeanuRandom random) {
         if (withProbability(probability, random)) {
             tree.acceptedPosition = otherTree.acceptedPosition;
             tree.gradientAtAcceptedPosition = otherTree.gradientAtAcceptedPosition;
@@ -339,7 +343,7 @@ public class NUTS {
         }
     }
 
-    private static boolean withProbability(double probability, Random random) {
+    private static boolean withProbability(double probability, KeanuRandom random) {
         return random.nextDouble() < probability;
     }
 
@@ -370,7 +374,7 @@ public class NUTS {
 
     private static void initializeMomentumForEachVertex(List<Vertex<Double>> vertices,
                                                         Map<Long, Double> momentums,
-                                                        Random random) {
+                                                        KeanuRandom random) {
         for (Vertex<Double> vertex : vertices) {
             momentums.put(vertex.getId(), random.nextGaussian());
         }

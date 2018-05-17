@@ -6,6 +6,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +20,8 @@ import static org.junit.Assert.assertEquals;
 public class LinearRegression {
     private final Logger log = LoggerFactory.getLogger(LinearRegression.class);
 
+    private KeanuRandom random;
+
     private class Point {
         public final double y;
         public final double[] factors;
@@ -26,6 +30,11 @@ public class LinearRegression {
             this.y = y;
             this.factors = factors;
         }
+    }
+
+    @Before
+    public void setup() {
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -85,7 +94,7 @@ public class LinearRegression {
 
     private void runGradientOptimizer(BayesNet bayesNet, int findStartStateAttempts, int maxEvaluations) {
         log.info("Preparing graph");
-        bayesNet.probeForNonZeroMasterP(findStartStateAttempts);
+        bayesNet.probeForNonZeroMasterP(findStartStateAttempts, random);
         log.info("Running optimizer");
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
         optimizer.maxLikelihood(maxEvaluations);

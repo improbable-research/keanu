@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+
 public class ConstantBoolVertex extends NonProbabilisticBool {
 
     public ConstantBoolVertex(Boolean constant) {
@@ -7,7 +9,7 @@ public class ConstantBoolVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample() {
+    public Boolean sample(KeanuRandom random) {
         return getValue();
     }
 

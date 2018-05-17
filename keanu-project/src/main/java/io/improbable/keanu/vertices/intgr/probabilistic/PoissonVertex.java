@@ -5,31 +5,21 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class PoissonVertex extends ProbabilisticInteger {
 
-    private final Random random;
     private final DoubleVertex mu;
 
-    public PoissonVertex(DoubleVertex mu, Random random) {
+    public PoissonVertex(DoubleVertex mu) {
         this.mu = mu;
-        this.random = random;
         setParents(mu);
     }
 
-    public PoissonVertex(double mu, Random random) {
-        this(new ConstantDoubleVertex(mu), random);
-    }
-
-    public PoissonVertex(DoubleVertex mu) {
-        this(mu, new Random());
-    }
-
     public PoissonVertex(double mu) {
-        this(new ConstantDoubleVertex(mu), new Random());
+        this(new ConstantDoubleVertex(mu));
     }
 
     public Vertex<Double> getMu() {
@@ -47,7 +37,7 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public Integer sample() {
-        return new Poisson(mu.getValue(), random).sample();
+    public Integer sample(KeanuRandom random) {
+        return Poisson.sample(mu.getValue(), random);
     }
 }

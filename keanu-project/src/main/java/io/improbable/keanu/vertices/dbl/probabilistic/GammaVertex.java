@@ -5,61 +5,46 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class GammaVertex extends ProbabilisticDouble {
 
     private final DoubleVertex a;
     private final DoubleVertex theta;
     private final DoubleVertex k;
-    private final Random random;
 
     /**
-     * @param a      location
-     * @param theta  scale
-     * @param k      shape
-     * @param random source for sampling
+     * @param a     location
+     * @param theta scale
+     * @param k     shape
      */
-    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k, Random random) {
+    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k) {
         this.a = a;
         this.theta = theta;
         this.k = k;
-        this.random = random;
         setParents(a, theta, k);
     }
 
-    public GammaVertex(DoubleVertex theta, double k, Random random) {
-        this(new ConstantDoubleVertex(0.0), theta, new ConstantDoubleVertex(k), random);
+    public GammaVertex(double a, double theta, double k) {
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k));
     }
 
-    public GammaVertex(double theta, DoubleVertex k, Random random) {
-        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), k, random);
-    }
-
-    public GammaVertex(double theta, double k, Random random) {
-        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k), random);
-    }
-
-    public GammaVertex(double a, double theta, double k, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k), random);
-    }
-
-    public GammaVertex(DoubleVertex a, DoubleVertex theta, DoubleVertex k) {
-        this(a, theta, k, new Random());
+    public GammaVertex(DoubleVertex theta, DoubleVertex k) {
+        this(new ConstantDoubleVertex(0.0), theta, k);
     }
 
     public GammaVertex(DoubleVertex theta, double k) {
-        this(new ConstantDoubleVertex(0.0), theta, new ConstantDoubleVertex(k), new Random());
+        this(new ConstantDoubleVertex(0.0), theta, new ConstantDoubleVertex(k));
     }
 
     public GammaVertex(double theta, DoubleVertex k) {
-        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), k, new Random());
+        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), k);
     }
 
     public GammaVertex(double theta, double k) {
-        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k), new Random());
+        this(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(theta), new ConstantDoubleVertex(k));
     }
 
     public DoubleVertex getA() {
@@ -99,7 +84,7 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(KeanuRandom random) {
         return Gamma.sample(a.getValue(), theta.getValue(), k.getValue(), random);
     }
 

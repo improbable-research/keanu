@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
@@ -59,8 +58,7 @@ public class DiscoverGraphTest {
     @Test
     public void findsVeryLongGraph() {
 
-        Random random = new Random(1);
-        DoubleVertex start = new GaussianVertex(0, 1, random);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
         DoubleVertex end = start;
 

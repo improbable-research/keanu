@@ -4,10 +4,9 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
@@ -20,16 +19,17 @@ public class RejectionSamplerTest {
     private BoolVertex v3;
     private double v1ProbTrueAccordingToBayes;
     private double v2ProbTrueAccordingToBayes;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        Random random = new Random(1);
+        random = new KeanuRandom(1);
 
         double v1ProbTrue = 0.4;
         double v2ProbTrue = 0.8;
 
-        v1 = new Flip(v1ProbTrue, random);
-        v2 = new Flip(v2ProbTrue, random);
+        v1 = new Flip(v1ProbTrue);
+        v2 = new Flip(v2ProbTrue);
         v3 = v1.or(v2);
 
         double v3ProbTrue = v1ProbTrue + v2ProbTrue - (v1ProbTrue * v2ProbTrue);
@@ -47,14 +47,16 @@ public class RejectionSamplerTest {
             asList(v1, v2),
             singletonList(v3),
             v1::getValue,
-            10000
+            10000,
+            random
         );
 
         double v2ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
             asList(v1, v2),
             singletonList(v3),
             v2::getValue,
-            10000
+            10000,
+            random
         );
 
         assertEquals(v1ProbTrueAccordingToBayes, v1ProbTrueAccordingToAlgo, 0.01);
@@ -67,7 +69,8 @@ public class RejectionSamplerTest {
         NetworkSamples samplesAccordingToAlgo = RejectionSampler.getPosteriorSamples(
             new BayesNet(v1.getConnectedGraph()),
             asList(v1, v2),
-            10000
+            10000,
+            random
         );
 
         double v1ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v1).probability(sample -> sample);
