@@ -206,6 +206,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor abs() {
+        return new Nd4jDoubleTensor(Transforms.abs(tensor));
+    }
+
+    @Override
     public DoubleTensor unaryMinus() {
         return new Nd4jDoubleTensor(tensor.neg());
     }
@@ -342,6 +347,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         tensor.negi();
         return this;
     }
+
+    @Override
+    public DoubleTensor absInPlace() {
+        Transforms.abs(tensor, false);
+        return this;
+    }
+
 
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {

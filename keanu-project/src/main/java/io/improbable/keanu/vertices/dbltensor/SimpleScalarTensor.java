@@ -130,6 +130,11 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor abs() {
+        return new SimpleScalarTensor(Math.abs(scalar));
+    }
+
+    @Override
     public DoubleTensor unaryMinus() {
         return new SimpleScalarTensor(-scalar);
     }
@@ -254,6 +259,11 @@ public class SimpleScalarTensor implements DoubleTensor {
     @Override
     public DoubleTensor unaryMinusInPlace() {
         return unaryMinus();
+    }
+
+    @Override
+    public DoubleTensor absInPlace() {
+        return abs();
     }
 
     @Override

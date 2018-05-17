@@ -99,6 +99,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor applyWhere(DoubleTensor withMask, double value);
 
+    DoubleTensor abs();
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
@@ -136,6 +138,8 @@ public interface DoubleTensor extends Tensor {
     DoubleTensor divInPlace(DoubleTensor that);
 
     DoubleTensor unaryMinusInPlace();
+
+    DoubleTensor absInPlace();
 
     double[] getLinearView();
 
