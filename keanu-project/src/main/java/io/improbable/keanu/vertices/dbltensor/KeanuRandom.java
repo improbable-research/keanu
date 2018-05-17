@@ -26,4 +26,5 @@ public class KeanuRandom {
     public DoubleTensor nextGaussian(int[] shape) {
         return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
     }
+
 }

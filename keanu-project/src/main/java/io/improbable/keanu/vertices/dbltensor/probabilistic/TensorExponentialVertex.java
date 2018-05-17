@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import java.util.Map;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
+import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
 
 public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
 
@@ -14,6 +15,14 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex b;
     private final KeanuRandom random;
 
+    /**
+     * One a or b or both driving an arbitrarily shaped tensor of Exponential
+     *
+     * @param shape  the desired shape of the vertex
+     * @param a the a of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param b the b of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param random the source of randomness
+     */
     public TensorExponentialVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex b, KeanuRandom random) {
 
         checkParentShapes(shape, a.getValue(), b.getValue());
@@ -23,6 +32,18 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
         this.random = random;
         setParents(a, b);
         setValue(DoubleTensor.placeHolder(shape));
+    }
+
+    /**
+     * One to one constructor for mapping some shape of a and b to
+     * a matching shaped exponential.
+     *
+     * @param a the a of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param b the b of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param random the source of randomness
+     */
+    public TensorExponentialVertex(DoubleTensorVertex a, DoubleTensorVertex b, KeanuRandom random) {
+        this(getShapeProposal(a.getValue(), b.getValue()), a, b, random);
     }
 
     @Override
