@@ -55,7 +55,7 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorExponentialVertex(double a, DoubleTensorVertex b, KeanuRandom random) {
-        this(a, new ConstantTensorVertex(b), random);
+        this(new ConstantTensorVertex(a), b, random);
     }
 
     public TensorExponentialVertex(double a, double b, KeanuRandom random) {
@@ -71,7 +71,7 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorExponentialVertex(double a, DoubleTensorVertex b) {
-        this(a, new ConstantTensorVertex(b), new KeanuRandom());
+        this(new ConstantTensorVertex(a), b, new KeanuRandom());
     }
 
     public TensorExponentialVertex(double a, double b) {
