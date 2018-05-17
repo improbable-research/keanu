@@ -34,8 +34,56 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
         this(getShapeProposal(a.getValue(), theta.getValue(), k.getValue()), a, theta, k, random);
     }
 
+    public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, double k, KeanuRandom random) {
+        this(a, theta, new ConstantTensorVertex(k), random);
+    }
+
+    public TensorGammaVertex(DoubleTensorVertex a, double theta, DoubleTensorVertex k, KeanuRandom random) {
+        this(a, new ConstantTensorVertex(theta), k, random);
+    }
+
+    public TensorGammaVertex(DoubleTensorVertex a, double theta, double k, KeanuRandom random) {
+        this(a, new ConstantTensorVertex(theta), new ConstantTensorVertex(k), random);
+    }
+
+    public TensorGammaVertex(double a, DoubleTensorVertex theta, DoubleTensorVertex k, KeanuRandom random) {
+        this(new ConstantTensorVertex(a), theta, k, random);
+    }
+
+    public TensorGammaVertex(double a, DoubleTensorVertex theta, double k, KeanuRandom random) {
+        this(new ConstantTensorVertex(a), theta, new ConstantTensorVertex(k), random);
+    }
+
     public TensorGammaVertex(double a, double theta, double k, KeanuRandom random) {
         this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), new ConstantTensorVertex(k), random);
+    }
+
+    public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, DoubleTensorVertex k) {
+        this(getShapeProposal(a.getValue(), theta.getValue(), k.getValue()), a, theta, k, new KeanuRandom());
+    }
+
+    public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, double k) {
+        this(a, theta, new ConstantTensorVertex(k), new KeanuRandom());
+    }
+
+    public TensorGammaVertex(DoubleTensorVertex a, double theta, DoubleTensorVertex k) {
+        this(a, new ConstantTensorVertex(theta), k, new KeanuRandom());
+    }
+
+    public TensorGammaVertex(DoubleTensorVertex a, double theta, double k) {
+        this(a, new ConstantTensorVertex(theta), new ConstantTensorVertex(k), new KeanuRandom());
+    }
+
+    public TensorGammaVertex(double a, DoubleTensorVertex theta, DoubleTensorVertex k) {
+        this(new ConstantTensorVertex(a), theta, k, new KeanuRandom());
+    }
+
+    public TensorGammaVertex(double a, DoubleTensorVertex theta, double k) {
+        this(new ConstantTensorVertex(a), theta, new ConstantTensorVertex(k), new KeanuRandom());
+    }
+
+    public TensorGammaVertex(double a, double theta, double k) {
+        this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), new ConstantTensorVertex(k), new KeanuRandom());
     }
 
     @Override

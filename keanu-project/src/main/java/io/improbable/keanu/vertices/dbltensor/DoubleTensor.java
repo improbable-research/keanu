@@ -54,8 +54,6 @@ public interface DoubleTensor extends Tensor {
 
     double sum();
 
-    DoubleTensor apply(Function<Double, Double> f);
-
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();
@@ -102,6 +100,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor applyWhere(DoubleTensor withMask, double value);
 
+    DoubleTensor apply(Function<Double, Double> f);
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
@@ -139,6 +139,8 @@ public interface DoubleTensor extends Tensor {
     DoubleTensor divInPlace(DoubleTensor that);
 
     DoubleTensor unaryMinusInPlace();
+
+    DoubleTensor applyInPlace(Function<Double, Double> f);
 
     double[] getLinearView();
 

@@ -426,6 +426,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return this;
     }
 
+    @Override
+    public DoubleTensor applyInPlace(Function<Double, Double> function) {
+        Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
+        List<Double> values = Arrays.asList(tensorValues);
+        List<Double> functionApplied = values.stream().map(function::apply).collect(Collectors.toList());
+        for (int i = 0; i < functionApplied.size(); i++) {
+            tensor.putScalar(i, functionApplied.get(i));
+        }
+        return new Nd4jDoubleTensor(tensor);
+    }
+
     private INDArray unsafeGetNd4J(DoubleTensor that) {
         return ((Nd4jDoubleTensor) that).tensor;
     }

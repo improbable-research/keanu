@@ -261,6 +261,11 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor applyInPlace(Function<Double, Double> f) {
+        return apply(f);
+    }
+
+    @Override
     public double[] getLinearView() {
         return new double[]{scalar};
     }
