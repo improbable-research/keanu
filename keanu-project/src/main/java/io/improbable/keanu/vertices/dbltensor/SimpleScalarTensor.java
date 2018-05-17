@@ -206,6 +206,11 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor sqrtInPlace() {
+        return pow(0.5);
+    }
+
+    @Override
     public DoubleTensor logInPlace() {
         return log();
     }

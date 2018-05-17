@@ -283,6 +283,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor sqrtInPlace() {
+        return powInPlace(0.5);
+    }
+
+    @Override
     public DoubleTensor logInPlace() {
         Transforms.log(tensor, false);
         return this;

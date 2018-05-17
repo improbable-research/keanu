@@ -14,7 +14,7 @@ public abstract class Vertex<T> {
     private long uuid = idGenerator.getAndIncrement();
     private Set<Vertex> children = new HashSet<>();
     private Set<Vertex> parents = new HashSet<>();
-    protected T value;
+    private T value;
     private boolean observed;
 
     /**

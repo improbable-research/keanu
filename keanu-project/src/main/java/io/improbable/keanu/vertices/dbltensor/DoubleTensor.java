@@ -118,6 +118,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor powInPlace(double exponent);
 
+    DoubleTensor sqrtInPlace();
+
     DoubleTensor logInPlace();
 
     DoubleTensor sinInPlace();

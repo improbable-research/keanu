@@ -16,8 +16,8 @@ public class TensorGamma {
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
         final DoubleTensor aMinusXOverTheta = a.minus(x).divInPlace(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
-        final DoubleTensor xMinusA = x.minus(a).powInPlace(k.minus(1));
-        final DoubleTensor lnXMinusAToKMinus1 = ((xMinusA).divInPlace(k.apply(Gamma::gamma))).logInPlace();
+        final DoubleTensor xMinusAPowKMinus1 = x.minus(a).powInPlace(k.minus(1));
+        final DoubleTensor lnXMinusAToKMinus1 = ((xMinusAPowKMinus1).divInPlace(k.apply(Gamma::gamma))).logInPlace();
         return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
     }
 

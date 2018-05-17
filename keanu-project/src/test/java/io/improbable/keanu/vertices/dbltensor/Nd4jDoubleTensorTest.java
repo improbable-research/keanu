@@ -20,8 +20,6 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canElementWiseMultiplyMatrix() {
-        System.out.println(matrixA.getRank());
-        System.out.println(matrixA.getValue(0,1));
         DoubleTensor result = matrixA.times(matrixB);
         assertArrayEquals(new double[]{1, 4, 9, 16}, result.getLinearView(), 0.0);
     }
