@@ -13,6 +13,7 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
@@ -30,7 +31,7 @@ public class TensorExponentialVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        TensorExponentialVertex tensorExponentialVertex = new TensorExponentialVertex(1, 1.5, new KeanuRandom(1));
+        TensorExponentialVertex tensorExponentialVertex = new TensorExponentialVertex(1, 1.5);
         double expectedDensity = Exponential.logPdf(1, 1.5, 2.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorExponentialVertex, 2.0, expectedDensity);
@@ -40,7 +41,7 @@ public class TensorExponentialVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = Exponential.logPdf(0.0, 1.0, 0.25) + Exponential.logPdf(0.0, 1.0, .75);
-        TensorExponentialVertex ndExponentialVertex = new TensorExponentialVertex(0, 1, new KeanuRandom(1));
+        TensorExponentialVertex ndExponentialVertex = new TensorExponentialVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndExponentialVertex, new double[]{0.25, .75}, expectedLogDensity);
     }
 
@@ -51,13 +52,13 @@ public class TensorExponentialVertexTest {
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 5.0, keanuRandom);
+        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 5.0);
         aTensor.setValue(2.);
 
-        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 5.0, keanuRandom);
+        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 5.0);
         bTensor.setValue(2.5);
 
-        TensorExponentialVertex tensorExponentialVertex = new TensorExponentialVertex(aTensor, bTensor, keanuRandom);
+        TensorExponentialVertex tensorExponentialVertex = new TensorExponentialVertex(aTensor, bTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5);
 
         TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
@@ -67,23 +68,23 @@ public class TensorExponentialVertexTest {
         assertEquals(exponentialLogDiff.dPdx, actual.withRespectTo(tensorExponentialVertex.getId()).scalar(), 1e-5);
     }
 
-//    @Test
-//    public void matchesKnownDerivativeLogDensityOfVector() {
-//
-//        double[] vector = new double[]{1, 1.5, 2, 2.5};
-//
-//        KeanuRandom keanuRandom = new KeanuRandom(1);
-//
-//        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 10., keanuRandom);
-//        aTensor.setValue(5.);
-//
-//        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 10., keanuRandom);
-//        bTensor.setValue(5.);
-//
-//        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorExponentialVertex(aTensor, bTensor, keanuRandom);
-//
-//        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
-//    }
+    @Test
+    public void matchesKnownDerivativeLogDensityOfVector() {
+
+        double[] vector = new double[]{1, 1.5, 2, 2.5};
+
+        KeanuRandom keanuRandom = new KeanuRandom(1);
+
+        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 10.);
+        aTensor.setValue(5.);
+
+        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 10.);
+        bTensor.setValue(5.);
+
+        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorExponentialVertex(aTensor, bTensor);
+
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+    }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
@@ -91,8 +92,7 @@ public class TensorExponentialVertexTest {
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         TensorExponentialVertex vertexUnderTest = new TensorExponentialVertex(
             mu,
-            new ConstantTensorVertex(3.0),
-            random
+            3.
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -101,8 +101,8 @@ public class TensorExponentialVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), random);
-        TensorExponentialVertex exponential = new TensorExponentialVertex(uniformA, new ConstantTensorVertex(3.0), random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(0.0, 1.0);
+        TensorExponentialVertex exponential = new TensorExponentialVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -122,8 +122,8 @@ public class TensorExponentialVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(1.), new ConstantTensorVertex(3.), random);
-        TensorExponentialVertex exponential = new TensorExponentialVertex(new ConstantTensorVertex(0.0), uniformA, random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(1., 3.);
+        TensorExponentialVertex exponential = new TensorExponentialVertex(0.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -150,15 +150,14 @@ public class TensorExponentialVertexTest {
         TensorExponentialVertex vertex = new TensorExponentialVertex(
             new int[]{sampleCount, 1},
             new ConstantTensorVertex(0.0),
-            new ConstantTensorVertex(0.5),
-            random
+            new ConstantTensorVertex(0.5)
         );
 
         double from = 0.5;
         double to = 4;
         double bucketSize = 0.05;
 
-        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2);
+        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
     }
 
     @Test
@@ -172,16 +171,17 @@ public class TensorExponentialVertexTest {
         aB.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueB)));
 
         List<DoubleTensorVertex> latentAB = new ArrayList<>();
-        TensorUniformVertex latentB = new TensorUniformVertex(0.01, 10.0, random);
+        TensorUniformVertex latentB = new TensorUniformVertex(0.01, 10.0);
         latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
         latentAB.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
         latentAB.add(latentB);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorExponentialVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
+            hyperParams -> new TensorExponentialVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             aB,
-            latentAB
+            latentAB,
+            random
         );
     }
 

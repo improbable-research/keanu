@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.apache.commons.math3.special.Gamma.gamma;
 
@@ -9,7 +9,7 @@ public class ChiSquared {
     private ChiSquared() {
     }
 
-    public static double sample(int k, Random random) {
+    public static double sample(int k, KeanuRandom random) {
         if (k < 1) {
             throw new IllegalArgumentException("Invalid value of k: " + k);
         }

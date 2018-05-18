@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
 
@@ -16,8 +17,8 @@ public abstract class IntegerBinaryOpVertex extends NonProbabilisticInteger {
     }
 
     @Override
-    public Integer sample() {
-        return op(a.sample(), b.sample());
+    public Integer sample(KeanuRandom random) {
+        return op(a.sample(random), b.sample(random));
     }
 
     public Integer getDerivedValue() {

@@ -17,23 +17,20 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
 
     private final DoubleTensorVertex mu;
     private final DoubleTensorVertex sigma;
-    private final KeanuRandom random;
 
     /**
      * One mu or sigma or both driving an arbitrarily shaped tensor of Gaussian
      *
-     * @param shape  the desired shape of the vertex
-     * @param mu     the mu of the Gaussian with either the same shape as specified for this vertex or a scalar
-     * @param sigma  the sigma of the Gaussian with either the same shape as specified for this vertex or a scalar
-     * @param random the source of randomness
+     * @param shape the desired shape of the vertex
+     * @param mu    the mu of the Gaussian with either the same shape as specified for this vertex or a scalar
+     * @param sigma the sigma of the Gaussian with either the same shape as specified for this vertex or a scalar
      */
-    public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
+    public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma) {
 
         checkParentShapes(shape, mu.getValue(), sigma.getValue());
 
         this.mu = mu;
         this.sigma = sigma;
-        this.random = random;
         setParents(mu, sigma);
         setValue(DoubleTensor.placeHolder(shape));
     }
@@ -42,40 +39,23 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
      * One to one constructor for mapping some shape of mu and sigma to
      * a matching shaped gaussian.
      *
-     * @param mu     mu with same shape as desired Gaussian tensor or scalar
-     * @param sigma  sigma with same shape as desired Gaussian tensor or scalar
-     * @param random source of randomness
+     * @param mu    mu with same shape as desired Gaussian tensor or scalar
+     * @param sigma sigma with same shape as desired Gaussian tensor or scalar
      */
-    public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma, KeanuRandom random) {
-        this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma, random);
-    }
-
-    public TensorGaussianVertex(DoubleTensorVertex mu, double sigma, KeanuRandom random) {
-        this(mu, new ConstantTensorVertex(sigma), random);
-    }
-
-    public TensorGaussianVertex(double mu, DoubleTensorVertex sigma, KeanuRandom random) {
-        this(new ConstantTensorVertex(mu), sigma, random);
-    }
-
-    public TensorGaussianVertex(double mu, double sigma, KeanuRandom random) {
-        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma), random);
-    }
-
     public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma) {
-        this(mu, sigma, new KeanuRandom());
-    }
-
-    public TensorGaussianVertex(double mu, double sigma) {
-        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma), new KeanuRandom());
-    }
-
-    public TensorGaussianVertex(double mu, DoubleTensorVertex sigma) {
-        this(new ConstantTensorVertex(mu), sigma, new KeanuRandom());
+        this(getShapeProposal(mu.getValue(), sigma.getValue()), mu, sigma);
     }
 
     public TensorGaussianVertex(DoubleTensorVertex mu, double sigma) {
-        this(mu, new ConstantTensorVertex(sigma), new KeanuRandom());
+        this(mu, new ConstantTensorVertex(sigma));
+    }
+
+    public TensorGaussianVertex(double mu, DoubleTensorVertex sigma) {
+        this(new ConstantTensorVertex(mu), sigma);
+    }
+
+    public TensorGaussianVertex(double mu, double sigma) {
+        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma));
     }
 
     @Override
@@ -111,7 +91,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
     }
 
     @Override
-    public DoubleTensor sample() {
+    public DoubleTensor sample(KeanuRandom random) {
         return TensorGaussian.sample(getValue().getShape(), mu.getValue(), sigma.getValue(), random);
     }
 

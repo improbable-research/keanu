@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
@@ -8,26 +9,29 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.*;
 
 public class UniformIntVertexTest {
-    int N = 100000;
-    double epsilon = 0.01;
-    Integer lowerBound = 10;
-    Integer upperBound = 20;
-    List<Integer> samples = new ArrayList<>();
+    private int N = 100000;
+    private double epsilon = 0.01;
+    private Integer lowerBound = 10;
+    private Integer upperBound = 20;
+    private List<Integer> samples = new ArrayList<>();
+    private KeanuRandom random;
 
     @Before
     public void setup() {
+
+        random = new KeanuRandom(1);
+
         UniformIntVertex testUniformVertex = new UniformIntVertex(
             new ConstantIntegerVertex(lowerBound),
-            new ConstantIntegerVertex(upperBound),
-            new Random(1));
+            new ConstantIntegerVertex(upperBound)
+        );
 
         for (int i = 0; i < N; i++) {
-            Integer sample = testUniformVertex.sample();
+            Integer sample = testUniformVertex.sample(random);
             samples.add(sample);
         }
     }

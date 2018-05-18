@@ -16,7 +16,6 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
 
     private final DoubleTensorVertex mu;
     private final DoubleTensorVertex beta;
-    private final KeanuRandom random;
 
     /**
      * One mu or beta or both driving an arbitrarily shaped tensor of Laplace
@@ -24,15 +23,13 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
      * @param shape  the desired shape of the vertex
      * @param mu     the mu of the Laplace with either the same shape as specified for this vertex or a scalar
      * @param beta   the beta of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param random the source of randomness
      */
-    public TensorLaplaceVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex beta, KeanuRandom random) {
+    public TensorLaplaceVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex beta) {
 
         checkParentShapes(shape, mu.getValue(), beta.getValue());
 
         this.mu = mu;
         this.beta = beta;
-        this.random = random;
         setParents(mu, beta);
         setValue(DoubleTensor.placeHolder(shape));
     }
@@ -43,38 +40,21 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
      *
      * @param mu     the mu of the Laplace with either the same shape as specified for this vertex or a scalar
      * @param beta   the beta of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param random the source of randomness
      */
-    public TensorLaplaceVertex(DoubleTensorVertex mu, DoubleTensorVertex beta, KeanuRandom random) {
-        this(getShapeProposal(mu.getValue(), beta.getValue()), mu, beta, random);
-    }
-
-    public TensorLaplaceVertex(DoubleTensorVertex mu, double beta, KeanuRandom random) {
-        this(mu, new ConstantTensorVertex(beta), random);
-    }
-
-    public TensorLaplaceVertex(double mu, DoubleTensorVertex beta, KeanuRandom random) {
-        this(new ConstantTensorVertex(mu), beta, random);
-    }
-
-    public TensorLaplaceVertex(double mu, double beta, KeanuRandom random) {
-        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(beta), random);
-    }
-
     public TensorLaplaceVertex(DoubleTensorVertex mu, DoubleTensorVertex beta) {
-        this(getShapeProposal(mu.getValue(), beta.getValue()), mu, beta, new KeanuRandom());
+        this(getShapeProposal(mu.getValue(), beta.getValue()), mu, beta);
     }
 
     public TensorLaplaceVertex(DoubleTensorVertex mu, double beta) {
-        this(mu, new ConstantTensorVertex(beta), new KeanuRandom());
+        this(mu, new ConstantTensorVertex(beta));
     }
 
     public TensorLaplaceVertex(double mu, DoubleTensorVertex beta) {
-        this(new ConstantTensorVertex(mu), beta, new KeanuRandom());
+        this(new ConstantTensorVertex(mu), beta);
     }
 
     public TensorLaplaceVertex(double mu, double beta) {
-        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(beta), new KeanuRandom());
+        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(beta));
     }
 
     @Override
@@ -110,7 +90,8 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
     }
 
     @Override
-    public DoubleTensor sample() {
+    public DoubleTensor sample(KeanuRandom random) {
         return TensorLaplace.sample(getValue().getShape(), mu.getValue(), beta.getValue(), random);
     }
+
 }

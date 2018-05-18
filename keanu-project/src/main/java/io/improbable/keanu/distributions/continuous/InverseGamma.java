@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import static org.apache.commons.math3.special.Gamma.digamma;
 import static org.apache.commons.math3.special.Gamma.gamma;
@@ -10,7 +10,7 @@ public class InverseGamma {
     private InverseGamma() {
     }
 
-    public static double sample(double a, double b, Random random) {
+    public static double sample(double a, double b, KeanuRandom random) {
         if (a <= 0.0 || b <= 0.0) {
             throw new IllegalArgumentException("Invalid value for a or b. a: " + a + ". b: " + b);
         }
