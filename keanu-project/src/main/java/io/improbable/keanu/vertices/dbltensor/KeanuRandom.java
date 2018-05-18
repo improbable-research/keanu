@@ -1,15 +1,10 @@
 package io.improbable.keanu.vertices.dbltensor;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-
-import static io.improbable.keanu.vertices.dbltensor.KeanuRandomSampling.gammaSample;
 
 public class KeanuRandom {
 
@@ -36,23 +31,23 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        List<Double> samples = exploreIndexesAndSample(shape, a, theta, k);
+        List<Double> samples = exploreIndexesAndSampleGamma(shape, a, theta, k);
         return createTensorFromList(samples, shape);
     }
 
-    private List<Double> exploreIndexesAndSample(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+    private List<Double> exploreIndexesAndSampleGamma(int[] shape, DoubleTensor... hyperParamaters) {
         List<Double> samples = new ArrayList<>();
         int[] results = new int[shape.length];
-        iterateThroughShape(0, shape.length, shape, results, samples, a, theta, k);
+        iterateThroughShape(0, shape.length, shape, results, samples, hyperParamaters);
         return samples;
     }
 
-    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<Double> samples, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<Double> samples, DoubleTensor... hyperParamaters) {
         if (count >= length) {
-            double sample = gammaSample(
-                a.getValue(result),
-                theta.getValue(result),
-                k.getValue(result),
+            Double sample = KeanuRandomSampling.gammaSample(
+                hyperParamaters[0].getValue(result),
+                hyperParamaters[1].getValue(result),
+                hyperParamaters[2].getValue(result),
                 nd4jRandom
             );
             samples.add(sample);
@@ -60,7 +55,7 @@ public class KeanuRandom {
         }
         for (int i = 0; i < size[count]; i++) {
             result[count] = i;
-            iterateThroughShape(count + 1, length, size, result, samples, a, theta, k);
+            iterateThroughShape(count + 1, length, size, result, samples, hyperParamaters);
         }
     }
 

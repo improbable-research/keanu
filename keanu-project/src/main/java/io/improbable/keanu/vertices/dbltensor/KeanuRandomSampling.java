@@ -11,7 +11,7 @@ class KeanuRandomSampling {
     private KeanuRandomSampling() {
     }
 
-    static double gammaSample(double a, double theta, double k, Random random) {
+    public static double gammaSample(double a, double theta, double k, Random random) {
         if (theta <= 0. || k <= 0.) {
             throw new IllegalArgumentException("Invalid value for theta or k. Theta: " + theta + ". k: " + k);
         }
