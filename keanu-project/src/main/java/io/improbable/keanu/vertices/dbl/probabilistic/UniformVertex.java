@@ -4,10 +4,10 @@ import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Collections;
 import java.util.Map;
-import java.util.Random;
 
 import static java.util.Collections.singletonMap;
 
@@ -15,41 +15,23 @@ public class UniformVertex extends ProbabilisticDouble {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
-    private final Random random;
 
-    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax, Random random) {
+    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
         this.xMin = xMin;
         this.xMax = xMax;
-        this.random = random;
         setParents(xMin, xMax);
     }
 
-    public UniformVertex(DoubleVertex xMin, double xMax, Random random) {
-        this(xMin, new ConstantDoubleVertex(xMax), random);
-    }
-
-    public UniformVertex(double xMin, DoubleVertex xMax, Random random) {
-        this(new ConstantDoubleVertex(xMin), xMax, random);
-    }
-
-    public UniformVertex(double xMin, double xMax, Random random) {
-        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), random);
-    }
-
-    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
-        this(xMin, xMax, new Random());
-    }
-
     public UniformVertex(DoubleVertex xMin, double xMax) {
-        this(xMin, xMax, new Random());
+        this(xMin, new ConstantDoubleVertex(xMax));
     }
 
     public UniformVertex(double xMin, DoubleVertex xMax) {
-        this(new ConstantDoubleVertex(xMin), xMax, new Random());
+        this(new ConstantDoubleVertex(xMin), xMax);
     }
 
     public UniformVertex(double xMin, double xMax) {
-        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), new Random());
+        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
     public DoubleVertex getXMin() {
@@ -85,7 +67,7 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(KeanuRandom random) {
         return Uniform.sample(xMin.getValue(), xMax.getValue(), random);
     }
 

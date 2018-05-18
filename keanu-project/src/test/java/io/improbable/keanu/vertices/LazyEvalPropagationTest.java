@@ -4,12 +4,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
@@ -18,13 +16,6 @@ import static org.junit.Assert.assertEquals;
 public class LazyEvalPropagationTest {
 
     private final Logger log = LoggerFactory.getLogger(LazyEvalPropagationTest.class);
-
-    Random random;
-
-    @Before
-    public void setup() {
-        random = new Random(1);
-    }
 
     @Test
     public void doesNotDoUnnecessaryOperations() {
@@ -49,11 +40,11 @@ public class LazyEvalPropagationTest {
     public void doesNotPropagateThroughProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new GaussianVertex(0, 1, random);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
         DoubleVertex end = addLinks(start, n, m, 1);
 
-        DoubleVertex nextLayerStart = new GaussianVertex(end, 1, random);
+        DoubleVertex nextLayerStart = new GaussianVertex(end, 1);
 
         DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 

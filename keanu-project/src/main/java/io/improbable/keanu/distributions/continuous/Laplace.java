@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -20,7 +20,7 @@ public class Laplace {
      * @param random source of randomness
      * @return a random number from the Laplace distribution
      */
-    public static double sample(double mu, double beta, Random random) {
+    public static double sample(double mu, double beta, KeanuRandom random) {
         if (beta <= 0.0) {
             throw new IllegalArgumentException("Invalid value for beta: " + beta);
         }

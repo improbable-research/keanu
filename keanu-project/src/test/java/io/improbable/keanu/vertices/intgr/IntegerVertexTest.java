@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
 import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
@@ -49,7 +48,7 @@ public class IntegerVertexTest {
 
     @Test
     public void doesObserve() {
-        PoissonVertex testIntegerVertex = new PoissonVertex(new ConstantDoubleVertex(1.0), new Random(1));
+        PoissonVertex testIntegerVertex = new PoissonVertex(new ConstantDoubleVertex(1.0));
         testIntegerVertex.lazyEval();
         testIntegerVertex.observe(5);
 

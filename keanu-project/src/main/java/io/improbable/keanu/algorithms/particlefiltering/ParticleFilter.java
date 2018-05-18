@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 
@@ -36,7 +37,7 @@ public class ParticleFilter {
      */
 
     public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices, int numParticles,
-                                                   int resamplingCycles, double resamplingProportion, Random random) {
+                                                   int resamplingCycles, double resamplingProportion, KeanuRandom random) {
 
         Map<Vertex, Set<Vertex>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
         List<Vertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
@@ -52,19 +53,22 @@ public class ParticleFilter {
         return particles;
     }
 
-    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex, Set<Vertex> vertexDeps,
+    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex,
+                                                  Set<Vertex> vertexDeps,
                                                   List<Particle> particles,
-                                                  int numParticles, int resamplingCycles,
-                                                  double resamplingProportion, Random random) {
+                                                  int numParticles,
+                                                  int resamplingCycles,
+                                                  double resamplingProportion,
+                                                  KeanuRandom random) {
 
         List<Particle> updatedParticles = sampleAndCopy(particles, numParticles, random);
-        addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps);
+        addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps, random);
 
         for (int i = 0; i < resamplingCycles; i++) {
             updatedParticles = removeWorstParticles(updatedParticles, resamplingProportion);
             int numToSample = numParticles - updatedParticles.size();
             List<Particle> sampledParticles = sampleAndCopy(particles, numToSample, random);
-            addObservedVertexToParticles(sampledParticles, nextObservedVertex, vertexDeps);
+            addObservedVertexToParticles(sampledParticles, nextObservedVertex, vertexDeps, random);
             updatedParticles.addAll(sampledParticles);
         }
 
@@ -82,21 +86,23 @@ public class ParticleFilter {
         return emptyParticles;
     }
 
-    private static void addObservedVertexToParticles(List<Particle> particles, Vertex<?> observedVertex,
-                                                     Set<Vertex> vertexDependencies) {
+    private static void addObservedVertexToParticles(List<Particle> particles,
+                                                     Vertex<?> observedVertex,
+                                                     Set<Vertex> vertexDependencies,
+                                                     KeanuRandom random) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);
             for (Vertex<?> latentVertex : vertexDependencies) {
-                sampleValueAndAddToParticle(latentVertex, particle);
+                sampleValueAndAddToParticle(latentVertex, particle, random);
             }
 
             particle.updateSumLogPOfSubgraph();
         }
     }
 
-    private static <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle) {
-        T sample = vertex.sample();
+    private static <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle, KeanuRandom random) {
+        T sample = vertex.sample(random);
         particle.addLatentVertex(vertex, sample);
     }
 
@@ -107,7 +113,7 @@ public class ParticleFilter {
         return new ArrayList<>(particlesToKeep);
     }
 
-    private static List<Particle> sampleAndCopy(List<Particle> particles, int numToSample, Random random) {
+    private static List<Particle> sampleAndCopy(List<Particle> particles, int numToSample, KeanuRandom random) {
 
         double sumWeights = particles.stream().mapToDouble(p -> exp(p.getSumLogPOfSubgraph())).sum();
         List<Particle> sampledParticles = new ArrayList<>();
@@ -119,7 +125,7 @@ public class ParticleFilter {
         return sampledParticles;
     }
 
-    private static Particle weightedRandomParticle(List<Particle> particles, double sumWeights, Random random) {
+    private static Particle weightedRandomParticle(List<Particle> particles, double sumWeights, KeanuRandom random) {
         double r = random.nextDouble() * sumWeights;
         double cumulativeWeight = 0;
         Particle p = particles.get(0);

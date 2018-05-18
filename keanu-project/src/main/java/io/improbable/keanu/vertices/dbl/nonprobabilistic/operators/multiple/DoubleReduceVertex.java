@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -35,8 +36,8 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
-        return applyReduce(Vertex::sample);
+    public Double sample(KeanuRandom random) {
+        return applyReduce(vertex -> vertex.sample(random));
     }
 
     @Override
