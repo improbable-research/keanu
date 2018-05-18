@@ -21,7 +21,7 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
     /**
      * One a, theta or k or all three driving an arbitrarily shaped tensor of Gamma
      *
-     * @param shape the desired shape of the vertex
+     * @param shape  the desired shape of the vertex
      * @param a      the a of the Gamma with either the same shape as specified for this vertex or a scalar
      * @param theta  the theta of the Gamma with either the same shape as specified for this vertex or a scalar
      * @param k      the k of the Gamma with either the same shape as specified for this vertex or a scalar

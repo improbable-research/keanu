@@ -91,9 +91,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
         INDArray tensorCopy = tensor.dup();
         List<Double> values = Arrays.asList(tensorValues);
-        List<Double> functionApplied = values.stream().map(function::apply).collect(Collectors.toList());
-        for (int i = 0; i < functionApplied.size(); i++) {
-            tensorCopy.putScalar(i, functionApplied.get(i));
+        for (int i = 0; i < values.size(); i++) {
+            tensorCopy.putScalar(i, function.apply(values.get(i)));
         }
         return new Nd4jDoubleTensor(tensorCopy);
     }

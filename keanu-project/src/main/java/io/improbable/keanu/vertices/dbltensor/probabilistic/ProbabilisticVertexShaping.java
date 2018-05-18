@@ -18,7 +18,7 @@ public class ProbabilisticVertexShaping {
      * @param shape   the shape of the vertex being checked
      * @param tensors the tensors of the parent vertices
      */
-    public static void  checkParentShapes(int[] shape, DoubleTensor... tensors) {
+    public static void checkParentShapes(int[] shape, DoubleTensor... tensors) {
 
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(tensors);
 
