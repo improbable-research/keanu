@@ -35,19 +35,19 @@ public class KeanuRandom {
         return createTensorFromList(samples, shape);
     }
 
-    private List<Double> exploreIndexesAndSampleGamma(int[] shape, DoubleTensor... hyperParamaters) {
+    private List<Double> exploreIndexesAndSampleGamma(int[] shape, DoubleTensor... hyperParameters) {
         List<Double> samples = new ArrayList<>();
         int[] results = new int[shape.length];
-        iterateThroughShape(0, shape.length, shape, results, samples, hyperParamaters);
+        iterateThroughShape(0, shape.length, shape, results, samples, hyperParameters);
         return samples;
     }
 
-    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<Double> samples, DoubleTensor... hyperParamaters) {
+    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<Double> samples, DoubleTensor... hyperParameters) {
         if (count >= length) {
             Double sample = KeanuRandomSampling.gammaSample(
-                hyperParamaters[0].getValue(result),
-                hyperParamaters[1].getValue(result),
-                hyperParamaters[2].getValue(result),
+                hyperParameters[0].getValue(result),
+                hyperParameters[1].getValue(result),
+                hyperParameters[2].getValue(result),
                 nd4jRandom
             );
             samples.add(sample);
@@ -55,7 +55,7 @@ public class KeanuRandom {
         }
         for (int i = 0; i < size[count]; i++) {
             result[count] = i;
-            iterateThroughShape(count + 1, length, size, result, samples, hyperParamaters);
+            iterateThroughShape(count + 1, length, size, result, samples, hyperParameters);
         }
     }
 
