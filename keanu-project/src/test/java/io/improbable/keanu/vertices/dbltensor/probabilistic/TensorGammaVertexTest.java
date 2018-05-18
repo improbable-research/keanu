@@ -51,13 +51,13 @@ public class TensorGammaVertexTest {
 
         Gamma.Diff gammaLogDiff = Gamma.dlnPdf(0.75, 2, 5.5, 1.5);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(new ConstantTensorVertex(0.5), new ConstantTensorVertex(1.0), keanuRandom);
+        TensorUniformVertex aTensor = new TensorUniformVertex(0.5, 1.0, keanuRandom);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        TensorUniformVertex thetaTensor = new TensorUniformVertex(new ConstantTensorVertex(0.5), new ConstantTensorVertex(1.0), keanuRandom);
+        TensorUniformVertex thetaTensor = new TensorUniformVertex(0.5, 1.0, keanuRandom);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(2));
 
-        TensorUniformVertex kTensor = new TensorUniformVertex(new ConstantTensorVertex(1.0), new ConstantTensorVertex(5.0), keanuRandom);
+        TensorUniformVertex kTensor = new TensorUniformVertex(1.0, 5.0, keanuRandom);
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
         TensorGammaVertex tensorGamma = new TensorGammaVertex(aTensor, thetaTensor, kTensor, new KeanuRandom(1));
@@ -78,13 +78,13 @@ public class TensorGammaVertexTest {
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(new ConstantTensorVertex(0.5), new ConstantTensorVertex(1.0), keanuRandom);
+        TensorUniformVertex aTensor = new TensorUniformVertex(0.5, 1.0, keanuRandom);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        TensorUniformVertex thetaTensor = new TensorUniformVertex(new ConstantTensorVertex(0.5), new ConstantTensorVertex(1.0), keanuRandom);
+        TensorUniformVertex thetaTensor = new TensorUniformVertex(0.5, 1.0, keanuRandom);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        TensorUniformVertex kTensor = new TensorUniformVertex(new ConstantTensorVertex(1.0), new ConstantTensorVertex(5.0), keanuRandom);
+        TensorUniformVertex kTensor = new TensorUniformVertex(1.0, 5.0, keanuRandom);
         kTensor.setValue(Nd4jDoubleTensor.scalar(2.5));
 
         Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorGammaVertex(aTensor, thetaTensor, kTensor, keanuRandom);
@@ -110,8 +110,8 @@ public class TensorGammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
 
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0), random);
-        TensorGammaVertex gamma = new TensorGammaVertex(uniformA, new ConstantTensorVertex(2.0), new ConstantTensorVertex(3.0), random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(0.0, 1.0, random);
+        TensorGammaVertex gamma = new TensorGammaVertex(uniformA, 2.0, 3.0, random);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
@@ -132,8 +132,8 @@ public class TensorGammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdtheta() {
 
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(1.0), new ConstantTensorVertex(3.0), random);
-        TensorGammaVertex gamma = new TensorGammaVertex(new ConstantTensorVertex(0.0), uniformA, new ConstantTensorVertex(3.0), random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(1.0, 3.0, random);
+        TensorGammaVertex gamma = new TensorGammaVertex(0.0, uniformA, 3.0, random);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
@@ -154,8 +154,8 @@ public class TensorGammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdk() {
 
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(2.0), new ConstantTensorVertex(5.0), random);
-        TensorGammaVertex gamma = new TensorGammaVertex(new ConstantTensorVertex(0.0), new ConstantTensorVertex(2.0), uniformA, random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(2.0, 5.0, random);
+        TensorGammaVertex gamma = new TensorGammaVertex(0.0, 2.0, uniformA, random);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);

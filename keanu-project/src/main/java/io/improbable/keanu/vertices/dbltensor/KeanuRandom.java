@@ -7,6 +7,7 @@ import org.nd4j.linalg.api.rng.Random;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import static io.improbable.keanu.vertices.dbltensor.KeanuRandomSampling.gammaSample;
 
@@ -35,39 +36,31 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        List<Double> gammaValues = new ArrayList<>();
-        List<List<Integer>> possibleIndexes = exploreIndexes(shape);
+        List<Double> samples = exploreIndexesAndSample(shape, a, theta, k);
+        return createTensorFromList(samples, shape);
+    }
 
-        for (List<Integer> index : possibleIndexes) {
-            int[] currentDimension = index.stream().mapToInt(i -> i).toArray();
+    private List<Double> exploreIndexesAndSample(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+        List<Double> samples = new ArrayList<>();
+        int[] results = new int[shape.length];
+        iterateThroughShape(0, shape.length, shape, results, samples, a, theta, k);
+        return samples;
+    }
+
+    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<Double> samples, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+        if (count >= length) {
             double sample = gammaSample(
-                a.getValue(currentDimension),
-                theta.getValue(currentDimension),
-                k.getValue(currentDimension),
+                a.getValue(result),
+                theta.getValue(result),
+                k.getValue(result),
                 nd4jRandom
             );
-            gammaValues.add(sample);
-        }
-
-        return createTensorFromList(gammaValues, shape);
-    }
-
-    private List<List<Integer>> exploreIndexes(int[] shape) {
-        List<List<Integer>> possibleIndexes = new ArrayList<>();
-        int[] results = new int[shape.length];
-        iterateThroughShape(0, shape.length, shape, results, possibleIndexes);
-        return possibleIndexes;
-    }
-
-    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<List<Integer>> dimensions) {
-        if (count >= length) {
-            Integer[] res = ArrayUtils.toObject(result);
-            dimensions.add(Arrays.asList(res));
+            samples.add(sample);
             return;
         }
         for (int i = 0; i < size[count]; i++) {
             result[count] = i;
-            iterateThroughShape(count + 1, length, size, result, dimensions);
+            iterateThroughShape(count + 1, length, size, result, samples, a, theta, k);
         }
     }
 

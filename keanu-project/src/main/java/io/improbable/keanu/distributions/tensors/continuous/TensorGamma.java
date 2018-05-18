@@ -27,9 +27,9 @@ public class TensorGamma {
         final DoubleTensor kMinus1 = k.minus(1.);
         final DoubleTensor oneOverTheta = theta.reciprocal();
 
-        final DoubleTensor dPdx = kMinus1.div(xMinusA).minus(oneOverTheta);
-        final DoubleTensor dPda = kMinus1.div(aMinusX).plus(oneOverTheta);
-        final DoubleTensor dPdtheta = theta.times(k).plusInPlace(a).minus(x).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dPdx = kMinus1.div(xMinusA).minusInPlace(oneOverTheta);
+        final DoubleTensor dPda = kMinus1.div(aMinusX).plusInPlace(oneOverTheta);
+        final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
         final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(Gamma::digamma));
 
         return new Diff(dPda, dPdtheta, dPdk, dPdx);

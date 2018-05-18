@@ -145,7 +145,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sqrt() {
-        return pow(0.5);
+        return new Nd4jDoubleTensor(Transforms.sqrt(tensor));
     }
 
     @Override
@@ -284,7 +284,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sqrtInPlace() {
-        return powInPlace(0.5);
+        Transforms.sqrt(tensor, false);
+        return this;
     }
 
     @Override
@@ -435,9 +436,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor applyInPlace(Function<Double, Double> function) {
         Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
         List<Double> values = Arrays.asList(tensorValues);
-        List<Double> functionApplied = values.stream().map(function::apply).collect(Collectors.toList());
-        for (int i = 0; i < functionApplied.size(); i++) {
-            tensor.putScalar(i, functionApplied.get(i));
+        for (int i = 0; i < values.size(); i++) {
+            tensor.putScalar(i, function.apply(values.get(i)));
         }
         return new Nd4jDoubleTensor(tensor);
     }

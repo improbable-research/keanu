@@ -72,6 +72,10 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
         this(new ConstantTensorVertex(a), theta, new ConstantTensorVertex(k), random);
     }
 
+    public TensorGammaVertex(double a, double theta, DoubleTensorVertex k, KeanuRandom random) {
+        this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), k, random);
+    }
+
     public TensorGammaVertex(double a, double theta, double k, KeanuRandom random) {
         this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), new ConstantTensorVertex(k), random);
     }
