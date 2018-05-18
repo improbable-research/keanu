@@ -69,24 +69,6 @@ public class TensorExponentialVertexTest {
     }
 
     @Test
-    public void matchesKnownDerivativeLogDensityOfVector() {
-
-        double[] vector = new double[]{1, 1.5, 2, 2.5};
-
-        KeanuRandom keanuRandom = new KeanuRandom(1);
-
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 10.);
-        aTensor.setValue(5.);
-
-        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 10.);
-        bTensor.setValue(5.);
-
-        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorExponentialVertex(aTensor, bTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
-    }
-
-    @Test
     public void isTreatedAsConstantWhenObserved() {
         TensorUniformVertex mu = new TensorUniformVertex(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
