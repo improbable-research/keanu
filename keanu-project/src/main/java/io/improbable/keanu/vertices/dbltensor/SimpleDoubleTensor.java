@@ -15,7 +15,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
         this.shape = shape;
     }
 
-    private SimpleDoubleTensor duplicate() {
+    @Override
+    public DoubleTensor duplicate() {
         return new SimpleDoubleTensor(value);
     }
 

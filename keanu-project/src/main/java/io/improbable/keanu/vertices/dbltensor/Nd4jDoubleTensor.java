@@ -83,6 +83,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor duplicate() {
+        return new Nd4jDoubleTensor(tensor.dup());
+    }
+
+    @Override
     public double scalar() {
         return tensor.getDouble(0);
     }

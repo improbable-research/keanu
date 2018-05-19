@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,10 +17,11 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import static org.junit.Assert.assertEquals;
 
 public class BetaVertexTest {
-    private final Logger log = LoggerFactory.getLogger(BetaVertexTest.class);
-
     private static final double DELTA = 0.0001;
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+    private final Logger log = LoggerFactory.getLogger(BetaVertexTest.class);
     private KeanuRandom random;
 
     @Before
@@ -183,14 +186,9 @@ public class BetaVertexTest {
         alphaBeta.add(new ConstantDoubleVertex(trueAlpha));
         alphaBeta.add(new ConstantDoubleVertex(trueBeta));
 
-        SmoothUniformVertex latentAlpha = new SmoothUniformVertex(0.01, 10.0);
-        latentAlpha.setValue(9.9);
-        SmoothUniformVertex latentBeta = new SmoothUniformVertex(0.01, 10.0);
-        latentBeta.setValue(5.0);
-
         List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
-        latentAlphaBeta.add(latentAlpha);
-        latentAlphaBeta.add(latentBeta);
+        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
+        latentAlphaBeta.add(new SmoothUniformVertex(0.01, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
             hyperParams -> new BetaVertex(hyperParams.get(0), hyperParams.get(1)),

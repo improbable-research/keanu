@@ -66,6 +66,8 @@ public interface DoubleTensor extends Tensor {
 
     double sum();
 
+    DoubleTensor duplicate();
+
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();

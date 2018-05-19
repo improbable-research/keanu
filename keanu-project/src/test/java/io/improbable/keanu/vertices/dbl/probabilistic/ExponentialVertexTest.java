@@ -20,11 +20,9 @@ public class ExponentialVertexTest {
 
     private static final double DELTA = 0.0001;
 
-    private final Logger log = LoggerFactory.getLogger(ExponentialVertexTest.class);
-
     @Rule
     public DeterministicRule deterministicRule = new DeterministicRule();
-
+    private final Logger log = LoggerFactory.getLogger(ExponentialVertexTest.class);
     private KeanuRandom random;
 
     @Before
