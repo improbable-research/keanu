@@ -1,10 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,8 +19,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 
 public class GammaVertexTest {
-    private final Logger log = LoggerFactory.getLogger(GammaVertexTest.class);
-
     private static final double DELTA = 0.0001;
 
     private static final double[][] TEST_VALUES = new double[][]{
@@ -32,6 +32,9 @@ public class GammaVertexTest {
         {1.0, 0.5}
     };
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+    private final Logger log = LoggerFactory.getLogger(GammaVertexTest.class);
     private KeanuRandom random;
 
     @Before

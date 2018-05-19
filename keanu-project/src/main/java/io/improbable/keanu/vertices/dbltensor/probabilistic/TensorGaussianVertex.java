@@ -26,7 +26,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
      */
     public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex sigma) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getValue(), sigma.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape(), sigma.getShape());
 
         this.mu = mu;
         this.sigma = sigma;
@@ -42,7 +42,7 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
      * @param sigma sigma with same shape as desired Gaussian tensor or scalar
      */
     public TensorGaussianVertex(DoubleTensorVertex mu, DoubleTensorVertex sigma) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getValue(), sigma.getValue()), mu, sigma);
+        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
     }
 
     public TensorGaussianVertex(DoubleTensorVertex mu, double sigma) {

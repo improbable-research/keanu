@@ -26,7 +26,7 @@ public class BinaryOpVertexTest {
     }
 
     @Test
-    public void basicTest() {
+    public void canSampleFromTwoParents() {
         Flip flip = new Flip(0.5);
         GaussianVertex gaus = new GaussianVertex(0.0, 1.0);
         BinaryOpLambda<Boolean, Double, Double> custom = new BinaryOpLambda<>(flip, gaus, (Boolean f, Double g) -> {

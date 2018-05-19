@@ -13,7 +13,7 @@ public abstract class TensorBinaryOpVertex extends NonProbabilisticDoubleTensor 
     protected final DoubleTensorVertex b;
 
     public TensorBinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
-        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getValue(), b.getValue());
+        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape());
         this.a = a;
         this.b = b;
         setParents(a, b);

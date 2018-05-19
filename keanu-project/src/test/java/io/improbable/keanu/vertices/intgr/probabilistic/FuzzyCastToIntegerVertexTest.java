@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
@@ -10,6 +11,7 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +27,8 @@ public class FuzzyCastToIntegerVertexTest {
 
     private final Logger log = LoggerFactory.getLogger(FuzzyCastToIntegerVertexTest.class);
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
     private KeanuRandom random;
 
     @Before
@@ -136,9 +140,8 @@ public class FuzzyCastToIntegerVertexTest {
     @Test
     public void calculateMuByObservingFuzzy() {
         DoubleVertex mu = new UniformVertex(0, 10);
-        DoubleVertex sigma = new ConstantDoubleVertex(1.);
 
-        FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, sigma.getValue(), 0, 10);
+        FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, 1.0, 0, 10);
         fuzzy.observe(6);
 
         BayesNetDoubleAsContinuous bayes = new BayesNetDoubleAsContinuous(fuzzy.getConnectedGraph());

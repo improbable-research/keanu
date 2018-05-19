@@ -4,7 +4,6 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorUniform;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Tensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 
 import java.util.Map;
@@ -25,7 +24,7 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
      */
     public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getValue(), xMax.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
@@ -34,19 +33,31 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getValue(), xMax.getValue()), xMin, xMax);
+        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 
     public TensorUniformVertex(DoubleTensorVertex xMin, double xMax) {
-        this(xMin.getShape(), xMin, new ConstantTensorVertex(xMax));
+        this(xMin, new ConstantTensorVertex(xMax));
     }
 
     public TensorUniformVertex(double xMin, DoubleTensorVertex xMax) {
-        this(xMax.getShape(), new ConstantTensorVertex(xMin), xMax);
+        this(new ConstantTensorVertex(xMin), xMax);
     }
 
     public TensorUniformVertex(double xMin, double xMax) {
-        this(Tensor.SCALAR_SHAPE, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
+        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
+    }
+
+    public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, double xMax) {
+        this(shape, xMin, new ConstantTensorVertex(xMax));
+    }
+
+    public TensorUniformVertex(int[] shape, double xMin, DoubleTensorVertex xMax) {
+        this(shape, new ConstantTensorVertex(xMin), xMax);
+    }
+
+    public TensorUniformVertex(int[] shape, double xMin, double xMax) {
+        this(shape, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
     }
 
     public DoubleTensorVertex getXMin() {
@@ -66,8 +77,8 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
 
         DoubleTensor dlogPdf = DoubleTensor.zeros(this.xMax.getValue().getShape());
-        dlogPdf.applyWhereInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
-        dlogPdf.applyWhereInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
+        dlogPdf.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
+        dlogPdf.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
 
         return singletonMap(getId(), dlogPdf);
     }
@@ -76,6 +87,5 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     public DoubleTensor sample(KeanuRandom random) {
         return TensorUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
     }
-
 
 }

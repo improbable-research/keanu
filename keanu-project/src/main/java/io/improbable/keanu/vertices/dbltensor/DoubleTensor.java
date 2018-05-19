@@ -74,6 +74,8 @@ public interface DoubleTensor extends Tensor {
 
     double sum();
 
+    DoubleTensor duplicate();
+
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();
@@ -116,7 +118,9 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
 
-    DoubleTensor applyWhereInPlace(DoubleTensor withMask, double value);
+    DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value);
+
+    DoubleTensor setWithMask(DoubleTensor mask, double value);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
@@ -156,6 +160,16 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor unaryMinusInPlace();
 
-    double[] getLinearView();
+    FlattenedView getFlattenedView();
 
+    interface FlattenedView {
+
+        long size();
+
+        double get(long index);
+
+        void set(long index, double value);
+
+        double[] asArray();
+    }
 }

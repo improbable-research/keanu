@@ -146,10 +146,12 @@ public class TensorHamiltonian {
      * return `T, r`
      *
      * @param latentVertices
-     * @param gradient              gradient at current position
-     * @param momentums             current vertex momentums
+     * @param latentSetAndCascadeCache
+     * @param position
+     * @param gradient                 gradient at current position
+     * @param momentums                current vertex momentums
      * @param stepSize
-     * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
+     * @param probabilisticVertices    all vertices that impact the joint posterior (masterP)
      * @return the gradient at the updated position
      */
     private static Map<Long, DoubleTensor> leapfrog(final List<Vertex<DoubleTensor>> latentVertices,

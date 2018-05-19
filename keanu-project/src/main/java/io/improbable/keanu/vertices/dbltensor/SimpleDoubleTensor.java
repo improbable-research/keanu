@@ -15,7 +15,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
         this.shape = shape;
     }
 
-    private SimpleDoubleTensor duplicate() {
+    @Override
+    public DoubleTensor duplicate() {
         return new SimpleDoubleTensor(value);
     }
 
@@ -146,13 +147,18 @@ public class SimpleDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor applyWhereInPlace(DoubleTensor withMask, double valueToApply) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, double valueToApply) {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
-        }else {
+        } else {
             throw new IllegalArgumentException("Only scalar tensors supported");
         }
         return this;
+    }
+
+    @Override
+    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+        return this.duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override
@@ -285,8 +291,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public double[] getLinearView() {
-        return new double[]{value};
+    public FlattenedView getFlattenedView() {
+        return new SimpleFlattenedView(value);
     }
 
     @Override
@@ -315,5 +321,40 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public boolean isShapePlaceholder() {
         return value == null;
+    }
+
+    private static class SimpleFlattenedView implements FlattenedView {
+
+        private double value;
+
+        public SimpleFlattenedView(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public long size() {
+            return 1;
+        }
+
+        @Override
+        public double get(long index) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            return value;
+        }
+
+        @Override
+        public void set(long index, double value) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            this.value = value;
+        }
+
+        @Override
+        public double[] asArray() {
+            return new double[]{value};
+        }
     }
 }

@@ -35,8 +35,8 @@ public class TensorMCMCTestDistributions {
                 (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2))
             );
 
-        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).getLinearView();
-        double[] means = averages.getLinearView();
+        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).getFlattenedView().asArray();
+        double[] means = averages.getFlattenedView().asArray();
 
         for (int i = 0; i < means.length; i++) {
             assertEquals(mu, means[i], 0.05);
@@ -44,7 +44,7 @@ public class TensorMCMCTestDistributions {
         }
     }
 
-    public static BayesNetTensorAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum, KeanuRandom random) {
+    public static BayesNetTensorAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
 
         TensorGaussianVertex A = new TensorGaussianVertex(mu, sigma);
         TensorGaussianVertex B = new TensorGaussianVertex(mu, sigma);
@@ -52,7 +52,7 @@ public class TensorMCMCTestDistributions {
         TensorGaussianVertex C = new TensorGaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setAndCascade(mu);
+        A.setValue(mu);
         B.setAndCascade(mu);
 
         return new BayesNetTensorAsContinuous(Arrays.asList(A, B, C));
@@ -61,17 +61,17 @@ public class TensorMCMCTestDistributions {
     public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-            .flatMapToDouble(tensor -> Arrays.stream(tensor.getLinearView()))
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.getFlattenedView().asArray()))
             .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-            .flatMapToDouble(tensor -> Arrays.stream(tensor.getLinearView()))
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.getFlattenedView().asArray()))
             .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static BayesNetTensorAsContinuous create2DDonutDistribution(KeanuRandom random) {
+    public static BayesNetTensorAsContinuous create2DDonutDistribution() {
         TensorGaussianVertex A = new TensorGaussianVertex(0, 1);
         TensorGaussianVertex B = new TensorGaussianVertex(0, 1);
 

@@ -1,10 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,10 +19,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class GaussianVertexTest {
-    private final Logger log = LoggerFactory.getLogger(GaussianVertexTest.class);
-
     private static final double DELTA = 0.0001;
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+    private final Logger log = LoggerFactory.getLogger(GaussianVertexTest.class);
     private KeanuRandom random;
 
     @Before
@@ -154,14 +157,9 @@ public class GaussianVertexTest {
         muSigma.add(new ConstantDoubleVertex(trueMu));
         muSigma.add(new ConstantDoubleVertex(trueSigma));
 
-        SmoothUniformVertex latentMu = new SmoothUniformVertex(-10.0, 10.0);
-        latentMu.setValue(latentMu.sample(random));
-        SmoothUniformVertex latentSigma = new SmoothUniformVertex(1.0, 10.0);
-        latentSigma.setValue(latentSigma.sample(random));
-
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
-        latentMuSigma.add(latentMu);
-        latentMuSigma.add(latentSigma);
+        latentMuSigma.add(new SmoothUniformVertex(-10.0, 10.0));
+        latentMuSigma.add(new SmoothUniformVertex(1.0, 10.0));
 
         VertexVariationalMAP.inferHyperParamsFromSamples(
             hyperParams -> new GaussianVertex(hyperParams.get(0), hyperParams.get(1)),
