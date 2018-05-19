@@ -4,7 +4,6 @@ import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.Arrays;
 import java.util.List;
@@ -36,8 +35,8 @@ public class TensorMCMCTestDistributions {
                 (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2))
             );
 
-        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).getLinearView();
-        double[] means = averages.getLinearView();
+        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).getFlattenedView().asArray();
+        double[] means = averages.getFlattenedView().asArray();
 
         for (int i = 0; i < means.length; i++) {
             assertEquals(mu, means[i], 0.05);
@@ -62,11 +61,11 @@ public class TensorMCMCTestDistributions {
     public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-            .flatMapToDouble(tensor -> Arrays.stream(tensor.getLinearView()))
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.getFlattenedView().asArray()))
             .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-            .flatMapToDouble(tensor -> Arrays.stream(tensor.getLinearView()))
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.getFlattenedView().asArray()))
             .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
