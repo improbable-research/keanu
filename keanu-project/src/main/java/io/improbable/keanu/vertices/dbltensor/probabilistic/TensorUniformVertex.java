@@ -4,7 +4,6 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorUniform;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Tensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 
 import java.util.Map;
@@ -17,55 +16,48 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
 
     private final DoubleTensorVertex xMin;
     private final DoubleTensorVertex xMax;
-    private final KeanuRandom random;
 
     /**
-     * @param shape  desired tensor shape
-     * @param xMin   inclusive
-     * @param xMax   exclusive
-     * @param random source of randomness
+     * @param shape desired tensor shape
+     * @param xMin  inclusive
+     * @param xMax  exclusive
      */
-    public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, KeanuRandom random) {
+    public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getValue(), xMax.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
-        this.random = random;
         setParents(xMin, xMax);
         setValue(DoubleTensor.placeHolder(shape));
     }
 
-    public TensorUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, KeanuRandom random) {
-        this(xMin.getValue().getShape(), xMin, xMax, random);
-    }
-
-    public TensorUniformVertex(DoubleTensorVertex xMin, double xMax, KeanuRandom random) {
-        this(xMin.getValue().getShape(), xMin, new ConstantTensorVertex(xMax), random);
-    }
-
-    public TensorUniformVertex(double xMin, DoubleTensorVertex xMax, KeanuRandom random) {
-        this(xMax.getValue().getShape(), new ConstantTensorVertex(xMin), xMax, random);
-    }
-
-    public TensorUniformVertex(double xMin, double xMax, KeanuRandom random) {
-        this(Tensor.SCALAR_SHAPE, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), random);
-    }
-
     public TensorUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getValue(), xMax.getValue()), xMin, xMax, new KeanuRandom());
+        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 
     public TensorUniformVertex(DoubleTensorVertex xMin, double xMax) {
-        this(xMin, xMax, new KeanuRandom());
+        this(xMin, new ConstantTensorVertex(xMax));
     }
 
     public TensorUniformVertex(double xMin, DoubleTensorVertex xMax) {
-        this(xMax.getValue().getShape(), new ConstantTensorVertex(xMin), xMax, new KeanuRandom());
+        this(new ConstantTensorVertex(xMin), xMax);
     }
 
     public TensorUniformVertex(double xMin, double xMax) {
-        this(Tensor.SCALAR_SHAPE, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), new KeanuRandom());
+        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
+    }
+
+    public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, double xMax) {
+        this(shape, xMin, new ConstantTensorVertex(xMax));
+    }
+
+    public TensorUniformVertex(int[] shape, double xMin, DoubleTensorVertex xMax) {
+        this(shape, new ConstantTensorVertex(xMin), xMax);
+    }
+
+    public TensorUniformVertex(int[] shape, double xMin, double xMax) {
+        this(shape, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
     }
 
     public DoubleTensorVertex getXMin() {
@@ -92,9 +84,8 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     }
 
     @Override
-    public DoubleTensor sample() {
+    public DoubleTensor sample(KeanuRandom random) {
         return TensorUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
     }
-
 
 }

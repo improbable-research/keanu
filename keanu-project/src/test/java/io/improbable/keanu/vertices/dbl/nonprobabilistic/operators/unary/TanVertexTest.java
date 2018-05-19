@@ -1,28 +1,27 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import javafx.scene.input.ScrollEvent;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 public class TanVertexTest {
 
-    private Random random;
-
-    @Before
-    public void setup() {
-        random = new Random(1);
-    }
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     @Test
     public void tanOpIsCalculatedCorrectly() {
@@ -41,13 +40,15 @@ public class TanVertexTest {
 
     @Test
     public void canSolveTanEquation() {
-        //tan 3x = 1
+        //tan 3x = -1
         //x = 45, 105 or 165
 
-        DoubleVertex unknownTheta = new UniformVertex(0.0, 10.0, random);
+        DoubleVertex unknownTheta = new UniformVertex(0.0, 10.0);
+        unknownTheta.setValue(5.0);
+
         TanVertex tan = new TanVertex(unknownTheta.multiply(3.0));
 
-        GaussianVertex observableTan = new GaussianVertex(tan, 1.0, random);
+        GaussianVertex observableTan = new GaussianVertex(tan, 1.0);
         observableTan.observe(-1.0);
 
         BayesNet bayesNet = new BayesNet(unknownTheta.getConnectedGraph());
@@ -55,9 +56,9 @@ public class TanVertexTest {
 
         gradientOptimizer.maxLikelihood(5000);
 
-        double theta = Math.toDegrees(unknownTheta.getValue()) % 60;
+        double result = Math.tan(3 * unknownTheta.getValue());
 
-        assertEquals(45, theta, 0.001);
+        assertEquals(-1, result, 0.001);
     }
 
     @Test
@@ -71,14 +72,15 @@ public class TanVertexTest {
             data.add(Math.tan(Math.PI / 2 - i));
         }
 
-        DoubleVertex unknownConstant = new UniformVertex(0.0, 5.0, random);
+        DoubleVertex unknownConstant = new UniformVertex(0.0, 5.0);
+        unknownConstant.setValue(2.5);
 
         for (int j = 1; j < dataCount; j++) {
             DoubleVertex tanPiOver2MinusX = new TanVertex(unknownConstant.minus(j));
             DoubleVertex CosOverSin = new CosVertex(j).div(new SinVertex(j));
 
-            GaussianVertex observableTan = new GaussianVertex(tanPiOver2MinusX, .00001, random);
-            GaussianVertex observableCosOverSin = new GaussianVertex(CosOverSin, .00001, random);
+            GaussianVertex observableTan = new GaussianVertex(tanPiOver2MinusX, .00001);
+            GaussianVertex observableCosOverSin = new GaussianVertex(CosOverSin, .00001);
 
             observableTan.observe(data.get(j - 1));
             observableCosOverSin.observe(data.get(j - 1));
@@ -89,13 +91,12 @@ public class TanVertexTest {
 
         gradientOptimizer.maxLikelihood(1500);
 
-        DoubleVertex absTan = new AbsVertex(unknownConstant);
-        assertEquals(Math.PI / 2, absTan.getValue() % Math.PI, 0.001);
+        assertEquals(Math.PI / 2, Math.abs(unknownConstant.getValue()) % Math.PI, 0.001);
     }
 
     @Test
     public void tanDualNumberIsCalculatedCorrectly() {
-        UniformVertex uniformVertex = new UniformVertex(0, 10, random);
+        UniformVertex uniformVertex = new UniformVertex(0, 10);
         uniformVertex.setValue(5.0);
 
         TanVertex tan = new TanVertex(uniformVertex);

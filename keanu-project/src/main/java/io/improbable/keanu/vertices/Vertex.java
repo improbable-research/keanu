@@ -3,15 +3,16 @@ package io.improbable.keanu.vertices;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> {
 
-    public static final AtomicLong idGenerator = new AtomicLong(0L);
+    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
-    private long uuid = idGenerator.getAndIncrement();
+    private long uuid = ID_GENERATOR.getAndIncrement();
     private Set<Vertex> children = new HashSet<>();
     private Set<Vertex> parents = new HashSet<>();
     private T value;
@@ -44,10 +45,15 @@ public abstract class Vertex<T> {
     }
 
     /**
+     * @param random source of randomness
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
      * this will always be the same value.
      */
-    public abstract T sample();
+    public abstract T sample(KeanuRandom random);
+
+    public T sampleUsingDefaultRandom() {
+        return sample(KeanuRandom.getDefaultRandom());
+    }
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's

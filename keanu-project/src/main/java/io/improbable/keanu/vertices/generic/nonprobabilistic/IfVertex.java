@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public class IfVertex<T> extends NonProbabilistic<T> {
 
@@ -16,8 +17,8 @@ public class IfVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T sample() {
-        return op(predicate.sample(), thn.sample(), els.sample());
+    public T sample(KeanuRandom random) {
+        return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
     @Override

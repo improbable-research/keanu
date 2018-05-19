@@ -16,8 +16,8 @@ import static org.junit.Assert.assertTrue;
 public class TensorMCMCTestDistributions {
 
     public static TensorBayesNet createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
-        TensorGaussianVertex A = new TensorGaussianVertex(new int[]{2, 1}, mu, sigma, random);
-        A.setAndCascade(A.sample());
+        TensorGaussianVertex A = new TensorGaussianVertex(new int[]{2, 1}, mu, sigma);
+        A.setAndCascade(A.sample(random));
         return new TensorBayesNet(A.getConnectedGraph());
     }
 
@@ -45,15 +45,15 @@ public class TensorMCMCTestDistributions {
         }
     }
 
-    public static TensorBayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum, KeanuRandom random) {
+    public static TensorBayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(mu, sigma, random);
-        TensorGaussianVertex B = new TensorGaussianVertex(mu, sigma, random);
+        TensorGaussianVertex A = new TensorGaussianVertex(mu, sigma);
+        TensorGaussianVertex B = new TensorGaussianVertex(mu, sigma);
 
-        TensorGaussianVertex C = new TensorGaussianVertex(A.plus(B), 1.0, random);
+        TensorGaussianVertex C = new TensorGaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setAndCascade(mu);
+        A.setValue(mu);
         B.setAndCascade(mu);
 
         return new TensorBayesNet(Arrays.asList(A, B, C));
@@ -72,11 +72,11 @@ public class TensorMCMCTestDistributions {
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static TensorBayesNet create2DDonutDistribution(KeanuRandom random) {
-        TensorGaussianVertex A = new TensorGaussianVertex(0, 1, random);
-        TensorGaussianVertex B = new TensorGaussianVertex(0, 1, random);
+    public static TensorBayesNet create2DDonutDistribution() {
+        TensorGaussianVertex A = new TensorGaussianVertex(0, 1);
+        TensorGaussianVertex B = new TensorGaussianVertex(0, 1);
 
-        TensorGaussianVertex D = new TensorGaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03, random);
+        TensorGaussianVertex D = new TensorGaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
         D.observe(0.5);
 
         A.setValue(Math.sqrt(0.5));

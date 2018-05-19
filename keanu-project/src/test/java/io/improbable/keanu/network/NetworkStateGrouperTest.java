@@ -2,6 +2,7 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.network.grouping.NetworkStateGrouper;
 import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Test;
 
 import java.util.*;
@@ -10,7 +11,7 @@ import static org.junit.Assert.assertTrue;
 
 public class NetworkStateGrouperTest {
 
-    private Random random = new Random(1);
+    private KeanuRandom random = new KeanuRandom(1);
 
     long v1Id = 1;
     long v2Id = 2;

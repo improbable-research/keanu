@@ -15,13 +15,13 @@ public class TensorShapeValidation {
      * the same shape of the proposal in question OR scalar.
      *
      * @param proposalShape the tensor shape being validated
-     * @param tensors       the tensors being validated against
+     * @param shapes       the tensors being validated against
      * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the non-scalar shape does
      *                                  not match the proposal shape.
      */
-    public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, Tensor... tensors) {
+    public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, int[]... shapes) {
 
-        Set<TensorShape> nonScalarShapes = getNonScalarShapes(tensors);
+        Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
 
         if (!nonScalarShapes.isEmpty()) {
 
@@ -45,12 +45,12 @@ public class TensorShapeValidation {
     /**
      * This ensures there is at most a single non-scalar shape.
      *
-     * @param tensors the tensors for shape checking
+     * @param shapes the tensors for shape checking
      * @return either a scalar shape OR the single non-scalar shape.
      * @throws IllegalArgumentException if there is more than one non-scalar shape
      */
-    public static int[] checkHasSingleNonScalarShapeOrAllScalar(DoubleTensor... tensors) {
-        Set<TensorShape> nonScalarShapes = getNonScalarShapes(tensors);
+    public static int[] checkHasSingleNonScalarShapeOrAllScalar(int[]... shapes) {
+        Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
 
         if (nonScalarShapes.isEmpty()) {
             return Tensor.SCALAR_SHAPE;
@@ -61,33 +61,27 @@ public class TensorShapeValidation {
         }
     }
 
-    private static Set<TensorShape> getNonScalarShapes(Tensor... tensors) {
-        return Arrays.stream(tensors)
+    private static Set<TensorShape> getNonScalarShapes(int[]... shapes) {
+        return Arrays.stream(shapes)
+            .map(TensorShape::new)
             .filter(shape -> !shape.isScalar())
-            .map(tensor -> new TensorShape(tensor.getShape(), tensor.getLength()))
             .collect(toSet());
     }
 
     private static class TensorShape {
 
         private int[] shape;
-        private int length;
 
-        public TensorShape(int[] shape, int length) {
+        public TensorShape(int[] shape) {
             this.shape = shape;
-            this.length = length;
         }
 
         public int[] getShape() {
             return shape;
         }
 
-        public int getLength() {
-            return length;
-        }
-
         public boolean isScalar() {
-            return length == 1;
+            return Arrays.equals(Tensor.SCALAR_SHAPE, shape);
         }
 
         @Override

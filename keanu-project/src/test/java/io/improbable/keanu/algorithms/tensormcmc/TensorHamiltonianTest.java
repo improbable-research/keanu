@@ -1,20 +1,19 @@
 package io.improbable.keanu.algorithms.tensormcmc;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.TensorBayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.vis.Vizer;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collector;
-import java.util.stream.Collectors;
-
 public class TensorHamiltonianTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     private KeanuRandom random;
 
@@ -46,7 +45,7 @@ public class TensorHamiltonianTest {
     @Test
     public void samplesContinuousPrior() {
 
-        TensorBayesNet bayesNet = TensorMCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0, random);
+        TensorBayesNet bayesNet = TensorMCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0);
 
         NetworkSamples posteriorSamples = TensorHamiltonian.getPosteriorSamples(
             bayesNet,
@@ -66,14 +65,14 @@ public class TensorHamiltonianTest {
     @Test
     public void samplesFromDonut() {
 
-        TensorBayesNet donutBayesNet = TensorMCMCTestDistributions.create2DDonutDistribution(random);
+        TensorBayesNet donutBayesNet = TensorMCMCTestDistributions.create2DDonutDistribution();
 
         NetworkSamples samples = TensorHamiltonian.getPosteriorSamples(
             donutBayesNet,
             donutBayesNet.getLatentVertices(),
             2500,
-            10,
-            0.05,
+            15,
+            0.02,
             random
         );
 

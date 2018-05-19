@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -33,16 +34,17 @@ public class ProbabilisticDoubleTensorContract {
                                                         double from,
                                                         double to,
                                                         double bucketSize,
-                                                        double maxError) {
+                                                        double maxError,
+                                                        KeanuRandom random) {
         double bucketCount = ((to - from) / bucketSize);
 
         if (bucketCount != (int) bucketCount) {
             throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
         }
 
-        double[] samples = vertexUnderTest.sample().getLinearView();
+        double[] samples = vertexUnderTest.sample(random).getLinearView();
 
-        Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample().getLinearView())
+        Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample(random).getLinearView())
             .filter(value -> value >= from && value <= to)
             .boxed()
             .collect(groupingBy(
@@ -70,11 +72,12 @@ public class ProbabilisticDoubleTensorContract {
                                                                          Vertex<DoubleTensor> vertexUnderTest,
                                                                          double expectedMean,
                                                                          double expectedStandardDeviation,
-                                                                         double maxError) {
+                                                                         double maxError,
+                                                                         KeanuRandom random) {
         List<Double> samples = new ArrayList<>();
 
         for (int i = 0; i < numberOfSamples; i++) {
-            double sample = vertexUnderTest.sample().scalar();
+            double sample = vertexUnderTest.sample(random).scalar();
             samples.add(sample);
         }
 
