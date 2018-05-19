@@ -2,20 +2,18 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Random;
-
 public class NUTSTest {
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -28,7 +26,7 @@ public class NUTSTest {
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
             1000,
-            0.1,
+            0.3,
             random
         );
 

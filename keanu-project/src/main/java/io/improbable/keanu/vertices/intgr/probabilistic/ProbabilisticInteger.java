@@ -12,7 +12,7 @@ public abstract class ProbabilisticInteger extends IntegerVertex {
     @Override
     public Integer lazyEval() {
         if (!hasValue()) {
-            setValue(sample());
+            setValue(sampleUsingDefaultRandom());
         }
         return getValue();
     }

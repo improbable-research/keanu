@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;

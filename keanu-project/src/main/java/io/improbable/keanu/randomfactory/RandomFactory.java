@@ -1,10 +1,10 @@
 package io.improbable.keanu.randomfactory;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public interface RandomFactory<T> {
 
-    void setRandom(Random random);
+    void setRandom(KeanuRandom random);
 
     T nextDouble(double min, double max);
 

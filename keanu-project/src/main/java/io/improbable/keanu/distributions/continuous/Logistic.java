@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -19,7 +19,7 @@ public class Logistic {
      * @param random source or randomness
      * @return a sample from the distribution
      */
-    public static double sample(double a, double b, Random random) {
+    public static double sample(double a, double b, KeanuRandom random) {
         if (b <= 0.0) {
             throw new IllegalArgumentException("Invalid value for beta: " + b);
         }

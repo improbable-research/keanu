@@ -2,26 +2,15 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
-import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
 public class SigmoidVertexTest {
-
-    private Random random;
-
-    @Before
-    public void setup() {
-        random = new Random(1);
-    }
 
     @Test
     public void sigmoidOpIsCalculatedCorrectly() {
@@ -52,12 +41,12 @@ public class SigmoidVertexTest {
         //sigmoid(x) = 0.75
         //x = -log((1/0.75)-1) = 1.0986
 
-        DoubleVertex unknownX = new UniformVertex(0.0, 10.0, random);
+        DoubleVertex unknownX = new UniformVertex(0.0, 10.0);
         unknownX.setAndCascade(5.0);
 
         SigmoidVertex sigmoid = new SigmoidVertex(unknownX);
 
-        GaussianVertex observableSigmoid = new GaussianVertex(sigmoid, 1.0, random);
+        GaussianVertex observableSigmoid = new GaussianVertex(sigmoid, 1.0);
         observableSigmoid.observe(0.75);
 
         BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(unknownX.getConnectedGraph());

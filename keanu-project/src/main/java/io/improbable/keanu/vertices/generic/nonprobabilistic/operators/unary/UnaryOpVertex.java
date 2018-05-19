@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
 public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
@@ -14,8 +15,8 @@ public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
     }
 
     @Override
-    public OUT sample() {
-        return op(inputVertex.sample());
+    public OUT sample(KeanuRandom random) {
+        return op(inputVertex.sample(random));
     }
 
     public OUT getDerivedValue() {

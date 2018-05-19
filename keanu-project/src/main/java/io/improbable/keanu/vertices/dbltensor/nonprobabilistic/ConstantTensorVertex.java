@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 
@@ -24,7 +25,7 @@ public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
     }
 
     @Override
-    public DoubleTensor sample() {
+    public DoubleTensor sample(KeanuRandom random) {
         return getValue();
     }
 

@@ -32,7 +32,7 @@ public class TensorGaussianVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(0, 1, new KeanuRandom(1));
+        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(0, 1);
         double expectedDensity = Gaussian.logPdf(0.0, 1.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, 0.5, expectedDensity);
     }
@@ -41,7 +41,7 @@ public class TensorGaussianVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = Gaussian.logPdf(0.0, 1.0, 0.25) + Gaussian.logPdf(0.0, 1.0, -0.75);
-        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(0, 1, new KeanuRandom(1));
+        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGaussianVertex, new double[]{0.25, -0.75}, expectedLogDensity);
     }
 
@@ -50,15 +50,13 @@ public class TensorGaussianVertexTest {
 
         Gaussian.Diff gaussianLogDiff = Gaussian.dlnPdf(0.0, 1.0, 0.5);
 
-        KeanuRandom keanuRandom = new KeanuRandom(1);
-
-        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        TensorUniformVertex sigmaTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        TensorUniformVertex sigmaTensor = new TensorUniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor, keanuRandom);
+        TensorGaussianVertex tensorGaussianVertex = new TensorGaussianVertex(muTensor, sigmaTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5);
 
         TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
@@ -73,15 +71,13 @@ public class TensorGaussianVertexTest {
 
         double[] vector = new double[]{0.25, -0.75, 0.1, -2, 1.3};
 
-        KeanuRandom keanuRandom = new KeanuRandom(1);
-
-        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        TensorUniformVertex sigmaTensor = new TensorUniformVertex(0.0, 1.0, keanuRandom);
+        TensorUniformVertex sigmaTensor = new TensorUniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorGaussianVertex(muTensor, sigmaTensor, keanuRandom);
+        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorGaussianVertex(muTensor, sigmaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
@@ -92,8 +88,7 @@ public class TensorGaussianVertexTest {
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         TensorGaussianVertex vertexUnderTest = new TensorGaussianVertex(
             mu,
-            new ConstantTensorVertex(3.0),
-            random
+            3.0
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -102,8 +97,8 @@ public class TensorGaussianVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(1.5), new ConstantTensorVertex(3.0), random);
-        TensorGaussianVertex gaussian = new TensorGaussianVertex(uniformA, new ConstantTensorVertex(3.0), random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(1.5, 3.0);
+        TensorGaussianVertex gaussian = new TensorGaussianVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -123,8 +118,8 @@ public class TensorGaussianVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdsigma() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(new ConstantTensorVertex(1.5), new ConstantTensorVertex(3.0), random);
-        TensorGaussianVertex gaussian = new TensorGaussianVertex(new ConstantTensorVertex(3.0), uniformA, random);
+        TensorUniformVertex uniformA = new TensorUniformVertex(1.5, 3.0);
+        TensorGaussianVertex gaussian = new TensorGaussianVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
@@ -145,21 +140,18 @@ public class TensorGaussianVertexTest {
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
 
-        KeanuRandom random = new KeanuRandom(1);
-
         int sampleCount = 1000000;
         TensorGaussianVertex vertex = new TensorGaussianVertex(
             new int[]{sampleCount, 1},
             new ConstantTensorVertex(0.0),
-            new ConstantTensorVertex(2.0),
-            random
+            new ConstantTensorVertex(2.0)
         );
 
         double from = -4;
         double to = 4;
         double bucketSize = 0.05;
 
-        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2);
+        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
     }
 
     @Test
@@ -173,18 +165,19 @@ public class TensorGaussianVertexTest {
         muSigma.add(new ConstantTensorVertex(trueSigma));
 
         List<DoubleTensorVertex> latentMuSigma = new ArrayList<>();
-        TensorUniformVertex latentMu = new TensorUniformVertex(0.01, 10.0, random);
+        TensorUniformVertex latentMu = new TensorUniformVertex(0.01, 10.0);
         latentMu.setAndCascade(DoubleTensor.scalar(9.9));
-        TensorUniformVertex latentSigma = new TensorUniformVertex(0.01, 10.0, random);
+        TensorUniformVertex latentSigma = new TensorUniformVertex(0.01, 10.0);
         latentSigma.setAndCascade(DoubleTensor.scalar(0.1));
         latentMuSigma.add(latentMu);
         latentMuSigma.add(latentSigma);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), random),
+            hyperParams -> new TensorGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             muSigma,
-            latentMuSigma
+            latentMuSigma,
+            random
         );
     }
 }

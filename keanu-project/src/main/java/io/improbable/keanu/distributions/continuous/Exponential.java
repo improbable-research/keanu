@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -20,7 +20,7 @@ public class Exponential {
      * @param random source of randomness
      * @return a random number from the Exponential distribution
      */
-    public static double sample(double a, double b, Random random) {
+    public static double sample(double a, double b, KeanuRandom random) {
         if (b <= 0.0) {
             throw new IllegalArgumentException("Invalid value for b");
         }

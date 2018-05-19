@@ -27,8 +27,8 @@ public class TensorFitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithMultiplyAndMinus() {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(1.0, 1.0, random);
-        TensorGaussianVertex B = new TensorGaussianVertex(2.0, 1.0, random);
+        TensorGaussianVertex A = new TensorGaussianVertex(1.0, 1.0);
+        TensorGaussianVertex B = new TensorGaussianVertex(2.0, 1.0);
 
         A.setAndCascade(Nd4jDoubleTensor.scalar(1.5));
         B.setAndCascade(Nd4jDoubleTensor.scalar(2.5));
@@ -36,10 +36,10 @@ public class TensorFitnessFunctionWithGradientTest {
         DoubleTensorVertex C = A.multiply(B);
         DoubleTensorVertex D = A.minus(B);
 
-        TensorGaussianVertex cObservation = new TensorGaussianVertex(C, 1.0, random);
+        TensorGaussianVertex cObservation = new TensorGaussianVertex(C, 1.0);
         cObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
-        TensorGaussianVertex dObservation = new TensorGaussianVertex(D, 1.0, random);
+        TensorGaussianVertex dObservation = new TensorGaussianVertex(D, 1.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
         assert2DGradientEqualsApproxGradient(
@@ -54,8 +54,8 @@ public class TensorFitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithAdditionAndDivision() {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(7.0, 3.0, random);
-        TensorGaussianVertex B = new TensorGaussianVertex(3.0, 3.0, random);
+        TensorGaussianVertex A = new TensorGaussianVertex(7.0, 3.0);
+        TensorGaussianVertex B = new TensorGaussianVertex(3.0, 3.0);
 
         A.setAndCascade(Nd4jDoubleTensor.scalar(6.0));
         B.setAndCascade(Nd4jDoubleTensor.scalar(3.0));
@@ -63,10 +63,10 @@ public class TensorFitnessFunctionWithGradientTest {
         DoubleTensorVertex C = A.divideBy(B);
         DoubleTensorVertex D = A.multiply(B);
 
-        TensorGaussianVertex cObservation = new TensorGaussianVertex(C, 5.0, random);
+        TensorGaussianVertex cObservation = new TensorGaussianVertex(C, 5.0);
         cObservation.observe(Nd4jDoubleTensor.scalar(2.1));
 
-        TensorGaussianVertex dObservation = new TensorGaussianVertex(D, 5.0, random);
+        TensorGaussianVertex dObservation = new TensorGaussianVertex(D, 5.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
         assert2DGradientEqualsApproxGradient(
@@ -81,8 +81,8 @@ public class TensorFitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithAdditionMultiplicationSubtractionDivision() {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(2.0, 3.0, random);
-        TensorGaussianVertex B = new TensorGaussianVertex(3.0, 3.0, random);
+        TensorGaussianVertex A = new TensorGaussianVertex(2.0, 3.0);
+        TensorGaussianVertex B = new TensorGaussianVertex(3.0, 3.0);
 
         A.setAndCascade(Nd4jDoubleTensor.scalar(2.2));
         B.setAndCascade(Nd4jDoubleTensor.scalar(3.2));
@@ -93,7 +93,7 @@ public class TensorFitnessFunctionWithGradientTest {
         DoubleTensorVertex E = C.minus(D);
         DoubleTensorVertex F = C.divideBy(D);
 
-        TensorGaussianVertex eObservation = new TensorGaussianVertex(E, 5.0, random);
+        TensorGaussianVertex eObservation = new TensorGaussianVertex(E, 5.0);
         eObservation.observe(Nd4jDoubleTensor.scalar(1.2));
 
         TensorGaussianVertex fObservation = new TensorGaussianVertex(F, C);
