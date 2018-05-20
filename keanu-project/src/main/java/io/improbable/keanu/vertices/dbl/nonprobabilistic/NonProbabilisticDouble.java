@@ -39,7 +39,9 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
 
     @Override
     public Double updateValue() {
-        setValue(getDerivedValue());
+        if (!this.isObserved()) {
+            setValue(getDerivedValue());
+        }
         return getValue();
     }
 

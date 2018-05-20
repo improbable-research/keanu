@@ -23,12 +23,6 @@ public abstract class TensorBinaryOpVertex extends NonProbabilisticDoubleTensor 
     }
 
     @Override
-    public DoubleTensor lazyEval() {
-        setValue(op(a.lazyEval(), b.lazyEval()));
-        return getValue();
-    }
-
-    @Override
     public DoubleTensor getDerivedValue() {
         return op(a.getValue(), b.getValue());
     }

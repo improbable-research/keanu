@@ -30,11 +30,6 @@ public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
     }
 
     @Override
-    public DoubleTensor lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public DoubleTensor getDerivedValue() {
         return getValue();
     }

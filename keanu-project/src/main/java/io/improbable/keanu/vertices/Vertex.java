@@ -66,12 +66,13 @@ public abstract class Vertex<T> {
     /**
      * This causes a backwards propagating calculation of the vertex value. This
      * propagation only happens for vertices with values dependent on parent values
-     * i.e. non-probabilistic vertices.
+     * i.e. non-probabilistic vertices. This will also cause probabilistic
+     * vertices that have no value to set their value by calling their sample method.
      *
      * @return The value at this vertex after recalculating any parent non-probabilistic
      * vertices.
      */
-    public T lazyEval() {
+    public final T lazyEval() {
         Deque<Vertex<?>> stack = new ArrayDeque<>();
         stack.push(this);
         Set<Vertex<?>> hasCalculated = new HashSet<>();
