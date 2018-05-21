@@ -18,6 +18,13 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex alpha;
     private final DoubleTensorVertex beta;
 
+    /**
+     * One alpha or beta or both driving an arbitrarily shaped tensor of Beta
+     *
+     * @param shape the desired shape of the vertex
+     * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param beta the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     */
     public TensorBetaVertex(int[] shape, DoubleTensorVertex alpha, DoubleTensorVertex beta) {
 
         checkParentShapes(shape, alpha.getValue(), beta.getValue());
@@ -28,6 +35,13 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    /**
+     * One to one constructor for mapping some shape of alpha and beta to
+     * a matching shaped Beta.
+     *
+     * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param beta the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     */
     public TensorBetaVertex(DoubleTensorVertex alpha, DoubleTensorVertex beta) {
         this(getShapeProposal(alpha.getValue(), beta.getValue()), alpha, beta);
     }
