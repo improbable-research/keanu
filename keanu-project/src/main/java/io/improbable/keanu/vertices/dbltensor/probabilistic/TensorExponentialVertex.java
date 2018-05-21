@@ -1,18 +1,16 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
-import io.improbable.keanu.distributions.tensors.continuous.TensorGaussian;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
-import java.util.Arrays;
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
 
@@ -28,7 +26,7 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
      */
     public TensorExponentialVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex b) {
 
-        checkParentShapes(shape, a.getValue(), b.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), b.getShape());
 
         this.a = a;
         this.b = b;
@@ -44,7 +42,7 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
      * @param b the b of the Exponential with either the same shape as specified for this vertex or a scalar
      */
     public TensorExponentialVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
-        this(getShapeProposal(a.getValue(), b.getValue()), a, b);
+        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     public TensorExponentialVertex(DoubleTensorVertex a, double b) {
@@ -93,7 +91,7 @@ public class TensorExponentialVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorExponential.sample(getValue().getShape(), a.getValue(), b.getValue(), random);
+        return TensorExponential.sample(getShape(), a.getValue(), b.getValue(), random);
     }
 
 }

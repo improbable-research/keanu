@@ -77,6 +77,18 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         super.setValue(DoubleTensor.scalar(value));
     }
 
+    public void setAndCascade(Double value) {
+        super.setAndCascade(DoubleTensor.scalar(value));
+    }
+
+    public void setAndCascade(Double value, Map<Long, Long> explored) {
+        super.setAndCascade(DoubleTensor.scalar(value), explored);
+    }
+
+    public void observe(Double value) {
+        super.observe(DoubleTensor.scalar(value));
+    }
+
     public double logPdf(double value) {
         if (this.getValue().isScalar()) {
             return this.logPdf(DoubleTensor.scalar(value));

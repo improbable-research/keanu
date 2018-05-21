@@ -23,11 +23,6 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return getValue();
     }

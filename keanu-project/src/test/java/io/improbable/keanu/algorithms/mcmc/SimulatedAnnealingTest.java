@@ -27,7 +27,9 @@ public class SimulatedAnnealingTest {
     public void setup() {
         random = new KeanuRandom(1);
         A = new GaussianVertex(5, 1);
+        A.setValue(5.0);
         B = new GaussianVertex(2, 1);
+        B.setValue(2.0);
         C = A.plus(B);
         D = new GaussianVertex(C, 1);
         D.observe(7.5);

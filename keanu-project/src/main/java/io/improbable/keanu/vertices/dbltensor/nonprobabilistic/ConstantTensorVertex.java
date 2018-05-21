@@ -16,7 +16,7 @@ public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
     }
 
     public ConstantTensorVertex(double constant) {
-        this(Nd4jDoubleTensor.scalar(constant));
+        this(DoubleTensor.scalar(constant));
     }
 
     @Override
@@ -26,11 +26,6 @@ public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return getValue();
-    }
-
-    @Override
-    public DoubleTensor lazyEval() {
         return getValue();
     }
 

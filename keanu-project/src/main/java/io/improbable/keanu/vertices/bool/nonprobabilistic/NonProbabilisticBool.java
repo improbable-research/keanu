@@ -24,7 +24,9 @@ public abstract class NonProbabilisticBool extends BoolVertex {
 
     @Override
     public Boolean updateValue() {
-        setValue(getDerivedValue());
+        if (!this.isObserved()) {
+            setValue(getDerivedValue());
+        }
         return getValue();
     }
 

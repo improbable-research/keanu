@@ -10,11 +10,6 @@ public abstract class ProbabilisticBool extends BoolVertex {
     }
 
     @Override
-    public Boolean lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public boolean isProbabilistic() {
         return true;
     }

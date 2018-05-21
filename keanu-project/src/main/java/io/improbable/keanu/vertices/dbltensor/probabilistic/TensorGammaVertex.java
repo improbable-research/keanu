@@ -9,8 +9,8 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartia
 
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorGammaVertex extends ProbabilisticDoubleTensor {
 
@@ -21,13 +21,13 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
     /**
      * One a, theta or k or all three driving an arbitrarily shaped tensor of Gamma
      *
-     * @param shape  the desired shape of the vertex
-     * @param a      the a of the Gamma with either the same shape as specified for this vertex or a scalar
-     * @param theta  the theta of the Gamma with either the same shape as specified for this vertex or a scalar
-     * @param k      the k of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param shape the desired shape of the vertex
+     * @param a     the a of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param theta the theta of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param k     the k of the Gamma with either the same shape as specified for this vertex or a scalar
      */
     public TensorGammaVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex theta, DoubleTensorVertex k) {
-        checkParentShapes(shape, a.getValue(), theta.getValue(), k.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), theta.getShape(), k.getShape());
 
         this.a = a;
         this.theta = theta;
@@ -40,12 +40,12 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
      * One to one constructor for mapping some shape of a, theta and k to
      * a matching shaped gamma.
      *
-     * @param a      the a of the Gamma with either the same shape as specified for this vertex or a scalar
-     * @param theta  the theta of the Gamma with either the same shape as specified for this vertex or a scalar
-     * @param k      the k of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param a     the a of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param theta the theta of the Gamma with either the same shape as specified for this vertex or a scalar
+     * @param k     the k of the Gamma with either the same shape as specified for this vertex or a scalar
      */
     public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, DoubleTensorVertex k) {
-        this(getShapeProposal(a.getValue(), theta.getValue(), k.getValue()), a, theta, k);
+        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), theta.getShape(), k.getShape()), a, theta, k);
     }
 
     public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, double k) {
@@ -94,9 +94,9 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
-                                                               DoubleTensor dPdtheta,
-                                                               DoubleTensor dPdk,
-                                                               DoubleTensor dPdx) {
+                                                             DoubleTensor dPdtheta,
+                                                             DoubleTensor dPdk,
+                                                             DoubleTensor dPdx) {
 
         TensorPartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         TensorPartialDerivatives dPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dPdtheta);
@@ -112,7 +112,7 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorGamma.sample(getValue().getShape(), a.getValue(), theta.getValue(), k.getValue(), random);
+        return TensorGamma.sample(getShape(), a.getValue(), theta.getValue(), k.getValue(), random);
     }
 
 }

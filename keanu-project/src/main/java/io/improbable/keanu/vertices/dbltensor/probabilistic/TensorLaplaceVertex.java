@@ -9,8 +9,8 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartia
 
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
 
@@ -26,7 +26,7 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
      */
     public TensorLaplaceVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex beta) {
 
-        checkParentShapes(shape, mu.getValue(), beta.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape(), beta.getShape());
 
         this.mu = mu;
         this.beta = beta;
@@ -42,7 +42,7 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
      * @param beta   the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public TensorLaplaceVertex(DoubleTensorVertex mu, DoubleTensorVertex beta) {
-        this(getShapeProposal(mu.getValue(), beta.getValue()), mu, beta);
+        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), beta.getShape()), mu, beta);
     }
 
     public TensorLaplaceVertex(DoubleTensorVertex mu, double beta) {
@@ -91,7 +91,7 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorLaplace.sample(getValue().getShape(), mu.getValue(), beta.getValue(), random);
+        return TensorLaplace.sample(getShape(), mu.getValue(), beta.getValue(), random);
     }
 
 }

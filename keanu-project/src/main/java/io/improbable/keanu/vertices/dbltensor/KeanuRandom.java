@@ -6,6 +6,7 @@ import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
 import org.nd4j.linalg.util.ArrayUtil;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class KeanuRandom {
@@ -44,7 +45,11 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextDouble(int[] shape) {
-        return new Nd4jDoubleTensor(nd4jRandom.nextDouble(shape));
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(nextDouble());
+        } else {
+            return new Nd4jDoubleTensor(nd4jRandom.nextDouble(shape));
+        }
     }
 
     public double nextDouble() {
@@ -52,14 +57,18 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGaussian(int[] shape) {
-        return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(nextGaussian());
+        } else {
+            return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
+        }
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
 
-        DataBufferWrapper aWrapped = new DataBufferWrapper(a.getLinearView());
-        DataBufferWrapper thetaWrapped = new DataBufferWrapper(theta.getLinearView());
-        DataBufferWrapper kWrapped = new DataBufferWrapper(k.getLinearView());
+        DataBufferWrapper aWrapped = new DataBufferWrapper(a.getFlattenedView().asArray());
+        DataBufferWrapper thetaWrapped = new DataBufferWrapper(theta.getFlattenedView().asArray());
+        DataBufferWrapper kWrapped = new DataBufferWrapper(k.getFlattenedView().asArray());
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
@@ -72,8 +81,8 @@ public class KeanuRandom {
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
 
-        DataBufferWrapper muWrapped = new DataBufferWrapper(mu.getLinearView());
-        DataBufferWrapper betaWrapped = new DataBufferWrapper(beta.getLinearView());
+        DataBufferWrapper muWrapped = new DataBufferWrapper(mu.getFlattenedView().asArray());
+        DataBufferWrapper betaWrapped = new DataBufferWrapper(beta.getFlattenedView().asArray());
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
