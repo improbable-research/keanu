@@ -72,13 +72,13 @@ public class KeanuRandom {
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
 
-        DataBufferWrapper aWrapped = new DataBufferWrapper(mu.getLinearView());
+        DataBufferWrapper muWrapped = new DataBufferWrapper(mu.getLinearView());
         DataBufferWrapper betaWrapped = new DataBufferWrapper(beta.getLinearView());
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = Laplace.sample(aWrapped.get(i), betaWrapped.get(i), this);
+            samples[i] = Laplace.sample(muWrapped.get(i), betaWrapped.get(i), this);
         }
 
         return DoubleTensor.create(samples, shape);

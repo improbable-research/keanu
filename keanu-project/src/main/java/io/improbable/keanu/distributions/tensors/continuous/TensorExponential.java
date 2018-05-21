@@ -13,9 +13,9 @@ public class TensorExponential {
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor negxMinusADivB = x.minus(a).unaryMinus().divInPlace(b);
-        final DoubleTensor logOfWithinBounds = negxMinusADivB.minusInPlace(b.log());
-        return logOfWithinBounds.applyWhere(x.getLessThanMask(a), 0.0);
+        final DoubleTensor negXMinusADivB = x.minus(a).unaryMinus().divInPlace(b);
+        final DoubleTensor negXMinusADivBMinusLogB = negXMinusADivB.minusInPlace(b.log());
+        return negXMinusADivBMinusLogB.applyWhere(x.getLessThanMask(a), 0.0);
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
