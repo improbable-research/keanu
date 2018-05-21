@@ -177,7 +177,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray tensorDup = tensor.dup();
 
         if (value == 0.0) {
-            tensorDup.muli(Nd4jDoubleTensor.ones(tensorDup.shape()).tensor.sub(maskDup));
+            INDArray swapOnesForZeros = Nd4jDoubleTensor.ones(tensorDup.shape()).tensor.sub(maskDup);
+            tensorDup.muli(swapOnesForZeros);
         } else {
             Nd4j.getExecutioner().exec(
                 new CompareAndSet(maskDup, value, Conditions.equals(1.0))

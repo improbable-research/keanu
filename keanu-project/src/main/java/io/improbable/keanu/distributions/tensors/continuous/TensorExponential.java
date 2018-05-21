@@ -7,6 +7,7 @@ public class TensorExponential {
 
     private TensorExponential() {
     }
+
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor b, KeanuRandom random) {
         return a.minus(b).times(random.nextDouble(shape).logInPlace());
     }
