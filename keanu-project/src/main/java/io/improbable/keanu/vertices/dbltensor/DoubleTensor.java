@@ -100,7 +100,7 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor applyWhere(DoubleTensor withMask, double value);
 
-    DoubleTensor apply(Function<Double, Double> f);
+    DoubleTensor apply(Function<Double, Double> function);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
@@ -142,7 +142,7 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor unaryMinusInPlace();
 
-    DoubleTensor applyInPlace(Function<Double, Double> f);
+    DoubleTensor applyInPlace(Function<Double, Double> function);
 
     double[] getLinearView();
 

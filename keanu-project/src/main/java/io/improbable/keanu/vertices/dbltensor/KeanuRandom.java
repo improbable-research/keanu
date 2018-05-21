@@ -71,6 +71,18 @@ public class KeanuRandom {
         return DoubleTensor.create(samples, shape);
     }
 
+    public double nextGaussian() {
+        return nd4jRandom.nextGaussian();
+    }
+
+    public boolean nextBoolean() {
+        return nd4jRandom.nextBoolean();
+    }
+
+    public int nextInt(int maxExclusive) {
+        return nd4jRandom.nextInt(maxExclusive);
+    }
+
     private static class DataBufferWrapper {
         private final double[] buffer;
 
@@ -85,17 +97,5 @@ public class KeanuRandom {
                 return buffer[i];
             }
         }
-    }
-
-    public double nextGaussian() {
-        return nd4jRandom.nextGaussian();
-    }
-
-    public boolean nextBoolean() {
-        return nd4jRandom.nextBoolean();
-    }
-
-    public int nextInt(int maxExclusive) {
-        return nd4jRandom.nextInt(maxExclusive);
     }
 }

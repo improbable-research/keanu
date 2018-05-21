@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbltensor;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
@@ -10,14 +9,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
-import org.nd4j.linalg.util.BigDecimalMath;
 
-import java.math.BigDecimal;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Consumer;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
