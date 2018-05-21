@@ -119,7 +119,11 @@ public abstract class Vertex<T> {
     }
 
     public T getValue() {
-        return !hasValue() ? lazyEval() : value;
+        return hasValue() ? value : lazyEval();
+    }
+
+    protected T getRawValue(){
+        return value;
     }
 
     public boolean hasValue() {

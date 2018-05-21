@@ -16,7 +16,7 @@ public class ConstantTensorVertex extends NonProbabilisticDoubleTensor {
     }
 
     public ConstantTensorVertex(double constant) {
-        this(Nd4jDoubleTensor.scalar(constant));
+        this(DoubleTensor.scalar(constant));
     }
 
     @Override

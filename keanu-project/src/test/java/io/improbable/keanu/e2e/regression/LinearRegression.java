@@ -1,5 +1,6 @@
 package io.improbable.keanu.e2e.regression;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,6 +21,9 @@ import static org.junit.Assert.assertEquals;
 
 public class LinearRegression {
     private final Logger log = LoggerFactory.getLogger(LinearRegression.class);
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     private KeanuRandom random;
 
@@ -54,7 +59,7 @@ public class LinearRegression {
             dProb.observe(p.y);
         }
 
-        m.setAndCascade(1.0);
+        m.setValue(1.0);
         b.setAndCascade(-5.0);
 
         BayesNet bayesNet = new BayesNet(m.getConnectedGraph());

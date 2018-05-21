@@ -28,6 +28,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(values, shape);
     }
 
+    public static Nd4jDoubleTensor create(double value, int[] shape){
+        return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
+    }
+
     public static Nd4jDoubleTensor ones(int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.ones(shape));
     }
@@ -68,6 +72,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return ArrayUtil.prod(shape);
     }
 
+    @Override
+    public boolean isShapePlaceholder() {
+        return tensor == null;
+    }
+
     public double getValue(int... index) {
         return tensor.getDouble(index);
     }
@@ -78,6 +87,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public double sum() {
         return tensor.sumNumber().doubleValue();
+    }
+
+    @Override
+    public DoubleTensor duplicate() {
+        return new Nd4jDoubleTensor(tensor.dup());
     }
 
     @Override
@@ -96,42 +110,37 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor reciprocal() {
-        return new Nd4jDoubleTensor(tensor.rdiv(1.0));
+        return duplicate().reciprocalInPlace();
     }
 
     @Override
     public DoubleTensor minus(double value) {
-        return new Nd4jDoubleTensor(tensor.sub(value));
+        return duplicate().minusInPlace(value);
     }
 
     @Override
     public DoubleTensor plus(double value) {
-        return new Nd4jDoubleTensor(tensor.add(value));
+        return duplicate().plusInPlace(value);
     }
 
     @Override
     public DoubleTensor times(double value) {
-        return new Nd4jDoubleTensor(tensor.mul(value));
+        return duplicate().timesInPlace(value);
     }
 
     @Override
     public DoubleTensor div(double value) {
-        return new Nd4jDoubleTensor(tensor.div(value));
+        return duplicate().divInPlace(value);
     }
 
     @Override
     public DoubleTensor pow(DoubleTensor exponent) {
-        if (exponent.isScalar()) {
-            return pow(exponent.scalar());
-        } else {
-            INDArray exponentArray = unsafeGetNd4J(exponent);
-            return new Nd4jDoubleTensor(Transforms.pow(tensor, exponentArray));
-        }
+        return duplicate().powInPlace(exponent);
     }
 
     @Override
     public DoubleTensor pow(double exponent) {
-        return new Nd4jDoubleTensor(Transforms.pow(tensor, exponent));
+        return duplicate().powInPlace(exponent);
     }
 
     @Override
@@ -141,32 +150,32 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor log() {
-        return new Nd4jDoubleTensor(Transforms.log(tensor));
+        return duplicate().logInPlace();
     }
 
     @Override
     public DoubleTensor sin() {
-        return new Nd4jDoubleTensor(Transforms.sin(tensor));
+        return duplicate().sinInPlace();
     }
 
     @Override
     public DoubleTensor cos() {
-        return new Nd4jDoubleTensor(Transforms.cos(tensor));
+        return duplicate().cosInPlace();
     }
 
     @Override
     public DoubleTensor asin() {
-        return new Nd4jDoubleTensor(Transforms.asin(tensor));
+        return duplicate().asinInPlace();
     }
 
     @Override
     public DoubleTensor acos() {
-        return new Nd4jDoubleTensor(Transforms.acos(tensor));
+        return duplicate().acosInPlace();
     }
 
     @Override
     public DoubleTensor exp() {
-        return new Nd4jDoubleTensor(Transforms.exp(tensor));
+        return duplicate().expInPlace();
     }
 
     @Override
@@ -223,7 +232,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor unaryMinus() {
-        return new Nd4jDoubleTensor(tensor.neg());
+        return duplicate().unaryMinusInPlace();
     }
 
     @Override
@@ -404,9 +413,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value) {
 
-        INDArray maskDup = unsafeGetNd4J(withMask).dup();
+        INDArray maskDup = unsafeGetNd4J(mask).dup();
 
         if (value == 0.0) {
             tensor.muli(maskDup);
@@ -432,13 +441,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return this;
     }
 
+    @Override
+    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+        return duplicate().setWithMaskInPlace(mask, value);
+    }
+
     private INDArray unsafeGetNd4J(DoubleTensor that) {
         return ((Nd4jDoubleTensor) that).tensor;
     }
 
     @Override
-    public double[] getLinearView() {
-        return tensor.linearView().toDoubleVector();
+    public FlattenedView getFlattenedView() {
+        return new Nd4jFlattenedView(tensor);
     }
 
     @Override
@@ -459,5 +473,34 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public String toString() {
         return tensor.toString();
+    }
+
+    private static class Nd4jFlattenedView implements FlattenedView {
+
+        INDArray tensor;
+
+        public Nd4jFlattenedView(INDArray tensor) {
+            this.tensor = tensor;
+        }
+
+        @Override
+        public long size() {
+            return tensor.data().length();
+        }
+
+        @Override
+        public double get(long index) {
+            return tensor.data().getDouble(index);
+        }
+
+        @Override
+        public void set(long index, double value) {
+            tensor.data().put(index, value);
+        }
+
+        @Override
+        public double[] asArray() {
+            return tensor.data().asDouble();
+        }
     }
 }

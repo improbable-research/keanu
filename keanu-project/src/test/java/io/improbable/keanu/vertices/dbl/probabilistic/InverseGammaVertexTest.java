@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.ArrayList;
@@ -13,9 +15,11 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 
 public class InverseGammaVertexTest {
 
-    private KeanuRandom random;
-
     private static final double DELTA = 0.001;
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+    private KeanuRandom random;
 
     @Before
     public void setup() {
