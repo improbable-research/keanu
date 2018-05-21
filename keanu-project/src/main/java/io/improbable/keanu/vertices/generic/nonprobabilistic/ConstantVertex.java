@@ -14,11 +14,6 @@ public class ConstantVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public T getDerivedValue() {
         return getValue();
     }

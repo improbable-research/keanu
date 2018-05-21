@@ -32,12 +32,6 @@ public class BoolReduceVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean lazyEval() {
-        setValue(applyReduce(Vertex::lazyEval));
-        return getValue();
-    }
-
-    @Override
     public Boolean getDerivedValue() {
         return applyReduce(Vertex::getValue);
     }
