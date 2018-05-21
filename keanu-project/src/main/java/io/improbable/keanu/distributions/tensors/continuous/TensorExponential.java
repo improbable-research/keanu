@@ -20,7 +20,7 @@ public class TensorExponential {
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
         final DoubleTensor dPda = b.reciprocal();
-        final DoubleTensor dPdb = x.minus(a).minus(b).div(b.pow(2));
+        final DoubleTensor dPdb = x.minus(a).minusInPlace(b).divInPlace(b.pow(2));
         return new Diff(dPda, dPdb, dPda.unaryMinus());
     }
 
