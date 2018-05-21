@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbltensor;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public interface DoubleTensor extends Tensor {
 
@@ -84,6 +85,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor pow(double exponent);
 
+    DoubleTensor sqrt();
+
     DoubleTensor log();
 
     DoubleTensor sin();
@@ -114,6 +117,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor setWithMask(DoubleTensor mask, double value);
 
+    DoubleTensor apply(Function<Double, Double> function);
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
@@ -129,6 +134,8 @@ public interface DoubleTensor extends Tensor {
     DoubleTensor powInPlace(DoubleTensor exponent);
 
     DoubleTensor powInPlace(double exponent);
+
+    DoubleTensor sqrtInPlace();
 
     DoubleTensor logInPlace();
 
@@ -151,6 +158,8 @@ public interface DoubleTensor extends Tensor {
     DoubleTensor divInPlace(DoubleTensor that);
 
     DoubleTensor unaryMinusInPlace();
+
+    DoubleTensor applyInPlace(Function<Double, Double> function);
 
     FlattenedView getFlattenedView();
 

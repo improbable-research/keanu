@@ -34,4 +34,5 @@ public interface Tensor {
     default boolean hasSameShapeAs(int[] shape) {
         return Arrays.equals(this.getShape(), shape);
     }
+
 }
