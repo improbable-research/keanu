@@ -19,7 +19,7 @@ public class TensorLaplace {
     }
 
     public static Diff dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
-        final DoubleTensor muMinusX = x.unaryMinus().plusInPlace(mu);
+        final DoubleTensor muMinusX = x.minus(mu);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
         final DoubleTensor denominator = muMinusXAbs.times(beta);

@@ -13,7 +13,7 @@ public class TensorExponential {
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor negXMinusADivB = x.minus(a).unaryMinus().divInPlace(b);
+        final DoubleTensor negXMinusADivB = x.minus(a).unaryMinusInPlace().divInPlace(b);
         final DoubleTensor negXMinusADivBMinusLogB = negXMinusADivB.minusInPlace(b.log());
         return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(a), 0.0);
     }
