@@ -463,7 +463,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray maskDup = unsafeGetNd4J(withMask).dup();
 
         if (value == 0.0) {
-            tensor.muli(maskDup);
+            INDArray swapOnesForZeros = Nd4jDoubleTensor.ones(tensor.shape()).tensor.sub(maskDup);
+            tensor.muli(swapOnesForZeros);
         } else {
             Nd4j.getExecutioner().exec(
                 new CompareAndSet(maskDup, value, Conditions.equals(1.0))
