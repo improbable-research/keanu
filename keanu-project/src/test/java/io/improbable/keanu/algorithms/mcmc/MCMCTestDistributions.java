@@ -39,7 +39,7 @@ public class MCMCTestDistributions {
         DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setAndCascade(mu);
+        A.setValue(mu);
         B.setAndCascade(mu);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
@@ -66,7 +66,7 @@ public class MCMCTestDistributions {
         DoubleVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
         D.observe(0.5);
 
-        A.setAndCascade(Math.sqrt(0.5));
+        A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, D));

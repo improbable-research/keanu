@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,6 +12,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.List;
@@ -19,6 +21,9 @@ import static io.improbable.keanu.vertices.bool.BoolVertex.If;
 import static org.junit.Assert.assertTrue;
 
 public class MultimodalSimulatedAnnealingTest {
+
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
 
     private KeanuRandom random;
 
@@ -31,6 +36,7 @@ public class MultimodalSimulatedAnnealingTest {
     public void findsBothModesForContinuousNetwork() {
 
         DoubleVertex A = new UniformVertex(-3.0, 3.0);
+        A.setValue(0.0);
         DoubleVertex B = A.multiply(A);
         DoubleVertex C = new GaussianVertex(B, 1.5);
         C.observe(4.0);
@@ -49,6 +55,7 @@ public class MultimodalSimulatedAnnealingTest {
     public void findsModesForDiscreteContinuousHybridNetwork() {
 
         DoubleVertex A = new UniformVertex(0.0, 3.0);
+        A.setValue(1.0);
         DoubleVertex B = A.multiply(A);
 
         DoubleVertex C = new UniformVertex(-3.0, 0.0);
