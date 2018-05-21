@@ -119,11 +119,15 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis);
 
+    DoubleTensor getLessThanMask(DoubleTensor lessThanThis);
+
     DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
 
     DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value);
 
     DoubleTensor setWithMask(DoubleTensor mask, double value);
+
+    DoubleTensor abs();
 
     DoubleTensor apply(Function<Double, Double> function);
 
@@ -166,6 +170,8 @@ public interface DoubleTensor extends Tensor {
     DoubleTensor divInPlace(DoubleTensor that);
 
     DoubleTensor unaryMinusInPlace();
+
+    DoubleTensor absInPlace();
 
     DoubleTensor applyInPlace(Function<Double, Double> function);
 

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
+import io.improbable.keanu.distributions.continuous.Laplace;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -73,6 +74,20 @@ public class KeanuRandom {
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
             samples[i] = Gamma.sample(aWrapped.get(i), thetaWrapped.get(i), kWrapped.get(i), this);
+        }
+
+        return DoubleTensor.create(samples, shape);
+    }
+
+    public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
+
+        DataBufferWrapper muWrapped = new DataBufferWrapper(mu.getFlattenedView().asArray());
+        DataBufferWrapper betaWrapped = new DataBufferWrapper(beta.getFlattenedView().asArray());
+
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = Laplace.sample(muWrapped.get(i), betaWrapped.get(i), this);
         }
 
         return DoubleTensor.create(samples, shape);
