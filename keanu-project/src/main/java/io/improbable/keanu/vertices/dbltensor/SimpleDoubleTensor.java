@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import java.util.function.Function;
+
 public class SimpleDoubleTensor implements DoubleTensor {
 
     private Double value;
@@ -76,6 +78,11 @@ public class SimpleDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor sqrt() {
+        return pow(0.5);
+    }
+
+    @Override
     public DoubleTensor log() {
         return this.duplicate().logInPlace();
     }
@@ -134,16 +141,20 @@ public class SimpleDoubleTensor implements DoubleTensor {
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
         if (greaterThanThis.isScalar()) {
             return new SimpleDoubleTensor(value > greaterThanThis.scalar() ? 1 : 0);
+        } else {
+            return DoubleTensor.create(value, greaterThanThis.getShape())
+                .getGreaterThanMask(greaterThanThis);
         }
-        throw new IllegalArgumentException("Only scalar tensors supported");
     }
 
     @Override
-    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
-        if (lessThanThis.isScalar()) {
-            return new SimpleDoubleTensor(value <= lessThanThis.scalar() ? 1 : 0);
+    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualsThis) {
+        if (lessThanOrEqualsThis.isScalar()) {
+            return new SimpleDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
+        } else {
+            return DoubleTensor.create(value, lessThanOrEqualsThis.getShape())
+                .getLessThanOrEqualToMask(lessThanOrEqualsThis);
         }
-        throw new IllegalArgumentException("Only scalar tensors supported");
     }
 
     @Override
@@ -151,7 +162,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return DoubleTensor.create(value, withMask.getShape())
+                .setWithMaskInPlace(withMask, valueToApply);
         }
         return this;
     }
@@ -159,6 +171,11 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor setWithMask(DoubleTensor mask, double value) {
         return this.duplicate().setWithMaskInPlace(mask, value);
+    }
+
+    @Override
+    public DoubleTensor apply(Function<Double, Double> function) {
+        return new SimpleDoubleTensor(function.apply(value));
     }
 
     @Override
@@ -196,9 +213,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (exponent.isScalar()) {
             value = Math.pow(value, exponent.scalar());
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return DoubleTensor.create(value, exponent.getShape()).powInPlace(exponent);
         }
-
         return this;
     }
 
@@ -206,6 +222,11 @@ public class SimpleDoubleTensor implements DoubleTensor {
     public DoubleTensor powInPlace(double exponent) {
         value = Math.pow(value, exponent);
         return this;
+    }
+
+    @Override
+    public DoubleTensor sqrtInPlace() {
+        return pow(0.5);
     }
 
     @Override
@@ -249,7 +270,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             minusInPlace(that.scalar());
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return that.unaryMinus().plusInPlace(value);
         }
         return this;
     }
@@ -259,7 +280,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             plusInPlace(that.scalar());
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return that.plus(value);
         }
         return this;
     }
@@ -269,7 +290,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             timesInPlace(that.scalar());
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return that.times(value);
         }
         return this;
     }
@@ -279,7 +300,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             divInPlace(that.scalar());
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return that.reciprocal().timesInPlace(value);
         }
         return this;
     }
@@ -288,6 +309,11 @@ public class SimpleDoubleTensor implements DoubleTensor {
     public DoubleTensor unaryMinusInPlace() {
         value = -value;
         return this;
+    }
+
+    @Override
+    public DoubleTensor applyInPlace(Function<Double, Double> function) {
+        return apply(function);
     }
 
     @Override

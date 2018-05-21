@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import io.improbable.keanu.distributions.continuous.Gamma;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
@@ -61,6 +63,21 @@ public class KeanuRandom {
         }
     }
 
+    public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+
+        DataBufferWrapper aWrapped = new DataBufferWrapper(a.getFlattenedView().asArray());
+        DataBufferWrapper thetaWrapped = new DataBufferWrapper(theta.getFlattenedView().asArray());
+        DataBufferWrapper kWrapped = new DataBufferWrapper(k.getFlattenedView().asArray());
+
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = Gamma.sample(aWrapped.get(i), thetaWrapped.get(i), kWrapped.get(i), this);
+        }
+
+        return DoubleTensor.create(samples, shape);
+    }
+
     public double nextGaussian() {
         return nd4jRandom.nextGaussian();
     }
@@ -73,4 +90,19 @@ public class KeanuRandom {
         return nd4jRandom.nextInt(maxExclusive);
     }
 
+    private static class DataBufferWrapper {
+        private final double[] buffer;
+
+        DataBufferWrapper(double[] buffer) {
+            this.buffer = buffer;
+        }
+
+        public double get(int i) {
+            if (buffer.length == 1) {
+                return buffer[0];
+            } else {
+                return buffer[i];
+            }
+        }
+    }
 }

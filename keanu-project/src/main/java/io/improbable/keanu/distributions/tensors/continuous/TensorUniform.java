@@ -15,7 +15,7 @@ public class TensorUniform {
     }
 
     /**
-     * @param shape requested sample shape
+     * @param shape  requested sample shape
      * @param xMin   minimum x value
      * @param xMax   maximum x value
      * @param random source of randomness
@@ -28,8 +28,8 @@ public class TensorUniform {
     public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor x) {
 
         DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds.setWithMaskInPlace(x.getLessThanOrEqualToMask(xMin), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getLessThanOrEqualToMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

@@ -14,11 +14,6 @@ public class ConstantIntegerVertex extends NonProbabilisticInteger {
     }
 
     @Override
-    public Integer lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public Integer getDerivedValue() {
         return getValue();
     }

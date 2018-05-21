@@ -39,7 +39,9 @@ public abstract class NonProbabilisticDoubleTensor extends DoubleTensorVertex {
 
     @Override
     public DoubleTensor updateValue() {
-        setValue(getDerivedValue());
+        if (!this.isObserved()) {
+            setValue(getDerivedValue());
+        }
         return getValue();
     }
 

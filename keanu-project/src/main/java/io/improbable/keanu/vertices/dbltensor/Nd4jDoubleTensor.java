@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
@@ -8,6 +9,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
+
+import java.util.function.Function;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -92,6 +95,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor apply(Function<Double, Double> function) {
+        DataBuffer data = tensor.data().dup();
+        for (int i = 0; i < data.length(); i++) {
+            data.put(i, function.apply(data.getDouble(i)));
+        }
+        return new Nd4jDoubleTensor(data.asDouble(), this.getShape());
+    }
+
+    @Override
     public double scalar() {
         return tensor.getDouble(0);
     }
@@ -129,6 +141,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor pow(double exponent) {
         return duplicate().powInPlace(exponent);
+    }
+
+    @Override
+    public DoubleTensor sqrt() {
+        return new Nd4jDoubleTensor(Transforms.sqrt(tensor));
     }
 
     @Override
@@ -266,6 +283,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor sqrtInPlace() {
+        Transforms.sqrt(tensor, false);
+        return this;
+    }
+
+    @Override
     public DoubleTensor logInPlace() {
         Transforms.log(tensor, false);
         return this;
@@ -395,7 +418,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
         if (value == 0.0) {
-            tensor.muli(maskDup);
+            INDArray swapOnesForZeros = Nd4j.ones(tensor.shape()).subi(maskDup);
+            tensor.muli(swapOnesForZeros);
         } else {
             Nd4j.getExecutioner().exec(
                 new CompareAndSet(maskDup, value, Conditions.equals(1.0))
@@ -406,6 +430,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             );
         }
 
+        return this;
+    }
+
+    @Override
+    public DoubleTensor applyInPlace(Function<Double, Double> function) {
+        DataBuffer data = tensor.data();
+        for (int i = 0; i < data.length(); i++) {
+            data.put(i, function.apply(data.getDouble(i)));
+        }
         return this;
     }
 

@@ -6,11 +6,6 @@ public abstract class ProbabilisticInteger extends IntegerVertex {
 
     @Override
     public Integer updateValue() {
-        return getValue();
-    }
-
-    @Override
-    public Integer lazyEval() {
         if (!hasValue()) {
             setValue(sampleUsingDefaultRandom());
         }
