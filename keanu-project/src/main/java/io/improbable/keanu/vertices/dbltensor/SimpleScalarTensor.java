@@ -26,8 +26,8 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor apply(Function<Double, Double> f) {
-        return new SimpleScalarTensor(f.apply(scalar));
+    public DoubleTensor apply(Function<Double, Double> function) {
+        return new SimpleScalarTensor(function.apply(scalar));
     }
 
     @Override
@@ -284,8 +284,8 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor applyInPlace(Function<Double, Double> f) {
-        return apply(f);
+    public DoubleTensor applyInPlace(Function<Double, Double> function) {
+        return apply(function);
     }
 
     @Override

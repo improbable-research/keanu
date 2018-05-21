@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import io.improbable.keanu.distributions.continuous.Gamma;
+import io.improbable.keanu.distributions.continuous.Laplace;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
+import org.nd4j.linalg.util.ArrayUtil;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.BiFunction;
 
 public class KeanuRandom {
 
@@ -57,54 +56,32 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        List<Double> samples = exploreIndexesAndSample(shape, KeanuRandomSampling::gammaSample, a, theta, k);
-        return createTensorFromList(samples, shape);
+
+        DataBufferWrapper aWrapped = new DataBufferWrapper(a.getLinearView());
+        DataBufferWrapper thetaWrapped = new DataBufferWrapper(theta.getLinearView());
+        DataBufferWrapper kWrapped = new DataBufferWrapper(k.getLinearView());
+
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = Gamma.sample(aWrapped.get(i), thetaWrapped.get(i), kWrapped.get(i), this);
+        }
+
+        return DoubleTensor.create(samples, shape);
     }
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
-        List<Double> samples = exploreIndexesAndSample(shape, KeanuRandomSampling::laplaceSample, mu, beta);
-        return createTensorFromList(samples, shape);
-    }
 
-    private List<Double> exploreIndexesAndSample(
-        int[] shape,
-        BiFunction<List<Double>, Random, Double> samplingFunc,
-        DoubleTensor... hyperParameters) {
+        DataBufferWrapper aWrapped = new DataBufferWrapper(mu.getLinearView());
+        DataBufferWrapper betaWrapped = new DataBufferWrapper(beta.getLinearView());
 
-        List<Double> samples = new ArrayList<>();
-        int[] results = new int[shape.length];
-        iterateThroughShape(0, shape.length, shape, results, samples, samplingFunc, hyperParameters);
-        return samples;
-    }
-
-    private void iterateThroughShape(
-        int count,
-        int length,
-        int[] size,
-        int[] result,
-        List<Double> samples,
-        BiFunction<List<Double>, Random, Double> samplingFunc,
-        DoubleTensor... hyperParameters) {
-
-        List<Double> hyperParamValues = new ArrayList<>();
-        for (DoubleTensor hyperParameter : hyperParameters) {
-            hyperParamValues.add(hyperParameter.getValue(result));
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = Laplace.sample(aWrapped.get(i), betaWrapped.get(i), this);
         }
 
-        if (count >= length) {
-            Double sample = samplingFunc.apply(hyperParamValues, nd4jRandom);
-            samples.add(sample);
-            return;
-        }
-        for (int i = 0; i < size[count]; i++) {
-            result[count] = i;
-            iterateThroughShape(count + 1, length, size, result, samples, samplingFunc, hyperParameters);
-        }
-    }
-
-    private DoubleTensor createTensorFromList(List<Double> list, int[] shape) {
-        double[] values = list.stream().mapToDouble(d -> d).toArray();
-        return Nd4jDoubleTensor.create(values, shape);
+        return DoubleTensor.create(samples, shape);
     }
 
     public double nextGaussian() {
@@ -117,5 +94,21 @@ public class KeanuRandom {
 
     public int nextInt(int maxExclusive) {
         return nd4jRandom.nextInt(maxExclusive);
+    }
+
+    private static class DataBufferWrapper {
+        private final double[] buffer;
+
+        DataBufferWrapper(double[] buffer) {
+            this.buffer = buffer;
+        }
+
+        public double get(int i) {
+            if (buffer.length == 1) {
+                return buffer[0];
+            } else {
+                return buffer[i];
+            }
+        }
     }
 }
