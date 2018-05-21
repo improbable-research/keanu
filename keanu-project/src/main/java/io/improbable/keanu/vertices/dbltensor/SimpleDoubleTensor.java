@@ -141,16 +141,20 @@ public class SimpleDoubleTensor implements DoubleTensor {
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
         if (greaterThanThis.isScalar()) {
             return new SimpleDoubleTensor(value > greaterThanThis.scalar() ? 1 : 0);
+        } else {
+            return DoubleTensor.create(value, greaterThanThis.getShape())
+                .getGreaterThanMask(greaterThanThis);
         }
-        throw new IllegalArgumentException("Only scalar tensors supported");
     }
 
     @Override
-    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis) {
-        if (lessThanThis.isScalar()) {
-            return new SimpleDoubleTensor(value <= lessThanThis.scalar() ? 1 : 0);
+    public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualsThis) {
+        if (lessThanOrEqualsThis.isScalar()) {
+            return new SimpleDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
+        } else {
+            return DoubleTensor.create(value, lessThanOrEqualsThis.getShape())
+                .getLessThanOrEqualToMask(lessThanOrEqualsThis);
         }
-        throw new IllegalArgumentException("Only scalar tensors supported");
     }
 
     @Override
@@ -158,7 +162,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return DoubleTensor.create(value, withMask.getShape())
+                .setWithMaskInPlace(withMask, valueToApply);
         }
         return this;
     }
@@ -208,9 +213,8 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (exponent.isScalar()) {
             value = Math.pow(value, exponent.scalar());
         } else {
-            throw new IllegalArgumentException("Only scalar tensors supported");
+            return DoubleTensor.create(value, exponent.getShape()).powInPlace(exponent);
         }
-
         return this;
     }
 
@@ -266,7 +270,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             minusInPlace(that.scalar());
         } else {
-            return that.unaryMinus().plusInPlace(this);
+            return that.unaryMinus().plusInPlace(value);
         }
         return this;
     }
@@ -276,7 +280,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             plusInPlace(that.scalar());
         } else {
-            return that.plus(this);
+            return that.plus(value);
         }
         return this;
     }
@@ -286,7 +290,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             timesInPlace(that.scalar());
         } else {
-            return that.times(this);
+            return that.times(value);
         }
         return this;
     }
@@ -296,7 +300,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             divInPlace(that.scalar());
         } else {
-            return that.reciprocal().timesInPlace(this);
+            return that.reciprocal().timesInPlace(value);
         }
         return this;
     }

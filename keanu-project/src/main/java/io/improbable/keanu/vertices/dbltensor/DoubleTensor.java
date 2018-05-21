@@ -7,6 +7,14 @@ import java.util.function.Function;
 
 public interface DoubleTensor extends Tensor {
 
+    static DoubleTensor create(double value, int[] shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(value);
+        } else {
+            return Nd4jDoubleTensor.create(value, shape);
+        }
+    }
+
     static DoubleTensor create(double[] values, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new SimpleDoubleTensor(values[0]);

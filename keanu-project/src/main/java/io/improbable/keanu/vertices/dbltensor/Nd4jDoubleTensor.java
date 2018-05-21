@@ -28,6 +28,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(values, shape);
     }
 
+    public static Nd4jDoubleTensor create(double value, int[] shape){
+        return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
+    }
+
     public static Nd4jDoubleTensor ones(int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.ones(shape));
     }
