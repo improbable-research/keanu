@@ -64,8 +64,8 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
 
         DoubleTensor dlogPdf = DoubleTensor.zeros(this.xMax.getValue().getShape());
-        dlogPdf.applyWhere(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
-        dlogPdf.applyWhere(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
+        dlogPdf.applyWhereInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
+        dlogPdf.applyWhereInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
 
         return singletonMap(getId(), dlogPdf);
     }

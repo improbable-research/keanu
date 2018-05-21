@@ -12,16 +12,14 @@ public class TensorExponential {
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor negXMinusA = x.minus(a).unaryMinusInPlace();
-        final DoubleTensor negxMinusADivB = negXMinusA.divInPlace(b);
+        final DoubleTensor negxMinusADivB = x.minus(a).unaryMinus().divInPlace(b);
         final DoubleTensor logOfWithinBounds = negxMinusADivB.minusInPlace(b.log());
-        logOfWithinBounds.applyWhere(a.getLessThanMask(x), 0.0);
-        return logOfWithinBounds;
+        return logOfWithinBounds.applyWhere(x.getLessThanMask(a), 0.0);
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
         final DoubleTensor dPda = b.reciprocal();
-        final DoubleTensor dPdb = x.minus(a).minus(b).divInPlace(b.pow(2));
+        final DoubleTensor dPdb = x.minus(a).minus(b).div(b.pow(2));
         return new Diff(dPda, dPdb, dPda.unaryMinus());
     }
 

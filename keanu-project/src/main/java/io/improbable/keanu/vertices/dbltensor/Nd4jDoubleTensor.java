@@ -171,6 +171,27 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+
+        INDArray maskDup = unsafeGetNd4J(withMask).dup();
+        INDArray tensorDup = tensor.dup();
+
+        if (value == 0.0) {
+            tensorDup.muli(Nd4jDoubleTensor.ones(tensorDup.shape()).tensor.sub(maskDup));
+        } else {
+            Nd4j.getExecutioner().exec(
+                new CompareAndSet(maskDup, value, Conditions.equals(1.0))
+            );
+
+            Nd4j.getExecutioner().exec(
+                new CompareAndSet(tensorDup, maskDup, Conditions.notEquals(0.0))
+            );
+        }
+
+        return new Nd4jDoubleTensor(tensorDup);
+    }
+
+    @Override
     public DoubleTensor minus(DoubleTensor that) {
 
         if (that.isScalar()) {
@@ -436,7 +457,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+    public DoubleTensor applyWhereInPlace(DoubleTensor withMask, double value) {
 
         INDArray maskDup = unsafeGetNd4J(withMask).dup();
 

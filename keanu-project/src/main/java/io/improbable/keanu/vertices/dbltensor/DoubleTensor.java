@@ -146,6 +146,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor unaryMinusInPlace();
 
+    DoubleTensor applyWhereInPlace(DoubleTensor withMask, double value);
+
     DoubleTensor absInPlace();
 
     DoubleTensor applyInPlace(Function<Double, Double> function);

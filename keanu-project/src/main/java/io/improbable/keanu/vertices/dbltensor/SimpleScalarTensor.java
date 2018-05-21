@@ -142,6 +142,14 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
+        if (withMask.isScalar()) {
+            return new SimpleScalarTensor(withMask.scalar() == 1.0 ? value : scalar);
+        }
+        throw new IllegalArgumentException("Only scalar tensors supported");
+    }
+
+    @Override
     public DoubleTensor abs() {
         return new SimpleScalarTensor(Math.abs(scalar));
     }
@@ -176,11 +184,8 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor applyWhere(DoubleTensor withMask, double value) {
-        if (withMask.isScalar()) {
-            return new SimpleScalarTensor(withMask.scalar() == 1.0 ? value : scalar);
-        }
-        throw new IllegalArgumentException("Only scalar tensors supported");
+    public DoubleTensor applyWhereInPlace(DoubleTensor withMask, double value) {
+        return applyWhere(withMask, value);
     }
 
     @Override
