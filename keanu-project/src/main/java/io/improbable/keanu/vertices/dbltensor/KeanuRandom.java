@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import io.improbable.keanu.distributions.continuous.Gamma;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,37 +57,34 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        List<Double> samples = exploreIndexesAndSampleGamma(shape, a, theta, k);
-        return createTensorFromList(samples, shape);
-    }
 
-    private List<Double> exploreIndexesAndSampleGamma(int[] shape, DoubleTensor... hyperParameters) {
-        List<Double> samples = new ArrayList<>();
-        int[] results = new int[shape.length];
-        iterateThroughShape(0, shape.length, shape, results, samples, hyperParameters);
-        return samples;
-    }
+        DataBufferWrapper aWrapped = new DataBufferWrapper(a.getLinearView());
+        DataBufferWrapper thetaWrapped = new DataBufferWrapper(theta.getLinearView());
+        DataBufferWrapper kWrapped = new DataBufferWrapper(k.getLinearView());
 
-    private void iterateThroughShape(int count, int length, int[] size, int[] result, List<Double> samples, DoubleTensor... hyperParameters) {
-        if (count >= length) {
-            Double sample = KeanuRandomSampling.gammaSample(
-                hyperParameters[0].getValue(result),
-                hyperParameters[1].getValue(result),
-                hyperParameters[2].getValue(result),
-                nd4jRandom
-            );
-            samples.add(sample);
-            return;
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = Gamma.sample(aWrapped.get(i), thetaWrapped.get(i), kWrapped.get(i), this);
         }
-        for (int i = 0; i < size[count]; i++) {
-            result[count] = i;
-            iterateThroughShape(count + 1, length, size, result, samples, hyperParameters);
-        }
+
+        return DoubleTensor.create(samples, shape);
     }
 
-    private DoubleTensor createTensorFromList(List<Double> list, int[] shape) {
-        double[] values = list.stream().mapToDouble(d -> d).toArray();
-        return Nd4jDoubleTensor.create(values, shape);
+    private static class DataBufferWrapper {
+        private final double[] buffer;
+
+        DataBufferWrapper(double[] buffer) {
+            this.buffer = buffer;
+        }
+
+        public double get(int i) {
+            if (buffer.length == 1) {
+                return buffer[0];
+            } else {
+                return buffer[i];
+            }
+        }
     }
 
     public double nextGaussian() {

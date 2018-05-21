@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbltensor;
 import org.junit.Before;
 import org.junit.Test;
 
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertArrayEquals;
 
 public class Nd4jDoubleTensorTest {
@@ -96,6 +97,25 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor result = matrixA.applyWhere(mask, -2);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.getLinearView(), 0.0);
+    }
+
+    @Test
+    public void canApplyUnaryFunctionToScalar() {
+        DoubleTensor result = scalarA.apply(a -> a * 2);
+        assertEquals(4, result.scalar(), 0.0);
+    }
+
+    @Test
+    public void canApplyUnaryFunctionToRank3() {
+        DoubleTensor rank3Tensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+        DoubleTensor result = rank3Tensor.apply(a -> a * 2);
+        assertArrayEquals(new double[]{2, 4, 6, 8, 10, 12, 14, 16}, result.getLinearView(), 0.0);
+    }
+
+    @Test
+    public void canApplySqrt() {
+        DoubleTensor result = scalarA.sqrt();
+        assertEquals(Math.sqrt(2.0), result.scalar(), 0.0);
     }
 
 }

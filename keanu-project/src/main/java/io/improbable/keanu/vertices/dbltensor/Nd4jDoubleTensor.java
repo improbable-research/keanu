@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
@@ -88,13 +89,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor apply(Function<Double, Double> function) {
-        Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
-        INDArray tensorCopy = tensor.dup();
-        List<Double> values = Arrays.asList(tensorValues);
-        for (int i = 0; i < values.size(); i++) {
-            tensorCopy.putScalar(i, function.apply(values.get(i)));
+        DataBuffer data = tensor.data().dup();
+        for (int i = 0; i < data.length(); i++) {
+            data.put(i, function.apply(data.getDouble(i)));
         }
-        return new Nd4jDoubleTensor(tensorCopy);
+        return new Nd4jDoubleTensor(data.asDouble(), this.getShape());
     }
 
     @Override
@@ -433,12 +432,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor applyInPlace(Function<Double, Double> function) {
-        Double[] tensorValues = ArrayUtils.toObject(tensor.toDoubleVector());
-        List<Double> values = Arrays.asList(tensorValues);
-        for (int i = 0; i < values.size(); i++) {
-            tensor.putScalar(i, function.apply(values.get(i)));
+        DataBuffer data = tensor.data();
+        for (int i = 0; i < data.length(); i++) {
+            data.put(i, function.apply(data.getDouble(i)));
         }
-        return new Nd4jDoubleTensor(tensor);
+        return this;
     }
 
     private INDArray unsafeGetNd4J(DoubleTensor that) {
