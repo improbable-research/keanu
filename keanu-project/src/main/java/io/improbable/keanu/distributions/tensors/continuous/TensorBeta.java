@@ -7,9 +7,22 @@ import org.apache.commons.math3.special.Gamma;
 
 public class TensorBeta {
 
-    public static DoubleTensor sample(int[] shape, DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax, KeanuRandom random) {
-        final DoubleTensor y1 = random.nextGamma(shape, Nd4jDoubleTensor.zeros(shape), Nd4jDoubleTensor.ones(shape), alpha);
-        final DoubleTensor y2 = random.nextGamma(shape, Nd4jDoubleTensor.zeros(shape), Nd4jDoubleTensor.ones(shape), beta);
+    public static DoubleTensor sample(int[] shape,
+                                    DoubleTensor alpha,
+                                    DoubleTensor beta,
+                                    DoubleTensor xMin,
+                                    DoubleTensor xMax,
+                                    KeanuRandom random) {
+
+        final DoubleTensor y1 = random.nextGamma(shape,
+                                                Nd4jDoubleTensor.zeros(shape),
+                                                Nd4jDoubleTensor.ones(shape),
+                                                alpha);
+
+        final DoubleTensor y2 = random.nextGamma(shape,
+                                                Nd4jDoubleTensor.zeros(shape),
+                                                Nd4jDoubleTensor.ones(shape),
+                                                beta);
 
         final DoubleTensor xMaxMinusxMin = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);
