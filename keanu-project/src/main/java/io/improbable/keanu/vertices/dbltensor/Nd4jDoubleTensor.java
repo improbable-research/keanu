@@ -2,10 +2,7 @@ package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -413,6 +410,25 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
             Nd4j.getExecutioner().exec(
                 new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
+            );
+        }
+
+        return new Nd4jDoubleTensor(mask);
+    }
+
+    @Override
+    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
+
+        INDArray mask = tensor.dup();
+
+        if (greaterThanOrEqualToThis.isScalar()) {
+            Nd4j.getExecutioner().exec(
+                new OldGreaterThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(greaterThanOrEqualToThis.scalar()), mask, mask.length())
+            );
+        } else {
+            INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanOrEqualToThis);
+            Nd4j.getExecutioner().exec(
+                new OldGreaterThanOrEqual(mask, greaterThanThisArray, mask, mask.length())
             );
         }
 

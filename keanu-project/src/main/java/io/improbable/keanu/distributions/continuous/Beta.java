@@ -23,7 +23,7 @@ public class Beta {
      * @param alpha  location
      * @param beta   shape
      * @param xMin   minimum x
-     * @param xMax   source of randomness
+     * @param xMax   maximum x
      * @param random source of randomness
      * @return a random number from the Beta distribution
      */
@@ -72,13 +72,13 @@ public class Beta {
     }
 
     public static class Diff {
-        public final double dPdAlpha;
-        public final double dPdBeta;
+        public final double dPdalpha;
+        public final double dPdbeta;
         public final double dPdx;
 
-        public Diff(double dPdAlpha, double dPdBeta, double dPdx) {
-            this.dPdAlpha = dPdAlpha;
-            this.dPdBeta = dPdBeta;
+        public Diff(double dPdalpha, double dPdbeta, double dPdx) {
+            this.dPdalpha = dPdalpha;
+            this.dPdbeta = dPdbeta;
             this.dPdx = dPdx;
         }
     }

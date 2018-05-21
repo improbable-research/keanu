@@ -48,7 +48,7 @@ public class BetaVertex extends ProbabilisticDouble {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Beta.Diff dlnPdf = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
-        return convertDualNumbersToDiff(dlnPdf.dPdAlpha, dlnPdf.dPdBeta, dlnPdf.dPdx);
+        return convertDualNumbersToDiff(dlnPdf.dPdalpha, dlnPdf.dPdbeta, dlnPdf.dPdx);
     }
 
     public Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPdAlpha, double dPdBeta, double dPdx) {

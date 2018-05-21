@@ -168,6 +168,14 @@ public class SimpleScalarTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis) {
+        if (greaterThanThis.isScalar()) {
+            return new SimpleScalarTensor(scalar >= greaterThanThis.scalar() ? 1 : 0);
+        }
+        throw new IllegalArgumentException("Only scalar tensors supported");
+    }
+
+    @Override
     public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
         if (lessThanThis.isScalar()) {
             return new SimpleScalarTensor(scalar < lessThanThis.scalar() ? 1 : 0);

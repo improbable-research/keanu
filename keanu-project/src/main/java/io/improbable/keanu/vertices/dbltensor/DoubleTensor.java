@@ -96,6 +96,8 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis);
 
+    DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis);
+
     DoubleTensor getLessThanMask(DoubleTensor lessThanThis);
 
     DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
