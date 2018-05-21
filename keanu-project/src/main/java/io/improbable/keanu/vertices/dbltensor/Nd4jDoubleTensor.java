@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
@@ -8,6 +9,8 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
+
+import java.util.function.Function;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -78,6 +81,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor apply(Function<Double, Double> function) {
+        DataBuffer data = tensor.data().dup();
+        for (int i = 0; i < data.length(); i++) {
+            data.put(i, function.apply(data.getDouble(i)));
+        }
+        return new Nd4jDoubleTensor(data.asDouble(), this.getShape());
+    }
+
+    @Override
     public double scalar() {
         return tensor.getDouble(0);
     }
@@ -120,6 +132,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor pow(double exponent) {
         return new Nd4jDoubleTensor(Transforms.pow(tensor, exponent));
+    }
+
+    @Override
+    public DoubleTensor sqrt() {
+        return new Nd4jDoubleTensor(Transforms.sqrt(tensor));
     }
 
     @Override
@@ -253,6 +270,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor powInPlace(double exponent) {
         Transforms.pow(tensor, exponent, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor sqrtInPlace() {
+        Transforms.sqrt(tensor, false);
         return this;
     }
 
@@ -397,6 +420,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             );
         }
 
+        return this;
+    }
+
+    @Override
+    public DoubleTensor applyInPlace(Function<Double, Double> function) {
+        DataBuffer data = tensor.data();
+        for (int i = 0; i < data.length(); i++) {
+            data.put(i, function.apply(data.getDouble(i)));
+        }
         return this;
     }
 

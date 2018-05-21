@@ -210,7 +210,7 @@ public class GammaVertexTest {
     @Test
     public void inferHyperParamsFromSamples() {
 
-        double trueA = 0.0;
+        double trueA = 0.;
         double trueTheta = 3.0;
         double trueK = 2.0;
 
