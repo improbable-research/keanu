@@ -18,7 +18,7 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex b;
 
     /**
-     * One a, theta or b or all three driving an arbitrarily shaped tensor of Gamma
+     * One a or b or both driving an arbitrarily shaped tensor of Inverse Gamma
      *
      * @param shape  the desired shape of the vertex
      * @param a      the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
@@ -73,8 +73,8 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
-                                                               DoubleTensor dPdb,
-                                                               DoubleTensor dPdx) {
+                                                             DoubleTensor dPdb,
+                                                             DoubleTensor dPdx) {
 
         TensorPartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         TensorPartialDerivatives dPdInputsFromB = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);

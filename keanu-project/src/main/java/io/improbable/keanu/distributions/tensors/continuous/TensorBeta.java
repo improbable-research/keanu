@@ -14,15 +14,18 @@ public class TensorBeta {
                                     DoubleTensor xMax,
                                     KeanuRandom random) {
 
+        final Nd4jDoubleTensor zeros = Nd4jDoubleTensor.zeros(shape);
+        final Nd4jDoubleTensor ones = Nd4jDoubleTensor.ones(shape);
+
         final DoubleTensor y1 = random.nextGamma(shape,
-            Nd4jDoubleTensor.zeros(shape),
-            Nd4jDoubleTensor.ones(shape),
+            zeros,
+            ones,
             alpha
         );
 
         final DoubleTensor y2 = random.nextGamma(shape,
-            Nd4jDoubleTensor.zeros(shape),
-            Nd4jDoubleTensor.ones(shape),
+            zeros,
+            ones,
             beta
         );
 
@@ -39,15 +42,15 @@ public class TensorBeta {
     }
 
     public static DoubleTensor logPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
-        final DoubleTensor logGammaAlpha = alpha.apply(Gamma::logGamma);
-        final DoubleTensor logGammaBeta = beta.apply(Gamma::logGamma);
-        final DoubleTensor alphaPlusBetaLogGamma = (alpha.plus(beta)).applyInPlace(Gamma::logGamma);
-        final DoubleTensor alphaMinusOneTimesLnX = alpha.minus(1).times(x.log());
-        final DoubleTensor betaMinusOneTimesOneMinusXLog = beta.minus(1).times(x.unaryMinus().plus(1).logInPlace());
+        final DoubleTensor lnGammaAlpha = alpha.apply(Gamma::logGamma);
+        final DoubleTensor lnGammaBeta = beta.apply(Gamma::logGamma);
+        final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).applyInPlace(Gamma::logGamma);
+        final DoubleTensor alphaMinusOneTimesLnX = x.log().timesInPlace(alpha.minus(1));
+        final DoubleTensor betaMinusOneTimesOneMinusXLn = x.unaryMinus().plusInPlace(1).logInPlace().timesInPlace(beta.minus(1));
 
-        final DoubleTensor betaFunction = logGammaAlpha.plusInPlace(logGammaBeta).minusInPlace(alphaPlusBetaLogGamma);
+        final DoubleTensor betaFunction = lnGammaAlpha.plusInPlace(lnGammaBeta).minusInPlace(alphaPlusBetaLnGamma);
 
-        return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLog).minusInPlace(betaFunction);
+        return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLn).minusInPlace(betaFunction);
     }
 
     public static Diff dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {

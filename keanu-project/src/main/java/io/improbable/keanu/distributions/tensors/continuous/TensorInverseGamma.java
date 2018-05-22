@@ -21,7 +21,7 @@ public class TensorInverseGamma {
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
         final DoubleTensor aTimesLnB = a.times(b.log());
-        final DoubleTensor negAMinus1TimesLnX = a.unaryMinus().minusInPlace(1).times(x.log());
+        final DoubleTensor negAMinus1TimesLnX = x.log().timesInPlace(a.unaryMinus().minusInPlace(1));
         final DoubleTensor lnGammaA = a.apply(Gamma::gamma).logInPlace();
 
         return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(b.div(x));
