@@ -17,6 +17,13 @@ public class TensorLogisticVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex a;
     private final DoubleTensorVertex b;
 
+    /**
+     * One a or b or both driving an arbitrarily shaped tensor of Logistic
+     *
+     * @param shape  the desired shape of the vertex
+     * @param a the a of the Logistic with either the same shape as specified for this vertex or a scalar
+     * @param b the b of the Logistic with either the same shape as specified for this vertex or a scalar
+     */
     public TensorLogisticVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex b) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), b.getShape());
@@ -27,6 +34,13 @@ public class TensorLogisticVertex extends ProbabilisticDoubleTensor {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    /**
+     * One to one constructor for mapping some shape of a and b to
+     * a matching shaped logistic.
+     *
+     * @param a the a of the Logistic with either the same shape as specified for this vertex or a scalar
+     * @param b the b of the Logistic with either the same shape as specified for this vertex or a scalar
+     */
     public TensorLogisticVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), a.getShape()), a, b);
     }

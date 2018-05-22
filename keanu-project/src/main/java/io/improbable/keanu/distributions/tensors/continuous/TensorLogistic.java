@@ -6,14 +6,16 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 public class TensorLogistic {
 
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor b, KeanuRandom random) {
-        return random.nextDouble(shape).reciprocal().minus(1).log().times(a.minus(b));
+        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(a.minus(b));
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor xMinusAOverB = x.minus(a).div(b);
-        final DoubleTensor ln1OverB = b.reciprocal().log();
+        final DoubleTensor xMinusAOverB = x.minus(a).divInPlace(b);
+        final DoubleTensor ln1OverB = b.reciprocal().logInPlace();
 
-        return xMinusAOverB.plus(ln1OverB).minusInPlace(xMinusAOverB.exp().plus(1).log().times(2));
+        return xMinusAOverB.plus(ln1OverB).minusInPlace(
+            xMinusAOverB.expInPlace().plusInPlace(1).logInPlace().timesInPlace(2)
+        );
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
@@ -23,14 +25,16 @@ public class TensorLogistic {
         final DoubleTensor bTimesExpAOverB = expAOverB.times(b);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(b);
 
-        final DoubleTensor dPda = expXOverB.minus(expAOverB).div(b.times(expPlus));
+        final DoubleTensor dPda = expXOverB.minus(expAOverB).divInPlace(b.times(expPlus));
         final DoubleTensor dPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
-        final DoubleTensor numeratorPartOne = a.times(expXOverB).plus(x.times(expAOverB)).plus(a.times(expAOverB.unaryMinus()));
-        final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minus(x.times(expXOverB));
-        final DoubleTensor denominator = b.pow(2).times(expPlus);
+        final DoubleTensor numeratorPartOne = a.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
+            a.times(expAOverB.unaryMinus())
+        );
+        final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
+        final DoubleTensor denominator = b.pow(2).timesInPlace(expPlus);
 
-        final DoubleTensor dPdb = numeratorPartOne.plus(numeratorPartTwo).div(denominator).unaryMinus();
+        final DoubleTensor dPdb = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
         return new Diff(dPda, dPdb, dPdx);
     }
