@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
@@ -46,16 +45,12 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 		};
 		for (int i = 0; i < test_values.length; i++) {
 			int v = (int) test_values[i][POS_V];
-//			TDistribution apache = new TDistribution(v);
 			StudentTVertex studentT = new StudentTVertex(v, random);
 			
-//			List<Double> apache_samples = new ArrayList<>();
 			List<Double> student_samples = new ArrayList<>();
 			for (int j = 0; j < N; j++) {
-//				apache_samples.add(apache.sample());
 				student_samples.add(studentT.sample());
 			}
-//			testSampleMeanAndStdDeviation(v, test_values[i][POS_MEAN], test_values[i][POS_SD], apache_samples, sample_delta);
 			testSampleMeanAndStdDeviation(v, test_values[i][POS_MEAN], test_values[i][POS_SD], student_samples, sample_delta);
 		}
 	}

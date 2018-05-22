@@ -91,19 +91,6 @@ public class StudentTVertex extends ProbabilisticDouble {
 	}
 	/**
 	 *
-	 * @param dPdt d/dt
-	 * @return Map<String, Double> of the derivatives
-	 */
-	private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdt) {
-//		PartialDerivatives dPdInputsFromV = v.getDualNumber().getPartialDerivatives().multiplyBy(dPdv);
-//		PartialDerivatives dPdInputs = dPdInputsFromV;
-//		dPdInputs.putWithRespectTo(getId(), dPdt);
-//
-//		return dPdInputs.asMap();
-		return null;
-	}
-	/**
-	 *
 	 * @return sample of Student T distribution
 	 */
 	@Override

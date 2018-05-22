@@ -55,14 +55,6 @@ public class StudentT {
 	}
 	/**
 	 *
-	 * @param in input
-	 * @return zeroth derivative of the digamma
-	 */
-	private static double zeroDerivativeOfDigamma(double in) {
-		return digamma(in);
-	}
-	/**
-	 *
 	 * @param v Degrees of Freedom
 	 * @param t random variable
 	 * @return Differential of the Probability Density Function
@@ -74,19 +66,6 @@ public class StudentT {
 		double tSq = pow(t, 2);
 		double tSqDividedByVPlusOne = (tSq / v) + 1.;
 		double sqrtVPiGammaHalfV = sqrtVPi * gammaHalfV;
-//		double sqrtPiGammaHalfV = sqrt(PI) * gammaHalfV;
-//
-//		double zeroDerivativeOfDigammaHalfV = zeroDerivativeOfDigamma(v / 2.);
-//		double zeroDerivativeOfDigammaHalfVPlusOne = zeroDerivativeOfDigamma((v + 1.) / 2.);
-//
-//		double dPdv_multiplier = pow(tSqDividedByVPlusOne, (-v - 1.) / 2.) * gammaHalfVPlusOne;
-//		double dPdv_pt1 = -1. / (2. * sqrtPiGammaHalfV * pow(v, 3. / 2.));
-//		double dPdv_pt2_numerator = -(tSq * (-v - 1.) / (2. * pow(v, 2.) * tSqDividedByVPlusOne)) -
-//				(0.5 * log(tSqDividedByVPlusOne));
-//		double dPdv_pt2 = dPdv_pt2_numerator / sqrtVPiGammaHalfV;
-//		double dPdv_pt3 = zeroDerivativeOfDigammaHalfV / (2. * sqrtVPiGammaHalfV);
-//		double dPdv_pt4 = zeroDerivativeOfDigammaHalfVPlusOne / (2. * sqrtVPiGammaHalfV);
-//		double dPdv = dPdv_multiplier * (dPdv_pt1 + dPdv_pt2 - dPdv_pt3 + dPdv_pt4);
 		
 		double dPdt_numerator = (t * (-v - 1)) * pow(tSqDividedByVPlusOne, -v / 2.) * gammaHalfVPlusOne;
 		double dPdt_denominator = (tSq + v) * sqrt((tSq + v) / v) * sqrtVPiGammaHalfV;
@@ -101,20 +80,6 @@ public class StudentT {
 	 * @return Differential of the Log of the Probability Density Function
 	 */
 	public static Diff dLogPdf(int v, double t) {
-		double tSq = pow(t, 2);
-		double tSqPlusV = tSq + v;
-		
-//		double digammaHalfV = zeroDerivativeOfDigamma(v / 2.);
-//		double digammaVPlusHalf = zeroDerivativeOfDigamma((v + 1.) / 2.);
-//
-//		double digamma_pt = log(tSqPlusV / v) + digammaHalfV - digammaVPlusHalf;
-//		double pt1 = -tSq * (digamma_pt - 1.);
-//		double pt2 = v * (digamma_pt);
-//
-//		double numerator = pt1 + pt2 + 1;
-//		double denominator = 2. * tSqPlusV;
-//
-//		double dPdv = numerator / denominator;
 		double dPdt = (-t * (v + 1.)) / (pow(t, 2.) + v);
 		
 		return new Diff(dPdt);
@@ -123,11 +88,9 @@ public class StudentT {
 	 * Differential Equation Class to store result of d/dv and d/dt
 	 */
 	public static class Diff {
-//		public double dPdv;
 		public double dPdt;
 		
 		public Diff(double dPdt) {
-//			this.dPdv = dPdv;
 			this.dPdt = dPdt;
 		}
 	}
