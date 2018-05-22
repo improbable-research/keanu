@@ -41,12 +41,6 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public Double lazyEval() {
-        setValue(applyReduce(Vertex::lazyEval));
-        return getValue();
-    }
-
-    @Override
     public Double getDerivedValue() {
         return applyReduce(Vertex::getValue);
     }

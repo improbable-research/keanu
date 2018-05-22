@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,10 +18,11 @@ import static org.junit.Assert.assertEquals;
 
 public class ExponentialVertexTest {
 
-    private final Logger log = LoggerFactory.getLogger(ExponentialVertexTest.class);
-
     private static final double DELTA = 0.0001;
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+    private final Logger log = LoggerFactory.getLogger(ExponentialVertexTest.class);
     private KeanuRandom random;
 
     @Before

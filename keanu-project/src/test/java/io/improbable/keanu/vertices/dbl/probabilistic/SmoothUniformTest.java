@@ -31,7 +31,7 @@ public class SmoothUniformTest {
         CObserved = new GaussianVertex(C, 0.2);
 
         //Both on left shoulder
-        A.setAndCascade(-25.0);
+        A.setValue(-25.0);
         B.setAndCascade(-9.0);
 
         CObserved.observe(50.0);
@@ -47,7 +47,7 @@ public class SmoothUniformTest {
         CObserved = new GaussianVertex(C, 0.2);
 
         //Both on right shoulder
-        A.setAndCascade(5.0);
+        A.setValue(5.0);
         B.setAndCascade(9.0);
 
         double expected = -50.0;

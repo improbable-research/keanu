@@ -71,7 +71,7 @@ public class TensorFitnessFunctionWithGradient {
         double[] gradient = new double[totalLatentDimensions];
         int fillPointer = 0;
         for (DoubleTensor tensor : tensors) {
-            double[] values = tensor.getLinearView();
+            double[] values = tensor.getFlattenedView().asArray();
             System.arraycopy(values, 0, gradient, fillPointer, values.length);
             fillPointer += values.length;
         }

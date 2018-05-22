@@ -1,5 +1,6 @@
 package io.improbable.keanu.kotlin
 
+import io.improbable.keanu.DeterministicRule
 import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
@@ -9,10 +10,15 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
 import junit.framework.TestCase.assertEquals
+import org.junit.Rule
 import org.junit.Test
 
 
 class OperatorOverloadingTest {
+
+    @Rule
+    @JvmField
+    var deterministicRule = DeterministicRule()
 
     @Test
     fun doubleVertexPlus() {

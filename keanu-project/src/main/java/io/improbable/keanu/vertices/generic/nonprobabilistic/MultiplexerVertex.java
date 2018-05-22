@@ -22,12 +22,6 @@ public class MultiplexerVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T lazyEval() {
-        setValue(getDerivedValue());
-        return getValue();
-    }
-
-    @Override
     public T getDerivedValue() {
         Vertex<T> selector = getSelector();
         return selector.getValue();

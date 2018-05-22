@@ -1,29 +1,50 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
 public interface DoubleTensor extends Tensor {
 
+    static DoubleTensor create(double value, int[] shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(value);
+        } else {
+            return Nd4jDoubleTensor.create(value, shape);
+        }
+    }
+
     static DoubleTensor create(double[] values, int[] shape) {
-        return new Nd4jDoubleTensor(values, shape);
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
+            return new SimpleDoubleTensor(values[0]);
+        } else {
+            return Nd4jDoubleTensor.create(values, shape);
+        }
     }
 
     static DoubleTensor ones(int[] shape) {
-        return Nd4jDoubleTensor.ones(shape);
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(1.0);
+        } else {
+            return Nd4jDoubleTensor.ones(shape);
+        }
     }
 
     static DoubleTensor zeros(int[] shape) {
-        return Nd4jDoubleTensor.zeros(shape);
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new SimpleDoubleTensor(0.0);
+        } else {
+            return Nd4jDoubleTensor.zeros(shape);
+        }
     }
 
     static DoubleTensor scalar(double scalarValue) {
-        return new SimpleScalarTensor(scalarValue);
+        return new SimpleDoubleTensor(scalarValue);
     }
 
     static DoubleTensor placeHolder(int[] shape) {
-        return new Nd4jDoubleTensor(shape);
+        return new SimpleDoubleTensor(shape);
     }
 
     static Map<Long, DoubleTensor> fromScalars(Map<Long, Double> scalars) {
@@ -53,6 +74,8 @@ public interface DoubleTensor extends Tensor {
     double scalar();
 
     double sum();
+
+    DoubleTensor duplicate();
 
     //New tensor Ops and transforms
 
@@ -102,7 +125,9 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
 
-    DoubleTensor applyWhere(DoubleTensor withMask, double value);
+    DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value);
+
+    DoubleTensor setWithMask(DoubleTensor mask, double value);
 
     DoubleTensor abs();
 
@@ -148,12 +173,20 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor unaryMinusInPlace();
 
-    DoubleTensor applyWhereInPlace(DoubleTensor withMask, double value);
-
     DoubleTensor absInPlace();
 
     DoubleTensor applyInPlace(Function<Double, Double> function);
 
-    double[] getLinearView();
+    FlattenedView getFlattenedView();
 
+    interface FlattenedView {
+
+        long size();
+
+        double get(long index);
+
+        void set(long index, double value);
+
+        double[] asArray();
+    }
 }

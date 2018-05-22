@@ -14,11 +14,6 @@ public class ConstantBoolVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean lazyEval() {
-        return getValue();
-    }
-
-    @Override
     public Boolean getDerivedValue() {
         return getValue();
     }
