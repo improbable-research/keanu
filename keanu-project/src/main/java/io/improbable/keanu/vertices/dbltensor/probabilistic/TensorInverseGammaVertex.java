@@ -9,8 +9,8 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartia
 
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.checkParentShapes;
-import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticVertexShaping.getShapeProposal;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
 
@@ -25,7 +25,7 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
      * @param b      the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
      */
     public TensorInverseGammaVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex b) {
-        checkParentShapes(shape, a.getValue(), b.getValue());
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), b.getShape());
 
         this.a = a;
         this.b = b;
@@ -41,7 +41,7 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
      * @param b      the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
      */
     public TensorInverseGammaVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
-        this(getShapeProposal(a.getValue(), b.getValue()), a, b);
+        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     public TensorInverseGammaVertex(DoubleTensorVertex a, double b) {
@@ -89,7 +89,7 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorInverseGamma.sample(getValue().getShape(), a.getValue(), b.getValue(), random);
+        return TensorInverseGamma.sample(getShape(), a.getValue(), b.getValue(), random);
     }
 
 }
