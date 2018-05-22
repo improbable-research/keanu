@@ -22,7 +22,19 @@ public class TensorTriangular {
     }
 
     public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c, DoubleTensor x) {
-        return null;
+        final DoubleTensor range = xMax.minus(xMin);
+
+        final DoubleTensor conditionalFirstHalf = x.getGreaterThanMask(xMin);
+        final DoubleTensor conditionalSecondHalf = x.getLessThanMask(c);
+        final DoubleTensor conditionalAnd = conditionalFirstHalf.times(conditionalSecondHalf);
+        final DoubleTensor conditionalResult = range.reciprocal().times(2).times(x.minus(xMin)).div(c.minus(xMin));
+
+        final DoubleTensor elseIfConditionalFirstHalf = x.getGreaterThanMask(c);
+        final DoubleTensor elseIfConditionalSecondHalf = x.getLessThanOrEqualToMask(xMax);
+        final DoubleTensor elseIfConditionalAnd = elseIfConditionalFirstHalf.times(elseIfConditionalSecondHalf);
+        final DoubleTensor elseIfConditionalResult = range.reciprocal().times(2).times(xMax.minus(x)).div(xMax.minus(c));
+
+        return (conditionalResult.times(conditionalAnd).plus(elseIfConditionalResult.times(elseIfConditionalAnd))).log();
     }
 
 
