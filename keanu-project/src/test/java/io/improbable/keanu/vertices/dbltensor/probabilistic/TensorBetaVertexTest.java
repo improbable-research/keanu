@@ -35,7 +35,6 @@ public class TensorBetaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-
         TensorBetaVertex tensorBetaVertex = new TensorBetaVertex(2., 3.);
         double expectedDensity = Beta.logPdf(2.0, 3.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorBetaVertex, 0.5, expectedDensity);
