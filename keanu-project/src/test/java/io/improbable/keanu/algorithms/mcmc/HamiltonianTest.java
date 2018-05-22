@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
@@ -20,7 +20,7 @@ public class HamiltonianTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesNet simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
+        BayesNetDoubleAsContinuous simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
             simpleGaussian,
@@ -39,7 +39,7 @@ public class HamiltonianTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesNet bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0, random);
+        BayesNetDoubleAsContinuous bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0, random);
 
         NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
             bayesNet,
@@ -59,7 +59,7 @@ public class HamiltonianTest {
     @Test
     public void samplesFromDonut() {
 
-        BayesNet donutBayesNet = MCMCTestDistributions.create2DDonutDistribution(random);
+        BayesNetDoubleAsContinuous donutBayesNet = MCMCTestDistributions.create2DDonutDistribution(random);
 
         NetworkSamples samples = Hamiltonian.getPosteriorSamples(
             donutBayesNet,

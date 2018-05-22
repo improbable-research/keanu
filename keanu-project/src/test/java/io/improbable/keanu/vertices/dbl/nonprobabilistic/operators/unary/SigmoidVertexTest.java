@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -49,7 +49,7 @@ public class SigmoidVertexTest {
         GaussianVertex observableSigmoid = new GaussianVertex(sigmoid, 1.0);
         observableSigmoid.observe(0.75);
 
-        BayesNet bayesNet = new BayesNet(unknownX.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(unknownX.getConnectedGraph());
         GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesNet);
         gradientOptimizer.maxLikelihood(5000);
 

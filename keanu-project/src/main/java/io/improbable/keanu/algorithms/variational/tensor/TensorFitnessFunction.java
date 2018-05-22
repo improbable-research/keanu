@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.tensorvariational;
+package io.improbable.keanu.algorithms.variational.tensor;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;

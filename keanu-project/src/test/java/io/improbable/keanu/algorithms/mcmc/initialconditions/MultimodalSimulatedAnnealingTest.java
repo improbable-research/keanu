@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -41,7 +41,7 @@ public class MultimodalSimulatedAnnealingTest {
         DoubleVertex C = new GaussianVertex(B, 1.5);
         C.observe(4.0);
 
-        BayesNet network = new BayesNet(A.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
         boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) + 2) < 0.01);
@@ -68,7 +68,7 @@ public class MultimodalSimulatedAnnealingTest {
         DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
         G.observe(4.0);
 
-        BayesNet network = new BayesNet(A.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
         boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) - 2) < 0.01);

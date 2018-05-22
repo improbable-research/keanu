@@ -1,8 +1,8 @@
-package io.improbable.keanu.algorithms.tensormcmc;
+package io.improbable.keanu.algorithms.mcmc.tensor;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.TensorBayesNet;
+import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
@@ -27,7 +27,7 @@ public class TensorHamiltonian {
     private TensorHamiltonian() {
     }
 
-    public static NetworkSamples getPosteriorSamples(final TensorBayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesNetTensorAsContinuous bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,
@@ -36,7 +36,7 @@ public class TensorHamiltonian {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, new KeanuRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(final TensorBayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesNetTensorAsContinuous bayesNet,
                                                      final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,

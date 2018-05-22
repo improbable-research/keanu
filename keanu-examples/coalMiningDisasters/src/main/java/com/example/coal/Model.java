@@ -3,7 +3,7 @@ package com.example.coal;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
@@ -85,7 +85,7 @@ public class Model {
      * Runs the MetropolisHastings algorithm and saves the resulting samples to results
      */
     public void run() {
-        BayesNet net = new BayesNet(switchpoint.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(switchpoint.getConnectedGraph());
         Integer numSamples = 50000;
         NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), numSamples, random);
 

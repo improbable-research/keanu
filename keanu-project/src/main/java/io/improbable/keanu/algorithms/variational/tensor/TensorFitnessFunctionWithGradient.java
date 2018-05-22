@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.tensorvariational;
+package io.improbable.keanu.algorithms.variational.tensor;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.tensorvariational.TensorFitnessFunction.logOfTotalProbability;
+import static io.improbable.keanu.algorithms.variational.tensor.TensorFitnessFunction.logOfTotalProbability;
 
 
 public class TensorFitnessFunctionWithGradient {

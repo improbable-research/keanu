@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
@@ -16,7 +16,7 @@ public class Prior {
     private Prior() {
     }
 
-    public static NetworkSamples sample(BayesNet bayesNet,
+    public static NetworkSamples sample(BayesianNetwork bayesNet,
                                         List<? extends Vertex> fromVertices,
                                         int sampleCount,
                                         KeanuRandom random) {

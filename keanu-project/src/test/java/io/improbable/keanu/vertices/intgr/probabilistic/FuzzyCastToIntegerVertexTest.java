@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -144,7 +144,7 @@ public class FuzzyCastToIntegerVertexTest {
         FuzzyCastToIntegerVertex fuzzy = new FuzzyCastToIntegerVertex(mu, 1.0, 0, 10);
         fuzzy.observe(6);
 
-        BayesNet bayes = new BayesNet(fuzzy.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayes = new BayesNetDoubleAsContinuous(fuzzy.getConnectedGraph());
         GradientOptimizer gradientOptimizer = new GradientOptimizer(bayes);
         gradientOptimizer.maxAPosteriori(1000);
 

@@ -1,6 +1,6 @@
-package io.improbable.keanu.algorithms.tensorvariational;
+package io.improbable.keanu.algorithms.variational.tensor;
 
-import io.improbable.keanu.network.TensorBayesNet;
+import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -12,19 +12,19 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.List;
 
-import static io.improbable.keanu.algorithms.tensorvariational.TensorGradientOptimizer.currentPoint;
+import static io.improbable.keanu.algorithms.variational.tensor.TensorGradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class TensorNonGradientOptimizer {
 
-    private final TensorBayesNet bayesNet;
+    private final BayesNetTensorAsContinuous bayesNet;
 
-    public TensorNonGradientOptimizer(TensorBayesNet bayesNet) {
+    public TensorNonGradientOptimizer(BayesNetTensorAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
     }
 
     public TensorNonGradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new TensorBayesNet(graph);
+        bayesNet = new BayesNetTensorAsContinuous(graph);
     }
 
     public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {

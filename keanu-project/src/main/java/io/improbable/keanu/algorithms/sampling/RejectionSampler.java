@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
@@ -41,13 +41,13 @@ public class RejectionSampler {
         }
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount) {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount,
                                                      KeanuRandom random) {

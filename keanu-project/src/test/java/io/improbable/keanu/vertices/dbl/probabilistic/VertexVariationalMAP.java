@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
@@ -47,7 +47,7 @@ public class VertexVariationalMAP {
     }
 
     private static void doInferenceOn(DoubleVertex unknownVertex, KeanuRandom random) {
-        BayesNet inferNet = new BayesNet(unknownVertex.getConnectedGraph());
+        BayesNetDoubleAsContinuous inferNet = new BayesNetDoubleAsContinuous(unknownVertex.getConnectedGraph());
 
         inferNet.probeForNonZeroMasterP(100, random);
 

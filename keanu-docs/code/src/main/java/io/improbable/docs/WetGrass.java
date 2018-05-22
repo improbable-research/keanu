@@ -2,7 +2,7 @@ package io.improbable.docs;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.RejectionSampler;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPT;
@@ -29,7 +29,7 @@ public class WetGrass {
         wetGrass.observe(true);
 
         NetworkSamples posteriorSamples = RejectionSampler.getPosteriorSamples(
-            new BayesNet(wetGrass.getConnectedGraph()),
+            new BayesianNetwork(wetGrass.getConnectedGraph()),
             Arrays.asList(sprinkler, rain),
             100000
         );

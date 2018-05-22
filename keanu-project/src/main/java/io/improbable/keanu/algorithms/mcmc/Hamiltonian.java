@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
@@ -27,7 +27,7 @@ public class Hamiltonian {
     private Hamiltonian() {
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,
@@ -36,7 +36,7 @@ public class Hamiltonian {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
                                                      final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,
