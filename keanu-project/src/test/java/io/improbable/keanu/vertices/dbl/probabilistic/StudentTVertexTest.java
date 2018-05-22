@@ -42,7 +42,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 		double sample_delta = 0.1;
 		double[][] test_values = {
 				// v, mean, sd
-				{2., 0., 4.5}
+				{2., 0., 4.0}
 		};
 		for (int i = 0; i < test_values.length; i++) {
 			int v = (int) test_values[i][POS_V];
