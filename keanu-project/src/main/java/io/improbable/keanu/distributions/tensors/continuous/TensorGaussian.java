@@ -24,7 +24,6 @@ public class TensorGaussian {
     }
 
     public static Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
-
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 

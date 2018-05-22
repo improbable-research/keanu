@@ -148,6 +148,16 @@ public class SimpleDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
+        if (lessThanThis.isScalar()) {
+            return new SimpleDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);
+        } else {
+            return DoubleTensor.create(value, lessThanThis.getShape())
+                .getLessThanOrEqualToMask(lessThanThis);
+        }
+    }
+
+    @Override
     public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualsThis) {
         if (lessThanOrEqualsThis.isScalar()) {
             return new SimpleDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
@@ -171,6 +181,11 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor setWithMask(DoubleTensor mask, double value) {
         return this.duplicate().setWithMaskInPlace(mask, value);
+    }
+
+    @Override
+    public DoubleTensor abs() {
+        return this.duplicate().absInPlace();
     }
 
     @Override
@@ -308,6 +323,12 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor unaryMinusInPlace() {
         value = -value;
+        return this;
+    }
+
+    @Override
+    public DoubleTensor absInPlace() {
+        value = Math.abs(value);
         return this;
     }
 

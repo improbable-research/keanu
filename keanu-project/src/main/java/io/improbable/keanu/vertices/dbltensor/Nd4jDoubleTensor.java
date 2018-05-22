@@ -4,6 +4,7 @@ import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
@@ -231,6 +232,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor abs() {
+        return new Nd4jDoubleTensor(Transforms.abs(tensor));
+    }
+
+    @Override
     public DoubleTensor unaryMinus() {
         return duplicate().unaryMinusInPlace();
     }
@@ -375,6 +381,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor absInPlace() {
+        return duplicate().absInPlace();
+    }
+
+
+    @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
 
         INDArray mask = tensor.dup();
@@ -387,6 +399,25 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
             Nd4j.getExecutioner().exec(
                 new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
+            );
+        }
+
+        return new Nd4jDoubleTensor(mask);
+    }
+
+    @Override
+    public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
+
+        INDArray mask = tensor.dup();
+
+        if (lessThanThis.isScalar()) {
+            Nd4j.getExecutioner().exec(
+                new OldLessThan(mask, Nd4j.ones(mask.shape()).mul(lessThanThis.scalar()), mask, mask.length())
+            );
+        } else {
+            INDArray lessThanThisArray = unsafeGetNd4J(lessThanThis);
+            Nd4j.getExecutioner().exec(
+                new OldLessThan(mask, lessThanThisArray, mask, mask.length())
             );
         }
 

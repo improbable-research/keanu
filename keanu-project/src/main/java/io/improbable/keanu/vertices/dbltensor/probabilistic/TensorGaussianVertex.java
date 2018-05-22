@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -83,7 +84,6 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         TensorGaussian.Diff dlnP = TensorGaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
-
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
