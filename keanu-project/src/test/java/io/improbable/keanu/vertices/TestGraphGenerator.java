@@ -25,7 +25,7 @@ public class TestGraphGenerator {
     }
 
     static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
-        final long id = Vertex.idGenerator.get();
+        final long id = Vertex.ID_GENERATOR.get();
         return new DoubleUnaryOpLambda<>(from, (a) -> {
             opCount.incrementAndGet();
             onOp.accept(id);
@@ -37,7 +37,7 @@ public class TestGraphGenerator {
     }
 
     static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
-        final long id = Vertex.idGenerator.get();
+        final long id = Vertex.ID_GENERATOR.get();
         return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
             opCount.incrementAndGet();
             onOp.accept(id);

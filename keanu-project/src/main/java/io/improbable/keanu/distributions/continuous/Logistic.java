@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -19,7 +19,7 @@ public class Logistic {
      * @param random source or randomness
      * @return a sample from the distribution
      */
-    public static double sample(double a, double b, Random random) {
+    public static double sample(double a, double b, KeanuRandom random) {
         if (b <= 0.0) {
             throw new IllegalArgumentException("Invalid value for beta: " + b);
         }
@@ -59,7 +59,7 @@ public class Logistic {
         double dPda = (expAPlus2XOverB - exp2APlusXOverB) / (bSquared * Math.pow(expXOverB + expAOverB, 3));
         double dPdx = (exp2APlusXOverB - expAPlus2XOverB) / (bSquared * Math.pow(expAOverB + expXOverB, 3));
         double dPdb = -(Math.exp((a / b) + (x / b)) * ((a * expXOverB) + (x * expAOverB) - (a * expAOverB) + (b * expAOverB) + (b * expXOverB) - (x * expXOverB))) /
-                (Math.pow(b, 3) * Math.pow(expAOverB + expXOverB, 3));
+            (Math.pow(b, 3) * Math.pow(expAOverB + expXOverB, 3));
 
         return new Diff(dPda, dPdb, dPdx);
     }
@@ -71,7 +71,7 @@ public class Logistic {
         double dPda = (expXOverB - expAOverB) / (b * (expAOverB + expXOverB));
         double dPdx = (expAOverB - expXOverB) / ((b * expAOverB) + (b * expXOverB));
         double dPdb = -(((a * expXOverB) + (x * expAOverB) + (a * -expAOverB) + (b * expAOverB) + (b * expXOverB) - (x * expXOverB)) /
-                (b * b * (expAOverB + expXOverB)));
+            (b * b * (expAOverB + expXOverB)));
         return new Diff(dPda, dPdb, dPdx);
     }
 

@@ -3,11 +3,9 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -17,23 +15,23 @@ public class SmoothUniformTest {
     DoubleVertex B;
     DoubleVertex C;
     DoubleVertex CObserved;
-    Random random;
+    KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
     public void optimizerMovesAwayFromLeftShoulder() {
 
-        A = new SmoothUniformVertex(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1000.), 0.05, random);
-        B = new SmoothUniformVertex(0, 1000, random);
+        A = new SmoothUniformVertex(0.0, 1000., 0.05);
+        B = new SmoothUniformVertex(0, 1000);
         C = A.plus(B);
         CObserved = new GaussianVertex(C, 0.2);
 
         //Both on left shoulder
-        A.setAndCascade(-25.0);
+        A.setValue(-25.0);
         B.setAndCascade(-9.0);
 
         CObserved.observe(50.0);
@@ -43,13 +41,13 @@ public class SmoothUniformTest {
     @Test
     public void optimizerMovesAwayFromRightShoulder() {
 
-        A = new SmoothUniformVertex(-1000, 0, random);
-        B = new SmoothUniformVertex(-1000, 0, random);
+        A = new SmoothUniformVertex(-1000, 0);
+        B = new SmoothUniformVertex(-1000, 0);
         C = A.plus(B);
         CObserved = new GaussianVertex(C, 0.2);
 
         //Both on right shoulder
-        A.setAndCascade(5.0);
+        A.setValue(5.0);
         B.setAndCascade(9.0);
 
         double expected = -50.0;
@@ -68,10 +66,9 @@ public class SmoothUniformTest {
 
         double edgeSharpness = 1.0;
         SmoothUniformVertex uniform = new SmoothUniformVertex(
-                new ConstantDoubleVertex(0.0),
-                new ConstantDoubleVertex(1.0),
-                edgeSharpness,
-                random
+            0.0,
+            1.0,
+            edgeSharpness
         );
 
         double from = -1;
@@ -79,16 +76,23 @@ public class SmoothUniformTest {
         double delta = 0.05;
         long N = 1000000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(uniform, N, from, to, delta, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
+            uniform,
+            N,
+            from,
+            to,
+            delta,
+            1e-2,
+            random
+        );
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         SmoothUniformVertex vertexUnderTest = new SmoothUniformVertex(
-                new UniformVertex(0.0, 1.0),
-                new ConstantDoubleVertex(3.0),
-                0.01,
-                random
+            new UniformVertex(0.0, 1.0),
+            3.0,
+            0.01
         );
         ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);

@@ -15,10 +15,10 @@ import static java.util.stream.Collectors.toMap;
  */
 public class NetworkSamples {
 
-    private final Map<String, ? extends List> samplesByVertex;
+    private final Map<Long, ? extends List> samplesByVertex;
     private final int size;
 
-    public NetworkSamples(Map<String, ? extends List> samplesByVertex, int size) {
+    public NetworkSamples(Map<Long, ? extends List> samplesByVertex, int size) {
         this.samplesByVertex = samplesByVertex;
         this.size = size;
     }
@@ -31,7 +31,7 @@ public class NetworkSamples {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertex.getId()));
     }
 
-    public <T> VertexSamples<T> get(String vertexId) {
+    public <T> VertexSamples<T> get(long vertexId) {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
     }
 
@@ -39,29 +39,29 @@ public class NetworkSamples {
         return new DoubleVertexSamples((List<Double>) samplesByVertex.get(vertex.getId()));
     }
 
-    public DoubleVertexSamples getDoubles(String vertexId) {
+    public DoubleVertexSamples getDoubles(long vertexId) {
         return new DoubleVertexSamples((List<Double>) samplesByVertex.get(vertexId));
     }
 
     public NetworkSamples drop(int dropCount) {
 
-        final Map<String, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        e -> e.getValue().subList(dropCount, size))
-                );
+        final Map<Long, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> e.getValue().subList(dropCount, size))
+            );
 
         return new NetworkSamples(withSamplesDropped, size - dropCount);
     }
 
     public NetworkSamples downSample(final int downSampleInterval) {
 
-        final Map<String, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
-                .collect(toMap(
-                        Map.Entry::getKey,
-                        e -> downSample(e.getValue(), downSampleInterval)
-                        )
-                );
+        final Map<Long, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
+            .collect(toMap(
+                Map.Entry::getKey,
+                e -> downSample(e.getValue(), downSampleInterval)
+                )
+            );
 
         return new NetworkSamples(withSamplesDownSampled, size / downSampleInterval);
     }
@@ -84,8 +84,8 @@ public class NetworkSamples {
     public double probability(Function<NetworkState, Boolean> predicate) {
         List<NetworkState> networkStates = toNetworkStates();
         long trueCount = networkStates.parallelStream()
-                .filter(predicate::apply)
-                .count();
+            .filter(predicate::apply)
+            .count();
 
         return (double) trueCount / networkStates.size();
     }
@@ -100,10 +100,10 @@ public class NetworkSamples {
 
     private static class SamplesBackedNetworkState implements NetworkState {
 
-        private final Map<String, ? extends List> samplesByVertex;
+        private final Map<Long, ? extends List> samplesByVertex;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<String, ? extends List> samplesByVertex, int index) {
+        public SamplesBackedNetworkState(Map<Long, ? extends List> samplesByVertex, int index) {
             this.samplesByVertex = samplesByVertex;
             this.index = index;
         }
@@ -114,12 +114,12 @@ public class NetworkSamples {
         }
 
         @Override
-        public <T> T get(String vertexId) {
+        public <T> T get(long vertexId) {
             return ((List<T>) samplesByVertex.get(vertexId)).get(index);
         }
 
         @Override
-        public Set<String> getVertexIds() {
+        public Set<Long> getVertexIds() {
             return new HashSet<>(samplesByVertex.keySet());
         }
     }

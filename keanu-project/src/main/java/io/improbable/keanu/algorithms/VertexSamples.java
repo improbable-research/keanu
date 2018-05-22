@@ -19,8 +19,8 @@ public class VertexSamples<T> {
 
     public double probability(Function<T, Boolean> samplePredicate) {
         long trueCount = samples.parallelStream()
-                .filter(samplePredicate::apply)
-                .count();
+            .filter(samplePredicate::apply)
+            .count();
 
         return (double) trueCount / samples.size();
     }
@@ -32,12 +32,12 @@ public class VertexSamples<T> {
         }
 
         Map<T, List<T>> groupedByValue = samples.stream()
-                .collect(groupingBy(v -> v));
+            .collect(groupingBy(v -> v));
 
         Optional<T> mode = groupedByValue.entrySet().stream()
-                .sorted(comparing(v -> -v.getValue().size()))
-                .map(Map.Entry::getKey)
-                .findFirst();
+            .sorted(comparing(v -> -v.getValue().size()))
+            .map(Map.Entry::getKey)
+            .findFirst();
 
         if (mode.isPresent()) {
             return mode.get();

@@ -37,16 +37,16 @@ public class CsvReaderTest {
     @Test
     public void givenTsvStringWithoutHeaderThenReturnsData() {
         CsvReader csvReader = ReadCsv.fromString(tsv)
-                .expectHeader(false)
-                .withDelimiter("\t");
+            .expectHeader(false)
+            .withDelimiter("\t");
         testWithoutHeader(csvReader);
     }
 
     @Test
     public void givenCsvStringThenLoadAsPOJO() {
         List<TestPOJO> testPOJOS = ReadCsv.fromString(csv)
-                .as(TestPOJO.class)
-                .asList();
+            .as(TestPOJO.class)
+            .asList();
 
         TestPOJO expectedPojo = testPOJOS.get(0);
 

@@ -15,8 +15,8 @@ public class TopologicalSort {
         Map<Vertex, Set<Vertex>> dependencies = mapDependencies(vertices);
 
         return vertices.stream().
-                sorted(Comparator.comparingInt(vertexA -> dependencies.get(vertexA).size()))
-                .collect(Collectors.toList());
+            sorted(Comparator.comparingInt(vertexA -> dependencies.get(vertexA).size()))
+            .collect(Collectors.toList());
     }
 
     public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {

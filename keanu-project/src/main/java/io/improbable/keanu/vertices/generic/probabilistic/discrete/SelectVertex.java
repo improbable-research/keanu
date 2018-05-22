@@ -2,25 +2,19 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 
 public class SelectVertex<T> extends Probabilistic<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
-    private final Random random;
-
-    public SelectVertex(Map<T, DoubleVertex> selectableValues, Random random) {
-        this.selectableValues = new LinkedHashMap<>(selectableValues);
-        this.random = random;
-        setParents(this.selectableValues.values());
-    }
 
     public SelectVertex(Map<T, DoubleVertex> selectableValues) {
-        this(selectableValues, new Random());
+        this.selectableValues = new LinkedHashMap<>(selectableValues);
+        setParents(this.selectableValues.values());
     }
 
     public Map<T, DoubleVertex> getSelectableValues() {
@@ -28,7 +22,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     @Override
-    public T sample() {
+    public T sample(KeanuRandom random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;
@@ -63,7 +57,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogProb(T value) {
+    public Map<Long, DoubleTensor> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

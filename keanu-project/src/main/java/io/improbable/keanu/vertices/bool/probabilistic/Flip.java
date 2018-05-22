@@ -3,28 +3,22 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class Flip extends ProbabilisticBool {
 
     private final Vertex<Double> probTrue;
-    private final Random random;
 
-    public Flip(Vertex<Double> probTrue, Random random) {
+    public Flip(Vertex<Double> probTrue) {
         this.probTrue = probTrue;
-        this.random = random;
         setValue(false);
         setParents(probTrue);
     }
 
-    public Flip(double probTrue, Random random) {
-        this(new ConstantDoubleVertex(probTrue), random);
-    }
-
     public Flip(double probTrue) {
-        this(new ConstantDoubleVertex(probTrue), new Random());
+        this(new ConstantDoubleVertex(probTrue));
     }
 
     public Vertex<Double> getProbTrue() {
@@ -38,12 +32,12 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPmf(Boolean value) {
+    public Map<Long, DoubleTensor> dLogPmf(Boolean value) {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public Boolean sample() {
+    public Boolean sample(KeanuRandom random) {
         return random.nextDouble() < probTrue.getValue();
     }
 

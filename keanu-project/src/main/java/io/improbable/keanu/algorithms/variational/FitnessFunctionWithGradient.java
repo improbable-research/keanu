@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
 import java.util.List;
@@ -18,13 +19,13 @@ public class FitnessFunctionWithGradient extends FitnessFunction {
 
             setAndCascadePoint(point);
 
-            Map<String, Double> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
+            Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
-            return alignGradientsToAppropriateIndex(diffs);
+            return alignGradientsToAppropriateIndex(DoubleTensor.toScalars(diffs));
         };
     }
 
-    private double[] alignGradientsToAppropriateIndex(Map<String /*Vertex Label*/, Double /*Gradient*/> diffs) {
+    private double[] alignGradientsToAppropriateIndex(Map<Long /*Vertex Label*/, Double /*Gradient*/> diffs) {
         double[] gradient = new double[latentVertices.size()];
         for (int i = 0; i < gradient.length; i++) {
             gradient[i] = diffs.getOrDefault(latentVertices.get(i).getId(), 0.0);

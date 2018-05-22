@@ -5,49 +5,31 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class LogisticVertex extends ProbabilisticDouble {
 
     private final DoubleVertex a;
     private final DoubleVertex b;
-    private final Random random;
 
-    public LogisticVertex(DoubleVertex a, DoubleVertex b, Random random) {
+    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
         this.a = a;
         this.b = b;
-        this.random = random;
         setParents(a, b);
     }
 
-    public LogisticVertex(DoubleVertex a, double b, Random random) {
-        this(a, new ConstantDoubleVertex(b), random);
-    }
-
-    public LogisticVertex(double a, DoubleVertex b, Random random) {
-        this(new ConstantDoubleVertex(a), b, random);
-    }
-
-    public LogisticVertex(double a, double b, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
-    }
-
-    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
-        this(a, b, new Random());
-    }
-
     public LogisticVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b), new Random());
+        this(a, new ConstantDoubleVertex(b));
     }
 
     public LogisticVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b, new Random());
+        this(new ConstantDoubleVertex(a), b);
     }
 
     public LogisticVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
     }
 
     public DoubleVertex getA() {
@@ -64,12 +46,12 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Logistic.Diff diff = Logistic.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(diff.dPda, diff.dPdb, diff.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
         PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
@@ -82,7 +64,7 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(KeanuRandom random) {
         return Logistic.sample(a.getValue(), b.getValue(), random);
     }
 }

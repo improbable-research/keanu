@@ -6,8 +6,13 @@ import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Algorithm 3: "Efficient NUTS".
@@ -26,46 +31,46 @@ public class NUTS {
                                                      final int sampleCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
 
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final Map<String, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
+        final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
-        final Map<String, List<?>> samples = new HashMap<>();
+        final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));
 
-        Map<String, Double> position = new HashMap<>();
+        Map<Long, Double> position = new HashMap<>();
         cachePosition(latentVertices, position);
 
-        Map<String, Double> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-                probabilisticVertices
-        );
+        Map<Long, Double> gradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
+            probabilisticVertices
+        ));
 
-        Map<String, Double> momentum = new HashMap<>();
+        Map<Long, Double> momentum = new HashMap<>();
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
 
         BuiltTree tree = new BuiltTree(
-                position,
-                gradient,
-                momentum,
-                position,
-                gradient,
-                momentum,
-                position,
-                gradient,
-                initialLogOfMasterP,
-                takeSample(sampleFromVertices),
-                1,
-                true
+            position,
+            gradient,
+            momentum,
+            position,
+            gradient,
+            momentum,
+            position,
+            gradient,
+            initialLogOfMasterP,
+            takeSample(sampleFromVertices),
+            1,
+            true
         );
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
@@ -85,35 +90,35 @@ public class NUTS {
                 int buildDirection = random.nextBoolean() ? 1 : -1;
 
                 BuiltTree otherHalfTree = buildOtherHalfOfTree(
-                        tree,
-                        latentVertices,
-                        latentSetAndCascadeCache,
-                        probabilisticVertices,
-                        sampleFromVertices,
-                        u,
-                        buildDirection,
-                        treeHeight,
-                        epsilon,
-                        random
+                    tree,
+                    latentVertices,
+                    latentSetAndCascadeCache,
+                    probabilisticVertices,
+                    sampleFromVertices,
+                    u,
+                    buildDirection,
+                    treeHeight,
+                    epsilon,
+                    random
                 );
 
                 if (otherHalfTree.shouldContinueFlag) {
                     final double acceptanceProb = (double) otherHalfTree.acceptedLeapfrogCount / tree.acceptedLeapfrogCount;
 
                     acceptOtherPositionWithProbability(
-                            acceptanceProb,
-                            tree, otherHalfTree,
-                            random
+                        acceptanceProb,
+                        tree, otherHalfTree,
+                        random
                     );
                 }
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
 
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
-                        tree.positionForward,
-                        tree.positionBackward,
-                        tree.momentumForward,
-                        tree.momentumBackward
+                    tree.positionForward,
+                    tree.positionBackward,
+                    tree.momentumForward,
+                    tree.momentumBackward
                 );
 
                 treeHeight++;
@@ -132,31 +137,31 @@ public class NUTS {
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
                                                   List<Vertex<Double>> latentVertices,
-                                                  final Map<String, Long> latentSetAndCascadeCache,
+                                                  final Map<Long, Long> latentSetAndCascadeCache,
                                                   List<Vertex> probabilisticVertices,
                                                   final List<? extends Vertex> sampleFromVertices,
                                                   double u,
                                                   int buildDirection,
                                                   int treeHeight,
                                                   double epsilon,
-                                                  Random random) {
+                                                  KeanuRandom random) {
 
         BuiltTree otherHalfTree;
         if (buildDirection == -1) {
 
             otherHalfTree = buildTree(
-                    latentVertices,
-                    latentSetAndCascadeCache,
-                    probabilisticVertices,
-                    sampleFromVertices,
-                    currentTree.positionBackward,
-                    currentTree.gradientBackward,
-                    currentTree.momentumBackward,
-                    u,
-                    buildDirection,
-                    treeHeight,
-                    epsilon,
-                    random
+                latentVertices,
+                latentSetAndCascadeCache,
+                probabilisticVertices,
+                sampleFromVertices,
+                currentTree.positionBackward,
+                currentTree.gradientBackward,
+                currentTree.momentumBackward,
+                u,
+                buildDirection,
+                treeHeight,
+                epsilon,
+                random
             );
 
             currentTree.positionBackward = otherHalfTree.positionBackward;
@@ -166,18 +171,18 @@ public class NUTS {
         } else {
 
             otherHalfTree = buildTree(
-                    latentVertices,
-                    latentSetAndCascadeCache,
-                    probabilisticVertices,
-                    sampleFromVertices,
-                    currentTree.positionForward,
-                    currentTree.gradientForward,
-                    currentTree.momentumForward,
-                    u,
-                    buildDirection,
-                    treeHeight,
-                    epsilon,
-                    random
+                latentVertices,
+                latentSetAndCascadeCache,
+                probabilisticVertices,
+                sampleFromVertices,
+                currentTree.positionForward,
+                currentTree.gradientForward,
+                currentTree.momentumForward,
+                u,
+                buildDirection,
+                treeHeight,
+                epsilon,
+                random
             );
 
             currentTree.positionForward = otherHalfTree.positionForward;
@@ -189,80 +194,80 @@ public class NUTS {
     }
 
     private static BuiltTree buildTree(List<Vertex<Double>> latentVertices,
-                                       final Map<String, Long> latentSetAndCascadeCache,
+                                       final Map<Long, Long> latentSetAndCascadeCache,
                                        List<Vertex> probabilisticVertices,
                                        final List<? extends Vertex> sampleFromVertices,
-                                       Map<String, Double> position,
-                                       Map<String, Double> gradient,
-                                       Map<String, Double> momentum,
+                                       Map<Long, Double> position,
+                                       Map<Long, Double> gradient,
+                                       Map<Long, Double> momentum,
                                        double u,
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
-                                       Random random) {
+                                       KeanuRandom random) {
         if (treeHeight == 0) {
 
             //Base case—take one leapfrog step in the build direction
 
             return builtTreeBaseCase(latentVertices,
-                    latentSetAndCascadeCache,
-                    probabilisticVertices,
-                    sampleFromVertices,
-                    position,
-                    gradient,
-                    momentum,
-                    u,
-                    buildDirection,
-                    epsilon
+                latentSetAndCascadeCache,
+                probabilisticVertices,
+                sampleFromVertices,
+                position,
+                gradient,
+                momentum,
+                u,
+                buildDirection,
+                epsilon
             );
 
         } else {
             //Recursion—implicitly build the left and right subtrees.
 
             BuiltTree tree = buildTree(
-                    latentVertices,
-                    latentSetAndCascadeCache,
-                    probabilisticVertices,
-                    sampleFromVertices,
-                    position,
-                    gradient,
-                    momentum,
-                    u,
-                    buildDirection,
-                    treeHeight - 1,
-                    epsilon,
-                    random
+                latentVertices,
+                latentSetAndCascadeCache,
+                probabilisticVertices,
+                sampleFromVertices,
+                position,
+                gradient,
+                momentum,
+                u,
+                buildDirection,
+                treeHeight - 1,
+                epsilon,
+                random
             );
 
             //Should continue building other half if first half's shouldContinueFlag is true
             if (tree.shouldContinueFlag) {
 
                 BuiltTree otherHalfTree = buildOtherHalfOfTree(
-                        tree,
-                        latentVertices,
-                        latentSetAndCascadeCache,
-                        probabilisticVertices,
-                        sampleFromVertices,
-                        u,
-                        buildDirection,
-                        treeHeight - 1,
-                        epsilon,
-                        random
+                    tree,
+                    latentVertices,
+                    latentSetAndCascadeCache,
+                    probabilisticVertices,
+                    sampleFromVertices,
+                    u,
+                    buildDirection,
+                    treeHeight - 1,
+                    epsilon,
+                    random
                 );
 
                 double acceptOtherTreePositionProbability = (double) otherHalfTree.acceptedLeapfrogCount / (tree.acceptedLeapfrogCount + otherHalfTree.acceptedLeapfrogCount);
 
                 acceptOtherPositionWithProbability(
-                        acceptOtherTreePositionProbability,
-                        tree, otherHalfTree,
-                        random
+                    acceptOtherTreePositionProbability,
+                    tree, otherHalfTree,
+                    random
                 );
 
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
-                        tree.positionForward,
-                        tree.positionBackward,
-                        tree.momentumForward,
-                        tree.momentumBackward
+                    tree.positionForward,
+                    tree.positionBackward,
+                    tree.momentumForward,
+                    tree.momentumBackward
                 );
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
@@ -274,24 +279,24 @@ public class NUTS {
     }
 
     private static BuiltTree builtTreeBaseCase(List<Vertex<Double>> latentVertices,
-                                               final Map<String, Long> latentSetAndCascadeCache,
+                                               final Map<Long, Long> latentSetAndCascadeCache,
                                                List<Vertex> probabilisticVertices,
                                                final List<? extends Vertex> sampleFromVertices,
-                                               Map<String, Double> position,
-                                               Map<String, Double> gradient,
-                                               Map<String, Double> momentum,
+                                               Map<Long, Double> position,
+                                               Map<Long, Double> gradient,
+                                               Map<Long, Double> momentum,
                                                double u,
                                                int buildDirection,
                                                double epsilon) {
 
         LeapFrogged leapfrog = leapfrog(
-                latentVertices,
-                latentSetAndCascadeCache,
-                probabilisticVertices,
-                position,
-                gradient,
-                momentum,
-                epsilon * buildDirection
+            latentVertices,
+            latentSetAndCascadeCache,
+            probabilisticVertices,
+            position,
+            gradient,
+            momentum,
+            epsilon * buildDirection
         );
 
         final double logOfMasterPAfterLeapfrog = getLogProb(probabilisticVertices);
@@ -300,21 +305,21 @@ public class NUTS {
         final int acceptedLeapfrogCount = u <= Math.exp(logOfMasterPMinusMomentum) ? 1 : 0;
         final boolean shouldContinueFlag = u < Math.exp(DELTA_MAX + logOfMasterPMinusMomentum);
 
-        final Map<String, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
+        final Map<Long, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 
         return new BuiltTree(
-                leapfrog.position,
-                leapfrog.gradient,
-                leapfrog.momentum,
-                leapfrog.position,
-                leapfrog.gradient,
-                leapfrog.momentum,
-                leapfrog.position,
-                leapfrog.gradient,
-                logOfMasterPAfterLeapfrog,
-                sampleAtAcceptedPosition,
-                acceptedLeapfrogCount,
-                shouldContinueFlag
+            leapfrog.position,
+            leapfrog.gradient,
+            leapfrog.momentum,
+            leapfrog.position,
+            leapfrog.gradient,
+            leapfrog.momentum,
+            leapfrog.position,
+            leapfrog.gradient,
+            logOfMasterPAfterLeapfrog,
+            sampleAtAcceptedPosition,
+            acceptedLeapfrogCount,
+            shouldContinueFlag
         );
     }
 
@@ -329,7 +334,7 @@ public class NUTS {
     private static void acceptOtherPositionWithProbability(double probability,
                                                            BuiltTree tree,
                                                            BuiltTree otherTree,
-                                                           Random random) {
+                                                           KeanuRandom random) {
         if (withProbability(probability, random)) {
             tree.acceptedPosition = otherTree.acceptedPosition;
             tree.gradientAtAcceptedPosition = otherTree.gradientAtAcceptedPosition;
@@ -338,20 +343,20 @@ public class NUTS {
         }
     }
 
-    private static boolean withProbability(double probability, Random random) {
+    private static boolean withProbability(double probability, KeanuRandom random) {
         return random.nextDouble() < probability;
     }
 
-    private static boolean isNotUTurning(Map<String, Double> positionForward,
-                                         Map<String, Double> positionBackward,
-                                         Map<String, Double> momentumForward,
-                                         Map<String, Double> momentumBackward) {
+    private static boolean isNotUTurning(Map<Long, Double> positionForward,
+                                         Map<Long, Double> positionBackward,
+                                         Map<Long, Double> momentumForward,
+                                         Map<Long, Double> momentumBackward) {
         double forward = 0.0;
         double backward = 0.0;
 
-        for (Map.Entry<String, Double> forwardPositionForLatent : positionForward.entrySet()) {
+        for (Map.Entry<Long, Double> forwardPositionForLatent : positionForward.entrySet()) {
 
-            final String latentId = forwardPositionForLatent.getKey();
+            final long latentId = forwardPositionForLatent.getKey();
             final double forwardMinusBackward = forwardPositionForLatent.getValue() - positionBackward.get(latentId);
 
             forward += forwardMinusBackward * momentumForward.get(latentId);
@@ -361,40 +366,40 @@ public class NUTS {
         return (forward >= 0.0) && (backward >= 0.0);
     }
 
-    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<String, Double> position) {
+    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<Long, Double> position) {
         for (Vertex<Double> vertex : latentVertices) {
             position.put(vertex.getId(), vertex.getValue());
         }
     }
 
     private static void initializeMomentumForEachVertex(List<Vertex<Double>> vertices,
-                                                        Map<String, Double> momentums,
-                                                        Random random) {
+                                                        Map<Long, Double> momentums,
+                                                        KeanuRandom random) {
         for (Vertex<Double> vertex : vertices) {
             momentums.put(vertex.getId(), random.nextGaussian());
         }
     }
 
-    private static void cache(Map<String, Double> from, Map<String, Double> to) {
-        for (Map.Entry<String, Double> entry : from.entrySet()) {
+    private static void cache(Map<Long, Double> from, Map<Long, Double> to) {
+        for (Map.Entry<Long, Double> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue());
         }
     }
 
     private static LeapFrogged leapfrog(final List<Vertex<Double>> latentVertices,
-                                        final Map<String, Long> latentSetAndCascadeCache,
+                                        final Map<Long, Long> latentSetAndCascadeCache,
                                         final List<Vertex> probabilisticVertices,
-                                        final Map<String, Double> position,
-                                        final Map<String, Double> gradient,
-                                        final Map<String, Double> momentum,
+                                        final Map<Long, Double> position,
+                                        final Map<Long, Double> gradient,
+                                        final Map<Long, Double> momentum,
                                         final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<String, Double> nextMomentum = new HashMap<>();
-        Map<String, Double> nextPosition = new HashMap<>();
+        Map<Long, Double> nextMomentum = new HashMap<>();
+        Map<Long, Double> nextPosition = new HashMap<>();
 
-        for (Map.Entry<String, Double> rEntry : momentum.entrySet()) {
+        for (Map.Entry<Long, Double> rEntry : momentum.entrySet()) {
             final double updatedMomentum = rEntry.getValue() + halfTimeStep * gradient.get(rEntry.getKey());
             nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
@@ -407,11 +412,11 @@ public class NUTS {
 
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
-        Map<String, Double> nextPositionGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-                probabilisticVertices
-        );
+        Map<Long, Double> nextPositionGradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
+            probabilisticVertices
+        ));
 
-        for (Map.Entry<String, Double> nextMomentumForLatent : nextMomentum.entrySet()) {
+        for (Map.Entry<Long, Double> nextMomentumForLatent : nextMomentum.entrySet()) {
             final double nextNextMomentumForLatent = nextMomentumForLatent.getValue() + halfTimeStep * nextPositionGradient.get(nextMomentumForLatent.getKey());
             nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
@@ -419,7 +424,7 @@ public class NUTS {
         return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private static double dotProduct(Map<String, Double> momentums) {
+    private static double dotProduct(Map<Long, Double> momentums) {
         double dotProduct = 0.0;
         for (Double momentum : momentums.values()) {
             dotProduct += momentum * momentum;
@@ -432,16 +437,16 @@ public class NUTS {
      *
      * @param sampleFromVertices take samples from these vertices
      */
-    private static Map<String, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
-        Map<String, ?> sample = new HashMap<>();
+    private static Map<Long, ?> takeSample(List<? extends Vertex> sampleFromVertices) {
+        Map<Long, ?> sample = new HashMap<>();
         for (Vertex vertex : sampleFromVertices) {
             putValue(vertex, sample);
         }
         return sample;
     }
 
-    private static <T> void putValue(Vertex<T> vertex, Map<String, ?> target) {
-        ((Map<String, T>) target).put(vertex.getId(), vertex.getValue());
+    private static <T> void putValue(Vertex<T> vertex, Map<Long, ?> target) {
+        ((Map<Long, T>) target).put(vertex.getId(), vertex.getValue());
     }
 
     /**
@@ -450,25 +455,25 @@ public class NUTS {
      * @param samples      samples taken already
      * @param cachedSample a cached sample from before leapfrog
      */
-    private static void addSampleFromCache(Map<String, List<?>> samples, Map<String, ?> cachedSample) {
-        for (Map.Entry<String, ?> sampleEntry : cachedSample.entrySet()) {
+    private static void addSampleFromCache(Map<Long, List<?>> samples, Map<Long, ?> cachedSample) {
+        for (Map.Entry<Long, ?> sampleEntry : cachedSample.entrySet()) {
             addSampleForVertex(sampleEntry.getKey(), sampleEntry.getValue(), samples);
         }
     }
 
-    private static <T> void addSampleForVertex(String id, T value, Map<String, List<?>> samples) {
+    private static <T> void addSampleForVertex(long id, T value, Map<Long, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
         samplesForVertex.add(value);
     }
 
     private static class LeapFrogged {
-        final Map<String, Double> position;
-        final Map<String, Double> momentum;
-        final Map<String, Double> gradient;
+        final Map<Long, Double> position;
+        final Map<Long, Double> momentum;
+        final Map<Long, Double> gradient;
 
-        LeapFrogged(Map<String, Double> position,
-                    Map<String, Double> momentum,
-                    Map<String, Double> gradient) {
+        LeapFrogged(Map<Long, Double> position,
+                    Map<Long, Double> momentum,
+                    Map<Long, Double> gradient) {
             this.position = position;
             this.momentum = momentum;
             this.gradient = gradient;
@@ -477,29 +482,29 @@ public class NUTS {
 
     private static class BuiltTree {
 
-        Map<String, Double> positionBackward;
-        Map<String, Double> gradientBackward;
-        Map<String, Double> momentumBackward;
-        Map<String, Double> positionForward;
-        Map<String, Double> gradientForward;
-        Map<String, Double> momentumForward;
-        Map<String, Double> acceptedPosition;
-        Map<String, Double> gradientAtAcceptedPosition;
+        Map<Long, Double> positionBackward;
+        Map<Long, Double> gradientBackward;
+        Map<Long, Double> momentumBackward;
+        Map<Long, Double> positionForward;
+        Map<Long, Double> gradientForward;
+        Map<Long, Double> momentumForward;
+        Map<Long, Double> acceptedPosition;
+        Map<Long, Double> gradientAtAcceptedPosition;
         double logOfMasterPAtAcceptedPosition;
-        Map<String, ?> sampleAtAcceptedPosition;
+        Map<Long, ?> sampleAtAcceptedPosition;
         int acceptedLeapfrogCount;
         boolean shouldContinueFlag;
 
-        BuiltTree(Map<String, Double> positionBackward,
-                  Map<String, Double> gradientBackward,
-                  Map<String, Double> momentumBackward,
-                  Map<String, Double> positionForward,
-                  Map<String, Double> gradientForward,
-                  Map<String, Double> momentumForward,
-                  Map<String, Double> acceptedPosition,
-                  Map<String, Double> gradientAtAcceptedPosition,
+        BuiltTree(Map<Long, Double> positionBackward,
+                  Map<Long, Double> gradientBackward,
+                  Map<Long, Double> momentumBackward,
+                  Map<Long, Double> positionForward,
+                  Map<Long, Double> gradientForward,
+                  Map<Long, Double> momentumForward,
+                  Map<Long, Double> acceptedPosition,
+                  Map<Long, Double> gradientAtAcceptedPosition,
                   double logOfMasterPAtAcceptedPosition,
-                  Map<String, ?> sampleAtAcceptedPosition,
+                  Map<Long, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
                   boolean shouldContinueFlag) {
 

@@ -5,51 +5,32 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class GaussianVertex extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    private final Random random;
 
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma, Random random) {
+    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
         this.mu = mu;
         this.sigma = sigma;
-        this.random = random;
         setParents(mu, sigma);
     }
 
-    public GaussianVertex(DoubleVertex mu, double sigma, Random random) {
-        this(mu, new ConstantDoubleVertex(sigma), random);
-    }
-
-    public GaussianVertex(double mu, DoubleVertex sigma, Random random) {
-        this(new ConstantDoubleVertex(mu), sigma, random);
-    }
-
-    public GaussianVertex(double mu, double sigma, Random random) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma), random);
-    }
-
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
-        this(mu, sigma, new Random());
-    }
-
-    public GaussianVertex(double mu, double sigma) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma), new Random());
+    public GaussianVertex(DoubleVertex mu, double sigma) {
+        this(mu, new ConstantDoubleVertex(sigma));
     }
 
     public GaussianVertex(double mu, DoubleVertex sigma) {
-        this(new ConstantDoubleVertex(mu), sigma, new Random());
+        this(new ConstantDoubleVertex(mu), sigma);
     }
 
-    public GaussianVertex(DoubleVertex mu, double sigma) {
-        this(mu, new ConstantDoubleVertex(sigma), new Random());
+    public GaussianVertex(double mu, double sigma) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
-
 
     public DoubleVertex getMu() {
         return mu;
@@ -65,12 +46,12 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPdmu, double dPdsigma, double dPdx) {
         PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
         PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
@@ -83,7 +64,7 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Double sample() {
+    public Double sample(KeanuRandom random) {
         return Gaussian.sample(mu.getValue(), sigma.getValue(), random);
     }
 

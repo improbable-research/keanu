@@ -7,11 +7,11 @@ import java.util.List;
 
 public class CsvLoading {
 
-    public static void main(String[] args){
+    public static void main(String[] args) {
 
         List<MyClass> myPojos = ReadCsv.fromFile("some/file/path")
-                .as(MyClass.class)
-                .asList();
+            .as(MyClass.class)
+            .asList();
     }
 
     public class MyClass {

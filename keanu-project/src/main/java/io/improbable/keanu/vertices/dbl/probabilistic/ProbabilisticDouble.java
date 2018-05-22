@@ -10,13 +10,8 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
 
     @Override
     public Double updateValue() {
-        return getValue();
-    }
-
-    @Override
-    public Double lazyEval() {
         if (!hasValue()) {
-            setValue(sample());
+            setValue(sampleUsingDefaultRandom());
         }
         return getValue();
     }

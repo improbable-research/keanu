@@ -2,22 +2,21 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.network.BayesNet;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesNet createSimpleGaussian(double mu, double sigma, Random random) {
-        GaussianVertex A = new GaussianVertex(mu, sigma, random);
+    public static BayesNet createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
+        GaussianVertex A = new GaussianVertex(mu, sigma);
         A.setAndCascade(mu + 0.5 * sigma);
         BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
         return bayesNet;
@@ -32,15 +31,15 @@ public class MCMCTestDistributions {
         assertEquals(sigma, stats.getStandardDeviation(), 0.1);
     }
 
-    public static BayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum, Random random) {
+    public static BayesNet createSumOfGaussianDistribution(double mu, double sigma, double observedSum, KeanuRandom random) {
 
-        DoubleVertex A = new GaussianVertex(mu, sigma, random);
-        DoubleVertex B = new GaussianVertex(mu, sigma, random);
+        DoubleVertex A = new GaussianVertex(mu, sigma);
+        DoubleVertex B = new GaussianVertex(mu, sigma);
 
-        DoubleVertex C = new GaussianVertex(A.plus(B), new ConstantDoubleVertex(1.0), random);
+        DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
-        A.setAndCascade(mu);
+        A.setValue(mu);
         B.setAndCascade(mu);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, C));
@@ -50,24 +49,24 @@ public class MCMCTestDistributions {
     public static void samplesMatchesSumOfGaussians(double expected, List<Double> sampleA, List<Double> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-                .mapToDouble(sample -> sample)
-                .average();
+            .mapToDouble(sample -> sample)
+            .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static BayesNet create2DDonutDistribution(Random random) {
-        DoubleVertex A = new GaussianVertex(0, 1, random);
-        DoubleVertex B = new GaussianVertex(0, 1, random);
+    public static BayesNet create2DDonutDistribution(KeanuRandom random) {
+        DoubleVertex A = new GaussianVertex(0, 1);
+        DoubleVertex B = new GaussianVertex(0, 1);
 
-        DoubleVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03, random);
+        DoubleVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
         D.observe(0.5);
 
-        A.setAndCascade(Math.sqrt(0.5));
+        A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
         BayesNet bayesNet = new BayesNet(Arrays.asList(A, B, D));
