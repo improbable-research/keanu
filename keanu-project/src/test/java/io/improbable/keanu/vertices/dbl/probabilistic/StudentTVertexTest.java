@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
@@ -11,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import static java.lang.Math.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static junit.framework.TestCase.assertEquals;
 
@@ -24,13 +24,14 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 	private static final int[] TEST_VALUES_OF_V = new int[]{
 			1, 2, 3
 	};
-	private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);	private Random random;
+	private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);
+	private KeanuRandom random;
 	/**
 	 *
 	 */
 	@Before
 	public void setup() {
-		random = new Random(1);
+		random = new KeanuRandom(1);
 	}
 	/**
 	 * Test the StudentTVertex -> StudentT -> sample()

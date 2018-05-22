@@ -1,10 +1,8 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
-
 import static java.lang.Math.*;
 import static org.apache.commons.math3.special.Gamma.gamma;
-import static org.apache.commons.math3.special.Gamma.digamma;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Student T Distribution
@@ -22,11 +20,11 @@ public class StudentT {
 	 * @param random random number generator (RNG) seed
 	 * @return sample of Student T distribution
 	 */
-	public static double sample(int v, Random random) {
+	public static double sample(int v, KeanuRandom random) {
 		if(v <= 0) {
 			throw new IllegalArgumentException("Invalid degrees of freedom (v), expect v > 0");
 		}
-		return Gaussian.sample( 0., 1., random) / sqrt( ChiSquared.sample((int) v, random) / v );
+		return Gaussian.sample( 0., 1., random) / sqrt( ChiSquared.sample(v, random) / v );
 		
 	}
 	/**

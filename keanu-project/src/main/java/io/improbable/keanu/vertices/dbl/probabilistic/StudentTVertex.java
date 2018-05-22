@@ -1,27 +1,26 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.StudentT;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
 
 /**
  *
  */
 public class StudentTVertex extends ProbabilisticDouble {
 	private final IntegerVertex v;
-	private final Random random;
+	private final KeanuRandom random;
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 * @param random random number generator (RNG) seed
 	 */
-	public StudentTVertex(IntegerVertex v, Random random) {
+	public StudentTVertex(IntegerVertex v, KeanuRandom random) {
 		this.v = v;
 		this.random = random;
 		setParents(v);
@@ -30,13 +29,13 @@ public class StudentTVertex extends ProbabilisticDouble {
 	 *
 	 * @param v Degrees of Freedom
 	 */
-	public StudentTVertex(IntegerVertex v) { this(v, new Random()); }
+	public StudentTVertex(IntegerVertex v) { this(v, new KeanuRandom()); }
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 * @param random random number generator (RNG) seed
 	 */
-	public StudentTVertex(int v, Random random) {
+	public StudentTVertex(int v, KeanuRandom random) {
 		this(new ConstantIntegerVertex(v), random);
 	}
 	/**
@@ -44,7 +43,7 @@ public class StudentTVertex extends ProbabilisticDouble {
 	 * @param v Degrees of Freedom
 	 */
 	public StudentTVertex(int v) {
-		this(new ConstantIntegerVertex(v), new Random());
+		this(new ConstantIntegerVertex(v), new KeanuRandom());
 	}
 	/**
 	 *
@@ -71,9 +70,9 @@ public class StudentTVertex extends ProbabilisticDouble {
 	 * @param t random variable
 	 * @return Differential of the Probability Density of t
 	 */
-	public Map<String, DoubleTensor> dPdf(Double t) {
+	public Map<Long, DoubleTensor> dPdf(Double t) {
 		StudentT.Diff diff = StudentT.dPdf(v.getValue(), t);
-		Map<String, DoubleTensor> m = new HashMap<>();
+		Map<Long, DoubleTensor> m = new HashMap<>();
 		m.put(getId(), DoubleTensor.scalar(diff.dPdt));
 		return m;
 	}
@@ -83,9 +82,9 @@ public class StudentTVertex extends ProbabilisticDouble {
 	 * @return Differential of the Log of the Probability Density of t
 	 */
 	@Override
-	public Map<String, DoubleTensor> dLogPdf(Double t) {
+	public Map<Long, DoubleTensor> dLogPdf(Double t) {
 		StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
-		Map<String, DoubleTensor> m = new HashMap<>();
+		Map<Long, DoubleTensor> m = new HashMap<>();
 		m.put(getId(), DoubleTensor.scalar(diff.dPdt));
 		return m;
 	}
@@ -94,5 +93,5 @@ public class StudentTVertex extends ProbabilisticDouble {
 	 * @return sample of Student T distribution
 	 */
 	@Override
-	public Double sample() { return StudentT.sample(v.getValue(), random); }
+	public Double sample(KeanuRandom random) { return StudentT.sample(v.getValue(), random); }
 }
