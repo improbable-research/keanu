@@ -87,13 +87,8 @@ public class MetropolisHastingsTest {
             random
         );
 
-        DoubleTensor averagePosteriorA = posteriorSamples.get(A).asList().stream()
-            .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace)
-            .divInPlace(100000);
-
-        DoubleTensor averagePosteriorB = posteriorSamples.get(B).asList().stream()
-            .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace)
-            .divInPlace(100000);
+        DoubleTensor averagePosteriorA = posteriorSamples.getDoubleTensors(A).getAverages();
+        DoubleTensor averagePosteriorB = posteriorSamples.getDoubleTensors(B).getAverages();
 
         DoubleTensor allActuals = averagePosteriorA.plus(averagePosteriorB);
 
