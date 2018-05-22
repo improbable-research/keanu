@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import org.junit.Before;
 import org.junit.Test;

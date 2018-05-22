@@ -23,6 +23,7 @@ public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
      * @param shape  the desired shape of the vertex
      * @param xMin the a of the Triangular with either the same shape as specified for this vertex or a scalar
      * @param xMax the b of the Triangular with either the same shape as specified for this vertex or a scalar
+     * @param c the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TensorTriangularVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, DoubleTensorVertex c) {
 
