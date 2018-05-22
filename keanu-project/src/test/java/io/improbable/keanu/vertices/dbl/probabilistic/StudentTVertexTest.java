@@ -50,7 +50,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 			
 			List<Double> student_samples = new ArrayList<>();
 			for (int j = 0; j < N; j++) {
-				student_samples.add(studentT.sample());
+				student_samples.add(studentT.sample(random));
 			}
 			testSampleMeanAndStdDeviation(v, test_values[i][POS_MEAN], test_values[i][POS_SD], student_samples, sample_delta);
 		}
