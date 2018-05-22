@@ -24,9 +24,9 @@ public class TensorInverseGamma {
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor dPda = a.apply(Gamma::digamma).unaryMinus().plus(b.log()).minus(x.log());
-        final DoubleTensor dPdb = a.div(b).minusInPlace(x.reciprocal());
-        final DoubleTensor dPdx = b.minus(a.plus(1).times(x)).div(x.pow(2));
+        final DoubleTensor dPda = x.log().unaryMinus().minus(a.apply(Gamma::digamma)).plus(b.log());
+        final DoubleTensor dPdb = x.reciprocal().unaryMinus().plus(a.div(b));
+        final DoubleTensor dPdx = x.pow(2).reciprocal().times(x.times(a.plus(1).unaryMinus()).plus(b));
 
         return new Diff(dPda, dPdb, dPdx);
     }
