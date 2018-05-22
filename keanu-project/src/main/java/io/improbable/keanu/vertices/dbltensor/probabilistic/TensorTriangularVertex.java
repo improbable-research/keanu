@@ -47,6 +47,26 @@ public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
     }
 
+    public TensorTriangularVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, double c) {
+        this(xMin, xMax, new ConstantTensorVertex(c));
+    }
+
+    public TensorTriangularVertex(DoubleTensorVertex xMin, double xMax, DoubleTensorVertex c) {
+        this(xMin, new ConstantTensorVertex(xMax), c);
+    }
+
+    public TensorTriangularVertex(DoubleTensorVertex xMin, double xMax, double c) {
+        this(xMin, new ConstantTensorVertex(xMax), new ConstantTensorVertex(c));
+    }
+
+    public TensorTriangularVertex(double xMin, DoubleTensorVertex xMax, DoubleTensorVertex c) {
+        this(new ConstantTensorVertex(xMin), xMax, c);
+    }
+
+    public TensorTriangularVertex(double xMin, double xMax, DoubleTensorVertex c) {
+        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), c);
+    }
+
     public TensorTriangularVertex(double xMin, double xMax, double c) {
         this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), new ConstantTensorVertex(c));
     }
