@@ -11,22 +11,26 @@ public class TensorInverseGamma {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor b, KeanuRandom random) {
-        final DoubleTensor gammaSample = random.nextGamma(shape, Nd4jDoubleTensor.zeros(shape), Nd4jDoubleTensor.ones(shape).div(b), a);
+        final DoubleTensor gammaSample = random.nextGamma(shape,
+            Nd4jDoubleTensor.zeros(shape),
+            Nd4jDoubleTensor.ones(shape).div(b),
+            a
+        );
         return gammaSample.reciprocal();
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
         final DoubleTensor aTimesLnB = a.times(b.log());
-        final DoubleTensor negAMinus1TimesLnX = a.unaryMinus().minus(1).times(x.log());
+        final DoubleTensor negAMinus1TimesLnX = a.unaryMinus().minusInPlace(1).times(x.log());
         final DoubleTensor lnGammaA = a.apply(Gamma::gamma).logInPlace();
 
-        return aTimesLnB.plus(negAMinus1TimesLnX).minus(lnGammaA).minus(b.div(x));
+        return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(b.div(x));
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor dPda = x.log().unaryMinus().minus(a.apply(Gamma::digamma)).plus(b.log());
-        final DoubleTensor dPdb = x.reciprocal().unaryMinus().plus(a.div(b));
-        final DoubleTensor dPdx = x.pow(2).reciprocal().times(x.times(a.plus(1).unaryMinus()).plus(b));
+        final DoubleTensor dPda = x.log().unaryMinusInPlace().minusInPlace(a.apply(Gamma::digamma)).plusInPlace(b.log());
+        final DoubleTensor dPdb = x.reciprocal().unaryMinusInPlace().plusInPlace(a.div(b));
+        final DoubleTensor dPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(a.plus(1).unaryMinusInPlace()).plusInPlace(b));
 
         return new Diff(dPda, dPdb, dPdx);
     }

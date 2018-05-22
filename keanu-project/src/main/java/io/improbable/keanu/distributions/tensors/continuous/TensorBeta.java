@@ -15,14 +15,16 @@ public class TensorBeta {
                                     KeanuRandom random) {
 
         final DoubleTensor y1 = random.nextGamma(shape,
-                                                Nd4jDoubleTensor.zeros(shape),
-                                                Nd4jDoubleTensor.ones(shape),
-                                                alpha);
+            Nd4jDoubleTensor.zeros(shape),
+            Nd4jDoubleTensor.ones(shape),
+            alpha
+        );
 
         final DoubleTensor y2 = random.nextGamma(shape,
-                                                Nd4jDoubleTensor.zeros(shape),
-                                                Nd4jDoubleTensor.ones(shape),
-                                                beta);
+            Nd4jDoubleTensor.zeros(shape),
+            Nd4jDoubleTensor.ones(shape),
+            beta
+        );
 
         final DoubleTensor xMaxMinusxMin = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);
