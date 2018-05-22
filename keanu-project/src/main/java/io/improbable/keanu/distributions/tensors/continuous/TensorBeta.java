@@ -29,11 +29,11 @@ public class TensorBeta {
             beta
         );
 
-        final DoubleTensor xMaxMinusxMin = xMax.minus(xMin);
+        final DoubleTensor range = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);
 
-        final DoubleTensor lessThan = xMax.minus(y2.div(y1PlusY2).timesInPlace(xMaxMinusxMin));
-        final DoubleTensor greaterThan = xMin.plus(y1.div(y1PlusY2).timesInPlace(xMaxMinusxMin));
+        final DoubleTensor lessThan = xMax.minus(y2.div(y1PlusY2).timesInPlace(range));
+        final DoubleTensor greaterThan = xMin.plus(y1.div(y1PlusY2).timesInPlace(range));
 
         final DoubleTensor lessMask = alpha.getLessThanMask(beta);
         final DoubleTensor greaterMask = alpha.getGreaterThanOrEqualToMask(beta);
