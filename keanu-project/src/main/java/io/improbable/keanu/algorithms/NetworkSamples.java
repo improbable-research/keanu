@@ -30,7 +30,7 @@ public class NetworkSamples {
     }
 
     public <T> VertexSamples<T> get(Vertex<T> vertex) {
-        return new VertexSamples<>((List<T>) samplesByVertex.get(vertex.getId()));
+        return get(vertex.getId());
     }
 
     public <T> VertexSamples<T> get(long vertexId) {
@@ -38,7 +38,7 @@ public class NetworkSamples {
     }
 
     public DoubleVertexSamples getDoubles(Vertex<Double> vertex) {
-        return new DoubleVertexSamples((List<Double>) samplesByVertex.get(vertex.getId()));
+        return getDoubles(vertex.getId());
     }
 
     public DoubleVertexSamples getDoubles(long vertexId) {
@@ -46,7 +46,7 @@ public class NetworkSamples {
     }
 
     public DoubleTensorVertexSamples getDoubleTensors(Vertex<DoubleTensor> vertex) {
-        return new DoubleTensorVertexSamples((List<DoubleTensor>) samplesByVertex.get(vertex.getId()));
+        return getDoubleTensors(vertex.getId());
     }
 
     public DoubleTensorVertexSamples getDoubleTensors(long vertexId) {
