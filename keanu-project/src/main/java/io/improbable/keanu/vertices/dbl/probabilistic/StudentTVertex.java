@@ -14,36 +14,20 @@ import java.util.Map;
  */
 public class StudentTVertex extends ProbabilisticDouble {
 	private final IntegerVertex v;
-	private final KeanuRandom random;
 	/**
 	 *
 	 * @param v Degrees of Freedom
-	 * @param random random number generator (RNG) seed
 	 */
-	public StudentTVertex(IntegerVertex v, KeanuRandom random) {
+	public StudentTVertex(IntegerVertex v) {
 		this.v = v;
-		this.random = random;
 		setParents(v);
 	}
 	/**
 	 *
 	 * @param v Degrees of Freedom
 	 */
-	public StudentTVertex(IntegerVertex v) { this(v, new KeanuRandom()); }
-	/**
-	 *
-	 * @param v Degrees of Freedom
-	 * @param random random number generator (RNG) seed
-	 */
-	public StudentTVertex(int v, KeanuRandom random) {
-		this(new ConstantIntegerVertex(v), random);
-	}
-	/**
-	 *
-	 * @param v Degrees of Freedom
-	 */
 	public StudentTVertex(int v) {
-		this(new ConstantIntegerVertex(v), new KeanuRandom());
+		this(new ConstantIntegerVertex(v));
 	}
 	/**
 	 *

@@ -18,7 +18,9 @@ import static junit.framework.TestCase.assertEquals;
 /**
  *
  */
-public class StudentTVertexTest {	private static final double DELTA = 0.0001;	private static int POS_V = 0;
+public class StudentTVertexTest {
+    private static final double DELTA = 0.0001;
+    private static int POS_V = 0;
 	private static int POS_MEAN = 1;
 	private static int POS_SD = 2; // standard deviation
 	private static final int[] TEST_VALUES_OF_V = new int[]{
@@ -46,7 +48,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 		};
 		for (int i = 0; i < test_values.length; i++) {
 			int v = (int) test_values[i][POS_V];
-			StudentTVertex studentT = new StudentTVertex(v, random);
+			StudentTVertex studentT = new StudentTVertex(v);
 			
 			List<Double> student_samples = new ArrayList<>();
 			for (int j = 0; j < N; j++) {
@@ -109,7 +111,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 	 */
 	private void testPdfAtGivenDegreesOfFreedom(int v) {
 		TDistribution apache = new TDistribution(v);
-		StudentTVertex studentT = new StudentTVertex(v, random);
+		StudentTVertex studentT = new StudentTVertex(v);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected = apache.density(t);
@@ -123,7 +125,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 	 */
 	private void testLogPdfAtGivenDegreesOfFreedom(int v) {
 		TDistribution apache = new TDistribution(v);
-		StudentTVertex studentT = new StudentTVertex(v, random);
+		StudentTVertex studentT = new StudentTVertex(v);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected = apache.logDensity(t);
@@ -136,7 +138,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 	 * @param v Degrees of Freedom
 	 */
 	private void testDPdfAtGivenDegreesOfFreedom(int v) {
-		StudentTVertex studentT = new StudentTVertex(v, random);
+		StudentTVertex studentT = new StudentTVertex(v);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected;
@@ -162,7 +164,7 @@ public class StudentTVertexTest {	private static final double DELTA = 0.0001;	pr
 	 * @param v Degrees of Freedom
 	 */
 	private void testDLogPdfAtGivenDegreesOfFreedom(int v) {
-		StudentTVertex studentT = new StudentTVertex(v, random);
+		StudentTVertex studentT = new StudentTVertex(v);
 		
 		for(double t = -4.5; t <= 4.5; t += 0.5) {
 			double expected;
