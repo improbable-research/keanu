@@ -2,7 +2,7 @@ package com.example.starter;
 
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -47,8 +47,8 @@ public class Model {
         Data.CsvLine secondCsvLine = data.csvLines.get(1);
 
         //Create your model as a bayesian network
-        DoubleVertex A = new GaussianVertex(firstCsvLine.mu, firstCsvLine.sigma, random);
-        DoubleVertex B = new GaussianVertex(secondCsvLine.mu, secondCsvLine.sigma, random);
+        DoubleVertex A = new GaussianVertex(firstCsvLine.mu, firstCsvLine.sigma);
+        DoubleVertex B = new GaussianVertex(secondCsvLine.mu, secondCsvLine.sigma);
 
         //Noisily observe that the gaussian defined in the first line plus the gaussian in the
         //second line sums to 2.0
@@ -56,7 +56,7 @@ public class Model {
         C.observe(2.0);
 
         //Create a BayesNet object from your model
-        BayesNet bayesNet = new BayesNet(A.getConnectedGraph());
+		BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
 
         //Find the most probable value for A and B given we've taken a
         //noisy observation of 2.0
