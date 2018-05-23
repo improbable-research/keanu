@@ -28,7 +28,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(values, shape);
     }
 
-    public static Nd4jDoubleTensor create(double value, int[] shape){
+    public static Nd4jDoubleTensor create(double value, int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
     }
 
@@ -392,7 +392,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (greaterThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldGreaterThan(mask, Nd4j.ones(mask.shape()).mul(greaterThanThis.scalar()), mask, mask.length())
+                new OldGreaterThan(mask,
+                    Nd4j.valueArrayOf(mask.shape(), greaterThanThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
@@ -411,7 +415,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (greaterThanOrEqualToThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldGreaterThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(greaterThanOrEqualToThis.scalar()), mask, mask.length())
+                new OldGreaterThanOrEqual(mask,
+                    Nd4j.valueArrayOf(mask.shape(), greaterThanOrEqualToThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanOrEqualToThis);
@@ -430,7 +438,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (lessThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldLessThan(mask, Nd4j.ones(mask.shape()).mul(lessThanThis.scalar()), mask, mask.length())
+                new OldLessThan(mask,
+                    Nd4j.valueArrayOf(mask.shape(), lessThanThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray lessThanThisArray = unsafeGetNd4J(lessThanThis);
@@ -449,7 +461,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (lessThanOrEqualToThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldLessThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(lessThanOrEqualToThis.scalar()), mask, mask.length())
+                new OldLessThanOrEqual(mask,
+                    Nd4j.valueArrayOf(mask.shape(), lessThanOrEqualToThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
