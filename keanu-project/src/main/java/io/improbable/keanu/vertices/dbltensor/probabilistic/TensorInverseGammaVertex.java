@@ -56,6 +56,18 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
         this(new ConstantTensorVertex(a), new ConstantTensorVertex(b));
     }
 
+    public TensorInverseGammaVertex(int[] shape,DoubleTensorVertex a, double b) {
+        this(shape, a, new ConstantTensorVertex(b));
+    }
+
+    public TensorInverseGammaVertex(int[] shape, double a, DoubleTensorVertex b) {
+        this(shape, new ConstantTensorVertex(a), b);
+    }
+
+    public TensorInverseGammaVertex(int[] shape, double a, double b) {
+        this(shape, new ConstantTensorVertex(a), new ConstantTensorVertex(b));
+    }
+
     @Override
     public double logPdf(DoubleTensor value) {
         DoubleTensor aValues = a.getValue();

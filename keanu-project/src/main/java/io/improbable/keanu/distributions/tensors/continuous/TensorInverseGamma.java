@@ -11,11 +11,7 @@ public class TensorInverseGamma {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor b, KeanuRandom random) {
-        final DoubleTensor gammaSample = random.nextGamma(shape,
-            Nd4jDoubleTensor.zeros(shape),
-            Nd4jDoubleTensor.ones(shape).div(b),
-            a
-        );
+        final DoubleTensor gammaSample = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, b.reciprocal(), a);
         return gammaSample.reciprocal();
     }
 

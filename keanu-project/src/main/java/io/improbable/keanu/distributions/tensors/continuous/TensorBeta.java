@@ -4,30 +4,19 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
 import org.apache.commons.math3.special.Gamma;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class TensorBeta {
 
     public static DoubleTensor sample(int[] shape,
-                                    DoubleTensor alpha,
-                                    DoubleTensor beta,
-                                    DoubleTensor xMin,
-                                    DoubleTensor xMax,
-                                    KeanuRandom random) {
+                                      DoubleTensor alpha,
+                                      DoubleTensor beta,
+                                      DoubleTensor xMin,
+                                      DoubleTensor xMax,
+                                      KeanuRandom random) {
 
-        final Nd4jDoubleTensor zeros = Nd4jDoubleTensor.zeros(shape);
-        final Nd4jDoubleTensor ones = Nd4jDoubleTensor.ones(shape);
-
-        final DoubleTensor y1 = random.nextGamma(shape,
-            zeros,
-            ones,
-            alpha
-        );
-
-        final DoubleTensor y2 = random.nextGamma(shape,
-            zeros,
-            ones,
-            beta
-        );
+        final DoubleTensor y1 = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, Nd4jDoubleTensor.ONE_SCALAR, alpha);
+        final DoubleTensor y2 = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, Nd4jDoubleTensor.ONE_SCALAR, beta);
 
         final DoubleTensor range = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);

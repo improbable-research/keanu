@@ -58,6 +58,18 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
         this(new ConstantTensorVertex(alpha), new ConstantTensorVertex(beta));
     }
 
+    public TensorBetaVertex(int[] shape, DoubleTensorVertex alpha, double beta) {
+        this(shape, alpha, new ConstantTensorVertex(beta));
+    }
+
+    public TensorBetaVertex(int[] shape, double alpha, DoubleTensorVertex beta) {
+        this(shape, new ConstantTensorVertex(alpha), beta);
+    }
+
+    public TensorBetaVertex(int[] shape, double alpha, double beta) {
+        this(shape, new ConstantTensorVertex(alpha), new ConstantTensorVertex(beta));
+    }
+
     @Override
     public double logPdf(DoubleTensor value) {
 

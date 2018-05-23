@@ -185,12 +185,12 @@ public class TensorBetaVertexTest {
         alphaBeta.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
 
         List<DoubleTensorVertex> latentAlphaBeta = new ArrayList<>();
-        TensorUniformVertex latentMu = new TensorUniformVertex(0.01, 10.0);
-        latentMu.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        TensorUniformVertex latentSigma = new TensorUniformVertex(0.01, 10.0);
-        latentSigma.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
-        latentAlphaBeta.add(latentMu);
-        latentAlphaBeta.add(latentSigma);
+        TensorUniformVertex latentAlpha = new TensorUniformVertex(0.01, 10.0);
+        latentAlpha.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
+        TensorUniformVertex latentBeta = new TensorUniformVertex(0.01, 10.0);
+        latentBeta.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
+        latentAlphaBeta.add(latentAlpha);
+        latentAlphaBeta.add(latentBeta);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(

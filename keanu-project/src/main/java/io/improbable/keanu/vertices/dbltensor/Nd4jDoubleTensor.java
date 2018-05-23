@@ -18,6 +18,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
 
+    public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
+
     public static Nd4jDoubleTensor scalar(double scalarValue) {
         return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
     }
