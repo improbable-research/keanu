@@ -99,17 +99,17 @@ public class SimpleDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor asin() {
-        return this.duplicate().asin();
+        return this.duplicate().asinInPlace();
     }
 
     @Override
     public DoubleTensor acos() {
-        return this.duplicate().acos();
+        return this.duplicate().acosInPlace();
     }
 
     @Override
     public DoubleTensor exp() {
-        return this.duplicate().exp();
+        return this.duplicate().expInPlace();
     }
 
     @Override
