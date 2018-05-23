@@ -31,9 +31,9 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
  * A = -2 / (Sw^3 * (Sw + Bw))
  * B = 3 / (Sw^3 * Sw^2*Bw)
  */
-public class SmoothUniformDistribution {
+public class SmoothUniform {
 
-    private SmoothUniformDistribution() {
+    private SmoothUniform() {
 
     }
 
