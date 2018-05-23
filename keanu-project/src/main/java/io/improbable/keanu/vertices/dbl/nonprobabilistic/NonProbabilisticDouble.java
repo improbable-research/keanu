@@ -28,7 +28,7 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         throw new UnsupportedOperationException();
     }
 
@@ -39,7 +39,9 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
 
     @Override
     public Double updateValue() {
-        setValue(getDerivedValue());
+        if (!this.isObserved()) {
+            setValue(getDerivedValue());
+        }
         return getValue();
     }
 

@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -14,13 +14,13 @@ public class Triangular {
     }
 
     /**
-     * @param xMin      minimum x value
-     * @param xMax      maximum x value
-     * @param c          mode
+     * @param xMin   minimum x value
+     * @param xMax   maximum x value
+     * @param c      mode
      * @param random source of randomness
      * @return a random number from the Triangular distribution
      */
-    public static double sample(double xMin, double xMax, double c, Random random) {
+    public static double sample(double xMin, double xMax, double c, KeanuRandom random) {
         if (xMax > xMin || c > xMin || c > xMax) {
             throw new IllegalArgumentException("Invalid value for xMax, xMin or c. xMax: " + xMax + ". xMin: " + xMin + ". c: " + c);
         }

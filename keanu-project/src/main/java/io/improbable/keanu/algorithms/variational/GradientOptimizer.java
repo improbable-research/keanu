@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -21,21 +21,21 @@ public class GradientOptimizer {
 
     private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
-    private static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
-            NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-            new SimpleValueChecker(1e-8, 1e-8)
+    public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
+        NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
+        new SimpleValueChecker(1e-8, 1e-8)
     );
 
     private static final double FLAT_GRADIENT = 1e-16;
 
-    private final BayesNet bayesNet;
+    private final BayesNetDoubleAsContinuous bayesNet;
 
-    public GradientOptimizer(BayesNet bayesNet) {
+    public GradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
     }
 
     public GradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNet(graph);
+        bayesNet = new BayesNetDoubleAsContinuous(graph);
     }
 
     /**
@@ -87,7 +87,7 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex> outputVertices,
+                            List<? extends Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());
@@ -105,11 +105,11 @@ public class GradientOptimizer {
         warnIfGradientIsFlat(initialGradient);
 
         PointValuePair pointValuePair = optimizer.optimize(
-                new MaxEval(maxEvaluations),
-                fitness,
-                gradient,
-                MAXIMIZE,
-                new InitialGuess(startingPoint)
+            new MaxEval(maxEvaluations),
+            fitness,
+            gradient,
+            MAXIMIZE,
+            new InitialGuess(startingPoint)
         );
 
         return pointValuePair.getValue();

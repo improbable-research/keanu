@@ -9,7 +9,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
     }
 
-    public static DualNumber createWithRespectToSelf(String withRespectTo, double value) {
+    public static DualNumber createWithRespectToSelf(long withRespectTo, double value) {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo));
     }
 
@@ -29,7 +29,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return partialDerivatives;
     }
 
-    public boolean isOfConstant(){
+    public boolean isOfConstant() {
         return partialDerivatives.isEmpty();
     }
 

@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.vertices.Constant;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
 
-public class ConstantDoubleVertex extends NonProbabilisticDouble implements Constant<Double> {
+public class ConstantDoubleVertex extends NonProbabilisticDouble {
 
     public ConstantDoubleVertex(Double constant) {
         setValue(constant);
@@ -18,12 +18,7 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble implements Cons
     }
 
     @Override
-    public Double sample() {
-        return getValue();
-    }
-
-    @Override
-    public Double lazyEval() {
+    public Double sample(KeanuRandom random) {
         return getValue();
     }
 

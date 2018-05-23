@@ -1,7 +1,7 @@
 package io.improbable.keanu.e2e.lorenz;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -46,8 +46,8 @@ public class LorenzTest {
             for (int i = 1; i < windowSize; i++) {
                 List<DoubleVertex> ti = graphTimeSteps.get(i - 1);
                 List<DoubleVertex> tiPlus1 = addTime(
-                        ti.get(0), ti.get(1), ti.get(2),
-                        LorenzModel.timeStep, LorenzModel.sigma, LorenzModel.rho, LorenzModel.beta
+                    ti.get(0), ti.get(1), ti.get(2),
+                    LorenzModel.timeStep, LorenzModel.sigma, LorenzModel.rho, LorenzModel.beta
                 );
                 graphTimeSteps.add(tiPlus1);
             }
@@ -68,7 +68,7 @@ public class LorenzTest {
                 observedXt.observe(observed.get(t).x);
             }
 
-            BayesNet net = new BayesNet(xt0.getConnectedGraph());
+            BayesNetDoubleAsContinuous net = new BayesNetDoubleAsContinuous(xt0.getConnectedGraph());
 
             GradientOptimizer graphOptimizer = new GradientOptimizer(net);
 
@@ -80,9 +80,9 @@ public class LorenzTest {
             LorenzModel.Coordinates actualAtPostT = observed.get(postT);
 
             error = Math.sqrt(
-                    Math.pow(actualAtPostT.x - posterior.get(0), 2) +
-                            Math.pow(actualAtPostT.y - posterior.get(1), 2) +
-                            Math.pow(actualAtPostT.z - posterior.get(2), 2)
+                Math.pow(actualAtPostT.x - posterior.get(0), 2) +
+                    Math.pow(actualAtPostT.y - posterior.get(1), 2) +
+                    Math.pow(actualAtPostT.z - posterior.get(2), 2)
             );
 
             log.info("Error: " + error);
@@ -117,8 +117,8 @@ public class LorenzTest {
         List<DoubleVertex> slice = graphTimeSteps.get(time);
 
         return slice.stream()
-                .map(Vertex::getValue)
-                .collect(Collectors.toList());
+            .map(Vertex::getValue)
+            .collect(Collectors.toList());
     }
 
 }

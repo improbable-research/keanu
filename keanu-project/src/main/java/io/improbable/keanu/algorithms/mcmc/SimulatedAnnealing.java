@@ -1,11 +1,15 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
@@ -13,24 +17,24 @@ import java.util.*;
  */
 public class SimulatedAnnealing {
 
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule schedule) {
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, new Random());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                                  int sampleCount,
-                                                 Random random) {
+                                                 KeanuRandom random) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
         return getMaxAPosteriori(bayesNet, sampleCount, schedule, random);
     }
 
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet, int sampleCount) {
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet, int sampleCount) {
 
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
 
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, new Random());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -42,21 +46,21 @@ public class SimulatedAnnealing {
      * @param random            the source of randomness
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public static NetworkState getMaxAPosteriori(BayesNet bayesNet,
+    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                                  int sampleCount,
                                                  AnnealingSchedule annealingSchedule,
-                                                 Random random) {
+                                                 KeanuRandom random) {
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<String, ?> maxSamplesByVertex = new HashMap<>();
+        Map<Long, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
         Map<Vertex, Set<Vertex>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 
-        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
+        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
 
         double logP = bayesNet.getLogOfMasterP();
         double maxLogP = logP;
@@ -79,12 +83,12 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(maxSamplesByVertex);
     }
 
-    private static void setSamplesAsMax(Map<String, ?> samples, List<Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> setSampleForVertex(vertex, samples));
+    private static void setSamplesAsMax(Map<Long, ?> samples, List<? extends Vertex> fromVertices) {
+        fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<String, ?> samples) {
-        ((Map<String, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<Long, ?> samples) {
+        ((Map<Long, ? super T>) samples).put(vertex.getId(), vertex.getValue());
     }
 
     /**

@@ -7,9 +7,9 @@ import java.util.Set;
 
 public class SimpleNetworkState implements NetworkState {
 
-    private final Map<String, ?> vertexValues;
+    private final Map<Long, ?> vertexValues;
 
-    public SimpleNetworkState(Map<String, ?> vertexValues) {
+    public SimpleNetworkState(Map<Long, ?> vertexValues) {
         this.vertexValues = vertexValues;
     }
 
@@ -19,12 +19,12 @@ public class SimpleNetworkState implements NetworkState {
     }
 
     @Override
-    public <T> T get(String vertexId) {
+    public <T> T get(long vertexId) {
         return (T) vertexValues.get(vertexId);
     }
 
     @Override
-    public Set<String> getVertexIds() {
+    public Set<Long> getVertexIds() {
         return vertexValues.keySet();
     }
 }

@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
@@ -10,7 +10,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -18,11 +17,11 @@ public class ChiSquaredVertexTest {
 
     private final Logger log = LoggerFactory.getLogger(ChiSquaredVertexTest.class);
 
-    private Random random;
+    private KeanuRandom random;
 
     @Before
     public void setup() {
-        random = new Random(1);
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -30,11 +29,11 @@ public class ChiSquaredVertexTest {
         int N = 100000;
         double epsilon = 0.1;
         int k = 10;
-        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(new ConstantIntegerVertex(k), new Random(1));
+        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(k);
 
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            double sample = testChiVertex.sample();
+            double sample = testChiVertex.sample(random);
             samples.add(sample);
         }
 
@@ -52,17 +51,22 @@ public class ChiSquaredVertexTest {
 
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
-        Vertex<Double> vertex = new ChiSquaredVertex(
-                new ConstantIntegerVertex(2),
-                random
-        );
+        Vertex<Double> vertex = new ChiSquaredVertex(2);
 
         double from = 2;
         double to = 4;
         double bucketSize = 0.05;
         long sampleCount = 100000;
 
-        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(vertex, sampleCount, from, to, bucketSize, 1e-2);
+        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
+            vertex,
+            sampleCount,
+            from,
+            to,
+            bucketSize,
+            1e-2,
+            random
+        );
     }
 
 }

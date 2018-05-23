@@ -28,7 +28,7 @@ public abstract class NonProbabilisticInteger extends IntegerVertex {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPmf(Integer value) {
+    public Map<Long, DoubleTensor> dLogPmf(Integer value) {
         throw new UnsupportedOperationException();
     }
 

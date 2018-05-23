@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public abstract class BoolUnaryOpVertex<A> extends NonProbabilisticBool {
 
@@ -13,8 +14,8 @@ public abstract class BoolUnaryOpVertex<A> extends NonProbabilisticBool {
     }
 
     @Override
-    public Boolean sample() {
-        return op(a.sample());
+    public Boolean sample(KeanuRandom random) {
+        return op(a.sample(random));
     }
 
     @Override

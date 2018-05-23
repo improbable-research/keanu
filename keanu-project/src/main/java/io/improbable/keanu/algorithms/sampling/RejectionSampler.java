@@ -1,8 +1,9 @@
 package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -15,12 +16,16 @@ public class RejectionSampler {
     private RejectionSampler() {
     }
 
-    public static double getPosteriorProbability(List<? extends Vertex> latentVertices, List<Vertex> observedVertices, Supplier<Boolean> isSuccess, int sampleCount) {
+    public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
+                                                 List<? extends Vertex> observedVertices,
+                                                 Supplier<Boolean> isSuccess,
+                                                 int sampleCount,
+                                                 KeanuRandom random) {
         int matchedSampleCount = 0;
         int success = 0;
 
         while (matchedSampleCount < sampleCount) {
-            sampleLatents(latentVertices);
+            sampleLatents(latentVertices, random);
             if (matchesObservation(observedVertices)) {
                 matchedSampleCount++;
                 if (isSuccess.get()) {
@@ -36,13 +41,22 @@ public class RejectionSampler {
         }
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet, List<Vertex<?>> fromVertices, int sampleCount) {
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
+                                                     List<Vertex<?>> fromVertices,
+                                                     int sampleCount) {
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
+    }
 
-        Map<String, List<?>> samples = new HashMap<>();
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
+                                                     List<Vertex<?>> fromVertices,
+                                                     int sampleCount,
+                                                     KeanuRandom random) {
+
+        Map<Long, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;
 
         while (acceptedCount < sampleCount) {
-            sampleLatents(bayesNet.getLatentVertices());
+            sampleLatents(bayesNet.getLatentVertices(), random);
             if (matchesObservation(bayesNet.getObservedVertices())) {
                 takeSamples(samples, fromVertices);
                 acceptedCount++;
@@ -52,24 +66,24 @@ public class RejectionSampler {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void sampleLatents(List<? extends Vertex> latents) {
-        latents.forEach(RejectionSampler::setFromSample);
+    private static void sampleLatents(List<? extends Vertex> latents, KeanuRandom random) {
+        latents.forEach(vertex -> setFromSample((Vertex<?>) vertex, random));
     }
 
-    private static <T> void setFromSample(Vertex<T> v) {
-        v.setAndCascade(v.sample());
+    private static <T> void setFromSample(Vertex<T> v, KeanuRandom random) {
+        v.setAndCascade(v.sample(random));
     }
 
-    private static boolean matchesObservation(List<Vertex> observedVertices) {
+    private static boolean matchesObservation(List<? extends Vertex> observedVertices) {
         return observedVertices.stream()
-                .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
+            .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
+    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<Long, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
     }

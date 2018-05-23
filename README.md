@@ -54,3 +54,7 @@ What does the future entail for Keanu? Find out at [Future](keanu-docs/future.md
 ## Examples
 
 Interested in more technical examples? Explore [Examples](keanu-docs/examples.md).
+
+## Hiring
+
+Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)

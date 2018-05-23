@@ -5,49 +5,31 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;
-import java.util.Random;
 
 public class ExponentialVertex extends ProbabilisticDouble {
 
     private final DoubleVertex a;
     private final DoubleVertex b;
-    private final Random random;
 
-    public ExponentialVertex(DoubleVertex a, DoubleVertex b, Random random) {
+    public ExponentialVertex(DoubleVertex a, DoubleVertex b) {
         this.a = a;
         this.b = b;
-        this.random = random;
         setParents(a, b);
     }
 
-    public ExponentialVertex(DoubleVertex a, double b, Random random) {
-        this(a, new ConstantDoubleVertex(b), random);
-    }
-
-    public ExponentialVertex(double a, DoubleVertex b, Random random) {
-        this(new ConstantDoubleVertex(a), b, random);
-    }
-
-    public ExponentialVertex(double a, double b, Random random) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), random);
-    }
-
-    public ExponentialVertex(DoubleVertex a, DoubleVertex b) {
-        this(a, b, new Random());
-    }
-
     public ExponentialVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b), new Random());
+        this(a, new ConstantDoubleVertex(b));
     }
 
     public ExponentialVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b, new Random());
+        this(new ConstantDoubleVertex(a), b);
     }
 
     public ExponentialVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b), new Random());
+        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
     }
 
     public DoubleVertex getA() {
@@ -64,17 +46,17 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<String, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(Double value) {
         Exponential.Diff dP = Exponential.dlnPdf(a.getValue(), b.getValue(), value);
         return convertDualNumbersToDiff(dP.dPda, dP.dPdb, dP.dPdx);
     }
 
     @Override
-    public Double sample() {
+    public Double sample(KeanuRandom random) {
         return Exponential.sample(a.getValue(), b.getValue(), random);
     }
 
-    private Map<String, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(double dPda, double dPdb, double dPdx) {
         PartialDerivatives dPdInputsFromMu = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
         PartialDerivatives dPdInputsFromSigma = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);

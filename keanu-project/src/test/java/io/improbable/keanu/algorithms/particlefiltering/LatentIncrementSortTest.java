@@ -7,14 +7,15 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import static junit.framework.TestCase.assertEquals;
 import static junit.framework.TestCase.assertTrue;
 
 public class LatentIncrementSortTest {
-
-    private Random random = new Random();
 
     @Test
     public void simpleGraph() {
@@ -69,14 +70,14 @@ public class LatentIncrementSortTest {
 
         assertEquals(3, dependencies.get(g3).size());
         assertTrue(dependencies.get(g3).contains(g2) &&
-                dependencies.get(g3).contains(sigma2) &&
-                dependencies.get(g3).contains(sigma3));
+            dependencies.get(g3).contains(sigma2) &&
+            dependencies.get(g3).contains(sigma3));
 
         assertEquals(4, dependencies.get(g6).size());
         assertTrue(dependencies.get(g6).contains(g4) &&
-                dependencies.get(g6).contains(sigma4) &&
-                dependencies.get(g6).contains(g5) &&
-                dependencies.get(g6).contains(sigma5));
+            dependencies.get(g6).contains(sigma4) &&
+            dependencies.get(g6).contains(g5) &&
+            dependencies.get(g6).contains(sigma5));
 
         List<Vertex<?>> expectedOrder = Arrays.asList(g1, g3, g6);
         int idx = 0;

@@ -1,18 +1,18 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.Identifiable;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
 
-public abstract class Vertex<T> implements Identifiable {
+public abstract class Vertex<T> {
 
-    public static final AtomicLong idGenerator = new AtomicLong(0L);
+    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
-    private String uuid = idGenerator.getAndIncrement() + "";
+    private long uuid = ID_GENERATOR.getAndIncrement();
     private Set<Vertex> children = new HashSet<>();
     private Set<Vertex> parents = new HashSet<>();
     private T value;
@@ -38,17 +38,22 @@ public abstract class Vertex<T> implements Identifiable {
      * @param value at a given value
      * @return the partial derivatives of the log density
      */
-    public abstract Map<String, DoubleTensor> dLogProb(T value);
+    public abstract Map<Long, DoubleTensor> dLogProb(T value);
 
-    public Map<String, DoubleTensor> dLogProbAtValue() {
+    public final Map<Long, DoubleTensor> dLogProbAtValue() {
         return dLogProb(getValue());
     }
 
     /**
+     * @param random source of randomness
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
      * this will always be the same value.
      */
-    public abstract T sample();
+    public abstract T sample(KeanuRandom random);
+
+    public T sampleUsingDefaultRandom() {
+        return sample(KeanuRandom.getDefaultRandom());
+    }
 
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's
@@ -61,12 +66,13 @@ public abstract class Vertex<T> implements Identifiable {
     /**
      * This causes a backwards propagating calculation of the vertex value. This
      * propagation only happens for vertices with values dependent on parent values
-     * i.e. non-probabilistic vertices.
+     * i.e. non-probabilistic vertices. This will also cause probabilistic
+     * vertices that have no value to set their value by calling their sample method.
      *
      * @return The value at this vertex after recalculating any parent non-probabilistic
      * vertices.
      */
-    public T lazyEval() {
+    public final T lazyEval() {
         Deque<Vertex<?>> stack = new ArrayDeque<>();
         stack.push(this);
         Set<Vertex<?>> hasCalculated = new HashSet<>();
@@ -114,7 +120,11 @@ public abstract class Vertex<T> implements Identifiable {
     }
 
     public T getValue() {
-        return !hasValue() ? lazyEval() : value;
+        return hasValue() ? value : lazyEval();
+    }
+
+    protected T getRawValue(){
+        return value;
     }
 
     public boolean hasValue() {
@@ -137,12 +147,12 @@ public abstract class Vertex<T> implements Identifiable {
      * @param explored the results of previously exploring the graph, which
      *                 allows the efficient propagation of this new value.
      */
-    public void setAndCascade(T value, Map<String, Long> explored) {
+    public void setAndCascade(T value, Map<Long, Long> explored) {
         setValue(value);
         VertexValuePropagation.cascadeUpdate(this, explored);
     }
 
-    public Map<String, Long> exploreSetting() {
+    public Map<Long, Long> exploreSetting() {
         return VertexValuePropagation.exploreSetting(this);
     }
 
@@ -175,7 +185,7 @@ public abstract class Vertex<T> implements Identifiable {
         return observed;
     }
 
-    public String getId() {
+    public long getId() {
         return uuid;
     }
 
@@ -187,7 +197,7 @@ public abstract class Vertex<T> implements Identifiable {
         children.add(v);
     }
 
-    public void setParents(Collection<? extends Vertex<?>> parents) {
+    public void setParents(Collection<? extends Vertex> parents) {
         this.parents = new HashSet<>();
         addParents(parents);
     }
@@ -196,7 +206,7 @@ public abstract class Vertex<T> implements Identifiable {
         setParents(Arrays.asList(parents));
     }
 
-    public void addParents(Collection<? extends Vertex<?>> parents) {
+    public void addParents(Collection<? extends Vertex> parents) {
         parents.forEach(this::addParent);
     }
 
@@ -216,12 +226,12 @@ public abstract class Vertex<T> implements Identifiable {
 
         Vertex<?> vertex = (Vertex<?>) o;
 
-        return uuid.equals(vertex.uuid);
+        return uuid == vertex.uuid;
     }
 
     @Override
     public int hashCode() {
-        return uuid.hashCode();
+        return (int) (uuid ^ (uuid >>> 32));
     }
 
     public Set<Vertex> getConnectedGraph() {

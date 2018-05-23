@@ -2,7 +2,9 @@ package io.improbable.keanu.vertices.generic;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
+import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -10,7 +12,6 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.Random;
 
 import static org.junit.Assert.assertEquals;
 
@@ -20,9 +21,15 @@ public class SelectVertexTest {
     private static double epsilon = 0.01;
     private static int N = 100000;
 
+    private KeanuRandom random;
+
+    @Before
+    public void setup() {
+        random = new KeanuRandom(1);
+    }
+
     @Test
     public void fourValuesEquallyWeightedSummingToOne() {
-        Random random = new Random(1);
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, new ConstantDoubleVertex(0.25));
@@ -36,7 +43,6 @@ public class SelectVertexTest {
 
     @Test
     public void fourValuesNotEquallyWeightedSummingToOne() {
-        Random random = new Random(1);
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, new ConstantDoubleVertex(0.1));
@@ -50,7 +56,6 @@ public class SelectVertexTest {
 
     @Test
     public void fourValuesEquallyWeightedSummingToFour() {
-        Random random = new Random(1);
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, new ConstantDoubleVertex(1.0));
@@ -65,7 +70,6 @@ public class SelectVertexTest {
 
     @Test
     public void fourValuesNotEquallyWeightedSummingToFour() {
-        Random random = new Random(1);
 
         LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, new ConstantDoubleVertex(0.25));
@@ -79,9 +83,9 @@ public class SelectVertexTest {
     }
 
     private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
-                                                       Random random) {
+                                                       KeanuRandom random) {
 
-        SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues, random);
+        SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues);
 
         LinkedHashMap<TestEnum, Integer> sampleFrequencies = new LinkedHashMap<>();
         sampleFrequencies.put(TestEnum.A, 0);
@@ -90,7 +94,7 @@ public class SelectVertexTest {
         sampleFrequencies.put(TestEnum.D, 0);
 
         for (int i = 0; i < N; i++) {
-            TestEnum s = select.sample();
+            TestEnum s = select.sample(random);
             sampleFrequencies.put(s, sampleFrequencies.get(s) + 1);
         }
 

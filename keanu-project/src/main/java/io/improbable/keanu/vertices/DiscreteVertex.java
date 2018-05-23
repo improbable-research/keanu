@@ -12,12 +12,12 @@ public abstract class DiscreteVertex<T> extends Vertex<T> {
     }
 
     @Override
-    public final Map<String, DoubleTensor> dLogProb(T value) {
+    public final Map<Long, DoubleTensor> dLogProb(T value) {
         return dLogPmf(value);
     }
 
     public abstract double logPmf(T value);
 
-    public abstract Map<String, DoubleTensor> dLogPmf(T value);
+    public abstract Map<Long, DoubleTensor> dLogPmf(T value);
 
 }

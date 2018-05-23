@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges
@@ -42,13 +42,13 @@ public class SmoothUniformDistribution {
      * The width of the shoulder is determined by the edgeSharpness as a percentage of the body width,
      * which is (xMax - xMin).
      *
-     * @param xMin min value from body
-     * @param xMax max value from body
+     * @param xMin          min value from body
+     * @param xMax          max value from body
      * @param edgeSharpness sharpness as a percentage of the body width
-     * @param random source of randomness
+     * @param random        source of randomness
      * @return a uniform random number between xMin and xMax
      */
-    public static double sample(double xMin, double xMax, final double edgeSharpness, Random random) {
+    public static double sample(double xMin, double xMax, final double edgeSharpness, KeanuRandom random) {
 
         final double r1 = random.nextDouble();
         final double bodyWidth = xMax - xMin;

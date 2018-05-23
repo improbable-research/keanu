@@ -1,11 +1,15 @@
 package io.improbable.keanu.e2e.regression;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +22,11 @@ import static org.junit.Assert.assertEquals;
 public class LinearRegression {
     private final Logger log = LoggerFactory.getLogger(LinearRegression.class);
 
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
+
+    private KeanuRandom random;
+
     private class Point {
         public final double y;
         public final double[] factors;
@@ -26,6 +35,11 @@ public class LinearRegression {
             this.y = y;
             this.factors = factors;
         }
+    }
+
+    @Before
+    public void setup() {
+        random = new KeanuRandom(1);
     }
 
     @Test
@@ -45,10 +59,10 @@ public class LinearRegression {
             dProb.observe(p.y);
         }
 
-        m.setAndCascade(1.0);
+        m.setValue(1.0);
         b.setAndCascade(-5.0);
 
-        BayesNet bayesNet = new BayesNet(m.getConnectedGraph());
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(m.getConnectedGraph());
         runGradientOptimizer(bayesNet, 10000, 10000);
 
         log.info("M = " + m.getValue() + ", B = " + b.getValue());
@@ -75,7 +89,7 @@ public class LinearRegression {
             dProb.observe(p.y);
         }
 
-        runGradientOptimizer(new BayesNet(a.getConnectedGraph()), 1000, 10000);
+        runGradientOptimizer(new BayesNetDoubleAsContinuous(a.getConnectedGraph()), 1000, 10000);
 
         log.info("A = " + a.getValue() + ", B = " + b.getValue() + ", C = " + c.getValue());
         assertEquals(expectedA, a.getValue(), 0.01);
@@ -83,9 +97,9 @@ public class LinearRegression {
         assertEquals(expectedC, c.getValue(), 0.01);
     }
 
-    private void runGradientOptimizer(BayesNet bayesNet, int findStartStateAttempts, int maxEvaluations) {
+    private void runGradientOptimizer(BayesNetDoubleAsContinuous bayesNet, int findStartStateAttempts, int maxEvaluations) {
         log.info("Preparing graph");
-        bayesNet.probeForNonZeroMasterP(findStartStateAttempts);
+        bayesNet.probeForNonZeroMasterP(findStartStateAttempts, random);
         log.info("Running optimizer");
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
         optimizer.maxLikelihood(maxEvaluations);

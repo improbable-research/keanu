@@ -2,8 +2,9 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -16,10 +17,10 @@ public class MetropolisHastings {
     private MetropolisHastings() {
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesNet bayesNet,
-                                                     List<Vertex> fromVertices,
+    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
+                                                     List<? extends Vertex> fromVertices,
                                                      int sampleCount) {
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, new Random());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -29,17 +30,17 @@ public class MetropolisHastings {
      * @param random       the source of randomness
      * @return Samples for each vertex ordered by MCMC iteration
      */
-    public static NetworkSamples getPosteriorSamples(final BayesNet bayesNet,
-                                                     final List<Vertex> fromVertices,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
+                                                     final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
-                                                     final Random random) {
+                                                     final KeanuRandom random) {
         checkBayesNetInHealthyState(bayesNet);
 
-        Map<String, List<?>> samplesByVertex = new HashMap<>();
+        Map<Long, List<?>> samplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
-        Map<String, Map<String, Long>> setAndCascadeCache = new HashMap<>();
+        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
 
         double logP = bayesNet.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
@@ -58,15 +59,15 @@ public class MetropolisHastings {
                                  final double logPOld,
                                  final Set<Vertex> affectedVertices,
                                  final double T,
-                                 final Map<String, Map<String, Long>> setAndCascadeCache,
-                                 final Random random) {
+                                 final Map<Long, Map<Long, Long>> setAndCascadeCache,
+                                 final KeanuRandom random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
 
         final T oldValue = chosenVertex.getValue();
-        final T proposedValue = chosenVertex.sample();
+        final T proposedValue = chosenVertex.sample(random);
 
-        Map<String, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
+        Map<Long, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
         chosenVertex.setAndCascade(proposedValue, cascadeCache);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);
@@ -89,34 +90,34 @@ public class MetropolisHastings {
         return logPNew;
     }
 
-    static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<Vertex> latentVertices) {
+    static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices) {
         return latentVertices.stream()
-                .collect(Collectors.toMap(
-                        v -> v,
-                        v -> {
-                            Set<Vertex> affectedVertices = new HashSet<>();
-                            affectedVertices.add(v);
-                            affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
-                            return affectedVertices;
-                        }));
+            .collect(Collectors.toMap(
+                v -> v,
+                v -> {
+                    Set<Vertex> affectedVertices = new HashSet<>();
+                    affectedVertices.add(v);
+                    affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
+                    return affectedVertices;
+                }));
     }
 
     private static double sumLogP(Set<Vertex> vertices) {
         return vertices.stream()
-                .mapToDouble(Vertex::logProbAtValue)
-                .sum();
+            .mapToDouble(Vertex::logProbAtValue)
+            .sum();
     }
 
-    private static void takeSamples(Map<String, List<?>> samples, List<Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
+    private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {
+        fromVertices.forEach(vertex -> addSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<String, List<?>> samples) {
+    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<Long, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
     }
 
-    private static void checkBayesNetInHealthyState(BayesNet bayesNet) {
+    private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
         if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {

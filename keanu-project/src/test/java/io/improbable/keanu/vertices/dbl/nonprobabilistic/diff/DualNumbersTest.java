@@ -1,29 +1,25 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Map;
-import java.util.Random;
 
 import static io.improbable.keanu.kotlin.ExtendPrefixOperatorsKt.exp;
 import static org.junit.Assert.assertEquals;
 
 public class DualNumbersTest {
 
-    Random random;
     DoubleVertex vA;
     DoubleVertex vB;
 
     @Before
     public void setup() {
-        random = new Random();
-        vA = new GaussianVertex(new ConstantDoubleVertex(1.0), new ConstantDoubleVertex(0.0), random);
-        vB = new GaussianVertex(new ConstantDoubleVertex(2.0), new ConstantDoubleVertex(0.0), random);
+        vA = new GaussianVertex(1.0, 0.0);
+        vB = new GaussianVertex(2.0, 0.0);
     }
 
     @Test
@@ -74,7 +70,7 @@ public class DualNumbersTest {
         DualNumber cDual = vC.getDualNumber();
 
         double C = cDual.getValue();
-        Map<String, Double> dc = cDual.getPartialDerivatives().asMap();
+        Map<Long, Double> dc = cDual.getPartialDerivatives().asMap();
 
         double da = 0.00000001;
 

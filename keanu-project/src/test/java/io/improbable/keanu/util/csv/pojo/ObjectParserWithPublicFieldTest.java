@@ -16,9 +16,9 @@ public class ObjectParserWithPublicFieldTest {
     @Before
     public void setup() {
         data = Arrays.asList(
-                Arrays.asList("5", "A"),
-                Arrays.asList("12", "6"),
-                Arrays.asList("04", "L")
+            Arrays.asList("5", "A"),
+            Arrays.asList("12", "6"),
+            Arrays.asList("04", "L")
         );
     }
 
@@ -27,15 +27,15 @@ public class ObjectParserWithPublicFieldTest {
         List<String> titles = Arrays.asList("id", "name");
 
         List<TestPOJOWithPublicFieldsClass> output = ObjectParser.parse(
-                TestPOJOWithPublicFieldsClass.class,
-                data.stream(),
-                titles
+            TestPOJOWithPublicFieldsClass.class,
+            data.stream(),
+            titles
         ).collect(toList());
 
         assertEquals(output, Arrays.asList(
-                new TestPOJOWithPublicFieldsClass(5, "A"),
-                new TestPOJOWithPublicFieldsClass(12, "6"),
-                new TestPOJOWithPublicFieldsClass(4, "L")
+            new TestPOJOWithPublicFieldsClass(5, "A"),
+            new TestPOJOWithPublicFieldsClass(12, "6"),
+            new TestPOJOWithPublicFieldsClass(4, "L")
         ));
     }
 
@@ -50,10 +50,10 @@ public class ObjectParserWithPublicFieldTest {
         List<String> titles = Arrays.asList("id", "name", "blah");
 
         ObjectParser.parse(
-                TestPOJOWithPublicFieldsClass.class,
-                data.stream(),
-                titles,
-                false
+            TestPOJOWithPublicFieldsClass.class,
+            data.stream(),
+            titles,
+            false
         );
     }
 
@@ -62,15 +62,15 @@ public class ObjectParserWithPublicFieldTest {
         List<String> titles = Arrays.asList("Id", "name");
 
         List<TestPOJOWithPublicFieldsClass> output = ObjectParser.parse(
-                TestPOJOWithPublicFieldsClass.class,
-                data.stream(),
-                titles
+            TestPOJOWithPublicFieldsClass.class,
+            data.stream(),
+            titles
         ).collect(toList());
 
         assertEquals(output, Arrays.asList(
-                new TestPOJOWithPublicFieldsClass(5, "A"),
-                new TestPOJOWithPublicFieldsClass(12, "6"),
-                new TestPOJOWithPublicFieldsClass(4, "L")
+            new TestPOJOWithPublicFieldsClass(5, "A"),
+            new TestPOJOWithPublicFieldsClass(12, "6"),
+            new TestPOJOWithPublicFieldsClass(4, "L")
         ));
     }
 

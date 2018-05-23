@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.Random;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -15,12 +15,12 @@ public class Uniform {
 
 
     /**
-     * @param xMin      minimum x value
-     * @param xMax      maximum x value
+     * @param xMin   minimum x value
+     * @param xMax   maximum x value
      * @param random source of randomness
      * @return a random number from the Uniform distribution
      */
-    public static double sample(double xMin, double xMax, Random random) {
+    public static double sample(double xMin, double xMax, KeanuRandom random) {
         return random.nextDouble() * (xMax - xMin) + xMin;
     }
 

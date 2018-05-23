@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNet;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -15,17 +15,17 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class NonGradientOptimizer {
 
-    private final BayesNet bayesNet;
+    private final BayesNetDoubleAsContinuous bayesNet;
 
-    public NonGradientOptimizer(BayesNet bayesNet) {
+    public NonGradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
     }
 
     public NonGradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNet(graph);
+        bayesNet = new BayesNetDoubleAsContinuous(graph);
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+    public double optimize(int maxEvaluations, double boundsRange, List<? extends Vertex> outputVertices) {
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
@@ -52,11 +52,11 @@ public class NonGradientOptimizer {
         }
 
         PointValuePair pointValuePair = optimizer.optimize(
-                new MaxEval(maxEvaluations),
-                new ObjectiveFunction(fitnessFunction.fitness()),
-                new SimpleBounds(minBounds, maxBounds),
-                MAXIMIZE,
-                new InitialGuess(currentPoint())
+            new MaxEval(maxEvaluations),
+            new ObjectiveFunction(fitnessFunction.fitness()),
+            new SimpleBounds(minBounds, maxBounds),
+            MAXIMIZE,
+            new InitialGuess(currentPoint())
         );
 
         return pointValuePair.getValue();

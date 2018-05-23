@@ -10,13 +10,13 @@ public class TopologicalSort {
     private TopologicalSort() {
     }
 
-    public static List<Vertex> sort(Collection<Vertex> vertices) {
+    public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
 
         Map<Vertex, Set<Vertex>> dependencies = mapDependencies(vertices);
 
         return vertices.stream().
-                sorted(Comparator.comparingInt(vertexA -> dependencies.get(vertexA).size()))
-                .collect(Collectors.toList());
+            sorted(Comparator.comparingInt(vertexA -> dependencies.get(vertexA).size()))
+            .collect(Collectors.toList());
     }
 
     public static Map<Vertex, Set<Vertex>> mapDependencies(Collection<? extends Vertex> vertices) {
