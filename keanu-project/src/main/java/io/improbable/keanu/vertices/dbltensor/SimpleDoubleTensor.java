@@ -148,6 +148,16 @@ public class SimpleDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
+        if (greaterThanOrEqualToThis.isScalar()) {
+            return new SimpleDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
+        } else {
+            return DoubleTensor.create(value, greaterThanOrEqualToThis.getShape())
+                .getGreaterThanMask(greaterThanOrEqualToThis);
+        }
+    }
+
+    @Override
     public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
         if (lessThanThis.isScalar()) {
             return new SimpleDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);

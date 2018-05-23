@@ -2,10 +2,7 @@ package io.improbable.keanu.vertices.dbltensor;
 
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -21,6 +18,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
 
+    public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
+
     public static Nd4jDoubleTensor scalar(double scalarValue) {
         return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
     }
@@ -29,7 +28,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(values, shape);
     }
 
-    public static Nd4jDoubleTensor create(double value, int[] shape){
+    public static Nd4jDoubleTensor create(double value, int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
     }
 
@@ -393,12 +392,39 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (greaterThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldGreaterThan(mask, Nd4j.ones(mask.shape()).mul(greaterThanThis.scalar()), mask, mask.length())
+                new OldGreaterThan(mask,
+                    Nd4j.valueArrayOf(mask.shape(), greaterThanThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
             Nd4j.getExecutioner().exec(
                 new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
+            );
+        }
+
+        return new Nd4jDoubleTensor(mask);
+    }
+
+    @Override
+    public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
+
+        INDArray mask = tensor.dup();
+
+        if (greaterThanOrEqualToThis.isScalar()) {
+            Nd4j.getExecutioner().exec(
+                new OldGreaterThanOrEqual(mask,
+                    Nd4j.valueArrayOf(mask.shape(), greaterThanOrEqualToThis.scalar()),
+                    mask,
+                    mask.length()
+                )
+            );
+        } else {
+            INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanOrEqualToThis);
+            Nd4j.getExecutioner().exec(
+                new OldGreaterThanOrEqual(mask, greaterThanThisArray, mask, mask.length())
             );
         }
 
@@ -412,7 +438,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (lessThanThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldLessThan(mask, Nd4j.ones(mask.shape()).mul(lessThanThis.scalar()), mask, mask.length())
+                new OldLessThan(mask,
+                    Nd4j.valueArrayOf(mask.shape(), lessThanThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray lessThanThisArray = unsafeGetNd4J(lessThanThis);
@@ -431,7 +461,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (lessThanOrEqualToThis.isScalar()) {
             Nd4j.getExecutioner().exec(
-                new OldLessThanOrEqual(mask, Nd4j.ones(mask.shape()).mul(lessThanOrEqualToThis.scalar()), mask, mask.length())
+                new OldLessThanOrEqual(mask,
+                    Nd4j.valueArrayOf(mask.shape(), lessThanOrEqualToThis.scalar()),
+                    mask,
+                    mask.length()
+                )
             );
         } else {
             INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
