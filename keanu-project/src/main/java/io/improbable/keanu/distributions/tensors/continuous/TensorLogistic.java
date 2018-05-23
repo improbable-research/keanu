@@ -19,8 +19,8 @@ public class TensorLogistic {
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
-        final DoubleTensor expAOverB = a.div(b).exp();
-        final DoubleTensor expXOverB = x.div(b).exp();
+        final DoubleTensor expAOverB = a.div(b).expInPlace();
+        final DoubleTensor expXOverB = x.div(b).expInPlace();
         final DoubleTensor expPlus = expAOverB.plus(expXOverB);
         final DoubleTensor bTimesExpAOverB = expAOverB.times(b);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(b);
