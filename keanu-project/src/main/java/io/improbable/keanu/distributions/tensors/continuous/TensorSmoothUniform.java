@@ -8,11 +8,11 @@ public class TensorSmoothUniform {
     private TensorSmoothUniform() {
     }
 
-    public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, DoubleTensor edgeSharpness, KeanuRandom random) {
+    public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness, KeanuRandom random) {
 
         final DoubleTensor r1 = random.nextDouble(shape);
         final DoubleTensor bodyWidth = xMax.minus(xMin);
-        final DoubleTensor shoulderWidth = edgeSharpness.times(bodyWidth);
+        final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
         final DoubleTensor rScaled = r1.times(bodyWidth.plus(shoulderWidth)).plus(xMin.minus(shoulderWidth.div(2)));
 
         final DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
@@ -48,7 +48,7 @@ public class TensorSmoothUniform {
             plus(secondConditionalFalseNestedFalse.times(secondConditionalFalseNestedFalseResult));
     }
 
-    public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
+    public static DoubleTensor pdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
 
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);

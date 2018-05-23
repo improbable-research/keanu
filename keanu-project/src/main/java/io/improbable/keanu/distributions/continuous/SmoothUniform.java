@@ -133,7 +133,7 @@ public class SmoothUniform {
         }
 
         double rightCutoff = xMax + shoulderWidth;
-        if (x > xMax && x > rightCutoff) {
+        if (x > xMax && x < rightCutoff) {
             //x is in right shoulder
             final double nx = shoulderWidth - (x - rightCutoff);
             return -dshoulder(shoulderWidth, bodyWidth, nx);
