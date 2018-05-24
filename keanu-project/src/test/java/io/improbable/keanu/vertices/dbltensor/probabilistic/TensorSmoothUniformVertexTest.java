@@ -1,12 +1,8 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.continuous.SmoothUniform;
-import io.improbable.keanu.distributions.tensors.continuous.TensorSmoothUniform;
 import io.improbable.keanu.vertices.dbl.probabilistic.SmoothUniformVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -77,14 +73,14 @@ public class TensorSmoothUniformVertexTest {
             tensorDerivativeRightRegion.get(tensorSmoothUniformVertex.getId()).scalar(),
             DELTA
         );
-
     }
 
     @Test
     public void smoothUniformSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        double edgeSharpness = 10.0;
+
+        double edgeSharpness = 1.0;
         TensorSmoothUniformVertex vertex = new TensorSmoothUniformVertex(
             new int[]{sampleCount, 1},
             0.0,
@@ -92,9 +88,9 @@ public class TensorSmoothUniformVertexTest {
             edgeSharpness
         );
 
-        double from = 0;
-        double to = 1;
-        double bucketSize = 0.01;
+        double from = -1;
+        double to = 2;
+        double bucketSize = 0.05;
 
         ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex,
             from,
