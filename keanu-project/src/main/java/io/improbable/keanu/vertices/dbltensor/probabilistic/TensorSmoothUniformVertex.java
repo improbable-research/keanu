@@ -20,6 +20,14 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
     private final DoubleTensorVertex xMax;
     private final double edgeSharpness;
 
+    /**
+     * One xMin or Xmax or both driving an arbitrarily shaped tensor of Smooth Uniform
+     *
+     * @param shape the desired shape of the vertex
+     * @param xMin    the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param edgeSharpness the edge sharpness of the Smooth Uniform
+     */
     public TensorSmoothUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, double edgeSharpness) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getShape(), xMax.getShape());
@@ -31,6 +39,14 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    /**
+     * One to one constructor for mapping some shape of mu and sigma to
+     * a matching shaped Smooth Uniform.
+     *
+     * @param xMin    the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param edgeSharpness the edge sharpness of the Smooth Uniform
+     */
     public TensorSmoothUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, double edgeSharpness) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
     }

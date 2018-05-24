@@ -40,7 +40,7 @@ public class TensorSmoothUniform {
 
         final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.getLessThanOrEqualToMask(acceptProbability));
         final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.times(r2.getGreaterThanMask(acceptProbability));
-        final DoubleTensor secondConditionalFalseNestedFalseResult = xMax.plus(shoulderWidth).minus(spillOnToShoulder);
+        final DoubleTensor secondConditionalFalseNestedFalseResult = xMax.plus(shoulderWidth).minusInPlace(spillOnToShoulder);
 
         return firstConditional.times(rScaled).
             plus(inverseFirstConditional.times(secondConditionalNestedTrue).times(rScaled)).
@@ -65,7 +65,7 @@ public class TensorSmoothUniform {
 
         final DoubleTensor thirdConditional = x.getGreaterThanMask(xMax);
         thirdConditional.timesInPlace(x.getLessThanMask(rightCutoff));
-        final DoubleTensor thirdConditionalResult = shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plus(xMax));
+        final DoubleTensor thirdConditionalResult = shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plusInPlace(xMax));
 
         return firstConditional.times(firstConditionalResult).
             plus(secondConditional.times(secondConditionalResult)).
