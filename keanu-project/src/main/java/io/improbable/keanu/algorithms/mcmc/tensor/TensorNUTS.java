@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.ArrayList;
@@ -22,13 +23,13 @@ import java.util.Map;
  */
 public class TensorNUTS {
 
-    private final static double DELTA_MAX = 1000.0;
+    static private final double DELTA_MAX = 1000.0;
 
     private TensorNUTS() {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNetTensorAsContinuous bayesNet,
-                                                     final List<DoubleVertex> fromVertices,
+                                                     final List<DoubleTensorVertex> fromVertices,
                                                      final int sampleCount,
                                                      final double stepSize) {
 

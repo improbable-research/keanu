@@ -30,8 +30,8 @@ public class TensorNUTSTest {
         NetworkSamples posteriorSamples = TensorNUTS.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            5000,
-            0.3,
+            1000,
+            0.25,
             random
         );
 
