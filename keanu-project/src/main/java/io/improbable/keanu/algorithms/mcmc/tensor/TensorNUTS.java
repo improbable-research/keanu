@@ -362,7 +362,7 @@ public class TensorNUTS {
             );
 
             forward += forwardMinusBackward.times(momentumForward.get(latentId)).sum();
-            backward += forwardMinusBackward.times(momentumBackward.get(latentId)).sum();
+            backward += forwardMinusBackward.timesInPlace(momentumBackward.get(latentId)).sum();
         }
 
         return (forward >= 0.0) && (backward >= 0.0);
@@ -402,14 +402,16 @@ public class TensorNUTS {
         Map<Long, DoubleTensor> nextPosition = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> rEntry : momentum.entrySet()) {
-            final DoubleTensor updatedMomentum = rEntry.getValue().plus(gradient.get(rEntry.getKey()).times(halfTimeStep));
+            final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
             nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
 
         for (Vertex<DoubleTensor> latent : latentVertices) {
-            final DoubleTensor nextPositionForLatent = position.get(latent.getId()).plus(
-                nextMomentum.get(latent.getId()).times(halfTimeStep)
-            );
+            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getId()).
+                times(halfTimeStep).
+                plusInPlace(
+                    position.get(latent.getId())
+                );
             nextPosition.put(latent.getId(), nextPositionForLatent);
             latent.setValue(nextPositionForLatent);
         }
@@ -419,9 +421,11 @@ public class TensorNUTS {
         Map<Long, DoubleTensor> nextPositionGradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
         for (Map.Entry<Long, DoubleTensor> nextMomentumForLatent : nextMomentum.entrySet()) {
-            final DoubleTensor nextNextMomentumForLatent = nextMomentumForLatent.getValue().plus(
-                nextPositionGradient.get(nextMomentumForLatent.getKey()).times(halfTimeStep)
-            );
+            final DoubleTensor nextNextMomentumForLatent = nextPositionGradient.get(nextMomentumForLatent.getKey()).
+                times(halfTimeStep).
+                plusInPlace(
+                    nextMomentumForLatent.getValue()
+                );
             nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
 
