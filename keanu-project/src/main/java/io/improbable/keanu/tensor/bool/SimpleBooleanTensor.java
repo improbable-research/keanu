@@ -2,9 +2,9 @@ package io.improbable.keanu.tensor.bool;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.SimpleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;

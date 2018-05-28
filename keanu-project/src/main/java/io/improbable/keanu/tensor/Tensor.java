@@ -94,7 +94,7 @@ public interface Tensor<T> {
         return new SimpleTensor<>(value);
     }
 
-    static <T> Tensor<T> placeHolder(int[] shape){
+    static <T> Tensor<T> placeHolder(int[] shape) {
         return new SimpleTensor<>(shape);
     }
 }

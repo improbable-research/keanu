@@ -1,7 +1,5 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.junit.Before;
 import org.junit.Test;
 

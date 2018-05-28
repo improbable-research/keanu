@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor;
 
-import io.improbable.keanu.tensor.TensorShape;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
