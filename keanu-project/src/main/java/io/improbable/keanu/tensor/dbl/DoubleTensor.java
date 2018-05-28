@@ -13,7 +13,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     static DoubleTensor create(double value, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(value);
+            return new ScalarDoubleTensor(value);
         } else {
             return Nd4jDoubleTensor.create(value, shape);
         }
@@ -21,7 +21,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     static DoubleTensor create(double[] values, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new SimpleDoubleTensor(values[0]);
+            return new ScalarDoubleTensor(values[0]);
         } else {
             return Nd4jDoubleTensor.create(values, shape);
         }
@@ -29,7 +29,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     static DoubleTensor ones(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(1.0);
+            return new ScalarDoubleTensor(1.0);
         } else {
             return Nd4jDoubleTensor.ones(shape);
         }
@@ -37,18 +37,18 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     static DoubleTensor zeros(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(0.0);
+            return new ScalarDoubleTensor(0.0);
         } else {
             return Nd4jDoubleTensor.zeros(shape);
         }
     }
 
     static DoubleTensor scalar(double scalarValue) {
-        return new SimpleDoubleTensor(scalarValue);
+        return new ScalarDoubleTensor(scalarValue);
     }
 
     static DoubleTensor placeHolder(int[] shape) {
-        return new SimpleDoubleTensor(shape);
+        return new ScalarDoubleTensor(shape);
     }
 
     static Map<Long, DoubleTensor> fromScalars(Map<Long, Double> scalars) {

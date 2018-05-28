@@ -6,17 +6,17 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.Function;
 
-public class SimpleDoubleTensor implements DoubleTensor {
+public class ScalarDoubleTensor implements DoubleTensor {
 
     private Double value;
     private int[] shape;
 
-    public SimpleDoubleTensor(double value) {
+    public ScalarDoubleTensor(double value) {
         this.value = value;
         this.shape = SCALAR_SHAPE;
     }
 
-    public SimpleDoubleTensor(int[] shape) {
+    public ScalarDoubleTensor(int[] shape) {
         this.value = null;
         this.shape = shape;
     }
@@ -43,7 +43,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor duplicate() {
-        return new SimpleDoubleTensor(value);
+        return new ScalarDoubleTensor(value);
     }
 
     @Override
@@ -182,7 +182,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {
         if (greaterThanThis.isScalar()) {
-            return new SimpleDoubleTensor(value > greaterThanThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value > greaterThanThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, greaterThanThis.getShape())
                 .getGreaterThanMask(greaterThanThis);
@@ -192,7 +192,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanOrEqualToThis) {
         if (greaterThanOrEqualToThis.isScalar()) {
-            return new SimpleDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, greaterThanOrEqualToThis.getShape())
                 .getGreaterThanMask(greaterThanOrEqualToThis);
@@ -202,7 +202,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor getLessThanMask(DoubleTensor lessThanThis) {
         if (lessThanThis.isScalar()) {
-            return new SimpleDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, lessThanThis.getShape())
                 .getLessThanOrEqualToMask(lessThanThis);
@@ -212,7 +212,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanOrEqualsThis) {
         if (lessThanOrEqualsThis.isScalar()) {
-            return new SimpleDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, lessThanOrEqualsThis.getShape())
                 .getLessThanOrEqualToMask(lessThanOrEqualsThis);
@@ -242,7 +242,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor apply(Function<Double, Double> function) {
-        return new SimpleDoubleTensor(function.apply(value));
+        return new ScalarDoubleTensor(function.apply(value));
     }
 
     @Override
@@ -253,7 +253,7 @@ public class SimpleDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor min(DoubleTensor min) {
         if (min.isScalar()) {
-            return new SimpleDoubleTensor(Math.min(value, min.scalar()));
+            return new ScalarDoubleTensor(Math.min(value, min.scalar()));
         } else {
             return DoubleTensor.create(value, shape).minInPlace(min);
         }

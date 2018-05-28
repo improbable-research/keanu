@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.dbl.SimpleDoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.*;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
@@ -35,7 +35,7 @@ public class TensorExponentialVertexTest {
         DoubleTensor matrixA = Nd4jDoubleTensor.create(new double[]{1, 4}, new int[]{2, 1});
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
-        DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new SimpleDoubleTensor(1.0), matrixX);
+        DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new ScalarDoubleTensor(1.0), matrixX);
         assertArrayEquals(new double[]{-1, 0}, maskResult.getFlattenedView().asDoubleArray(), 0.0);
     }
 
