@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbltensor;
+package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;

@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.tensormcmc;
 
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
 

@@ -3,7 +3,7 @@ package io.improbable.keanu.tensor.bool;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.generic.SimpleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.junit.Before;
 import org.junit.Test;
 

@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 
 import java.util.Collections;
 import java.util.HashMap;

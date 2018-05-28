@@ -2,6 +2,9 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.SimpleDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.*;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
@@ -11,7 +14,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertArrayEquals;

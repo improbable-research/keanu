@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;

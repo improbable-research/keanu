@@ -1,13 +1,10 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Beta;
-import io.improbable.keanu.distributions.continuous.Gamma;
-import io.improbable.keanu.vertices.dbl.probabilistic.BetaVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.junit.Before;

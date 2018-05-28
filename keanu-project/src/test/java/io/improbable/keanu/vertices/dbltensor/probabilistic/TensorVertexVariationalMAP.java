@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.algorithms.variational.tensor.TensorGradientOptimizer;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 

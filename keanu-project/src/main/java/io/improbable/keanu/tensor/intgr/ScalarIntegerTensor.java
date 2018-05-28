@@ -1,7 +1,7 @@
 package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.function.Function;

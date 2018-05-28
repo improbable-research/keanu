@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 
 
 import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;

@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.*;

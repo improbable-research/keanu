@@ -1,13 +1,10 @@
 package io.improbable.keanu.algorithms.tensormcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.mcmc.MCMCTestDistributions;
-import io.improbable.keanu.algorithms.mcmc.NUTS;
 import io.improbable.keanu.algorithms.mcmc.tensor.TensorNUTS;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;

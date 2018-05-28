@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.bool;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public interface BooleanTensor extends Tensor<Boolean> {
 

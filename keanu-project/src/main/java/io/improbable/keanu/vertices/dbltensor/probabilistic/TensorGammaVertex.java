@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.tensors.continuous.TensorGamma;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
