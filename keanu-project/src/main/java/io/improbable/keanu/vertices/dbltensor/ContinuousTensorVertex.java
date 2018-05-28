@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Map;

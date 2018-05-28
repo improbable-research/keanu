@@ -1,11 +1,15 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface DoubleTensor extends Tensor {
+public interface DoubleTensor extends NumberTensor<Double> {
 
     static DoubleTensor create(double value, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
@@ -67,16 +71,6 @@ public interface DoubleTensor extends Tensor {
         return asScalars;
     }
 
-    double getValue(int... index);
-
-    void setValue(double value, int... index);
-
-    double scalar();
-
-    double sum();
-
-    DoubleTensor duplicate();
-
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();
@@ -133,6 +127,12 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor apply(Function<Double, Double> function);
 
+    DoubleTensor max(DoubleTensor max);
+
+    DoubleTensor min(DoubleTensor max);
+
+    DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
@@ -177,16 +177,27 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor applyInPlace(Function<Double, Double> function);
 
-    FlattenedView getFlattenedView();
+    DoubleTensor maxInPlace(DoubleTensor max);
 
-    interface FlattenedView {
+    DoubleTensor minInPlace(DoubleTensor max);
 
-        long size();
+    DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 
-        double get(long index);
+    // Comparisons
+    BooleanTensor lessThan(double value);
 
-        void set(long index, double value);
+    BooleanTensor lessThanOrEqual(double value);
 
-        double[] asArray();
-    }
+    BooleanTensor lessThan(DoubleTensor value);
+
+    BooleanTensor lessThanOrEqual(DoubleTensor value);
+
+    BooleanTensor greaterThan(double value);
+
+    BooleanTensor greaterThanOrEqual(double value);
+
+    BooleanTensor greaterThan(DoubleTensor value);
+
+    BooleanTensor greaterThanOrEqual(DoubleTensor value);
+
 }

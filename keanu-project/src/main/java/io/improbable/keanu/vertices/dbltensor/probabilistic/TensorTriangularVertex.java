@@ -8,8 +8,8 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVer
 
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
 

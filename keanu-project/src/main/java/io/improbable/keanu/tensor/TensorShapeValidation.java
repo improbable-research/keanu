@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbltensor;
+package io.improbable.keanu.tensor;
 
 import java.util.Arrays;
 import java.util.Set;
@@ -15,7 +15,7 @@ public class TensorShapeValidation {
      * the same shape of the proposal in question OR scalar.
      *
      * @param proposalShape the tensor shape being validated
-     * @param shapes       the tensors being validated against
+     * @param shapes        the tensors being validated against
      * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the non-scalar shape does
      *                                  not match the proposal shape.
      */
@@ -68,35 +68,4 @@ public class TensorShapeValidation {
             .collect(toSet());
     }
 
-    private static class TensorShape {
-
-        private int[] shape;
-
-        public TensorShape(int[] shape) {
-            this.shape = shape;
-        }
-
-        public int[] getShape() {
-            return shape;
-        }
-
-        public boolean isScalar() {
-            return Arrays.equals(Tensor.SCALAR_SHAPE, shape);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            TensorShape that = (TensorShape) o;
-
-            return Arrays.equals(shape, that.shape);
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(shape);
-        }
-    }
 }

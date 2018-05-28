@@ -20,7 +20,7 @@ public class DoubleTensorVertexSamplesTest {
 
         DoubleTensor averages = samples.getAverages();
 
-        assertArrayEquals(new double[]{2.0, 2.0, 7.0}, averages.getFlattenedView().asArray(), 0.0);
+        assertArrayEquals(new double[]{2.0, 2.0, 7.0}, averages.getFlattenedView().asDoubleArray(), 0.0);
 
     }
 }

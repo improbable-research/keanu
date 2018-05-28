@@ -34,7 +34,7 @@ public class TensorExponentialVertexTest {
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
         DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new SimpleDoubleTensor(1.0), matrixX);
-        assertArrayEquals(new double[]{-1, 0}, maskResult.getFlattenedView().asArray(), 0.0);
+        assertArrayEquals(new double[]{-1, 0}, maskResult.getFlattenedView().asDoubleArray(), 0.0);
     }
 
     @Test
