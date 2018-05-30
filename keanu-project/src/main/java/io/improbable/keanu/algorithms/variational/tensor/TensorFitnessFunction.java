@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.variational.tensor;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class TensorFitnessFunction {
         int position = 0;
         for (Vertex<DoubleTensor> vertex : latentVertices) {
 
-            int dimensions = numDimensions(vertex);
+            int dimensions = (int)numDimensions(vertex);
 
             double[] values = new double[dimensions];
             System.arraycopy(point, position, values, 0, dimensions);
@@ -46,8 +46,9 @@ public class TensorFitnessFunction {
         VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
     }
 
-    static int numDimensions(Vertex<DoubleTensor> vertex) {
-        return vertex.getValue().getLength();
+    static long numDimensions(Vertex<DoubleTensor> vertex) {
+        long length = vertex.getValue().getLength();
+        return  length;
     }
 
     public static double logOfTotalProbability(List<? extends Vertex> probabilisticVertices) {

@@ -2,6 +2,9 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.*;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
@@ -11,7 +14,6 @@ import org.junit.Test;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertArrayEquals;
@@ -33,8 +35,8 @@ public class TensorExponentialVertexTest {
         DoubleTensor matrixA = Nd4jDoubleTensor.create(new double[]{1, 4}, new int[]{2, 1});
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
-        DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new SimpleDoubleTensor(1.0), matrixX);
-        assertArrayEquals(new double[]{-1, 0}, maskResult.getFlattenedView().asArray(), 0.0);
+        DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new ScalarDoubleTensor(1.0), matrixX);
+        assertArrayEquals(new double[]{-1, 0}, maskResult.asFlatDoubleArray(), 0.0);
     }
 
     @Test

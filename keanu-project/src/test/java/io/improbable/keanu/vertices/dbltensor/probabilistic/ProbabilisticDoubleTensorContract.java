@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
@@ -42,9 +42,9 @@ public class ProbabilisticDoubleTensorContract {
             throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
         }
 
-        double[] samples = vertexUnderTest.sample(random).getFlattenedView().asArray();
+        double[] samples = vertexUnderTest.sample(random).asFlatDoubleArray();
 
-        Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample(random).getFlattenedView().asArray())
+        Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample(random).asFlatDoubleArray())
             .filter(value -> value >= from && value <= to)
             .boxed()
             .collect(groupingBy(

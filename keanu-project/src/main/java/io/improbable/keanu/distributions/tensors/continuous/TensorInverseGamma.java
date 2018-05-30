@@ -1,8 +1,8 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.math3.special.Gamma;
 
 public class TensorInverseGamma {

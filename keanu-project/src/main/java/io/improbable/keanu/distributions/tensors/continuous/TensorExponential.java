@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public class TensorExponential {

@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.variational.tensor;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -109,16 +109,20 @@ public class TensorGradientOptimizer {
 
     static double[] currentPoint(List<Vertex<DoubleTensor>> continuousVertices) {
 
-        int totalLatentDimensions = 0;
+        long totalLatentDimensions = 0;
         for (Vertex<DoubleTensor> vertex : continuousVertices) {
             totalLatentDimensions += TensorFitnessFunction.numDimensions(vertex);
         }
 
+        if (totalLatentDimensions > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Geater than " + Integer.MAX_VALUE + " latent dimensions not supported");
+        }
+
         int position = 0;
-        double[] point = new double[totalLatentDimensions];
+        double[] point = new double[(int) totalLatentDimensions];
 
         for (Vertex<DoubleTensor> vertex : continuousVertices) {
-            double[] values = vertex.getValue().getFlattenedView().asArray();
+            double[] values = vertex.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
         }

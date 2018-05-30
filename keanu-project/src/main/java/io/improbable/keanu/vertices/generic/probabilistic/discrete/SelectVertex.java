@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 

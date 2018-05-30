@@ -1,15 +1,19 @@
-package io.improbable.keanu.vertices.dbltensor;
+package io.improbable.keanu.tensor.dbl;
+
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
 
-public interface DoubleTensor extends Tensor {
+public interface DoubleTensor extends NumberTensor<Double> {
 
     static DoubleTensor create(double value, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(value);
+            return new ScalarDoubleTensor(value);
         } else {
             return Nd4jDoubleTensor.create(value, shape);
         }
@@ -17,7 +21,7 @@ public interface DoubleTensor extends Tensor {
 
     static DoubleTensor create(double[] values, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new SimpleDoubleTensor(values[0]);
+            return new ScalarDoubleTensor(values[0]);
         } else {
             return Nd4jDoubleTensor.create(values, shape);
         }
@@ -25,7 +29,7 @@ public interface DoubleTensor extends Tensor {
 
     static DoubleTensor ones(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(1.0);
+            return new ScalarDoubleTensor(1.0);
         } else {
             return Nd4jDoubleTensor.ones(shape);
         }
@@ -33,18 +37,18 @@ public interface DoubleTensor extends Tensor {
 
     static DoubleTensor zeros(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(0.0);
+            return new ScalarDoubleTensor(0.0);
         } else {
             return Nd4jDoubleTensor.zeros(shape);
         }
     }
 
     static DoubleTensor scalar(double scalarValue) {
-        return new SimpleDoubleTensor(scalarValue);
+        return new ScalarDoubleTensor(scalarValue);
     }
 
     static DoubleTensor placeHolder(int[] shape) {
-        return new SimpleDoubleTensor(shape);
+        return new ScalarDoubleTensor(shape);
     }
 
     static Map<Long, DoubleTensor> fromScalars(Map<Long, Double> scalars) {
@@ -66,16 +70,6 @@ public interface DoubleTensor extends Tensor {
 
         return asScalars;
     }
-
-    double getValue(int... index);
-
-    void setValue(double value, int... index);
-
-    double scalar();
-
-    double sum();
-
-    DoubleTensor duplicate();
 
     //New tensor Ops and transforms
 
@@ -133,6 +127,12 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor apply(Function<Double, Double> function);
 
+    DoubleTensor max(DoubleTensor max);
+
+    DoubleTensor min(DoubleTensor max);
+
+    DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
@@ -177,16 +177,27 @@ public interface DoubleTensor extends Tensor {
 
     DoubleTensor applyInPlace(Function<Double, Double> function);
 
-    FlattenedView getFlattenedView();
+    DoubleTensor maxInPlace(DoubleTensor max);
 
-    interface FlattenedView {
+    DoubleTensor minInPlace(DoubleTensor max);
 
-        long size();
+    DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 
-        double get(long index);
+    // Comparisons
+    BooleanTensor lessThan(double value);
 
-        void set(long index, double value);
+    BooleanTensor lessThanOrEqual(double value);
 
-        double[] asArray();
-    }
+    BooleanTensor lessThan(DoubleTensor value);
+
+    BooleanTensor lessThanOrEqual(DoubleTensor value);
+
+    BooleanTensor greaterThan(double value);
+
+    BooleanTensor greaterThanOrEqual(double value);
+
+    BooleanTensor greaterThan(DoubleTensor value);
+
+    BooleanTensor greaterThanOrEqual(DoubleTensor value);
+
 }

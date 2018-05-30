@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorAdditionVertex;

@@ -1,17 +1,17 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.tensors.continuous.TensorBeta;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.vertices.dbltensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class TensorBetaVertex extends ProbabilisticDoubleTensor {
 
@@ -23,7 +23,7 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
      *
      * @param shape the desired shape of the vertex
      * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
-     * @param beta the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param beta  the beta of the Beta with either the same shape as specified for this vertex or a scalar
      */
     public TensorBetaVertex(int[] shape, DoubleTensorVertex alpha, DoubleTensorVertex beta) {
 
@@ -40,7 +40,7 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
      * a matching shaped Beta.
      *
      * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
-     * @param beta the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param beta  the beta of the Beta with either the same shape as specified for this vertex or a scalar
      */
     public TensorBetaVertex(DoubleTensorVertex alpha, DoubleTensorVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);

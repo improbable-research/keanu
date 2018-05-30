@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.variational.tensor;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
@@ -71,7 +71,7 @@ public class TensorFitnessFunctionWithGradient {
         double[] gradient = new double[totalLatentDimensions];
         int fillPointer = 0;
         for (DoubleTensor tensor : tensors) {
-            double[] values = tensor.getFlattenedView().asArray();
+            double[] values = tensor.asFlatDoubleArray();
             System.arraycopy(values, 0, gradient, fillPointer, values.length);
             fillPointer += values.length;
         }
