@@ -156,6 +156,18 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public DoubleTensor toDoubleMask() {
+        double[] doubles = asFlatDoubleArray();
+        return DoubleTensor.create(doubles, copyOf(shape, shape.length));
+    }
+
+    @Override
+    public IntegerTensor toIntegerMask() {
+        int[] doubles = asFlatIntegerArray();
+        return IntegerTensor.create(doubles, copyOf(shape, shape.length));
+    }
+
+    @Override
     public int getRank() {
         return shape.length;
     }

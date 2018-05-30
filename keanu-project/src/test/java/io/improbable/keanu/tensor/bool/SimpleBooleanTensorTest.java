@@ -141,4 +141,14 @@ public class SimpleBooleanTensorTest {
         assertArrayEquals(new Boolean[]{false, true, false, true}, matrixA.asFlatArray());
     }
 
+    @Test
+    public void canConvertToDoubles() {
+        assertArrayEquals(new double[]{1.0, 0.0, 1.0, 0.0}, matrixA.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canConvertToIntegers() {
+        assertArrayEquals(new int[]{1, 0, 1, 0}, matrixA.asFlatIntegerArray());
+    }
+
 }

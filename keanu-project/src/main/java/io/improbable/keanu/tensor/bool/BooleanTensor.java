@@ -42,4 +42,8 @@ public interface BooleanTensor extends Tensor<Boolean> {
 
     boolean allFalse();
 
+    DoubleTensor toDoubleMask();
+
+    IntegerTensor toIntegerMask();
+
 }

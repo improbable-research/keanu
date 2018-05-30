@@ -694,7 +694,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     private BooleanTensor fromMask(INDArray mask, int[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[(int) mask.length()];
+        boolean[] boolsFromMask = new boolean[mask.length()];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getDouble(i) != 0.0;
