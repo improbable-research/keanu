@@ -35,8 +35,8 @@ public class TensorMCMCTestDistributions {
                 (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2))
             );
 
-        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).getFlattenedView().asDoubleArray();
-        double[] means = averages.getFlattenedView().asDoubleArray();
+        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).asDoubleArray();
+        double[] means = averages.asDoubleArray();
 
         for (int i = 0; i < means.length; i++) {
             assertEquals(mu, means[i], 0.05);
@@ -61,11 +61,11 @@ public class TensorMCMCTestDistributions {
     public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-            .flatMapToDouble(tensor -> Arrays.stream(tensor.getFlattenedView().asDoubleArray()))
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.asDoubleArray()))
             .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-            .flatMapToDouble(tensor -> Arrays.stream(tensor.getFlattenedView().asDoubleArray()))
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.asDoubleArray()))
             .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);

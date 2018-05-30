@@ -560,20 +560,21 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             tensor.data().put(index, value);
         }
 
-        @Override
-        public double[] asDoubleArray() {
-            return tensor.data().asDouble();
-        }
+    }
 
-        @Override
-        public int[] asIntegerArray() {
-            return tensor.data().asInt();
-        }
+    @Override
+    public double[] asDoubleArray() {
+        return tensor.data().asDouble();
+    }
 
-        @Override
-        public Integer[] asObjectArray() {
-            return ArrayUtils.toObject(asIntegerArray());
-        }
+    @Override
+    public int[] asIntegerArray() {
+        return tensor.data().asInt();
+    }
+
+    @Override
+    public Integer[] asArray() {
+        return ArrayUtils.toObject(asIntegerArray());
     }
 
 }

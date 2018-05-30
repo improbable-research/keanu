@@ -15,12 +15,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.minus(2);
         int[] expected = new int[]{-1, 0, 1, 2};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.minusInPlace(2);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -28,12 +28,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.plus(2);
         int[] expected = new int[]{3, 4, 5, 6};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.plusInPlace(2);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -41,12 +41,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.times(2);
         int[] expected = new int[]{2, 4, 6, 8};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.timesInPlace(2);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -54,13 +54,13 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.div(2);
         int[] expected = new int[]{0, 1, 1, 2};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.divInPlace(2);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
-        assertArrayEquals(new double[]{0.0, 1.0, 1.0, 2.0}, matrixA.getFlattenedView().asDoubleArray(), 0.0);
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
+        assertArrayEquals(new double[]{0.0, 1.0, 1.0, 2.0}, matrixA.asDoubleArray(), 0.0);
     }
 
     @Test
@@ -69,12 +69,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new int[]{2, 2});
         IntegerTensor result = matrixA.pow(matrixB);
         int[] expected = new int[]{1, 8, 9, 1};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.powInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -82,12 +82,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.pow(2);
         int[] expected = new int[]{1, 4, 9, 16};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.powInPlace(2);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -96,12 +96,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new int[]{2, 2});
         IntegerTensor result = matrixA.minus(matrixB);
         int[] expected = new int[]{-1, -1, 1, 4};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.minusInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -110,12 +110,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new int[]{2, 2});
         IntegerTensor result = matrixA.plus(matrixB);
         int[] expected = new int[]{3, 5, 5, 4};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.plusInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -124,12 +124,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixB = IntegerTensor.create(new int[]{2, 3, 2, 0}, new int[]{2, 2});
         IntegerTensor result = matrixA.times(matrixB);
         int[] expected = new int[]{2, 6, 6, 0};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.timesInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -138,13 +138,13 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixC = IntegerTensor.create(new int[]{5, -1, 7, 2}, new int[]{2, 2});
         IntegerTensor result = matrixA.div(matrixC);
         int[] expected = new int[]{0, -2, 0, 2};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.divInPlace(matrixC);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
-        assertArrayEquals(new double[]{0.0, -2.0, 0.0, 2.0}, matrixA.getFlattenedView().asDoubleArray(), 0.0);
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
+        assertArrayEquals(new double[]{0.0, -2.0, 0.0, 2.0}, matrixA.asDoubleArray(), 0.0);
     }
 
     @Test
@@ -152,12 +152,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.unaryMinus();
         int[] expected = new int[]{-1, -2, -3, -4};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.unaryMinusInPlace();
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -165,12 +165,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{-1, -2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.abs();
         int[] expected = new int[]{1, 2, 3, 4};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.absInPlace();
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -183,8 +183,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor maskFromScalar = matrix.getGreaterThanMask(scalarTwo);
 
         int[] expected = new int[]{0, 0, 1, 1};
-        assertArrayEquals(expected, maskFromMatrix.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, maskFromScalar.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, maskFromMatrix.asIntegerArray());
+        assertArrayEquals(expected, maskFromScalar.asIntegerArray());
     }
 
     @Test
@@ -197,8 +197,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor maskFromScalar = matrix.getGreaterThanOrEqualToMask(scalarTWo);
 
         int[] expected = new int[]{0, 1, 1, 1};
-        assertArrayEquals(expected, maskFromMatrix.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, maskFromScalar.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, maskFromMatrix.asIntegerArray());
+        assertArrayEquals(expected, maskFromScalar.asIntegerArray());
     }
 
     @Test
@@ -211,8 +211,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor maskFromScalar = matrix.getLessThanMask(scalarTwo);
 
         int[] expected = new int[]{1, 0, 0, 0};
-        assertArrayEquals(expected, maskFromMatrix.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, maskFromScalar.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, maskFromMatrix.asIntegerArray());
+        assertArrayEquals(expected, maskFromScalar.asIntegerArray());
     }
 
     @Test
@@ -225,8 +225,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor maskFromScalar = matrix.getLessThanOrEqualToMask(scalarTwo);
 
         int[] expected = new int[]{1, 1, 0, 0};
-        assertArrayEquals(expected, maskFromMatrix.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, maskFromScalar.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, maskFromMatrix.asIntegerArray());
+        assertArrayEquals(expected, maskFromScalar.asIntegerArray());
     }
 
     @Test
@@ -236,11 +236,11 @@ public class Nd4jIntegerTensorTest {
         int[] expected = new int[]{100, 100, 3, 4};
 
         IntegerTensor result = matrix.setWithMask(mask, 100);
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, result.asIntegerArray());
 
         IntegerTensor resultInPlace = matrix.setWithMaskInPlace(mask, 100);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrix.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrix.asIntegerArray());
     }
 
     @Test
@@ -248,12 +248,12 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixA = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.apply(v -> v + 1);
         int[] expected = new int[]{2, 3, 4, 5};
-        assertArrayEquals(expected, result.getFlattenedView().asIntegerArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asIntegerArray()));
+        assertArrayEquals(expected, result.asIntegerArray());
+        assertFalse(Arrays.equals(expected, matrixA.asIntegerArray()));
 
         IntegerTensor resultInPlace = matrixA.applyInPlace(v -> v + 1);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asIntegerArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asIntegerArray());
+        assertArrayEquals(expected, resultInPlace.asIntegerArray());
+        assertArrayEquals(expected, matrixA.asIntegerArray());
     }
 
     @Test
@@ -261,7 +261,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         BooleanTensor result = matrix.lessThan(3);
         Boolean[] expected = new Boolean[]{true, true, false, false};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -269,7 +269,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         BooleanTensor result = matrix.lessThanOrEqual(3);
         Boolean[] expected = new Boolean[]{true, true, true, false};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -278,7 +278,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new int[]{2, 2});
         BooleanTensor result = matrix.lessThan(otherMatrix);
         Boolean[] expected = new Boolean[]{false, false, true, true};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -287,7 +287,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new int[]{2, 2});
         BooleanTensor result = matrix.lessThanOrEqual(otherMatrix);
         Boolean[] expected = new Boolean[]{false, true, true, true};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -296,7 +296,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new int[]{2, 2});
         BooleanTensor result = matrix.greaterThan(otherMatrix);
         Boolean[] expected = new Boolean[]{true, false, false, false};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -305,7 +305,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor otherMatrix = IntegerTensor.create(new int[]{0, 2, 4, 7}, new int[]{2, 2});
         BooleanTensor result = matrix.greaterThanOrEqual(otherMatrix);
         Boolean[] expected = new Boolean[]{true, true, false, false};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -313,7 +313,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         BooleanTensor result = matrix.greaterThan(3);
         Boolean[] expected = new Boolean[]{false, false, false, true};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
     @Test
@@ -321,7 +321,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrix = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         BooleanTensor result = matrix.greaterThanOrEqual(3);
         Boolean[] expected = new Boolean[]{false, false, true, true};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, result.asArray());
     }
 
 }

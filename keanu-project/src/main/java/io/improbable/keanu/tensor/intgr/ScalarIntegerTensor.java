@@ -160,7 +160,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             return new ScalarIntegerTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, greaterThanOrEqualToThis.getShape())
-                .getGreaterThanMask(greaterThanOrEqualToThis);
+                .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
         }
     }
 
@@ -170,7 +170,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             return new ScalarIntegerTensor(value < lessThanThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, lessThanThis.getShape())
-                .getLessThanOrEqualToMask(lessThanThis);
+                .getLessThanMask(lessThanThis);
         }
     }
 
@@ -403,20 +403,21 @@ public class ScalarIntegerTensor implements IntegerTensor {
             this.value = value;
         }
 
-        @Override
-        public double[] asDoubleArray() {
-            return new double[]{value};
-        }
+    }
 
-        @Override
-        public int[] asIntegerArray() {
-            return new int[]{value};
-        }
+    @Override
+    public double[] asDoubleArray() {
+        return new double[]{value};
+    }
 
-        @Override
-        public Integer[] asObjectArray() {
-            return ArrayUtils.toObject(new int[]{value});
-        }
+    @Override
+    public int[] asIntegerArray() {
+        return new int[]{value};
+    }
+
+    @Override
+    public Integer[] asArray() {
+        return new Integer[]{value};
     }
 
 }

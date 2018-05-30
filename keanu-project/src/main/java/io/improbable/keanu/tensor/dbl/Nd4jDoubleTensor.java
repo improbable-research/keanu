@@ -118,8 +118,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor min(DoubleTensor max) {
-        return duplicate().minInPlace(max);
+    public DoubleTensor min(DoubleTensor min) {
+        return duplicate().minInPlace(min);
     }
 
     @Override
@@ -733,21 +733,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         public void set(long index, Double value) {
             tensor.data().put(index, value);
         }
+    }
 
-        @Override
-        public double[] asDoubleArray() {
-            return tensor.data().asDouble();
-        }
+    @Override
+    public double[] asDoubleArray() {
+        return tensor.data().asDouble();
+    }
 
-        @Override
-        public int[] asIntegerArray() {
-            return tensor.data().asInt();
-        }
+    @Override
+    public int[] asIntegerArray() {
+        return tensor.data().asInt();
+    }
 
-        @Override
-        public Double[] asObjectArray() {
-            return ArrayUtils.toObject(asDoubleArray());
-        }
-
+    @Override
+    public Double[] asArray() {
+        return ArrayUtils.toObject(asDoubleArray());
     }
 }

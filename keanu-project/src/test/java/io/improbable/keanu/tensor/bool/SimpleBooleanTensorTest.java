@@ -31,36 +31,36 @@ public class SimpleBooleanTensorTest {
     public void doesElementwiseAnd() {
         BooleanTensor result = matrixA.and(matrixB);
         Boolean[] expected = new Boolean[]{false, false, true, false};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asObjectArray()));
+        assertArrayEquals(expected, result.asArray());
+        assertFalse(Arrays.equals(expected, matrixA.asArray()));
 
         BooleanTensor resultInPlace = matrixA.andInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asObjectArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, resultInPlace.asArray());
+        assertArrayEquals(expected, matrixA.asArray());
     }
 
     @Test
     public void doesElementwiseOr() {
         BooleanTensor result = matrixA.or(matrixB);
         Boolean[] expected = new Boolean[]{true, false, true, true};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asObjectArray()));
+        assertArrayEquals(expected, result.asArray());
+        assertFalse(Arrays.equals(expected, matrixA.asArray()));
 
         BooleanTensor resultInPlace = matrixA.orInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asObjectArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, resultInPlace.asArray());
+        assertArrayEquals(expected, matrixA.asArray());
     }
 
     @Test
     public void doesElementwiseNot() {
         BooleanTensor result = matrixA.not();
         Boolean[] expected = new Boolean[]{false, true, false, true};
-        assertArrayEquals(expected, result.getFlattenedView().asObjectArray());
-        assertFalse(Arrays.equals(expected, matrixA.getFlattenedView().asObjectArray()));
+        assertArrayEquals(expected, result.asArray());
+        assertFalse(Arrays.equals(expected, matrixA.asArray()));
 
         BooleanTensor resultInPlace = matrixA.notInPlace();
-        assertArrayEquals(expected, resultInPlace.getFlattenedView().asObjectArray());
-        assertArrayEquals(expected, matrixA.getFlattenedView().asObjectArray());
+        assertArrayEquals(expected, resultInPlace.asArray());
+        assertArrayEquals(expected, matrixA.asArray());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class SimpleBooleanTensorTest {
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new int[]{2, 2});
 
         DoubleTensor result = matrixA.setDoubleIf(trueCase, falseCase);
-        assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.getFlattenedView().asDoubleArray(), 0.0);
+        assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asDoubleArray(), 0.0);
     }
 
     @Test
@@ -78,13 +78,13 @@ public class SimpleBooleanTensorTest {
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new int[]{2, 2});
 
         IntegerTensor result = matrixA.setIntegerIf(trueCase, falseCase);
-        assertArrayEquals(new int[]{1, 7, 3, 23}, result.getFlattenedView().asIntegerArray());
+        assertArrayEquals(new int[]{1, 7, 3, 23}, result.asIntegerArray());
     }
 
     @Test
     public void doesSetBooleanIf() {
         BooleanTensor result = matrixA.setBooleanIf(matrixB, matrixC);
-        assertArrayEquals(new Boolean[]{false, true, true, false}, result.getFlattenedView().asObjectArray());
+        assertArrayEquals(new Boolean[]{false, true, true, false}, result.asArray());
     }
 
     enum Something {
@@ -107,7 +107,7 @@ public class SimpleBooleanTensorTest {
         Tensor<Something> result = matrixA.setIf(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
-            result.getFlattenedView().asObjectArray()
+            result.asArray()
         );
     }
 
@@ -138,7 +138,7 @@ public class SimpleBooleanTensorTest {
         matrixA.setValue(false, 1, 0);
         matrixA.setValue(true, 1, 1);
 
-        assertArrayEquals(new Boolean[]{false, true, false, true}, matrixA.getFlattenedView().asObjectArray());
+        assertArrayEquals(new Boolean[]{false, true, false, true}, matrixA.asArray());
     }
 
 }

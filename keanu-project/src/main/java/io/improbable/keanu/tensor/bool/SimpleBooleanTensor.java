@@ -111,7 +111,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.getFlattenedView().asObjectArray();
+        Boolean[] thatData = that.asArray();
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i] && thatData[i];
         }
@@ -120,7 +120,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.getFlattenedView().asObjectArray();
+        Boolean[] thatData = that.asArray();
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i] || thatData[i];
         }
@@ -238,29 +238,30 @@ public class SimpleBooleanTensor implements BooleanTensor {
             data[(int) index] = value;
         }
 
-        @Override
-        public double[] asDoubleArray() {
-            double[] doubles = new double[data.length];
-            for (int i = 0; i < doubles.length; i++) {
-                doubles[i] = data[i] ? 1.0 : 0.0;
-            }
+    }
 
-            return doubles;
+    @Override
+    public double[] asDoubleArray() {
+        double[] doubles = new double[data.length];
+        for (int i = 0; i < doubles.length; i++) {
+            doubles[i] = data[i] ? 1.0 : 0.0;
         }
 
-        @Override
-        public int[] asIntegerArray() {
-            int[] integers = new int[data.length];
-            for (int i = 0; i < integers.length; i++) {
-                integers[i] = data[i] ? 1 : 0;
-            }
+        return doubles;
+    }
 
-            return integers;
+    @Override
+    public int[] asIntegerArray() {
+        int[] integers = new int[data.length];
+        for (int i = 0; i < integers.length; i++) {
+            integers[i] = data[i] ? 1 : 0;
         }
 
-        @Override
-        public Boolean[] asObjectArray() {
-            return ArrayUtils.toObject(data);
-        }
+        return integers;
+    }
+
+    @Override
+    public Boolean[] asArray() {
+        return ArrayUtils.toObject(data);
     }
 }

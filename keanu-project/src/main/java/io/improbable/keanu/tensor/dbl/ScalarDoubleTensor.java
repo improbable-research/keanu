@@ -195,7 +195,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             return new ScalarDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, greaterThanOrEqualToThis.getShape())
-                .getGreaterThanMask(greaterThanOrEqualToThis);
+                .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
         }
     }
 
@@ -205,7 +205,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             return new ScalarDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, lessThanThis.getShape())
-                .getLessThanOrEqualToMask(lessThanThis);
+                .getLessThanMask(lessThanThis);
         }
     }
 
@@ -527,20 +527,20 @@ public class ScalarDoubleTensor implements DoubleTensor {
             }
             this.value = value;
         }
+    }
 
-        @Override
-        public double[] asDoubleArray() {
-            return new double[]{value};
-        }
+    @Override
+    public double[] asDoubleArray() {
+        return new double[]{value};
+    }
 
-        @Override
-        public int[] asIntegerArray() {
-            return new int[]{(int) value};
-        }
+    @Override
+    public int[] asIntegerArray() {
+        return new int[]{value.intValue()};
+    }
 
-        @Override
-        public Double[] asObjectArray() {
-            return ArrayUtils.toObject(asDoubleArray());
-        }
+    @Override
+    public Double[] asArray() {
+        return ArrayUtils.toObject(asDoubleArray());
     }
 }

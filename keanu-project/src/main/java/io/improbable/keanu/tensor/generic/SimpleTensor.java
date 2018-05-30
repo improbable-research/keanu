@@ -120,39 +120,42 @@ public class SimpleTensor<T> implements Tensor<T> {
             data[(int) index] = value;
         }
 
-        @Override
-        public double[] asDoubleArray() {
+    }
 
-            if (data.length > 0 && !(data[0] instanceof Number)) {
-                throw new IllegalStateException(data[0].getClass().getName() + " cannot be converted to doubles");
-            }
+    @Override
+    public double[] asDoubleArray() {
 
-            double[] doubles = new double[data.length];
-            for (int i = 0; i < doubles.length; i++) {
-                doubles[i] = ((Number) data[i]).doubleValue();
-            }
+        assertIsNumber();
 
-            return doubles;
+        double[] doubles = new double[data.length];
+        for (int i = 0; i < doubles.length; i++) {
+            doubles[i] = ((Number) data[i]).doubleValue();
         }
 
-        @Override
-        public int[] asIntegerArray() {
+        return doubles;
+    }
 
-            if (data.length > 0 && !(data[0] instanceof Number)) {
-                throw new IllegalStateException(data[0].getClass().getName() + " cannot be converted to integers");
-            }
+    @Override
+    public int[] asIntegerArray() {
 
-            int[] integers = new int[data.length];
-            for (int i = 0; i < integers.length; i++) {
-                integers[i] = ((Number) data[i]).intValue();
-            }
+        assertIsNumber();
 
-            return integers;
+        int[] integers = new int[data.length];
+        for (int i = 0; i < integers.length; i++) {
+            integers[i] = ((Number) data[i]).intValue();
         }
 
-        @Override
-        public T[] asObjectArray() {
-            return data;
+        return integers;
+    }
+
+    @Override
+    public T[] asArray() {
+        return data;
+    }
+
+    private void assertIsNumber() {
+        if (data.length > 0 && !(data[0] instanceof Number)) {
+            throw new IllegalStateException(data[0].getClass().getName() + " cannot be converted to number");
         }
     }
 }
