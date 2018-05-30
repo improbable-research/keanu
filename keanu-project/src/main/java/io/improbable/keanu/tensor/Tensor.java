@@ -62,11 +62,11 @@ public interface Tensor<T> {
         void set(long index, T value);
     }
 
-    double[] asDoubleArray();
+    double[] asFlatDoubleArray();
 
-    int[] asIntegerArray();
+    int[] asFlatIntegerArray();
 
-    T[] asArray();
+    T[] asFlatArray();
 
     default BooleanTensor elementwiseEquals(Tensor<T> that) {
         return elementwiseEquals(this, that);
@@ -77,8 +77,8 @@ public interface Tensor<T> {
             throw new IllegalArgumentException("Cannot compare tensors of different shapes");
         }
 
-        T[] aArray = a.asArray();
-        T[] bArray = b.asArray();
+        T[] aArray = a.asFlatArray();
+        T[] bArray = b.asFlatArray();
 
         boolean[] equality = new boolean[aArray.length];
 

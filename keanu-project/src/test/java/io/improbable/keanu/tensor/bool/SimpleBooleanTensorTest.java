@@ -31,36 +31,36 @@ public class SimpleBooleanTensorTest {
     public void doesElementwiseAnd() {
         BooleanTensor result = matrixA.and(matrixB);
         Boolean[] expected = new Boolean[]{false, false, true, false};
-        assertArrayEquals(expected, result.asArray());
-        assertFalse(Arrays.equals(expected, matrixA.asArray()));
+        assertArrayEquals(expected, result.asFlatArray());
+        assertFalse(Arrays.equals(expected, matrixA.asFlatArray()));
 
         BooleanTensor resultInPlace = matrixA.andInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.asArray());
-        assertArrayEquals(expected, matrixA.asArray());
+        assertArrayEquals(expected, resultInPlace.asFlatArray());
+        assertArrayEquals(expected, matrixA.asFlatArray());
     }
 
     @Test
     public void doesElementwiseOr() {
         BooleanTensor result = matrixA.or(matrixB);
         Boolean[] expected = new Boolean[]{true, false, true, true};
-        assertArrayEquals(expected, result.asArray());
-        assertFalse(Arrays.equals(expected, matrixA.asArray()));
+        assertArrayEquals(expected, result.asFlatArray());
+        assertFalse(Arrays.equals(expected, matrixA.asFlatArray()));
 
         BooleanTensor resultInPlace = matrixA.orInPlace(matrixB);
-        assertArrayEquals(expected, resultInPlace.asArray());
-        assertArrayEquals(expected, matrixA.asArray());
+        assertArrayEquals(expected, resultInPlace.asFlatArray());
+        assertArrayEquals(expected, matrixA.asFlatArray());
     }
 
     @Test
     public void doesElementwiseNot() {
         BooleanTensor result = matrixA.not();
         Boolean[] expected = new Boolean[]{false, true, false, true};
-        assertArrayEquals(expected, result.asArray());
-        assertFalse(Arrays.equals(expected, matrixA.asArray()));
+        assertArrayEquals(expected, result.asFlatArray());
+        assertFalse(Arrays.equals(expected, matrixA.asFlatArray()));
 
         BooleanTensor resultInPlace = matrixA.notInPlace();
-        assertArrayEquals(expected, resultInPlace.asArray());
-        assertArrayEquals(expected, matrixA.asArray());
+        assertArrayEquals(expected, resultInPlace.asFlatArray());
+        assertArrayEquals(expected, matrixA.asFlatArray());
     }
 
     @Test
@@ -69,7 +69,7 @@ public class SimpleBooleanTensorTest {
         DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new int[]{2, 2});
 
         DoubleTensor result = matrixA.setDoubleIf(trueCase, falseCase);
-        assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asDoubleArray(), 0.0);
+        assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asFlatDoubleArray(), 0.0);
     }
 
     @Test
@@ -78,13 +78,13 @@ public class SimpleBooleanTensorTest {
         IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new int[]{2, 2});
 
         IntegerTensor result = matrixA.setIntegerIf(trueCase, falseCase);
-        assertArrayEquals(new int[]{1, 7, 3, 23}, result.asIntegerArray());
+        assertArrayEquals(new int[]{1, 7, 3, 23}, result.asFlatIntegerArray());
     }
 
     @Test
     public void doesSetBooleanIf() {
         BooleanTensor result = matrixA.setBooleanIf(matrixB, matrixC);
-        assertArrayEquals(new Boolean[]{false, true, true, false}, result.asArray());
+        assertArrayEquals(new Boolean[]{false, true, true, false}, result.asFlatArray());
     }
 
     enum Something {
@@ -107,7 +107,7 @@ public class SimpleBooleanTensorTest {
         Tensor<Something> result = matrixA.setIf(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
-            result.asArray()
+            result.asFlatArray()
         );
     }
 
@@ -138,7 +138,7 @@ public class SimpleBooleanTensorTest {
         matrixA.setValue(false, 1, 0);
         matrixA.setValue(true, 1, 1);
 
-        assertArrayEquals(new Boolean[]{false, true, false, true}, matrixA.asArray());
+        assertArrayEquals(new Boolean[]{false, true, false, true}, matrixA.asFlatArray());
     }
 
 }

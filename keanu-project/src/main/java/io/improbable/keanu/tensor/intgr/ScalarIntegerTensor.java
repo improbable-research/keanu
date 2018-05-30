@@ -406,17 +406,17 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public double[] asDoubleArray() {
+    public double[] asFlatDoubleArray() {
         return new double[]{value};
     }
 
     @Override
-    public int[] asIntegerArray() {
+    public int[] asFlatIntegerArray() {
         return new int[]{value};
     }
 
     @Override
-    public Integer[] asArray() {
+    public Integer[] asFlatArray() {
         return new Integer[]{value};
     }
 

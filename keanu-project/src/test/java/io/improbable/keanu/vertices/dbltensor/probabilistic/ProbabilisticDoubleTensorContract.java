@@ -42,9 +42,9 @@ public class ProbabilisticDoubleTensorContract {
             throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
         }
 
-        double[] samples = vertexUnderTest.sample(random).asDoubleArray();
+        double[] samples = vertexUnderTest.sample(random).asFlatDoubleArray();
 
-        Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample(random).asDoubleArray())
+        Map<Double, Long> histogram = Arrays.stream(vertexUnderTest.sample(random).asFlatDoubleArray())
             .filter(value -> value >= from && value <= to)
             .boxed()
             .collect(groupingBy(

@@ -530,17 +530,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public double[] asDoubleArray() {
+    public double[] asFlatDoubleArray() {
         return new double[]{value};
     }
 
     @Override
-    public int[] asIntegerArray() {
+    public int[] asFlatIntegerArray() {
         return new int[]{value.intValue()};
     }
 
     @Override
-    public Double[] asArray() {
-        return ArrayUtils.toObject(asDoubleArray());
+    public Double[] asFlatArray() {
+        return ArrayUtils.toObject(asFlatDoubleArray());
     }
 }

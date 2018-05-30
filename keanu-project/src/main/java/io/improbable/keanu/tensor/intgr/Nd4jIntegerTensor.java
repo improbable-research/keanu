@@ -563,18 +563,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public double[] asDoubleArray() {
+    public double[] asFlatDoubleArray() {
         return tensor.data().asDouble();
     }
 
     @Override
-    public int[] asIntegerArray() {
+    public int[] asFlatIntegerArray() {
         return tensor.data().asInt();
     }
 
     @Override
-    public Integer[] asArray() {
-        return ArrayUtils.toObject(asIntegerArray());
+    public Integer[] asFlatArray() {
+        return ArrayUtils.toObject(asFlatIntegerArray());
     }
 
 }

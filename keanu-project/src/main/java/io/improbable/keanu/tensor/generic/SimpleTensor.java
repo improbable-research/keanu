@@ -123,7 +123,7 @@ public class SimpleTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public double[] asDoubleArray() {
+    public double[] asFlatDoubleArray() {
 
         assertIsNumber();
 
@@ -136,7 +136,7 @@ public class SimpleTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public int[] asIntegerArray() {
+    public int[] asFlatIntegerArray() {
 
         assertIsNumber();
 
@@ -149,7 +149,7 @@ public class SimpleTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public T[] asArray() {
+    public T[] asFlatArray() {
         return data;
     }
 

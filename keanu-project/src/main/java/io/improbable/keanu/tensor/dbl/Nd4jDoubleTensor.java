@@ -736,17 +736,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public double[] asDoubleArray() {
+    public double[] asFlatDoubleArray() {
         return tensor.data().asDouble();
     }
 
     @Override
-    public int[] asIntegerArray() {
+    public int[] asFlatIntegerArray() {
         return tensor.data().asInt();
     }
 
     @Override
-    public Double[] asArray() {
-        return ArrayUtils.toObject(asDoubleArray());
+    public Double[] asFlatArray() {
+        return ArrayUtils.toObject(asFlatDoubleArray());
     }
 }

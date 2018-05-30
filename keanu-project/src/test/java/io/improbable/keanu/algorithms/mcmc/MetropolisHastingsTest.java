@@ -92,7 +92,7 @@ public class MetropolisHastingsTest {
 
         DoubleTensor allActuals = averagePosteriorA.plus(averagePosteriorB);
 
-        for (double actual : allActuals.asDoubleArray()) {
+        for (double actual : allActuals.asFlatDoubleArray()) {
             assertEquals(44.0, actual, 0.1);
         }
     }

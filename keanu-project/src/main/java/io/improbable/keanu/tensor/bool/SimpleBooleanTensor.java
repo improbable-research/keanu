@@ -111,7 +111,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor andInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.asArray();
+        Boolean[] thatData = that.asFlatArray();
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i] && thatData[i];
         }
@@ -120,7 +120,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor orInPlace(BooleanTensor that) {
-        Boolean[] thatData = that.asArray();
+        Boolean[] thatData = that.asFlatArray();
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i] || thatData[i];
         }
@@ -241,7 +241,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public double[] asDoubleArray() {
+    public double[] asFlatDoubleArray() {
         double[] doubles = new double[data.length];
         for (int i = 0; i < doubles.length; i++) {
             doubles[i] = data[i] ? 1.0 : 0.0;
@@ -251,7 +251,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public int[] asIntegerArray() {
+    public int[] asFlatIntegerArray() {
         int[] integers = new int[data.length];
         for (int i = 0; i < integers.length; i++) {
             integers[i] = data[i] ? 1 : 0;
@@ -261,7 +261,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public Boolean[] asArray() {
+    public Boolean[] asFlatArray() {
         return ArrayUtils.toObject(data);
     }
 }

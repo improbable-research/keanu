@@ -122,7 +122,7 @@ public class TensorGradientOptimizer {
         double[] point = new double[(int) totalLatentDimensions];
 
         for (Vertex<DoubleTensor> vertex : continuousVertices) {
-            double[] values = vertex.getValue().asDoubleArray();
+            double[] values = vertex.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
         }
