@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.multi
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.multiple.BoolReduceVertex;
 
 import java.util.Collection;
 

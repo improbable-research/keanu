@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binar
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 
 import java.util.function.BiFunction;
 

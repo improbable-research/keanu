@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binar
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 
 public class OrBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
 

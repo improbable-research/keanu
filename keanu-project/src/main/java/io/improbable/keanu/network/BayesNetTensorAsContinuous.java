@@ -1,7 +1,7 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.intgrtensor.probabilistic;
 
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.intgrtensor.probabilistic.UniformIntVertex;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;

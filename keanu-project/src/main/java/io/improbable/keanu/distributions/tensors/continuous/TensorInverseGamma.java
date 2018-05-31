@@ -1,7 +1,6 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
 
