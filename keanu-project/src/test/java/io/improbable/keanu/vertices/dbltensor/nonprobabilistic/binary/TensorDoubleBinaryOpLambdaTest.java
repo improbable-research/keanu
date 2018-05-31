@@ -1,0 +1,26 @@
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary;
+
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDoubleBinaryOpLambda;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.TensorDoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
+import org.junit.Test;
+
+import static org.junit.Assert.assertArrayEquals;
+
+public class TensorDoubleBinaryOpLambdaTest {
+
+    @Test
+    public void GIVEN_a_double_tensor_THEN_transform() {
+
+        TensorUniformVertex matrix = new TensorUniformVertex(new int[]{2, 2}, 0, 5);
+        matrix.setAndCascade(2.5);
+        TensorUniformVertex matrixB = new TensorUniformVertex(new int[]{2, 2}, 0, 5);
+        matrix.setAndCascade(3.5);
+
+        DoubleTensorVertex matrixLambda = new TensorDoubleBinaryOpLambda<>(matrix, matrixB, (val, valB) -> val.plus(valB));
+
+        assertArrayEquals(new double[]{5.5, 5.5, 5.5, 5.5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
+    }
+
+}
