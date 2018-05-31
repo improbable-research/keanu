@@ -8,7 +8,7 @@ import java.util.Collection;
 public class OrMultipleVertex extends BoolReduceVertex {
 
     public OrMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
-        super(input, io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.multiple.OrMultipleVertex::or);
+        super(input, OrMultipleVertex::or);
     }
 
     private static BooleanTensor or(BooleanTensor a, BooleanTensor b) {

@@ -11,6 +11,7 @@ public class CastBoolVertex extends NonProbabilisticBool {
     public CastBoolVertex(Vertex<BooleanTensor> inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
+        setValue(BooleanTensor.placeHolder(inputVertex.getShape()));
     }
 
     @Override

@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class AndMultipleVertex extends BoolReduceVertex {
     public AndMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
-        super(input, io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.multiple.AndMultipleVertex::and);
+        super(input, AndMultipleVertex::and);
     }
 
     private static BooleanTensor and(BooleanTensor a, BooleanTensor b) {

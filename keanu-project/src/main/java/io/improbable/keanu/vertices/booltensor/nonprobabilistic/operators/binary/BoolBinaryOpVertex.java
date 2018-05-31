@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.NonProbabilisticBool;
@@ -12,9 +13,11 @@ public abstract class BoolBinaryOpVertex<TA extends Tensor, TB extends Tensor> e
     protected final Vertex<TB> b;
 
     public BoolBinaryOpVertex(Vertex<TA> a, Vertex<TB> b) {
+        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape());
         this.a = a;
         this.b = b;
         setParents(a, b);
+        setValue(BooleanTensor.placeHolder(resultShape));
     }
 
     @Override

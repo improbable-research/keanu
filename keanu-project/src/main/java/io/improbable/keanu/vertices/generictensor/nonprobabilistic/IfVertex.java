@@ -15,6 +15,7 @@ public abstract class IfVertex<T, TENSOR extends Tensor<T>> extends NonProbabili
                     Vertex<? extends BooleanTensor> predicate,
                     Vertex<? extends TENSOR> thn,
                     Vertex<? extends TENSOR> els) {
+
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
