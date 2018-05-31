@@ -128,6 +128,21 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor ceil() {
+        return duplicate().ceilInPlace();
+    }
+
+    @Override
+    public DoubleTensor floor() {
+        return duplicate().floorInPlace();
+    }
+
+    @Override
+    public DoubleTensor sigmoid() {
+        return duplicate().sigmoidInPlace();
+    }
+
+    @Override
     public Double scalar() {
         return tensor.getDouble(0);
     }
@@ -190,6 +205,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor tan() {
         return duplicate().tanInPlace();
+    }
+
+    @Override
+    public DoubleTensor atan() {
+        return duplicate().atanInPlace();
     }
 
     @Override
@@ -357,13 +377,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor atanInPlace() {
+        Transforms.atan(tensor, false);
+        return this;
+    }
+
+    @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
-
+            tensor = Transforms.atan2(Nd4j.valueArrayOf(this.shape, y.scalar()), tensor);
         }
         else {
-            INDArray yArray = unsafeGetNd4J(y);
-            Transforms.atan2(tensor, yArray);
+            tensor = Transforms.atan2(unsafeGetNd4J(y), tensor);
         }
         return this;
     }
@@ -587,6 +612,24 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
         return minInPlace(min).maxInPlace(max);
+    }
+
+    @Override
+    public DoubleTensor ceilInPlace() {
+        Transforms.ceil(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor floorInPlace() {
+        Transforms.floor(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor sigmoidInPlace() {
+        Transforms.sigmoid(tensor, false);
+        return this;
     }
 
     // Comparisons

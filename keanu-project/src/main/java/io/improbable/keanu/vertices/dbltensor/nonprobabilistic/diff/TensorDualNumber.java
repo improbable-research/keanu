@@ -129,4 +129,42 @@ public class TensorDualNumber {
     public TensorDualNumber unaryMinus() {
         return times(-1.0);
     }
+
+    public TensorDualNumber exp() {
+        DoubleTensor eVal = value.exp();
+        return new TensorDualNumber(eVal, getPartialDerivatives().multiplyBy(eVal));
+    }
+
+    public TensorDualNumber sin() {
+        return new TensorDualNumber(value.sin(), getPartialDerivatives().multiplyBy(value.cos()));
+    }
+
+    public TensorDualNumber cos() {
+        return new TensorDualNumber(value.cos(), getPartialDerivatives().multiplyBy(value.sin().unaryMinus()));
+    }
+
+    public TensorDualNumber tan() {
+        DoubleTensor dTan = value.cos().pow(2).reciprocal();
+        return new TensorDualNumber(value.tan(), getPartialDerivatives().multiplyBy(dTan));
+    }
+
+    public TensorDualNumber asin() {
+        DoubleTensor dArcSin = (value.unaryMinus().plus(1).times(value)).sqrt().reciprocal();
+        return new TensorDualNumber(value.sin(), getPartialDerivatives().multiplyBy(dArcSin));
+    }
+
+    public TensorDualNumber acos() {
+        DoubleTensor dArcCos = value.unaryMinus().plus(1).times(value).sqrt().reciprocal().unaryMinus();
+        return new TensorDualNumber(value.acos(), getPartialDerivatives().multiplyBy(dArcCos));
+    }
+
+    public TensorDualNumber atan() {
+        DoubleTensor dArcTan = value.pow(2).plus(1).reciprocal();
+        return new TensorDualNumber(value.atan(), getPartialDerivatives().multiplyBy(dArcTan));
+    }
+
+    public TensorDualNumber log() {
+        return new TensorDualNumber(value.log(), getPartialDerivatives().divideBy(value));
+    }
+
 }

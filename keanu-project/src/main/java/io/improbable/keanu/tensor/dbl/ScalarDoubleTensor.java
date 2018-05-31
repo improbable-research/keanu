@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.dbl;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.analysis.function.Sigmoid;
 
 import java.util.function.Function;
 
@@ -145,6 +146,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor atan() {
+        return this.duplicate().atanInPlace();
+    }
+
+    @Override
     public DoubleTensor atan2(DoubleTensor y) {
         return this.duplicate().atan2InPlace(y);
     }
@@ -275,6 +281,21 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor ceil() {
+        return duplicate().ceilInPlace();
+    }
+
+    @Override
+    public DoubleTensor floor() {
+        return duplicate().floorInPlace();
+    }
+
+    @Override
+    public DoubleTensor sigmoid() {
+        return duplicate().sigmoidInPlace();
+    }
+
+    @Override
     public DoubleTensor reciprocalInPlace() {
         value = 1.0 / value;
         return this;
@@ -346,6 +367,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor tanInPlace() {
         value = Math.tan(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atanInPlace() {
+        value = Math.atan(value);
         return this;
     }
 
@@ -455,6 +482,24 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
         return minusInPlace(min).maxInPlace(max);
+    }
+
+    @Override
+    public DoubleTensor ceilInPlace() {
+        value = Math.ceil(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor floorInPlace() {
+        value = Math.floor(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor sigmoidInPlace() {
+        value = new Sigmoid().value(value);
+        return this;
     }
 
     @Override

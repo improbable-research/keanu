@@ -4,10 +4,7 @@ package io.improbable.keanu.vertices.dbltensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorAdditionVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDifferenceVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDivisionVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorMultiplicationVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.*;
 
 import java.util.*;
 
@@ -27,6 +24,10 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
 
     public DoubleTensorVertex divideBy(DoubleTensorVertex that) {
         return new TensorDivisionVertex(this, that);
+    }
+
+    public DoubleTensorVertex atan2(DoubleTensorVertex that) {
+        return new TensorArcTan2Vertex(this, that);
     }
 
     public final TensorDualNumber getDualNumber() {

@@ -2,8 +2,11 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
 
@@ -15,11 +18,19 @@ public class TensorArcTan2Vertex extends TensorBinaryOpVertex {
 
     @Override
     protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
-        return ;
+        return a.atan2(b);
     }
 
     @Override
     protected TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
-        return null;
+        TensorDualNumber aDual = dualNumbers.get(a);
+        TensorDualNumber bDual = dualNumbers.get(b);
+
+        DoubleTensor denominator = ((b.getValue().pow(2)).times((a.getValue().pow(2))));
+
+        TensorPartialDerivatives thisInfA = aDual.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
+        TensorPartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinus());
+        TensorPartialDerivatives newInf = thisInfA.add(thisInfB);
+        return new TensorDualNumber(op(a.getValue(), b.getValue()), newInf);
     }
 }

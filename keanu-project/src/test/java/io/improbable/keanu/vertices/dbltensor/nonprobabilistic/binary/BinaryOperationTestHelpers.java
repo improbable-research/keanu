@@ -69,7 +69,6 @@ public class BinaryOperationTestHelpers {
                                                                             double[] expectedGradientWrtA,
                                                                             double[] expectedGradientWrtB,
                                                                             BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
-        KeanuRandom random = new KeanuRandom(1);
         TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
         TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
@@ -79,6 +78,7 @@ public class BinaryOperationTestHelpers {
         DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{2, 2});
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
+        System.out.println(wrtA.getValue(0, 0));
         assertEquals(expectedTensorA.getValue(0, 0), wrtA.getValue(0, 0), 1e-5);
         assertEquals(expectedTensorA.getValue(0, 1), wrtA.getValue(0, 1), 1e-5);
         assertEquals(expectedTensorA.getValue(1, 0), wrtA.getValue(1, 0), 1e-5);
