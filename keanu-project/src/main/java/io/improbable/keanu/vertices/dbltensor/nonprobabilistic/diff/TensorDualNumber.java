@@ -81,7 +81,7 @@ public class TensorDualNumber {
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         DoubleTensor newValue = this.value.pow(that.value);
         TensorPartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
-        TensorPartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().times(newValue));
+        TensorPartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().timesInPlace(newValue));
         TensorPartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new TensorDualNumber(newValue, newInf);
     }
@@ -140,26 +140,26 @@ public class TensorDualNumber {
     }
 
     public TensorDualNumber cos() {
-        return new TensorDualNumber(value.cos(), getPartialDerivatives().multiplyBy(value.sin().unaryMinus()));
+        return new TensorDualNumber(value.cos(), getPartialDerivatives().multiplyBy(value.sin().unaryMinusInPlace()));
     }
 
     public TensorDualNumber tan() {
-        DoubleTensor dTan = value.cos().pow(2).reciprocal();
+        DoubleTensor dTan = value.cos().powInPlace(2).reciprocalInPlace();
         return new TensorDualNumber(value.tan(), getPartialDerivatives().multiplyBy(dTan));
     }
 
     public TensorDualNumber asin() {
-        DoubleTensor dArcSin = (value.unaryMinus().times(value).plus(1)).sqrt().reciprocal();
+        DoubleTensor dArcSin = (value.unaryMinus().timesInPlace(value).plusInPlace(1)).sqrtInPlace().reciprocalInPlace();
         return new TensorDualNumber(value.sin(), getPartialDerivatives().multiplyBy(dArcSin));
     }
 
     public TensorDualNumber acos() {
-        DoubleTensor dArcCos = value.unaryMinus().times(value).plus(1).sqrt().reciprocal().unaryMinus();
+        DoubleTensor dArcCos = value.unaryMinus().timesInPlace(value).plusInPlace(1).sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
         return new TensorDualNumber(value.acos(), getPartialDerivatives().multiplyBy(dArcCos));
     }
 
     public TensorDualNumber atan() {
-        DoubleTensor dArcTan = value.pow(2).plus(1).reciprocal();
+        DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
         return new TensorDualNumber(value.atan(), getPartialDerivatives().multiplyBy(dArcTan));
     }
 
