@@ -83,6 +83,7 @@ public class TensorDualNumber {
         TensorPartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
         TensorPartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().times(newValue));
         TensorPartialDerivatives newInf = thisInfBase.add(thisInfExponent);
+        DoubleTensor g = this.value.log();
         return new TensorDualNumber(newValue, newInf);
     }
 

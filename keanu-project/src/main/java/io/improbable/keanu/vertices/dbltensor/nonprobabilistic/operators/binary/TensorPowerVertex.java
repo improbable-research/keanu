@@ -21,7 +21,7 @@ public class TensorPowerVertex extends TensorBinaryOpVertex {
     @Override
     protected TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
         TensorDualNumber aDual = dualNumbers.get(a);
-        TensorDualNumber bDual = dualNumbers.get(a);
+        TensorDualNumber bDual = dualNumbers.get(b);
         return aDual.pow(bDual);
     }
 }

@@ -26,6 +26,10 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return new TensorDivisionVertex(this, that);
     }
 
+    public DoubleTensorVertex power(DoubleTensorVertex power) {
+        return new TensorPowerVertex(this, power);
+    }
+
     public DoubleTensorVertex atan2(DoubleTensorVertex that) {
         return new TensorArcTan2Vertex(this, that);
     }
