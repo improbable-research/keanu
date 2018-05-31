@@ -15,11 +15,12 @@ public class TensorSmoothUniform {
 
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
-        final DoubleTensor rScaled = r1.times(bodyWidth.plus(shoulderWidth)).plusInPlace(xMin.minus(shoulderWidth.div(2)));
+        final DoubleTensor rScaled = r1.timesInPlace(bodyWidth.plus(shoulderWidth)).plusInPlace(xMin.minus(shoulderWidth.div(2)));
         final DoubleTensor bodyHeight = bodyHeight(shoulderWidth, bodyWidth);
 
-        final DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
-        firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
+        DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
+        firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
         final DoubleTensor inverseFirstConditional = DoubleTensor.ones(firstConditional.getShape()).minusInPlace(firstConditional);
 
         final DoubleTensor secondConditional = rScaled.getLessThanMask(xMin);
@@ -29,8 +30,8 @@ public class TensorSmoothUniform {
         DoubleTensor acceptProbability = shoulderDensity.div(bodyHeight);
 
         final DoubleTensor secondConditionalNestedTrue = secondConditional.times(r2.getLessThanOrEqualToMask(acceptProbability));
-        final DoubleTensor secondConditionalNestedFalse = secondConditional.times(r2.getGreaterThanMask(acceptProbability));
-        final DoubleTensor secondConditionalNestedFalseResult = xMin.minus(shoulderWidth).plus(spillOnToShoulder);
+        final DoubleTensor secondConditionalNestedFalse = secondConditional.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedFalseResult = xMin.minus(shoulderWidth).plusInPlace(spillOnToShoulder);
 
         final DoubleTensor secondConditionalFalse = rScaled.getGreaterThanOrEqualToMask(xMin);
         spillOnToShoulder = rScaled.minus(xMax);
@@ -39,14 +40,14 @@ public class TensorSmoothUniform {
         acceptProbability = shoulderDensity.divInPlace(bodyHeight);
 
         final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.getLessThanOrEqualToMask(acceptProbability));
-        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.times(r2.getGreaterThanMask(acceptProbability));
-        final DoubleTensor secondConditionalFalseNestedFalseResult = xMax.plus(shoulderWidth).minusInPlace(spillOnToShoulder);
+        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedFalseResult = shoulderWidth.plusInPlace(xMax).minusInPlace(spillOnToShoulder);
 
-        return firstConditional.times(rScaled).
-            plus(inverseFirstConditional.times(secondConditionalNestedTrue).times(rScaled)).
-            plus(inverseFirstConditional.times(secondConditionalNestedFalse).times(secondConditionalNestedFalseResult)).
-            plus(inverseFirstConditional.times(secondConditionalFalseNestedTrue).times(rScaled)).
-            plus(inverseFirstConditional.times(secondConditionalFalseNestedFalse).times(secondConditionalFalseNestedFalseResult));
+        return firstConditional.timesInPlace(rScaled)
+            .plusInPlace(inverseFirstConditional.times(secondConditionalNestedTrue).timesInPlace(rScaled))
+            .plusInPlace(inverseFirstConditional.times(secondConditionalNestedFalse).timesInPlace(secondConditionalNestedFalseResult))
+            .plusInPlace(inverseFirstConditional.times(secondConditionalFalseNestedTrue).timesInPlace(rScaled))
+            .plusInPlace(inverseFirstConditional.timesInPlace(secondConditionalFalseNestedFalse).timesInPlace(secondConditionalFalseNestedFalseResult));
     }
 
     public static DoubleTensor pdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
@@ -55,21 +56,22 @@ public class TensorSmoothUniform {
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
 
-        final DoubleTensor firstConditional = x.getGreaterThanOrEqualToMask(xMin);
+        DoubleTensor firstConditional = x.getGreaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
         firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
         final DoubleTensor firstConditionalResult = bodyHeight(shoulderWidth, bodyWidth);
 
-        final DoubleTensor secondConditional = x.getLessThanMask(xMin);
-        secondConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        DoubleTensor secondConditional = x.getLessThanMask(xMin);
+        secondConditional = secondConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
         final DoubleTensor secondConditionalResult = shoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        final DoubleTensor thirdConditional = x.getGreaterThanMask(xMax);
-        thirdConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        DoubleTensor thirdConditional = x.getGreaterThanMask(xMax);
+        thirdConditional = thirdConditional.timesInPlace(x.getLessThanMask(rightCutoff));
         final DoubleTensor thirdConditionalResult = shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plusInPlace(xMax));
 
-        return firstConditional.times(firstConditionalResult).
-            plus(secondConditional.times(secondConditionalResult)).
-            plus(thirdConditional.times(thirdConditionalResult));
+        return firstConditional.timesInPlace(firstConditionalResult)
+            .plusInPlace(secondConditional.timesInPlace(secondConditionalResult))
+            .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
     }
 
     public static DoubleTensor dlnPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
@@ -77,25 +79,25 @@ public class TensorSmoothUniform {
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
 
-        final DoubleTensor firstConditional = x.getLessThanMask(xMin);
-        firstConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        DoubleTensor firstConditional = x.getLessThanMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
         final DoubleTensor firstConditionalResult = dShoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        final DoubleTensor secondConditional = x.getGreaterThanMask(xMax);
-        secondConditional.times(x.getGreaterThanMask(rightCutoff));
+        DoubleTensor secondConditional = x.getGreaterThanMask(xMax);
+        secondConditional = secondConditional.timesInPlace(x.getLessThanMask(rightCutoff));
         final DoubleTensor secondConditionalResult = dShoulder(shoulderWidth,
             bodyWidth,
-            shoulderWidth.minus(x).plus(rightCutoff)
-        ).unaryMinus();
+            shoulderWidth.minus(x).plusInPlace(rightCutoff)
+            ).unaryMinusInPlace();
 
-        return firstConditional.times(firstConditionalResult).
-            plus(secondConditional.times(secondConditionalResult));
+        return firstConditional.timesInPlace(firstConditionalResult)
+            .plusInPlace(secondConditional.timesInPlace(secondConditionalResult));
     }
 
     private static DoubleTensor shoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
         final DoubleTensor A = getCubeCoefficient(Sw, Bw);
         final DoubleTensor B = getSquareCoefficient(Sw, Bw);
-        return A.times(x.pow(3)).plus(B.times(x.pow(2)));
+        return x.pow(3).timesInPlace(A).plusInPlace(x.pow(2).timesInPlace(B));
     }
 
     private static DoubleTensor dShoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {

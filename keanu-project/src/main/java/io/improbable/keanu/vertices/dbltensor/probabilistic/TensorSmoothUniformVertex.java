@@ -23,9 +23,9 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
     /**
      * One xMin or Xmax or both driving an arbitrarily shaped tensor of Smooth Uniform
      *
-     * @param shape the desired shape of the vertex
-     * @param xMin    the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
-     * @param xMax the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param shape         the desired shape of the vertex
+     * @param xMin          the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public TensorSmoothUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, double edgeSharpness) {
@@ -43,8 +43,8 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
      * One to one constructor for mapping some shape of mu and sigma to
      * a matching shaped Smooth Uniform.
      *
-     * @param xMin    the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
-     * @param xMax the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMin          the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public TensorSmoothUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, double edgeSharpness) {
@@ -112,19 +112,19 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
     public double logPdf(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
-        final DoubleTensor shoulderWidth = (max.minus(min)).times(this.edgeSharpness);
+        final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
         final DoubleTensor density = TensorSmoothUniform.pdf(min, max, shoulderWidth, value);
-        return density.log().sum();
+        return density.logInPlace().sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
-        final DoubleTensor shoulderWidth = (max.minus(min)).times(this.edgeSharpness);
+        final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
         final DoubleTensor dPdfdx = TensorSmoothUniform.dlnPdf(min, max, shoulderWidth, value);
         final DoubleTensor density = TensorSmoothUniform.pdf(min, max, shoulderWidth, value);
-        final DoubleTensor dlogPdfdx = dPdfdx.div(density);
+        final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
 
         return singletonMap(getId(), dlogPdfdx);
     }
