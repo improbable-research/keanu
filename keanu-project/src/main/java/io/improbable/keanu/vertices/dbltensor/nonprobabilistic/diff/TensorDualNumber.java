@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Collections;
 import java.util.Map;
@@ -72,6 +74,15 @@ public class TensorDualNumber {
         TensorPartialDerivatives thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
         TensorPartialDerivatives thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
         TensorPartialDerivatives newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
+        return new TensorDualNumber(newValue, newInf);
+    }
+
+    public TensorDualNumber pow(TensorDualNumber that) {
+        // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
+        DoubleTensor newValue = this.value.pow(that.value);
+        TensorPartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
+        TensorPartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().times(newValue));
+        TensorPartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new TensorDualNumber(newValue, newInf);
     }
 

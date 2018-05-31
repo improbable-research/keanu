@@ -140,6 +140,16 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor tan() {
+        return this.duplicate().tanInPlace();
+    }
+
+    @Override
+    public DoubleTensor atan2(DoubleTensor y) {
+        return this.duplicate().atan2InPlace(y);
+    }
+
+    @Override
     public DoubleTensor asin() {
         return this.duplicate().asinInPlace();
     }
@@ -330,6 +340,20 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor cosInPlace() {
         value = Math.cos(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor tanInPlace() {
+        value = Math.tan(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atan2InPlace(DoubleTensor y) {
+        if (y.isScalar()) {
+            value = Math.atan2(value, y.scalar());
+        }
         return this;
     }
 

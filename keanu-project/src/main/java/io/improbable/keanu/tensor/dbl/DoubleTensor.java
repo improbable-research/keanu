@@ -95,6 +95,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor cos();
 
+    DoubleTensor tan();
+
+    DoubleTensor atan2(DoubleTensor y);
+
     DoubleTensor asin();
 
     DoubleTensor acos();
@@ -156,6 +160,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor sinInPlace();
 
     DoubleTensor cosInPlace();
+
+    DoubleTensor tanInPlace();
+
+    DoubleTensor atan2InPlace(DoubleTensor y);
 
     DoubleTensor asinInPlace();
 

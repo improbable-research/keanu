@@ -188,6 +188,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor tan() {
+        return duplicate().tanInPlace();
+    }
+
+    @Override
+    public DoubleTensor atan2(DoubleTensor y) {
+        return duplicate().atan2InPlace(y);
+    }
+
+    @Override
     public DoubleTensor asin() {
         return duplicate().asinInPlace();
     }
@@ -337,6 +347,24 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor cosInPlace() {
         Transforms.cos(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor tanInPlace() {
+        Transforms.sin(tensor, true).div(Transforms.cos(tensor, false));
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atan2InPlace(DoubleTensor y) {
+        if (y.isScalar()) {
+
+        }
+        else {
+            INDArray yArray = unsafeGetNd4J(y);
+            Transforms.atan2(tensor, yArray);
+        }
         return this;
     }
 
