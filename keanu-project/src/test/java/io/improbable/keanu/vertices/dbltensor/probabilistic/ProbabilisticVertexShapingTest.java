@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.vertices.dbltensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
 public class ProbabilisticVertexShapingTest {
 
-    private int[] scalar1 = new int[]{1,1};
-    private int[] scalar2 = new int[]{1,1};
+    private int[] scalar1 = new int[]{1, 1};
+    private int[] scalar2 = new int[]{1, 1};
     private int[] twoByTwo1 = new int[]{2, 2};
     private int[] twoByTwo2 = new int[]{2, 2};
     private int[] twoByThree = new int[]{2, 3};

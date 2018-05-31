@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.variational.tensor;
 
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;

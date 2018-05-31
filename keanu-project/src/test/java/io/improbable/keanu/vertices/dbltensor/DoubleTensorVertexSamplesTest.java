@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -20,7 +21,7 @@ public class DoubleTensorVertexSamplesTest {
 
         DoubleTensor averages = samples.getAverages();
 
-        assertArrayEquals(new double[]{2.0, 2.0, 7.0}, averages.getFlattenedView().asArray(), 0.0);
+        assertArrayEquals(new double[]{2.0, 2.0, 7.0}, averages.asFlatDoubleArray(), 0.0);
 
     }
 }

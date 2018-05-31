@@ -2,6 +2,13 @@ package io.improbable.keanu.vertices.dbltensor;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;
+import io.improbable.keanu.distributions.discrete.Poisson;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -46,7 +53,7 @@ public class KeanuRandom {
 
     public DoubleTensor nextDouble(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(nextDouble());
+            return new ScalarDoubleTensor(nextDouble());
         } else {
             return new Nd4jDoubleTensor(nd4jRandom.nextDouble(shape));
         }
@@ -58,7 +65,7 @@ public class KeanuRandom {
 
     public DoubleTensor nextGaussian(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new SimpleDoubleTensor(nextGaussian());
+            return new ScalarDoubleTensor(nextGaussian());
         } else {
             return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
         }
@@ -66,14 +73,14 @@ public class KeanuRandom {
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
 
-        DataBufferWrapper aWrapped = new DataBufferWrapper(a.getFlattenedView().asArray());
-        DataBufferWrapper thetaWrapped = new DataBufferWrapper(theta.getFlattenedView().asArray());
-        DataBufferWrapper kWrapped = new DataBufferWrapper(k.getFlattenedView().asArray());
+        Tensor.FlattenedView<Double> aWrapped = a.getFlattenedView();
+        Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
+        Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = Gamma.sample(aWrapped.get(i), thetaWrapped.get(i), kWrapped.get(i), this);
+            samples[i] = Gamma.sample(aWrapped.getOrScalar(i), thetaWrapped.getOrScalar(i), kWrapped.getOrScalar(i), this);
         }
 
         return DoubleTensor.create(samples, shape);
@@ -81,13 +88,13 @@ public class KeanuRandom {
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
 
-        DataBufferWrapper muWrapped = new DataBufferWrapper(mu.getFlattenedView().asArray());
-        DataBufferWrapper betaWrapped = new DataBufferWrapper(beta.getFlattenedView().asArray());
+        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
+        Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = Laplace.sample(muWrapped.get(i), betaWrapped.get(i), this);
+            samples[i] = Laplace.sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), this);
         }
 
         return DoubleTensor.create(samples, shape);
@@ -101,23 +108,25 @@ public class KeanuRandom {
         return nd4jRandom.nextBoolean();
     }
 
+    public IntegerTensor nextInt(int[] shape) {
+        return new Nd4jIntegerTensor(nd4jRandom.nextInt(shape));
+    }
+
+    public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
+        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
+
+        int length = ArrayUtil.prod(shape);
+        int[] samples = new int[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = Poisson.sample(muWrapped.getOrScalar(i), this);
+        }
+
+        return IntegerTensor.create(samples, shape);
+
+    }
+
     public int nextInt(int maxExclusive) {
         return nd4jRandom.nextInt(maxExclusive);
     }
 
-    private static class DataBufferWrapper {
-        private final double[] buffer;
-
-        DataBufferWrapper(double[] buffer) {
-            this.buffer = buffer;
-        }
-
-        public double get(int i) {
-            if (buffer.length == 1) {
-                return buffer[0];
-            } else {
-                return buffer[i];
-            }
-        }
-    }
 }

@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
