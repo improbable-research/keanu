@@ -20,7 +20,7 @@ public class TensorArcTanVertexTest {
     public void calculatesDualNumberOfTwoScalarsAtan() {
         calculatesDualNumberOfScalar(
             0.5,
-            1.0 / Math.sqrt(1.0 - 0.5 * 0.5),
+            1.0 / (1.0 + 0.5 * 0.5),
             DoubleTensorVertex::atan
         );
     }
@@ -38,10 +38,10 @@ public class TensorArcTanVertexTest {
     public void calculatesDualNumberOfTwoMatricesElementWiseAtan() {
         calculatesDualNumberOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            new double[]{1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
-                1.0 / Math.sqrt(1.0 - 0.2 * 0.2),
-                1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
-                1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
+            new double[]{1.0 / (1.0 + 0.1 * 0.1),
+                1.0 / (1.0 + 0.2 * 0.2),
+                1.0 / (1.0 + 0.3 * 0.3),
+                1.0 / (1.0 + 0.4 * 0.4)
             },
             DoubleTensorVertex::atan
         );

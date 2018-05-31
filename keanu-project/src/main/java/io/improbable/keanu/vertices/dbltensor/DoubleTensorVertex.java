@@ -55,6 +55,18 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return new TensorSigmoidVertex(this);
     }
 
+    public DoubleTensorVertex sin() {
+        return new TensorSinVertex(this);
+    }
+
+    public DoubleTensorVertex cos() {
+        return new TensorCosVertex(this);
+    }
+
+    public DoubleTensorVertex tan() {
+        return new TensorTanVertex(this);
+    }
+
     public DoubleTensorVertex asin() {
         return new TensorArcSinVertex(this);
     }
