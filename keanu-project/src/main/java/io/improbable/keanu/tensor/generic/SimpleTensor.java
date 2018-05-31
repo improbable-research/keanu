@@ -3,6 +3,8 @@ package io.improbable.keanu.tensor.generic;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 
+import java.util.Arrays;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static java.util.Arrays.copyOf;
 
@@ -75,6 +77,26 @@ public class SimpleTensor<T> implements Tensor<T> {
     @Override
     public SimpleTensor<T> duplicate() {
         return new SimpleTensor<>(copyOf(data, data.length), copyOf(shape, shape.length));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        SimpleTensor<?> that = (SimpleTensor<?>) o;
+
+        if (!Arrays.equals(data, that.data)) return false;
+        if (!Arrays.equals(shape, that.shape)) return false;
+        return Arrays.equals(stride, that.stride);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(data);
+        result = 31 * result + Arrays.hashCode(shape);
+        result = 31 * result + Arrays.hashCode(stride);
+        return result;
     }
 
     @Override

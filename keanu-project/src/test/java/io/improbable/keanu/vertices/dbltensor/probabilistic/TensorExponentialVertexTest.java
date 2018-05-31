@@ -5,8 +5,9 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.*;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
@@ -36,7 +37,7 @@ public class TensorExponentialVertexTest {
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
         DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new ScalarDoubleTensor(1.0), matrixX);
-        assertArrayEquals(new double[]{-1, 0}, maskResult.asFlatDoubleArray(), 0.0);
+        assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
     }
 
     @Test
@@ -139,8 +140,8 @@ public class TensorExponentialVertexTest {
         int sampleCount = 1000000;
         TensorExponentialVertex vertex = new TensorExponentialVertex(
             new int[]{sampleCount, 1},
-            new ConstantTensorVertex(0.0),
-            new ConstantTensorVertex(0.5)
+            new ConstantDoubleTensorVertex(0.0),
+            new ConstantDoubleTensorVertex(0.5)
         );
 
         double from = 0.5;
@@ -157,13 +158,13 @@ public class TensorExponentialVertexTest {
         double trueB = 2.0;
 
         List<DoubleTensorVertex> aB = new ArrayList<>();
-        aB.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
-        aB.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueB)));
+        aB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
+        aB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueB)));
 
         List<DoubleTensorVertex> latentAB = new ArrayList<>();
         TensorUniformVertex latentB = new TensorUniformVertex(0.01, 10.0);
         latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
-        latentAB.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
+        latentAB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
         latentAB.add(latentB);
 
         int numSamples = 2000;

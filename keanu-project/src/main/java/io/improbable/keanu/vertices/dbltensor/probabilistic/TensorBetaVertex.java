@@ -4,8 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorBeta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -47,27 +46,27 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorBetaVertex(DoubleTensorVertex alpha, double beta) {
-        this(alpha, new ConstantTensorVertex(beta));
+        this(alpha, new ConstantDoubleTensorVertex(beta));
     }
 
     public TensorBetaVertex(double alpha, DoubleTensorVertex beta) {
-        this(new ConstantTensorVertex(alpha), beta);
+        this(new ConstantDoubleTensorVertex(alpha), beta);
     }
 
     public TensorBetaVertex(double alpha, double beta) {
-        this(new ConstantTensorVertex(alpha), new ConstantTensorVertex(beta));
+        this(new ConstantDoubleTensorVertex(alpha), new ConstantDoubleTensorVertex(beta));
     }
 
     public TensorBetaVertex(int[] shape, DoubleTensorVertex alpha, double beta) {
-        this(shape, alpha, new ConstantTensorVertex(beta));
+        this(shape, alpha, new ConstantDoubleTensorVertex(beta));
     }
 
     public TensorBetaVertex(int[] shape, double alpha, DoubleTensorVertex beta) {
-        this(shape, new ConstantTensorVertex(alpha), beta);
+        this(shape, new ConstantDoubleTensorVertex(alpha), beta);
     }
 
     public TensorBetaVertex(int[] shape, double alpha, double beta) {
-        this(shape, new ConstantTensorVertex(alpha), new ConstantTensorVertex(beta));
+        this(shape, new ConstantDoubleTensorVertex(alpha), new ConstantDoubleTensorVertex(beta));
     }
 
     @Override
@@ -108,8 +107,8 @@ public class TensorBetaVertex extends ProbabilisticDoubleTensor {
             getShape(),
             alpha.getValue(),
             beta.getValue(),
-            Nd4jDoubleTensor.scalar(0.),
-            Nd4jDoubleTensor.scalar(1.),
+            DoubleTensor.scalar(0.),
+            DoubleTensor.scalar(1.),
             random
         );
     }

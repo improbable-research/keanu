@@ -4,8 +4,9 @@ import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
-import io.improbable.keanu.vertices.dbltensor.*;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
@@ -99,8 +100,8 @@ public class TensorGammaVertexTest {
         a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         TensorGammaVertex vertexUnderTest = new TensorGammaVertex(
             a,
-            new ConstantTensorVertex(1.5),
-            new ConstantTensorVertex(5.0)
+            new ConstantDoubleTensorVertex(1.5),
+            new ConstantDoubleTensorVertex(5.0)
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -180,9 +181,9 @@ public class TensorGammaVertexTest {
         int sampleCount = 1000000;
         TensorGammaVertex vertex = new TensorGammaVertex(
             new int[]{sampleCount, 1},
-            new ConstantTensorVertex(1.5),
-            new ConstantTensorVertex(2.0),
-            new ConstantTensorVertex(7.5)
+            new ConstantDoubleTensorVertex(1.5),
+            new ConstantDoubleTensorVertex(2.0),
+            new ConstantDoubleTensorVertex(7.5)
         );
 
         double from = 1.5;
@@ -199,10 +200,10 @@ public class TensorGammaVertexTest {
         double trueTheta = 2.0;
         double trueK = 3.0;
 
-        DoubleTensorVertex constA = new ConstantTensorVertex(trueA);
-        DoubleTensorVertex constA2 = new ConstantTensorVertex(trueA);
-        DoubleTensorVertex constTheta = new ConstantTensorVertex(trueTheta);
-        DoubleTensorVertex constK = new ConstantTensorVertex(trueK);
+        DoubleTensorVertex constA = new ConstantDoubleTensorVertex(trueA);
+        DoubleTensorVertex constA2 = new ConstantDoubleTensorVertex(trueA);
+        DoubleTensorVertex constTheta = new ConstantDoubleTensorVertex(trueTheta);
+        DoubleTensorVertex constK = new ConstantDoubleTensorVertex(trueK);
 
         List<DoubleTensorVertex> aThetaK = new ArrayList<>();
         aThetaK.add(constA);

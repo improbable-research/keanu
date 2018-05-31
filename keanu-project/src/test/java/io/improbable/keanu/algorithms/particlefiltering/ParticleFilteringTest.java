@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.e2e.regression.LinearRegression;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;

@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic;
 
-import io.improbable.keanu.vertices.NonProbabilisticObservationException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilisticObservationException;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ public abstract class NonProbabilisticDoubleTensor extends DoubleTensorVertex {
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return this.getDerivedValue().equals(getValue()) ? 0.0 : Double.NEGATIVE_INFINITY;
+        return this.getDerivedValue().elementwiseEquals(getValue()).allTrue() ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override

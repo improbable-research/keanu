@@ -2,7 +2,6 @@ package io.improbable.keanu.distributions.tensors.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.math3.special.Gamma;
 
 public class TensorBeta {
@@ -14,8 +13,8 @@ public class TensorBeta {
                                       DoubleTensor xMax,
                                       KeanuRandom random) {
 
-        final DoubleTensor y1 = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, Nd4jDoubleTensor.ONE_SCALAR, alpha);
-        final DoubleTensor y2 = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, Nd4jDoubleTensor.ONE_SCALAR, beta);
+        final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR, alpha);
+        final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR, beta);
 
         final DoubleTensor range = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);

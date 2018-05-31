@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
@@ -143,8 +143,8 @@ public class TensorLaplaceVertexTest {
         int sampleCount = 1000000;
         TensorLaplaceVertex vertex = new TensorLaplaceVertex(
             new int[]{sampleCount, 1},
-            new ConstantTensorVertex(0.0),
-            new ConstantTensorVertex(2.0)
+            new ConstantDoubleTensorVertex(0.0),
+            new ConstantDoubleTensorVertex(2.0)
         );
 
         double from = -4;
@@ -161,8 +161,8 @@ public class TensorLaplaceVertexTest {
         double trueBeta = 2.0;
 
         List<DoubleTensorVertex> muBeta = new ArrayList<>();
-        muBeta.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueMu)));
-        muBeta.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
+        muBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueMu)));
+        muBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
 
         List<DoubleTensorVertex> latentMuBeta = new ArrayList<>();
         TensorUniformVertex latentMu = new TensorUniformVertex(0.01, 10.0);

@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -49,31 +49,31 @@ public class TensorGammaVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorGammaVertex(DoubleTensorVertex a, DoubleTensorVertex theta, double k) {
-        this(a, theta, new ConstantTensorVertex(k));
+        this(a, theta, new ConstantDoubleTensorVertex(k));
     }
 
     public TensorGammaVertex(DoubleTensorVertex a, double theta, DoubleTensorVertex k) {
-        this(a, new ConstantTensorVertex(theta), k);
+        this(a, new ConstantDoubleTensorVertex(theta), k);
     }
 
     public TensorGammaVertex(DoubleTensorVertex a, double theta, double k) {
-        this(a, new ConstantTensorVertex(theta), new ConstantTensorVertex(k));
+        this(a, new ConstantDoubleTensorVertex(theta), new ConstantDoubleTensorVertex(k));
     }
 
     public TensorGammaVertex(double a, DoubleTensorVertex theta, DoubleTensorVertex k) {
-        this(new ConstantTensorVertex(a), theta, k);
+        this(new ConstantDoubleTensorVertex(a), theta, k);
     }
 
     public TensorGammaVertex(double a, DoubleTensorVertex theta, double k) {
-        this(new ConstantTensorVertex(a), theta, new ConstantTensorVertex(k));
+        this(new ConstantDoubleTensorVertex(a), theta, new ConstantDoubleTensorVertex(k));
     }
 
     public TensorGammaVertex(double a, double theta, DoubleTensorVertex k) {
-        this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), k);
+        this(new ConstantDoubleTensorVertex(a), new ConstantDoubleTensorVertex(theta), k);
     }
 
     public TensorGammaVertex(double a, double theta, double k) {
-        this(new ConstantTensorVertex(a), new ConstantTensorVertex(theta), new ConstantTensorVertex(k));
+        this(new ConstantDoubleTensorVertex(a), new ConstantDoubleTensorVertex(theta), new ConstantDoubleTensorVertex(k));
     }
 
     @Override

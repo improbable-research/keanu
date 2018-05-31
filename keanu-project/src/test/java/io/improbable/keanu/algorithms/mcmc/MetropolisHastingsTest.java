@@ -2,15 +2,16 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.booltensor.BoolVertex;
+import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -87,8 +88,8 @@ public class MetropolisHastingsTest {
             random
         );
 
-        DoubleTensor averagePosteriorA = posteriorSamples.getDoubleTensors(A).getAverages();
-        DoubleTensor averagePosteriorB = posteriorSamples.getDoubleTensors(B).getAverages();
+        DoubleTensor averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages();
+        DoubleTensor averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages();
 
         DoubleTensor allActuals = averagePosteriorA.plus(averagePosteriorB);
 
@@ -102,7 +103,9 @@ public class MetropolisHastingsTest {
 
         Flip A = new Flip(0.5);
 
-        DoubleVertex B = new DoubleUnaryOpLambda<>(A, val -> val ? 0.9 : 0.1);
+        DoubleIfVertex B = If.isTrue(A)
+            .then(0.9)
+            .orElse(0.1);
 
         Flip C = new Flip(B);
 
@@ -118,7 +121,7 @@ public class MetropolisHastingsTest {
             random
         );
 
-        double postProbTrue = posteriorSamples.get(A).probability(v -> v);
+        double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
 
         assertEquals(0.9, postProbTrue, 0.01);
     }
@@ -130,7 +133,10 @@ public class MetropolisHastingsTest {
         Flip B = new Flip(0.5);
 
         BoolVertex C = A.or(B);
-        DoubleVertex D = new DoubleUnaryOpLambda<>(C, val -> val ? 0.9 : 0.1);
+
+        DoubleIfVertex D = If.isTrue(C)
+            .then(0.9)
+            .orElse(0.1);
 
         Flip E = new Flip(D);
 
@@ -146,7 +152,7 @@ public class MetropolisHastingsTest {
             random
         );
 
-        double postProbTrue = posteriorSamples.get(A).probability(v -> v);
+        double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
 
         assertEquals(0.643, postProbTrue, 0.01);
     }
@@ -169,7 +175,7 @@ public class MetropolisHastingsTest {
             random
         );
 
-        double postProbTrue = posteriorSamples.get(A).probability(v -> v);
+        double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
 
         System.out.println(postProbTrue);
 

@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorInverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -20,9 +20,9 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
     /**
      * One a or b or both driving an arbitrarily shaped tensor of Inverse Gamma
      *
-     * @param shape  the desired shape of the vertex
-     * @param a      the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
-     * @param b      the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
+     * @param shape the desired shape of the vertex
+     * @param a     the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
+     * @param b     the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
      */
     public TensorInverseGammaVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex b) {
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), b.getShape());
@@ -37,35 +37,35 @@ public class TensorInverseGammaVertex extends ProbabilisticDoubleTensor {
      * One to one constructor for mapping some shape of a and b to
      * a matching shaped inverse gamma.
      *
-     * @param a      the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
-     * @param b      the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
+     * @param a the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
+     * @param b the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
      */
     public TensorInverseGammaVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     public TensorInverseGammaVertex(DoubleTensorVertex a, double b) {
-        this(a, new ConstantTensorVertex(b));
+        this(a, new ConstantDoubleTensorVertex(b));
     }
 
     public TensorInverseGammaVertex(double a, DoubleTensorVertex b) {
-        this(new ConstantTensorVertex(a), b);
+        this(new ConstantDoubleTensorVertex(a), b);
     }
 
     public TensorInverseGammaVertex(double a, double b) {
-        this(new ConstantTensorVertex(a), new ConstantTensorVertex(b));
+        this(new ConstantDoubleTensorVertex(a), new ConstantDoubleTensorVertex(b));
     }
 
-    public TensorInverseGammaVertex(int[] shape,DoubleTensorVertex a, double b) {
-        this(shape, a, new ConstantTensorVertex(b));
+    public TensorInverseGammaVertex(int[] shape, DoubleTensorVertex a, double b) {
+        this(shape, a, new ConstantDoubleTensorVertex(b));
     }
 
     public TensorInverseGammaVertex(int[] shape, double a, DoubleTensorVertex b) {
-        this(shape, new ConstantTensorVertex(a), b);
+        this(shape, new ConstantDoubleTensorVertex(a), b);
     }
 
     public TensorInverseGammaVertex(int[] shape, double a, double b) {
-        this(shape, new ConstantTensorVertex(a), new ConstantTensorVertex(b));
+        this(shape, new ConstantDoubleTensorVertex(a), new ConstantDoubleTensorVertex(b));
     }
 
     @Override

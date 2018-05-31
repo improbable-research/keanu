@@ -7,6 +7,8 @@ import io.improbable.keanu.tensor.generic.SimpleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static java.util.Arrays.copyOf;
 
@@ -205,6 +207,30 @@ public class SimpleBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor duplicate() {
         return new SimpleBooleanTensor(copyOf(data, data.length), copyOf(shape, shape.length));
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof Tensor) {
+            Tensor that = (Tensor) o;
+            if (!Arrays.equals(that.getShape(), shape)) return false;
+            return Arrays.equals(
+                that.asFlatArray(),
+                this.asFlatArray()
+            );
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = Arrays.hashCode(data);
+        result = 31 * result + Arrays.hashCode(shape);
+        result = 31 * result + Arrays.hashCode(stride);
+        return result;
     }
 
     @Override

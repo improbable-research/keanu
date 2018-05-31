@@ -14,6 +14,7 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static java.util.Arrays.copyOf;
@@ -23,10 +24,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     static {
         System.setProperty("dtype", "double");
     }
-
-    public static final DoubleTensor ZERO_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(0.0));
-
-    public static final DoubleTensor ONE_SCALAR = new Nd4jDoubleTensor(Nd4j.scalar(1.0));
 
     public static Nd4jDoubleTensor scalar(double scalarValue) {
         return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
@@ -658,18 +655,26 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public FlattenedView getFlattenedView() {
+    public FlattenedView<Double> getFlattenedView() {
         return new Nd4jDoubleFlattenedView(tensor);
     }
 
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
 
-        Nd4jDoubleTensor that = (Nd4jDoubleTensor) o;
+        if (o instanceof Nd4jDoubleTensor) {
+            return tensor.equals(((Nd4jDoubleTensor) o).tensor);
+        } else if (o instanceof Tensor) {
+            Tensor that = (Tensor) o;
+            if (!Arrays.equals(that.getShape(), shape)) return false;
+            return Arrays.equals(
+                that.asFlatArray(),
+                this.asFlatArray()
+            );
+        }
 
-        return tensor.equals(that.tensor);
+        return false;
     }
 
     @Override
@@ -689,7 +694,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public IntegerTensor toInteger() {
-        return new Nd4jIntegerTensor(tensor.dup());
+        Transforms.floor(tensor, false);
+        return new Nd4jIntegerTensor(tensor);
     }
 
     private BooleanTensor fromMask(INDArray mask, int[] shape) {

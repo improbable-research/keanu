@@ -9,13 +9,13 @@ public class TensorExponential {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor b, KeanuRandom random) {
-        return a.minus(b).times(random.nextDouble(shape).logInPlace());
+        return a.minus(random.nextDouble(shape).logInPlace().timesInPlace(b));
     }
 
     public static DoubleTensor logPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {
         final DoubleTensor negXMinusADivB = x.minus(a).unaryMinusInPlace().divInPlace(b);
         final DoubleTensor negXMinusADivBMinusLogB = negXMinusADivB.minusInPlace(b.log());
-        return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(a), 0.0);
+        return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(a), Double.NEGATIVE_INFINITY);
     }
 
     public static Diff dlnPdf(DoubleTensor a, DoubleTensor b, DoubleTensor x) {

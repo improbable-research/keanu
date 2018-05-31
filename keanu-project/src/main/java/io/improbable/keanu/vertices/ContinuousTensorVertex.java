@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbltensor;
+package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -21,16 +21,4 @@ public abstract class ContinuousTensorVertex<T extends Tensor> extends Vertex<T>
 
     public abstract Map<Long, DoubleTensor> dLogPdf(T value);
 
-    /**
-     * TODO: Move this up to the Vertex base class when everything has been tensorized
-     * @return true there is a tensor present and that tensor is more than just a shape placeholder
-     */
-    @Override
-    public boolean hasValue() {
-        return getRawValue() != null && !getRawValue().isShapePlaceholder();
-    }
-
-    public int[] getShape(){
-        return getRawValue().getShape();
-    }
 }
