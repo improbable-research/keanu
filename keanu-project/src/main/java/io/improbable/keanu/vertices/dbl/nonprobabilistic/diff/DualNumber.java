@@ -56,21 +56,6 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(newValue, newInf);
     }
 
-//    TensorAbsVertex
-//TensorArcCosVertex
-//TensorArcSinVertex
-//TensorArcTanVertex
-//TensorCeilVertex
-//TensorCosVertex
-//TensorDoubleUnaryOpLambda
-//TensorDoubleUnaryOpVertex
-//TensorExpVertex
-//TensorFloorVertex
-//TensorLogVertex
-//TensorSigmoidVertex
-//TensorSinVertex
-//TensorTanVertex
-
     public DualNumber divideBy(DualNumber that) {
         // dc = (B * da - A * db) / B^2;
         double newValue = this.value / that.value;

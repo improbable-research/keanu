@@ -77,7 +77,6 @@ public class BinaryOperationTestHelpers {
         DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{2, 2});
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        System.out.println(wrtA.getValue(0, 0));
         assertEquals(expectedTensorA.getValue(0, 0), wrtA.getValue(0, 0), 1e-5);
         assertEquals(expectedTensorA.getValue(0, 1), wrtA.getValue(0, 1), 1e-5);
         assertEquals(expectedTensorA.getValue(1, 0), wrtA.getValue(1, 0), 1e-5);

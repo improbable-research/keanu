@@ -380,6 +380,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
             value = Math.atan2(value, y.scalar());
+        } else {
+            return Nd4jDoubleTensor.create(value, y.getShape()).atan2InPlace(y);
         }
         return this;
     }
