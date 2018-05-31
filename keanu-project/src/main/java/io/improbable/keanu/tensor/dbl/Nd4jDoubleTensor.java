@@ -372,7 +372,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor tanInPlace() {
-        Transforms.sin(tensor, true).div(Transforms.cos(tensor, false));
+        INDArray sin = Transforms.sin(tensor, true);
+        INDArray cos = Transforms.cos(tensor, true);
+        tensor = sin.div(cos);
         return this;
     }
 
