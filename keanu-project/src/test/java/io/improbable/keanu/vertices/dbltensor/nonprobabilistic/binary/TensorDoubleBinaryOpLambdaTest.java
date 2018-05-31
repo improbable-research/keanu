@@ -16,11 +16,11 @@ public class TensorDoubleBinaryOpLambdaTest {
         TensorUniformVertex matrix = new TensorUniformVertex(new int[]{2, 2}, 0, 5);
         matrix.setAndCascade(2.5);
         TensorUniformVertex matrixB = new TensorUniformVertex(new int[]{2, 2}, 0, 5);
-        matrix.setAndCascade(3.5);
+        matrixB.setAndCascade(3.5);
 
         DoubleTensorVertex matrixLambda = new TensorDoubleBinaryOpLambda<>(matrix, matrixB, (val, valB) -> val.plus(valB));
 
-        assertArrayEquals(new double[]{5.5, 5.5, 5.5, 5.5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
+        assertArrayEquals(new double[]{6, 6, 6, 6}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
     }
 
 }
