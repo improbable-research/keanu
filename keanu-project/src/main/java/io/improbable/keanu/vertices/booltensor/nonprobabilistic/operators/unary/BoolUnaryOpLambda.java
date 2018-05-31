@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.Function;
 
-public abstract class BoolUnaryOpLambda<A> extends BoolUnaryOpVertex<A> {
+public abstract class BoolUnaryOpLambda<A extends Tensor> extends BoolUnaryOpVertex<A> {
 
     private final Function<A, BooleanTensor> boolOp;
 
