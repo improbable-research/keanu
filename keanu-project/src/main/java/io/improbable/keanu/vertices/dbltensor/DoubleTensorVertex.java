@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.*;
 
 import java.util.*;
 
@@ -28,6 +29,42 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
 
     public DoubleTensorVertex power(DoubleTensorVertex power) {
         return new TensorPowerVertex(this, power);
+    }
+
+    public DoubleTensorVertex abs() {
+        return new TensorAbsVertex(this);
+    }
+
+    public DoubleTensorVertex floor() {
+        return new TensorFloorVertex(this);
+    }
+
+    public DoubleTensorVertex ceil() {
+        return new TensorCeilVertex(this);
+    }
+
+    public DoubleTensorVertex exp() {
+        return new TensorExpVertex(this);
+    }
+
+    public DoubleTensorVertex log() {
+        return new TensorLogVertex(this);
+    }
+
+    public DoubleTensorVertex sigmoid() {
+        return new TensorSigmoidVertex(this);
+    }
+
+    public DoubleTensorVertex asin() {
+        return new TensorArcSinVertex(this);
+    }
+
+    public DoubleTensorVertex acos() {
+        return new TensorArcCosVertex(this);
+    }
+
+    public DoubleTensorVertex atan() {
+        return new TensorArcTanVertex(this);
     }
 
     public DoubleTensorVertex atan2(DoubleTensorVertex that) {

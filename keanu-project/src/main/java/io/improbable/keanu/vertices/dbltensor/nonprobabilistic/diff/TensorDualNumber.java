@@ -83,7 +83,6 @@ public class TensorDualNumber {
         TensorPartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
         TensorPartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().times(newValue));
         TensorPartialDerivatives newInf = thisInfBase.add(thisInfExponent);
-        DoubleTensor g = this.value.log();
         return new TensorDualNumber(newValue, newInf);
     }
 
@@ -150,12 +149,12 @@ public class TensorDualNumber {
     }
 
     public TensorDualNumber asin() {
-        DoubleTensor dArcSin = (value.unaryMinus().plus(1).times(value)).sqrt().reciprocal();
+        DoubleTensor dArcSin = (value.unaryMinus().times(value).plus(1)).sqrt().reciprocal();
         return new TensorDualNumber(value.sin(), getPartialDerivatives().multiplyBy(dArcSin));
     }
 
     public TensorDualNumber acos() {
-        DoubleTensor dArcCos = value.unaryMinus().plus(1).times(value).sqrt().reciprocal().unaryMinus();
+        DoubleTensor dArcCos = value.unaryMinus().times(value).plus(1).sqrt().reciprocal().unaryMinus();
         return new TensorDualNumber(value.acos(), getPartialDerivatives().multiplyBy(dArcCos));
     }
 

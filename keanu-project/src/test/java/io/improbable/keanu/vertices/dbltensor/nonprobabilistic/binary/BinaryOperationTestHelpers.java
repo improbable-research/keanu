@@ -48,7 +48,6 @@ public class BinaryOperationTestHelpers {
                                                           double[] expected,
                                                           BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
 
-        KeanuRandom random = new KeanuRandom(1);
         TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
         TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
