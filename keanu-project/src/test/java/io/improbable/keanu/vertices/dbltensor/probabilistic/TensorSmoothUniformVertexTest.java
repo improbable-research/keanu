@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.SmoothUniformVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
