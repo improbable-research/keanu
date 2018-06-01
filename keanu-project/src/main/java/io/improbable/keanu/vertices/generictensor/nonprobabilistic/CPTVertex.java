@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CPTVertex<T, OUT extends Tensor<T>> extends NonProbabilistic<T, OUT> {
+public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
     private final Map<Condition, Vertex<OUT>> conditions;

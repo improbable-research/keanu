@@ -5,8 +5,8 @@ import io.improbable.keanu.vertices.booltensor.BoolVertex;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.booltensor.BoolVertex.FALSE;
-import static io.improbable.keanu.vertices.booltensor.BoolVertex.TRUE;
+import static io.improbable.keanu.vertices.booltensor.nonprobabilistic.ConstantBoolVertex.FALSE;
+import static io.improbable.keanu.vertices.booltensor.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
@@ -17,7 +17,7 @@ public class CPTVertexTest {
 
         BoolVertex A = new Flip(0.2);
 
-        CPTVertex<Boolean, BooleanTensor> cpt = CPT.of(A)
+        CPTVertex<BooleanTensor> cpt = CPT.of(A)
             .when(true).then(TRUE)
             .orDefault(FALSE);
 
@@ -34,7 +34,7 @@ public class CPTVertexTest {
         BoolVertex A = new Flip(0.5);
         BoolVertex B = new Flip(0.5);
 
-        CPTVertex<Boolean, BooleanTensor> cpt = CPT.of(A, B)
+        CPTVertex<BooleanTensor> cpt = CPT.of(A, B)
             .when(true, true).then(FALSE)
             .when(false, true).then(TRUE)
             .when(true, false).then(TRUE)

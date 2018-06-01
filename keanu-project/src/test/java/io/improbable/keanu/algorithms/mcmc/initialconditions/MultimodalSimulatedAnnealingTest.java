@@ -66,7 +66,7 @@ public class MultimodalSimulatedAnnealingTest {
 
         BoolVertex E = new Flip(0.5);
 
-        DoubleIfVertex F = If.isTrue(E)
+        DoubleTensorVertex F = If.isTrue(E)
             .then(B)
             .orElse(D);
 

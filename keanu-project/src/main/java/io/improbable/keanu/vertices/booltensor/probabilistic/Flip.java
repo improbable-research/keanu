@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.booltensor.probabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -14,9 +15,10 @@ public class Flip extends ProbabilisticBool {
     private final Vertex<DoubleTensor> probTrue;
 
     public Flip(int[] shape, Vertex<DoubleTensor> probTrue) {
+        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
-        setValue(BooleanTensor.placeHolder(shape));
+        setValue(BooleanTensor.placeHolder(resultShape));
     }
 
     public Flip(Vertex<DoubleTensor> probTrue) {
@@ -58,5 +60,4 @@ public class Flip extends ProbabilisticBool {
 
         return uniforms.lessThan(probTrue.getValue());
     }
-
 }

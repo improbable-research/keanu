@@ -61,9 +61,9 @@ public class If {
             this.thn = thn;
         }
 
-        public IfVertex<T, Tensor<T>> orElse(Vertex<? extends Tensor<T>> els) {
+        public Vertex<Tensor<T>> orElse(Vertex<? extends Tensor<T>> els) {
             if (Arrays.equals(thn.getShape(), els.getShape())) {
-                return new GenericIfVertex<>(thn.getShape(), predicate, thn, els);
+                return new IfVertex<>(predicate, thn, els);
             } else {
                 throw new IllegalArgumentException("Else must match then shape");
             }
@@ -81,9 +81,9 @@ public class If {
             this.thn = thn;
         }
 
-        public BooleanIfVertex orElse(Vertex<? extends BooleanTensor> els) {
+        public BoolVertex orElse(Vertex<? extends BooleanTensor> els) {
             if (Arrays.equals(thn.getShape(), els.getShape())) {
-                return new BooleanIfVertex(thn.getShape(), predicate, thn, els);
+                return new BooleanIfVertex(predicate, thn, els);
             } else {
                 throw new IllegalArgumentException("Else must match then shape");
             }
@@ -101,15 +101,15 @@ public class If {
             this.thn = thn;
         }
 
-        public DoubleIfVertex orElse(Vertex<? extends DoubleTensor> els) {
+        public DoubleTensorVertex orElse(Vertex<? extends DoubleTensor> els) {
             if (Arrays.equals(thn.getShape(), els.getShape())) {
-                return new DoubleIfVertex(thn.getShape(), predicate, thn, els);
+                return new DoubleIfVertex(predicate, thn, els);
             } else {
                 throw new IllegalArgumentException("Else must match then shape");
             }
         }
 
-        public DoubleIfVertex orElse(double els) {
+        public DoubleTensorVertex orElse(double els) {
             return orElse(new ConstantDoubleTensorVertex(els));
         }
     }

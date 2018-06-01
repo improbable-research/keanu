@@ -6,12 +6,11 @@ import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 public class CastBoolVertex extends NonProbabilisticBool {
 
-    private final Vertex<BooleanTensor> inputVertex;
+    private final Vertex<? extends BooleanTensor> inputVertex;
 
-    public CastBoolVertex(Vertex<BooleanTensor> inputVertex) {
+    public CastBoolVertex(Vertex<? extends BooleanTensor> inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-        setValue(BooleanTensor.placeHolder(inputVertex.getShape()));
     }
 
     @Override

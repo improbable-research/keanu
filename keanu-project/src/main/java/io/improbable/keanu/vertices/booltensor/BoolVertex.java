@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.DiscreteTensorVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.booltensor.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.multiple.AndMultipleVertex;
@@ -16,9 +17,6 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BoolVertex extends DiscreteTensorVertex<BooleanTensor> {
-
-    public static final ConstantVertex<Boolean, BooleanTensor> TRUE = ConstantVertex.of(true);
-    public static final ConstantVertex<Boolean, BooleanTensor> FALSE = ConstantVertex.of(false);
 
     @SafeVarargs
     public final io.improbable.keanu.vertices.booltensor.BoolVertex or(Vertex<BooleanTensor>... those) {

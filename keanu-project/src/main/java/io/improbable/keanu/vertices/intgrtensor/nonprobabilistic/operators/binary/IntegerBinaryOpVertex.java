@@ -13,11 +13,9 @@ public abstract class IntegerBinaryOpVertex extends NonProbabilisticInteger {
     protected final IntegerVertex b;
 
     public IntegerBinaryOpVertex(IntegerVertex a, IntegerVertex b) {
-        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape());
         this.a = a;
         this.b = b;
         setParents(a, b);
-        setValue(IntegerTensor.placeHolder(resultShape));
     }
 
     @Override

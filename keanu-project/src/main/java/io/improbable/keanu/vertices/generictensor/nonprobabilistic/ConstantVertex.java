@@ -7,21 +7,21 @@ import io.improbable.keanu.tensor.generic.SimpleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-public class ConstantVertex<T, TENSOR extends Tensor<T>> extends NonProbabilistic<T, TENSOR> {
+public class ConstantVertex<TENSOR extends Tensor> extends NonProbabilistic<TENSOR> {
 
-    public static ConstantVertex<Boolean, BooleanTensor> of(boolean value) {
+    public static ConstantVertex<BooleanTensor> of(boolean value) {
         return new ConstantVertex<>(BooleanTensor.scalar(value));
     }
 
-    public static ConstantVertex<Integer, IntegerTensor> of(int value) {
+    public static ConstantVertex<IntegerTensor> of(int value) {
         return new ConstantVertex<>(IntegerTensor.scalar(value));
     }
 
-    public static ConstantVertex<Double, DoubleTensor> of(double value) {
+    public static ConstantVertex<DoubleTensor> of(double value) {
         return new ConstantVertex<>(DoubleTensor.scalar(value));
     }
 
-    public static <GENERIC> ConstantVertex<GENERIC, SimpleTensor<GENERIC>> of(GENERIC value) {
+    public static <GENERIC> ConstantVertex<SimpleTensor<GENERIC>> of(GENERIC value) {
         return new ConstantVertex<>(new SimpleTensor<>(value));
     }
 

@@ -11,7 +11,6 @@ public class CastIntegerVertex extends NonProbabilisticInteger {
     public CastIntegerVertex(Vertex<IntegerTensor> inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-        setValue(IntegerTensor.placeHolder(inputVertex.getShape()));
     }
 
     @Override

@@ -30,7 +30,7 @@ public class EqualsVertexTest {
     }
 
     private <T> void equals(T a, T b, boolean expected) {
-        EqualsVertex<T, SimpleTensor<T>> vertex = new EqualsVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
+        EqualsVertex<SimpleTensor<T>> vertex = new EqualsVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
         assertEquals(expected, vertex.lazyEval().scalar());
     }
 }

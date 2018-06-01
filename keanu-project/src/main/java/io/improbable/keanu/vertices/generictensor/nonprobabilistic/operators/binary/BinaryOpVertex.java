@@ -5,27 +5,26 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.NonProbabilistic;
 
-public abstract class BinaryOpVertex<A, B, C,
-    TA extends Tensor<A>, TB extends Tensor<B>, TC extends Tensor<C>> extends NonProbabilistic<C, TC> {
+public abstract class BinaryOpVertex<A extends Tensor, B extends Tensor, C extends Tensor> extends NonProbabilistic<C> {
 
-    protected final Vertex<TA> a;
-    protected final Vertex<TB> b;
+    protected final Vertex<A> a;
+    protected final Vertex<B> b;
 
-    public BinaryOpVertex(Vertex<TA> a, Vertex<TB> b) {
+    public BinaryOpVertex(Vertex<A> a, Vertex<B> b) {
         this.a = a;
         this.b = b;
         setParents(a, b);
     }
 
     @Override
-    public TC sample(KeanuRandom random) {
+    public C sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
     }
 
-    public TC getDerivedValue() {
+    public C getDerivedValue() {
         return op(a.getValue(), b.getValue());
     }
 
-    protected abstract TC op(TA a, TB b);
+    protected abstract C op(A a, B b);
 }
 

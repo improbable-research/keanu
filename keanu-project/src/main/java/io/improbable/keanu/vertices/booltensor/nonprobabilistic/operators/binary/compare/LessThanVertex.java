@@ -5,9 +5,9 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 
-public class LessThanVertex<TA extends NumberTensor, TB extends NumberTensor> extends BoolBinaryOpVertex<TA, TB> {
+public class LessThanVertex<A extends NumberTensor, B extends NumberTensor> extends BoolBinaryOpVertex<A, B> {
 
-    public LessThanVertex(Vertex<TA> a, Vertex<TB> b) {
+    public LessThanVertex(Vertex<A> a, Vertex<B> b) {
         super(a, b);
     }
 
@@ -15,7 +15,7 @@ public class LessThanVertex<TA extends NumberTensor, TB extends NumberTensor> ex
      * Returns true if a is less than b
      */
     @Override
-    public BooleanTensor op(TA a, TB b) {
+    public BooleanTensor op(A a, B b) {
         return a.toDouble().lessThan(b.toDouble());
     }
 

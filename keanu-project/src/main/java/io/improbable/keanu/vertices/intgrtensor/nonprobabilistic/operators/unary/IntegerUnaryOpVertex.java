@@ -12,7 +12,6 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
     public IntegerUnaryOpVertex(IntegerVertex inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-        setValue(IntegerTensor.placeHolder(inputVertex.getShape()));
     }
 
     @Override

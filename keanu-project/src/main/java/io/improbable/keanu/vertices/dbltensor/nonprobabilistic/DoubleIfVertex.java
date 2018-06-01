@@ -3,19 +3,43 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.generictensor.nonprobabilistic.IfVertex;
+import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 
-public class DoubleIfVertex extends IfVertex<Double, DoubleTensor> {
+import java.util.Map;
 
-    public DoubleIfVertex(int[] shape,
-                          Vertex<? extends BooleanTensor> predicate,
+public class DoubleIfVertex extends NonProbabilisticDoubleTensor {
+
+    private final Vertex<? extends BooleanTensor> predicate;
+    private final Vertex<? extends DoubleTensor> thn;
+    private final Vertex<? extends DoubleTensor> els;
+
+    public DoubleIfVertex(Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
-        super(DoubleTensor.placeHolder(shape), predicate, thn, els);
+
+        this.predicate = predicate;
+        this.thn = thn;
+        this.els = els;
+        setParents(predicate, thn, els);
     }
 
     @Override
-    protected DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
+    public DoubleTensor sample(KeanuRandom random) {
+        return op(predicate.sample(random), thn.sample(random), els.sample(random));
+    }
+
+    @Override
+    public DoubleTensor getDerivedValue() {
+        return op(predicate.getValue(), thn.getValue(), els.getValue());
+    }
+
+    private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
         return predicate.setDoubleIf(thn, els);
+    }
+
+    @Override
+    protected TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
+        throw new UnsupportedOperationException("if is non-differentiable");
     }
 }

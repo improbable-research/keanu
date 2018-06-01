@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.NonProbabilistic;
 
-public abstract class UnaryOpVertex<IN_TENSOR extends Tensor, OUT, OUT_TENSOR extends Tensor<OUT>> extends NonProbabilistic<OUT, OUT_TENSOR> {
+public abstract class UnaryOpVertex<IN_TENSOR extends Tensor, OUT_TENSOR extends Tensor> extends NonProbabilistic<OUT_TENSOR> {
 
     protected final Vertex<IN_TENSOR> inputVertex;
 

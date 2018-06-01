@@ -5,19 +5,19 @@ import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.BiFunction;
 
-public class BinaryOpLambda<A, B, C, TA extends Tensor<A>, TB extends Tensor<B>, TC extends Tensor<C>> extends BinaryOpVertex<A, B, C, TA, TB, TC> {
+public class BinaryOpLambda<A extends Tensor, B extends Tensor, C extends Tensor> extends BinaryOpVertex<A, B, C> {
 
-    private BiFunction<TA, TB, TC> op;
+    private BiFunction<A, B, C> op;
 
-    public BinaryOpLambda(Vertex<TA> a,
-                          Vertex<TB> b,
-                          BiFunction<TA, TB, TC> op) {
+    public BinaryOpLambda(Vertex<A> a,
+                          Vertex<B> b,
+                          BiFunction<A, B, C> op) {
         super(a, b);
         this.op = op;
     }
 
     @Override
-    protected TC op(TA a, TB b) {
+    protected C op(A a, B b) {
         return op.apply(a, b);
     }
 

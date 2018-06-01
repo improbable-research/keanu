@@ -15,9 +15,6 @@ import java.util.List;
 
 public abstract class BoolVertex extends DiscreteVertex<Boolean> {
 
-    public static final ConstantVertex<Boolean> TRUE = new ConstantVertex<>(true);
-    public static final ConstantVertex<Boolean> FALSE = new ConstantVertex<>(false);
-
     @SafeVarargs
     public final BoolVertex or(Vertex<Boolean>... those) {
         if (those.length == 0) return this;

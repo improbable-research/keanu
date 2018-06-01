@@ -69,7 +69,7 @@ public class CPT {
             return new CPTWhenBuilder<>(new CPTVertex.Condition(condition), this);
         }
 
-        public CPTVertex<T, OUT> orDefault(Vertex<OUT> defaultResult) {
+        public CPTVertex<OUT> orDefault(Vertex<OUT> defaultResult) {
             return new CPTVertex<>(inputs, conditions, defaultResult);
         }
 

@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 import java.util.function.Function;
 
-public class UnaryOpLambda<IN_TENSOR extends Tensor, OUT, OUT_TENSOR extends Tensor<OUT>> extends UnaryOpVertex<IN_TENSOR, OUT, OUT_TENSOR> {
+public class UnaryOpLambda<IN_TENSOR extends Tensor, OUT_TENSOR extends Tensor> extends UnaryOpVertex<IN_TENSOR, OUT_TENSOR> {
 
     private Function<IN_TENSOR, OUT_TENSOR> op;
 

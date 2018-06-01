@@ -32,7 +32,7 @@ public class BinaryOpVertexTest {
         Flip flip = new Flip(0.5);
 
         TensorGaussianVertex gaussianVertex = new TensorGaussianVertex(0.0, 1.0);
-        BinaryOpLambda<Boolean, Double, Double, BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
+        BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
             flip, gaussianVertex,
             (BooleanTensor f, DoubleTensor g) ->
                 f.setDoubleIf(g, DoubleTensor.scalar(0.0))

@@ -5,14 +5,14 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 
-public class NotEqualsVertex<T, TA extends Tensor<T>, TB extends Tensor<T>> extends BoolBinaryOpVertex<TA, TB> {
+public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends BoolBinaryOpVertex<A, B> {
 
-    public NotEqualsVertex(Vertex<TA> a, Vertex<TB> b) {
+    public NotEqualsVertex(Vertex<A> a, Vertex<B> b) {
         super(a, b);
     }
 
     @Override
-    public BooleanTensor op(TA a, TB b) {
+    public BooleanTensor op(A a, B b) {
         return a.elementwiseEquals(b).not();
     }
 

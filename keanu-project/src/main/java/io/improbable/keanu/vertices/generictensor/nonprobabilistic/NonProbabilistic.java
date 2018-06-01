@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Map;
 
-public abstract class NonProbabilistic<T, TENSOR extends Tensor<T>> extends Vertex<TENSOR> {
+public abstract class NonProbabilistic<TENSOR extends Tensor> extends Vertex<TENSOR> {
 
     @Override
     public double logProb(TENSOR value) {

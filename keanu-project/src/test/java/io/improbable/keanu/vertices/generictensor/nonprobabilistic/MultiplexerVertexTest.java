@@ -47,7 +47,7 @@ public class MultiplexerVertexTest {
         optionGroup2.put(TestEnum.D, new ConstantDoubleTensorVertex(0.5));
         SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2);
 
-        MultiplexerVertex<TestEnum, Tensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
+        MultiplexerVertex<Tensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 
         LinkedHashMap<TestEnum, Integer> frequencies = new LinkedHashMap<>();
         frequencies.put(TestEnum.A, 0);

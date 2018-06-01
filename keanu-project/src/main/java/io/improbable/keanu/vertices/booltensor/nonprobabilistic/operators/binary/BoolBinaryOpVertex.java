@@ -7,17 +7,15 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.NonProbabilisticBool;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-public abstract class BoolBinaryOpVertex<TA extends Tensor, TB extends Tensor> extends NonProbabilisticBool {
+public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends NonProbabilisticBool {
 
-    protected final Vertex<TA> a;
-    protected final Vertex<TB> b;
+    protected final Vertex<A> a;
+    protected final Vertex<B> b;
 
-    public BoolBinaryOpVertex(Vertex<TA> a, Vertex<TB> b) {
-        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape());
+    public BoolBinaryOpVertex(Vertex<A> a, Vertex<B> b) {
         this.a = a;
         this.b = b;
         setParents(a, b);
-        setValue(BooleanTensor.placeHolder(resultShape));
     }
 
     @Override
@@ -30,5 +28,5 @@ public abstract class BoolBinaryOpVertex<TA extends Tensor, TB extends Tensor> e
         return op(a.getValue(), b.getValue());
     }
 
-    protected abstract BooleanTensor op(TA a, TB b);
+    protected abstract BooleanTensor op(A a, B b);
 }

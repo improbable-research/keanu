@@ -68,17 +68,17 @@ public interface Tensor<T> {
 
     T[] asFlatArray();
 
-    default BooleanTensor elementwiseEquals(Tensor<T> that) {
+    default BooleanTensor elementwiseEquals(Tensor that) {
         return elementwiseEquals(this, that);
     }
 
-    static <T> BooleanTensor elementwiseEquals(Tensor<T> a, Tensor<T> b) {
+    static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
         if (!a.hasSameShapeAs(b)) {
             throw new IllegalArgumentException("Cannot compare tensors of different shapes");
         }
 
-        T[] aArray = a.asFlatArray();
-        T[] bArray = b.asFlatArray();
+        Object[] aArray = a.asFlatArray();
+        Object[] bArray = b.asFlatArray();
 
         boolean[] equality = new boolean[aArray.length];
 

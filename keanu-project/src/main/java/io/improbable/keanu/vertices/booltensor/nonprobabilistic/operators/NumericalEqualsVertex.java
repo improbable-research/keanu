@@ -20,16 +20,10 @@ public class NumericalEqualsVertex extends NonProbabilisticBool {
     public NumericalEqualsVertex(Vertex<? extends NumberTensor> a,
                                  Vertex<? extends NumberTensor> b,
                                  Vertex<? extends NumberTensor> epsilon) {
-        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(
-            a.getShape(),
-            b.getShape(),
-            epsilon.getShape()
-        );
         this.a = a;
         this.b = b;
         this.epsilon = epsilon;
         setParents(a, b, epsilon);
-        setValue(BooleanTensor.placeHolder(resultShape));
     }
 
     @Override

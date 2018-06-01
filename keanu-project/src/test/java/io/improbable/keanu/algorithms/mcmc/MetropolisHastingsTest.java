@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
 import org.junit.Before;
@@ -103,7 +102,7 @@ public class MetropolisHastingsTest {
 
         Flip A = new Flip(0.5);
 
-        DoubleIfVertex B = If.isTrue(A)
+        DoubleTensorVertex B = If.isTrue(A)
             .then(0.9)
             .orElse(0.1);
 
@@ -134,7 +133,7 @@ public class MetropolisHastingsTest {
 
         BoolVertex C = A.or(B);
 
-        DoubleIfVertex D = If.isTrue(C)
+        DoubleTensorVertex D = If.isTrue(C)
             .then(0.9)
             .orElse(0.1);
 

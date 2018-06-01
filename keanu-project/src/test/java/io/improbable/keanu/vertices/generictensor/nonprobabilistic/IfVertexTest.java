@@ -6,7 +6,6 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.booltensor.BoolVertex;
-import io.improbable.keanu.vertices.booltensor.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
@@ -14,8 +13,8 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static io.improbable.keanu.vertices.booltensor.BoolVertex.FALSE;
-import static io.improbable.keanu.vertices.booltensor.BoolVertex.TRUE;
+import static io.improbable.keanu.vertices.booltensor.nonprobabilistic.ConstantBoolVertex.FALSE;
+import static io.improbable.keanu.vertices.booltensor.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -40,7 +39,7 @@ public class IfVertexTest {
 
         BoolVertex predicate = new Flip(0.5);
 
-        IfVertex<Boolean, Tensor<Boolean>> ifIsTrue = If.isTrue(predicate)
+        BoolVertex ifIsTrue = If.isTrue(predicate)
             .then(TRUE)
             .orElse(FALSE);
 
@@ -57,7 +56,7 @@ public class IfVertexTest {
         double pV3 = 0.1;
         Flip v3 = new Flip(pV3);
 
-        BooleanIfVertex v4 = If.isTrue(v1)
+        BoolVertex v4 = If.isTrue(v1)
             .then(v2)
             .orElse(v3);
 

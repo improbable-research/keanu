@@ -30,7 +30,7 @@ public class NotEqualsVertexTest {
     }
 
     private <T> void equals(T a, T b, boolean expected) {
-        NotEqualsVertex<T, Tensor<T>, Tensor<T>> vertex = new NotEqualsVertex<>(
+        NotEqualsVertex<Tensor<T>, Tensor<T>> vertex = new NotEqualsVertex<>(
             new ConstantVertex<>(Tensor.scalar(a)),
             new ConstantVertex<>(Tensor.scalar(b))
         );

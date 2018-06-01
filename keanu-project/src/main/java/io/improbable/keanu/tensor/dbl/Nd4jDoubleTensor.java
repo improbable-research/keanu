@@ -640,7 +640,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public BooleanTensor elementwiseEquals(Tensor<Double> that) {
+    public BooleanTensor elementwiseEquals(Tensor that) {
 
         if (that instanceof Nd4jDoubleTensor) {
             INDArray eq = tensor.eq(unsafeGetNd4J((Nd4jDoubleTensor) that));

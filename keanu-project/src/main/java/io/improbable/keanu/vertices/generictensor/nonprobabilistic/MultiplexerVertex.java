@@ -6,7 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.intgrtensor.IntegerVertex;
 
-public class MultiplexerVertex<T, TENSOR extends Tensor<T>> extends NonProbabilistic<T, TENSOR> {
+public class MultiplexerVertex<TENSOR extends Tensor> extends NonProbabilistic<TENSOR> {
 
     private final IntegerVertex selectorControlVertex;
     private final Vertex<TENSOR>[] selectVertices;
