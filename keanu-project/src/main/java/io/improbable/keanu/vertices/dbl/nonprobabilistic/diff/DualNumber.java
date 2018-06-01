@@ -150,4 +150,9 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         double dArcCos = -1.0 / Math.sqrt(1.0 - getValue() * getValue());
         return new DualNumber(Math.acos(getValue()), getPartialDerivatives().multiplyBy(dArcCos));
     }
+
+    public DualNumber atan() {
+        double dArcTan = 1 / (1 + Math.pow(getValue(), 2));
+        return new DualNumber(Math.atan(getValue()), getPartialDerivatives().multiplyBy(dArcTan));
+    }
 }

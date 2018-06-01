@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Collections;
 import java.util.Map;
@@ -75,6 +77,15 @@ public class TensorDualNumber {
         return new TensorDualNumber(newValue, newInf);
     }
 
+    public TensorDualNumber pow(TensorDualNumber that) {
+        // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
+        DoubleTensor newValue = this.value.pow(that.value);
+        TensorPartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
+        TensorPartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().timesInPlace(newValue));
+        TensorPartialDerivatives newInf = thisInfBase.add(thisInfExponent);
+        return new TensorDualNumber(newValue, newInf);
+    }
+
     public TensorDualNumber plus(TensorDualNumber that) {
         return add(that);
     }
@@ -118,4 +129,42 @@ public class TensorDualNumber {
     public TensorDualNumber unaryMinus() {
         return times(-1.0);
     }
+
+    public TensorDualNumber exp() {
+        DoubleTensor eVal = value.exp();
+        return new TensorDualNumber(eVal, getPartialDerivatives().multiplyBy(eVal));
+    }
+
+    public TensorDualNumber sin() {
+        return new TensorDualNumber(value.sin(), getPartialDerivatives().multiplyBy(value.cos()));
+    }
+
+    public TensorDualNumber cos() {
+        return new TensorDualNumber(value.cos(), getPartialDerivatives().multiplyBy(value.sin().unaryMinusInPlace()));
+    }
+
+    public TensorDualNumber tan() {
+        DoubleTensor dTan = value.cos().powInPlace(2).reciprocalInPlace();
+        return new TensorDualNumber(value.tan(), getPartialDerivatives().multiplyBy(dTan));
+    }
+
+    public TensorDualNumber asin() {
+        DoubleTensor dArcSin = (value.unaryMinus().timesInPlace(value).plusInPlace(1)).sqrtInPlace().reciprocalInPlace();
+        return new TensorDualNumber(value.asin(), getPartialDerivatives().multiplyBy(dArcSin));
+    }
+
+    public TensorDualNumber acos() {
+        DoubleTensor dArcCos = value.unaryMinus().timesInPlace(value).plusInPlace(1).sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
+        return new TensorDualNumber(value.acos(), getPartialDerivatives().multiplyBy(dArcCos));
+    }
+
+    public TensorDualNumber atan() {
+        DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
+        return new TensorDualNumber(value.atan(), getPartialDerivatives().multiplyBy(dArcTan));
+    }
+
+    public TensorDualNumber log() {
+        return new TensorDualNumber(value.log(), getPartialDerivatives().divideBy(value));
+    }
+
 }

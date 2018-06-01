@@ -2,12 +2,12 @@ package io.improbable.keanu.vertices.dbltensor;
 
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorAdditionVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDifferenceVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDivisionVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorMultiplicationVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.*;
 
 import java.util.*;
 
@@ -27,6 +27,82 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
 
     public DoubleTensorVertex divideBy(DoubleTensorVertex that) {
         return new TensorDivisionVertex(this, that);
+    }
+
+    public DoubleTensorVertex pow(DoubleTensorVertex exponent) {
+        return new TensorPowerVertex(this, exponent);
+    }
+
+    public DoubleTensorVertex minus(double that) {
+        return new TensorDifferenceVertex(this, new ConstantTensorVertex(that));
+    }
+
+    public DoubleTensorVertex plus(double that) {
+        return new TensorAdditionVertex(this, new ConstantTensorVertex(that));
+    }
+
+    public DoubleTensorVertex multiply(double that) {
+        return new TensorMultiplicationVertex(this, new ConstantTensorVertex(that));
+    }
+
+    public DoubleTensorVertex divideBy(double that) {
+        return new TensorDivisionVertex(this, new ConstantTensorVertex(that));
+    }
+
+    public DoubleTensorVertex pow(double power) {
+        return new TensorPowerVertex(this, new ConstantTensorVertex(power));
+    }
+
+    public DoubleTensorVertex abs() {
+        return new TensorAbsVertex(this);
+    }
+
+    public DoubleTensorVertex floor() {
+        return new TensorFloorVertex(this);
+    }
+
+    public DoubleTensorVertex ceil() {
+        return new TensorCeilVertex(this);
+    }
+
+    public DoubleTensorVertex exp() {
+        return new TensorExpVertex(this);
+    }
+
+    public DoubleTensorVertex log() {
+        return new TensorLogVertex(this);
+    }
+
+    public DoubleTensorVertex sigmoid() {
+        return new TensorSigmoidVertex(this);
+    }
+
+    public DoubleTensorVertex sin() {
+        return new TensorSinVertex(this);
+    }
+
+    public DoubleTensorVertex cos() {
+        return new TensorCosVertex(this);
+    }
+
+    public DoubleTensorVertex tan() {
+        return new TensorTanVertex(this);
+    }
+
+    public DoubleTensorVertex asin() {
+        return new TensorArcSinVertex(this);
+    }
+
+    public DoubleTensorVertex acos() {
+        return new TensorArcCosVertex(this);
+    }
+
+    public DoubleTensorVertex atan() {
+        return new TensorArcTanVertex(this);
+    }
+
+    public DoubleTensorVertex atan2(DoubleTensorVertex that) {
+        return new TensorArcTan2Vertex(this, that);
     }
 
     public final TensorDualNumber getDualNumber() {

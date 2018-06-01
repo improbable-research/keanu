@@ -20,7 +20,6 @@ public class TensorSmoothUniform {
 
         DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
         firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
-        firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
         final DoubleTensor inverseFirstConditional = DoubleTensor.ones(firstConditional.getShape()).minusInPlace(firstConditional);
 
         final DoubleTensor secondConditional = rScaled.getLessThanMask(xMin);
