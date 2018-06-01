@@ -150,7 +150,7 @@ public class TensorDualNumber {
 
     public TensorDualNumber asin() {
         DoubleTensor dArcSin = (value.unaryMinus().timesInPlace(value).plusInPlace(1)).sqrtInPlace().reciprocalInPlace();
-        return new TensorDualNumber(value.sin(), getPartialDerivatives().multiplyBy(dArcSin));
+        return new TensorDualNumber(value.asin(), getPartialDerivatives().multiplyBy(dArcSin));
     }
 
     public TensorDualNumber acos() {

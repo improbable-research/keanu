@@ -18,8 +18,7 @@ public class UnaryOperationTestHelpers {
                                                    double expected,
                                                    Function<DoubleTensorVertex, DoubleTensorVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
+        ConstantTensorVertex A = new ConstantTensorVertex(aValue);
 
         assertEquals(expected, op.apply(A).getValue().scalar(), 1e-5);
     }
@@ -39,8 +38,7 @@ public class UnaryOperationTestHelpers {
                                                        double[] expected,
                                                        Function<DoubleTensorVertex, DoubleTensorVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
+        ConstantTensorVertex A = new ConstantTensorVertex(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A).getValue();
 
@@ -55,6 +53,7 @@ public class UnaryOperationTestHelpers {
     public static void calculatesDualNumberOfMatrixElementWiseOperator(double[] aValues,
                                                                        double[] expectedGradientWrtA,
                                                                        Function<DoubleTensorVertex, DoubleTensorVertex> op) {
+
         TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
 
@@ -62,7 +61,6 @@ public class UnaryOperationTestHelpers {
         DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{2, 2});
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        System.out.println(wrtA.getValue(0, 0));
         assertEquals(expectedTensorA.getValue(0, 0), wrtA.getValue(0, 0), 1e-5);
         assertEquals(expectedTensorA.getValue(0, 1), wrtA.getValue(0, 1), 1e-5);
         assertEquals(expectedTensorA.getValue(1, 0), wrtA.getValue(1, 0), 1e-5);

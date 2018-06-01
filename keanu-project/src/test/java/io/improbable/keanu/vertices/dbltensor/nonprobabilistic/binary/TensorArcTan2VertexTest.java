@@ -12,7 +12,7 @@ public class TensorArcTan2VertexTest {
         operatesOnTwoScalarVertexValues(
             1.0,
             Math.PI,
-            Math.atan2(1.0, Math.PI),
+            Math.atan2(Math.PI, 1.0),
             DoubleTensorVertex::atan2
         );
     }
@@ -38,7 +38,7 @@ public class TensorArcTan2VertexTest {
         operatesOnTwo2x2MatrixVertexValues(
             new double[]{0.0, 0.1, 0.2, 0.3},
             new double[]{2.0, 4.0, 3.0, 8.0},
-            new double[]{0.0, Math.atan2(.1, 4), Math.atan2(.2, 3), Math.atan2(.3, 8)},
+            new double[]{Math.atan2(2., 0.), Math.atan2(4, .1), Math.atan2(3, .2), Math.atan2(8, .3)},
             DoubleTensorVertex::atan2
         );
     }

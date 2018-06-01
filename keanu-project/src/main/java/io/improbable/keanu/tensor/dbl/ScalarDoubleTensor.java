@@ -10,16 +10,19 @@ import java.util.function.Function;
 public class ScalarDoubleTensor implements DoubleTensor {
 
     private Double value;
+    private Sigmoid signmoid;
     private int[] shape;
 
     public ScalarDoubleTensor(double value) {
         this.value = value;
         this.shape = SCALAR_SHAPE;
+        this.signmoid = new Sigmoid();
     }
 
     public ScalarDoubleTensor(int[] shape) {
         this.value = null;
         this.shape = shape;
+        this.signmoid = new Sigmoid();
     }
 
     @Override
@@ -148,6 +151,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor atan() {
         return this.duplicate().atanInPlace();
+    }
+
+    @Override
+    public DoubleTensor atan2(double y) {
+        return this.duplicate().atan2InPlace(y);
     }
 
     @Override
@@ -377,9 +385,15 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor atan2InPlace(double y) {
+        value = Math.atan2(y, value);
+        return this;
+    }
+
+    @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
-            value = Math.atan2(value, y.scalar());
+            value = Math.atan2(y.scalar(), value);
         } else {
             return Nd4jDoubleTensor.create(value, y.getShape()).atan2InPlace(y);
         }
@@ -500,7 +514,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sigmoidInPlace() {
-        value = new Sigmoid().value(value);
+        value = signmoid.value(value);
         return this;
     }
 

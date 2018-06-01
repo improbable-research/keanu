@@ -213,6 +213,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor atan2(double y) {
+        return duplicate().atan2InPlace(y);
+    }
+
+    @Override
     public DoubleTensor atan2(DoubleTensor y) {
         return duplicate().atan2InPlace(y);
     }
@@ -385,12 +390,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor atan2InPlace(double y) {
+        return atan2InPlace(DoubleTensor.create(y, this.shape));
+    }
+
+    @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
-            tensor = Transforms.atan2(Nd4j.valueArrayOf(this.shape, y.scalar()), tensor);
+            tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.shape, y.scalar()));
         }
         else {
-            tensor = Transforms.atan2(unsafeGetNd4J(y), tensor);
+            tensor = Transforms.atan2(tensor, unsafeGetNd4J(y));
         }
         return this;
     }

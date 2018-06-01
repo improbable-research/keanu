@@ -29,8 +29,8 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return new TensorDivisionVertex(this, that);
     }
 
-    public DoubleTensorVertex power(DoubleTensorVertex power) {
-        return new TensorPowerVertex(this, power);
+    public DoubleTensorVertex pow(DoubleTensorVertex exponent) {
+        return new TensorPowerVertex(this, exponent);
     }
 
     public DoubleTensorVertex minus(double that) {
@@ -49,7 +49,7 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
         return new TensorDivisionVertex(this, new ConstantTensorVertex(that));
     }
 
-    public DoubleTensorVertex power(double power) {
+    public DoubleTensorVertex pow(double power) {
         return new TensorPowerVertex(this, new ConstantTensorVertex(power));
     }
 

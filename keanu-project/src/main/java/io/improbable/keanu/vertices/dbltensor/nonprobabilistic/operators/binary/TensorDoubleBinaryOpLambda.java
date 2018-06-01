@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
 public class TensorDoubleBinaryOpLambda<A, B> extends NonProbabilisticDoubleTensor {
 
     protected final Vertex<A> a;
@@ -25,6 +27,8 @@ public class TensorDoubleBinaryOpLambda<A, B> extends NonProbabilisticDoubleTens
         this.op = op;
         this.dualNumberCalculation = dualNumberCalculation;
         setParents(a, b);
+        setValue(DoubleTensor.placeHolder(this.getValue().getShape()));
+
     }
 
     public TensorDoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, DoubleTensor> op) {

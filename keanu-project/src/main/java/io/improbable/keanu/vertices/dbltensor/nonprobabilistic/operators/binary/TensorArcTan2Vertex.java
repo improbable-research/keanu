@@ -26,10 +26,10 @@ public class TensorArcTan2Vertex extends TensorBinaryOpVertex {
         TensorDualNumber aDual = dualNumbers.get(a);
         TensorDualNumber bDual = dualNumbers.get(b);
 
-        DoubleTensor denominator = ((b.getValue().pow(2)).times((a.getValue().pow(2))));
+        DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
 
         TensorPartialDerivatives thisInfA = aDual.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
-        TensorPartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinus());
+        TensorPartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());
         TensorPartialDerivatives newInf = thisInfA.add(thisInfB);
         return new TensorDualNumber(op(a.getValue(), b.getValue()), newInf);
     }
