@@ -90,6 +90,8 @@ public class GradientOptimizer {
                             List<? extends Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
+        bayesNet.cascadeObservations();
+
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());

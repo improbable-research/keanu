@@ -124,6 +124,7 @@ public class MetropolisHastings {
     }
 
     private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
+        bayesNet.cascadeObservations();
         if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {

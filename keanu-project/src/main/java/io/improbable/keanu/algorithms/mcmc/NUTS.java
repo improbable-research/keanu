@@ -40,6 +40,8 @@ public class NUTS {
                                                      final double epsilon,
                                                      final KeanuRandom random) {
 
+        bayesNet.cascadeObservations();
+
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();

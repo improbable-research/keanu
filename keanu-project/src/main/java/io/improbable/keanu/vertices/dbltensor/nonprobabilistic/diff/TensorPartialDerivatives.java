@@ -85,12 +85,7 @@ public class TensorPartialDerivatives {
 
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
-            DoubleTensor v;
-            if (entry.getValue().isScalar() && !multiplier.isScalar()) {
-                v = entry.getValue().times(multiplier.sum());
-            } else {
-                v = entry.getValue().times(multiplier);
-            }
+            DoubleTensor v = entry.getValue().times(multiplier);
             multiplied.put(k, v);
         }
 

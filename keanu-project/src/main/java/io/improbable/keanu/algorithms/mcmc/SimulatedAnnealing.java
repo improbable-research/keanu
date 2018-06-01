@@ -51,6 +51,8 @@ public class SimulatedAnnealing {
                                                  AnnealingSchedule annealingSchedule,
                                                  KeanuRandom random) {
 
+        bayesNet.cascadeObservations();
+
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }

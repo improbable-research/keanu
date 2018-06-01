@@ -10,7 +10,9 @@ import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static io.improbable.keanu.algorithms.variational.tensor.TensorGradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
@@ -18,23 +20,41 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 public class TensorNonGradientOptimizer {
 
     private final BayesNetTensorAsContinuous bayesNet;
+    private final List<BiConsumer<double[], Double>> onFitnessCalculations;
 
     public TensorNonGradientOptimizer(BayesNetTensorAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
+        this.onFitnessCalculations = new ArrayList<>();
     }
 
     public TensorNonGradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNetTensorAsContinuous(graph);
+        this(new BayesNetTensorAsContinuous(graph));
+    }
+
+    public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
+        this.onFitnessCalculations.add(fitnessCalculationHandler);
+    }
+
+    private void handleFitnessCalculation(double[] point, Double fitness) {
+        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+            fitnessCalculationHandler.accept(point, fitness);
+        }
     }
 
     public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+
+        bayesNet.cascadeObservations();
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
         List<? extends Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        TensorFitnessFunction fitnessFunction = new TensorFitnessFunction(outputVertices, latentVertices);
+        TensorFitnessFunction fitnessFunction = new TensorFitnessFunction(
+            outputVertices,
+            latentVertices,
+            this::handleFitnessCalculation
+        );
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
 
