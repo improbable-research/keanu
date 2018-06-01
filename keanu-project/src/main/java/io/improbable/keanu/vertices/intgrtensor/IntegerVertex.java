@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgrtensor;
 
-
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -18,83 +17,83 @@ import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.operators.unary
 import java.util.Map;
 import java.util.function.Function;
 
-public abstract class IntegerVertex extends DiscreteTensorVertex<IntegerTensor> implements IntegerOperators<io.improbable.keanu.vertices.intgrtensor.IntegerVertex> {
+public abstract class IntegerVertex extends DiscreteTensorVertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex minus(io.improbable.keanu.vertices.intgrtensor.IntegerVertex that) {
+    public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex plus(io.improbable.keanu.vertices.intgrtensor.IntegerVertex that) {
+    public IntegerVertex plus(IntegerVertex that) {
         return new IntegerAdditionVertex(this, that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex multiply(io.improbable.keanu.vertices.intgrtensor.IntegerVertex that) {
+    public IntegerVertex multiply(IntegerVertex that) {
         return new IntegerMultiplicationVertex(this, that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex divideBy(io.improbable.keanu.vertices.intgrtensor.IntegerVertex that) {
+    public IntegerVertex divideBy(IntegerVertex that) {
         return new IntegerDivisionVertex(this, that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex minus(Vertex<IntegerTensor> that) {
+    public IntegerVertex minus(Vertex<IntegerTensor> that) {
         return new IntegerDifferenceVertex(this, new CastIntegerVertex(that));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex plus(Vertex<IntegerTensor> that) {
+    public IntegerVertex plus(Vertex<IntegerTensor> that) {
         return new IntegerAdditionVertex(this, new CastIntegerVertex(that));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex multiply(Vertex<IntegerTensor> that) {
+    public IntegerVertex multiply(Vertex<IntegerTensor> that) {
         return new IntegerMultiplicationVertex(this, new CastIntegerVertex(that));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex divideBy(Vertex<IntegerTensor> that) {
+    public IntegerVertex divideBy(Vertex<IntegerTensor> that) {
         return new IntegerDivisionVertex(this, new CastIntegerVertex(that));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex minus(int value) {
+    public IntegerVertex minus(int value) {
         return new IntegerDifferenceVertex(this, new ConstantIntegerVertex(value));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex plus(int value) {
+    public IntegerVertex plus(int value) {
         return new IntegerAdditionVertex(this, new ConstantIntegerVertex(value));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex multiply(int factor) {
+    public IntegerVertex multiply(int factor) {
         return new IntegerMultiplicationVertex(this, new ConstantIntegerVertex(factor));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex divideBy(int divisor) {
+    public IntegerVertex divideBy(int divisor) {
         return new IntegerDivisionVertex(this, new ConstantIntegerVertex(divisor));
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex abs() {
+    public IntegerVertex abs() {
         return new IntegerAbsVertex(this);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
+    public IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(this, op);
     }
 
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex times(io.improbable.keanu.vertices.intgrtensor.IntegerVertex that) {
+    public IntegerVertex times(IntegerVertex that) {
         return multiply(that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex div(io.improbable.keanu.vertices.intgrtensor.IntegerVertex that) {
+    public IntegerVertex div(IntegerVertex that) {
         return divideBy(that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex times(int that) {
+    public IntegerVertex times(int that) {
         return multiply(that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex div(int that) {
+    public IntegerVertex div(int that) {
         return divideBy(that);
     }
 
-    public io.improbable.keanu.vertices.intgrtensor.IntegerVertex unaryMinus() {
+    public IntegerVertex unaryMinus() {
         return multiply(-1);
     }
 

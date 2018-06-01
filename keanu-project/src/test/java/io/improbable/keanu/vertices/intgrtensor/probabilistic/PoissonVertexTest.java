@@ -13,7 +13,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class PoissonVertexTest {
-    private final Logger log = LoggerFactory.getLogger(io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertexTest.class);
+    private final Logger log = LoggerFactory.getLogger(PoissonVertexTest.class);
 
     @Test
     public void samplingProducesRealisticMeanAndStandardDeviation() {
