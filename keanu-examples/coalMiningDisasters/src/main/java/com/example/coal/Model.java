@@ -4,19 +4,15 @@ package com.example.coal;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
-
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorExponentialVertex;
+import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
+import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgrtensor.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.intgrtensor.probabilistic.UniformIntVertex;
 
 public class Model {
 
@@ -29,68 +25,65 @@ public class Model {
         Model coalMiningDisastersModel = new Model(coalMiningDisasterData);
 
         System.out.println("Running model...");
+        long start = System.currentTimeMillis();
         coalMiningDisastersModel.run();
-        System.out.println("Run complete");
+        long finish = System.currentTimeMillis() - start;
+        System.out.println("Run complete " + finish);
 
-        int switchYear = coalMiningDisastersModel.results.get(coalMiningDisastersModel.switchpoint).getMode();
+        int switchYear = coalMiningDisastersModel.results
+            .getIntegerTensorSamples(coalMiningDisastersModel.switchpoint)
+            .getIntegerMode();
 
         System.out.println("Switch year found: " + switchYear);
     }
 
-    private final KeanuRandom random;
+    TensorExponentialVertex earlyRate;
+    TensorExponentialVertex lateRate;
+    UniformIntVertex switchpoint;
 
-    final ConstantVertex<Integer> startYearVertex;
-    final ConstantVertex<Integer> endYearVertex;
-    final ExponentialVertex earlyRate;
-    final ExponentialVertex lateRate;
-    final List<PoissonVertex> disasters;
-    final UniformIntVertex switchpoint;
-
-    final Data data;
+    KeanuRandom random;
+    Data data;
     NetworkSamples results;
 
     public Model(Data data) {
         this.data = data;
         random = new KeanuRandom(1);
-
-        startYearVertex = new ConstantVertex<>(data.startYear);
-        endYearVertex = new ConstantVertex<>(data.endYear + 1);
-        switchpoint = new UniformIntVertex(startYearVertex, endYearVertex);
-        earlyRate = new ExponentialVertex(1.0, 1.0);
-        lateRate = new ExponentialVertex(1.0, 1.0);
-
-        Stream<IfVertex<Double>> rates = IntStream.range(data.startYear, data.endYear).boxed()
-            .map(ConstantVertex::new)
-            .map(year -> {
-                GreaterThanVertex<Integer, Integer> switchpointGreaterThanYear = new GreaterThanVertex<>(
-                    switchpoint,
-                    year
-                );
-                return new IfVertex<>(switchpointGreaterThanYear, earlyRate, lateRate);
-            });
-
-        disasters = rates
-            .map(CastDoubleVertex::new)
-            .map(PoissonVertex::new)
-            .collect(Collectors.toList());
-
-        IntStream.range(0, disasters.size()).forEach(i -> {
-            Integer year = data.startYear + i;
-            Integer observedValue = data.yearToDisasterCounts.get(year);
-            disasters.get(i).observe(observedValue);
-        });
     }
 
     /**
      * Runs the MetropolisHastings algorithm and saves the resulting samples to results
      */
     public void run() {
-        BayesianNetwork net = new BayesianNetwork(switchpoint.getConnectedGraph());
+        BayesianNetwork net = buildBayesianNetwork();
         Integer numSamples = 50000;
-        NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), numSamples, random);
 
-        Integer dropCount = 1000;
-        results = posteriorDistSamples.drop(dropCount).downSample(5);
+        NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(
+            net,
+            net.getLatentVertices(),
+            numSamples,
+            random
+        );
+
+        results = posteriorDistSamples.drop(10000).downSample(3);
+    }
+
+    private BayesianNetwork buildBayesianNetwork() {
+
+        switchpoint = new UniformIntVertex(data.startYear, data.endYear + 1);
+        earlyRate = new TensorExponentialVertex(1.0, 1.0);
+        lateRate = new TensorExponentialVertex(1.0, 1.0);
+
+        ConstantIntegerVertex years = new ConstantIntegerVertex(IntegerTensor.create(data.years));
+
+        DoubleTensorVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
+            .then(earlyRate)
+            .orElse(lateRate);
+
+        PoissonVertex disastersForYear = new PoissonVertex(rateForYear);
+
+        disastersForYear.observe(IntegerTensor.create(data.disasters));
+
+        return new BayesianNetwork(switchpoint.getConnectedGraph());
     }
 
 }
