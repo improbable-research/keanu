@@ -2,9 +2,9 @@ package io.improbable.keanu.vertices.dbltensor;
 
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
+import io.improbable.keanu.vertices.ContinuousTensorVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.*;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.*;
@@ -34,23 +34,23 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
     }
 
     public DoubleTensorVertex minus(double that) {
-        return new TensorDifferenceVertex(this, new ConstantTensorVertex(that));
+        return new TensorDifferenceVertex(this, new ConstantDoubleTensorVertex(that));
     }
 
     public DoubleTensorVertex plus(double that) {
-        return new TensorAdditionVertex(this, new ConstantTensorVertex(that));
+        return new TensorAdditionVertex(this, new ConstantDoubleTensorVertex(that));
     }
 
     public DoubleTensorVertex multiply(double that) {
-        return new TensorMultiplicationVertex(this, new ConstantTensorVertex(that));
+        return new TensorMultiplicationVertex(this, new ConstantDoubleTensorVertex(that));
     }
 
     public DoubleTensorVertex divideBy(double that) {
-        return new TensorDivisionVertex(this, new ConstantTensorVertex(that));
+        return new TensorDivisionVertex(this, new ConstantDoubleTensorVertex(that));
     }
 
     public DoubleTensorVertex pow(double power) {
-        return new TensorPowerVertex(this, new ConstantTensorVertex(power));
+        return new TensorPowerVertex(this, new ConstantDoubleTensorVertex(power));
     }
 
     public DoubleTensorVertex abs() {

@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorTriangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 
 import java.util.Map;
 
@@ -19,11 +19,11 @@ public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
 
     /**
      * One xMin, xMax, c or all three driving an arbitrarily shaped tensor of Triangular
-
-     * @param shape  the desired shape of the vertex
-     * @param xMin the a of the Triangular with either the same shape as specified for this vertex or a scalar
-     * @param xMax the b of the Triangular with either the same shape as specified for this vertex or a scalar
-     * @param c the c of the Triangular with either the same shape as specified for this vertex or a scalar
+     *
+     * @param shape the desired shape of the vertex
+     * @param xMin  the a of the Triangular with either the same shape as specified for this vertex or a scalar
+     * @param xMax  the b of the Triangular with either the same shape as specified for this vertex or a scalar
+     * @param c     the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TensorTriangularVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, DoubleTensorVertex c) {
 
@@ -41,34 +41,34 @@ public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
      *
      * @param xMin the xMin of the Triangular with either the same shape as specified for this vertex or a scalar
      * @param xMax the xMax of the Triangular with either the same shape as specified for this vertex or a scalar
-     * @param c the c of the Triangular with either the same shape as specified for this vertex or a scalar
+     * @param c    the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TensorTriangularVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, DoubleTensorVertex c) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape(), c.getShape()), xMin, xMax, c);
     }
 
     public TensorTriangularVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax, double c) {
-        this(xMin, xMax, new ConstantTensorVertex(c));
+        this(xMin, xMax, new ConstantDoubleTensorVertex(c));
     }
 
     public TensorTriangularVertex(DoubleTensorVertex xMin, double xMax, DoubleTensorVertex c) {
-        this(xMin, new ConstantTensorVertex(xMax), c);
+        this(xMin, new ConstantDoubleTensorVertex(xMax), c);
     }
 
     public TensorTriangularVertex(DoubleTensorVertex xMin, double xMax, double c) {
-        this(xMin, new ConstantTensorVertex(xMax), new ConstantTensorVertex(c));
+        this(xMin, new ConstantDoubleTensorVertex(xMax), new ConstantDoubleTensorVertex(c));
     }
 
     public TensorTriangularVertex(double xMin, DoubleTensorVertex xMax, DoubleTensorVertex c) {
-        this(new ConstantTensorVertex(xMin), xMax, c);
+        this(new ConstantDoubleTensorVertex(xMin), xMax, c);
     }
 
     public TensorTriangularVertex(double xMin, double xMax, DoubleTensorVertex c) {
-        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), c);
+        this(new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), c);
     }
 
     public TensorTriangularVertex(double xMin, double xMax, double c) {
-        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), new ConstantTensorVertex(c));
+        this(new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), new ConstantDoubleTensorVertex(c));
     }
 
 

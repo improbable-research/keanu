@@ -1,9 +1,10 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import org.apache.commons.lang3.ArrayUtils;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 public class ScalarIntegerTensor implements IntegerTensor {
@@ -48,20 +49,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public Integer getValue(int... index) {
-        if (index.length == 1 && index[0] == 0) {
-            return value;
-        } else {
-            throw new IndexOutOfBoundsException(ArrayUtils.toString(index) + " out of bounds on scalar");
-        }
+        return value;
     }
 
     @Override
     public void setValue(Integer value, int... index) {
-        if (index.length == 1 && index[0] == 0) {
-            this.value = value;
-        } else {
-            throw new IndexOutOfBoundsException(ArrayUtils.toString(index) + " out of bounds on scalar");
-        }
+        this.value = value;
     }
 
     @Override
@@ -362,6 +355,24 @@ public class ScalarIntegerTensor implements IntegerTensor {
         } else {
             return that.lessThanOrEqual(value);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tensor)) return false;
+
+        Tensor that = (Tensor) o;
+
+        if (!Arrays.equals(that.getShape(), shape)) return false;
+        return that.scalar().equals(value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + Arrays.hashCode(shape);
+        return result;
     }
 
     @Override

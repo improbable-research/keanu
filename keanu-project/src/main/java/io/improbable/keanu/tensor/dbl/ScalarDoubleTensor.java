@@ -1,10 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 public class ScalarDoubleTensor implements DoubleTensor {
@@ -627,5 +629,23 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public Double[] asFlatArray() {
         return ArrayUtils.toObject(asFlatDoubleArray());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Tensor)) return false;
+
+        Tensor that = (Tensor) o;
+
+        if (!Arrays.equals(that.getShape(), shape)) return false;
+        return that.scalar().equals(value);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = value != null ? value.hashCode() : 0;
+        result = 31 * result + Arrays.hashCode(shape);
+        return result;
     }
 }

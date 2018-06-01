@@ -1,8 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff;
 
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -32,7 +31,7 @@ public class TensorPartialDerivatives {
     }
 
     public DoubleTensor withRespectTo(long id) {
-        return derivativeWithRespectTo.getOrDefault(id, Nd4jDoubleTensor.ZERO_SCALAR);
+        return derivativeWithRespectTo.getOrDefault(id, DoubleTensor.ZERO_SCALAR);
     }
 
     public boolean isEmpty() {

@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,6 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static io.improbable.keanu.vertices.dbltensor.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class TensorBetaVertexTest {
@@ -143,8 +142,8 @@ public class TensorBetaVertexTest {
         int sampleCount = 1000000;
         TensorBetaVertex vertex = new TensorBetaVertex(
             new int[]{sampleCount, 1},
-            new ConstantTensorVertex(5.0),
-            new ConstantTensorVertex(2.0)
+            new ConstantDoubleTensorVertex(5.0),
+            new ConstantDoubleTensorVertex(2.0)
         );
 
         double from = 0.3;
@@ -160,8 +159,8 @@ public class TensorBetaVertexTest {
         int sampleCount = 1000000;
         TensorBetaVertex vertex = new TensorBetaVertex(
             new int[]{sampleCount, 1},
-            new ConstantTensorVertex(5.0),
-            new ConstantTensorVertex(2.0)
+            new ConstantDoubleTensorVertex(5.0),
+            new ConstantDoubleTensorVertex(2.0)
         );
 
         double from = 0.3;
@@ -178,8 +177,8 @@ public class TensorBetaVertexTest {
         double trueBeta = 2.;
 
         List<DoubleTensorVertex> alphaBeta = new ArrayList<>();
-        alphaBeta.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueAlpha)));
-        alphaBeta.add(new ConstantTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
+        alphaBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueAlpha)));
+        alphaBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
 
         List<DoubleTensorVertex> latentAlphaBeta = new ArrayList<>();
         TensorUniformVertex latentAlpha = new TensorUniformVertex(0.01, 10.0);

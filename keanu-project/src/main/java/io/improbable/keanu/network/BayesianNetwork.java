@@ -41,7 +41,7 @@ public class BayesianNetwork {
         return latentVertices;
     }
 
-    public List<Vertex> getObservedVertices(){
+    public List<Vertex> getObservedVertices() {
         return observedVertices;
     }
 

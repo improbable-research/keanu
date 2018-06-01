@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 
 import java.util.Map;
 
@@ -37,27 +37,27 @@ public class TensorUniformVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorUniformVertex(DoubleTensorVertex xMin, double xMax) {
-        this(xMin, new ConstantTensorVertex(xMax));
+        this(xMin, new ConstantDoubleTensorVertex(xMax));
     }
 
     public TensorUniformVertex(double xMin, DoubleTensorVertex xMax) {
-        this(new ConstantTensorVertex(xMin), xMax);
+        this(new ConstantDoubleTensorVertex(xMin), xMax);
     }
 
     public TensorUniformVertex(double xMin, double xMax) {
-        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
+        this(new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax));
     }
 
     public TensorUniformVertex(int[] shape, DoubleTensorVertex xMin, double xMax) {
-        this(shape, xMin, new ConstantTensorVertex(xMax));
+        this(shape, xMin, new ConstantDoubleTensorVertex(xMax));
     }
 
     public TensorUniformVertex(int[] shape, double xMin, DoubleTensorVertex xMax) {
-        this(shape, new ConstantTensorVertex(xMin), xMax);
+        this(shape, new ConstantDoubleTensorVertex(xMin), xMax);
     }
 
     public TensorUniformVertex(int[] shape, double xMin, double xMax) {
-        this(shape, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax));
+        this(shape, new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax));
     }
 
     public DoubleTensorVertex getXMin() {

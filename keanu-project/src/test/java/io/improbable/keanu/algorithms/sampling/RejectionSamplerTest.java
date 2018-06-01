@@ -2,8 +2,8 @@ package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.booltensor.BoolVertex;
+import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -46,7 +46,7 @@ public class RejectionSamplerTest {
         double v1ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
             asList(v1, v2),
             singletonList(v3),
-            v1::getValue,
+            () -> v1.getValue().scalar(),
             10000,
             random
         );
@@ -54,7 +54,7 @@ public class RejectionSamplerTest {
         double v2ProbTrueAccordingToAlgo = RejectionSampler.getPosteriorProbability(
             asList(v1, v2),
             singletonList(v3),
-            v2::getValue,
+            () -> v2.getValue().scalar(),
             10000,
             random
         );
@@ -73,8 +73,8 @@ public class RejectionSamplerTest {
             random
         );
 
-        double v1ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v1).probability(sample -> sample);
-        double v2ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v2).probability(sample -> sample);
+        double v1ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v1).probability(sample -> sample.scalar());
+        double v2ProbTrueAccordingToAlgo = samplesAccordingToAlgo.get(v2).probability(sample -> sample.scalar());
 
         assertEquals(v1ProbTrueAccordingToBayes, v1ProbTrueAccordingToAlgo, 0.01);
         assertEquals(v2ProbTrueAccordingToBayes, v2ProbTrueAccordingToAlgo, 0.01);

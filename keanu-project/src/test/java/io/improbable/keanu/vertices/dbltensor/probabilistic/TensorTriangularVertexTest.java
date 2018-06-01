@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,9 +39,9 @@ public class TensorTriangularVertexTest {
         int sampleCount = 1000000;
         TensorTriangularVertex vertex = new TensorTriangularVertex(
             new int[]{sampleCount, 1},
-            new ConstantTensorVertex(0.0),
-            new ConstantTensorVertex(10.0),
-            new ConstantTensorVertex(5.0)
+            new ConstantDoubleTensorVertex(0.0),
+            new ConstantDoubleTensorVertex(10.0),
+            new ConstantDoubleTensorVertex(5.0)
         );
 
         double from = 1;

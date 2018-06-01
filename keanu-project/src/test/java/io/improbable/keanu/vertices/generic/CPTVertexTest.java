@@ -6,8 +6,8 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.CPT;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.bool.BoolVertex.FALSE;
-import static io.improbable.keanu.vertices.bool.BoolVertex.TRUE;
+import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.FALSE;
+import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertEquals;
 
 public class CPTVertexTest {

@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 

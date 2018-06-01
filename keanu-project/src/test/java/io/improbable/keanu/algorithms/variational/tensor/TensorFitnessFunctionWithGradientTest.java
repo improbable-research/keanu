@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.variational.tensor;
 
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
 import org.junit.Before;
 import org.junit.Test;

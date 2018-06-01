@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.distributions.discrete.Poisson;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.Map;

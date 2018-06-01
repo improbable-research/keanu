@@ -33,7 +33,7 @@ public class PriorSamplingTest {
         final int sampleCount = 10000;
         NetworkSamples samples = Prior.sample(net, net.getLatentVertices(), sampleCount, random);
 
-        double averageC = samples.getDoubles(C).getSummaryStatistics().getAverage();
+        double averageC = samples.getDoubleSamples(C).getSummaryStatistics().getAverage();
 
         assertEquals(sampleCount, samples.size());
         assertEquals(100.0, averageC, 0.1);

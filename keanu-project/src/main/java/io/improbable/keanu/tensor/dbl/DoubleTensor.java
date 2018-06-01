@@ -11,6 +11,10 @@ import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
 
+    public static final DoubleTensor ZERO_SCALAR = scalar(0.0);
+
+    public static final DoubleTensor ONE_SCALAR = scalar(1.0);
+
     static DoubleTensor create(double value, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(value);

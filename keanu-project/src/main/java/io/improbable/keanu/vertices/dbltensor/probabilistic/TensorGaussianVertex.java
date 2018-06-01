@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -46,27 +46,27 @@ public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorGaussianVertex(DoubleTensorVertex mu, double sigma) {
-        this(mu, new ConstantTensorVertex(sigma));
+        this(mu, new ConstantDoubleTensorVertex(sigma));
     }
 
     public TensorGaussianVertex(double mu, DoubleTensorVertex sigma) {
-        this(new ConstantTensorVertex(mu), sigma);
+        this(new ConstantDoubleTensorVertex(mu), sigma);
     }
 
     public TensorGaussianVertex(double mu, double sigma) {
-        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma));
+        this(new ConstantDoubleTensorVertex(mu), new ConstantDoubleTensorVertex(sigma));
     }
 
     public TensorGaussianVertex(int[] shape, DoubleTensorVertex mu, double sigma) {
-        this(shape, mu, new ConstantTensorVertex(sigma));
+        this(shape, mu, new ConstantDoubleTensorVertex(sigma));
     }
 
     public TensorGaussianVertex(int[] shape, double mu, DoubleTensorVertex sigma) {
-        this(shape, new ConstantTensorVertex(mu), sigma);
+        this(shape, new ConstantDoubleTensorVertex(mu), sigma);
     }
 
     public TensorGaussianVertex(int[] shape, double mu, double sigma) {
-        this(shape, new ConstantTensorVertex(mu), new ConstantTensorVertex(sigma));
+        this(shape, new ConstantDoubleTensorVertex(mu), new ConstantDoubleTensorVertex(sigma));
     }
 
     @Override

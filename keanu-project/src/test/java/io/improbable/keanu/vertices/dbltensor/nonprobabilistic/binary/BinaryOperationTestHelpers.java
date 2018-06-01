@@ -1,10 +1,9 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
 
@@ -48,9 +47,9 @@ public class BinaryOperationTestHelpers {
                                                           double[] expected,
                                                           BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
+        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
+        TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A, B).getValue();
@@ -68,9 +67,9 @@ public class BinaryOperationTestHelpers {
                                                                             double[] expectedGradientWrtA,
                                                                             double[] expectedGradientWrtB,
                                                                             BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
-        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
+        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantTensorVertex(0.0), new ConstantTensorVertex(1.0));
+        TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
         TensorDualNumber result = op.apply(A, B).getDualNumber();

@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorSmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 
 import java.util.Map;
 
@@ -53,15 +53,15 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
 
 
     public TensorSmoothUniformVertex(DoubleTensorVertex xMin, double xMax, double edgeSharpness) {
-        this(xMin, new ConstantTensorVertex(xMax), edgeSharpness);
+        this(xMin, new ConstantDoubleTensorVertex(xMax), edgeSharpness);
     }
 
     public TensorSmoothUniformVertex(double xMin, DoubleTensorVertex xMax, double edgeSharpness) {
-        this(new ConstantTensorVertex(xMin), xMax, edgeSharpness);
+        this(new ConstantDoubleTensorVertex(xMin), xMax, edgeSharpness);
     }
 
     public TensorSmoothUniformVertex(double xMin, double xMax, double edgeSharpness) {
-        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), edgeSharpness);
+        this(new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), edgeSharpness);
     }
 
     public TensorSmoothUniformVertex(DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
@@ -69,27 +69,27 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorSmoothUniformVertex(DoubleTensorVertex xMin, double xMax) {
-        this(xMin, new ConstantTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+        this(xMin, new ConstantDoubleTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     public TensorSmoothUniformVertex(double xMin, DoubleTensorVertex xMax) {
-        this(new ConstantTensorVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
+        this(new ConstantDoubleTensorVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
     public TensorSmoothUniformVertex(double xMin, double xMax) {
-        this(new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+        this(new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     public TensorSmoothUniformVertex(int[] shape, DoubleTensorVertex xMin, double xMax, double edgeSharpness) {
-        this(shape, xMin, new ConstantTensorVertex(xMax), edgeSharpness);
+        this(shape, xMin, new ConstantDoubleTensorVertex(xMax), edgeSharpness);
     }
 
     public TensorSmoothUniformVertex(int[] shape, double xMin, DoubleTensorVertex xMax, double edgeSharpness) {
-        this(shape, new ConstantTensorVertex(xMin), xMax, edgeSharpness);
+        this(shape, new ConstantDoubleTensorVertex(xMin), xMax, edgeSharpness);
     }
 
     public TensorSmoothUniformVertex(int[] shape, double xMin, double xMax, double edgeSharpness) {
-        this(shape, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), edgeSharpness);
+        this(shape, new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), edgeSharpness);
     }
 
     public TensorSmoothUniformVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax) {
@@ -97,15 +97,15 @@ public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
     }
 
     public TensorSmoothUniformVertex(int[] shape, DoubleTensorVertex xMin, double xMax) {
-        this(shape, xMin, new ConstantTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+        this(shape, xMin, new ConstantDoubleTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     public TensorSmoothUniformVertex(int[] shape, double xMin, DoubleTensorVertex xMax) {
-        this(shape, new ConstantTensorVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
+        this(shape, new ConstantDoubleTensorVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
     public TensorSmoothUniformVertex(int[] shape, double xMin, double xMax) {
-        this(shape, new ConstantTensorVertex(xMin), new ConstantTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+        this(shape, new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     @Override

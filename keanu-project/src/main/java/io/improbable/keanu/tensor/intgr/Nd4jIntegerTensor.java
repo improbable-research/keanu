@@ -13,6 +13,7 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 import static java.util.Arrays.copyOf;
@@ -504,7 +505,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public BooleanTensor elementwiseEquals(Tensor<Integer> that) {
+    public BooleanTensor elementwiseEquals(Tensor that) {
 
         if (that instanceof Nd4jIntegerTensor) {
             INDArray eq = tensor.eq(unsafeGetNd4J((Nd4jIntegerTensor) that));
@@ -512,6 +513,31 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         } else {
             return Tensor.elementwiseEquals(this, that);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+
+        if (o instanceof Nd4jIntegerTensor) {
+            return tensor.equals(((Nd4jIntegerTensor) o).tensor);
+        } else if (o instanceof Tensor) {
+            Tensor that = (Tensor) o;
+            if (!Arrays.equals(that.getShape(), shape)) return false;
+            return Arrays.equals(
+                that.asFlatArray(),
+                this.asFlatArray()
+            );
+        }
+
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = tensor != null ? tensor.hashCode() : 0;
+        result = 31 * result + Arrays.hashCode(shape);
+        return result;
     }
 
     private INDArray unsafeGetNd4J(IntegerTensor that) {

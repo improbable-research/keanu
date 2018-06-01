@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.generictensor.nonprobabilistic.operators.binary.BinaryOpLambda;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,19 +30,18 @@ public class BinaryOpVertexTest {
     @Test
     public void canSampleFromTwoParents() {
         Flip flip = new Flip(0.5);
-        GaussianVertex gaus = new GaussianVertex(0.0, 1.0);
-        BinaryOpLambda<Boolean, Double, Double> custom = new BinaryOpLambda<>(flip, gaus, (Boolean f, Double g) -> {
-            if (f) {
-                return g;
-            } else {
-                return 0.0;
-            }
-        });
+
+        TensorGaussianVertex gaussianVertex = new TensorGaussianVertex(0.0, 1.0);
+        BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
+            flip, gaussianVertex,
+            (BooleanTensor f, DoubleTensor g) ->
+                f.setDoubleIf(g, DoubleTensor.scalar(0.0))
+        );
 
         int N = 1000000;
         List<Double> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            samples.add(custom.sample(random));
+            samples.add(custom.sample(random).scalar());
         }
 
         SummaryStatistics stats = new SummaryStatistics();

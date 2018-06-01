@@ -5,10 +5,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
-import io.improbable.keanu.vertices.intgr.IntegerVertex
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
+import io.improbable.keanu.vertices.intgrtensor.IntegerVertex
+import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex
+import io.improbable.keanu.vertices.intgrtensor.probabilistic.PoissonVertex
+import io.improbable.keanu.vertices.intgrtensor.probabilistic.UniformIntVertex
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -424,7 +424,7 @@ class OperatorOverloadingTest {
         val resultI2 = modelB.add(iv1, iv2)
 
         assertEquals(resultD1.value, resultD2.value)
-        assertEquals(resultI1.value, resultI2.value)
+        assertEquals(resultI1.value, resultI2.value.scalar())
     }
 
     class SimpleModel<A : DoubleOperators<A>, B : IntegerOperators<B>> {

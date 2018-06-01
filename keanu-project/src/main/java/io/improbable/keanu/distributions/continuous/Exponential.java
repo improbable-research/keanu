@@ -32,7 +32,7 @@ public class Exponential {
     }
 
     public static double logPdf(double a, double b, double x) {
-        return (x >= a) ? (-(x - a) / b) - Math.log(b) : 0.0;
+        return (x >= a) ? (-(x - a) / b) - Math.log(b) : Double.NEGATIVE_INFINITY;
     }
 
     public static Diff dPdf(double a, double b, double x) {

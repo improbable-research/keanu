@@ -16,6 +16,10 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         return Nd4jIntegerTensor.create(values, shape);
     }
 
+    static IntegerTensor create(int[] values) {
+        return Nd4jIntegerTensor.create(values, new int[]{1, values.length});
+    }
+
     static IntegerTensor create(double value, int[] shape) {
         return Nd4jIntegerTensor.create(value, shape);
     }

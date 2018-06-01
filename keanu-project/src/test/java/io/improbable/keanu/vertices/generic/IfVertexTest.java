@@ -6,8 +6,8 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.IfVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.bool.BoolVertex.FALSE;
-import static io.improbable.keanu.vertices.bool.BoolVertex.TRUE;
+import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.FALSE;
+import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertTrue;
 

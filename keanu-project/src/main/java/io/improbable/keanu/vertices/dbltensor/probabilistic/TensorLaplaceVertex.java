@@ -4,7 +4,7 @@ import io.improbable.keanu.distributions.tensors.continuous.TensorLaplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
@@ -20,9 +20,9 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
     /**
      * One mu or beta or both driving an arbitrarily shaped tensor of Laplace
      *
-     * @param shape  the desired shape of the vertex
-     * @param mu     the mu of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param beta   the beta of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param shape the desired shape of the vertex
+     * @param mu    the mu of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param beta  the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public TensorLaplaceVertex(int[] shape, DoubleTensorVertex mu, DoubleTensorVertex beta) {
 
@@ -38,23 +38,23 @@ public class TensorLaplaceVertex extends ProbabilisticDoubleTensor {
      * One to one constructor for mapping some shape of mu and sigma to
      * a matching shaped laplace.
      *
-     * @param mu     the mu of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param beta   the beta of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param mu   the mu of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public TensorLaplaceVertex(DoubleTensorVertex mu, DoubleTensorVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), beta.getShape()), mu, beta);
     }
 
     public TensorLaplaceVertex(DoubleTensorVertex mu, double beta) {
-        this(mu, new ConstantTensorVertex(beta));
+        this(mu, new ConstantDoubleTensorVertex(beta));
     }
 
     public TensorLaplaceVertex(double mu, DoubleTensorVertex beta) {
-        this(new ConstantTensorVertex(mu), beta);
+        this(new ConstantDoubleTensorVertex(mu), beta);
     }
 
     public TensorLaplaceVertex(double mu, double beta) {
-        this(new ConstantTensorVertex(mu), new ConstantTensorVertex(beta));
+        this(new ConstantDoubleTensorVertex(mu), new ConstantDoubleTensorVertex(beta));
     }
 
     @Override
