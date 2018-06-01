@@ -125,6 +125,21 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor ceil() {
+        return duplicate().ceilInPlace();
+    }
+
+    @Override
+    public DoubleTensor floor() {
+        return duplicate().floorInPlace();
+    }
+
+    @Override
+    public DoubleTensor sigmoid() {
+        return duplicate().sigmoidInPlace();
+    }
+
+    @Override
     public Double scalar() {
         return tensor.getDouble(0);
     }
@@ -182,6 +197,26 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor cos() {
         return duplicate().cosInPlace();
+    }
+
+    @Override
+    public DoubleTensor tan() {
+        return duplicate().tanInPlace();
+    }
+
+    @Override
+    public DoubleTensor atan() {
+        return duplicate().atanInPlace();
+    }
+
+    @Override
+    public DoubleTensor atan2(double y) {
+        return duplicate().atan2InPlace(y);
+    }
+
+    @Override
+    public DoubleTensor atan2(DoubleTensor y) {
+        return duplicate().atan2InPlace(y);
     }
 
     @Override
@@ -334,6 +369,36 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor cosInPlace() {
         Transforms.cos(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor tanInPlace() {
+        INDArray sin = Transforms.sin(tensor, true);
+        INDArray cos = Transforms.cos(tensor, true);
+        tensor = sin.divi(cos);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atanInPlace() {
+        Transforms.atan(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor atan2InPlace(double y) {
+        return atan2InPlace(DoubleTensor.create(y, this.shape));
+    }
+
+    @Override
+    public DoubleTensor atan2InPlace(DoubleTensor y) {
+        if (y.isScalar()) {
+            tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.shape, y.scalar()));
+        }
+        else {
+            tensor = Transforms.atan2(tensor, unsafeGetNd4J(y));
+        }
         return this;
     }
 
@@ -556,6 +621,24 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
         return minInPlace(min).maxInPlace(max);
+    }
+
+    @Override
+    public DoubleTensor ceilInPlace() {
+        Transforms.ceil(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor floorInPlace() {
+        Transforms.floor(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor sigmoidInPlace() {
+        Transforms.sigmoid(tensor, false);
+        return this;
     }
 
     // Comparisons

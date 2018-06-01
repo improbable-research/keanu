@@ -99,6 +99,14 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor cos();
 
+    DoubleTensor tan();
+
+    DoubleTensor atan();
+
+    DoubleTensor atan2(double y);
+
+    DoubleTensor atan2(DoubleTensor y);
+
     DoubleTensor asin();
 
     DoubleTensor acos();
@@ -137,6 +145,12 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
+    DoubleTensor ceil();
+
+    DoubleTensor floor();
+
+    DoubleTensor sigmoid();
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
@@ -160,6 +174,14 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor sinInPlace();
 
     DoubleTensor cosInPlace();
+
+    DoubleTensor tanInPlace();
+
+    DoubleTensor atanInPlace();
+
+    DoubleTensor atan2InPlace(double y);
+
+    DoubleTensor atan2InPlace(DoubleTensor y);
 
     DoubleTensor asinInPlace();
 
@@ -186,6 +208,12 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor minInPlace(DoubleTensor max);
 
     DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
+
+    DoubleTensor ceilInPlace();
+
+    DoubleTensor floorInPlace();
+
+    DoubleTensor sigmoidInPlace();
 
     // Comparisons
     BooleanTensor lessThan(double value);

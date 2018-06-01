@@ -25,9 +25,6 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber inputDualNumber = dualNumbers.get(inputVertex);
-        double dArcTan = 1 / (1 + Math.pow(inputVertex.getValue(), 2));
-        PartialDerivatives outputPartialDerivative = inputDualNumber.getPartialDerivatives().multiplyBy(dArcTan);
-        return new DualNumber(op(inputVertex.getValue()), outputPartialDerivative);
+        return dualNumbers.get(inputVertex).atan();
     }
 }

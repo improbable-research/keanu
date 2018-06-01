@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.SmoothUniformDistribution;
+import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -71,7 +71,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
-        final double density = SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
+        final double density = SmoothUniform.pdf(min, max, shoulderWidth, value);
         return Math.log(density);
     }
 
@@ -85,8 +85,8 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final double min = xMin.getValue();
         final double max = xMax.getValue();
         final double shoulderWidth = this.edgeSharpness * (max - min);
-        final double dPdfdx = SmoothUniformDistribution.dPdfdx(min, max, shoulderWidth, value);
-        final double density = SmoothUniformDistribution.pdf(min, max, shoulderWidth, value);
+        final double dPdfdx = SmoothUniform.dPdfdx(min, max, shoulderWidth, value);
+        final double density = SmoothUniform.pdf(min, max, shoulderWidth, value);
         final double dlogPdfdx = dPdfdx / density;
 
         return singletonMap(getId(), DoubleTensor.scalar(dlogPdfdx));
@@ -94,7 +94,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     @Override
     public Double sample(KeanuRandom random) {
-        return SmoothUniformDistribution.sample(xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
+        return SmoothUniform.sample(xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
     }
 
 }
