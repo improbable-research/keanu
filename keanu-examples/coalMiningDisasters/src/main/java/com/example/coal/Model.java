@@ -25,10 +25,8 @@ public class Model {
         Model coalMiningDisastersModel = new Model(coalMiningDisasterData);
 
         System.out.println("Running model...");
-        long start = System.currentTimeMillis();
         coalMiningDisastersModel.run();
-        long finish = System.currentTimeMillis() - start;
-        System.out.println("Run complete " + finish);
+        System.out.println("Run complete");
 
         int switchYear = coalMiningDisastersModel.results
             .getIntegerTensorSamples(coalMiningDisastersModel.switchpoint)
