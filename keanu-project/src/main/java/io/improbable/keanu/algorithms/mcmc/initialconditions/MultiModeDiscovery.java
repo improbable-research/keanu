@@ -22,7 +22,7 @@ public class MultiModeDiscovery {
                                                                    KeanuRandom random) {
 
         List<NetworkState> maxSamples = new ArrayList<>();
-        VertexValuePropagation.cascadeUpdate(network.getObservedVertices());
+        network.cascadeObservations();
         List<Vertex> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
 
         for (int i = 0; i < attempts; i++) {

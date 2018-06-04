@@ -13,8 +13,10 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
@@ -26,8 +28,33 @@ public class TensorGradientOptimizer {
 
     private final BayesNetTensorAsContinuous bayesNet;
 
+    private final List<BiConsumer<double[], double[]>> onGradientCalculations;
+    private final List<BiConsumer<double[], Double>> onFitnessCalculations;
+
     public TensorGradientOptimizer(BayesNetTensorAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
+        this.onGradientCalculations = new ArrayList<>();
+        this.onFitnessCalculations = new ArrayList<>();
+    }
+
+    public void onGradientCalculation(BiConsumer<double[], double[]> gradientCalculationHandler) {
+        this.onGradientCalculations.add(gradientCalculationHandler);
+    }
+
+    private void handleGradientCalculation(double[] point, double[] gradients) {
+        for (BiConsumer<double[], double[]> gradientCalculationHandler : onGradientCalculations) {
+            gradientCalculationHandler.accept(point, gradients);
+        }
+    }
+
+    public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
+        this.onFitnessCalculations.add(fitnessCalculationHandler);
+    }
+
+    private void handleFitnessCalculation(double[] point, Double fitness) {
+        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+            fitnessCalculationHandler.accept(point, fitness);
+        }
     }
 
     /**
@@ -82,7 +109,15 @@ public class TensorGradientOptimizer {
                             List<Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
-        TensorFitnessFunctionWithGradient fitnessFunction = new TensorFitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());
+        bayesNet.cascadeObservations();
+
+        TensorFitnessFunctionWithGradient fitnessFunction = new TensorFitnessFunctionWithGradient(
+            outputVertices,
+            bayesNet.getContinuousLatentVertices(),
+            this::handleGradientCalculation,
+            this::handleFitnessCalculation
+        );
+
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 

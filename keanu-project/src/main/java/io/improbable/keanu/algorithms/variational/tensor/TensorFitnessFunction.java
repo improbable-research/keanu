@@ -7,23 +7,39 @@ import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class TensorFitnessFunction {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
     private final Map<Long, Long> exploreSettingAll;
+    private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public TensorFitnessFunction(List<Vertex> probabilisticVertices, List<? extends Vertex<DoubleTensor>> latentVertices) {
+    public TensorFitnessFunction(List<Vertex> probabilisticVertices,
+                                 List<? extends Vertex<DoubleTensor>> latentVertices,
+                                 BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
+        this.onFitnessCalculation = onFitnessCalculation;
+    }
+
+    public TensorFitnessFunction(List<Vertex> probabilisticVertices,
+                                 List<? extends Vertex<DoubleTensor>> latentVertices) {
+        this(probabilisticVertices, latentVertices, null);
     }
 
     public MultivariateFunction fitness() {
         return point -> {
             setAndCascadePoint(point, latentVertices, exploreSettingAll);
-            return logOfTotalProbability(probabilisticVertices);
+            double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
+
+            if (onFitnessCalculation != null) {
+                onFitnessCalculation.accept(point, logOfTotalProbability);
+            }
+
+            return logOfTotalProbability;
         };
     }
 
@@ -47,8 +63,7 @@ public class TensorFitnessFunction {
     }
 
     static long numDimensions(Vertex<DoubleTensor> vertex) {
-        long length = vertex.getValue().getLength();
-        return length;
+        return vertex.getValue().getLength();
     }
 
     public static double logOfTotalProbability(List<? extends Vertex> probabilisticVertices) {

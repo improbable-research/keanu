@@ -52,6 +52,8 @@ public class RejectionSampler {
                                                      int sampleCount,
                                                      KeanuRandom random) {
 
+        bayesNet.cascadeObservations();
+
         Map<Long, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;
 
