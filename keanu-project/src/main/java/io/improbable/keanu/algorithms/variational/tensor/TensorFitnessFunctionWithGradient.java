@@ -77,18 +77,27 @@ public class TensorFitnessFunctionWithGradient {
         for (Vertex<DoubleTensor> vertex : latentVertices) {
             DoubleTensor tensor = diffs.get(vertex.getId());
             if (tensor != null) {
-                if (TensorShape.isScalar(vertex.getShape()) && !TensorShape.isScalar(tensor.getShape())) {
-                    tensors.add(DoubleTensor.scalar(tensor.sum()));
-                } else {
-                    tensors.add(tensor);
-                }
+                tensors.add(alignGradientToLatent(vertex, tensor));
             } else {
-                int[] missingVertexShape = vertex.getValue().getShape();
-                tensors.add(DoubleTensor.zeros(missingVertexShape));
+                tensors.add(DoubleTensor.zeros(vertex.getShape()));
             }
         }
 
         return flattenAll(tensors);
+    }
+
+    /**
+     * @param latentVertex wrt vertex
+     * @param gradients    gradient wrt latentVertex
+     * @return the gradient with the appropriate shape given the latent vertex
+     */
+    private static DoubleTensor alignGradientToLatent(Vertex<DoubleTensor> latentVertex,
+                                                      DoubleTensor gradients) {
+        if (TensorShape.isScalar(latentVertex.getShape()) && !TensorShape.isScalar(gradients.getShape())) {
+            return DoubleTensor.scalar(gradients.sum());
+        } else {
+            return gradients;
+        }
     }
 
     private static double[] flattenAll(List<DoubleTensor> tensors) {

@@ -54,14 +54,10 @@ public class LinearRegression {
 
         double expectedM = 3.0;
         double expectedB = 20.0;
-//        List<Point> points = make1FactorTestData(10000, expectedM, expectedB);
+        List<Point> points = make1FactorTestData(10000, expectedM, expectedB);
 
         ProbabilisticDouble m = new GaussianVertex(0.0, 10.0);
         ProbabilisticDouble b = new GaussianVertex(0.0, 10.0);
-
-        List<Point> points = new ArrayList<>();
-        points.add(new Point(20, new double[]{0}));
-        points.add(new Point(23, new double[]{1}));
 
         log.info("Building graph");
         for (Point p : points) {
