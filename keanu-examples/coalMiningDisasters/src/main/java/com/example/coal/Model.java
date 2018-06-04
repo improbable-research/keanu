@@ -30,7 +30,7 @@ public class Model {
 
         int switchYear = coalMiningDisastersModel.results
             .getIntegerTensorSamples(coalMiningDisastersModel.switchpoint)
-            .getIntegerMode();
+            .getScalarMode();
 
         System.out.println("Switch year found: " + switchYear);
     }
