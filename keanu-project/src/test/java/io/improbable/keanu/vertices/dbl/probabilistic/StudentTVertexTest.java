@@ -29,9 +29,6 @@ public class StudentTVertexTest {
     private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);
     private KeanuRandom random;
 
-    /**
-     *
-     */
     @Before
     public void setup() {
         random = new KeanuRandom(1);
@@ -42,11 +39,11 @@ public class StudentTVertexTest {
      */
     @Test
     public void sampleTest() {
-        int N = 10 * 1000 * 1000;
+        int N = 20_000;
         double sample_delta = 0.1;
         double[][] test_values = {
             // v, mean, sd
-            {2., 0., 4.0}
+            {3., 0., Math.sqrt(3.0)}
         };
         for (int i = 0; i < test_values.length; i++) {
             int v = (int) test_values[i][POS_V];
