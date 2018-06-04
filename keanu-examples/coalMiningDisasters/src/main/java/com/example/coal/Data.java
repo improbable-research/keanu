@@ -4,23 +4,37 @@ import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 
 import java.util.HashMap;
-import java.util.IntSummaryStatistics;
 import java.util.List;
 import java.util.Map;
 
 public class Data {
 
-    public Map<Integer, Integer> yearToDisasterCounts;
     public int startYear;
     public int endYear;
+    public int[] years;
+    public int[] disasters;
 
-    public Data(Map<Integer, Integer> yearToDisasterCount) {
-        this.yearToDisasterCounts = yearToDisasterCount;
+    public Data(Map<Integer, Integer> yearToDisasterData) {
 
-        //find start and end year from data
-        IntSummaryStatistics yearStats = yearToDisasterCounts.keySet().stream().mapToInt(i -> i).summaryStatistics();
-        startYear = yearStats.getMin();
-        endYear = yearStats.getMax();
+        startYear = Integer.MAX_VALUE;
+        endYear = Integer.MIN_VALUE;
+        years = new int[yearToDisasterData.size()];
+        disasters = new int[yearToDisasterData.size()];
+
+        int i = 0;
+        for (Map.Entry<Integer, Integer> yearToDisaster : yearToDisasterData.entrySet()) {
+
+            disasters[i] = yearToDisaster.getValue();
+            int year = yearToDisaster.getKey();
+            years[i] = year;
+
+            //find start and end year from data
+            startYear = Math.min(startYear, year);
+            endYear = Math.max(endYear, year);
+
+            i++;
+        }
+
     }
 
     public static Data load(String fileName) {

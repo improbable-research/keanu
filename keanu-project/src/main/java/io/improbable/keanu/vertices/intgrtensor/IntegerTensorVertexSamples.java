@@ -30,11 +30,11 @@ public class IntegerTensorVertexSamples extends VertexSamples<IntegerTensor> {
             .divInPlace(samples.size());
     }
 
-    public Integer getIntegerMode() {
-        return getIntegerMode(0, 0);
+    public Integer getScalarMode() {
+        return getModeAtIndex(0, 0);
     }
 
-    public Integer getIntegerMode(int... index) {
+    public Integer getModeAtIndex(int... index) {
 
         if (samples.isEmpty()) {
             throw new IllegalStateException("Mode for empty samples is undefined");
