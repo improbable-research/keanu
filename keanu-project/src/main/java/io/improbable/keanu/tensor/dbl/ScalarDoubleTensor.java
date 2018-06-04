@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.analysis.function.Sigmoid;
+import org.apache.commons.math3.util.FastMath;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -12,19 +12,16 @@ import java.util.function.Function;
 public class ScalarDoubleTensor implements DoubleTensor {
 
     private Double value;
-    private Sigmoid signmoid;
     private int[] shape;
 
     public ScalarDoubleTensor(double value) {
         this.value = value;
         this.shape = SCALAR_SHAPE;
-        this.signmoid = new Sigmoid();
     }
 
     public ScalarDoubleTensor(int[] shape) {
         this.value = null;
         this.shape = shape;
-        this.signmoid = new Sigmoid();
     }
 
     @Override
@@ -516,7 +513,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sigmoidInPlace() {
-        value = signmoid.value(value);
+        value = 1.0D / (1.0D + FastMath.exp(-value));
         return this;
     }
 
