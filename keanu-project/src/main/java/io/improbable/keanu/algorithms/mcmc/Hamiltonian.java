@@ -43,6 +43,8 @@ public class Hamiltonian {
                                                      final double stepSize,
                                                      final KeanuRandom random) {
 
+        bayesNet.cascadeObservations();
+
         final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();

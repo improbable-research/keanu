@@ -53,6 +53,10 @@ public class BayesianNetwork {
         return sum;
     }
 
+    public void cascadeObservations() {
+        VertexValuePropagation.cascadeUpdate(observedVertices);
+    }
+
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
@@ -61,8 +65,6 @@ public class BayesianNetwork {
      * @param random   random source for sampling
      */
     public void probeForNonZeroMasterP(int attempts, KeanuRandom random) {
-
-        VertexValuePropagation.cascadeUpdate(observedVertices);
 
         if (isInImpossibleState()) {
 

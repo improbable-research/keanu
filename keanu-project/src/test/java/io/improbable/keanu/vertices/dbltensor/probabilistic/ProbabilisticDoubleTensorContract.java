@@ -207,7 +207,7 @@ public class ProbabilisticDoubleTensorContract {
         hyperParameterVertices.remove(tensorVertex.getId());
 
         for (Long id : hyperParameterVertices) {
-            assertEquals(tensorPartialDerivatives.withRespectTo(id).scalar(), actualDerivatives.get(id).scalar(), 1e-5);
+            assertEquals(tensorPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
         }
 
         for (int i = 0; i < vector.length; i++) {

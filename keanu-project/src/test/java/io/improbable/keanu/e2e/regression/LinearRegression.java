@@ -2,12 +2,19 @@ package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.tensor.TensorGradientOptimizer;
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -47,7 +54,7 @@ public class LinearRegression {
 
         double expectedM = 3.0;
         double expectedB = 20.0;
-        List<Point> points = make1FactorTestData(1000, expectedM, expectedB);
+        List<Point> points = make1FactorTestData(10000, expectedM, expectedB);
 
         ProbabilisticDouble m = new GaussianVertex(0.0, 10.0);
         ProbabilisticDouble b = new GaussianVertex(0.0, 10.0);
@@ -68,6 +75,38 @@ public class LinearRegression {
         log.info("M = " + m.getValue() + ", B = " + b.getValue());
         assertEquals(expectedM, m.getValue(), 0.01);
         assertEquals(expectedB, b.getValue(), 0.01);
+    }
+
+
+    @Test
+    public void linearRegression1FactorTensorVariationalMAP() {
+
+        // Generate data
+        int N = 100000;
+        double expectedM = 3.0;
+        double expectedB = 20.0;
+
+        DoubleTensorVertex xGenerator = new TensorUniformVertex(new int[]{1, N}, 0, 10);
+        DoubleTensorVertex yGenerator = new TensorGaussianVertex(xGenerator.multiply(expectedM).plus(expectedB), 1.0);
+        DoubleTensor xData = xGenerator.sample(random);
+        xGenerator.setAndCascade(xData);
+        DoubleTensor yData = yGenerator.sample(random);
+
+        // Linear Regression
+        DoubleTensorVertex m = new TensorGaussianVertex(0.0, 10.0);
+        DoubleTensorVertex b = new TensorGaussianVertex(0.0, 10.0);
+        DoubleTensorVertex x = new ConstantDoubleTensorVertex(xData);
+        DoubleTensorVertex y = new TensorGaussianVertex(x.multiply(m).plus(b), 5.0);
+        y.observe(yData);
+
+        BayesNetTensorAsContinuous bayesNet = new BayesNetTensorAsContinuous(m.getConnectedGraph());
+        TensorGradientOptimizer optimizer = new TensorGradientOptimizer(bayesNet);
+
+        optimizer.maxLikelihood(10000);
+
+        log.info("M = " + m.getValue().scalar() + ", B = " + b.getValue().scalar());
+        assertEquals(expectedM, m.getValue().scalar(), 0.05);
+        assertEquals(expectedB, b.getValue().scalar(), 0.05);
     }
 
     @Test

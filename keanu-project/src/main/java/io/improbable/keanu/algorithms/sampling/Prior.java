@@ -25,6 +25,8 @@ public class Prior {
             throw new IllegalStateException("Cannot sample prior from graph with observations");
         }
 
+        bayesNet.cascadeObservations();
+
         List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
         Map<Long, List> samplesByVertex = new HashMap<>();
 
