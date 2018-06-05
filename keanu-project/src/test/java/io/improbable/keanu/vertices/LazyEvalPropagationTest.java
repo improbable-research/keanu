@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.TensorFloorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,10 +22,10 @@ public class LazyEvalPropagationTest {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleTensorVertex start = new TensorFloorVertex(new ConstantDoubleTensorVertex(4.2));
+        DoubleVertex start = new FloorVertex(new ConstantDoubleVertex(4.2));
 
         int links = 20;
-        DoubleTensorVertex end = addLinks(start, n, m, links);
+        DoubleVertex end = addLinks(start, n, m, links);
 
         end.lazyEval();
 
@@ -40,13 +40,13 @@ public class LazyEvalPropagationTest {
     public void doesNotPropagateThroughProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleTensorVertex start = new TensorGaussianVertex(0, 1);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
-        DoubleTensorVertex end = addLinks(start, n, m, 1);
+        DoubleVertex end = addLinks(start, n, m, 1);
 
-        DoubleTensorVertex nextLayerStart = new TensorGaussianVertex(end, 1);
+        DoubleVertex nextLayerStart = new GaussianVertex(end, 1);
 
-        DoubleTensorVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
+        DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
         //Before lazy eval is called
         assertEquals(0, n.get());
@@ -62,15 +62,15 @@ public class LazyEvalPropagationTest {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
 
-        DoubleTensorVertex start1 = new ConstantDoubleTensorVertex(5.0);
-        DoubleTensorVertex start2 = new ConstantDoubleTensorVertex(5.0);
-        DoubleTensorVertex start3 = new ConstantDoubleTensorVertex(5.0);
+        DoubleVertex start1 = new ConstantDoubleVertex(5.0);
+        DoubleVertex start2 = new ConstantDoubleVertex(5.0);
+        DoubleVertex start3 = new ConstantDoubleVertex(5.0);
 
         //start 2 is a shared parent between these sums
-        DoubleTensorVertex middleSum1 = TestGraphGenerator.sumVertex(start1, start2, n, m, id -> log.info("OP on id:" + id));
-        DoubleTensorVertex middleSum2 = TestGraphGenerator.sumVertex(start2, start3, n, m, id -> log.info("OP on id:" + id));
+        DoubleVertex middleSum1 = TestGraphGenerator.sumVertex(start1, start2, n, m, id -> log.info("OP on id:" + id));
+        DoubleVertex middleSum2 = TestGraphGenerator.sumVertex(start2, start3, n, m, id -> log.info("OP on id:" + id));
 
-        DoubleTensorVertex finalSum = TestGraphGenerator.sumVertex(middleSum1, middleSum2, n, m, id -> log.info("OP on id:" + id));
+        DoubleVertex finalSum = TestGraphGenerator.sumVertex(middleSum1, middleSum2, n, m, id -> log.info("OP on id:" + id));
 
         finalSum.lazyEval();
 

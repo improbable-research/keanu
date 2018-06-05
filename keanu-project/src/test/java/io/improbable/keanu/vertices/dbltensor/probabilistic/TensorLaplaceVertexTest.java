@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TensorLaplaceVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        TensorLaplaceVertex tensorLaplaceVertex = new TensorLaplaceVertex(0.5, 1);
+        LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(0.5, 1);
         double expectedDensity = Laplace.logPdf(0.5, 1.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorLaplaceVertex, 0.5, expectedDensity);
     }
@@ -41,7 +41,7 @@ public class TensorLaplaceVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = Laplace.logPdf(0.0, 1.0, 0.25) + Laplace.logPdf(0.0, 1.0, 0.75);
-        TensorLaplaceVertex ndLaplaceVertex = new TensorLaplaceVertex(0, 1);
+        LaplaceVertex ndLaplaceVertex = new LaplaceVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLaplaceVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
 
@@ -50,16 +50,16 @@ public class TensorLaplaceVertexTest {
 
         Laplace.Diff laplaceLogDiff = Laplace.dlnPdf(0.0, 1.0, 0.5);
 
-        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        TensorUniformVertex betaTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex betaTensor = new UniformVertex(0.0, 1.0);
         betaTensor.setValue(1.0);
 
-        TensorLaplaceVertex tensorLaplaceVertex = new TensorLaplaceVertex(muTensor, betaTensor);
+        LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5);
 
-        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(laplaceLogDiff.dPdmu, actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
         assertEquals(laplaceLogDiff.dPdbeta, actual.withRespectTo(betaTensor.getId()).scalar(), 1e-5);
@@ -71,22 +71,22 @@ public class TensorLaplaceVertexTest {
 
         double[] vector = new double[]{0.25, 0.75, 0.1, 22, 1.3};
 
-        TensorUniformVertex muTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        TensorUniformVertex betaTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex betaTensor = new UniformVertex(0.0, 1.0);
         betaTensor.setValue(1.0);
 
-        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorLaplaceVertex(muTensor, betaTensor);
+        Supplier<DoubleVertex> vertexSupplier = () -> new LaplaceVertex(muTensor, betaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        TensorUniformVertex mu = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex mu = new UniformVertex(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        TensorLaplaceVertex vertexUnderTest = new TensorLaplaceVertex(
+        LaplaceVertex vertexUnderTest = new LaplaceVertex(
             mu,
             3.0
         );
@@ -97,8 +97,8 @@ public class TensorLaplaceVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.5, 3.0);
-        TensorLaplaceVertex laplace = new TensorLaplaceVertex(uniformA, 3.0);
+        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        LaplaceVertex laplace = new LaplaceVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -118,8 +118,8 @@ public class TensorLaplaceVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.5, 3.0);
-        TensorLaplaceVertex laplace = new TensorLaplaceVertex(3.0, uniformA);
+        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        LaplaceVertex laplace = new LaplaceVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
@@ -141,10 +141,10 @@ public class TensorLaplaceVertexTest {
     public void laplaceSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        TensorLaplaceVertex vertex = new TensorLaplaceVertex(
+        LaplaceVertex vertex = new LaplaceVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(0.0),
-            new ConstantDoubleTensorVertex(2.0)
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(2.0)
         );
 
         double from = -4;
@@ -160,21 +160,21 @@ public class TensorLaplaceVertexTest {
         double trueMu = 4.5;
         double trueBeta = 2.0;
 
-        List<DoubleTensorVertex> muBeta = new ArrayList<>();
-        muBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueMu)));
-        muBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
+        List<DoubleVertex> muBeta = new ArrayList<>();
+        muBeta.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueMu)));
+        muBeta.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueBeta)));
 
-        List<DoubleTensorVertex> latentMuBeta = new ArrayList<>();
-        TensorUniformVertex latentMu = new TensorUniformVertex(0.01, 10.0);
+        List<DoubleVertex> latentMuBeta = new ArrayList<>();
+        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
         latentMu.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        TensorUniformVertex latentBeta = new TensorUniformVertex(0.01, 10.0);
+        UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
         latentBeta.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
         latentMuBeta.add(latentMu);
         latentMuBeta.add(latentBeta);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorLaplaceVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LaplaceVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             muBeta,
             latentMuBeta,
             random

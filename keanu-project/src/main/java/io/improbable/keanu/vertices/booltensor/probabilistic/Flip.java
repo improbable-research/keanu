@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 
@@ -27,11 +27,11 @@ public class Flip extends ProbabilisticBool {
     }
 
     public Flip(double probTrue) {
-        this(Tensor.SCALAR_SHAPE, new ConstantDoubleTensorVertex(probTrue));
+        this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(probTrue));
     }
 
     public Flip(int[] shape, double probTrue) {
-        this(shape, new ConstantDoubleTensorVertex(probTrue));
+        this(shape, new ConstantDoubleVertex(probTrue));
     }
 
     public Vertex<DoubleTensor> getProbTrue() {

@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.operators.binary.BinaryOpLambda;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
@@ -31,7 +31,7 @@ public class BinaryOpVertexTest {
     public void canSampleFromTwoParents() {
         Flip flip = new Flip(0.5);
 
-        TensorGaussianVertex gaussianVertex = new TensorGaussianVertex(0.0, 1.0);
+        GaussianVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
         BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
             flip, gaussianVertex,
             (BooleanTensor f, DoubleTensor g) ->

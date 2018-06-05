@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
@@ -12,7 +12,7 @@ public class TensorTanVertexTest {
         operatesOnScalarVertexValue(
             Math.PI,
             Math.tan(Math.PI),
-            DoubleTensorVertex::tan
+            DoubleVertex::tan
         );
     }
 
@@ -21,7 +21,7 @@ public class TensorTanVertexTest {
         calculatesDualNumberOfScalar(
             0.5,
             1 / Math.pow(Math.cos(0.5), 2),
-            DoubleTensorVertex::tan
+            DoubleVertex::tan
         );
     }
 
@@ -30,7 +30,7 @@ public class TensorTanVertexTest {
         operatesOn2x2MatrixVertexValues(
             new double[]{0.0, 0.1, 0.2, 0.3},
             new double[]{Math.tan(0.0), Math.tan(0.1), Math.tan(0.2), Math.tan(0.3)},
-            DoubleTensorVertex::tan
+            DoubleVertex::tan
         );
     }
 
@@ -43,7 +43,7 @@ public class TensorTanVertexTest {
                 1 / Math.pow(Math.cos(0.3), 2),
                 1 / Math.pow(Math.cos(0.4), 2)
             },
-            DoubleTensorVertex::tan
+            DoubleVertex::tan
         );
     }
     

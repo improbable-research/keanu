@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
@@ -12,7 +12,7 @@ public class TensorExpVertexTest {
         operatesOnScalarVertexValue(
             5,
             Math.exp(5),
-            DoubleTensorVertex::exp
+            DoubleVertex::exp
         );
     }
 
@@ -21,7 +21,7 @@ public class TensorExpVertexTest {
         calculatesDualNumberOfScalar(
             0.5,
             Math.exp(0.5),
-            DoubleTensorVertex::exp
+            DoubleVertex::exp
         );
     }
 
@@ -30,7 +30,7 @@ public class TensorExpVertexTest {
         operatesOn2x2MatrixVertexValues(
             new double[]{0.0, 0.1, 0.2, 0.3},
             new double[]{Math.exp(0.0), Math.exp(0.1), Math.exp(0.2), Math.exp(0.3)},
-            DoubleTensorVertex::exp
+            DoubleVertex::exp
         );
     }
 
@@ -39,7 +39,7 @@ public class TensorExpVertexTest {
         calculatesDualNumberOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             new double[]{Math.exp(0.1), Math.exp(0.2), Math.exp(0.3), Math.exp(0.4)},
-            DoubleTensorVertex::exp
+            DoubleVertex::exp
         );
     }
 

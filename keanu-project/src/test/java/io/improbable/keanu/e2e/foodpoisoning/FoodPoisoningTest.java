@@ -9,9 +9,8 @@ import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.booltensor.BoolVertex;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.DoubleIfVertex;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Test;
@@ -91,7 +90,7 @@ public class FoodPoisoningTest {
                     )
                 );
 
-            DoubleTensorVertex pIll = If.isTrue(ingestedPathogen)
+            DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
                 .orElse(0.1);
 

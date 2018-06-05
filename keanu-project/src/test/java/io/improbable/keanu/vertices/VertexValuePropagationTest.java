@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,10 +21,10 @@ public class VertexValuePropagationTest {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleTensorVertex start = new TensorGaussianVertex(0, 1);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
         int links = 20;
-        DoubleTensorVertex end = addLinks(start, n, m, links);
+        DoubleVertex end = addLinks(start, n, m, links);
 
         start.setAndCascade(2.0);
 
@@ -39,13 +39,13 @@ public class VertexValuePropagationTest {
     public void doesNotPropagateThroughProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleTensorVertex start = new TensorGaussianVertex(0, 1);
+        DoubleVertex start = new GaussianVertex(0, 1);
 
-        DoubleTensorVertex end = addLinks(start, n, m, 1);
+        DoubleVertex end = addLinks(start, n, m, 1);
 
-        DoubleTensorVertex nextLayerStart = new TensorGaussianVertex(end, 1);
+        DoubleVertex nextLayerStart = new GaussianVertex(end, 1);
 
-        DoubleTensorVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
+        DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
         start.setAndCascade(3.0);
 
@@ -60,15 +60,15 @@ public class VertexValuePropagationTest {
     public void doesPropagateAroundProbabilisticVertices() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleTensorVertex firstLayerStart = new TensorGaussianVertex(0, 1);
+        DoubleVertex firstLayerStart = new GaussianVertex(0, 1);
 
-        DoubleTensorVertex firstLayerEnd = addLinks(firstLayerStart, n, m, 1);
+        DoubleVertex firstLayerEnd = addLinks(firstLayerStart, n, m, 1);
 
-        DoubleTensorVertex secondLayerStart = new TensorGaussianVertex(firstLayerEnd, 1);
+        DoubleVertex secondLayerStart = new GaussianVertex(firstLayerEnd, 1);
 
-        DoubleTensorVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, m, id -> log.info("OP on id: " + id));
-        DoubleTensorVertex secondLayerRight = passThroughVertex(secondLayerStart, n, m, id -> log.info("OP on id: " + id));
-        DoubleTensorVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, m, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerLeft = sumVertex(secondLayerStart, firstLayerEnd, n, m, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerRight = passThroughVertex(secondLayerStart, n, m, id -> log.info("OP on id: " + id));
+        DoubleVertex secondLayerEnd = sumVertex(secondLayerLeft, secondLayerRight, n, m, id -> log.info("OP on id: " + id));
 
         secondLayerStart.setValue(2.0);
         firstLayerStart.setValue(3.0);

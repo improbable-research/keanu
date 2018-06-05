@@ -2,10 +2,10 @@ package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -26,19 +26,19 @@ public class ParticleFilteringTest {
     @Test
     public void findsCorrectTemp() {
 
-        DoubleTensorVertex temperature = new TensorUniformVertex(0.0, 100.0);
-        DoubleTensorVertex noiseAMu = new TensorGaussianVertex(0.0, 2.0);
-        DoubleTensorVertex noiseA = new TensorGaussianVertex(noiseAMu, 2.0);
-        DoubleTensorVertex noiseBMu = new TensorGaussianVertex(0.0, 2.0);
-        DoubleTensorVertex noiseB = new TensorGaussianVertex(noiseBMu, 2.0);
-        DoubleTensorVertex noiseCMu = new TensorGaussianVertex(0.0, 2.0);
-        DoubleTensorVertex noiseC = new TensorGaussianVertex(noiseCMu, 2.0);
-        DoubleTensorVertex noiseDMu = new TensorGaussianVertex(0.0, 2.0);
-        DoubleTensorVertex noiseD = new TensorGaussianVertex(noiseDMu, 2.0);
-        DoubleTensorVertex thermometerA = new TensorGaussianVertex(temperature.plus(noiseA), 1.0);
-        DoubleTensorVertex thermometerB = new TensorGaussianVertex(temperature.plus(noiseB), 1.0);
-        DoubleTensorVertex thermometerC = new TensorGaussianVertex(temperature.plus(noiseC), 1.0);
-        DoubleTensorVertex thermometerD = new TensorGaussianVertex(temperature.plus(noiseD), 1.0);
+        DoubleVertex temperature = new UniformVertex(0.0, 100.0);
+        DoubleVertex noiseAMu = new GaussianVertex(0.0, 2.0);
+        DoubleVertex noiseA = new GaussianVertex(noiseAMu, 2.0);
+        DoubleVertex noiseBMu = new GaussianVertex(0.0, 2.0);
+        DoubleVertex noiseB = new GaussianVertex(noiseBMu, 2.0);
+        DoubleVertex noiseCMu = new GaussianVertex(0.0, 2.0);
+        DoubleVertex noiseC = new GaussianVertex(noiseCMu, 2.0);
+        DoubleVertex noiseDMu = new GaussianVertex(0.0, 2.0);
+        DoubleVertex noiseD = new GaussianVertex(noiseDMu, 2.0);
+        DoubleVertex thermometerA = new GaussianVertex(temperature.plus(noiseA), 1.0);
+        DoubleVertex thermometerB = new GaussianVertex(temperature.plus(noiseB), 1.0);
+        DoubleVertex thermometerC = new GaussianVertex(temperature.plus(noiseC), 1.0);
+        DoubleVertex thermometerD = new GaussianVertex(temperature.plus(noiseD), 1.0);
         thermometerA.observe(21.0);
         thermometerB.observe(19.5);
         thermometerC.observe(22.0);

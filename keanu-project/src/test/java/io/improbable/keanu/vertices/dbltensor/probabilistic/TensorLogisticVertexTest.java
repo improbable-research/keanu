@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -30,7 +30,7 @@ public class TensorLogisticVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        TensorLogisticVertex tensorLogisticVertex = new TensorLogisticVertex(0.5, 1.5);
+        LogisticVertex tensorLogisticVertex = new LogisticVertex(0.5, 1.5);
         double expectedDensity = Logistic.logPdf(0.5, 1.5, 2.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorLogisticVertex, 2.0, expectedDensity);
@@ -40,7 +40,7 @@ public class TensorLogisticVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = Logistic.logPdf(0.0, 1.0, 0.25) + Logistic.logPdf(0.0, 1.0, .75);
-        TensorLogisticVertex ndLogisticVertex = new TensorLogisticVertex(0.0, 1);
+        LogisticVertex ndLogisticVertex = new LogisticVertex(0.0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLogisticVertex, new double[]{0.25, .75}, expectedLogDensity);
     }
 
@@ -49,16 +49,16 @@ public class TensorLogisticVertexTest {
 
         Logistic.Diff logisticLogDiff = Logistic.dlnPdf(0.0, 0.5, 1.5);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex aTensor = new UniformVertex(0.0, 5.0);
         aTensor.setValue(0.0);
 
-        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex bTensor = new UniformVertex(0.0, 5.0);
         bTensor.setValue(0.5);
 
-        TensorLogisticVertex tensorLogisticVertex = new TensorLogisticVertex(aTensor, bTensor);
+        LogisticVertex tensorLogisticVertex = new LogisticVertex(aTensor, bTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogPdf(1.5);
 
-        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(logisticLogDiff.dPda, actual.withRespectTo(aTensor.getId()).scalar(), 1e-5);
         assertEquals(logisticLogDiff.dPdb, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
@@ -67,9 +67,9 @@ public class TensorLogisticVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        TensorUniformVertex mu = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex mu = new UniformVertex(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        TensorLogisticVertex vertexUnderTest = new TensorLogisticVertex(
+        LogisticVertex vertexUnderTest = new LogisticVertex(
             mu,
             3.
         );
@@ -80,8 +80,8 @@ public class TensorLogisticVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(0.0, 1.0);
-        TensorLogisticVertex logistic = new TensorLogisticVertex(uniformA, 1.0);
+        UniformVertex uniformA = new UniformVertex(0.0, 1.0);
+        LogisticVertex logistic = new LogisticVertex(uniformA, 1.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -101,8 +101,8 @@ public class TensorLogisticVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(0., 1.);
-        TensorLogisticVertex logistic = new TensorLogisticVertex(0.0, uniformA);
+        UniformVertex uniformA = new UniformVertex(0., 1.);
+        LogisticVertex logistic = new LogisticVertex(0.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(1.0);
@@ -126,10 +126,10 @@ public class TensorLogisticVertexTest {
         KeanuRandom random = new KeanuRandom(1);
 
         int sampleCount = 1000000;
-        TensorLogisticVertex vertex = new TensorLogisticVertex(
+        LogisticVertex vertex = new LogisticVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(0.0),
-            new ConstantDoubleTensorVertex(0.5)
+            new ConstantDoubleVertex(0.0),
+            new ConstantDoubleVertex(0.5)
         );
 
         double from = 0.5;
@@ -145,19 +145,19 @@ public class TensorLogisticVertexTest {
         double trueA = 0.0;
         double trueB = 0.5;
 
-        List<DoubleTensorVertex> aB = new ArrayList<>();
-        aB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
-        aB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueB)));
+        List<DoubleVertex> aB = new ArrayList<>();
+        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueA)));
+        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueB)));
 
-        List<DoubleTensorVertex> latentAB = new ArrayList<>();
-        TensorUniformVertex latentB = new TensorUniformVertex(0.01, 10.0);
+        List<DoubleVertex> latentAB = new ArrayList<>();
+        UniformVertex latentB = new UniformVertex(0.01, 10.0);
         latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
-        latentAB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
+        latentAB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueA)));
         latentAB.add(latentB);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorLogisticVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LogisticVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             aB,
             latentAB,
             random

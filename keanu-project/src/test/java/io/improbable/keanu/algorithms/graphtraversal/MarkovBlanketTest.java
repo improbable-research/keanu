@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -16,9 +16,9 @@ public class MarkovBlanketTest {
     @Test
     public void findBlanketFromSimpleGraph() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(A, B);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(5.0, 1.0);
+        DoubleVertex C = new GaussianVertex(A, B);
 
         Set<Vertex> blanket = MarkovBlanket.get(C);
 
@@ -29,13 +29,13 @@ public class MarkovBlanketTest {
     @Test
     public void findBlanketFromDoubleDiamondWithDeterministicGraph() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex D = new TensorGaussianVertex(B, C);
-        DoubleTensorVertex E = D.multiply(2.0);
-        DoubleTensorVertex F = new TensorGaussianVertex(D, 1.0);
-        DoubleTensorVertex G = new TensorGaussianVertex(E, F);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(A, 1.0);
+        DoubleVertex C = new GaussianVertex(A, 1.0);
+        DoubleVertex D = new GaussianVertex(B, C);
+        DoubleVertex E = D.multiply(2.0);
+        DoubleVertex F = new GaussianVertex(D, 1.0);
+        DoubleVertex G = new GaussianVertex(E, F);
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 
@@ -46,13 +46,13 @@ public class MarkovBlanketTest {
     @Test
     public void findBlanketFromDoubleDiamondGraph() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex D = new TensorGaussianVertex(B, C);
-        DoubleTensorVertex E = new TensorGaussianVertex(D, 1.0);
-        DoubleTensorVertex F = new TensorGaussianVertex(D, 1.0);
-        DoubleTensorVertex G = new TensorGaussianVertex(E, F);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(A, 1.0);
+        DoubleVertex C = new GaussianVertex(A, 1.0);
+        DoubleVertex D = new GaussianVertex(B, C);
+        DoubleVertex E = new GaussianVertex(D, 1.0);
+        DoubleVertex F = new GaussianVertex(D, 1.0);
+        DoubleVertex G = new GaussianVertex(E, F);
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 

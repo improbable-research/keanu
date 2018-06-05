@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,7 +32,7 @@ public class TensorInverseGammaVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        TensorInverseGammaVertex tensorInverseGammaVertex = new TensorInverseGammaVertex(2.0, 1.0);
+        InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(2.0, 1.0);
         double expectedDensity = InverseGamma.logPdf(2.0, 1.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorInverseGammaVertex, 0.5, expectedDensity);
     }
@@ -41,7 +41,7 @@ public class TensorInverseGammaVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = InverseGamma.logPdf(2.0, 1.0, 0.25) + InverseGamma.logPdf(2.0, 1.0, 0.75);
-        TensorInverseGammaVertex ndInverseGammaVertex = new TensorInverseGammaVertex(2.0, 1.0);
+        InverseGammaVertex ndInverseGammaVertex = new InverseGammaVertex(2.0, 1.0);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndInverseGammaVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
 
@@ -50,16 +50,16 @@ public class TensorInverseGammaVertexTest {
 
         InverseGamma.Diff inverseGammaLogDiff = InverseGamma.dlnPdf(2.0, 1.0, 0.5);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex aTensor = new UniformVertex(0.0, 5.0);
         aTensor.setValue(2.0);
 
-        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex bTensor = new UniformVertex(0.0, 1.0);
         bTensor.setValue(1.0);
 
-        TensorInverseGammaVertex tensorInverseGammaVertex = new TensorInverseGammaVertex(aTensor, bTensor);
+        InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5);
 
-        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(inverseGammaLogDiff.dPda, actual.withRespectTo(aTensor.getId()).scalar(), 1e-5);
         assertEquals(inverseGammaLogDiff.dPdb, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
@@ -71,22 +71,22 @@ public class TensorInverseGammaVertexTest {
 
         double[] vector = new double[]{0.25, 0.75, 0.1, 0.9, 0.3};
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex aTensor = new UniformVertex(0.0, 1.0);
         aTensor.setValue(2.0);
 
-        TensorUniformVertex bTensor = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex bTensor = new UniformVertex(0.0, 1.0);
         bTensor.setValue(1.0);
 
-        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorInverseGammaVertex(aTensor, bTensor);
+        Supplier<DoubleVertex> vertexSupplier = () -> new InverseGammaVertex(aTensor, bTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        TensorUniformVertex a = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setAndCascade(Nd4jDoubleTensor.scalar(2.5));
-        TensorInverseGammaVertex vertexUnderTest = new TensorInverseGammaVertex(
+        InverseGammaVertex vertexUnderTest = new InverseGammaVertex(
             a,
             3.0
         );
@@ -97,8 +97,8 @@ public class TensorInverseGammaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.0, 3.0);
-        TensorInverseGammaVertex inverseGamma = new TensorInverseGammaVertex(uniformA, 3.0);
+        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        InverseGammaVertex inverseGamma = new InverseGammaVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
@@ -118,8 +118,8 @@ public class TensorInverseGammaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.0, 3.0);
-        TensorInverseGammaVertex inverseGamma = new TensorInverseGammaVertex(3.0, uniformA);
+        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        InverseGammaVertex inverseGamma = new InverseGammaVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
@@ -141,10 +141,10 @@ public class TensorInverseGammaVertexTest {
     public void inverseGammaSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        TensorInverseGammaVertex vertex = new TensorInverseGammaVertex(
+        InverseGammaVertex vertex = new InverseGammaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(2.0),
-            new ConstantDoubleTensorVertex(3.0)
+            new ConstantDoubleVertex(2.0),
+            new ConstantDoubleVertex(3.0)
         );
 
         double from = 0.0;
@@ -160,21 +160,21 @@ public class TensorInverseGammaVertexTest {
         double trueA = 4.5;
         double trueB = 2.0;
 
-        List<DoubleTensorVertex> aB = new ArrayList<>();
-        aB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueA)));
-        aB.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueB)));
+        List<DoubleVertex> aB = new ArrayList<>();
+        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueA)));
+        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueB)));
 
-        List<DoubleTensorVertex> latentAB = new ArrayList<>();
-        TensorUniformVertex latentA = new TensorUniformVertex(0.01, 10.0);
+        List<DoubleVertex> latentAB = new ArrayList<>();
+        UniformVertex latentA = new UniformVertex(0.01, 10.0);
         latentA.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        TensorUniformVertex latentB = new TensorUniformVertex(0.01, 10.0);
+        UniformVertex latentB = new UniformVertex(0.01, 10.0);
         latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
         latentAB.add(latentA);
         latentAB.add(latentB);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorInverseGammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new InverseGammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             aB,
             latentAB,
             random

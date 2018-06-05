@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -15,9 +15,9 @@ public class TopologicalSortTest {
     @Test
     public void sortsSimpleLinearGraph() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(B, 1.0);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(A, 1.0);
+        DoubleVertex C = new GaussianVertex(B, 1.0);
 
         List<? extends Vertex> sorted = TopologicalSort.sort(Arrays.asList(C, B, A));
         List<Vertex<?>> expected = Arrays.asList(A, B, C);
@@ -28,10 +28,10 @@ public class TopologicalSortTest {
     @Test
     public void sortsSimpleDiamondGraph() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex D = new TensorGaussianVertex(B, C);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(A, 1.0);
+        DoubleVertex C = new GaussianVertex(A, 1.0);
+        DoubleVertex D = new GaussianVertex(B, C);
 
         List<? extends Vertex> sorted = TopologicalSort.sort(Arrays.asList(D, C, B, A));
 
@@ -43,13 +43,13 @@ public class TopologicalSortTest {
     @Test
     public void sortsDoubleDiamondGraph() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(A, 1.0);
-        DoubleTensorVertex D = new TensorGaussianVertex(B, C);
-        DoubleTensorVertex E = new TensorGaussianVertex(D, 1.0);
-        DoubleTensorVertex F = new TensorGaussianVertex(D, 1.0);
-        DoubleTensorVertex G = new TensorGaussianVertex(E, F);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(A, 1.0);
+        DoubleVertex C = new GaussianVertex(A, 1.0);
+        DoubleVertex D = new GaussianVertex(B, C);
+        DoubleVertex E = new GaussianVertex(D, 1.0);
+        DoubleVertex F = new GaussianVertex(D, 1.0);
+        DoubleVertex G = new GaussianVertex(E, F);
 
         List<Vertex> vertices = Arrays.asList(F, B, G, C, E, A);
         List<? extends Vertex> sorted = TopologicalSort.sort(vertices);
@@ -61,19 +61,19 @@ public class TopologicalSortTest {
 
     @Test
     public void sortsComplexGraph() {
-        DoubleTensorVertex A = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex C = new TensorGaussianVertex(A, B);
-        DoubleTensorVertex D = new TensorGaussianVertex(5.0, 1.0);
-        DoubleTensorVertex F = new TensorGaussianVertex(C, D);
-        DoubleTensorVertex E = new TensorGaussianVertex(C, F);
-        DoubleTensorVertex H = new TensorGaussianVertex(E, F);
-        DoubleTensorVertex G = new TensorGaussianVertex(E, 1.0);
-        DoubleTensorVertex I = new TensorGaussianVertex(H, G);
-        DoubleTensorVertex J = new TensorGaussianVertex(H, 1.0);
-        DoubleTensorVertex K = new TensorGaussianVertex(H, J);
-        DoubleTensorVertex M = new TensorGaussianVertex(J, 1.0);
-        DoubleTensorVertex L = new TensorGaussianVertex(K, H);
+        DoubleVertex A = new GaussianVertex(5.0, 1.0);
+        DoubleVertex B = new GaussianVertex(5.0, 1.0);
+        DoubleVertex C = new GaussianVertex(A, B);
+        DoubleVertex D = new GaussianVertex(5.0, 1.0);
+        DoubleVertex F = new GaussianVertex(C, D);
+        DoubleVertex E = new GaussianVertex(C, F);
+        DoubleVertex H = new GaussianVertex(E, F);
+        DoubleVertex G = new GaussianVertex(E, 1.0);
+        DoubleVertex I = new GaussianVertex(H, G);
+        DoubleVertex J = new GaussianVertex(H, 1.0);
+        DoubleVertex K = new GaussianVertex(H, J);
+        DoubleVertex M = new GaussianVertex(J, 1.0);
+        DoubleVertex L = new GaussianVertex(K, H);
 
         List<Vertex> vertices = Arrays.asList(H, B, L, I, F, E, A, G, D, J, K, M, C);
         List<? extends Vertex> sorted = TopologicalSort.sort(vertices);

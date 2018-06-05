@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
@@ -9,12 +9,12 @@ public class TensorMultiplicationVertexTest {
 
     @Test
     public void multipliesTwoScalarVertexValues() {
-        operatesOnTwoScalarVertexValues(2.0, 3.0, 6.0, DoubleTensorVertex::multiply);
+        operatesOnTwoScalarVertexValues(2.0, 3.0, 6.0, DoubleVertex::multiply);
     }
 
     @Test
     public void calculatesDualNumberOfTwoScalarsMultiplied() {
-        calculatesDualNumberOfTwoScalars(2.0, 3.0, 3.0, 2.0, DoubleTensorVertex::multiply);
+        calculatesDualNumberOfTwoScalars(2.0, 3.0, 3.0, 2.0, DoubleVertex::multiply);
     }
 
     @Test
@@ -23,7 +23,7 @@ public class TensorMultiplicationVertexTest {
             new double[]{1.0, 2.0, 3.0, 4.0},
             new double[]{2.0, 3.0, 4.0, 5.0},
             new double[]{2.0, 6.0, 12.0, 20.0},
-            DoubleTensorVertex::multiply
+            DoubleVertex::multiply
         );
     }
 
@@ -34,7 +34,7 @@ public class TensorMultiplicationVertexTest {
             new double[]{2.0, 3.0, 4.0, 5.0},
             new double[]{2.0, 3.0, 4.0, 5.0},
             new double[]{1.0, 2.0, 3.0, 4.0},
-            DoubleTensorVertex::multiply
+            DoubleVertex::multiply
         );
     }
 }

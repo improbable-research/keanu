@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -19,14 +19,14 @@ public class LatentIncrementSortTest {
 
     @Test
     public void simpleGraph() {
-        DoubleTensorVertex muA = new ConstantDoubleTensorVertex(0.0);
-        DoubleTensorVertex muB = new ConstantDoubleTensorVertex(3.0);
-        DoubleTensorVertex sigma = new TensorUniformVertex(1.0, 2.0);
+        DoubleVertex muA = new ConstantDoubleVertex(0.0);
+        DoubleVertex muB = new ConstantDoubleVertex(3.0);
+        DoubleVertex sigma = new UniformVertex(1.0, 2.0);
 
-        DoubleTensorVertex gA = new TensorGaussianVertex(muA, sigma);
-        DoubleTensorVertex gB = new TensorGaussianVertex(muB, sigma);
-        DoubleTensorVertex sum = gA.plus(gB);
-        DoubleTensorVertex fuzzySum = new TensorGaussianVertex(sum, sigma);
+        DoubleVertex gA = new GaussianVertex(muA, sigma);
+        DoubleVertex gB = new GaussianVertex(muB, sigma);
+        DoubleVertex sum = gA.plus(gB);
+        DoubleVertex fuzzySum = new GaussianVertex(sum, sigma);
 
         gA.observe(0.1);
         fuzzySum.observe(1.0);
@@ -42,24 +42,24 @@ public class LatentIncrementSortTest {
 
     @Test
     public void moreComplexGraph() {
-        DoubleTensorVertex mu = new ConstantDoubleTensorVertex(0.0);
-        DoubleTensorVertex sigma1 = new TensorUniformVertex(1.0, 2.0);
-        DoubleTensorVertex g1 = new TensorGaussianVertex(mu, sigma1);
+        DoubleVertex mu = new ConstantDoubleVertex(0.0);
+        DoubleVertex sigma1 = new UniformVertex(1.0, 2.0);
+        DoubleVertex g1 = new GaussianVertex(mu, sigma1);
         g1.observe(0.0);
 
-        DoubleTensorVertex sigma2 = new TensorUniformVertex(1.0, 2.0);
-        DoubleTensorVertex g2 = new TensorGaussianVertex(g1, sigma2);
+        DoubleVertex sigma2 = new UniformVertex(1.0, 2.0);
+        DoubleVertex g2 = new GaussianVertex(g1, sigma2);
 
-        DoubleTensorVertex sigma3 = new TensorUniformVertex(1.0, 2.0);
-        DoubleTensorVertex g3 = new TensorGaussianVertex(g2, sigma3);
+        DoubleVertex sigma3 = new UniformVertex(1.0, 2.0);
+        DoubleVertex g3 = new GaussianVertex(g2, sigma3);
         g3.observe(0.0);
 
-        DoubleTensorVertex g4 = new TensorGaussianVertex(g3, sigma3);
-        DoubleTensorVertex sigma4 = new TensorUniformVertex(1.0, 2.0);
-        DoubleTensorVertex g5 = new TensorGaussianVertex(g4, sigma4);
+        DoubleVertex g4 = new GaussianVertex(g3, sigma3);
+        DoubleVertex sigma4 = new UniformVertex(1.0, 2.0);
+        DoubleVertex g5 = new GaussianVertex(g4, sigma4);
 
-        DoubleTensorVertex sigma5 = new TensorUniformVertex(1.0, 2.0);
-        DoubleTensorVertex g6 = new TensorGaussianVertex(g5, sigma5);
+        DoubleVertex sigma5 = new UniformVertex(1.0, 2.0);
+        DoubleVertex g6 = new GaussianVertex(g5, sigma5);
         g6.observe(0.0);
 
         Map<Vertex, Set<Vertex>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());

@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.generictensor.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generictensor.probabilistic.discrete.SelectVertex;
 import io.improbable.keanu.vertices.intgrtensor.IntegerVertex;
 import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex;
@@ -37,14 +37,14 @@ public class MultiplexerVertexTest {
         expected.put(TestEnum.C, 0.25);
         expected.put(TestEnum.D, 0.25);
 
-        LinkedHashMap<TestEnum, DoubleTensorVertex> optionGroup1 = new LinkedHashMap<>();
-        optionGroup1.put(TestEnum.A, new ConstantDoubleTensorVertex(0.5));
-        optionGroup1.put(TestEnum.B, new ConstantDoubleTensorVertex(0.5));
+        LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
+        optionGroup1.put(TestEnum.A, new ConstantDoubleVertex(0.5));
+        optionGroup1.put(TestEnum.B, new ConstantDoubleVertex(0.5));
         SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1);
 
-        LinkedHashMap<TestEnum, DoubleTensorVertex> optionGroup2 = new LinkedHashMap<>();
-        optionGroup2.put(TestEnum.C, new ConstantDoubleTensorVertex(0.5));
-        optionGroup2.put(TestEnum.D, new ConstantDoubleTensorVertex(0.5));
+        LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
+        optionGroup2.put(TestEnum.C, new ConstantDoubleVertex(0.5));
+        optionGroup2.put(TestEnum.D, new ConstantDoubleVertex(0.5));
         SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2);
 
         MultiplexerVertex<Tensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);

@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.TensorSinVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.SinVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,10 +19,10 @@ public class DualNumberPropagationTest {
     public void doesNotPerformUnneccesaryDualNumberCalculations() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleTensorVertex start = new TensorSinVertex(new ConstantDoubleTensorVertex(Math.PI / 3));
+        DoubleVertex start = new SinVertex(new ConstantDoubleVertex(Math.PI / 3));
 
         int links = 20;
-        DoubleTensorVertex end = TestGraphGenerator.addLinks(start, n, m, links);
+        DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
 
         end.getDualNumber();
 

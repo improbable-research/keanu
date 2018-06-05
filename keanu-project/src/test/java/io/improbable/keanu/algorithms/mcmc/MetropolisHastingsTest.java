@@ -5,9 +5,9 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.booltensor.BoolVertex;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Test;
@@ -29,13 +29,13 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesContinuousPrior() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(20.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(20.0, 1.0);
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
 
         A.setValue(20.0);
         B.setValue(20.0);
 
-        DoubleTensorVertex Cobserved = new TensorGaussianVertex(A.plus(B), 1.0);
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
 
         Cobserved.observe(46.0);
 
@@ -60,13 +60,13 @@ public class MetropolisHastingsTest {
     public void samplesContinuousTensorPrior() {
 
         int[] shape = new int[]{1, 1};
-        DoubleTensorVertex A = new TensorGaussianVertex(shape, 20.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(shape, 20.0, 1.0);
+        DoubleVertex A = new GaussianVertex(shape, 20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(shape, 20.0, 1.0);
 
         A.setValue(20.0);
         B.setValue(20.0);
 
-        DoubleTensorVertex Cobserved = new TensorGaussianVertex(A.plus(B), 1.0);
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
@@ -94,7 +94,7 @@ public class MetropolisHastingsTest {
 
         Flip A = new Flip(0.5);
 
-        DoubleTensorVertex B = If.isTrue(A)
+        DoubleVertex B = If.isTrue(A)
             .then(0.9)
             .orElse(0.1);
 
@@ -125,7 +125,7 @@ public class MetropolisHastingsTest {
 
         BoolVertex C = A.or(B);
 
-        DoubleTensorVertex D = If.isTrue(C)
+        DoubleVertex D = If.isTrue(C)
             .then(0.9)
             .orElse(0.1);
 

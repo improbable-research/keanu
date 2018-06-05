@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.*;
@@ -158,46 +158,46 @@ public class ProbabilisticDoubleTensorContract {
             diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
-    public static void isTreatedAsConstantWhenObserved(DoubleTensorVertex vertexUnderTest) {
+    public static void isTreatedAsConstantWhenObserved(DoubleVertex vertexUnderTest) {
         vertexUnderTest.observe(DoubleTensor.ones(vertexUnderTest.getValue().getShape()));
         assertTrue(vertexUnderTest.getDualNumber().isOfConstant());
     }
 
-    public static void hasNoGradientWithRespectToItsValueWhenObserved(DoubleTensorVertex vertexUnderTest) {
+    public static void hasNoGradientWithRespectToItsValueWhenObserved(DoubleVertex vertexUnderTest) {
         DoubleTensor ones = DoubleTensor.ones(vertexUnderTest.getValue().getShape());
         vertexUnderTest.observe(ones);
         assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest.getId()));
     }
 
-    public static void matchesKnownLogDensityOfVector(DoubleTensorVertex vertexUnderTest, double[] vector, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfVector(DoubleVertex vertexUnderTest, double[] vector, double expectedLogDensity) {
 
         double actualDensity = vertexUnderTest.logPdf(DoubleTensor.create(vector, new int[]{vector.length, 1}));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static void matchesKnownLogDensityOfScalar(DoubleTensorVertex vertexUnderTest, double scalar, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfScalar(DoubleVertex vertexUnderTest, double scalar, double expectedLogDensity) {
 
         double actualDensity = vertexUnderTest.logPdf(Nd4jDoubleTensor.scalar(scalar));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<DoubleTensorVertex> vertexUnderTestSupplier) {
+    public static void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<DoubleVertex> vertexUnderTestSupplier) {
 
-        DoubleTensorVertex[] scalarVertices = new DoubleTensorVertex[vector.length];
-        TensorPartialDerivatives tensorPartialDerivatives = new TensorPartialDerivatives(new HashMap<>());
+        DoubleVertex[] scalarVertices = new DoubleVertex[vector.length];
+        PartialDerivatives tensorPartialDerivatives = new PartialDerivatives(new HashMap<>());
 
         for (int i = 0; i < vector.length; i++) {
 
             scalarVertices[i] = vertexUnderTestSupplier.get();
 
             tensorPartialDerivatives = tensorPartialDerivatives.add(
-                new TensorPartialDerivatives(
+                new PartialDerivatives(
                     scalarVertices[i].dLogPdf(vector[i])
                 )
             );
         }
 
-        DoubleTensorVertex tensorVertex = vertexUnderTestSupplier.get();
+        DoubleVertex tensorVertex = vertexUnderTestSupplier.get();
 
         Map<Long, DoubleTensor> actualDerivatives = tensorVertex.dLogPdf(
             DoubleTensor.create(vector, new int[]{vector.length, 1})

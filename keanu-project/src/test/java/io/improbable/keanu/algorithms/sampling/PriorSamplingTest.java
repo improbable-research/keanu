@@ -2,9 +2,9 @@ package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -12,17 +12,17 @@ import static junit.framework.TestCase.assertEquals;
 
 public class PriorSamplingTest {
 
-    private DoubleTensorVertex A;
-    private DoubleTensorVertex B;
-    private DoubleTensorVertex C;
+    private DoubleVertex A;
+    private DoubleVertex B;
+    private DoubleVertex C;
     private KeanuRandom random;
 
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        A = new TensorGaussianVertex(100.0, 1);
-        B = new TensorGaussianVertex(A, 1);
-        C = new TensorGaussianVertex(B, 1);
+        A = new GaussianVertex(100.0, 1);
+        B = new GaussianVertex(A, 1);
+        C = new GaussianVertex(B, 1);
     }
 
     @Test

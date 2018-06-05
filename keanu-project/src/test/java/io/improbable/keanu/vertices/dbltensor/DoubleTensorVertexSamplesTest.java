@@ -17,7 +17,7 @@ public class DoubleTensorVertexSamplesTest {
         DoubleTensor c = DoubleTensor.create(new double[]{8, -4, 12}, new int[]{1, 3});
         DoubleTensor d = DoubleTensor.create(new double[]{4, 4, 8}, new int[]{1, 3});
 
-        DoubleTensorVertexSamples samples = new DoubleTensorVertexSamples(Arrays.asList(a, b, c, d));
+        DoubleVertexSamples samples = new DoubleVertexSamples(Arrays.asList(a, b, c, d));
 
         DoubleTensor averages = samples.getAverages();
 

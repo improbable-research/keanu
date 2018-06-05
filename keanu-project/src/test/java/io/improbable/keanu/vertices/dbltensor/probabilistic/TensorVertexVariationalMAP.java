@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.algorithms.variational.TensorGradientOptimizer;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.List;
@@ -14,18 +14,18 @@ import static org.junit.Assert.assertEquals;
 public class TensorVertexVariationalMAP {
 
     public static void inferHyperParamsFromSamples(
-        Function<List<DoubleTensorVertex>, DoubleTensorVertex> vertexUnderTestCreator,
-        List<DoubleTensorVertex> hyperParamsForSampling,
-        List<DoubleTensorVertex> latentsToInfer,
+        Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
+        List<DoubleVertex> hyperParamsForSampling,
+        List<DoubleVertex> latentsToInfer,
         KeanuRandom random) {
 
         // SOURCE OF TRUTH
-        DoubleTensorVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
+        DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
 
         // GENERATE FAKE DATA
         DoubleTensor samples = sourceVertex.sample(random);
 
-        DoubleTensorVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
+        DoubleVertex observedDistribution = vertexUnderTestCreator.apply(latentsToInfer);
         observedDistribution.observe(samples);
 
         // INFER HYPER PARAMETERS
@@ -36,7 +36,7 @@ public class TensorVertexVariationalMAP {
         }
     }
 
-    private static void doInferenceOn(DoubleTensorVertex unknownVertex, KeanuRandom random) {
+    private static void doInferenceOn(DoubleVertex unknownVertex, KeanuRandom random) {
         BayesNetTensorAsContinuous inferNet = new BayesNetTensorAsContinuous(unknownVertex.getConnectedGraph());
 
         inferNet.probeForNonZeroMasterP(100, random);

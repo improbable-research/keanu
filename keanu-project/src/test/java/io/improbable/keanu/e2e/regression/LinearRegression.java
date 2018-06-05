@@ -4,11 +4,11 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.TensorGradientOptimizer;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -40,9 +40,9 @@ public class LinearRegression {
         double expectedM = 3.0;
         double expectedB = 20.0;
 
-        DoubleTensorVertex xGenerator = new TensorUniformVertex(new int[]{1, N}, 0, 10);
-        DoubleTensorVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
-        DoubleTensorVertex yGenerator = new TensorGaussianVertex(mu, 1.0);
+        DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
+        DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
         DoubleTensor xData = xGenerator.sample(random);
         System.out.println("XData before " + xData.sum());
         xGenerator.setAndCascade(xData);
@@ -53,10 +53,10 @@ public class LinearRegression {
         System.out.println(yData.sum());
 
         // Linear Regression
-        DoubleTensorVertex m = new TensorGaussianVertex(0.0, 10.0);
-        DoubleTensorVertex b = new TensorGaussianVertex(0.0, 10.0);
-        DoubleTensorVertex x = new ConstantDoubleTensorVertex(xData);
-        DoubleTensorVertex y = new TensorGaussianVertex(x.multiply(m).plus(b), 5.0);
+        DoubleVertex m = new GaussianVertex(0.0, 10.0);
+        DoubleVertex b = new GaussianVertex(0.0, 10.0);
+        DoubleVertex x = new ConstantDoubleVertex(xData);
+        DoubleVertex y = new GaussianVertex(x.multiply(m).plus(b), 5.0);
         y.observe(yData);
 
         BayesNetTensorAsContinuous bayesNet = new BayesNetTensorAsContinuous(m.getConnectedGraph());
@@ -85,9 +85,9 @@ public class LinearRegression {
         double expectedW2 = 7.0;
         double expectedB = 20.0;
 
-        DoubleTensorVertex x1Generator = new TensorUniformVertex(new int[]{1, N}, 0, 10);
-        DoubleTensorVertex x2Generator = new TensorUniformVertex(new int[]{1, N}, 50, 100);
-        DoubleTensorVertex yGenerator = new TensorGaussianVertex(
+        DoubleVertex x1Generator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 50, 100);
+        DoubleVertex yGenerator = new GaussianVertex(
             x1Generator.multiply(expectedW1).plus(x2Generator.multiply(expectedW2)).plus(expectedB),
             1.0
         );
@@ -98,12 +98,12 @@ public class LinearRegression {
         DoubleTensor yData = yGenerator.sample(random);
 
         // Linear Regression
-        DoubleTensorVertex w1 = new TensorGaussianVertex(0.0, 10.0);
-        DoubleTensorVertex w2 = new TensorGaussianVertex(0.0, 10.0);
-        DoubleTensorVertex b = new TensorGaussianVertex(0.0, 10.0);
-        DoubleTensorVertex x1 = new ConstantDoubleTensorVertex(x1Data);
-        DoubleTensorVertex x2 = new ConstantDoubleTensorVertex(x2Data);
-        DoubleTensorVertex y = new TensorGaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
+        DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
+        DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
+        DoubleVertex b = new GaussianVertex(0.0, 10.0);
+        DoubleVertex x1 = new ConstantDoubleVertex(x1Data);
+        DoubleVertex x2 = new ConstantDoubleVertex(x2Data);
+        DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
         y.observe(yData);
 
         BayesNetTensorAsContinuous bayesNet = new BayesNetTensorAsContinuous(y.getConnectedGraph());

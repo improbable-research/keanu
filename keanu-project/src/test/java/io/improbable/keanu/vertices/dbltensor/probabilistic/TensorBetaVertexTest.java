@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class TensorBetaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        TensorBetaVertex tensorBetaVertex = new TensorBetaVertex(2., 3.);
+        BetaVertex tensorBetaVertex = new BetaVertex(2., 3.);
         double expectedDensity = Beta.logPdf(2.0, 3.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorBetaVertex, 0.5, expectedDensity);
     }
@@ -40,7 +40,7 @@ public class TensorBetaVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         double expectedLogDensity = Beta.logPdf(2.0, 3.0, 0.25) + Beta.logPdf(2.0, 3.0, 0.1);
-        TensorBetaVertex ndBetaVertex = new TensorBetaVertex(2, 3);
+        BetaVertex ndBetaVertex = new BetaVertex(2, 3);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndBetaVertex, new double[]{0.25, 0.1}, expectedLogDensity);
     }
 
@@ -49,16 +49,16 @@ public class TensorBetaVertexTest {
 
         Beta.Diff betaLogDiff = Beta.dlnPdf(2.0, 3.0, 0.5);
 
-        TensorUniformVertex alphaTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex alphaTensor = new UniformVertex(0.0, 5.0);
         alphaTensor.setValue(2.0);
 
-        TensorUniformVertex betaTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex betaTensor = new UniformVertex(0.0, 5.0);
         betaTensor.setValue(3.0);
 
-        TensorBetaVertex tensorBetaVertex = new TensorBetaVertex(alphaTensor, betaTensor);
+        BetaVertex tensorBetaVertex = new BetaVertex(alphaTensor, betaTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogPdf(0.5);
 
-        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(betaLogDiff.dPdalpha, actual.withRespectTo(alphaTensor.getId()).scalar(), 1e-5);
         assertEquals(betaLogDiff.dPdbeta, actual.withRespectTo(betaTensor.getId()).scalar(), 1e-5);
@@ -70,22 +70,22 @@ public class TensorBetaVertexTest {
 
         double[] vector = new double[]{0.25, 0.75, 0.1, 0.9, 0.3};
 
-        TensorUniformVertex alphaTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex alphaTensor = new UniformVertex(0.0, 5.0);
         alphaTensor.setValue(2.0);
 
-        TensorUniformVertex betaTensor = new TensorUniformVertex(0.0, 5.0);
+        UniformVertex betaTensor = new UniformVertex(0.0, 5.0);
         betaTensor.setValue(3.0);
 
-        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorBetaVertex(alphaTensor, betaTensor);
+        Supplier<DoubleVertex> vertexSupplier = () -> new BetaVertex(alphaTensor, betaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        TensorUniformVertex alpha = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex alpha = new UniformVertex(0.0, 1.0);
         alpha.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        TensorBetaVertex vertexUnderTest = new TensorBetaVertex(
+        BetaVertex vertexUnderTest = new BetaVertex(
             alpha,
             3.0
         );
@@ -96,8 +96,8 @@ public class TensorBetaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdalpha() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.5, 3.0);
-        TensorBetaVertex beta = new TensorBetaVertex(uniformA, 3.0);
+        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        BetaVertex beta = new BetaVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
@@ -117,8 +117,8 @@ public class TensorBetaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.5, 3.0);
-        TensorBetaVertex beta = new TensorBetaVertex(3.0, uniformA);
+        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        BetaVertex beta = new BetaVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
@@ -140,10 +140,10 @@ public class TensorBetaVertexTest {
     public void betaSampleMethodMatchesLogProbMethodForAlphaGreaterThanBeta() {
 
         int sampleCount = 1000000;
-        TensorBetaVertex vertex = new TensorBetaVertex(
+        BetaVertex vertex = new BetaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(5.0),
-            new ConstantDoubleTensorVertex(2.0)
+            new ConstantDoubleVertex(5.0),
+            new ConstantDoubleVertex(2.0)
         );
 
         double from = 0.3;
@@ -157,10 +157,10 @@ public class TensorBetaVertexTest {
     public void betaSampleMethodMatchesLogProbMethodForAlphaLessthanBeta() {
 
         int sampleCount = 1000000;
-        TensorBetaVertex vertex = new TensorBetaVertex(
+        BetaVertex vertex = new BetaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(5.0),
-            new ConstantDoubleTensorVertex(2.0)
+            new ConstantDoubleVertex(5.0),
+            new ConstantDoubleVertex(2.0)
         );
 
         double from = 0.3;
@@ -176,21 +176,21 @@ public class TensorBetaVertexTest {
         double trueAlpha = 2.;
         double trueBeta = 2.;
 
-        List<DoubleTensorVertex> alphaBeta = new ArrayList<>();
-        alphaBeta.add(new ConstantDoubleTensorVertex(DoubleTensor.scalar(trueAlpha)));
-        alphaBeta.add(new ConstantDoubleTensorVertex(DoubleTensor.scalar(trueBeta)));
+        List<DoubleVertex> alphaBeta = new ArrayList<>();
+        alphaBeta.add(new ConstantDoubleVertex(DoubleTensor.scalar(trueAlpha)));
+        alphaBeta.add(new ConstantDoubleVertex(DoubleTensor.scalar(trueBeta)));
 
-        List<DoubleTensorVertex> latentAlphaBeta = new ArrayList<>();
-        TensorUniformVertex latentAlpha = new TensorUniformVertex(0.01, 10.0);
+        List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
+        UniformVertex latentAlpha = new UniformVertex(0.01, 10.0);
         latentAlpha.setAndCascade(DoubleTensor.scalar(9.9));
-        TensorUniformVertex latentBeta = new TensorUniformVertex(0.01, 10.0);
+        UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
         latentBeta.setAndCascade(DoubleTensor.scalar(0.1));
         latentAlphaBeta.add(latentAlpha);
         latentAlphaBeta.add(latentBeta);
 
         int numSamples = 2000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorBetaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new BetaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             alphaBeta,
             latentAlphaBeta,
             random

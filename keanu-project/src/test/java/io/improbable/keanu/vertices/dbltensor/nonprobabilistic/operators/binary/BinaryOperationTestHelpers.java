@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex;
 
 import java.util.function.BiFunction;
 
@@ -16,11 +16,11 @@ public class BinaryOperationTestHelpers {
     public static void operatesOnTwoScalarVertexValues(double aValue,
                                                        double bValue,
                                                        double expected,
-                                                       BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                       BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
-        TensorUniformVertex B = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
 
         assertEquals(expected, op.apply(A, B).getValue().scalar(), 1e-5);
@@ -30,14 +30,14 @@ public class BinaryOperationTestHelpers {
                                                         double bValue,
                                                         double expectedGradientWrtA,
                                                         double expectedGradientWrtB,
-                                                        BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                        BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
-        TensorUniformVertex B = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
 
-        TensorDualNumber resultDualNumber = op.apply(A, B).getDualNumber();
+        DualNumber resultDualNumber = op.apply(A, B).getDualNumber();
         assertEquals(expectedGradientWrtA, resultDualNumber.getPartialDerivatives().withRespectTo(A).scalar(), 1e-5);
         assertEquals(expectedGradientWrtB, resultDualNumber.getPartialDerivatives().withRespectTo(B).scalar(), 1e-5);
     }
@@ -45,11 +45,11 @@ public class BinaryOperationTestHelpers {
     public static void operatesOnTwo2x2MatrixVertexValues(double[] aValues,
                                                           double[] bValues,
                                                           double[] expected,
-                                                          BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                          BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
+        UniformVertex A = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
+        UniformVertex B = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A, B).getValue();
@@ -66,13 +66,13 @@ public class BinaryOperationTestHelpers {
                                                                             double[] bValues,
                                                                             double[] expectedGradientWrtA,
                                                                             double[] expectedGradientWrtB,
-                                                                            BiFunction<DoubleTensorVertex, DoubleTensorVertex, DoubleTensorVertex> op) {
-        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
+                                                                            BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+        UniformVertex A = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        TensorUniformVertex B = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
+        UniformVertex B = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
-        TensorDualNumber result = op.apply(A, B).getDualNumber();
+        DualNumber result = op.apply(A, B).getDualNumber();
         DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{2, 2});
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);

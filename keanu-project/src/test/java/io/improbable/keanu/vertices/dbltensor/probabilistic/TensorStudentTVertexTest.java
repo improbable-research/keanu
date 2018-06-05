@@ -35,7 +35,7 @@ public class TensorStudentTVertexTest {
 
         int v = 3;
 
-        TensorStudentTVertex studentT = new TensorStudentTVertex(new int[]{N, 1}, v);
+        StudentTVertex studentT = new StudentTVertex(new int[]{N, 1}, v);
 
         List<Double> samples = studentT.sample(random).asFlatList();
 
@@ -74,7 +74,7 @@ public class TensorStudentTVertexTest {
 
     private void testLogPdfAtGivenDegreesOfFreedom(int v) {
         TDistribution apache = new TDistribution(v);
-        TensorStudentTVertex studentT = new TensorStudentTVertex(v);
+        StudentTVertex studentT = new StudentTVertex(v);
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected = apache.logDensity(t);
@@ -84,7 +84,7 @@ public class TensorStudentTVertexTest {
     }
 
     private void testDLogPdfAtGivenDegreesOfFreedom(int v) {
-        TensorStudentTVertex studentT = new TensorStudentTVertex(v);
+        StudentTVertex studentT = new StudentTVertex(v);
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected;

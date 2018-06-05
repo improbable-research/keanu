@@ -23,8 +23,8 @@ public class TensorSmoothUniformVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        TensorSmoothUniformVertex tensorSmoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
-        TensorSmoothUniformVertex smoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
+        SmoothUniformVertex tensorSmoothUniformVertex = new SmoothUniformVertex(0, 1);
+        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
         double expectedDensity = smoothUniformVertex.logPdf(0.5);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorSmoothUniformVertex, 0.5, expectedDensity);
@@ -33,9 +33,9 @@ public class TensorSmoothUniformVertexTest {
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        TensorSmoothUniformVertex smoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
+        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
         double expectedLogDensity = smoothUniformVertex.logPdf(0.25) + smoothUniformVertex.logPdf(0.75);
-        TensorSmoothUniformVertex tensorSmoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
+        SmoothUniformVertex tensorSmoothUniformVertex = new SmoothUniformVertex(0, 1);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorSmoothUniformVertex,
             new double[]{0.25, 0.75},
@@ -46,8 +46,8 @@ public class TensorSmoothUniformVertexTest {
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
 
-        TensorSmoothUniformVertex smoothUniformVertex = new TensorSmoothUniformVertex(0, 1, 10);
-        TensorSmoothUniformVertex tensorSmoothUniformVertex = new TensorSmoothUniformVertex(0, 1, 10);
+        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1, 10);
+        SmoothUniformVertex tensorSmoothUniformVertex = new SmoothUniformVertex(0, 1, 10);
 
         Map<Long, DoubleTensor> derivativeFlatRegion = smoothUniformVertex.dLogPdf(0.5);
         Map<Long, DoubleTensor> tensorDerivativeFlatRegion = tensorSmoothUniformVertex.dLogPdf(0.5);
@@ -80,7 +80,7 @@ public class TensorSmoothUniformVertexTest {
         int sampleCount = 1000000;
 
         double edgeSharpness = 1.0;
-        TensorSmoothUniformVertex vertex = new TensorSmoothUniformVertex(
+        SmoothUniformVertex vertex = new SmoothUniformVertex(
             new int[]{sampleCount, 1},
             0.0,
             1.0,

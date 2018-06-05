@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,7 +15,7 @@ import static org.junit.Assert.assertTrue;
 public class TensorMCMCTestDistributions {
 
     public static BayesNetTensorAsContinuous createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
-        TensorGaussianVertex A = new TensorGaussianVertex(new int[]{2, 1}, mu, sigma);
+        GaussianVertex A = new GaussianVertex(new int[]{2, 1}, mu, sigma);
         A.setAndCascade(A.sample(random));
         return new BayesNetTensorAsContinuous(A.getConnectedGraph());
     }
@@ -46,10 +46,10 @@ public class TensorMCMCTestDistributions {
 
     public static BayesNetTensorAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(mu, sigma);
-        TensorGaussianVertex B = new TensorGaussianVertex(mu, sigma);
+        GaussianVertex A = new GaussianVertex(mu, sigma);
+        GaussianVertex B = new GaussianVertex(mu, sigma);
 
-        TensorGaussianVertex C = new TensorGaussianVertex(A.plus(B), 1.0);
+        GaussianVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
         A.setValue(mu);
@@ -72,10 +72,10 @@ public class TensorMCMCTestDistributions {
     }
 
     public static BayesNetTensorAsContinuous create2DDonutDistribution() {
-        TensorGaussianVertex A = new TensorGaussianVertex(0, 1);
-        TensorGaussianVertex B = new TensorGaussianVertex(0, 1);
+        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex B = new GaussianVertex(0, 1);
 
-        TensorGaussianVertex D = new TensorGaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
+        GaussianVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
         D.observe(0.5);
 
         A.setValue(Math.sqrt(0.5));

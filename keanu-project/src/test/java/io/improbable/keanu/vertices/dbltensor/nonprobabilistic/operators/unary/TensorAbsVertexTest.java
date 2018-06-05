@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
@@ -12,7 +12,7 @@ public class TensorAbsVertexTest {
         operatesOnScalarVertexValue(
             -3,
             3.0,
-            DoubleTensorVertex::abs
+            DoubleVertex::abs
         );
     }
 
@@ -21,7 +21,7 @@ public class TensorAbsVertexTest {
         operatesOn2x2MatrixVertexValues(
             new double[]{-2, 3.0, -6.0, 4.0},
             new double[]{2.0, 3.0, 6.0, 4.0},
-            DoubleTensorVertex::abs
+            DoubleVertex::abs
         );
     }
 

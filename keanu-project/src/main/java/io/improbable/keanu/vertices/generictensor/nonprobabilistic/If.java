@@ -7,8 +7,8 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.booltensor.BoolVertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.BooleanIfVertex;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.ConstantBoolVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.DoubleIfVertex;
 
 import java.util.Arrays;
@@ -41,12 +41,12 @@ public class If {
             return then(new ConstantBoolVertex(thn));
         }
 
-        public DoubleIfThenElseBuilder then(DoubleTensorVertex thn) {
+        public DoubleIfThenElseBuilder then(DoubleVertex thn) {
             return new DoubleIfThenElseBuilder(predicate, thn);
         }
 
         public DoubleIfThenElseBuilder then(double thn) {
-            return then(new ConstantDoubleTensorVertex(thn));
+            return then(new ConstantDoubleVertex(thn));
         }
     }
 
@@ -101,7 +101,7 @@ public class If {
             this.thn = thn;
         }
 
-        public DoubleTensorVertex orElse(Vertex<? extends DoubleTensor> els) {
+        public DoubleVertex orElse(Vertex<? extends DoubleTensor> els) {
             if (Arrays.equals(thn.getShape(), els.getShape())) {
                 return new DoubleIfVertex(predicate, thn, els);
             } else {
@@ -109,8 +109,8 @@ public class If {
             }
         }
 
-        public DoubleTensorVertex orElse(double els) {
-            return orElse(new ConstantDoubleTensorVertex(els));
+        public DoubleVertex orElse(double els) {
+            return orElse(new ConstantDoubleVertex(els));
         }
     }
 }

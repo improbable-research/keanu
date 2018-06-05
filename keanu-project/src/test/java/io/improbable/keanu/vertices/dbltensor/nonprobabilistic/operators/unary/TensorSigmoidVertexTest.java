@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.junit.Before;
 import org.junit.Test;
@@ -21,7 +21,7 @@ public class TensorSigmoidVertexTest {
         operatesOnScalarVertexValue(
             5,
             sigmoid.value(5),
-            DoubleTensorVertex::sigmoid
+            DoubleVertex::sigmoid
         );
     }
 
@@ -30,7 +30,7 @@ public class TensorSigmoidVertexTest {
         calculatesDualNumberOfScalar(
             0.5,
             Math.exp(0.5) / Math.pow(Math.exp(0.5) + 1., 2),
-            DoubleTensorVertex::sigmoid
+            DoubleVertex::sigmoid
         );
     }
 
@@ -39,7 +39,7 @@ public class TensorSigmoidVertexTest {
         operatesOn2x2MatrixVertexValues(
             new double[]{0.0, 0.1, 0.2, 0.3},
             new double[]{sigmoid.value(0.0), sigmoid.value(0.1), sigmoid.value(0.2), sigmoid.value(0.3)},
-            DoubleTensorVertex::sigmoid
+            DoubleVertex::sigmoid
         );
     }
 
@@ -52,7 +52,7 @@ public class TensorSigmoidVertexTest {
                 Math.exp(0.3) / Math.pow(Math.exp(0.3) + 1., 2),
                 Math.exp(0.4) / Math.pow(Math.exp(0.4) + 1., 2)
             },
-            DoubleTensorVertex::sigmoid
+            DoubleVertex::sigmoid
         );
     }
 }

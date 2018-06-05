@@ -4,7 +4,7 @@ import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertexSamples;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertexSamples;
 import io.improbable.keanu.vertices.intgrtensor.IntegerTensorVertexSamples;
 
 import java.util.*;
@@ -38,12 +38,12 @@ public class NetworkSamples {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
     }
 
-    public DoubleTensorVertexSamples getDoubleTensorSamples(Vertex<DoubleTensor> vertex) {
+    public DoubleVertexSamples getDoubleTensorSamples(Vertex<DoubleTensor> vertex) {
         return getDoubleTensorSamples(vertex.getId());
     }
 
-    public DoubleTensorVertexSamples getDoubleTensorSamples(long vertexId) {
-        return new DoubleTensorVertexSamples(samplesByVertex.get(vertexId));
+    public DoubleVertexSamples getDoubleTensorSamples(long vertexId) {
+        return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
     public IntegerTensorVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {

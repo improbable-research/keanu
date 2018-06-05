@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.generictensor.probabilistic.discrete;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.generictensor.probabilistic.Probabilistic;
 
@@ -12,16 +12,16 @@ import java.util.Map;
 
 public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
 
-    private final Map<T, DoubleTensorVertex> selectableValues;
+    private final Map<T, DoubleVertex> selectableValues;
 
-    public SelectVertex(Map<T, DoubleTensorVertex> selectableValues) {
+    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
         this.selectableValues = defensiveCopy(selectableValues);
         setParents(this.selectableValues.values());
     }
 
-    private Map<T, DoubleTensorVertex> defensiveCopy(Map<T, DoubleTensorVertex> selectableValues) {
-        LinkedHashMap<T, DoubleTensorVertex> copy = new LinkedHashMap<>();
-        for (Map.Entry<T, DoubleTensorVertex> entry : selectableValues.entrySet()) {
+    private Map<T, DoubleVertex> defensiveCopy(Map<T, DoubleVertex> selectableValues) {
+        LinkedHashMap<T, DoubleVertex> copy = new LinkedHashMap<>();
+        for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
             if (!TensorShape.isScalar(entry.getValue().getShape())) {
                 throw new IllegalArgumentException("Selected probability must be scalar");
             }
@@ -30,7 +30,7 @@ public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
         return copy;
     }
 
-    public Map<T, DoubleTensorVertex> getSelectableValues() {
+    public Map<T, DoubleVertex> getSelectableValues() {
         return selectableValues;
     }
 
@@ -45,7 +45,7 @@ public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
         }
 
         T value = null;
-        for (Map.Entry<T, DoubleTensorVertex> entry : selectableValues.entrySet()) {
+        for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
             sum += entry.getValue().getValue().scalar() / sumOfProbabilities;
             if (p < sum) {
                 value = entry.getKey();
@@ -81,7 +81,7 @@ public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
 
     private double getSumOfProbabilities() {
         double sumP = 0.0;
-        for (DoubleTensorVertex p : selectableValues.values()) {
+        for (DoubleVertex p : selectableValues.values()) {
             sumP += p.getValue().scalar();
         }
         return sumP;

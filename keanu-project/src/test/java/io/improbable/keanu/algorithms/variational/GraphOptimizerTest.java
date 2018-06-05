@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -14,13 +14,13 @@ public class GraphOptimizerTest {
     @Test
     public void calculatesMaxLikelihood() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(20.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(20.0, 1.0);
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
 
         A.setValue(20.0);
         B.setAndCascade(20.0);
 
-        DoubleTensorVertex Cobserved = new TensorGaussianVertex(A.plus(B), 1.0);
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
 
         Cobserved.observe(44.0);
 
@@ -38,13 +38,13 @@ public class GraphOptimizerTest {
     @Test
     public void calculatesMaxAPosteriori() {
 
-        DoubleTensorVertex A = new TensorGaussianVertex(20.0, 1.0);
-        DoubleTensorVertex B = new TensorGaussianVertex(20.0, 1.0);
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
 
         A.setValue(21.5);
         B.setAndCascade(21.5);
 
-        DoubleTensorVertex Cobserved = new TensorGaussianVertex(A.plus(B), 1.0);
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
 
         Cobserved.observe(46.0);
 

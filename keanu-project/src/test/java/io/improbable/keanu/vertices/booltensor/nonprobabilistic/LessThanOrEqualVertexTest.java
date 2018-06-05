@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.booltensor.nonprobabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex;
 import org.junit.Test;
 
@@ -31,7 +31,7 @@ public class LessThanOrEqualVertexTest {
     }
 
     private void isLessThanOrEqual(double a, double b, boolean expected) {
-        LessThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new LessThanOrEqualVertex<>(new ConstantDoubleTensorVertex(a), new ConstantDoubleTensorVertex(b));
+        LessThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new LessThanOrEqualVertex<>(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
         assertEquals(expected, vertex.lazyEval().scalar());
     }
 }

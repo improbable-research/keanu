@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.variational;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -19,19 +19,19 @@ public class TensorFitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithMultiplyAndMinus() {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(1.0, 1.0);
-        TensorGaussianVertex B = new TensorGaussianVertex(2.0, 1.0);
+        GaussianVertex A = new GaussianVertex(1.0, 1.0);
+        GaussianVertex B = new GaussianVertex(2.0, 1.0);
 
         A.setAndCascade(Nd4jDoubleTensor.scalar(1.5));
         B.setAndCascade(Nd4jDoubleTensor.scalar(2.5));
 
-        DoubleTensorVertex C = A.multiply(B);
-        DoubleTensorVertex D = A.minus(B);
+        DoubleVertex C = A.multiply(B);
+        DoubleVertex D = A.minus(B);
 
-        TensorGaussianVertex cObservation = new TensorGaussianVertex(C, 1.0);
+        GaussianVertex cObservation = new GaussianVertex(C, 1.0);
         cObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
-        TensorGaussianVertex dObservation = new TensorGaussianVertex(D, 1.0);
+        GaussianVertex dObservation = new GaussianVertex(D, 1.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
         assert2DGradientEqualsApproxGradient(
@@ -46,19 +46,19 @@ public class TensorFitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithAdditionAndDivision() {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(7.0, 3.0);
-        TensorGaussianVertex B = new TensorGaussianVertex(3.0, 3.0);
+        GaussianVertex A = new GaussianVertex(7.0, 3.0);
+        GaussianVertex B = new GaussianVertex(3.0, 3.0);
 
         A.setAndCascade(Nd4jDoubleTensor.scalar(6.0));
         B.setAndCascade(Nd4jDoubleTensor.scalar(3.0));
 
-        DoubleTensorVertex C = A.divideBy(B);
-        DoubleTensorVertex D = A.multiply(B);
+        DoubleVertex C = A.divideBy(B);
+        DoubleVertex D = A.multiply(B);
 
-        TensorGaussianVertex cObservation = new TensorGaussianVertex(C, 5.0);
+        GaussianVertex cObservation = new GaussianVertex(C, 5.0);
         cObservation.observe(Nd4jDoubleTensor.scalar(2.1));
 
-        TensorGaussianVertex dObservation = new TensorGaussianVertex(D, 5.0);
+        GaussianVertex dObservation = new GaussianVertex(D, 5.0);
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
         assert2DGradientEqualsApproxGradient(
@@ -73,22 +73,22 @@ public class TensorFitnessFunctionWithGradientTest {
     @Test
     public void calculatesGradientCorrectlyWithAdditionMultiplicationSubtractionDivision() {
 
-        TensorGaussianVertex A = new TensorGaussianVertex(2.0, 3.0);
-        TensorGaussianVertex B = new TensorGaussianVertex(3.0, 3.0);
+        GaussianVertex A = new GaussianVertex(2.0, 3.0);
+        GaussianVertex B = new GaussianVertex(3.0, 3.0);
 
         A.setAndCascade(Nd4jDoubleTensor.scalar(2.2));
         B.setAndCascade(Nd4jDoubleTensor.scalar(3.2));
 
-        DoubleTensorVertex C = A.plus(B);
-        DoubleTensorVertex D = A.multiply(B);
+        DoubleVertex C = A.plus(B);
+        DoubleVertex D = A.multiply(B);
 
-        DoubleTensorVertex E = C.minus(D);
-        DoubleTensorVertex F = C.divideBy(D);
+        DoubleVertex E = C.minus(D);
+        DoubleVertex F = C.divideBy(D);
 
-        TensorGaussianVertex eObservation = new TensorGaussianVertex(E, 5.0);
+        GaussianVertex eObservation = new GaussianVertex(E, 5.0);
         eObservation.observe(Nd4jDoubleTensor.scalar(1.2));
 
-        TensorGaussianVertex fObservation = new TensorGaussianVertex(F, C);
+        GaussianVertex fObservation = new GaussianVertex(F, C);
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
         assert2DGradientEqualsApproxGradient(

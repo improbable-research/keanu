@@ -6,10 +6,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.CastDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.CastDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 
@@ -17,9 +17,9 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 public class PoissonVertex extends ProbabilisticInteger {
 
-    private final DoubleTensorVertex mu;
+    private final DoubleVertex mu;
 
-    public PoissonVertex(int[] shape, DoubleTensorVertex mu) {
+    public PoissonVertex(int[] shape, DoubleVertex mu) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 
@@ -29,19 +29,19 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     public PoissonVertex(int[] shape, double mu) {
-        this(shape, new ConstantDoubleTensorVertex(mu));
+        this(shape, new ConstantDoubleVertex(mu));
     }
 
-    public PoissonVertex(DoubleTensorVertex mu) {
+    public PoissonVertex(DoubleVertex mu) {
         this(mu.getShape(), mu);
     }
 
     public PoissonVertex(Vertex<? extends NumberTensor> mu) {
-        this(mu.getShape(), new CastDoubleTensorVertex(mu));
+        this(mu.getShape(), new CastDoubleVertex(mu));
     }
 
     public PoissonVertex(double mu) {
-        this(Tensor.SCALAR_SHAPE, new ConstantDoubleTensorVertex(mu));
+        this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(mu));
     }
 
     public Vertex<DoubleTensor> getMu() {

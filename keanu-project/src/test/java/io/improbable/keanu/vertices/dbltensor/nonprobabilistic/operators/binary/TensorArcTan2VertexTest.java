@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
@@ -13,7 +13,7 @@ public class TensorArcTan2VertexTest {
             1.0,
             Math.PI,
             Math.atan2(Math.PI, 1.0),
-            DoubleTensorVertex::atan2
+            DoubleVertex::atan2
         );
     }
 
@@ -29,7 +29,7 @@ public class TensorArcTan2VertexTest {
             b,
             wrtA,
             wrtB,
-            DoubleTensorVertex::atan2
+            DoubleVertex::atan2
         );
     }
 
@@ -39,7 +39,7 @@ public class TensorArcTan2VertexTest {
             new double[]{0.0, 0.1, 0.2, 0.3},
             new double[]{2.0, 4.0, 3.0, 8.0},
             new double[]{Math.atan2(2., 0.), Math.atan2(4, .1), Math.atan2(3, .2), Math.atan2(8, .3)},
-            DoubleTensorVertex::atan2
+            DoubleVertex::atan2
         );
     }
 
@@ -50,7 +50,7 @@ public class TensorArcTan2VertexTest {
             new double[]{2.0, 3.0, 4.0, 5.0},
             new double[]{2. / 4., 3. / 36., 4. / (9. * 16), 5. / (16 * 25)},
             new double[]{-1. / 4., -2. / 36., -3. / (9 * 16), -4. / (16 * 25)},
-            DoubleTensorVertex::atan2
+            DoubleVertex::atan2
         );
     }
 

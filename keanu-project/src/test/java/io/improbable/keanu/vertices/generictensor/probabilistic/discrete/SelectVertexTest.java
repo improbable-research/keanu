@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.generictensor.probabilistic.discrete;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -30,11 +30,11 @@ public class SelectVertexTest {
     @Test
     public void fourValuesEquallyWeightedSummingToOne() {
 
-        LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, new ConstantDoubleTensorVertex(0.25));
-        selectableValues.put(TestEnum.B, new ConstantDoubleTensorVertex(0.25));
-        selectableValues.put(TestEnum.C, new ConstantDoubleTensorVertex(0.25));
-        selectableValues.put(TestEnum.D, new ConstantDoubleTensorVertex(0.25));
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, new ConstantDoubleVertex(0.25));
+        selectableValues.put(TestEnum.B, new ConstantDoubleVertex(0.25));
+        selectableValues.put(TestEnum.C, new ConstantDoubleVertex(0.25));
+        selectableValues.put(TestEnum.D, new ConstantDoubleVertex(0.25));
 
         LinkedHashMap<TestEnum, Double> proportions = testSample(selectableValues, random);
         assertProportionsWithinExpectedRanges(selectableValues, proportions);
@@ -43,11 +43,11 @@ public class SelectVertexTest {
     @Test
     public void fourValuesNotEquallyWeightedSummingToOne() {
 
-        LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, new ConstantDoubleTensorVertex(0.1));
-        selectableValues.put(TestEnum.B, new ConstantDoubleTensorVertex(0.2));
-        selectableValues.put(TestEnum.C, new ConstantDoubleTensorVertex(0.3));
-        selectableValues.put(TestEnum.D, new ConstantDoubleTensorVertex(0.4));
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, new ConstantDoubleVertex(0.1));
+        selectableValues.put(TestEnum.B, new ConstantDoubleVertex(0.2));
+        selectableValues.put(TestEnum.C, new ConstantDoubleVertex(0.3));
+        selectableValues.put(TestEnum.D, new ConstantDoubleVertex(0.4));
 
         LinkedHashMap<TestEnum, Double> proportions = testSample(selectableValues, random);
         assertProportionsWithinExpectedRanges(selectableValues, proportions);
@@ -56,32 +56,32 @@ public class SelectVertexTest {
     @Test
     public void fourValuesEquallyWeightedSummingToFour() {
 
-        LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, new ConstantDoubleTensorVertex(1.0));
-        selectableValues.put(TestEnum.B, new ConstantDoubleTensorVertex(1.0));
-        selectableValues.put(TestEnum.C, new ConstantDoubleTensorVertex(1.0));
-        selectableValues.put(TestEnum.D, new ConstantDoubleTensorVertex(1.0));
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, new ConstantDoubleVertex(1.0));
+        selectableValues.put(TestEnum.B, new ConstantDoubleVertex(1.0));
+        selectableValues.put(TestEnum.C, new ConstantDoubleVertex(1.0));
+        selectableValues.put(TestEnum.D, new ConstantDoubleVertex(1.0));
 
         LinkedHashMap<TestEnum, Double> proportions = testSample(selectableValues, random);
-        LinkedHashMap<TestEnum, DoubleTensorVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
+        LinkedHashMap<TestEnum, DoubleVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
         assertProportionsWithinExpectedRanges(normalisedSelectableValues, proportions);
     }
 
     @Test
     public void fourValuesNotEquallyWeightedSummingToFour() {
 
-        LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, new ConstantDoubleTensorVertex(0.25));
-        selectableValues.put(TestEnum.B, new ConstantDoubleTensorVertex(0.75));
-        selectableValues.put(TestEnum.C, new ConstantDoubleTensorVertex(1.25));
-        selectableValues.put(TestEnum.D, new ConstantDoubleTensorVertex(1.75));
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, new ConstantDoubleVertex(0.25));
+        selectableValues.put(TestEnum.B, new ConstantDoubleVertex(0.75));
+        selectableValues.put(TestEnum.C, new ConstantDoubleVertex(1.25));
+        selectableValues.put(TestEnum.D, new ConstantDoubleVertex(1.75));
 
         LinkedHashMap<TestEnum, Double> proportions = testSample(selectableValues, random);
-        LinkedHashMap<TestEnum, DoubleTensorVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
+        LinkedHashMap<TestEnum, DoubleVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
         assertProportionsWithinExpectedRanges(normalisedSelectableValues, proportions);
     }
 
-    private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues,
+    private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
                                                        KeanuRandom random) {
 
         SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues);
@@ -110,7 +110,7 @@ public class SelectVertexTest {
         return proportions;
     }
 
-    private void assertProportionsWithinExpectedRanges(LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues,
+    private void assertProportionsWithinExpectedRanges(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
                                                        HashMap<TestEnum, Double> proportions) {
 
         for (Map.Entry<TestEnum, Double> entry : proportions.entrySet()) {
@@ -121,12 +121,12 @@ public class SelectVertexTest {
         }
     }
 
-    private LinkedHashMap<TestEnum, DoubleTensorVertex> normaliseSelectableValues(LinkedHashMap<TestEnum, DoubleTensorVertex> selectableValues,
-                                                                                  double sum) {
-        LinkedHashMap<TestEnum, DoubleTensorVertex> normalised = new LinkedHashMap<>();
-        for (Map.Entry<TestEnum, DoubleTensorVertex> entry : selectableValues.entrySet()) {
+    private LinkedHashMap<TestEnum, DoubleVertex> normaliseSelectableValues(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
+                                                                            double sum) {
+        LinkedHashMap<TestEnum, DoubleVertex> normalised = new LinkedHashMap<>();
+        for (Map.Entry<TestEnum, DoubleVertex> entry : selectableValues.entrySet()) {
             double normalizedProbability = entry.getValue().getValue().scalar() / sum;
-            normalised.put(entry.getKey(), new ConstantDoubleTensorVertex(normalizedProbability));
+            normalised.put(entry.getKey(), new ConstantDoubleVertex(normalizedProbability));
         }
         return normalised;
     }

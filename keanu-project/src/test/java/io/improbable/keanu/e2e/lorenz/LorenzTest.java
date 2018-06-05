@@ -4,9 +4,9 @@ import io.improbable.keanu.algorithms.variational.TensorGradientOptimizer;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,17 +36,17 @@ public class LorenzTest {
 
         while (error > convergedError && window < maxWindows) {
 
-            TensorGaussianVertex xt0 = new TensorGaussianVertex(priorMu[0], 1.0);
-            TensorGaussianVertex yt0 = new TensorGaussianVertex(priorMu[1], 1.0);
-            TensorGaussianVertex zt0 = new TensorGaussianVertex(priorMu[2], 1.0);
+            GaussianVertex xt0 = new GaussianVertex(priorMu[0], 1.0);
+            GaussianVertex yt0 = new GaussianVertex(priorMu[1], 1.0);
+            GaussianVertex zt0 = new GaussianVertex(priorMu[2], 1.0);
 
-            List<List<DoubleTensorVertex>> graphTimeSteps = new ArrayList<>();
+            List<List<DoubleVertex>> graphTimeSteps = new ArrayList<>();
             graphTimeSteps.add(Arrays.asList(xt0, yt0, zt0));
 
             //Build graph
             for (int i = 1; i < windowSize; i++) {
-                List<DoubleTensorVertex> ti = graphTimeSteps.get(i - 1);
-                List<DoubleTensorVertex> tiPlus1 = addTime(
+                List<DoubleVertex> ti = graphTimeSteps.get(i - 1);
+                List<DoubleVertex> tiPlus1 = addTime(
                     ti.get(0), ti.get(1), ti.get(2),
                     LorenzModel.timeStep, LorenzModel.sigma, LorenzModel.rho, LorenzModel.beta
                 );
@@ -62,10 +62,10 @@ public class LorenzTest {
 
                 int t = window * (windowSize - 1) + i;
 
-                List<DoubleTensorVertex> timeSlice = graphTimeSteps.get(i);
-                DoubleTensorVertex xt = timeSlice.get(0);
+                List<DoubleVertex> timeSlice = graphTimeSteps.get(i);
+                DoubleVertex xt = timeSlice.get(0);
 
-                TensorGaussianVertex observedXt = new TensorGaussianVertex(xt, new ConstantDoubleTensorVertex(1.0));
+                GaussianVertex observedXt = new GaussianVertex(xt, new ConstantDoubleVertex(1.0));
                 observedXt.observe(observed.get(t).x);
             }
 
@@ -95,27 +95,27 @@ public class LorenzTest {
         assertTrue(error <= convergedError);
     }
 
-    private List<DoubleTensorVertex> addTime(DoubleTensorVertex xt,
-                                             DoubleTensorVertex yt,
-                                             DoubleTensorVertex zt,
-                                             double timestep,
-                                             double sigma,
-                                             double rho,
-                                             double beta) {
+    private List<DoubleVertex> addTime(DoubleVertex xt,
+                                       DoubleVertex yt,
+                                       DoubleVertex zt,
+                                       double timestep,
+                                       double sigma,
+                                       double rho,
+                                       double beta) {
 
-        DoubleTensorVertex rhov = new ConstantDoubleTensorVertex(rho);
+        DoubleVertex rhov = new ConstantDoubleVertex(rho);
 
-        DoubleTensorVertex xtplus1 = xt.multiply(1 - timestep * sigma).plus(yt.multiply(timestep * sigma));
+        DoubleVertex xtplus1 = xt.multiply(1 - timestep * sigma).plus(yt.multiply(timestep * sigma));
 
-        DoubleTensorVertex ytplus1 = yt.multiply(1 - timestep).plus(xt.multiply(rhov.minus(zt)).multiply(timestep));
+        DoubleVertex ytplus1 = yt.multiply(1 - timestep).plus(xt.multiply(rhov.minus(zt)).multiply(timestep));
 
-        DoubleTensorVertex ztplus1 = zt.multiply(1 - timestep * beta).plus(xt.multiply(yt).multiply(timestep));
+        DoubleVertex ztplus1 = zt.multiply(1 - timestep * beta).plus(xt.multiply(yt).multiply(timestep));
 
         return Arrays.asList(xtplus1, ytplus1, ztplus1);
     }
 
-    private List<DoubleTensor> getTimeSliceValues(List<List<DoubleTensorVertex>> graphTimeSteps, int time) {
-        List<DoubleTensorVertex> slice = graphTimeSteps.get(time);
+    private List<DoubleTensor> getTimeSliceValues(List<List<DoubleVertex>> graphTimeSteps, int time) {
+        List<DoubleVertex> slice = graphTimeSteps.get(time);
 
         return slice.stream()
             .map(Vertex::getValue)

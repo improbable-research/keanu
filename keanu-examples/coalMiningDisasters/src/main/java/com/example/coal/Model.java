@@ -6,9 +6,9 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorExponentialVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.ExponentialVertex;
 import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgrtensor.probabilistic.PoissonVertex;
@@ -35,8 +35,8 @@ public class Model {
         System.out.println("Switch year found: " + switchYear);
     }
 
-    TensorExponentialVertex earlyRate;
-    TensorExponentialVertex lateRate;
+    ExponentialVertex earlyRate;
+    ExponentialVertex lateRate;
     UniformIntVertex switchpoint;
 
     KeanuRandom random;
@@ -68,12 +68,12 @@ public class Model {
     private BayesianNetwork buildBayesianNetwork() {
 
         switchpoint = new UniformIntVertex(data.startYear, data.endYear + 1);
-        earlyRate = new TensorExponentialVertex(1.0, 1.0);
-        lateRate = new TensorExponentialVertex(1.0, 1.0);
+        earlyRate = new ExponentialVertex(1.0, 1.0);
+        lateRate = new ExponentialVertex(1.0, 1.0);
 
         ConstantIntegerVertex years = new ConstantIntegerVertex(IntegerTensor.create(data.years));
 
-        DoubleTensorVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
+        DoubleVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
             .then(earlyRate)
             .orElse(lateRate);
 

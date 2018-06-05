@@ -4,11 +4,11 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
 
-public class DoubleIfVertex extends NonProbabilisticDoubleTensor {
+public class DoubleIfVertex extends NonProbabilisticDouble {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends DoubleTensor> thn;
@@ -39,7 +39,7 @@ public class DoubleIfVertex extends NonProbabilisticDoubleTensor {
     }
 
     @Override
-    protected TensorDualNumber calculateDualNumber(Map<Vertex, TensorDualNumber> dualNumbers) {
+    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         throw new UnsupportedOperationException("if is non-differentiable");
     }
 }

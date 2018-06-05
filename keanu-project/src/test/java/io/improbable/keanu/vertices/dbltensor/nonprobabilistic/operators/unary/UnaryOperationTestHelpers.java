@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex;
 
 import java.util.function.Function;
 
@@ -15,29 +15,29 @@ public class UnaryOperationTestHelpers {
 
     public static void operatesOnScalarVertexValue(double aValue,
                                                    double expected,
-                                                   Function<DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                   Function<DoubleVertex, DoubleVertex> op) {
 
-        ConstantDoubleTensorVertex A = new ConstantDoubleTensorVertex(aValue);
+        ConstantDoubleVertex A = new ConstantDoubleVertex(aValue);
 
         assertEquals(expected, op.apply(A).getValue().scalar(), 1e-5);
     }
 
     public static void calculatesDualNumberOfScalar(double aValue,
                                                     double expectedGradientWrtA,
-                                                    Function<DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                    Function<DoubleVertex, DoubleVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(0.0, 1.0);
+        UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
 
-        TensorDualNumber resultDualNumber = op.apply(A).getDualNumber();
+        DualNumber resultDualNumber = op.apply(A).getDualNumber();
         assertEquals(expectedGradientWrtA, resultDualNumber.getPartialDerivatives().withRespectTo(A).scalar(), 1e-5);
     }
 
     public static void operatesOn2x2MatrixVertexValues(double[] aValues,
                                                        double[] expected,
-                                                       Function<DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                       Function<DoubleVertex, DoubleVertex> op) {
 
-        ConstantDoubleTensorVertex A = new ConstantDoubleTensorVertex(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
+        ConstantDoubleVertex A = new ConstantDoubleVertex(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A).getValue();
 
@@ -51,12 +51,12 @@ public class UnaryOperationTestHelpers {
 
     public static void calculatesDualNumberOfMatrixElementWiseOperator(double[] aValues,
                                                                        double[] expectedGradientWrtA,
-                                                                       Function<DoubleTensorVertex, DoubleTensorVertex> op) {
+                                                                       Function<DoubleVertex, DoubleVertex> op) {
 
-        TensorUniformVertex A = new TensorUniformVertex(new int[]{2, 2}, new ConstantDoubleTensorVertex(0.0), new ConstantDoubleTensorVertex(1.0));
+        UniformVertex A = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
 
-        TensorDualNumber result = op.apply(A).getDualNumber();
+        DualNumber result = op.apply(A).getDualNumber();
         DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{2, 2});
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
@@ -13,7 +13,7 @@ public class TensorAdditionVertexTest {
             2.0,
             3.0,
             5.0,
-            DoubleTensorVertex::plus
+            DoubleVertex::plus
         );
     }
 
@@ -24,7 +24,7 @@ public class TensorAdditionVertexTest {
             3.0,
             1.0,
             1.0,
-            DoubleTensorVertex::plus
+            DoubleVertex::plus
         );
     }
 
@@ -34,7 +34,7 @@ public class TensorAdditionVertexTest {
             new double[]{1.0, 2.0, 6.0, 4.0},
             new double[]{2.0, 4.0, 3.0, 8.0},
             new double[]{3.0, 6.0, 9.0, 12.0},
-            DoubleTensorVertex::plus
+            DoubleVertex::plus
         );
     }
 
@@ -45,7 +45,7 @@ public class TensorAdditionVertexTest {
             new double[]{2.0, 3.0, 4.0, 5.0},
             new double[]{1.0, 1.0, 1.0, 1.0},
             new double[]{1.0, 1.0, 1.0, 1.0},
-            DoubleTensorVertex::plus
+            DoubleVertex::plus
         );
     }
 }

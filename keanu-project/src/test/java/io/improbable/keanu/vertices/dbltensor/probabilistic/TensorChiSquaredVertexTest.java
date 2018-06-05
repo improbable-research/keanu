@@ -9,9 +9,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,7 +29,7 @@ public class TensorChiSquaredVertexTest {
         int N = 100000;
         double epsilon = 0.1;
         int k = 10;
-        TensorChiSquaredVertex testChiVertex = new TensorChiSquaredVertex(new int[]{N, 1}, k);
+        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(new int[]{N, 1}, k);
 
         SummaryStatistics stats = new SummaryStatistics();
         Arrays.stream(testChiVertex.sample(random).asFlatArray())
@@ -49,7 +47,7 @@ public class TensorChiSquaredVertexTest {
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
         int sampleCount = 1000000;
-        Vertex<DoubleTensor> vertex = new TensorChiSquaredVertex(new int[]{sampleCount, 1}, 2);
+        Vertex<DoubleTensor> vertex = new ChiSquaredVertex(new int[]{sampleCount, 1}, 2);
 
         double from = 2;
         double to = 4;

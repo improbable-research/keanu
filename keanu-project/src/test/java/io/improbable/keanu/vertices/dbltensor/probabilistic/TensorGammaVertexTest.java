@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.PartialDerivatives;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,8 +31,8 @@ public class TensorGammaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        TensorGammaVertex gamma = new TensorGammaVertex(0.5, 1, 1.5);
-        TensorGammaVertex tensorGamma = new TensorGammaVertex(0.5, 1, 1.5);
+        GammaVertex gamma = new GammaVertex(0.5, 1, 1.5);
+        GammaVertex tensorGamma = new GammaVertex(0.5, 1, 1.5);
 
         double expectedDensity = gamma.logPdf(0.5);
 
@@ -42,7 +42,7 @@ public class TensorGammaVertexTest {
     @Test
     public void matchesKnownLogDensityOfVector() {
         double expectedLogDensity = Gamma.logPdf(0.0, 1.0, 5., 1) + Gamma.logPdf(0.0, 1.0, 5., 3);
-        TensorGammaVertex tensorGamma = new TensorGammaVertex(0.0, 1., 5.);
+        GammaVertex tensorGamma = new GammaVertex(0.0, 1., 5.);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGamma, new double[]{1., 3.}, expectedLogDensity);
     }
 
@@ -52,19 +52,19 @@ public class TensorGammaVertexTest {
 
         Gamma.Diff gammaLogDiff = Gamma.dlnPdf(0.75, 2, 5.5, 1.5);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.5, 1.0);
+        UniformVertex aTensor = new UniformVertex(0.5, 1.0);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        TensorUniformVertex thetaTensor = new TensorUniformVertex(0.5, 1.0);
+        UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(2));
 
-        TensorUniformVertex kTensor = new TensorUniformVertex(1.0, 5.0);
+        UniformVertex kTensor = new UniformVertex(1.0, 5.0);
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
-        TensorGammaVertex tensorGamma = new TensorGammaVertex(aTensor, thetaTensor, kTensor);
+        GammaVertex tensorGamma = new GammaVertex(aTensor, thetaTensor, kTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5));
 
-        TensorPartialDerivatives actual = new TensorPartialDerivatives(actualDerivatives);
+        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(gammaLogDiff.dPda, actual.withRespectTo(aTensor.getId()).scalar(), 1e-5);
         assertEquals(gammaLogDiff.dPdtheta, actual.withRespectTo(thetaTensor.getId()).scalar(), 1e-5);
@@ -79,28 +79,28 @@ public class TensorGammaVertexTest {
 
         KeanuRandom keanuRandom = new KeanuRandom(1);
 
-        TensorUniformVertex aTensor = new TensorUniformVertex(0.5, 1.0);
+        UniformVertex aTensor = new UniformVertex(0.5, 1.0);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        TensorUniformVertex thetaTensor = new TensorUniformVertex(0.5, 1.0);
+        UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        TensorUniformVertex kTensor = new TensorUniformVertex(1.0, 5.0);
+        UniformVertex kTensor = new UniformVertex(1.0, 5.0);
         kTensor.setValue(Nd4jDoubleTensor.scalar(2.5));
 
-        Supplier<DoubleTensorVertex> vertexSupplier = () -> new TensorGammaVertex(aTensor, thetaTensor, kTensor);
+        Supplier<DoubleVertex> vertexSupplier = () -> new GammaVertex(aTensor, thetaTensor, kTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        TensorUniformVertex a = new TensorUniformVertex(1.0, 2.0);
+        UniformVertex a = new UniformVertex(1.0, 2.0);
         a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        TensorGammaVertex vertexUnderTest = new TensorGammaVertex(
+        GammaVertex vertexUnderTest = new GammaVertex(
             a,
-            new ConstantDoubleTensorVertex(1.5),
-            new ConstantDoubleTensorVertex(5.0)
+            new ConstantDoubleVertex(1.5),
+            new ConstantDoubleVertex(5.0)
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -110,8 +110,8 @@ public class TensorGammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
 
-        TensorUniformVertex uniformA = new TensorUniformVertex(0.0, 1.0);
-        TensorGammaVertex gamma = new TensorGammaVertex(uniformA, 2.0, 3.0);
+        UniformVertex uniformA = new UniformVertex(0.0, 1.0);
+        GammaVertex gamma = new GammaVertex(uniformA, 2.0, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
@@ -132,8 +132,8 @@ public class TensorGammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdtheta() {
 
-        TensorUniformVertex uniformA = new TensorUniformVertex(1.0, 3.0);
-        TensorGammaVertex gamma = new TensorGammaVertex(0.0, uniformA, 3.0);
+        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        GammaVertex gamma = new GammaVertex(0.0, uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
@@ -154,8 +154,8 @@ public class TensorGammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdk() {
 
-        TensorUniformVertex uniformA = new TensorUniformVertex(2.0, 5.0);
-        TensorGammaVertex gamma = new TensorGammaVertex(0.0, 2.0, uniformA);
+        UniformVertex uniformA = new UniformVertex(2.0, 5.0);
+        GammaVertex gamma = new GammaVertex(0.0, 2.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
@@ -178,11 +178,11 @@ public class TensorGammaVertexTest {
         KeanuRandom random = new KeanuRandom(1);
 
         int sampleCount = 1000000;
-        TensorGammaVertex vertex = new TensorGammaVertex(
+        GammaVertex vertex = new GammaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(1.5),
-            new ConstantDoubleTensorVertex(2.0),
-            new ConstantDoubleTensorVertex(7.5)
+            new ConstantDoubleVertex(1.5),
+            new ConstantDoubleVertex(2.0),
+            new ConstantDoubleVertex(7.5)
         );
 
         double from = 1.5;
@@ -199,20 +199,20 @@ public class TensorGammaVertexTest {
         double trueTheta = 2.0;
         double trueK = 3.0;
 
-        DoubleTensorVertex constA = new ConstantDoubleTensorVertex(trueA);
-        DoubleTensorVertex constA2 = new ConstantDoubleTensorVertex(trueA);
-        DoubleTensorVertex constTheta = new ConstantDoubleTensorVertex(trueTheta);
-        DoubleTensorVertex constK = new ConstantDoubleTensorVertex(trueK);
+        DoubleVertex constA = new ConstantDoubleVertex(trueA);
+        DoubleVertex constA2 = new ConstantDoubleVertex(trueA);
+        DoubleVertex constTheta = new ConstantDoubleVertex(trueTheta);
+        DoubleVertex constK = new ConstantDoubleVertex(trueK);
 
-        List<DoubleTensorVertex> aThetaK = new ArrayList<>();
+        List<DoubleVertex> aThetaK = new ArrayList<>();
         aThetaK.add(constA);
         aThetaK.add(constTheta);
         aThetaK.add(constK);
 
-        List<DoubleTensorVertex> latentAThetaK = new ArrayList<>();
-        TensorUniformVertex latentTheta = new TensorUniformVertex(0.01, 10.0);
+        List<DoubleVertex> latentAThetaK = new ArrayList<>();
+        UniformVertex latentTheta = new UniformVertex(0.01, 10.0);
         latentTheta.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        TensorUniformVertex latentK = new TensorUniformVertex(0.01, 10.0);
+        UniformVertex latentK = new UniformVertex(0.01, 10.0);
         latentK.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
 
         latentAThetaK.add(constA2);
@@ -221,7 +221,7 @@ public class TensorGammaVertexTest {
 
         int numSamples = 5000;
         TensorVertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new TensorGammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), hyperParams.get(2)),
+            hyperParams -> new GammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), hyperParams.get(2)),
             aThetaK,
             latentAThetaK,
             random

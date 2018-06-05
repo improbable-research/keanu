@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
@@ -12,7 +12,7 @@ public class TensorArcCosVertexTest {
         operatesOnScalarVertexValue(
             Math.PI,
             Math.acos(Math.PI),
-            DoubleTensorVertex::acos
+            DoubleVertex::acos
         );
     }
 
@@ -21,7 +21,7 @@ public class TensorArcCosVertexTest {
         calculatesDualNumberOfScalar(
             0.5,
             -1.0 / Math.sqrt(1.0 - 0.5 * 0.5),
-            DoubleTensorVertex::acos
+            DoubleVertex::acos
         );
     }
 
@@ -30,7 +30,7 @@ public class TensorArcCosVertexTest {
         operatesOn2x2MatrixVertexValues(
             new double[]{0.0, 0.1, 0.2, 0.3},
             new double[]{Math.acos(0.0), Math.acos(0.1), Math.acos(0.2), Math.acos(0.3)},
-            DoubleTensorVertex::acos
+            DoubleVertex::acos
         );
     }
 
@@ -43,7 +43,7 @@ public class TensorArcCosVertexTest {
                 -1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
                 -1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
             },
-            DoubleTensorVertex::acos
+            DoubleVertex::acos
         );
     }
 

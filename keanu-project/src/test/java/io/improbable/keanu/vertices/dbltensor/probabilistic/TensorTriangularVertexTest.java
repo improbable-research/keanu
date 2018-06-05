@@ -16,17 +16,17 @@ public class TensorTriangularVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        TensorTriangularVertex tensorTriangularVertex = new TensorTriangularVertex(0.0, 10., 5.);
+        TriangularVertex tensorTriangularVertex = new TriangularVertex(0.0, 10., 5.);
         double expectedLogDensity = Math.log(0.1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorTriangularVertex, 2.5, expectedLogDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
-        TensorTriangularVertex triangularVertex = new TensorTriangularVertex(0.0, 10, 5);
+        TriangularVertex triangularVertex = new TriangularVertex(0.0, 10, 5);
 
         double expectedLogDensity = triangularVertex.logPdf(2.5) + triangularVertex.logPdf(7.5);
-        TensorTriangularVertex tensorTriangularVertex = new TensorTriangularVertex(0.0, 10, 5);
+        TriangularVertex tensorTriangularVertex = new TriangularVertex(0.0, 10, 5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorTriangularVertex, new double[]{2.5, 7.5}, expectedLogDensity);
     }
 
@@ -34,7 +34,7 @@ public class TensorTriangularVertexTest {
     public void gaussianSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        TensorTriangularVertex vertex = new TensorTriangularVertex(
+        TriangularVertex vertex = new TriangularVertex(
             new int[]{sampleCount, 1},
             0.0,
             10.0,

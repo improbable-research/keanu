@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.TensorLogVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -13,13 +13,13 @@ import static org.junit.Assert.assertEquals;
 
 public class TensorDualNumbersTest {
 
-    DoubleTensorVertex vA;
-    DoubleTensorVertex vB;
+    DoubleVertex vA;
+    DoubleVertex vB;
 
     @Before
     public void setup() {
-        vA = new TensorGaussianVertex(1.0, 0.0);
-        vB = new TensorGaussianVertex(2.0, 0.0);
+        vA = new GaussianVertex(1.0, 0.0);
+        vB = new GaussianVertex(2.0, 0.0);
     }
 
     @Test
@@ -44,21 +44,21 @@ public class TensorDualNumbersTest {
 
     @Test
     public void diffOverPlusMinusMultiplyCombination() {
-        DoubleTensorVertex vC = vA.plus(vB);
-        DoubleTensorVertex vD = vA.minus(vB);
-        DoubleTensorVertex vE = vC.multiply(vD);
+        DoubleVertex vC = vA.plus(vB);
+        DoubleVertex vD = vA.minus(vB);
+        DoubleVertex vE = vC.multiply(vD);
         assertDiffIsCorrect(vA, vB, vE);
     }
 
     @Test
     public void diffOverPlusDivideMultiplyLogCombination() {
-        DoubleTensorVertex vC = vA.plus(vB);
-        DoubleTensorVertex vD = vA.divideBy(vB);
-        DoubleTensorVertex vE = vC.multiply(vD);
-        assertDiffIsCorrect(vA, vB, new TensorLogVertex(vE));
+        DoubleVertex vC = vA.plus(vB);
+        DoubleVertex vD = vA.divideBy(vB);
+        DoubleVertex vE = vC.multiply(vD);
+        assertDiffIsCorrect(vA, vB, new LogVertex(vE));
     }
 
-    private void assertDiffIsCorrect(DoubleTensorVertex vA, DoubleTensorVertex vB, DoubleTensorVertex vC) {
+    private void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, DoubleVertex vC) {
 
         double A = 1.0;
         double B = 2.0;
@@ -67,7 +67,7 @@ public class TensorDualNumbersTest {
         vB.setValue(B);
         vC.lazyEval();
 
-        TensorDualNumber cDual = vC.getDualNumber();
+        DualNumber cDual = vC.getDualNumber();
 
         DoubleTensor C = cDual.getValue();
         Map<Long, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();

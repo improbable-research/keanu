@@ -1,24 +1,24 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex
+import io.improbable.keanu.vertices.dbltensor.DoubleVertex
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex
 
 // Vertices
-operator fun Double.plus(that: DoubleTensorVertex): DoubleTensorVertex {
+operator fun Double.plus(that: DoubleVertex): DoubleVertex {
     return that + this
 }
 
-operator fun Double.minus(that: DoubleTensorVertex): DoubleTensorVertex {
-    return ConstantDoubleTensorVertex(this) - that
+operator fun Double.minus(that: DoubleVertex): DoubleVertex {
+    return ConstantDoubleVertex(this) - that
 }
 
-operator fun Double.times(that: DoubleTensorVertex): DoubleTensorVertex {
+operator fun Double.times(that: DoubleVertex): DoubleVertex {
     return that * this
 }
 
-operator fun Double.div(that: DoubleTensorVertex): DoubleTensorVertex {
-    return ConstantDoubleTensorVertex(this) / that
+operator fun Double.div(that: DoubleVertex): DoubleVertex {
+    return ConstantDoubleVertex(this) / that
 }
 
 // Tensors
