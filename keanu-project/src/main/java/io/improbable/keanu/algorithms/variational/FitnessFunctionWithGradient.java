@@ -13,10 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.TensorFitnessFunction.logOfTotalProbability;
+import static io.improbable.keanu.algorithms.variational.FitnessFunction.logOfTotalProbability;
 
 
-public class TensorFitnessFunctionWithGradient {
+public class FitnessFunctionWithGradient {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
@@ -24,10 +24,10 @@ public class TensorFitnessFunctionWithGradient {
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public TensorFitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
-                                             List<? extends Vertex<DoubleTensor>> latentVertices,
-                                             BiConsumer<double[], double[]> onGradientCalculation,
-                                             BiConsumer<double[], Double> onFitnessCalculation) {
+    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
+                                       List<? extends Vertex<DoubleTensor>> latentVertices,
+                                       BiConsumer<double[], double[]> onGradientCalculation,
+                                       BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
@@ -35,15 +35,15 @@ public class TensorFitnessFunctionWithGradient {
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public TensorFitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
-                                             List<? extends Vertex<DoubleTensor>> latentVertices) {
+    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
+                                       List<? extends Vertex<DoubleTensor>> latentVertices) {
         this(probabilisticVertices, latentVertices, null, null);
     }
 
     public MultivariateVectorFunction gradient() {
         return point -> {
 
-            TensorFitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
+            FitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
 
             Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
@@ -59,7 +59,7 @@ public class TensorFitnessFunctionWithGradient {
 
     public MultivariateFunction fitness() {
         return point -> {
-            TensorFitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
+            FitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
             double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
 
             if (onFitnessCalculation != null) {

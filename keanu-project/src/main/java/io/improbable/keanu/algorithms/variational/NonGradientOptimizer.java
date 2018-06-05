@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -14,21 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.TensorGradientOptimizer.currentPoint;
+import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class TensorNonGradientOptimizer {
+public class NonGradientOptimizer {
 
-    private final BayesNetTensorAsContinuous bayesNet;
+    private final BayesNetDoubleAsContinuous bayesNet;
     private final List<BiConsumer<double[], Double>> onFitnessCalculations;
 
-    public TensorNonGradientOptimizer(BayesNetTensorAsContinuous bayesNet) {
+    public NonGradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
         this.onFitnessCalculations = new ArrayList<>();
     }
 
-    public TensorNonGradientOptimizer(List<Vertex<Double>> graph) {
-        this(new BayesNetTensorAsContinuous(graph));
+    public NonGradientOptimizer(List<Vertex<Double>> graph) {
+        this(new BayesNetDoubleAsContinuous(graph));
     }
 
     public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
@@ -50,7 +50,7 @@ public class TensorNonGradientOptimizer {
         }
 
         List<? extends Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        TensorFitnessFunction fitnessFunction = new TensorFitnessFunction(
+        FitnessFunction fitnessFunction = new FitnessFunction(
             outputVertices,
             latentVertices,
             this::handleFitnessCalculation
@@ -61,7 +61,7 @@ public class TensorNonGradientOptimizer {
         double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
-        if (TensorFitnessFunction.isValidInitialFitness(initialFitness)) {
+        if (FitnessFunction.isValidInitialFitness(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 

@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.LogProbGradient;
@@ -26,7 +26,7 @@ public class TensorNUTS {
     private TensorNUTS() {
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetTensorAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
                                                      final double stepSize) {
@@ -34,7 +34,7 @@ public class TensorNUTS {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetTensorAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,

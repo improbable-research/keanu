@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
@@ -14,10 +14,10 @@ import static org.junit.Assert.assertTrue;
 
 public class TensorMCMCTestDistributions {
 
-    public static BayesNetTensorAsContinuous createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
+    public static BayesNetDoubleAsContinuous createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
         GaussianVertex A = new GaussianVertex(new int[]{2, 1}, mu, sigma);
         A.setAndCascade(A.sample(random));
-        return new BayesNetTensorAsContinuous(A.getConnectedGraph());
+        return new BayesNetDoubleAsContinuous(A.getConnectedGraph());
     }
 
     public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples) {
@@ -44,7 +44,7 @@ public class TensorMCMCTestDistributions {
         }
     }
 
-    public static BayesNetTensorAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
+    public static BayesNetDoubleAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
 
         GaussianVertex A = new GaussianVertex(mu, sigma);
         GaussianVertex B = new GaussianVertex(mu, sigma);
@@ -55,7 +55,7 @@ public class TensorMCMCTestDistributions {
         A.setValue(mu);
         B.setAndCascade(mu);
 
-        return new BayesNetTensorAsContinuous(Arrays.asList(A, B, C));
+        return new BayesNetDoubleAsContinuous(Arrays.asList(A, B, C));
     }
 
     public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
@@ -71,7 +71,7 @@ public class TensorMCMCTestDistributions {
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static BayesNetTensorAsContinuous create2DDonutDistribution() {
+    public static BayesNetDoubleAsContinuous create2DDonutDistribution() {
         GaussianVertex A = new GaussianVertex(0, 1);
         GaussianVertex B = new GaussianVertex(0, 1);
 
@@ -81,7 +81,7 @@ public class TensorMCMCTestDistributions {
         A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
-        return new BayesNetTensorAsContinuous(Arrays.asList(A, B, D));
+        return new BayesNetDoubleAsContinuous(Arrays.asList(A, B, D));
     }
 
     public static void samplesMatch2DDonut(List<DoubleTensor> samplesA, List<DoubleTensor> samplesB) {

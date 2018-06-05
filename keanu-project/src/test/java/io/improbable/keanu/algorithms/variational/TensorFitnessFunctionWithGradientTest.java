@@ -112,7 +112,7 @@ public class TensorFitnessFunctionWithGradientTest {
                                                       List<Vertex> probabilisticVertices,
                                                       List<? extends Vertex<DoubleTensor>> latentVertices) {
 
-        TensorFitnessFunctionWithGradient fitness = new TensorFitnessFunctionWithGradient(probabilisticVertices, latentVertices);
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(probabilisticVertices, latentVertices);
 
         double[] point = Arrays.copyOf(bottomLeft, bottomLeft.length);
 

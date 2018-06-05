@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -20,23 +20,23 @@ import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class TensorGradientOptimizer {
+public class GradientOptimizer {
 
     public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
         NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
         new SimpleValueChecker(1e-8, 1e-8)
     );
 
-    private final Logger log = LoggerFactory.getLogger(TensorGradientOptimizer.class);
+    private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
     private static final double FLAT_GRADIENT = 1e-16;
 
-    private final BayesNetTensorAsContinuous bayesNet;
+    private final BayesNetDoubleAsContinuous bayesNet;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations;
     private final List<BiConsumer<double[], Double>> onFitnessCalculations;
 
-    public TensorGradientOptimizer(BayesNetTensorAsContinuous bayesNet) {
+    public GradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
         this.bayesNet = bayesNet;
         this.onGradientCalculations = new ArrayList<>();
         this.onFitnessCalculations = new ArrayList<>();
@@ -83,7 +83,7 @@ public class TensorGradientOptimizer {
      * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations) {
-        return maxAPosteriori(maxEvaluations, TensorGradientOptimizer.DEFAULT_OPTIMIZER);
+        return maxAPosteriori(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     /**
@@ -107,7 +107,7 @@ public class TensorGradientOptimizer {
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations) {
-        return maxLikelihood(maxEvaluations, TensorGradientOptimizer.DEFAULT_OPTIMIZER);
+        return maxLikelihood(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     private double optimize(int maxEvaluations,
@@ -116,7 +116,7 @@ public class TensorGradientOptimizer {
 
         bayesNet.cascadeObservations();
 
-        TensorFitnessFunctionWithGradient fitnessFunction = new TensorFitnessFunctionWithGradient(
+        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
             outputVertices,
             bayesNet.getContinuousLatentVertices(),
             this::handleGradientCalculation,
@@ -130,7 +130,7 @@ public class TensorGradientOptimizer {
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
-        if (TensorFitnessFunction.isValidInitialFitness(initialFitness)) {
+        if (FitnessFunction.isValidInitialFitness(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
@@ -151,7 +151,7 @@ public class TensorGradientOptimizer {
 
         long totalLatentDimensions = 0;
         for (Vertex<DoubleTensor> vertex : continuousVertices) {
-            totalLatentDimensions += TensorFitnessFunction.numDimensions(vertex);
+            totalLatentDimensions += FitnessFunction.numDimensions(vertex);
         }
 
         if (totalLatentDimensions > Integer.MAX_VALUE) {

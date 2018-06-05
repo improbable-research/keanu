@@ -1,8 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.variational.TensorGradientOptimizer;
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
@@ -59,8 +59,8 @@ public class LinearRegression {
         DoubleVertex y = new GaussianVertex(x.multiply(m).plus(b), 5.0);
         y.observe(yData);
 
-        BayesNetTensorAsContinuous bayesNet = new BayesNetTensorAsContinuous(m.getConnectedGraph());
-        TensorGradientOptimizer optimizer = new TensorGradientOptimizer(bayesNet);
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(m.getConnectedGraph());
+        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
         optimizer.onGradientCalculation((point, gradient) -> {
             System.out.println(Arrays.toString(point) + " grad= " + Arrays.toString(gradient));
         });
@@ -106,8 +106,8 @@ public class LinearRegression {
         DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
         y.observe(yData);
 
-        BayesNetTensorAsContinuous bayesNet = new BayesNetTensorAsContinuous(y.getConnectedGraph());
-        TensorGradientOptimizer optimizer = new TensorGradientOptimizer(bayesNet);
+        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(y.getConnectedGraph());
+        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
         optimizer.maxLikelihood(10000);
 

@@ -9,24 +9,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-public class TensorFitnessFunction {
+public class FitnessFunction {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
     private final Map<Long, Long> exploreSettingAll;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public TensorFitnessFunction(List<Vertex> probabilisticVertices,
-                                 List<? extends Vertex<DoubleTensor>> latentVertices,
-                                 BiConsumer<double[], Double> onFitnessCalculation) {
+    public FitnessFunction(List<Vertex> probabilisticVertices,
+                           List<? extends Vertex<DoubleTensor>> latentVertices,
+                           BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public TensorFitnessFunction(List<Vertex> probabilisticVertices,
-                                 List<? extends Vertex<DoubleTensor>> latentVertices) {
+    public FitnessFunction(List<Vertex> probabilisticVertices,
+                           List<? extends Vertex<DoubleTensor>> latentVertices) {
         this(probabilisticVertices, latentVertices, null);
     }
 

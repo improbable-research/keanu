@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
@@ -26,7 +26,7 @@ public class TensorHamiltonianTest {
     public void samplesGaussian() {
         double mu = 0.0;
         double sigma = 1.0;
-        BayesNetTensorAsContinuous simpleGaussian = TensorMCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
+        BayesNetDoubleAsContinuous simpleGaussian = TensorMCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
         NetworkSamples posteriorSamples = TensorHamiltonian.getPosteriorSamples(
             simpleGaussian,
@@ -45,7 +45,7 @@ public class TensorHamiltonianTest {
     @Test
     public void samplesContinuousPrior() {
 
-        BayesNetTensorAsContinuous bayesNet = TensorMCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0);
+        BayesNetDoubleAsContinuous bayesNet = TensorMCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0);
 
         NetworkSamples posteriorSamples = TensorHamiltonian.getPosteriorSamples(
             bayesNet,
@@ -65,7 +65,7 @@ public class TensorHamiltonianTest {
     @Test
     public void samplesFromDonut() {
 
-        BayesNetTensorAsContinuous donutBayesNet = TensorMCMCTestDistributions.create2DDonutDistribution();
+        BayesNetDoubleAsContinuous donutBayesNet = TensorMCMCTestDistributions.create2DDonutDistribution();
 
         NetworkSamples samples = TensorHamiltonian.getPosteriorSamples(
             donutBayesNet,

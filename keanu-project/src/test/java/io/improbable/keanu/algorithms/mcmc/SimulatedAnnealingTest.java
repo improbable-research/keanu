@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.variational.TensorGradientOptimizer;
-import io.improbable.keanu.network.BayesNetTensorAsContinuous;
+import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
@@ -50,10 +50,10 @@ public class SimulatedAnnealingTest {
     }
 
     private NetworkState findMAPWithOptimizer() {
-        BayesNetTensorAsContinuous network = new BayesNetTensorAsContinuous(A.getConnectedGraph());
+        BayesNetDoubleAsContinuous network = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
         network.probeForNonZeroMasterP(100, random);
 
-        TensorGradientOptimizer graphOptimizer = new TensorGradientOptimizer(network);
+        GradientOptimizer graphOptimizer = new GradientOptimizer(network);
         graphOptimizer.maxAPosteriori(1000);
 
         return new SimpleNetworkState(network.getLatentVertices().stream()
