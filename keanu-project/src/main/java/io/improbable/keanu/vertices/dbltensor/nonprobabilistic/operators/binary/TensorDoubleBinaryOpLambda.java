@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
@@ -12,7 +10,7 @@ import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public class TensorDoubleBinaryOpLambda<A, B> extends NonProbabilisticDoubleTensor {
 
@@ -21,18 +19,32 @@ public class TensorDoubleBinaryOpLambda<A, B> extends NonProbabilisticDoubleTens
     protected final BiFunction<A, B, DoubleTensor> op;
     protected final Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation;
 
-    public TensorDoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, DoubleTensor> op, Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
+    public TensorDoubleBinaryOpLambda(int[] shape,
+                                      Vertex<A> a,
+                                      Vertex<B> b,
+                                      BiFunction<A, B, DoubleTensor> op,
+                                      Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
         this.a = a;
         this.b = b;
         this.op = op;
         this.dualNumberCalculation = dualNumberCalculation;
         setParents(a, b);
-        setValue(DoubleTensor.placeHolder(this.getValue().getShape()));
+        setValue(DoubleTensor.placeHolder(shape));
+    }
 
+    public TensorDoubleBinaryOpLambda(int[] shape, Vertex<A> a, Vertex<B> b, BiFunction<A, B, DoubleTensor> op) {
+        this(shape, a, b, op, null);
+    }
+
+    public TensorDoubleBinaryOpLambda(Vertex<A> a,
+                                      Vertex<B> b,
+                                      BiFunction<A, B, DoubleTensor> op,
+                                      Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b, op, dualNumberCalculation);
     }
 
     public TensorDoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, DoubleTensor> op) {
-        this(a, b, op, null);
+        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b, op, null);
     }
 
     @Override

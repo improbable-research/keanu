@@ -1,10 +1,10 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.DeterministicRule
-import io.improbable.keanu.vertices.dbl.DoubleVertex
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex
 import io.improbable.keanu.vertices.intgrtensor.IntegerVertex
 import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex
 import io.improbable.keanu.vertices.intgrtensor.probabilistic.PoissonVertex
@@ -22,8 +22,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexPlus() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = GaussianVertex(0.0, 1.0)
+        val a = TensorGaussianVertex(0.0, 1.0)
+        val b = TensorGaussianVertex(0.0, 1.0)
 
         val e1 = a.value + b.value
         val r1 = a + b
@@ -94,8 +94,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexMinus() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = GaussianVertex(0.0, 1.0)
+        val a = TensorGaussianVertex(0.0, 1.0)
+        val b = TensorGaussianVertex(0.0, 1.0)
 
         val e1 = a.value - b.value
         val r1 = a - b
@@ -166,7 +166,7 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexUnaryMinus() {
-        val a = GaussianVertex(0.0, 1.0)
+        val a = TensorGaussianVertex(0.0, 1.0)
 
         val e1 = -a.value
         val r1 = -a
@@ -202,8 +202,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexTimes() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = GaussianVertex(0.0, 1.0)
+        val a = TensorGaussianVertex(0.0, 1.0)
+        val b = TensorGaussianVertex(0.0, 1.0)
 
         val e1 = a.value * b.value
         val r1 = a * b
@@ -270,8 +270,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexDivide() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = ConstantDoubleVertex(2.0)
+        val a = TensorGaussianVertex(0.0, 1.0)
+        val b = ConstantDoubleTensorVertex(2.0)
 
         val e1 = a.value / b.value
         val r1 = a / b
@@ -344,10 +344,10 @@ class OperatorOverloadingTest {
     @Test
     fun doubleVertexNestedOperators() {
         val a = 4.0
-        val b = GaussianVertex(0.0, 1.0)
-        val c = GaussianVertex(0.0, 1.0)
-        val d = ConstantDoubleVertex(1.0)
-        val e = UniformVertex(1.0, 10.0)
+        val b = TensorGaussianVertex(0.0, 1.0)
+        val c = TensorGaussianVertex(0.0, 1.0)
+        val d = ConstantDoubleTensorVertex(1.0)
+        val e = TensorUniformVertex(1.0, 10.0)
         val f = 10.0
         val g = 5.0
 
@@ -413,17 +413,17 @@ class OperatorOverloadingTest {
         val ai2 = ArithmeticInteger(2)
         val resultI1 = modelA.add(ai1, ai2)
 
-        val modelB = SimpleModel<DoubleVertex, IntegerVertex>()
+        val modelB = SimpleModel<DoubleTensorVertex, IntegerVertex>()
 
-        val dv1 = ConstantDoubleVertex(1.0)
-        val dv2 = ConstantDoubleVertex(1.5)
+        val dv1 = ConstantDoubleTensorVertex(1.0)
+        val dv2 = ConstantDoubleTensorVertex(1.5)
         val resultD2 = modelB.add(dv1, dv2)
 
         val iv1 = ConstantIntegerVertex(1)
         val iv2 = ConstantIntegerVertex(2)
         val resultI2 = modelB.add(iv1, iv2)
 
-        assertEquals(resultD1.value, resultD2.value)
+        assertEquals(resultD1.value, resultD2.value.scalar())
         assertEquals(resultI1.value, resultI2.value.scalar())
     }
 
@@ -440,16 +440,16 @@ class OperatorOverloadingTest {
 
     @Test
     fun vertexOperatorTest() {
-        val a = ConstantDoubleVertex(0.123)
+        val a = ConstantDoubleTensorVertex(0.123)
 
-        assertEquals(Math.acos(a.value), acos(a).value)
-        assertEquals(Math.asin(a.value), asin(a).value)
-        assertEquals(Math.cos(a.value), cos(a).value)
-        assertEquals(Math.sin(a.value), sin(a).value)
-        assertEquals(Math.exp(a.value), exp(a).value)
-        assertEquals(Math.log(a.value), log(a).value)
-        assertEquals(Math.pow(a.value, 2.345), pow(a, 2.345).value)
-        assertEquals(Math.pow(a.value, a.value), pow(a, a).value)
+        assertEquals(Math.acos(a.value.scalar()), acos(a).value.scalar())
+        assertEquals(Math.asin(a.value.scalar()), asin(a).value.scalar())
+        assertEquals(Math.cos(a.value.scalar()), cos(a).value.scalar())
+        assertEquals(Math.sin(a.value.scalar()), sin(a).value.scalar())
+        assertEquals(Math.exp(a.value.scalar()), exp(a).value.scalar())
+        assertEquals(Math.log(a.value.scalar()), log(a).value.scalar())
+        assertEquals(Math.pow(a.value.scalar(), 2.345), pow(a, 2.345).value.scalar())
+        assertEquals(Math.pow(a.value.scalar(), a.value.scalar()), pow(a, a).value.scalar())
     }
 
     @Test

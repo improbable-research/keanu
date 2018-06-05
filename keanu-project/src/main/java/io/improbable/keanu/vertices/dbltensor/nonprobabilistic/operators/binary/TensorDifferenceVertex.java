@@ -7,10 +7,12 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNu
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
 public class TensorDifferenceVertex extends TensorDoubleBinaryOpVertex {
 
     public TensorDifferenceVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
-        super(a, b);
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     @Override

@@ -10,11 +10,15 @@ import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantInteger
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
 public class TensorChiSquaredVertex extends TensorProbabilisticDouble {
 
     private IntegerVertex k;
 
     public TensorChiSquaredVertex(int[] shape, IntegerVertex k) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, k.getShape());
+
         this.k = k;
         setParents(k);
         setValue(DoubleTensor.placeHolder(shape));

@@ -1,7 +1,9 @@
 package io.improbable.keanu.tensor;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Set;
+import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -66,6 +68,26 @@ public class TensorShapeValidation {
             .map(TensorShape::new)
             .filter(shape -> !shape.isScalar())
             .collect(toSet());
+    }
+
+    public static int[] checkAllShapesMatch(int[]... shapes) {
+        return checkAllShapesMatch(Arrays.stream(shapes));
+    }
+
+    public static int[] checkAllShapesMatch(Collection<int[]> shapes) {
+        return checkAllShapesMatch(shapes.stream());
+    }
+
+    private static int[] checkAllShapesMatch(Stream<int[]> shapesStream) {
+        Set<TensorShape> uniqueShapes = shapesStream
+            .map(TensorShape::new)
+            .collect(toSet());
+
+        if (uniqueShapes.size() != 1) {
+            throw new IllegalArgumentException("Shapes must match");
+        }
+
+        return uniqueShapes.iterator().next().getShape();
     }
 
 }

@@ -10,8 +10,8 @@ public abstract class BoolUnaryOpLambda<A extends Tensor> extends BoolUnaryOpVer
 
     private final Function<A, BooleanTensor> boolOp;
 
-    public BoolUnaryOpLambda(Vertex<A> a, Function<A, BooleanTensor> boolOp) {
-        super(a);
+    public BoolUnaryOpLambda(int[] shape, Vertex<A> a, Function<A, BooleanTensor> boolOp) {
+        super(shape, a);
         this.boolOp = boolOp;
     }
 

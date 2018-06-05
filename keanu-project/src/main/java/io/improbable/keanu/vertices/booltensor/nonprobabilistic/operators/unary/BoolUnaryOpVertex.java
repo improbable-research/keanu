@@ -10,9 +10,10 @@ public abstract class BoolUnaryOpVertex<A extends Tensor> extends NonProbabilist
 
     protected final Vertex<A> a;
 
-    public BoolUnaryOpVertex(Vertex<A> a) {
+    public BoolUnaryOpVertex(int[] shape, Vertex<A> a) {
         this.a = a;
         setParents(a);
+        setValue(BooleanTensor.placeHolder(shape));
     }
 
     @Override

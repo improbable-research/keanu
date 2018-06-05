@@ -3,10 +3,12 @@ package io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.operators.bina
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgrtensor.IntegerVertex;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
 public class IntegerAdditionVertex extends IntegerBinaryOpVertex {
 
     public IntegerAdditionVertex(IntegerVertex a, IntegerVertex b) {
-        super(a, b);
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     @Override

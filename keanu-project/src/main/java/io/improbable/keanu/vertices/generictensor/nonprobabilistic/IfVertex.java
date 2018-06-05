@@ -19,6 +19,7 @@ public class IfVertex<T> extends NonProbabilistic<Tensor<T>> {
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
+        //TODO: add shape place holder
     }
 
     @Override

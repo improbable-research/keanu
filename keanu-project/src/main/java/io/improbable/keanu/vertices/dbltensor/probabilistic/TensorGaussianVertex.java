@@ -69,6 +69,14 @@ public class TensorGaussianVertex extends TensorProbabilisticDouble {
         this(shape, new ConstantDoubleTensorVertex(mu), new ConstantDoubleTensorVertex(sigma));
     }
 
+    public DoubleTensorVertex getMu() {
+        return mu;
+    }
+
+    public DoubleTensorVertex getSigma() {
+        return sigma;
+    }
+
     @Override
     public double logPdf(DoubleTensor value) {
 

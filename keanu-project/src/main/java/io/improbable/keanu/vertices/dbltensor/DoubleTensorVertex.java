@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbltensor;
 
 
+import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ContinuousTensorVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -10,9 +11,11 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.*;
 
 import java.util.*;
+import java.util.function.Function;
 
-public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTensor> {
+public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTensor> implements DoubleOperators<DoubleTensorVertex> {
 
+    //TODO: use Vertex<DoubleTensor> and cast if needed
     public DoubleTensorVertex minus(DoubleTensorVertex that) {
         return new TensorDifferenceVertex(this, that);
     }
@@ -103,6 +106,31 @@ public abstract class DoubleTensorVertex extends ContinuousTensorVertex<DoubleTe
 
     public DoubleTensorVertex atan2(DoubleTensorVertex that) {
         return new TensorArcTan2Vertex(this, that);
+    }
+
+    public DoubleTensorVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
+        return new TensorDoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
+    }
+
+    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    public DoubleTensorVertex times(DoubleTensorVertex that) {
+        return multiply(that);
+    }
+
+    public DoubleTensorVertex div(DoubleTensorVertex that) {
+        return divideBy(that);
+    }
+
+    public DoubleTensorVertex times(double that) {
+        return multiply(that);
+    }
+
+    public DoubleTensorVertex div(double that) {
+        return divideBy(that);
+    }
+
+    public DoubleTensorVertex unaryMinus() {
+        return multiply(-1.0);
     }
 
     public final TensorDualNumber getDualNumber() {

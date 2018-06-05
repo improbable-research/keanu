@@ -76,7 +76,7 @@ public class TensorUniformVertex extends TensorProbabilisticDouble {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
 
-        DoubleTensor dlogPdf = DoubleTensor.zeros(this.xMax.getValue().getShape());
+        DoubleTensor dlogPdf = DoubleTensor.zeros(this.xMax.getShape());
         dlogPdf = dlogPdf.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
         dlogPdf = dlogPdf.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
 

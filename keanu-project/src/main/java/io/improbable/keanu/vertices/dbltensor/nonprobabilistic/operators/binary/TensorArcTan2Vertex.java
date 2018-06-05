@@ -8,10 +8,12 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartia
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
 public class TensorArcTan2Vertex extends TensorDoubleBinaryOpVertex {
 
     public TensorArcTan2Vertex(DoubleTensorVertex a, DoubleTensorVertex b) {
-        super(a, b);
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     @Override

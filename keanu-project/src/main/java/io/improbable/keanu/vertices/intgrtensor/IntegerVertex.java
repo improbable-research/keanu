@@ -71,10 +71,13 @@ public abstract class IntegerVertex extends DiscreteTensorVertex<IntegerTensor> 
         return new IntegerAbsVertex(this);
     }
 
-    public IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpLambda<>(this, op);
+    public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
+        return new IntegerUnaryOpLambda<>(shape, this, op);
     }
 
+    public IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
+        return new IntegerUnaryOpLambda<>(this.getShape(), this, op);
+    }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
     public IntegerVertex times(IntegerVertex that) {

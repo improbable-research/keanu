@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
+import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.TensorLogVertex;
+import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -17,24 +17,24 @@ import static org.junit.Assert.assertTrue;
 
 public class DiscoverGraphTest {
 
-    DoubleVertex A;
-    DoubleVertex B;
-    DoubleVertex C;
-    DoubleVertex D;
-    DoubleVertex E;
-    DoubleVertex F;
-    DoubleVertex G;
-    List<DoubleVertex> allVertices;
+    DoubleTensorVertex A;
+    DoubleTensorVertex B;
+    DoubleTensorVertex C;
+    DoubleTensorVertex D;
+    DoubleTensorVertex E;
+    DoubleTensorVertex F;
+    DoubleTensorVertex G;
+    List<DoubleTensorVertex> allVertices;
 
     @Before
     public void setup() {
-        A = new ConstantDoubleVertex(2.0);
-        B = new ConstantDoubleVertex(2.0);
-        C = new LogVertex(A);
+        A = new ConstantDoubleTensorVertex(2.0);
+        B = new ConstantDoubleTensorVertex(2.0);
+        C = new TensorLogVertex(A);
         D = A.multiply(B);
         E = C.plus(D);
         F = D.minus(E);
-        G = new LogVertex(F);
+        G = new TensorLogVertex(F);
         allVertices = Arrays.asList(A, B, C, D, E, F, G);
     }
 
@@ -58,14 +58,14 @@ public class DiscoverGraphTest {
     @Test
     public void findsVeryLongGraph() {
 
-        DoubleVertex start = new GaussianVertex(0, 1);
+        DoubleTensorVertex start = new TensorGaussianVertex(0, 1);
 
-        DoubleVertex end = start;
+        DoubleTensorVertex end = start;
 
         int links = 15000;
         for (int i = 0; i < links; i++) {
-            DoubleVertex left = end.abs();
-            DoubleVertex right = end.abs();
+            DoubleTensorVertex left = end.abs();
+            DoubleTensorVertex right = end.abs();
             end = left.plus(right);
         }
 
@@ -78,7 +78,7 @@ public class DiscoverGraphTest {
 
     private void assertFindsAllVertices(Vertex<?> v) {
         Set<Vertex> vertices = DiscoverGraph.getEntireGraph(v);
-        assertTrue(vertices.size() == allVertices.size());
+        assertEquals(vertices.size(), allVertices.size());
         assertTrue(vertices.containsAll(allVertices));
     }
 }

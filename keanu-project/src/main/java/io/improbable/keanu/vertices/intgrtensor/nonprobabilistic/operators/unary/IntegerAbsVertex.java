@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.intgrtensor.IntegerVertex;
 public class IntegerAbsVertex extends IntegerUnaryOpVertex {
 
     public IntegerAbsVertex(IntegerVertex inputVertex) {
-        super(inputVertex);
+        super(inputVertex.getShape(), inputVertex);
     }
 
     @Override

@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
@@ -17,15 +15,24 @@ public class TensorDoubleUnaryOpLambda<IN> extends NonProbabilisticDoubleTensor 
     protected final Function<IN, DoubleTensor> op;
     protected final Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberSupplier;
 
-    public TensorDoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
+    public TensorDoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualNumberSupplier = dualNumberCalculation;
         setParents(inputVertex);
+        setValue(DoubleTensor.placeHolder(shape));
+    }
+
+    public TensorDoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
+        this(shape, inputVertex, op, null);
+    }
+
+    public TensorDoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, TensorDualNumber>, TensorDualNumber> dualNumberCalculation) {
+        this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation);
     }
 
     public TensorDoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
-        this(inputVertex, op, null);
+        this(inputVertex.getShape(), inputVertex, op, null);
     }
 
     @Override

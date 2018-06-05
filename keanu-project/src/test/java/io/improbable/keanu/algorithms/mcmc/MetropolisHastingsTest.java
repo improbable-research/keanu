@@ -5,8 +5,6 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.booltensor.BoolVertex;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorGaussianVertex;
@@ -16,7 +14,6 @@ import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.OptionalDouble;
 
 import static org.junit.Assert.assertEquals;
 
@@ -32,13 +29,13 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesContinuousPrior() {
 
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
+        DoubleTensorVertex A = new TensorGaussianVertex(20.0, 1.0);
+        DoubleTensorVertex B = new TensorGaussianVertex(20.0, 1.0);
 
         A.setValue(20.0);
         B.setValue(20.0);
 
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+        DoubleTensorVertex Cobserved = new TensorGaussianVertex(A.plus(B), 1.0);
 
         Cobserved.observe(46.0);
 
@@ -52,15 +49,10 @@ public class MetropolisHastingsTest {
             random
         );
 
-        OptionalDouble averagePosteriorA = posteriorSamples.get(A).asList().stream()
-            .mapToDouble(sample -> sample)
-            .average();
+        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
+        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();
 
-        OptionalDouble averagePosteriorB = posteriorSamples.get(B).asList().stream()
-            .mapToDouble(sample -> sample)
-            .average();
-
-        double actual = averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble();
+        double actual = averagePosteriorA + averagePosteriorB;
         assertEquals(44.0, actual, 0.1);
     }
 

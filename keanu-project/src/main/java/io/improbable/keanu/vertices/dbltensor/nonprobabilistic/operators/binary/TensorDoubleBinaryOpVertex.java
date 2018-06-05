@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
 
-import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
@@ -12,12 +11,11 @@ public abstract class TensorDoubleBinaryOpVertex extends NonProbabilisticDoubleT
     protected final DoubleTensorVertex a;
     protected final DoubleTensorVertex b;
 
-    public TensorDoubleBinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
-        int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape());
+    public TensorDoubleBinaryOpVertex(int[] shape, DoubleTensorVertex a, DoubleTensorVertex b) {
         this.a = a;
         this.b = b;
         setParents(a, b);
-        setValue(DoubleTensor.placeHolder(resultShape));
+        setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override

@@ -4,7 +4,6 @@ import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertexSamples;
 import io.improbable.keanu.vertices.intgrtensor.IntegerTensorVertexSamples;
 
@@ -37,14 +36,6 @@ public class NetworkSamples {
 
     public <T> VertexSamples<T> get(long vertexId) {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
-    }
-
-    public DoubleVertexSamples getDoubleSamples(Vertex<Double> vertex) {
-        return getDoubleSamples(vertex.getId());
-    }
-
-    public DoubleVertexSamples getDoubleSamples(long vertexId) {
-        return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
     public DoubleTensorVertexSamples getDoubleTensorSamples(Vertex<DoubleTensor> vertex) {

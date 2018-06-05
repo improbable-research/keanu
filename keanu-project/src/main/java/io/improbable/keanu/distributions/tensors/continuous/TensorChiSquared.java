@@ -20,6 +20,7 @@ public class TensorChiSquared {
         DoubleTensor halfK = k.toDouble().div(2);
         DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
         DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.apply(Gamma::gamma).logInPlace());
+        //TODO: NEGATIVE_INFINITY out places where x<=0
         return numerator.minusInPlace(denominator);
     }
 

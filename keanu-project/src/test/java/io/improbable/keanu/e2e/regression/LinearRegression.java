@@ -1,7 +1,7 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.variational.tensor.TensorGradientOptimizer;
+import io.improbable.keanu.algorithms.variational.TensorGradientOptimizer;
 import io.improbable.keanu.network.BayesNetTensorAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
@@ -14,6 +14,8 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -39,10 +41,16 @@ public class LinearRegression {
         double expectedB = 20.0;
 
         DoubleTensorVertex xGenerator = new TensorUniformVertex(new int[]{1, N}, 0, 10);
-        DoubleTensorVertex yGenerator = new TensorGaussianVertex(xGenerator.multiply(expectedM).plus(expectedB), 1.0);
+        DoubleTensorVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
+        DoubleTensorVertex yGenerator = new TensorGaussianVertex(mu, 1.0);
         DoubleTensor xData = xGenerator.sample(random);
+        System.out.println("XData before " + xData.sum());
         xGenerator.setAndCascade(xData);
+        System.out.println("XData After " + xData.sum());
+        System.out.println("Mu After " + mu.getValue().sum());
+
         DoubleTensor yData = yGenerator.sample(random);
+        System.out.println(yData.sum());
 
         // Linear Regression
         DoubleTensorVertex m = new TensorGaussianVertex(0.0, 10.0);
@@ -53,6 +61,13 @@ public class LinearRegression {
 
         BayesNetTensorAsContinuous bayesNet = new BayesNetTensorAsContinuous(m.getConnectedGraph());
         TensorGradientOptimizer optimizer = new TensorGradientOptimizer(bayesNet);
+        optimizer.onGradientCalculation((point, gradient) -> {
+            System.out.println(Arrays.toString(point) + " grad= " + Arrays.toString(gradient));
+        });
+
+        optimizer.onFitnessCalculation((point, fitness) -> {
+            System.out.println(Arrays.toString(point) + " fitn= " + fitness);
+        });
 
         optimizer.maxLikelihood(10000);
 

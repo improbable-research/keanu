@@ -9,10 +9,10 @@ public abstract class TensorDoubleUnaryOpVertex extends NonProbabilisticDoubleTe
 
     protected final DoubleTensorVertex inputVertex;
 
-    public TensorDoubleUnaryOpVertex(DoubleTensorVertex inputVertex) {
+    public TensorDoubleUnaryOpVertex(int[] shape, DoubleTensorVertex inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-        setValue(DoubleTensor.placeHolder(inputVertex.getShape()));
+        setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override

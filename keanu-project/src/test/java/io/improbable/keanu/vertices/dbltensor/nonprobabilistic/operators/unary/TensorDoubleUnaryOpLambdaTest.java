@@ -13,7 +13,7 @@ public class TensorDoubleUnaryOpLambdaTest {
 
         TensorUniformVertex matrix = new TensorUniformVertex(new int[]{2, 2}, 0, 5);
         matrix.setAndCascade(2.5);
-        DoubleTensorVertex matrixLambda = new TensorDoubleUnaryOpLambda<>(matrix, (val) -> val.times(2));
+        DoubleTensorVertex matrixLambda = new TensorDoubleUnaryOpLambda<>(matrix.getShape(), matrix, (val) -> val.times(2));
 
         assertArrayEquals(new double[]{5, 5, 5, 5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
     }

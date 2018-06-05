@@ -10,6 +10,8 @@ import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantInteger
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
 public class TensorStudentTVertex extends TensorProbabilisticDouble {
 
     private final IntegerVertex v;
@@ -19,6 +21,7 @@ public class TensorStudentTVertex extends TensorProbabilisticDouble {
      * @param v     Degrees of Freedom
      */
     public TensorStudentTVertex(int[] shape, IntegerVertex v) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, v.getShape());
         this.v = v;
         setParents(v);
         setValue(DoubleTensor.placeHolder(shape));

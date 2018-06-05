@@ -5,9 +5,6 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.booltensor.BoolVertex;
 import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.CastDoubleTensorVertex;
@@ -38,17 +35,17 @@ public class MultimodalSimulatedAnnealingTest {
     @Test
     public void findsBothModesForContinuousNetwork() {
 
-        DoubleVertex A = new UniformVertex(-3.0, 3.0);
+        DoubleTensorVertex A = new  TensorUniformVertex(-3.0, 3.0);
         A.setValue(0.0);
-        DoubleVertex B = A.multiply(A);
-        DoubleVertex C = new GaussianVertex(B, 1.5);
+        DoubleTensorVertex B = A.multiply(A);
+        DoubleTensorVertex C = new TensorGaussianVertex(B, 1.5);
         C.observe(4.0);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
-        boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) + 2) < 0.01);
-        boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A) - 2) < 0.01);
+        boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() + 2) < 0.01);
+        boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
 
         assertTrue(findsLowerMode);
         assertTrue(findsUpperMode);
