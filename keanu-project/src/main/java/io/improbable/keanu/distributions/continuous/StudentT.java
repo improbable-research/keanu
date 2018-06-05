@@ -63,26 +63,6 @@ public class StudentT {
     /**
      * @param v Degrees of Freedom
      * @param t random variable
-     * @return Differential of the Probability Density Function
-     */
-    public static Diff dPdf(int v, double t) {
-        double gammaHalfV = gamma(v / 2.);
-        double gammaHalfVPlusOne = gamma((v + 1.) / 2.);
-        double sqrtVPi = sqrt(v * PI);
-        double tSq = pow(t, 2);
-        double tSqDividedByVPlusOne = (tSq / v) + 1.;
-        double sqrtVPiGammaHalfV = sqrtVPi * gammaHalfV;
-
-        double dPdt_numerator = (t * (-v - 1)) * pow(tSqDividedByVPlusOne, -v / 2.) * gammaHalfVPlusOne;
-        double dPdt_denominator = (tSq + v) * sqrt((tSq + v) / v) * sqrtVPiGammaHalfV;
-        double dPdt = dPdt_numerator / dPdt_denominator;
-
-        return new Diff(dPdt);
-    }
-
-    /**
-     * @param v Degrees of Freedom
-     * @param t random variable
      * @return Differential of the Log of the Probability Density Function
      */
     public static Diff dLogPdf(int v, double t) {

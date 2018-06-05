@@ -25,7 +25,7 @@ public class TensorBeta {
         final DoubleTensor lessMask = alpha.getLessThanMask(beta);
         final DoubleTensor greaterMask = alpha.getGreaterThanOrEqualToMask(beta);
 
-        return lessMask.times(lessThan).plus(greaterMask.times(greaterThan));
+        return lessMask.timesInPlace(lessThan).plusInPlace(greaterMask.timesInPlace(greaterThan));
     }
 
     public static DoubleTensor logPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {

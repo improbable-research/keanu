@@ -116,33 +116,6 @@ public class SmoothUniform {
         return 0.0;
     }
 
-    public static double dPdfdx(final double xMin, final double xMax, final double shoulderWidth, final double x) {
-
-        if (x >= xMin && x <= xMax) {
-            //x is in flat region
-            return 0.0;
-        }
-
-        double bodyWidth = xMax - xMin;
-
-        double leftCutoff = xMin - shoulderWidth;
-        if (x < xMin && x > leftCutoff) {
-            //x is in left shoulder
-            final double nx = x - leftCutoff;
-            return dshoulder(shoulderWidth, bodyWidth, nx);
-        }
-
-        double rightCutoff = xMax + shoulderWidth;
-        if (x > xMax && x < rightCutoff) {
-            //x is in right shoulder
-            final double nx = shoulderWidth - (x - rightCutoff);
-            return -dshoulder(shoulderWidth, bodyWidth, nx);
-        }
-
-        //x is not in density bounds
-        return 0.0;
-    }
-
     private static double getCubeCoefficient(final double Sw, final double Bw) {
         return -2.0 / (Sw * Sw * Sw * (Sw + Bw));
     }

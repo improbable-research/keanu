@@ -43,21 +43,6 @@ public class Beta {
         return pow(x, alpha - 1) * pow(1 - x, beta - 1) / denominator;
     }
 
-    public static Diff dPdf(double alpha, double beta, double x) {
-        double gammaAgammaB = gamma(alpha) * gamma(beta);
-        double gammaAplusB = gamma(alpha + beta);
-        double dPdx = -((pow(x, alpha - 2) * pow(1 - x, beta - 2) * (alpha * (x - 1) + (beta - 2) * x + 1) * gammaAplusB) / gammaAgammaB);
-
-        double pow1minusXToTheBminus1 = pow(1 - x, beta - 1);
-        double powXToTheAminus1 = pow(x, alpha - 1);
-        double diagammaAplusB = digamma(alpha + beta);
-        double commonToDaAndDb = powXToTheAminus1 * pow1minusXToTheBminus1 * gammaAplusB;
-        double dPdAlpha = commonToDaAndDb * (diagammaAplusB + log(x) - digamma(alpha)) / gammaAgammaB;
-        double dPdBeta = commonToDaAndDb * (diagammaAplusB + log(1 - x) - digamma(beta)) / gammaAgammaB;
-
-        return new Diff(dPdAlpha, dPdBeta, dPdx);
-    }
-
     public static double logPdf(double alpha, double beta, double x) {
         double betaFunction = logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta);
         return (alpha - 1) * Math.log(x) + (beta - 1) * Math.log(1 - x) - betaFunction;

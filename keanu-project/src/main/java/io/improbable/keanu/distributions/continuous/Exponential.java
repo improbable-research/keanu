@@ -35,16 +35,6 @@ public class Exponential {
         return (x >= a) ? (-(x - a) / b) - Math.log(b) : Double.NEGATIVE_INFINITY;
     }
 
-    public static Diff dPdf(double a, double b, double x) {
-        double exponent = Math.exp((a - x) / b);
-        double bSquared = b * b;
-
-        double dPda = exponent / bSquared;
-        double dPdb = -(exponent * (a + b - x)) / (Math.pow(b, 3));
-        double dPdx = -dPda;
-        return new Diff(dPda, dPdb, dPdx);
-    }
-
     public static Diff dlnPdf(double a, double b, double x) {
         double dPda = 1 / b;
         double dPdb = -(a + b - x) / Math.pow(b, 2);

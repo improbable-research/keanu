@@ -13,8 +13,7 @@ public class TensorGaussian {
 
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
         DoubleTensor unityGaussian = random.nextGaussian(shape);
-        //TODO: in place these ops
-        return unityGaussian.times(sigma).plus(mu);
+        return unityGaussian.timesInPlace(sigma).plusInPlace(mu);
     }
 
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {

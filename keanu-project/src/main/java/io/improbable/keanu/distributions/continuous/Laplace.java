@@ -35,17 +35,6 @@ public class Laplace {
         return 1 / (2 * beta) * Math.exp(-Math.abs(x - mu) / beta);
     }
 
-    public static Diff dPdf(double mu, double beta, double x) {
-        double absMuMinusX = Math.abs(mu - x);
-        double denominator = 2 * Math.pow(beta, 2) * absMuMinusX;
-        double expAbsMuMinusXDivBeta = Math.exp(-(absMuMinusX / beta));
-
-        double dPdx = ((mu - x) * expAbsMuMinusXDivBeta) / denominator;
-        double dPdm = ((x - mu) * expAbsMuMinusXDivBeta) / denominator;
-        double dPdb = (expAbsMuMinusXDivBeta * (absMuMinusX - beta)) / (2 * Math.pow(beta, 3));
-        return new Diff(dPdm, dPdb, dPdx);
-    }
-
     public static double logPdf(double mu, double beta, double x) {
         return -(Math.abs(mu - x) / beta + Math.log(2 * beta));
     }

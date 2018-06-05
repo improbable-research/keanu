@@ -43,27 +43,6 @@ public class Logistic {
         return Math.log(1 / b) + xMinusAOverB - (2 * Math.log(1 + Math.exp(xMinusAOverB)));
     }
 
-    /**
-     * @param a location parameter (any real number)
-     * @param b scale parameter (b greater than 0)
-     * @param x at value
-     * @return the partial derivatives at x
-     */
-    public static Diff dPdf(double a, double b, double x) {
-        double expAOverB = Math.exp(a / b);
-        double expXOverB = Math.exp(x / b);
-        double expAPlus2XOverB = Math.exp((a + 2 * x) / b);
-        double exp2APlusXOverB = Math.exp((2 * a + x) / b);
-        double bSquared = Math.pow(b, 2);
-
-        double dPda = (expAPlus2XOverB - exp2APlusXOverB) / (bSquared * Math.pow(expXOverB + expAOverB, 3));
-        double dPdx = (exp2APlusXOverB - expAPlus2XOverB) / (bSquared * Math.pow(expAOverB + expXOverB, 3));
-        double dPdb = -(Math.exp((a / b) + (x / b)) * ((a * expXOverB) + (x * expAOverB) - (a * expAOverB) + (b * expAOverB) + (b * expXOverB) - (x * expXOverB))) /
-            (Math.pow(b, 3) * Math.pow(expAOverB + expXOverB, 3));
-
-        return new Diff(dPda, dPdb, dPdx);
-    }
-
     public static Diff dlnPdf(double a, double b, double x) {
         double expAOverB = Math.exp(a / b);
         double expXOverB = Math.exp(x / b);

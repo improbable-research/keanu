@@ -177,14 +177,14 @@ public class TensorBetaVertexTest {
         double trueBeta = 2.;
 
         List<DoubleTensorVertex> alphaBeta = new ArrayList<>();
-        alphaBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueAlpha)));
-        alphaBeta.add(new ConstantDoubleTensorVertex(Nd4jDoubleTensor.scalar(trueBeta)));
+        alphaBeta.add(new ConstantDoubleTensorVertex(DoubleTensor.scalar(trueAlpha)));
+        alphaBeta.add(new ConstantDoubleTensorVertex(DoubleTensor.scalar(trueBeta)));
 
         List<DoubleTensorVertex> latentAlphaBeta = new ArrayList<>();
         TensorUniformVertex latentAlpha = new TensorUniformVertex(0.01, 10.0);
-        latentAlpha.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
+        latentAlpha.setAndCascade(DoubleTensor.scalar(9.9));
         TensorUniformVertex latentBeta = new TensorUniformVertex(0.01, 10.0);
-        latentBeta.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
+        latentBeta.setAndCascade(DoubleTensor.scalar(0.1));
         latentAlphaBeta.add(latentAlpha);
         latentAlphaBeta.add(latentBeta);
 

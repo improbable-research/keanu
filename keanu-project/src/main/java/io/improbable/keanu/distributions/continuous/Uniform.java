@@ -13,7 +13,6 @@ public class Uniform {
     private Uniform() {
     }
 
-
     /**
      * @param xMin   minimum x value
      * @param xMax   maximum x value
