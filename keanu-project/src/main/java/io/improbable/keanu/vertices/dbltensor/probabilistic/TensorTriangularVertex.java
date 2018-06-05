@@ -11,7 +11,7 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
+public class TensorTriangularVertex extends TensorProbabilisticDouble {
 
     private final DoubleTensorVertex xMin;
     private final DoubleTensorVertex xMax;
@@ -34,6 +34,30 @@ public class TensorTriangularVertex extends ProbabilisticDoubleTensor {
         this.c = c;
         setParents(xMin, xMax, c);
         setValue(DoubleTensor.placeHolder(shape));
+    }
+
+    public TensorTriangularVertex(int[] shape, DoubleTensorVertex xMin, DoubleTensorVertex xMax, double c) {
+        this(shape, xMin, xMax, new ConstantDoubleTensorVertex(c));
+    }
+
+    public TensorTriangularVertex(int[] shape, DoubleTensorVertex xMin, double xMax, DoubleTensorVertex c) {
+        this(shape, xMin, new ConstantDoubleTensorVertex(xMax), c);
+    }
+
+    public TensorTriangularVertex(int[] shape, DoubleTensorVertex xMin, double xMax, double c) {
+        this(shape, xMin, new ConstantDoubleTensorVertex(xMax), new ConstantDoubleTensorVertex(c));
+    }
+
+    public TensorTriangularVertex(int[] shape, double xMin, DoubleTensorVertex xMax, DoubleTensorVertex c) {
+        this(shape, new ConstantDoubleTensorVertex(xMin), xMax, c);
+    }
+
+    public TensorTriangularVertex(int[] shape, double xMin, double xMax, DoubleTensorVertex c) {
+        this(shape, new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), c);
+    }
+
+    public TensorTriangularVertex(int[] shape, double xMin, double xMax, double c) {
+        this(shape, new ConstantDoubleTensorVertex(xMin), new ConstantDoubleTensorVertex(xMax), new ConstantDoubleTensorVertex(c));
     }
 
     /**

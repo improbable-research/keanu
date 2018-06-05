@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary;
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;

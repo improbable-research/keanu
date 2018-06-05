@@ -1,10 +1,10 @@
-package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.unary;
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
-import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
+import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
+import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
 public class TensorCeilVertexTest {
 

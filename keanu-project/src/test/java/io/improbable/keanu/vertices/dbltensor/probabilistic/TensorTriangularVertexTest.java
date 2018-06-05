@@ -1,8 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
-import io.improbable.keanu.vertices.dbl.probabilistic.TriangularVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,14 +17,13 @@ public class TensorTriangularVertexTest {
     public void matchesKnownLogDensityOfScalar() {
 
         TensorTriangularVertex tensorTriangularVertex = new TensorTriangularVertex(0.0, 10., 5.);
-        TriangularVertex triangularVertex = new TriangularVertex(0.0, 10, 5);
-        double expectedDensity = triangularVertex.logPdf(2.5);
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorTriangularVertex, 2.5, expectedDensity);
+        double expectedLogDensity = Math.log(0.1);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorTriangularVertex, 2.5, expectedLogDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
-        TriangularVertex triangularVertex = new TriangularVertex(0.0, 10, 5);
+        TensorTriangularVertex triangularVertex = new TensorTriangularVertex(0.0, 10, 5);
 
         double expectedLogDensity = triangularVertex.logPdf(2.5) + triangularVertex.logPdf(7.5);
         TensorTriangularVertex tensorTriangularVertex = new TensorTriangularVertex(0.0, 10, 5);
@@ -39,9 +36,9 @@ public class TensorTriangularVertexTest {
         int sampleCount = 1000000;
         TensorTriangularVertex vertex = new TensorTriangularVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleTensorVertex(0.0),
-            new ConstantDoubleTensorVertex(10.0),
-            new ConstantDoubleTensorVertex(5.0)
+            0.0,
+            10.0,
+            5.0
         );
 
         double from = 1;

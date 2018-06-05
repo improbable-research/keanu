@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantInteger
 import java.util.HashMap;
 import java.util.Map;
 
-public class TensorStudentTVertex extends ProbabilisticDoubleTensor {
+public class TensorStudentTVertex extends TensorProbabilisticDouble {
 
     private final IntegerVertex v;
 

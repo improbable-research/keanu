@@ -1,11 +1,11 @@
-package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.unary;
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.junit.Before;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.unary.UnaryOperationTestHelpers.*;
+import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class TensorSigmoidVertexTest {
 

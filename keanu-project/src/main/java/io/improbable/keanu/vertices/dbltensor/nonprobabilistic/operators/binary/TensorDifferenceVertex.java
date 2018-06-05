@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNu
 
 import java.util.Map;
 
-public class TensorDifferenceVertex extends TensorBinaryOpVertex {
+public class TensorDifferenceVertex extends TensorDoubleBinaryOpVertex {
 
     public TensorDifferenceVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         super(a, b);

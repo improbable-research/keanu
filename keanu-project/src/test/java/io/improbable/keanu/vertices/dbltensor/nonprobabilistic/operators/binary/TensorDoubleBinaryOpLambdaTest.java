@@ -1,8 +1,6 @@
-package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary;
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.TensorDoubleBinaryOpLambda;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.TensorDoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbltensor.probabilistic.TensorUniformVertex;
 import org.junit.Test;
 

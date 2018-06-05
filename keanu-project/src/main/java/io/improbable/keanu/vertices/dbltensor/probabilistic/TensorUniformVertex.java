@@ -12,7 +12,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
 
-public class TensorUniformVertex extends ProbabilisticDoubleTensor {
+public class TensorUniformVertex extends TensorProbabilisticDouble {
 
     private final DoubleTensorVertex xMin;
     private final DoubleTensorVertex xMax;

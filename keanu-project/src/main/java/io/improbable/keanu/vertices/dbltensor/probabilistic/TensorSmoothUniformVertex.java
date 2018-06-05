@@ -12,7 +12,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
 
-public class TensorSmoothUniformVertex extends ProbabilisticDoubleTensor {
+public class TensorSmoothUniformVertex extends TensorProbabilisticDouble {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 

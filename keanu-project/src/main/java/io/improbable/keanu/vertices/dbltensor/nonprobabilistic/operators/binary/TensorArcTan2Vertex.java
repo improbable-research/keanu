@@ -2,15 +2,13 @@ package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNumber;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorPartialDerivatives;
 
 import java.util.Map;
 
-public class TensorArcTan2Vertex extends TensorBinaryOpVertex {
+public class TensorArcTan2Vertex extends TensorDoubleBinaryOpVertex {
 
     public TensorArcTan2Vertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         super(a, b);

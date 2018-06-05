@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;

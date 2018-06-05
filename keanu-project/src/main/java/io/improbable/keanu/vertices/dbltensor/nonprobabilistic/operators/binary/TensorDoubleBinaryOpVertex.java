@@ -7,12 +7,12 @@ import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.NonProbabilisticDoubleTensor;
 
-public abstract class TensorBinaryOpVertex extends NonProbabilisticDoubleTensor {
+public abstract class TensorDoubleBinaryOpVertex extends NonProbabilisticDoubleTensor {
 
     protected final DoubleTensorVertex a;
     protected final DoubleTensorVertex b;
 
-    public TensorBinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
+    public TensorDoubleBinaryOpVertex(DoubleTensorVertex a, DoubleTensorVertex b) {
         int[] resultShape = TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape());
         this.a = a;
         this.b = b;

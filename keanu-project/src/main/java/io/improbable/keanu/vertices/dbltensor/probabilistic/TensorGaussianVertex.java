@@ -12,7 +12,7 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class TensorGaussianVertex extends ProbabilisticDoubleTensor {
+public class TensorGaussianVertex extends TensorProbabilisticDouble {
 
     private final DoubleTensorVertex mu;
     private final DoubleTensorVertex sigma;

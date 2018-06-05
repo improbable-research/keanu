@@ -1,9 +1,9 @@
-package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary;
+package io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.binary.BinaryOperationTestHelpers.*;
+import static io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 public class TensorArcTan2VertexTest {
 

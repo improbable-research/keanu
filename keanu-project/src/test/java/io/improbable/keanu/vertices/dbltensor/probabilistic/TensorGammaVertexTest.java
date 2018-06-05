@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbltensor.probabilistic;
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex;
 import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleTensorVertex;
@@ -32,7 +31,7 @@ public class TensorGammaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        GammaVertex gamma = new GammaVertex(0.5, 1, 1.5);
+        TensorGammaVertex gamma = new TensorGammaVertex(0.5, 1, 1.5);
         TensorGammaVertex tensorGamma = new TensorGammaVertex(0.5, 1, 1.5);
 
         double expectedDensity = gamma.logPdf(0.5);

@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.TensorDualNu
 
 import java.util.Map;
 
-public abstract class ProbabilisticDoubleTensor extends DoubleTensorVertex {
+public abstract class TensorProbabilisticDouble extends DoubleTensorVertex {
 
     @Override
     public DoubleTensor updateValue() {

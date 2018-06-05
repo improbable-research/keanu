@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbltensor.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.probabilistic.SmoothUniformVertex;
 import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,7 +24,7 @@ public class TensorSmoothUniformVertexTest {
     public void matchesKnownLogDensityOfScalar() {
 
         TensorSmoothUniformVertex tensorSmoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
-        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
+        TensorSmoothUniformVertex smoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
         double expectedDensity = smoothUniformVertex.logPdf(0.5);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorSmoothUniformVertex, 0.5, expectedDensity);
@@ -34,7 +33,7 @@ public class TensorSmoothUniformVertexTest {
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
+        TensorSmoothUniformVertex smoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
         double expectedLogDensity = smoothUniformVertex.logPdf(0.25) + smoothUniformVertex.logPdf(0.75);
         TensorSmoothUniformVertex tensorSmoothUniformVertex = new TensorSmoothUniformVertex(0, 1);
 
@@ -47,7 +46,7 @@ public class TensorSmoothUniformVertexTest {
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
 
-        SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1, 10);
+        TensorSmoothUniformVertex smoothUniformVertex = new TensorSmoothUniformVertex(0, 1, 10);
         TensorSmoothUniformVertex tensorSmoothUniformVertex = new TensorSmoothUniformVertex(0, 1, 10);
 
         Map<Long, DoubleTensor> derivativeFlatRegion = smoothUniformVertex.dLogPdf(0.5);
