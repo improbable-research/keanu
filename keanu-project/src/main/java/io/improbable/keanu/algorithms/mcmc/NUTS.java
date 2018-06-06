@@ -378,7 +378,7 @@ public class NUTS {
                                                         Map<Long, DoubleTensor> momentums,
                                                         KeanuRandom random) {
         for (Vertex<DoubleTensor> vertex : vertices) {
-            momentums.put(vertex.getId(), random.nextGaussian(vertex.getValue().getShape()));
+            momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
         }
     }
 

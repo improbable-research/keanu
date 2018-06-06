@@ -129,7 +129,7 @@ public class Hamiltonian {
                                                         Map<Long, DoubleTensor> momentums,
                                                         KeanuRandom random) {
         for (Vertex<DoubleTensor> currentVertex : vertexes) {
-            momentums.put(currentVertex.getId(), random.nextGaussian(currentVertex.getValue().getShape()));
+            momentums.put(currentVertex.getId(), random.nextGaussian(currentVertex.getShape()));
         }
     }
 
