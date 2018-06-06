@@ -47,9 +47,9 @@ public class BinaryOperationTestHelpers {
                                                           double[] expected,
                                                           BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        UniformVertex A = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        UniformVertex B = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        UniformVertex B = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A, B).getValue();
@@ -67,9 +67,9 @@ public class BinaryOperationTestHelpers {
                                                                             double[] expectedGradientWrtA,
                                                                             double[] expectedGradientWrtB,
                                                                             BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        UniformVertex A = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        UniformVertex A = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        UniformVertex B = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        UniformVertex B = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
         DualNumber result = op.apply(A, B).getDualNumber();

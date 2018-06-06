@@ -9,6 +9,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -86,8 +87,8 @@ public class BoolVertexTest {
         double p = 0.5;
 
         Flip f = new Flip(0.5);
-        ConstantBoolVertex tru = new ConstantBoolVertex(true);
-        ConstantBoolVertex fal = new ConstantBoolVertex(false);
+        ConstantBoolVertex tru = ConstantVertex.of(true);
+        ConstantBoolVertex fal = ConstantVertex.of(false);
 
         BoolVertex a = f.and(tru).or(fal);
 

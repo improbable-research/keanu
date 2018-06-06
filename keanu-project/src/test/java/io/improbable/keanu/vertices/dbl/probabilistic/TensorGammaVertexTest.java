@@ -5,8 +5,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -99,8 +99,8 @@ public class TensorGammaVertexTest {
         a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         GammaVertex vertexUnderTest = new GammaVertex(
             a,
-            new ConstantDoubleVertex(1.5),
-            new ConstantDoubleVertex(5.0)
+            ConstantVertex.of(1.5),
+            ConstantVertex.of(5.0)
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -180,9 +180,9 @@ public class TensorGammaVertexTest {
         int sampleCount = 1000000;
         GammaVertex vertex = new GammaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleVertex(1.5),
-            new ConstantDoubleVertex(2.0),
-            new ConstantDoubleVertex(7.5)
+            ConstantVertex.of(1.5),
+            ConstantVertex.of(2.0),
+            ConstantVertex.of(7.5)
         );
 
         double from = 1.5;
@@ -199,10 +199,10 @@ public class TensorGammaVertexTest {
         double trueTheta = 2.0;
         double trueK = 3.0;
 
-        DoubleVertex constA = new ConstantDoubleVertex(trueA);
-        DoubleVertex constA2 = new ConstantDoubleVertex(trueA);
-        DoubleVertex constTheta = new ConstantDoubleVertex(trueTheta);
-        DoubleVertex constK = new ConstantDoubleVertex(trueK);
+        DoubleVertex constA = ConstantVertex.of(trueA);
+        DoubleVertex constA2 = ConstantVertex.of(trueA);
+        DoubleVertex constTheta = ConstantVertex.of(trueTheta);
+        DoubleVertex constK = ConstantVertex.of(trueK);
 
         List<DoubleVertex> aThetaK = new ArrayList<>();
         aThetaK.add(constA);

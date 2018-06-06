@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor.bool;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.SimpleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.junit.Before;
 import org.junit.Test;
@@ -94,12 +94,12 @@ public class SimpleBooleanTensorTest {
     @Test
     public void doesSetGenericIf() {
 
-        Tensor<Something> trueCase = new SimpleTensor<>(
+        Tensor<Something> trueCase = new GenericTensor<>(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
             new int[]{2, 2}
         );
 
-        Tensor<Something> falseCase = new SimpleTensor<>(
+        Tensor<Something> falseCase = new GenericTensor<>(
             new Something[]{Something.D, Something.C, Something.C, Something.A},
             new int[]{2, 2}
         );

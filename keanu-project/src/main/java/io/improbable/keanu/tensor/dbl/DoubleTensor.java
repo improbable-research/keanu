@@ -11,11 +11,11 @@ import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
 
-    public static final DoubleTensor ZERO_SCALAR = scalar(0.0);
+    DoubleTensor ZERO_SCALAR = scalar(0.0);
 
-    public static final DoubleTensor ONE_SCALAR = scalar(1.0);
+    DoubleTensor ONE_SCALAR = scalar(1.0);
 
-    public static final DoubleTensor TWO_SCALAR = scalar(2.0);
+    DoubleTensor TWO_SCALAR = scalar(2.0);
 
     static DoubleTensor create(double value, int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
@@ -31,6 +31,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
         } else {
             return Nd4jDoubleTensor.create(values, shape);
         }
+    }
+
+    static DoubleTensor create(double[] values) {
+        return create(values, new int[]{1, values.length});
     }
 
     static DoubleTensor ones(int[] shape) {

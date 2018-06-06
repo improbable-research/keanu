@@ -5,8 +5,8 @@ import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,7 +65,7 @@ public class LorenzTest {
                 List<DoubleVertex> timeSlice = graphTimeSteps.get(i);
                 DoubleVertex xt = timeSlice.get(0);
 
-                GaussianVertex observedXt = new GaussianVertex(xt, new ConstantDoubleVertex(1.0));
+                GaussianVertex observedXt = new GaussianVertex(xt, 1.0);
                 observedXt.observe(observed.get(t).x);
             }
 
@@ -103,7 +103,7 @@ public class LorenzTest {
                                        double rho,
                                        double beta) {
 
-        DoubleVertex rhov = new ConstantDoubleVertex(rho);
+        DoubleVertex rhov = ConstantVertex.of(rho);
 
         DoubleVertex xtplus1 = xt.multiply(1 - timestep * sigma).plus(yt.multiply(timestep * sigma));
 

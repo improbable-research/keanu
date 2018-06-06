@@ -71,7 +71,7 @@ public class Model {
         earlyRate = new ExponentialVertex(1.0, 1.0);
         lateRate = new ExponentialVertex(1.0, 1.0);
 
-        ConstantIntegerVertex years = new ConstantIntegerVertex(IntegerTensor.create(data.years));
+        ConstantIntegerVertex years = new ConstantIntegerVertex(data.years);
 
         DoubleVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
             .then(earlyRate)

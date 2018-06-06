@@ -5,8 +5,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -128,8 +128,8 @@ public class TensorLogisticVertexTest {
         int sampleCount = 1000000;
         LogisticVertex vertex = new LogisticVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleVertex(0.0),
-            new ConstantDoubleVertex(0.5)
+            ConstantVertex.of(0.0),
+            ConstantVertex.of(0.5)
         );
 
         double from = 0.5;
@@ -146,13 +146,13 @@ public class TensorLogisticVertexTest {
         double trueB = 0.5;
 
         List<DoubleVertex> aB = new ArrayList<>();
-        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueA)));
-        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueB)));
+        aB.add(ConstantVertex.of(trueA));
+        aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
         UniformVertex latentB = new UniformVertex(0.01, 10.0);
-        latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
-        latentAB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueA)));
+        latentB.setAndCascade(0.1);
+        latentAB.add(ConstantVertex.of(trueA));
         latentAB.add(latentB);
 
         int numSamples = 2000;

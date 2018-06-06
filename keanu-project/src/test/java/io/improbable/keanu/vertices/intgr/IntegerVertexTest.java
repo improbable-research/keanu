@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,8 +18,8 @@ public class IntegerVertexTest {
 
     @Before
     public void setup() {
-        v1 = new ConstantIntegerVertex(3);
-        v2 = new ConstantIntegerVertex(2);
+        v1 = ConstantVertex.of(3);
+        v2 = ConstantVertex.of(2);
     }
 
     @Test

@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -30,9 +30,9 @@ public class NotEqualsVertexTest {
     }
 
     private <T> void equals(T a, T b, boolean expected) {
-        NotEqualsVertex<Tensor<T>, Tensor<T>> vertex = new NotEqualsVertex<>(
-            new ConstantVertex<>(Tensor.scalar(a)),
-            new ConstantVertex<>(Tensor.scalar(b))
+        NotEqualsVertex<GenericTensor<T>, GenericTensor<T>> vertex = new NotEqualsVertex<>(
+            ConstantVertex.of(a),
+            ConstantVertex.of(b)
         );
         assertEquals(expected, vertex.lazyEval().scalar());
     }

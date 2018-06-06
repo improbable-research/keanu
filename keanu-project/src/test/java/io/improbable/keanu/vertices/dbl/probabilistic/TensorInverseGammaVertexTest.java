@@ -5,8 +5,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -143,8 +143,8 @@ public class TensorInverseGammaVertexTest {
         int sampleCount = 1000000;
         InverseGammaVertex vertex = new InverseGammaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleVertex(2.0),
-            new ConstantDoubleVertex(3.0)
+            2.0,
+            3.0
         );
 
         double from = 0.0;
@@ -161,8 +161,8 @@ public class TensorInverseGammaVertexTest {
         double trueB = 2.0;
 
         List<DoubleVertex> aB = new ArrayList<>();
-        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueA)));
-        aB.add(new ConstantDoubleVertex(Nd4jDoubleTensor.scalar(trueB)));
+        aB.add(ConstantVertex.of(trueA));
+        aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
         UniformVertex latentA = new UniformVertex(0.01, 10.0);

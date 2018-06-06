@@ -14,7 +14,7 @@ public class SimpleTensorTest {
     @Test
     public void canGetRandomAccessValue() {
 
-        Tensor<Something> somethingTensor = new SimpleTensor<>(
+        Tensor<Something> somethingTensor = new GenericTensor<>(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -29,7 +29,7 @@ public class SimpleTensorTest {
     @Test
     public void canSetRandomAccessValue() {
 
-        Tensor<Something> somethingTensor = new SimpleTensor<>(
+        Tensor<Something> somethingTensor = new GenericTensor<>(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,

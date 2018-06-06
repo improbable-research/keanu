@@ -3,7 +3,7 @@ package io.improbable.keanu.tensor.bool;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.SimpleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 
@@ -108,7 +108,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
             result[i] = data[i] ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
         }
 
-        return new SimpleTensor<>(result, copyOf(shape, shape.length));
+        return new GenericTensor<>(result, copyOf(shape, shape.length));
     }
 
     @Override

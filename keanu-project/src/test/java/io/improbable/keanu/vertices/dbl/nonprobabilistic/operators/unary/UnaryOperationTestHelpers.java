@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 
 import java.util.function.Function;
 
@@ -17,7 +18,7 @@ public class UnaryOperationTestHelpers {
                                                    double expected,
                                                    Function<DoubleVertex, DoubleVertex> op) {
 
-        ConstantDoubleVertex A = new ConstantDoubleVertex(aValue);
+        ConstantDoubleVertex A = ConstantVertex.of(aValue);
 
         assertEquals(expected, op.apply(A).getValue().scalar(), 1e-5);
     }
@@ -37,7 +38,7 @@ public class UnaryOperationTestHelpers {
                                                        double[] expected,
                                                        Function<DoubleVertex, DoubleVertex> op) {
 
-        ConstantDoubleVertex A = new ConstantDoubleVertex(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
+        ConstantDoubleVertex A = new ConstantDoubleVertex(DoubleTensor.create(aValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A).getValue();
 
@@ -53,7 +54,7 @@ public class UnaryOperationTestHelpers {
                                                                        double[] expectedGradientWrtA,
                                                                        Function<DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(new int[]{2, 2}, new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(1.0));
+        UniformVertex A = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
 
         DualNumber result = op.apply(A).getDualNumber();

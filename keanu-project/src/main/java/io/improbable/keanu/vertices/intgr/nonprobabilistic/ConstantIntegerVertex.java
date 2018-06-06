@@ -9,6 +9,10 @@ public class ConstantIntegerVertex extends NonProbabilisticInteger {
         setValue(constant);
     }
 
+    public ConstantIntegerVertex(int[] vector) {
+        this(IntegerTensor.create(vector));
+    }
+
     public ConstantIntegerVertex(int constant) {
         this(IntegerTensor.scalar(constant));
     }

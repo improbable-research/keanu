@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -28,8 +27,8 @@ public class MultiplexerVertexTest {
     public void multiplexerGivesReasonableDistributionOfSamples() {
         KeanuRandom random = new KeanuRandom(1);
 
-        IntegerVertex selectorOrigin = new ConstantIntegerVertex(0);
-        IntegerVertex selectorBound = new ConstantIntegerVertex(2);
+        IntegerVertex selectorOrigin = ConstantVertex.of(0);
+        IntegerVertex selectorBound = ConstantVertex.of(2);
         IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound);
         Map<TestEnum, Double> expected = new HashMap<>();
         expected.put(TestEnum.A, 0.25);
@@ -38,13 +37,13 @@ public class MultiplexerVertexTest {
         expected.put(TestEnum.D, 0.25);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
-        optionGroup1.put(TestEnum.A, new ConstantDoubleVertex(0.5));
-        optionGroup1.put(TestEnum.B, new ConstantDoubleVertex(0.5));
+        optionGroup1.put(TestEnum.A, ConstantVertex.of(0.5));
+        optionGroup1.put(TestEnum.B, ConstantVertex.of(0.5));
         SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
-        optionGroup2.put(TestEnum.C, new ConstantDoubleVertex(0.5));
-        optionGroup2.put(TestEnum.D, new ConstantDoubleVertex(0.5));
+        optionGroup2.put(TestEnum.C, ConstantVertex.of(0.5));
+        optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
         SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2);
 
         MultiplexerVertex<Tensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);

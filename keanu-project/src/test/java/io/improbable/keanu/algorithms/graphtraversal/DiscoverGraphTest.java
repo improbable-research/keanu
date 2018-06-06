@@ -2,9 +2,9 @@ package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -28,8 +28,8 @@ public class DiscoverGraphTest {
 
     @Before
     public void setup() {
-        A = new ConstantDoubleVertex(2.0);
-        B = new ConstantDoubleVertex(2.0);
+        A = ConstantVertex.of(2.0);
+        B = ConstantVertex.of(2.0);
         C = new LogVertex(A);
         D = A.multiply(B);
         E = C.plus(D);

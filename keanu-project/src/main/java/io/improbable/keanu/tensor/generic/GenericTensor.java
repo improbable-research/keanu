@@ -8,13 +8,13 @@ import java.util.Arrays;
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static java.util.Arrays.copyOf;
 
-public class SimpleTensor<T> implements Tensor<T> {
+public class GenericTensor<T> implements Tensor<T> {
 
     private T[] data;
     private int[] shape;
     private int[] stride;
 
-    public SimpleTensor(T[] data, int[] shape) {
+    public GenericTensor(T[] data, int[] shape) {
         this.data = data;
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -24,7 +24,7 @@ public class SimpleTensor<T> implements Tensor<T> {
         }
     }
 
-    public SimpleTensor(T scalar) {
+    public GenericTensor(T scalar) {
         this.data = (T[]) (new Object[]{scalar});
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
@@ -33,7 +33,7 @@ public class SimpleTensor<T> implements Tensor<T> {
     /**
      * @param shape placeholder shape
      */
-    public SimpleTensor(int[] shape) {
+    public GenericTensor(int[] shape) {
         this.data = null;
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -75,8 +75,8 @@ public class SimpleTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public SimpleTensor<T> duplicate() {
-        return new SimpleTensor<>(copyOf(data, data.length), copyOf(shape, shape.length));
+    public GenericTensor<T> duplicate() {
+        return new GenericTensor<>(copyOf(data, data.length), copyOf(shape, shape.length));
     }
 
     @Override
@@ -84,7 +84,7 @@ public class SimpleTensor<T> implements Tensor<T> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        SimpleTensor<?> that = (SimpleTensor<?>) o;
+        GenericTensor<?> that = (GenericTensor<?>) o;
 
         if (!Arrays.equals(data, that.data)) return false;
         if (!Arrays.equals(shape, that.shape)) return false;

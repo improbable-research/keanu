@@ -3,8 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,12 +25,12 @@ public class GreaterThanOrEqualVertexTest {
     }
 
     private void isGreaterThanOrEqual(int a, int b, boolean expected) {
-        GreaterThanOrEqualVertex<IntegerTensor, IntegerTensor> vertex = new GreaterThanOrEqualVertex<>(new ConstantIntegerVertex(a), new ConstantIntegerVertex(b));
+        GreaterThanOrEqualVertex<IntegerTensor, IntegerTensor> vertex = new GreaterThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
         assertEquals(expected, vertex.lazyEval().scalar());
     }
 
     private void isGreaterThanOrEqual(double a, double b, boolean expected) {
-        GreaterThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new GreaterThanOrEqualVertex<>(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
+        GreaterThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new GreaterThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
         assertEquals(expected, vertex.lazyEval().scalar());
     }
 }

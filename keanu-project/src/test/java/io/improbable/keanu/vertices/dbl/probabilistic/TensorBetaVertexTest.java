@@ -5,8 +5,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -142,8 +142,8 @@ public class TensorBetaVertexTest {
         int sampleCount = 1000000;
         BetaVertex vertex = new BetaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleVertex(5.0),
-            new ConstantDoubleVertex(2.0)
+            5.0,
+            2.0
         );
 
         double from = 0.3;
@@ -159,8 +159,8 @@ public class TensorBetaVertexTest {
         int sampleCount = 1000000;
         BetaVertex vertex = new BetaVertex(
             new int[]{sampleCount, 1},
-            new ConstantDoubleVertex(5.0),
-            new ConstantDoubleVertex(2.0)
+            5.0,
+            2.0
         );
 
         double from = 0.3;
@@ -177,8 +177,8 @@ public class TensorBetaVertexTest {
         double trueBeta = 2.;
 
         List<DoubleVertex> alphaBeta = new ArrayList<>();
-        alphaBeta.add(new ConstantDoubleVertex(DoubleTensor.scalar(trueAlpha)));
-        alphaBeta.add(new ConstantDoubleVertex(DoubleTensor.scalar(trueBeta)));
+        alphaBeta.add(ConstantVertex.of(trueAlpha));
+        alphaBeta.add(ConstantVertex.of(trueBeta));
 
         List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
         UniformVertex latentAlpha = new UniformVertex(0.01, 10.0);

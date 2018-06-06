@@ -2,7 +2,7 @@ package io.improbable.keanu.tensor;
 
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.generic.SimpleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 
 import java.util.Arrays;
 import java.util.List;
@@ -96,10 +96,10 @@ public interface Tensor<T> {
     }
 
     static <T> Tensor<T> scalar(T value) {
-        return new SimpleTensor<>(value);
+        return new GenericTensor<>(value);
     }
 
     static <T> Tensor<T> placeHolder(int[] shape) {
-        return new SimpleTensor<>(shape);
+        return new GenericTensor<>(shape);
     }
 }

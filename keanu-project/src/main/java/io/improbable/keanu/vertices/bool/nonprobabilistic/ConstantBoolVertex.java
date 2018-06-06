@@ -14,7 +14,11 @@ public class ConstantBoolVertex extends NonProbabilisticBool {
     }
 
     public ConstantBoolVertex(boolean constant) {
-        setValue(BooleanTensor.scalar(constant));
+        this(BooleanTensor.scalar(constant));
+    }
+
+    public ConstantBoolVertex(boolean[] vector) {
+        this(BooleanTensor.create(vector));
     }
 
     @Override

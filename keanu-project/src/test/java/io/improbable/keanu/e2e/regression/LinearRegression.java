@@ -6,9 +6,9 @@ import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -55,7 +55,7 @@ public class LinearRegression {
         // Linear Regression
         DoubleVertex m = new GaussianVertex(0.0, 10.0);
         DoubleVertex b = new GaussianVertex(0.0, 10.0);
-        DoubleVertex x = new ConstantDoubleVertex(xData);
+        DoubleVertex x = ConstantVertex.of(xData);
         DoubleVertex y = new GaussianVertex(x.multiply(m).plus(b), 5.0);
         y.observe(yData);
 
@@ -101,8 +101,8 @@ public class LinearRegression {
         DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
         DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
         DoubleVertex b = new GaussianVertex(0.0, 10.0);
-        DoubleVertex x1 = new ConstantDoubleVertex(x1Data);
-        DoubleVertex x2 = new ConstantDoubleVertex(x2Data);
+        DoubleVertex x1 = ConstantVertex.of(x1Data);
+        DoubleVertex x2 = ConstantVertex.of(x2Data);
         DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
         y.observe(yData);
 

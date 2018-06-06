@@ -3,8 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
@@ -26,12 +25,12 @@ public class LessThanOrEqualVertexTest {
     }
 
     private void isLessThanOrEqual(int a, int b, boolean expected) {
-        LessThanOrEqualVertex<IntegerTensor, IntegerTensor> vertex = new LessThanOrEqualVertex<>(new ConstantIntegerVertex(a), new ConstantIntegerVertex(b));
+        LessThanOrEqualVertex<IntegerTensor, IntegerTensor> vertex = new LessThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
         assertEquals(expected, vertex.lazyEval().scalar());
     }
 
     private void isLessThanOrEqual(double a, double b, boolean expected) {
-        LessThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new LessThanOrEqualVertex<>(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
+        LessThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new LessThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
         assertEquals(expected, vertex.lazyEval().scalar());
     }
 }

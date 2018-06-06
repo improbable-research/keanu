@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.dbl;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ContinuousTensorVertex;
+import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
 import java.util.*;
 import java.util.function.Function;
 
-public abstract class DoubleVertex extends ContinuousTensorVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
+public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
 
     //TODO: use Vertex<DoubleTensor> and cast if needed
     public DoubleVertex minus(DoubleVertex that) {
