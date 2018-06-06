@@ -28,7 +28,7 @@ public class TensorHamiltonianTest {
         double sigma = 1.0;
         BayesNetDoubleAsContinuous simpleGaussian = TensorMCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
-        NetworkSamples posteriorSamples = TensorHamiltonian.getPosteriorSamples(
+        NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
             1000,
@@ -47,7 +47,7 @@ public class TensorHamiltonianTest {
 
         BayesNetDoubleAsContinuous bayesNet = TensorMCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.0);
 
-        NetworkSamples posteriorSamples = TensorHamiltonian.getPosteriorSamples(
+        NetworkSamples posteriorSamples = Hamiltonian.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
             2000,
@@ -67,7 +67,7 @@ public class TensorHamiltonianTest {
 
         BayesNetDoubleAsContinuous donutBayesNet = TensorMCMCTestDistributions.create2DDonutDistribution();
 
-        NetworkSamples samples = TensorHamiltonian.getPosteriorSamples(
+        NetworkSamples samples = Hamiltonian.getPosteriorSamples(
             donutBayesNet,
             donutBayesNet.getLatentVertices(),
             2500,

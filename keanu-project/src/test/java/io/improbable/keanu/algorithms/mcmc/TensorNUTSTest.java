@@ -23,7 +23,7 @@ public class TensorNUTSTest {
         double sigma = 1.0;
         BayesNetDoubleAsContinuous simpleGaussian = TensorMCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
-        NetworkSamples posteriorSamples = TensorNUTS.getPosteriorSamples(
+        NetworkSamples posteriorSamples = NUTS.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
             1000,
@@ -41,7 +41,7 @@ public class TensorNUTSTest {
 
         BayesNetDoubleAsContinuous bayesNet = TensorMCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.);
 
-        NetworkSamples posteriorSamples = TensorNUTS.getPosteriorSamples(
+        NetworkSamples posteriorSamples = NUTS.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
             2000,
@@ -59,7 +59,7 @@ public class TensorNUTSTest {
     public void samplesFromDonut() {
         BayesNetDoubleAsContinuous donutBayesNet = TensorMCMCTestDistributions.create2DDonutDistribution();
 
-        NetworkSamples samples = TensorNUTS.getPosteriorSamples(
+        NetworkSamples samples = NUTS.getPosteriorSamples(
             donutBayesNet,
             donutBayesNet.getLatentVertices(),
             1000,

@@ -21,9 +21,9 @@ import java.util.Map;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-public class TensorHamiltonian {
+public class Hamiltonian {
 
-    private TensorHamiltonian() {
+    private Hamiltonian() {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,

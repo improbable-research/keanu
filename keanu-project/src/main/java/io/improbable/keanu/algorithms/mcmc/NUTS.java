@@ -19,11 +19,11 @@ import java.util.Map;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-public class TensorNUTS {
+public class NUTS {
 
     static private final double DELTA_MAX = 1000.0;
 
-    private TensorNUTS() {
+    private NUTS() {
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
