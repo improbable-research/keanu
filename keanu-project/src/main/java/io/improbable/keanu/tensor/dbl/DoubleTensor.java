@@ -61,26 +61,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return new ScalarDoubleTensor(shape);
     }
 
-    static Map<Long, DoubleTensor> fromScalars(Map<Long, Double> scalars) {
-        Map<Long, DoubleTensor> asTensors = new HashMap<>();
-
-        for (Map.Entry<Long, Double> entry : scalars.entrySet()) {
-            asTensors.put(entry.getKey(), DoubleTensor.scalar(entry.getValue()));
-        }
-
-        return asTensors;
-    }
-
-    static Map<Long, Double> toScalars(Map<Long, DoubleTensor> tensors) {
-        Map<Long, Double> asScalars = new HashMap<>();
-
-        for (Map.Entry<Long, DoubleTensor> entry : tensors.entrySet()) {
-            asScalars.put(entry.getKey(), entry.getValue().scalar());
-        }
-
-        return asScalars;
-    }
-
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();

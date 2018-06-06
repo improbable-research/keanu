@@ -6,16 +6,20 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public interface BooleanTensor extends Tensor<Boolean> {
 
-    static BooleanTensor create(boolean[] data, int[] shape) {
-        return new SimpleBooleanTensor(data, shape);
+    static BooleanTensor create(boolean value, int[] shape) {
+        return new SimpleBooleanTensor(value, shape);
     }
 
-    static BooleanTensor create(boolean[] data) {
-        return new SimpleBooleanTensor(data, new int[]{1, data.length});
+    static BooleanTensor create(boolean[] values, int[] shape) {
+        return new SimpleBooleanTensor(values, shape);
     }
 
-    static BooleanTensor scalar(boolean value) {
-        return new SimpleBooleanTensor(value);
+    static BooleanTensor create(boolean[] values) {
+        return create(values, new int[]{1, values.length});
+    }
+
+    static BooleanTensor scalar(boolean scalarValue) {
+        return new SimpleBooleanTensor(scalarValue);
     }
 
     static BooleanTensor placeHolder(int[] shape) {

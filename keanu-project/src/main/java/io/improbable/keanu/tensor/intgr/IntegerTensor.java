@@ -2,38 +2,62 @@ package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
+import java.util.Arrays;
 import java.util.function.Function;
 
 public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<IntegerTensor> {
+
+    IntegerTensor ZERO_SCALAR = scalar(0);
+
+    IntegerTensor ONE_SCALAR = scalar(1);
+
+    IntegerTensor TWO_SCALAR = scalar(2);
+
+    static IntegerTensor create(int value, int[] shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new ScalarIntegerTensor(value);
+        } else {
+            return Nd4jIntegerTensor.create(value, shape);
+        }
+    }
+
+    static IntegerTensor create(int[] values, int[] shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
+            return new ScalarIntegerTensor(values[0]);
+        } else {
+            return Nd4jIntegerTensor.create(values, shape);
+        }
+    }
+
+    static IntegerTensor create(int[] values) {
+        return create(values, new int[]{1, values.length});
+    }
+
+    static IntegerTensor ones(int[] shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new ScalarIntegerTensor(1);
+        } else {
+            return Nd4jIntegerTensor.ones(shape);
+        }
+    }
+
+    static IntegerTensor zeros(int[] shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new ScalarIntegerTensor(0);
+        } else {
+            return Nd4jIntegerTensor.zeros(shape);
+        }
+    }
 
     static IntegerTensor scalar(int scalarValue) {
         return new ScalarIntegerTensor(scalarValue);
     }
 
-    static IntegerTensor create(int[] values, int[] shape) {
-        return Nd4jIntegerTensor.create(values, shape);
-    }
-
-    static IntegerTensor create(int[] values) {
-        return Nd4jIntegerTensor.create(values, new int[]{1, values.length});
-    }
-
-    static IntegerTensor create(double value, int[] shape) {
-        return Nd4jIntegerTensor.create(value, shape);
-    }
-
-    static IntegerTensor ones(int[] shape) {
-        return Nd4jIntegerTensor.ones(shape);
-    }
-
-    static IntegerTensor zeros(int[] shape) {
-        return Nd4jIntegerTensor.zeros(shape);
-    }
-
     static IntegerTensor placeHolder(int[] shape) {
-        return new Nd4jIntegerTensor(shape);
+        return new ScalarIntegerTensor(shape);
     }
 
     //New tensor Ops and transforms

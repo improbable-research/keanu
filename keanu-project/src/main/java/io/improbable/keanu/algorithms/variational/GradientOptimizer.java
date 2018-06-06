@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -10,8 +10,6 @@ import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,16 +25,14 @@ public class GradientOptimizer {
         new SimpleValueChecker(1e-8, 1e-8)
     );
 
-    private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
-
     private static final double FLAT_GRADIENT = 1e-16;
 
-    private final BayesNetDoubleAsContinuous bayesNet;
+    private final BayesianNetwork bayesNet;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations;
     private final List<BiConsumer<double[], Double>> onFitnessCalculations;
 
-    public GradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
+    public GradientOptimizer(BayesianNetwork bayesNet) {
         this.bayesNet = bayesNet;
         this.onGradientCalculations = new ArrayList<>();
         this.onFitnessCalculations = new ArrayList<>();
@@ -155,7 +151,7 @@ public class GradientOptimizer {
         }
 
         if (totalLatentDimensions > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Geater than " + Integer.MAX_VALUE + " latent dimensions not supported");
+            throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
         }
 
         int position = 0;
@@ -173,7 +169,7 @@ public class GradientOptimizer {
     private void warnIfGradientIsFlat(double[] gradient) {
         double maxGradient = Arrays.stream(gradient).max().getAsDouble();
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
-            log.warn("The initial gradient is very flat. The largest gradient is {}", maxGradient);
+            throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
         }
     }
 }

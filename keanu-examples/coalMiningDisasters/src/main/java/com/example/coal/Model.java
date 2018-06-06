@@ -4,7 +4,7 @@ package com.example.coal;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -71,7 +71,7 @@ public class Model {
         earlyRate = new ExponentialVertex(1.0, 1.0);
         lateRate = new ExponentialVertex(1.0, 1.0);
 
-        ConstantIntegerVertex years = new ConstantIntegerVertex(data.years);
+        ConstantIntegerVertex years = ConstantVertex.of(data.years);
 
         DoubleVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
             .then(earlyRate)
@@ -79,7 +79,7 @@ public class Model {
 
         PoissonVertex disastersForYear = new PoissonVertex(rateForYear);
 
-        disastersForYear.observe(IntegerTensor.create(data.disasters));
+        disastersForYear.observe(data.disasters);
 
         return new BayesianNetwork(switchpoint.getConnectedGraph());
     }

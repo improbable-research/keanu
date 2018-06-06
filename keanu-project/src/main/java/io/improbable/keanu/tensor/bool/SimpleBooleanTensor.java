@@ -44,6 +44,13 @@ public class SimpleBooleanTensor implements BooleanTensor {
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
+    public SimpleBooleanTensor(boolean constant, int[] shape) {
+        this.data = new boolean[(int) TensorShape.getLength(shape)];
+        this.shape = shape;
+        this.stride = TensorShape.getRowFirstStride(shape);
+        Arrays.fill(this.data, constant);
+    }
+
     @Override
     public BooleanTensor and(BooleanTensor that) {
         return duplicate().andInPlace(that);

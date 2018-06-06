@@ -178,36 +178,51 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
-    public void setValue(Double value) {
+    public void setValue(double value) {
         super.setValue(DoubleTensor.create(value, getShape()));
     }
 
-    public void setAndCascade(Double value) {
+    public void setValue(double[] values) {
+        super.setValue(DoubleTensor.create(values, getShape()));
+    }
+
+    public void setAndCascade(double value) {
         super.setAndCascade(DoubleTensor.create(value, getShape()));
     }
 
-    public void setAndCascade(Double value, Map<Long, Long> explored) {
+    public void setAndCascade(double[] values) {
+        super.setAndCascade(DoubleTensor.create(values, getShape()));
+    }
+
+    public void setAndCascade(double value, Map<Long, Long> explored) {
         super.setAndCascade(DoubleTensor.create(value, getShape()), explored);
     }
 
-    public void observe(Double value) {
+    public void setAndCascade(double[] values, Map<Long, Long> explored) {
+        super.setAndCascade(DoubleTensor.create(values, getShape()), explored);
+    }
+
+    public void observe(double value) {
         super.observe(DoubleTensor.create(value, getShape()));
     }
 
+    public void observe(double[] values) {
+        super.observe(DoubleTensor.create(values, getShape()));
+    }
+
     public double logPdf(double value) {
-        if (this.getValue().isScalar()) {
-            return this.logPdf(DoubleTensor.scalar(value));
-        } else {
-            throw new IllegalArgumentException("Vertex is not scalar");
-        }
+        return this.logPdf(DoubleTensor.scalar(value));
+    }
+
+    public double logPdf(double[] values) {
+        return this.logPdf(DoubleTensor.create(values));
     }
 
     public Map<Long, DoubleTensor> dLogPdf(double value) {
-        if (this.getValue().isScalar()) {
-            return this.dLogPdf(DoubleTensor.scalar(value));
-        } else {
-            throw new IllegalArgumentException("Vertex is not scalar");
-        }
+        return this.dLogPdf(DoubleTensor.scalar(value));
     }
 
+    public Map<Long, DoubleTensor> dLogPdf(double[] values) {
+        return this.dLogPdf(DoubleTensor.create(values));
+    }
 }

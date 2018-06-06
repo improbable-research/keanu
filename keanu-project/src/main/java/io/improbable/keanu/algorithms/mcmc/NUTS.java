@@ -2,7 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
@@ -26,7 +26,7 @@ public class NUTS {
     private NUTS() {
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
                                                      final double stepSize) {
@@ -34,7 +34,7 @@ public class NUTS {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,
@@ -207,7 +207,7 @@ public class NUTS {
                                        KeanuRandom random) {
         if (treeHeight == 0) {
 
-            //Base case—take one leapfrog step in the build direction
+            //Base case-take one leapfrog step in the build direction
 
             return builtTreeBaseCase(latentVertices,
                 latentSetAndCascadeCache,
@@ -222,7 +222,7 @@ public class NUTS {
             );
 
         } else {
-            //Recursion—implicitly build the left and right subtrees.
+            //Recursion-implicitly build the left and right subtrees.
 
             BuiltTree tree = buildTree(
                 latentVertices,

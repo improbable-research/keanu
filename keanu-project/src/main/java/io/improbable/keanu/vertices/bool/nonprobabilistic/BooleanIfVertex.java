@@ -10,13 +10,15 @@ public class BooleanIfVertex extends NonProbabilisticBool {
     private final Vertex<? extends BooleanTensor> thn;
     private final Vertex<? extends BooleanTensor> els;
 
-    public BooleanIfVertex(Vertex<? extends BooleanTensor> predicate,
+    public BooleanIfVertex(int[] shape,
+                           Vertex<? extends BooleanTensor> predicate,
                            Vertex<? extends BooleanTensor> thn,
                            Vertex<? extends BooleanTensor> els) {
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
+        setValue(BooleanTensor.placeHolder(shape));
     }
 
     protected BooleanTensor op(BooleanTensor predicate, BooleanTensor thn, BooleanTensor els) {

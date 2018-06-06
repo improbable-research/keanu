@@ -14,7 +14,8 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
     private final Vertex<? extends DoubleTensor> thn;
     private final Vertex<? extends DoubleTensor> els;
 
-    public DoubleIfVertex(Vertex<? extends BooleanTensor> predicate,
+    public DoubleIfVertex(int[] shape,
+                          Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
 
@@ -22,6 +23,7 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
+        setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override

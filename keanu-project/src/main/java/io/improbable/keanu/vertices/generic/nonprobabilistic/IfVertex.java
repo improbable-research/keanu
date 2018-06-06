@@ -11,7 +11,8 @@ public class IfVertex<T> extends NonProbabilistic<Tensor<T>> {
     private final Vertex<? extends Tensor<T>> thn;
     private final Vertex<? extends Tensor<T>> els;
 
-    public IfVertex(Vertex<? extends BooleanTensor> predicate,
+    public IfVertex(int[] shape,
+                    Vertex<? extends BooleanTensor> predicate,
                     Vertex<? extends Tensor<T>> thn,
                     Vertex<? extends Tensor<T>> els) {
 
@@ -19,7 +20,7 @@ public class IfVertex<T> extends NonProbabilistic<Tensor<T>> {
         this.thn = thn;
         this.els = els;
         setParents(predicate, thn, els);
-        //TODO: add shape place holder
+        setValue(Tensor.placeHolder(shape));
     }
 
     @Override

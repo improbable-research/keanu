@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
@@ -24,7 +24,7 @@ public class GraphOptimizerTest {
 
         Cobserved.observe(44.0);
 
-        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
@@ -48,7 +48,7 @@ public class GraphOptimizerTest {
 
         Cobserved.observe(46.0);
 
-        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(Arrays.asList(A, B, Cobserved));
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 

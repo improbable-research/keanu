@@ -38,35 +38,51 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
     }
 
     public void setValue(boolean value) {
-        super.setValue(BooleanTensor.scalar(value));
+        super.setValue(BooleanTensor.create(value, getShape()));
+    }
+
+    public void setValue(boolean[] values) {
+        super.setValue(BooleanTensor.create(values, getShape()));
     }
 
     public void setAndCascade(boolean value) {
-        super.setAndCascade(BooleanTensor.scalar(value));
+        super.setAndCascade(BooleanTensor.create(value, getShape()));
+    }
+
+    public void setAndCascade(boolean[] values) {
+        super.setAndCascade(BooleanTensor.create(values, getShape()));
     }
 
     public void setAndCascade(boolean value, Map<Long, Long> explored) {
-        super.setAndCascade(BooleanTensor.scalar(value), explored);
+        super.setAndCascade(BooleanTensor.create(value, getShape()), explored);
+    }
+
+    public void setAndCascade(boolean[] values, Map<Long, Long> explored) {
+        super.setAndCascade(BooleanTensor.create(values, getShape()), explored);
     }
 
     public void observe(boolean value) {
-        super.observe(BooleanTensor.scalar(value));
+        super.observe(BooleanTensor.create(value, getShape()));
+    }
+
+    public void observe(boolean[] values) {
+        super.observe(BooleanTensor.create(values, getShape()));
     }
 
     public double logPmf(boolean value) {
-        if (this.getValue().isScalar()) {
-            return this.logPmf(BooleanTensor.scalar(value));
-        } else {
-            throw new IllegalArgumentException("Vertex is not scalar");
-        }
+        return this.logPmf(BooleanTensor.scalar(value));
+    }
+
+    public double logPmf(boolean[] values) {
+        return this.logPmf(BooleanTensor.create(values));
     }
 
     public Map<Long, DoubleTensor> dLogPmf(boolean value) {
-        if (this.getValue().isScalar()) {
-            return this.dLogPmf(BooleanTensor.scalar(value));
-        } else {
-            throw new IllegalArgumentException("Vertex is not scalar");
-        }
+        return this.dLogPmf(BooleanTensor.scalar(value));
+    }
+
+    public Map<Long, DoubleTensor> dLogPmf(boolean[] values) {
+        return this.dLogPmf(BooleanTensor.create(values));
     }
 
 }

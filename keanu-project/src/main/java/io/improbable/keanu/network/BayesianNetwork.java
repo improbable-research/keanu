@@ -2,6 +2,7 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -13,6 +14,10 @@ public class BayesianNetwork {
     private final List<Vertex> latentAndObservedVertices;
     private final List<Vertex> latentVertices;
     private final List<Vertex> observedVertices;
+
+    //Lazy evaluated
+    private List<Vertex<DoubleTensor>> continuousLatentVertices;
+    private List<Vertex> discreteLatentVertices;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
 
@@ -113,6 +118,36 @@ public class BayesianNetwork {
 
     private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {
         vertex.setValue(vertex.sample(random));
+    }
+
+    public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
+        if (continuousLatentVertices == null) {
+            splitContinuousAndDiscrete();
+        }
+
+        return continuousLatentVertices;
+    }
+
+    public List<Vertex> getDiscreteLatentVertices() {
+        if (discreteLatentVertices == null) {
+            splitContinuousAndDiscrete();
+        }
+
+        return discreteLatentVertices;
+    }
+
+    private void splitContinuousAndDiscrete() {
+
+        continuousLatentVertices = new ArrayList<>();
+        discreteLatentVertices = new ArrayList<>();
+
+        for (Vertex<?> vertex : getLatentVertices()) {
+            if (vertex.getValue() instanceof DoubleTensor) {
+                continuousLatentVertices.add((Vertex<DoubleTensor>) vertex);
+            } else {
+                discreteLatentVertices.add(vertex);
+            }
+        }
     }
 
 }

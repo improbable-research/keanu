@@ -101,35 +101,51 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
     }
 
     public void setValue(int value) {
-        super.setValue(IntegerTensor.scalar(value));
+        super.setValue(IntegerTensor.create(value, getShape()));
+    }
+
+    public void setValue(int[] values) {
+        super.setValue(IntegerTensor.create(values, getShape()));
     }
 
     public void setAndCascade(int value) {
-        super.setAndCascade(IntegerTensor.scalar(value));
+        super.setAndCascade(IntegerTensor.create(value, getShape()));
+    }
+
+    public void setAndCascade(int[] values) {
+        super.setAndCascade(IntegerTensor.create(values, getShape()));
     }
 
     public void setAndCascade(int value, Map<Long, Long> explored) {
-        super.setAndCascade(IntegerTensor.scalar(value), explored);
+        super.setAndCascade(IntegerTensor.create(value, getShape()), explored);
+    }
+
+    public void setAndCascade(int[] values, Map<Long, Long> explored) {
+        super.setAndCascade(IntegerTensor.create(values, getShape()), explored);
     }
 
     public void observe(int value) {
-        super.observe(IntegerTensor.scalar(value));
+        super.observe(IntegerTensor.create(value, getShape()));
+    }
+
+    public void observe(int[] values) {
+        super.observe(IntegerTensor.create(values));
     }
 
     public double logPmf(int value) {
-        if (this.getValue().isScalar()) {
-            return this.logPmf(IntegerTensor.scalar(value));
-        } else {
-            throw new IllegalArgumentException("Vertex is not scalar");
-        }
+        return this.logPmf(IntegerTensor.scalar(value));
+    }
+
+    public double logPmf(int[] values) {
+        return this.logPmf(IntegerTensor.create(values));
     }
 
     public Map<Long, DoubleTensor> dLogPmf(int value) {
-        if (this.getValue().isScalar()) {
-            return this.dLogPmf(IntegerTensor.scalar(value));
-        } else {
-            throw new IllegalArgumentException("Vertex is not scalar");
-        }
+        return this.dLogPmf(IntegerTensor.scalar(value));
+    }
+
+    public Map<Long, DoubleTensor> dLogPmf(int[] values) {
+        return this.dLogPmf(IntegerTensor.create(values));
     }
 
 }

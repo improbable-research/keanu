@@ -1,7 +1,7 @@
 package io.improbable.keanu.e2e.lorenz;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -69,7 +69,7 @@ public class LorenzTest {
                 observedXt.observe(observed.get(t).x);
             }
 
-            BayesNetDoubleAsContinuous net = new BayesNetDoubleAsContinuous(xt0.getConnectedGraph());
+            BayesianNetwork net = new BayesianNetwork(xt0.getConnectedGraph());
 
             GradientOptimizer graphOptimizer = new GradientOptimizer(net);
 

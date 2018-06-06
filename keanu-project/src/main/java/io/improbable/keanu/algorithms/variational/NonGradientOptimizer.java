@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
@@ -19,16 +19,16 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class NonGradientOptimizer {
 
-    private final BayesNetDoubleAsContinuous bayesNet;
+    private final BayesianNetwork bayesNet;
     private final List<BiConsumer<double[], Double>> onFitnessCalculations;
 
-    public NonGradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
+    public NonGradientOptimizer(BayesianNetwork bayesNet) {
         this.bayesNet = bayesNet;
         this.onFitnessCalculations = new ArrayList<>();
     }
 
     public NonGradientOptimizer(List<Vertex<Double>> graph) {
-        this(new BayesNetDoubleAsContinuous(graph));
+        this(new BayesianNetwork(graph));
     }
 
     public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
