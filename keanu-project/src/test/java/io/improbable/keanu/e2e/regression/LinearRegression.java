@@ -4,18 +4,16 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.assertEquals;
 
@@ -44,13 +42,8 @@ public class LinearRegression {
         DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
         DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
         DoubleTensor xData = xGenerator.sample(random);
-        System.out.println("XData before " + xData.sum());
         xGenerator.setAndCascade(xData);
-        System.out.println("XData After " + xData.sum());
-        System.out.println("Mu After " + mu.getValue().sum());
-
         DoubleTensor yData = yGenerator.sample(random);
-        System.out.println(yData.sum());
 
         // Linear Regression
         DoubleVertex m = new GaussianVertex(0.0, 10.0);
@@ -61,13 +54,6 @@ public class LinearRegression {
 
         BayesianNetwork bayesNet = new BayesianNetwork(m.getConnectedGraph());
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
-        optimizer.onGradientCalculation((point, gradient) -> {
-            System.out.println(Arrays.toString(point) + " grad= " + Arrays.toString(gradient));
-        });
-
-        optimizer.onFitnessCalculation((point, fitness) -> {
-            System.out.println(Arrays.toString(point) + " fitn= " + fitness);
-        });
 
         optimizer.maxLikelihood(10000);
 
