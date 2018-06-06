@@ -5,9 +5,9 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.diff.LogProbGradient;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;

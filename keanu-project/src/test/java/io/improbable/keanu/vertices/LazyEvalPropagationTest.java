@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.FloorVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

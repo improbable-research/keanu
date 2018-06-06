@@ -1,7 +1,7 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions

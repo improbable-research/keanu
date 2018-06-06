@@ -1,10 +1,10 @@
 package io.improbable.keanu.randomfactory;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 

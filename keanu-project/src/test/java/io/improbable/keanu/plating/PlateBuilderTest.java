@@ -1,6 +1,6 @@
 package io.improbable.keanu.plating;
 
-import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import org.junit.Test;
 
 import java.util.Arrays;

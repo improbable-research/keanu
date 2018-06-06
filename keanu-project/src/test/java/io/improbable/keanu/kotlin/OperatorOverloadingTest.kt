@@ -1,14 +1,14 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.DeterministicRule
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex
-import io.improbable.keanu.vertices.dbltensor.probabilistic.UniformVertex
-import io.improbable.keanu.vertices.intgrtensor.IntegerVertex
-import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex
-import io.improbable.keanu.vertices.intgrtensor.probabilistic.PoissonVertex
-import io.improbable.keanu.vertices.intgrtensor.probabilistic.UniformIntVertex
+import io.improbable.keanu.vertices.dbl.DoubleVertex
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
+import io.improbable.keanu.vertices.intgr.IntegerVertex
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test

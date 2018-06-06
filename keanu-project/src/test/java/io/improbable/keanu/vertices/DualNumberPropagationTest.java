@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

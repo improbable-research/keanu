@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.variational;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;

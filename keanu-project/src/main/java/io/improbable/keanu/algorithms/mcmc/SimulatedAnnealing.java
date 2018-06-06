@@ -4,7 +4,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.HashMap;
 import java.util.List;

@@ -3,7 +3,7 @@ package io.improbable.keanu.network;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;

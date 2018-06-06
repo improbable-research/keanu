@@ -1,8 +1,8 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor
-import io.improbable.keanu.vertices.intgrtensor.IntegerVertex
-import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex
+import io.improbable.keanu.vertices.intgr.IntegerVertex
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 
 //Vertices
 operator fun Int.plus(that: IntegerVertex): IntegerVertex {

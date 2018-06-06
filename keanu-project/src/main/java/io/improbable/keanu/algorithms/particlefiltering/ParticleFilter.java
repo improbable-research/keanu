@@ -1,7 +1,7 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.*;
 

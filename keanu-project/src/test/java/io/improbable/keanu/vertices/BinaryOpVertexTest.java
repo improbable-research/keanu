@@ -2,10 +2,10 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generictensor.nonprobabilistic.operators.binary.BinaryOpLambda;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;

@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

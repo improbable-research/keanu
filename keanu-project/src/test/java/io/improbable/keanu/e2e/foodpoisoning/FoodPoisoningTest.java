@@ -7,11 +7,11 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
-import io.improbable.keanu.vertices.booltensor.BoolVertex;
-import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Test;
 

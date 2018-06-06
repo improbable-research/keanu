@@ -4,14 +4,14 @@ import io.improbable.keanu.algorithms.sampling.RejectionSampler;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.booltensor.BoolVertex;
-import io.improbable.keanu.vertices.booltensor.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.improbable.keanu.vertices.booltensor.BoolVertexTest.priorProbabilityTrue;
+import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
 import static org.junit.Assert.assertEquals;
 
 public class RocketTest {

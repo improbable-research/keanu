@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 

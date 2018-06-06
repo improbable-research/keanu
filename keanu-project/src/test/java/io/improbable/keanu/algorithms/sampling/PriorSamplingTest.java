@@ -2,9 +2,9 @@ package io.improbable.keanu.algorithms.sampling;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 

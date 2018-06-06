@@ -1,9 +1,8 @@
 package io.improbable.keanu.distributions.continuous;
 
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static org.apache.commons.math3.special.Gamma.*;
 

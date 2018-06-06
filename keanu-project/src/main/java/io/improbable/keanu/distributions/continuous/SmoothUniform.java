@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges

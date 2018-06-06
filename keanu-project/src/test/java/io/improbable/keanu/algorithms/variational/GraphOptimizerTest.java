@@ -1,8 +1,8 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;

@@ -3,7 +3,7 @@ package io.improbable.keanu.randomfactory;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.kotlin.ArithmeticDouble;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
 

@@ -5,14 +5,14 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.booltensor.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.probabilistic.ExponentialVertex;
-import io.improbable.keanu.vertices.generictensor.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgrtensor.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgrtensor.probabilistic.PoissonVertex;
-import io.improbable.keanu.vertices.intgrtensor.probabilistic.UniformIntVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
 public class Model {
 

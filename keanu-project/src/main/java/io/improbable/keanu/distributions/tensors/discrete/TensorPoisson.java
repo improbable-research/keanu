@@ -3,7 +3,7 @@ package io.improbable.keanu.distributions.tensors.discrete;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 

@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.binary.DoubleBinaryOpLambda;
-import io.improbable.keanu.vertices.dbltensor.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

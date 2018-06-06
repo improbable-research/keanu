@@ -2,7 +2,7 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.network.grouping.NetworkStateGrouper;
 import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 
 import java.util.*;
