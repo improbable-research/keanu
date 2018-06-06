@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.generic.SimpleTensor;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.apache.commons.math3.util.MathArrays.copyOf;
 
@@ -67,6 +68,10 @@ public interface Tensor<T> {
     int[] asFlatIntegerArray();
 
     T[] asFlatArray();
+
+    default List<T> asFlatList() {
+        return Arrays.asList(asFlatArray());
+    }
 
     default BooleanTensor elementwiseEquals(Tensor that) {
         return elementwiseEquals(this, that);
