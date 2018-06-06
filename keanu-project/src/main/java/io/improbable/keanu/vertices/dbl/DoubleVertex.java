@@ -15,7 +15,6 @@ import java.util.function.Function;
 
 public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
 
-    //TODO: use Vertex<DoubleTensor> and cast if needed
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
     }
