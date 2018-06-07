@@ -1,8 +1,7 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
@@ -10,24 +9,25 @@ import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
+public class SelectVertex<T> extends Probabilistic<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
-    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
-        this.selectableValues = defensiveCopy(selectableValues);
-        setParents(this.selectableValues.values());
+    public static <T> SelectVertex<T> of(Map<T, Double> selectableValues) {
+        return new SelectVertex<>(defensiveCopy(selectableValues));
     }
 
-    private Map<T, DoubleVertex> defensiveCopy(Map<T, DoubleVertex> selectableValues) {
+    private static <T> Map<T, DoubleVertex> defensiveCopy(Map<T, Double> selectableValues) {
         LinkedHashMap<T, DoubleVertex> copy = new LinkedHashMap<>();
-        for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
-            if (!TensorShape.isScalar(entry.getValue().getShape())) {
-                throw new IllegalArgumentException("Selected probability must be scalar");
-            }
-            copy.put(entry.getKey(), entry.getValue());
+        for (Map.Entry<T, Double> entry : selectableValues.entrySet()) {
+            copy.put(entry.getKey(), ConstantVertex.of(entry.getValue()));
         }
         return copy;
+    }
+
+    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
+        this.selectableValues = selectableValues;
+        setParents(this.selectableValues.values());
     }
 
     public Map<T, DoubleVertex> getSelectableValues() {
@@ -35,7 +35,7 @@ public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
     }
 
     @Override
-    public Tensor<T> sample(KeanuRandom random) {
+    public T sample(KeanuRandom random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;
@@ -57,25 +57,21 @@ public class SelectVertex<T> extends Probabilistic<T, Tensor<T>> {
             value = values[values.length - 1];
         }
 
-        return Tensor.scalar(value);
-    }
-
-    public double logProbOf(T value) {
-        return logProb(Tensor.scalar(value));
+        return value;
     }
 
     @Override
-    public double logProb(Tensor<T> value) {
+    public double logProb(T value) {
         double sumOfProbabilities = getSumOfProbabilities();
         if (sumOfProbabilities == 0.0) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
-        final double probability = selectableValues.get(value.scalar()).getValue().scalar() / sumOfProbabilities;
+        final double probability = selectableValues.get(value).getValue().scalar() / sumOfProbabilities;
         return Math.log(probability);
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(Tensor<T> value) {
+    public Map<Long, DoubleTensor> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 

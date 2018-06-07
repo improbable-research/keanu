@@ -93,7 +93,7 @@ public class SelectVertexTest {
         sampleFrequencies.put(TestEnum.D, 0);
 
         for (int i = 0; i < N; i++) {
-            TestEnum s = select.sample(random).scalar();
+            TestEnum s = select.sample(random);
             sampleFrequencies.put(s, sampleFrequencies.get(s) + 1);
         }
 
