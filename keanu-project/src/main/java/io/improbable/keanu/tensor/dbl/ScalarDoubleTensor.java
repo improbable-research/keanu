@@ -274,12 +274,22 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public double max() {
+        return value;
+    }
+
+    @Override
     public DoubleTensor min(DoubleTensor min) {
         if (min.isScalar()) {
             return new ScalarDoubleTensor(Math.min(value, min.scalar()));
         } else {
             return DoubleTensor.create(value, shape).minInPlace(min);
         }
+    }
+
+    @Override
+    public double min() {
+        return value;
     }
 
     @Override
