@@ -57,7 +57,7 @@ in your gradle or maven build file.
 In your project's build.gradle:
 
 ```$groovy
-compile group: 'io.improbable', name: 'keanu', version: '0.0.7'
+compile group: 'io.improbable', name: 'keanu', version: '0.0.8'
 ```
 
 #### Maven
