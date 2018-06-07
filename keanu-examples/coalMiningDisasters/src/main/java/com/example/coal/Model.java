@@ -39,13 +39,12 @@ public class Model {
     ExponentialVertex lateRate;
     UniformIntVertex switchpoint;
 
-    KeanuRandom random;
     Data data;
     NetworkSamples results;
 
     public Model(Data data) {
         this.data = data;
-        random = new KeanuRandom(1);
+        KeanuRandom.setDefaultRandomSeed(1);
     }
 
     /**
@@ -59,7 +58,7 @@ public class Model {
             net,
             net.getLatentVertices(),
             numSamples,
-            random
+            KeanuRandom.getDefaultRandom()
         );
 
         results = posteriorDistSamples.drop(10000).downSample(3);
