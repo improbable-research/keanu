@@ -1,27 +1,37 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
+import java.util.Collections;
+import java.util.Map;
 
-public class DualNumber implements DoubleOperators<DualNumber> {
+public class DualNumber {
 
-    public static DualNumber createConstant(double value) {
+    public static DualNumber createConstant(DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
     }
 
-    public static DualNumber createWithRespectToSelf(long withRespectTo, double value) {
-        return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo));
+    public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
+        return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
-    private double value;
+    private DoubleTensor value;
     private PartialDerivatives partialDerivatives;
 
-    public DualNumber(double value, PartialDerivatives partialDerivatives) {
+    public DualNumber(DoubleTensor value, PartialDerivatives partialDerivatives) {
         this.value = value;
         this.partialDerivatives = partialDerivatives;
     }
 
-    public double getValue() {
+    public DualNumber(DoubleTensor value, Map<Long, DoubleTensor> partialDerivatives) {
+        this(value, new PartialDerivatives(partialDerivatives));
+    }
+
+    public DualNumber(DoubleTensor value, long infinitesimalLabel) {
+        this(value, new PartialDerivatives(Collections.singletonMap(infinitesimalLabel, DoubleTensor.ones(value.getShape()))));
+    }
+
+    public DoubleTensor getValue() {
         return value;
     }
 
@@ -35,21 +45,21 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
     public DualNumber add(DualNumber that) {
         // dc = da + db;
-        double newValue = this.value + that.value;
+        DoubleTensor newValue = this.value.plus(that.value);
         PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber subtract(DualNumber that) {
         // dc = da - db;
-        double newValue = this.value - that.value;
+        DoubleTensor newValue = this.value.minus(that.value);
         PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber multiplyBy(DualNumber that) {
         // dc = A * db + B * da;
-        double newValue = this.value * that.value;
+        DoubleTensor newValue = this.value.times(that.value);
         PartialDerivatives thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
         PartialDerivatives thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
@@ -58,18 +68,18 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
     public DualNumber divideBy(DualNumber that) {
         // dc = (B * da - A * db) / B^2;
-        double newValue = this.value / that.value;
+        DoubleTensor newValue = this.value.div(that.value);
         PartialDerivatives thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
         PartialDerivatives thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
-        PartialDerivatives newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value * that.value);
+        PartialDerivatives newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber pow(DualNumber that) {
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
-        double newValue = Math.pow(this.value, that.value);
-        PartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value * Math.pow(this.value, that.value - 1));
-        PartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(Math.log(this.value) * newValue);
+        DoubleTensor newValue = this.value.pow(that.value);
+        PartialDerivatives thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
+        PartialDerivatives thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().timesInPlace(newValue));
         PartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new DualNumber(newValue, newInf);
     }
@@ -91,32 +101,26 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     }
 
     public DualNumber plus(double value) {
-        double newValue = this.value + value;
-        PartialDerivatives clonedInf = this.partialDerivatives.copy();
+        DoubleTensor newValue = this.value.plus(value);
+        PartialDerivatives clonedInf = this.partialDerivatives.clone();
         return new DualNumber(newValue, clonedInf);
     }
 
     public DualNumber minus(double value) {
-        double newValue = this.value - value;
-        PartialDerivatives clonedInf = this.partialDerivatives.copy();
+        DoubleTensor newValue = this.value.minus(value);
+        PartialDerivatives clonedInf = this.partialDerivatives.clone();
         return new DualNumber(newValue, clonedInf);
     }
 
     public DualNumber times(double value) {
-        double newValue = this.value * value;
+        DoubleTensor newValue = this.value.times(value);
         PartialDerivatives newInf = this.partialDerivatives.multiplyBy(value);
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber div(double value) {
-        double newValue = this.value / value;
+        DoubleTensor newValue = this.value.div(value);
         PartialDerivatives newInf = this.partialDerivatives.divideBy(value);
-        return new DualNumber(newValue, newInf);
-    }
-
-    public DualNumber pow(double value) {
-        double newValue = Math.pow(this.value, value);
-        PartialDerivatives newInf = this.partialDerivatives.powerTo(value);
         return new DualNumber(newValue, newInf);
     }
 
@@ -124,30 +128,41 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return times(-1.0);
     }
 
-    public DualNumber log() {
-        return new DualNumber(Math.log(getValue()), getPartialDerivatives().divideBy(getValue()));
-    }
-
     public DualNumber exp() {
-        double eVal = Math.exp(getValue());
+        DoubleTensor eVal = value.exp();
         return new DualNumber(eVal, getPartialDerivatives().multiplyBy(eVal));
     }
 
     public DualNumber sin() {
-        return new DualNumber(Math.sin(getValue()), getPartialDerivatives().multiplyBy(Math.cos(getValue())));
+        return new DualNumber(value.sin(), getPartialDerivatives().multiplyBy(value.cos()));
     }
 
     public DualNumber cos() {
-        return new DualNumber(Math.cos(getValue()), getPartialDerivatives().multiplyBy(-Math.sin(getValue())));
+        return new DualNumber(value.cos(), getPartialDerivatives().multiplyBy(value.sin().unaryMinusInPlace()));
+    }
+
+    public DualNumber tan() {
+        DoubleTensor dTan = value.cos().powInPlace(2).reciprocalInPlace();
+        return new DualNumber(value.tan(), getPartialDerivatives().multiplyBy(dTan));
     }
 
     public DualNumber asin() {
-        double dArcSin = 1.0 / Math.sqrt(1.0 - getValue() * getValue());
-        return new DualNumber(Math.asin(getValue()), getPartialDerivatives().multiplyBy(dArcSin));
+        DoubleTensor dArcSin = (value.unaryMinus().timesInPlace(value).plusInPlace(1)).sqrtInPlace().reciprocalInPlace();
+        return new DualNumber(value.asin(), getPartialDerivatives().multiplyBy(dArcSin));
     }
 
     public DualNumber acos() {
-        double dArcCos = -1.0 / Math.sqrt(1.0 - getValue() * getValue());
-        return new DualNumber(Math.acos(getValue()), getPartialDerivatives().multiplyBy(dArcCos));
+        DoubleTensor dArcCos = value.unaryMinus().timesInPlace(value).plusInPlace(1).sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
+        return new DualNumber(value.acos(), getPartialDerivatives().multiplyBy(dArcCos));
     }
+
+    public DualNumber atan() {
+        DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
+        return new DualNumber(value.atan(), getPartialDerivatives().multiplyBy(dArcTan));
+    }
+
+    public DualNumber log() {
+        return new DualNumber(value.log(), getPartialDerivatives().divideBy(value));
+    }
+
 }

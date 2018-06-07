@@ -1,41 +1,28 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.distributions.continuous.Gamma;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import org.apache.commons.math3.distribution.GammaDistribution;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+import static org.junit.Assert.assertEquals;
 
 public class GammaVertexTest {
-    private static final double DELTA = 0.0001;
 
-    private static final double[][] TEST_VALUES = new double[][]{
-        {2.0, 1.0},
-        {2.0, 2.0},
-        {2.0, 3.0},
-        {1.0, 5.0},
-        {0.5, 9.0},
-        {1.0, 7.5},
-        {1.5, 7.5},
-        {1.0, 0.5}
-    };
-
-    @Rule
-    public DeterministicRule deterministicRule = new DeterministicRule();
-    private final Logger log = LoggerFactory.getLogger(GammaVertexTest.class);
     private KeanuRandom random;
+
+    private static final double DELTA = 0.0001;
 
     @Before
     public void setup() {
@@ -43,78 +30,121 @@ public class GammaVertexTest {
     }
 
     @Test
-    public void samplingProducesRealisticMeanAndStandardDeviation() {
-        int N = 100000;
-        double epsilon = 1e-2;
+    public void matchesKnownLogDensityOfScalar() {
+        GammaVertex gamma = new GammaVertex(0.5, 1, 1.5);
+        GammaVertex tensorGamma = new GammaVertex(0.5, 1, 1.5);
 
-        double a = 0.5;
-        double theta = 0.5;
-        double k = 6.0;
+        double expectedDensity = gamma.logPdf(0.5);
 
-        GammaVertex gammaVertex = new GammaVertex(a, theta, k);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGamma, 0.5, expectedDensity);
+    }
 
-        double mean = k * theta + a;
-        double standardDeviation = Math.sqrt(k * Math.pow(theta, 2));
+    @Test
+    public void matchesKnownLogDensityOfVector() {
+        double expectedLogDensity = Gamma.logPdf(0.0, 1.0, 5., 1) + Gamma.logPdf(0.0, 1.0, 5., 3);
+        GammaVertex tensorGamma = new GammaVertex(0.0, 1., 5.);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGamma, new double[]{1., 3.}, expectedLogDensity);
+    }
 
-        ProbabilisticDoubleContract.samplingProducesRealisticMeanAndStandardDeviation(
-            N,
-            gammaVertex,
-            mean,
-            standardDeviation,
-            epsilon,
-            random
+    @Test
+    public void matchesKnownDerivativeLogDensityOfScalar() {
+        KeanuRandom keanuRandom = new KeanuRandom(1);
+
+        Gamma.Diff gammaLogDiff = Gamma.dlnPdf(0.75, 2, 5.5, 1.5);
+
+        UniformVertex aTensor = new UniformVertex(0.5, 1.0);
+        aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
+
+        UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
+        thetaTensor.setValue(Nd4jDoubleTensor.scalar(2));
+
+        UniformVertex kTensor = new UniformVertex(1.0, 5.0);
+        kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
+
+        GammaVertex tensorGamma = new GammaVertex(aTensor, thetaTensor, kTensor);
+        Map<Long, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5));
+
+        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
+
+        assertEquals(gammaLogDiff.dPda, actual.withRespectTo(aTensor.getId()).scalar(), 1e-5);
+        assertEquals(gammaLogDiff.dPdtheta, actual.withRespectTo(thetaTensor.getId()).scalar(), 1e-5);
+        assertEquals(gammaLogDiff.dPdk, actual.withRespectTo(kTensor.getId()).scalar(), 1e-5);
+        assertEquals(gammaLogDiff.dPdx, actual.withRespectTo(tensorGamma.getId()).scalar(), 1e-5);
+    }
+
+    @Test
+    public void matchesKnownDerivativeLogDensityOfVector() {
+
+        double[] vector = new double[]{1.5, 2, 2.5, 3, 3.5};
+
+        KeanuRandom keanuRandom = new KeanuRandom(1);
+
+        UniformVertex aTensor = new UniformVertex(0.5, 1.0);
+        aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
+
+        UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
+        thetaTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
+
+        UniformVertex kTensor = new UniformVertex(1.0, 5.0);
+        kTensor.setValue(Nd4jDoubleTensor.scalar(2.5));
+
+        Supplier<DoubleVertex> vertexSupplier = () -> new GammaVertex(aTensor, thetaTensor, kTensor);
+
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+    }
+
+    @Test
+    public void isTreatedAsConstantWhenObserved() {
+        UniformVertex a = new UniformVertex(1.0, 2.0);
+        a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
+        GammaVertex vertexUnderTest = new GammaVertex(
+            a,
+            ConstantVertex.of(1.5),
+            ConstantVertex.of(5.0)
         );
-    }
-
-    @Test
-    public void pdfMatchesApacheMathGammaDistribution() {
-        for (int i = 0; i < TEST_VALUES.length; i++) {
-            testPdfAtPercentiles(TEST_VALUES[i][0], TEST_VALUES[i][1]);
-        }
-    }
-
-    @Test
-    public void dPdxMatchesApproxGradient() {
-        for (int i = 0; i < TEST_VALUES.length; i++) {
-            testdPdxAtPercentiles(TEST_VALUES[i][0], TEST_VALUES[i][1]);
-        }
+        vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
+        ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
     }
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        UniformVertex uniformVertex = new UniformVertex(0.0, 1.0);
-        GammaVertex gammaVertex = new GammaVertex(uniformVertex, new ConstantDoubleVertex(0.5), new ConstantDoubleVertex(1.0));
 
-        double vertexStartValue = 1.0;
-        double vertexEndValue = 1.5;
+        UniformVertex uniformA = new UniformVertex(0.0, 1.0);
+        GammaVertex gamma = new GammaVertex(uniformA, 2.0, 3.0);
+
+        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
+        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
         double vertexIncrement = 0.1;
 
-        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.0,
-            1.0,
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            Nd4jDoubleTensor.scalar(0.0),
+            Nd4jDoubleTensor.scalar(2.0),
             0.1,
-            uniformVertex,
-            gammaVertex,
+            uniformA,
+            gamma,
             vertexStartValue,
             vertexEndValue,
             vertexIncrement,
-            DELTA
-        );
+            DELTA);
     }
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdtheta() {
-        UniformVertex t = new UniformVertex(0.0, 1.0);
-        GammaVertex gammaVertex = new GammaVertex(new ConstantDoubleVertex(0.5), t, new ConstantDoubleVertex(1.0));
 
-        double vertexStartValue = 1.0;
-        double vertexEndValue = 5.0;
+        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        GammaVertex gamma = new GammaVertex(0.0, uniformA, 3.0);
+
+        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
+        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
         double vertexIncrement = 0.1;
 
-        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.1,
-            1.0,
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            Nd4jDoubleTensor.scalar(1.0),
+            Nd4jDoubleTensor.scalar(2.5),
             0.1,
-            t,
-            gammaVertex,
+            uniformA,
+            gamma,
             vertexStartValue,
             vertexEndValue,
             vertexIncrement,
@@ -123,119 +153,80 @@ public class GammaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdk() {
-        UniformVertex k = new UniformVertex(0.0, 1.0);
-        GammaVertex gammaVertex = new GammaVertex(new ConstantDoubleVertex(0.5), new ConstantDoubleVertex(1.0), k);
 
-        double vertexStartValue = 1.0;
-        double vertexEndValue = 1.5;
+        UniformVertex uniformA = new UniformVertex(2.0, 5.0);
+        GammaVertex gamma = new GammaVertex(0.0, 2.0, uniformA);
+
+        DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
+        DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(3.5);
         double vertexIncrement = 0.1;
 
-        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(0.5,
-            2.5,
+        moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
+            Nd4jDoubleTensor.scalar(2.0),
+            Nd4jDoubleTensor.scalar(4.5),
             0.1,
-            k,
-            gammaVertex,
+            uniformA,
+            gamma,
             vertexStartValue,
             vertexEndValue,
             vertexIncrement,
             DELTA);
     }
 
-    private void testPdfAtPercentiles(double theta, double k) {
-        GammaVertex gammaVertex = new GammaVertex(
-            0.0,
-            theta,
-            k
-        );
-
-        GammaDistribution apache = new GammaDistribution(k, theta);
-        log.info("k = " + k + ", theta = " + theta + ":");
-
-        for (double x = 0.1; x <= 1.0; x += 0.1) {
-            double expected = Math.log(apache.density(x));
-            double density = gammaVertex.logProb(x);
-            assertThat("   Density at " + x + " = " + density + " (expected = " + expected + ")",
-                expected, closeTo(density, 0.0001)
-            );
-        }
-    }
-
-    private void testdPdxAtPercentiles(double theta, double k) {
-        GammaVertex gammaVertex = new GammaVertex(
-            0.0,
-            theta,
-            k
-        );
-
-        log.info("k = " + k + ", theta = " + theta + ":");
-
-        for (double x = 0.01; x <= 1.0; x += 0.1) {
-            double approxExpected = (gammaVertex.logProb(x + DELTA) - gammaVertex.logProb(x - DELTA)) / (2 * DELTA);
-            gammaVertex.setValue(x);
-            double actual = gammaVertex.dLogProbAtValue().get(gammaVertex.getId()).scalar();
-            assertThat("   Gradient at " + x + " = " + actual + " (approx expected = " + approxExpected + ")",
-                approxExpected, closeTo(actual, 0.1)
-            );
-        }
-    }
-
     @Test
-    public void isTreatedAsConstantWhenObserved() {
-        GammaVertex vertexUnderTest = new GammaVertex(
-            new UniformVertex(0.0, 1.0),
-            new ConstantDoubleVertex(.0),
-            new ConstantDoubleVertex(1.0)
+    public void gammaSampledMethodMatchesLogProbMethod() {
+        KeanuRandom random = new KeanuRandom(1);
+
+        int sampleCount = 1000000;
+        GammaVertex vertex = new GammaVertex(
+            new int[]{sampleCount, 1},
+            ConstantVertex.of(1.5),
+            ConstantVertex.of(2.0),
+            ConstantVertex.of(7.5)
         );
 
-        ProbabilisticDoubleContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
-        ProbabilisticDoubleContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
-    }
+        double from = 1.5;
+        double to = 2.5;
+        double bucketSize = 0.05;
 
-    @Test
-    public void samplingMatchesLogProb() {
-        GammaVertex gammaVertex = new GammaVertex(
-            0.0,
-            2.0,
-            3.0
-        );
-
-        ProbabilisticDoubleContract.sampleMethodMatchesLogProbMethod(
-            gammaVertex,
-            100000,
-            2.0,
-            10.0,
-            0.1,
-            0.01,
-            random
-        );
+        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
     }
 
     @Test
     public void inferHyperParamsFromSamples() {
 
-        double trueA = 0.;
-        double trueTheta = 3.0;
-        double trueK = 2.0;
+        double trueA = 0.0;
+        double trueTheta = 2.0;
+        double trueK = 3.0;
 
-        DoubleVertex a = new ConstantDoubleVertex(trueA);
+        DoubleVertex constA = ConstantVertex.of(trueA);
+        DoubleVertex constA2 = ConstantVertex.of(trueA);
+        DoubleVertex constTheta = ConstantVertex.of(trueTheta);
+        DoubleVertex constK = ConstantVertex.of(trueK);
 
         List<DoubleVertex> aThetaK = new ArrayList<>();
-        aThetaK.add(a);
-        aThetaK.add(new ConstantDoubleVertex(trueTheta));
-        aThetaK.add(new ConstantDoubleVertex(trueK));
+        aThetaK.add(constA);
+        aThetaK.add(constTheta);
+        aThetaK.add(constK);
 
         List<DoubleVertex> latentAThetaK = new ArrayList<>();
-        latentAThetaK.add(a);
-        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0));
-        latentAThetaK.add(new SmoothUniformVertex(0.01, 10.0));
+        UniformVertex latentTheta = new UniformVertex(0.01, 10.0);
+        latentTheta.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
+        UniformVertex latentK = new UniformVertex(0.01, 10.0);
+        latentK.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
 
+        latentAThetaK.add(constA2);
+        latentAThetaK.add(latentTheta);
+        latentAThetaK.add(latentK);
+
+        int numSamples = 5000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new GammaVertex(hyperParams.get(0), hyperParams.get(1), hyperParams.get(2)),
+            hyperParams -> new GammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1), hyperParams.get(2)),
             aThetaK,
             latentAThetaK,
-            2000,
             random
         );
+
     }
 
 }

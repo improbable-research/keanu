@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -11,24 +11,22 @@ import java.util.Map;
 public class SigmoidVertex extends DoubleUnaryOpVertex {
 
     public SigmoidVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
-
-    public SigmoidVertex(double inputValue) {
-        super(new ConstantDoubleVertex(inputValue));
+        super(inputVertex.getShape(), inputVertex);
     }
 
     @Override
-    protected Double op(Double x) {
-        return 1. / (1. + Math.exp(-x));
+    protected DoubleTensor op(DoubleTensor a) {
+        return a.unaryMinus().expInPlace().plusInPlace(1).reciprocalInPlace();
     }
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         DualNumber dualNumber = dualNumbers.get(inputVertex);
-        double x = dualNumber.getValue();
-        double dxdfx = Math.exp(x) / Math.pow(Math.exp(x) + 1., 2);
+        DoubleTensor x = dualNumber.getValue();
+        DoubleTensor xExp = x.exp();
+        DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
         PartialDerivatives infinitesimal = dualNumber.getPartialDerivatives().multiplyBy(dxdfx);
-        return new DualNumber(op(x), infinitesimal);
+        return new DualNumber(x.sigmoid(), infinitesimal);
     }
+
 }

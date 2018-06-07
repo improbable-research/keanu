@@ -1,43 +1,50 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class ArcSinVertexTest {
 
     @Test
-    public void arcSineOpIsCalculatedCorrectly() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(0.5);
-        ArcSinVertex arcSin = new ArcSinVertex(x);
-
-        assertEquals(Math.asin(0.5), arcSin.getValue(), 0.00001);
+    public void asinScalarVertexValues() {
+        operatesOnScalarVertexValue(
+            Math.PI,
+            Math.asin(Math.PI),
+            DoubleVertex::asin
+        );
     }
 
     @Test
-    public void arcSineOpIsCalculatedCorrectlyWithValues() {
-        ArcSinVertex arcSinWithValue = new ArcSinVertex(0.5);
-
-        assertEquals(Math.asin(0.5), arcSinWithValue.getValue(), 0.00001);
+    public void calculatesDualNumberOfTwoScalarsAsin() {
+        calculatesDualNumberOfScalar(
+            0.5,
+            1.0 / Math.sqrt(1.0 - 0.5 * 0.5),
+            DoubleVertex::asin
+        );
     }
 
     @Test
-    public void sinDualNumberIsCalculatedCorrectly() {
-        DoubleVertex uniform = new UniformVertex(0, 1);
-        uniform.setValue(0.5);
-        //dPow = 3 * 0.5^2
-        DoubleVertex pow = new PowerVertex(uniform, 3);
+    public void asinMatrixVertexValues() {
+        operatesOn2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{Math.asin(0.0), Math.asin(0.1), Math.asin(0.2), Math.asin(0.3)},
+            DoubleVertex::asin
+        );
+    }
 
-        ArcSinVertex aSine = new ArcSinVertex(pow);
-        double dArcSine = aSine.getDualNumber().getPartialDerivatives().withRespectTo(uniform);
-        //dArcSine = 1 / √(1 - (0.5^3)^2) * 3 * 0.5^2
-        double expected = 1 / Math.sqrt(1 - Math.pow(Math.pow(uniform.getValue(), 3), 2)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
-
-        assertEquals(expected, dArcSine, 0.0001);
+    @Test
+    public void calculatesDualNumberOfTwoMatricesElementWiseAsin() {
+        calculatesDualNumberOfMatrixElementWiseOperator(
+            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
+                1.0 / Math.sqrt(1.0 - 0.2 * 0.2),
+                1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
+                1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
+            },
+            DoubleVertex::asin
+        );
     }
 
 }

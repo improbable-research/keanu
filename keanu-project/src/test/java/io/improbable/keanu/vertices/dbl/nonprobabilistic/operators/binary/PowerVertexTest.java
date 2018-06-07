@@ -1,95 +1,41 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 public class PowerVertexTest {
 
     @Test
-    public void calculateSquareCorrectly() {
-        DoubleVertex A = new ConstantDoubleVertex(5.);
-        DoubleVertex ASquared = new PowerVertex(A, 2.);
-
-        assertEquals(Math.pow(5., 2.), ASquared.lazyEval(), 0.0001);
+    public void powerTwoScalarVertexValues() {
+        operatesOnTwoScalarVertexValues(2.0, 3.0, 8.0, DoubleVertex::pow);
     }
 
     @Test
-    public void calculateSquareRootCorrectly() {
-        DoubleVertex A = new ConstantDoubleVertex(25.);
-        DoubleVertex ASquareRoot = new PowerVertex(A, 0.5);
-
-        assertEquals(Math.sqrt(25.), ASquareRoot.lazyEval(), 0.0001);
+    public void calculatesDualNumberOfTwoScalarsPower() {
+        calculatesDualNumberOfTwoScalars(2.0, 3.0, 3.*4., Math.log(2.)*8., DoubleVertex::pow);
     }
 
     @Test
-    public void calculateSquareDualNumberCorrectly() {
-        DoubleVertex A = new ConstantDoubleVertex(5.);
-        DoubleVertex ASquared = new PowerVertex(A, 2.);
-
-        assertEquals(Math.pow(5., 2.), ASquared.getDualNumber().getValue(), 0.0001);
+    public void powerTwoMatrixVertexValues() {
+        operatesOnTwo2x2MatrixVertexValues(
+            new double[]{1.0, 2.0, 3.0, 4.0},
+            new double[]{2.0, 3.0, 4.0, 5.0},
+            new double[]{1.0, 8.0, 81.0, 1024.0},
+            DoubleVertex::pow
+        );
     }
 
     @Test
-    public void calculatePowerVertexUsingVertexAsHyperAndValueAsBase() {
-        DoubleVertex A = new ConstantDoubleVertex(2.0);
-        DoubleVertex B = new PowerVertex(5.0, A);
-
-        assertEquals(Math.pow(5, 2), B.getValue(), 0.0001);
-    }
-
-    @Test
-    public void calculatePowerVertexUsingVertexAsHyper() {
-        DoubleVertex A = new ConstantDoubleVertex(5.);
-        DoubleVertex B = new GaussianVertex(2.0, 1.0);
-        B.setValue(2.0);
-        DoubleVertex C = A.pow(B);
-
-        assertEquals(Math.pow(5, 2), C.getValue(), 0.0001);
-    }
-
-    @Test
-    public void calculatePartialDerivative() {
-        DoubleVertex A = new UniformVertex(0, 10);
-        A.setValue(4d);
-        DoubleVertex B = new LogVertex(A);
-        //Differential of B = 1 / A
-        DoubleVertex APower = new PowerVertex(B, 3.);
-        //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
-
-        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.0001);
-    }
-
-    @Test
-    public void calculatePartialDerivativeUsingVertexAsHyper() {
-        DoubleVertex A = new UniformVertex(0, 10);
-        A.setValue(4d);
-        DoubleVertex B = new LogVertex(A);
-        //Differential of B = 1 / A
-        DoubleVertex APower = new PowerVertex(B, new ConstantDoubleVertex(3.0));
-        //Differential of APower = (3 - 1) * ((1 / A) ^ 3) * (1 / A)
-
-        assertEquals((Math.pow(Math.log(4), 2)) * 3.0 / 4.0, APower.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.0001);
-    }
-
-    @Test
-    public void calculatePartialDerivativesWithRespectToAandB() {
-        UniformVertex A = new UniformVertex(1.0, 5.0);
-        UniformVertex B = new UniformVertex(1.0, 10.0);
-
-        A.setValue(4.0);
-        B.setValue(3.0);
-
-        PowerVertex P = new PowerVertex(A, B);
-
-        Assert.assertEquals((3 * Math.pow(4, 3 - 1)), P.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.001);
-        Assert.assertEquals(Math.pow(4, 3) * Math.log(4), P.getDualNumber().getPartialDerivatives().withRespectTo(B), 0.001);
+    public void calculatesDualNumberOfTwoMatricesElementWisePower() {
+        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+            new double[]{1.0, 2.0, 3.0, 4.0},
+            new double[]{2.0, 3.0, 4.0, 5.0},
+            new double[]{2.0, 3.0*4, 4.0*27, 5.0*256},
+            new double[]{Math.log(1.0)*1, Math.log(2.0)*8, Math.log(3.0)*81, Math.log(4.0)*1024},
+            DoubleVertex::pow
+        );
     }
 
 }

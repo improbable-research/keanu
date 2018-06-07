@@ -2,12 +2,11 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,40 +26,42 @@ public class Hamiltonian {
     private Hamiltonian() {
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
-                                                     final List<DoubleVertex> fromVertices,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
+                                                     final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,
                                                      final double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, KeanuRandom.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, new KeanuRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> fromVertices,
                                                      final int sampleCount,
                                                      final int leapFrogCount,
                                                      final double stepSize,
                                                      final KeanuRandom random) {
 
-        final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        bayesNet.cascadeObservations();
+
+        final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
 
-        Map<Long, Double> position = new HashMap<>();
+        Map<Long, DoubleTensor> position = new HashMap<>();
         cachePosition(latentVertices, position);
-        Map<Long, Double> positionBeforeLeapfrog = new HashMap<>();
+        Map<Long, DoubleTensor> positionBeforeLeapfrog = new HashMap<>();
 
-        Map<Long, Double> gradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
+        Map<Long, DoubleTensor> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
             bayesNet.getLatentAndObservedVertices()
-        ));
-        Map<Long, Double> gradientBeforeLeapfrog = new HashMap<>();
+        );
+        Map<Long, DoubleTensor> gradientBeforeLeapfrog = new HashMap<>();
 
-        final Map<Long, Double> momentum = new HashMap<>();
-        final Map<Long, Double> momentumBeforeLeapfrog = new HashMap<>();
+        final Map<Long, DoubleTensor> momentum = new HashMap<>();
+        final Map<Long, DoubleTensor> momentumBeforeLeapfrog = new HashMap<>();
 
         double logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
 
@@ -100,7 +101,7 @@ public class Hamiltonian {
             if (shouldReject(likelihoodOfLeapfrog, random)) {
 
                 //Revert to position and gradient before leapfrog
-                Map<Long, Double> tempSwap = position;
+                Map<Long, DoubleTensor> tempSwap = position;
                 position = positionBeforeLeapfrog;
                 positionBeforeLeapfrog = tempSwap;
 
@@ -118,24 +119,22 @@ public class Hamiltonian {
         return new NetworkSamples(samples, sampleCount);
     }
 
-    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<Long, Double> position) {
-        for (Vertex<Double> vertex : latentVertices) {
+    private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<Long, DoubleTensor> position) {
+        for (Vertex<DoubleTensor> vertex : latentVertices) {
             position.put(vertex.getId(), vertex.getValue());
         }
     }
 
-    private static Map<Long, Double> initializeMomentumForEachVertex(List<Vertex<Double>> vertexes,
-                                                                     Map<Long, Double> momentums,
-                                                                     KeanuRandom random) {
-        for (int i = 0; i < vertexes.size(); i++) {
-            Vertex currentVertex = vertexes.get(i);
-            momentums.put(currentVertex.getId(), random.nextGaussian());
+    private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertexes,
+                                                        Map<Long, DoubleTensor> momentums,
+                                                        KeanuRandom random) {
+        for (Vertex<DoubleTensor> currentVertex : vertexes) {
+            momentums.put(currentVertex.getId(), random.nextGaussian(currentVertex.getShape()));
         }
-        return momentums;
     }
 
-    private static void cache(Map<Long, Double> from, Map<Long, Double> to) {
-        for (Map.Entry<Long, Double> entry : from.entrySet()) {
+    private static void cache(Map<Long, DoubleTensor> from, Map<Long, DoubleTensor> to) {
+        for (Map.Entry<Long, DoubleTensor> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue());
         }
     }
@@ -148,33 +147,35 @@ public class Hamiltonian {
      * return `T, r`
      *
      * @param latentVertices
-     * @param gradient              gradient at current position
-     * @param momentums             current vertex momentums
+     * @param latentSetAndCascadeCache
+     * @param position
+     * @param gradient                 gradient at current position
+     * @param momentums                current vertex momentums
      * @param stepSize
-     * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
+     * @param probabilisticVertices    all vertices that impact the joint posterior (masterP)
      * @return the gradient at the updated position
      */
-    private static Map<Long, Double> leapfrog(final List<Vertex<Double>> latentVertices,
-                                              final Map<Long, Long> latentSetAndCascadeCache,
-                                              final Map<Long, Double> position,
-                                              final Map<Long, Double> gradient,
-                                              final Map<Long, Double> momentums,
-                                              final double stepSize,
-                                              final List<? extends Vertex> probabilisticVertices) {
+    private static Map<Long, DoubleTensor> leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
+                                                    final Map<Long, Long> latentSetAndCascadeCache,
+                                                    final Map<Long, DoubleTensor> position,
+                                                    final Map<Long, DoubleTensor> gradient,
+                                                    final Map<Long, DoubleTensor> momentums,
+                                                    final double stepSize,
+                                                    final List<? extends Vertex> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 
-        Map<Long, Double> momentumsAtHalfTimeStep = new HashMap<>();
+        Map<Long, DoubleTensor> momentumsAtHalfTimeStep = new HashMap<>();
 
         //Set `r = r + (eps/2)dTL(T)
-        for (Map.Entry<Long, Double> vertexMomentum : momentums.entrySet()) {
-            final double updatedMomentum = vertexMomentum.getValue() + halfTimeStep * gradient.get(vertexMomentum.getKey());
+        for (Map.Entry<Long, DoubleTensor> vertexMomentum : momentums.entrySet()) {
+            final DoubleTensor updatedMomentum = gradient.get(vertexMomentum.getKey()).times(halfTimeStep).plusInPlace(vertexMomentum.getValue());
             momentumsAtHalfTimeStep.put(vertexMomentum.getKey(), updatedMomentum);
         }
 
         //Set `T = T + `r.
-        for (Vertex<Double> latent : latentVertices) {
-            final double nextPosition = position.get(latent.getId()) + halfTimeStep * momentumsAtHalfTimeStep.get(latent.getId());
+        for (Vertex<DoubleTensor> latent : latentVertices) {
+            final DoubleTensor nextPosition = momentumsAtHalfTimeStep.get(latent.getId()).times(halfTimeStep).plusInPlace(position.get(latent.getId()));
             position.put(latent.getId(), nextPosition);
             latent.setValue(nextPosition);
         }
@@ -182,12 +183,12 @@ public class Hamiltonian {
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
         //Set `r = `r + (eps/2)dTL(`T)
-        Map<Long, Double> newGradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
+        Map<Long, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
             probabilisticVertices
-        ));
+        );
 
-        for (Map.Entry<Long, Double> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
-            final double updatedMomentum = halfTimeStepMomentum.getValue() + halfTimeStep * newGradient.get(halfTimeStepMomentum.getKey());
+        for (Map.Entry<Long, DoubleTensor> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
+            final DoubleTensor updatedMomentum = newGradient.get(halfTimeStepMomentum.getKey()).times(halfTimeStep).plusInPlace(halfTimeStepMomentum.getValue());
             momentums.put(halfTimeStepMomentum.getKey(), updatedMomentum);
         }
 
@@ -196,8 +197,8 @@ public class Hamiltonian {
 
     private static double getLikelihoodOfLeapfrog(final double logOfMasterPAfterLeapfrog,
                                                   final double previousLogOfMasterP,
-                                                  final Map<Long, Double> leapfroggedMomentum,
-                                                  final Map<Long, Double> momentumPreviousTimeStep) {
+                                                  final Map<Long, DoubleTensor> leapfroggedMomentum,
+                                                  final Map<Long, DoubleTensor> momentumPreviousTimeStep) {
 
         final double leapFroggedMomentumDotProduct = (0.5 * dotProduct(leapfroggedMomentum));
         final double previousMomentumDotProduct = (0.5 * dotProduct(momentumPreviousTimeStep));
@@ -215,10 +216,10 @@ public class Hamiltonian {
         return likelihood < random.nextDouble();
     }
 
-    private static double dotProduct(Map<Long, Double> momentums) {
+    private static double dotProduct(Map<Long, DoubleTensor> momentums) {
         double dotProduct = 0.0;
-        for (Double momentum : momentums.values()) {
-            dotProduct += momentum * momentum;
+        for (DoubleTensor momentum : momentums.values()) {
+            dotProduct += momentum.pow(2).sum();
         }
         return dotProduct;
     }

@@ -1,11 +1,15 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public abstract class ProbabilisticBool extends BoolVertex {
 
     @Override
-    public Boolean updateValue() {
+    public BooleanTensor updateValue() {
+        if (!hasValue()) {
+            setValue(sampleUsingDefaultRandom());
+        }
         return getValue();
     }
 

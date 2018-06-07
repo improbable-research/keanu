@@ -1,43 +1,46 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class CosVertexTest {
 
     @Test
-    public void cosOpIsCalculatedCorrectly() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(Math.PI / 2);
-        CosVertex cos = new CosVertex(x);
-
-        assertEquals(Math.cos(Math.PI / 2), cos.getValue(), 0.00001);
+    public void cosScalarVertexValue() {
+        operatesOnScalarVertexValue(
+            Math.PI,
+            Math.cos(Math.PI),
+            DoubleVertex::cos
+        );
     }
 
     @Test
-    public void cosOpIsCalculatedCorrectlyWithValue() {
-        CosVertex cosWithValue = new CosVertex(Math.PI / 2);
-
-        assertEquals(Math.cos(Math.PI / 2), cosWithValue.getValue(), 0.00001);
+    public void calculatesDualNumberOScalarCos() {
+        calculatesDualNumberOfScalar(
+            0.5,
+            -Math.sin(0.5),
+            DoubleVertex::cos
+        );
     }
 
     @Test
-    public void cosDualNumberIsCalculatedCorrectly() {
-        DoubleVertex uniform = new UniformVertex(0, 10);
-        uniform.setValue(5.0);
+    public void cosMatrixVertexValues() {
+        operatesOn2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{Math.cos(0.0), Math.cos(0.1), Math.cos(0.2), Math.cos(0.3)},
+            DoubleVertex::cos
+        );
+    }
 
-        DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
-        CosVertex cos = new CosVertex(pow);
-
-        double dCos = cos.getDualNumber().getPartialDerivatives().withRespectTo(uniform);
-        //dCos = -sin(5^3) * 3 * 5^2
-        double expected = -Math.sin(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
-
-        assertEquals(expected, dCos, 0.0001);
+    @Test
+    public void calculatesDualNumberOfMatrixElementWiseCos() {
+        calculatesDualNumberOfMatrixElementWiseOperator(
+            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{-Math.sin(0.1), -Math.sin(0.2), -Math.sin(0.3), -Math.sin(0.4)},
+            DoubleVertex::cos
+        );
     }
 
 }

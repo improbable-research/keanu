@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -25,7 +25,7 @@ public class PoissonVertexTest {
 
         List<Integer> samples = new ArrayList<>();
         for (int i = 0; i < N; i++) {
-            Integer sample = testPoissonVertex.sample(random);
+            Integer sample = testPoissonVertex.sample(random).scalar();
             samples.add(sample);
         }
 
@@ -48,9 +48,9 @@ public class PoissonVertexTest {
 
         PoissonVertex poissonVertex = new PoissonVertex(mu);
 
-        double logProb = poissonVertex.logProb(19);
-        double logProbThreshold = poissonVertex.logProb(20);
-        double logProbAboveThreshold = poissonVertex.logProb(21);
+        double logProb = poissonVertex.logPmf(19);
+        double logProbThreshold = poissonVertex.logPmf(20);
+        double logProbAboveThreshold = poissonVertex.logPmf(21);
 
         assertTrue(logProbAboveThreshold > logProbThreshold && logProbThreshold > logProb);
     }

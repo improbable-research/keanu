@@ -29,7 +29,7 @@ public class VertexValuePropagationTest {
         start.setAndCascade(2.0);
 
         //Calculates the correct answer
-        assertEquals(Math.pow(2, links + 1), end.getValue(), 0.0);
+        assertEquals(Math.pow(2, links + 1), end.getValue().scalar(), 0.0);
 
         //Does the right amount of work
         assertEquals(3 * links, n.get());
@@ -50,7 +50,7 @@ public class VertexValuePropagationTest {
         start.setAndCascade(3.0);
 
         //Calculates the correct answer
-        assertEquals(6.0, end.getValue(), 0.0);
+        assertEquals(6.0, end.getValue().scalar(), 0.0);
 
         //Does the right amount of work
         assertEquals(3, n.get());
@@ -75,8 +75,8 @@ public class VertexValuePropagationTest {
         VertexValuePropagation.cascadeUpdate(firstLayerStart, secondLayerStart);
 
         //Calculates the correct answer
-        assertEquals(6.0, firstLayerEnd.getValue(), 0.0);
-        assertEquals(10.0, secondLayerEnd.getValue(), 0.0);
+        assertEquals(6.0, firstLayerEnd.getValue().scalar(), 0.0);
+        assertEquals(10.0, secondLayerEnd.getValue().scalar(), 0.0);
 
         //Does the right amount of work
         assertEquals(6, n.get());

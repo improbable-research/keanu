@@ -16,7 +16,7 @@ public class ModelTest {
         Model model = new Model(coalMiningDisasterData);
         model.run();
 
-        int switchYear = model.results.get(model.switchpoint).getMode();
+        int switchYear = model.results.getIntegerTensorSamples(model.switchpoint).getScalarMode();
 
         assertTrue(switchYear == 1890);
     }

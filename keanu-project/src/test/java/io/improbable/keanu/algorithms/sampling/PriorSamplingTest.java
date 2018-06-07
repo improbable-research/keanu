@@ -3,8 +3,8 @@ package io.improbable.keanu.algorithms.sampling;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,7 +33,7 @@ public class PriorSamplingTest {
         final int sampleCount = 10000;
         NetworkSamples samples = Prior.sample(net, net.getLatentVertices(), sampleCount, random);
 
-        double averageC = samples.getDoubles(C).getSummaryStatistics().getAverage();
+        double averageC = samples.getDoubleTensorSamples(C).getAverages().scalar();
 
         assertEquals(sampleCount, samples.size());
         assertEquals(100.0, averageC, 0.1);

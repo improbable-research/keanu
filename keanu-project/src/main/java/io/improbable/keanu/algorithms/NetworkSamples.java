@@ -1,10 +1,11 @@
 package io.improbable.keanu.algorithms;
 
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensorVertexSamples;
+import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
 
 import java.util.*;
 import java.util.function.Function;
@@ -37,20 +38,20 @@ public class NetworkSamples {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
     }
 
-    public DoubleVertexSamples getDoubles(Vertex<Double> vertex) {
-        return getDoubles(vertex.getId());
+    public DoubleVertexSamples getDoubleTensorSamples(Vertex<DoubleTensor> vertex) {
+        return getDoubleTensorSamples(vertex.getId());
     }
 
-    public DoubleVertexSamples getDoubles(long vertexId) {
-        return new DoubleVertexSamples((List<Double>) samplesByVertex.get(vertexId));
+    public DoubleVertexSamples getDoubleTensorSamples(long vertexId) {
+        return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
-    public DoubleTensorVertexSamples getDoubleTensors(Vertex<DoubleTensor> vertex) {
-        return getDoubleTensors(vertex.getId());
+    public IntegerTensorVertexSamples getIntegerTensorSamples(Vertex<IntegerTensor> vertex) {
+        return getIntegerTensorSamples(vertex.getId());
     }
 
-    public DoubleTensorVertexSamples getDoubleTensors(long vertexId) {
-        return new DoubleTensorVertexSamples((List<DoubleTensor>) samplesByVertex.get(vertexId));
+    public IntegerTensorVertexSamples getIntegerTensorSamples(long vertexId) {
+        return new IntegerTensorVertexSamples(samplesByVertex.get(vertexId));
     }
 
     public NetworkSamples drop(int dropCount) {

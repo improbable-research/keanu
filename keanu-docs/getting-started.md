@@ -13,25 +13,25 @@ public class WetGrass {
 
         Flip rain = new Flip(0.2);
 
-        Vertex<Boolean> sprinkler = If.isTrue(rain)
-                .then(new Flip(0.01))
-                .orElse(new Flip(0.4));
+        BoolVertex sprinkler = If.isTrue(rain)
+            .then(new Flip(0.01))
+            .orElse(new Flip(0.4));
 
-        Vertex<Boolean> wetGrass = CPT.of(sprinkler, rain)
-                .when(false, false).then(new Flip(0.0))
-                .when(false, true).then(new Flip(0.8))
-                .when(true, false).then(new Flip(0.9))
-                .orDefault(new Flip(0.99));
+        CPTVertex<BooleanTensor> wetGrass = CPT.of(sprinkler, rain)
+            .when(false, false).then(new Flip(0.0))
+            .when(false, true).then(new Flip(0.8))
+            .when(true, false).then(new Flip(0.9))
+            .orDefault(new Flip(0.99));
 
-        wetGrass.observe(true);
+        wetGrass.observe(BooleanTensor.scalar(true));
 
         NetworkSamples posteriorSamples = RejectionSampler.getPosteriorSamples(
-                new BayesNet(wetGrass.getConnectedGraph()),
-                Arrays.asList(sprinkler, rain),
-                100000
+            new BayesianNetwork(wetGrass.getConnectedGraph()),
+            Arrays.asList(sprinkler, rain),
+            100000
         );
 
-        double probabilityOfRainGivenWetGrass = posteriorSamples.get(rain).probability(isRaining -> isRaining == true);
+        double probabilityOfRainGivenWetGrass = posteriorSamples.get(rain).probability(isRaining -> isRaining.scalar() == true);
 
         System.out.println(probabilityOfRainGivenWetGrass);
     }
@@ -57,7 +57,7 @@ in your gradle or maven build file.
 In your project's build.gradle:
 
 ```$groovy
-compile group: 'io.improbable', name: 'keanu', version: '0.0.6'
+compile group: 'io.improbable', name: 'keanu', version: '0.0.7'
 ```
 
 #### Maven

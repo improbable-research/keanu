@@ -1,24 +1,18 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
-public abstract class ContinuousVertex<T> extends Vertex<T> {
+public abstract class ContinuousVertex<T extends Tensor> extends Vertex<T> {
 
     @Override
     public final double logProb(T value) {
         return logPdf(value);
     }
 
-    /**
-     * The partial derivatives of the natural log prob.
-     *
-     * @param value at a given value
-     * @return the partial derivatives of the log density
-     */
-    @Override
-    public final Map<Long, DoubleTensor> dLogProb(T value) {
+    public Map<Long, DoubleTensor> dLogProb(T value) {
         return dLogPdf(value);
     }
 

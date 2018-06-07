@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,6 +24,8 @@ public class Prior {
         if (!bayesNet.getObservedVertices().isEmpty()) {
             throw new IllegalStateException("Cannot sample prior from graph with observations");
         }
+
+        bayesNet.cascadeObservations();
 
         List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
         Map<Long, List> samplesByVertex = new HashMap<>();

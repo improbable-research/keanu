@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.sampling;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +51,8 @@ public class RejectionSampler {
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount,
                                                      KeanuRandom random) {
+
+        bayesNet.cascadeObservations();
 
         Map<Long, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;

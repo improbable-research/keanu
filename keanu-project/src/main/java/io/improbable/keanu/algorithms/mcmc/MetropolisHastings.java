@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -72,22 +72,26 @@ public class MetropolisHastings {
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);
 
-        final double logPNew = logPOld - affectedVerticesLogPOld + affectedVerticesLogPNew;
+        if (affectedVerticesLogPNew != Double.NEGATIVE_INFINITY) {
 
-        final double pqxOld = chosenVertex.logProb(oldValue);
-        final double pqxNew = chosenVertex.logProb(proposedValue);
+            final double logPNew = logPOld - affectedVerticesLogPOld + affectedVerticesLogPNew;
 
-        final double logr = (logPNew * (1.0 / T) + pqxOld) - (logPOld * (1.0 / T) + pqxNew);
-        final double r = Math.exp(logr);
+            final double pqxOld = chosenVertex.logProb(oldValue);
+            final double pqxNew = chosenVertex.logProb(proposedValue);
 
-        final boolean shouldReject = r < random.nextDouble();
+            final double logr = (logPNew * (1.0 / T) + pqxOld) - (logPOld * (1.0 / T) + pqxNew);
+            final double r = Math.exp(logr);
 
-        if (shouldReject) {
-            chosenVertex.setAndCascade(oldValue, cascadeCache);
-            return logPOld;
+            final boolean shouldAccept = r >= random.nextDouble();
+
+            if (shouldAccept) {
+                return logPNew;
+            }
         }
 
-        return logPNew;
+        //reject change
+        chosenVertex.setAndCascade(oldValue, cascadeCache);
+        return logPOld;
     }
 
     static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices) {
@@ -103,9 +107,11 @@ public class MetropolisHastings {
     }
 
     private static double sumLogP(Set<Vertex> vertices) {
-        return vertices.stream()
-            .mapToDouble(Vertex::logProbAtValue)
-            .sum();
+        double sum = 0.0;
+        for (Vertex v : vertices) {
+            sum += v.logProbAtValue();
+        }
+        return sum;
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {
@@ -118,6 +124,7 @@ public class MetropolisHastings {
     }
 
     private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
+        bayesNet.cascadeObservations();
         if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {

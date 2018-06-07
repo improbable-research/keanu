@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.e2e.regression.LinearRegression;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Rule;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -48,7 +48,6 @@ public class ParticleFilteringTest {
         int resamplingCycles = 3;
         double resamplingProportion = 0.5;
 
-
         List<ParticleFilter.Particle> particles = ParticleFilter.getProbableValues(
             temperature.getConnectedGraph(),
             numParticles,
@@ -60,7 +59,7 @@ public class ParticleFilteringTest {
         particles.sort(ParticleFilter.Particle::sortDescending);
         ParticleFilter.Particle p = particles.get(0);
 
-        double estimatedTemp = (double) p.getLatentVertices().get(temperature);
+        double estimatedTemp = ((DoubleTensor) p.getLatentVertices().get(temperature)).scalar();
         double probability = exp(p.getSumLogPOfSubgraph());
 
         log.info("Final temp estimate = " + estimatedTemp + ", probability = " + probability);

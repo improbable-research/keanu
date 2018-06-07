@@ -1,43 +1,50 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class ArcCosVertexTest {
 
     @Test
-    public void arcCosOpIsCalculatedCorrectly() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(0.5);
-        ArcCosVertex aCos = new ArcCosVertex(x);
-
-        assertEquals(Math.acos(0.5), aCos.getValue(), 0.00001);
+    public void acosScalarVertexValue() {
+        operatesOnScalarVertexValue(
+            Math.PI,
+            Math.acos(Math.PI),
+            DoubleVertex::acos
+        );
     }
 
     @Test
-    public void arcCosOpIsCalculatedCorrectlyWithValue() {
-        ArcCosVertex aCosWithValue = new ArcCosVertex(0.5);
-
-        assertEquals(Math.acos(0.5), aCosWithValue.getValue(), 0.00001);
+    public void calculatesDualNumberOScalarACos() {
+        calculatesDualNumberOfScalar(
+            0.5,
+            -1.0 / Math.sqrt(1.0 - 0.5 * 0.5),
+            DoubleVertex::acos
+        );
     }
 
     @Test
-    public void arcCosDualNumberIsCalculatedCorrectly() {
-        DoubleVertex uniform = new UniformVertex(0, 10);
-        uniform.setValue(5.0);
+    public void acosMatrixVertexValues() {
+        operatesOn2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{Math.acos(0.0), Math.acos(0.1), Math.acos(0.2), Math.acos(0.3)},
+            DoubleVertex::acos
+        );
+    }
 
-        DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
-        ArcCosVertex aCos = new ArcCosVertex(pow);
-
-        double dArcCos = aCos.getDualNumber().getPartialDerivatives().withRespectTo(uniform);
-        //dArcCos = π / 2 - asin(5^3) * 3 * 5^2
-        double expected = Math.PI / 2 - Math.asin(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
-
-        assertEquals(expected, dArcCos, 0.0001);
+    @Test
+    public void calculatesDualNumberOfMatrixElementWiseACos() {
+        calculatesDualNumberOfMatrixElementWiseOperator(
+            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{-1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
+                -1.0 / Math.sqrt(1.0 - 0.2 * 0.2),
+                -1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
+                -1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
+            },
+            DoubleVertex::acos
+        );
     }
 
 }

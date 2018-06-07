@@ -1,9 +1,8 @@
 package io.improbable.keanu.distributions.continuous;
 
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static org.apache.commons.math3.special.Gamma.*;
 
@@ -41,21 +40,6 @@ public class Beta {
     public static double pdf(double alpha, double beta, double x) {
         double denominator = gamma(alpha) * gamma(beta) / gamma(alpha + beta);
         return pow(x, alpha - 1) * pow(1 - x, beta - 1) / denominator;
-    }
-
-    public static Diff dPdf(double alpha, double beta, double x) {
-        double gammaAgammaB = gamma(alpha) * gamma(beta);
-        double gammaAplusB = gamma(alpha + beta);
-        double dPdx = -((pow(x, alpha - 2) * pow(1 - x, beta - 2) * (alpha * (x - 1) + (beta - 2) * x + 1) * gammaAplusB) / gammaAgammaB);
-
-        double pow1minusXToTheBminus1 = pow(1 - x, beta - 1);
-        double powXToTheAminus1 = pow(x, alpha - 1);
-        double diagammaAplusB = digamma(alpha + beta);
-        double commonToDaAndDb = powXToTheAminus1 * pow1minusXToTheBminus1 * gammaAplusB;
-        double dPdAlpha = commonToDaAndDb * (diagammaAplusB + log(x) - digamma(alpha)) / gammaAgammaB;
-        double dPdBeta = commonToDaAndDb * (diagammaAplusB + log(1 - x) - digamma(beta)) / gammaAgammaB;
-
-        return new Diff(dPdAlpha, dPdBeta, dPdx);
     }
 
     public static double logPdf(double alpha, double beta, double x) {

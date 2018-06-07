@@ -3,17 +3,18 @@ package io.improbable.keanu.vertices.bool;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.Prior;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.Collections;
 
-import static io.improbable.keanu.vertices.bool.BoolVertex.If;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -39,7 +40,7 @@ public class BoolVertexTest {
         v1.setValue(true);
         v2.setValue(false);
 
-        assertTrue(v3.lazyEval());
+        assertTrue(v3.lazyEval().scalar());
     }
 
     @Test
@@ -49,7 +50,7 @@ public class BoolVertexTest {
         v1.setValue(true);
         v2.setValue(false);
 
-        assertTrue(!v3.lazyEval());
+        assertTrue(!v3.lazyEval().scalar());
     }
 
     @Test
@@ -71,19 +72,6 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void ifProbabilityIsCorrect() {
-
-        double pV3 = 0.1;
-        Flip v3 = new Flip(pV3);
-
-        Vertex<Boolean> v4 = If(v1, v2, v3);
-
-        double pV4True = ifProbability(pV1, pV2, pV3);
-
-        assertEquals(priorProbabilityTrue(v4, 10000, random), pV4True, 0.01);
-    }
-
-    @Test
     public void castVertexWorksAsExpected() {
         double p = 0.5;
 
@@ -99,8 +87,8 @@ public class BoolVertexTest {
         double p = 0.5;
 
         Flip f = new Flip(0.5);
-        ConstantBoolVertex tru = new ConstantBoolVertex(true);
-        ConstantBoolVertex fal = new ConstantBoolVertex(false);
+        ConstantBoolVertex tru = ConstantVertex.of(true);
+        ConstantBoolVertex fal = ConstantVertex.of(false);
 
         BoolVertex a = f.and(tru).or(fal);
 
@@ -116,18 +104,11 @@ public class BoolVertexTest {
         return pA + pB - (pA * pB);
     }
 
-    private double ifProbability(double pThn, double pThnIsValue, double pElsIsValue) {
-        double pThnAndThnIsValue = pThn * pThnIsValue;
-        double pElsAndElsIsValue = (1 - pThn) * pElsIsValue;
-
-        return pThnAndThnIsValue + pElsAndElsIsValue;
-    }
-
-    public static double priorProbabilityTrue(Vertex<Boolean> vertex, int sampleCount, KeanuRandom random) {
+    public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
         BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
 
         NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount, random);
-        return samples.get(vertex).probability(val -> val);
+        return samples.get(vertex).probability(val -> val.scalar());
     }
 
 }

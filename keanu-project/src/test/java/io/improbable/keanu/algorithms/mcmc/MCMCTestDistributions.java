@@ -1,10 +1,9 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,72 +14,84 @@ import static org.junit.Assert.assertTrue;
 
 public class MCMCTestDistributions {
 
-    public static BayesNetDoubleAsContinuous createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
+    public static BayesianNetwork createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
+        GaussianVertex A = new GaussianVertex(new int[]{2, 1}, mu, sigma);
+        A.setAndCascade(A.sample(random));
+        return new BayesianNetwork(A.getConnectedGraph());
+    }
+
+    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples) {
+
+        int[] shape = samples.get(0).getShape();
+
+        DoubleTensor summed = samples.stream()
+            .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace);
+
+        DoubleTensor averages = summed.divInPlace(samples.size());
+
+        DoubleTensor sumDiffSquared = samples.stream()
+            .reduce(
+                DoubleTensor.zeros(shape),
+                (acc, tensor) -> acc.plusInPlace(tensor.minus(averages).powInPlace(2))
+            );
+
+        double[] standardDeviations = sumDiffSquared.div(samples.size() - 1).pow(0.5).asFlatDoubleArray();
+        double[] means = averages.asFlatDoubleArray();
+
+        for (int i = 0; i < means.length; i++) {
+            assertEquals(mu, means[i], 0.05);
+            assertEquals(sigma, standardDeviations[i], 0.1);
+        }
+    }
+
+    public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
+
         GaussianVertex A = new GaussianVertex(mu, sigma);
-        A.setAndCascade(mu + 0.5 * sigma);
-        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
-        return bayesNet;
-    }
+        GaussianVertex B = new GaussianVertex(mu, sigma);
 
-    public static void samplesMatchSimpleGaussian(double mu, double sigma, List<Double> samples) {
-
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        assertEquals(mu, stats.getMean(), 0.05);
-        assertEquals(sigma, stats.getStandardDeviation(), 0.1);
-    }
-
-    public static BayesNetDoubleAsContinuous createSumOfGaussianDistribution(double mu, double sigma, double observedSum, KeanuRandom random) {
-
-        DoubleVertex A = new GaussianVertex(mu, sigma);
-        DoubleVertex B = new GaussianVertex(mu, sigma);
-
-        DoubleVertex C = new GaussianVertex(A.plus(B), 1.0);
+        GaussianVertex C = new GaussianVertex(A.plus(B), 1.0);
         C.observe(observedSum);
 
         A.setValue(mu);
         B.setAndCascade(mu);
 
-        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(Arrays.asList(A, B, C));
-        return bayesNet;
+        return new BayesianNetwork(Arrays.asList(A, B, C));
     }
 
-    public static void samplesMatchesSumOfGaussians(double expected, List<Double> sampleA, List<Double> samplesB) {
+    public static void samplesMatchesSumOfGaussians(double expected, List<DoubleTensor> sampleA, List<DoubleTensor> samplesB) {
 
         OptionalDouble averagePosteriorA = sampleA.stream()
-            .mapToDouble(sample -> sample)
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.asFlatDoubleArray()))
             .average();
 
         OptionalDouble averagePosteriorB = samplesB.stream()
-            .mapToDouble(sample -> sample)
+            .flatMapToDouble(tensor -> Arrays.stream(tensor.asFlatDoubleArray()))
             .average();
 
         assertEquals(expected, averagePosteriorA.getAsDouble() + averagePosteriorB.getAsDouble(), 0.1);
     }
 
-    public static BayesNetDoubleAsContinuous create2DDonutDistribution(KeanuRandom random) {
-        DoubleVertex A = new GaussianVertex(0, 1);
-        DoubleVertex B = new GaussianVertex(0, 1);
+    public static BayesianNetwork create2DDonutDistribution() {
+        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex B = new GaussianVertex(0, 1);
 
-        DoubleVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
+        GaussianVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
         D.observe(0.5);
 
         A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);
 
-        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(Arrays.asList(A, B, D));
-        return bayesNet;
+        return new BayesianNetwork(Arrays.asList(A, B, D));
     }
 
-    public static void samplesMatch2DDonut(List<Double> samplesA, List<Double> samplesB) {
+    public static void samplesMatch2DDonut(List<DoubleTensor> samplesA, List<DoubleTensor> samplesB) {
 
         boolean topOfDonut, rightOfDonut, bottomOfDonut, leftOfDonut, middleOfDonut;
         topOfDonut = rightOfDonut = bottomOfDonut = leftOfDonut = middleOfDonut = false;
 
         for (int i = 0; i < samplesA.size(); i++) {
-            double sampleFromA = samplesA.get(i);
-            double sampleFromB = samplesB.get(i);
+            double sampleFromA = samplesA.get(i).scalar();
+            double sampleFromB = samplesB.get(i).scalar();
 
             if (sampleFromA > -0.2 && sampleFromA < 0.2 && sampleFromB > 0.6 && sampleFromB < 0.8) {
                 topOfDonut = true;

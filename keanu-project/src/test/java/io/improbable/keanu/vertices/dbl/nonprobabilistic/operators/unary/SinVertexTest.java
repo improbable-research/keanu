@@ -1,43 +1,46 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class SinVertexTest {
 
     @Test
-    public void sinOpIsCalculatedCorrectly() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(Math.PI / 2);
-        SinVertex sin = new SinVertex(x);
-
-        assertEquals(Math.sin(Math.PI / 2), sin.getValue(), 0.00001);
+    public void sinScalarVertexValue() {
+        operatesOnScalarVertexValue(
+            Math.PI,
+            Math.sin(Math.PI),
+            DoubleVertex::sin
+        );
     }
 
     @Test
-    public void sinOpIsCalculatedCorrectlyWithValue() {
-        SinVertex sinWithValue = new SinVertex(Math.PI / 2);
-
-        assertEquals(Math.sin(Math.PI / 2), sinWithValue.getValue(), 0.00001);
+    public void calculatesDualNumberOScalarSin() {
+        calculatesDualNumberOfScalar(
+            0.5,
+            Math.cos(0.5),
+            DoubleVertex::sin
+        );
     }
 
     @Test
-    public void sinDualNumberIsCalculatedCorrectly() {
-        DoubleVertex uniform = new UniformVertex(0, 10);
-        uniform.setValue(5.0);
-
-        DoubleVertex pow = new PowerVertex(uniform, 3); //dPow = 3 * 5^2
-        SinVertex sin = new SinVertex(pow);
-
-        double dSin = sin.getDualNumber().getPartialDerivatives().withRespectTo(uniform);
-        //dSin = cos(5^3) * 3 * 5^2
-        double expected = Math.cos(Math.pow(uniform.getValue(), 3)) * (3 * Math.pow(uniform.getValue(), 3 - 1));
-
-        assertEquals(expected, dSin, 0.0001);
+    public void sinMatrixVertexValues() {
+        operatesOn2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{Math.sin(0.0), Math.sin(0.1), Math.sin(0.2), Math.sin(0.3)},
+            DoubleVertex::sin
+        );
     }
 
+    @Test
+    public void calculatesDualNumberOfMatrixElementWisesin() {
+        calculatesDualNumberOfMatrixElementWiseOperator(
+            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{Math.cos(0.1), Math.cos(0.2), Math.cos(0.3), Math.cos(0.4)},
+            DoubleVertex::sin
+        );
+    }
+    
 }

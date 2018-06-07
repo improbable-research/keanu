@@ -1,41 +1,72 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
 import java.util.Map;
+import java.util.function.BiConsumer;
 
 public class FitnessFunction {
 
-    protected final List<? extends Vertex> probabilisticVertices;
-    protected final List<? extends Vertex<Double>> latentVertices;
-    protected final Map<Long, Long> exploreSettingAll;
+    private final List<Vertex> probabilisticVertices;
+    private final List<? extends Vertex<DoubleTensor>> latentVertices;
+    private final Map<Long, Long> exploreSettingAll;
+    private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunction(List<? extends Vertex> probabilisticVertices, List<? extends Vertex<Double>> latentVertices) {
+    public FitnessFunction(List<Vertex> probabilisticVertices,
+                           List<? extends Vertex<DoubleTensor>> latentVertices,
+                           BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
         this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
+        this.onFitnessCalculation = onFitnessCalculation;
+    }
+
+    public FitnessFunction(List<Vertex> probabilisticVertices,
+                           List<? extends Vertex<DoubleTensor>> latentVertices) {
+        this(probabilisticVertices, latentVertices, null);
     }
 
     public MultivariateFunction fitness() {
         return point -> {
-            setAndCascadePoint(point);
-            return logOfTotalProbability();
+            setAndCascadePoint(point, latentVertices, exploreSettingAll);
+            double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
+
+            if (onFitnessCalculation != null) {
+                onFitnessCalculation.accept(point, logOfTotalProbability);
+            }
+
+            return logOfTotalProbability;
         };
     }
 
-    protected void setAndCascadePoint(double[] point) {
-        for (int i = 0; i < point.length; i++) {
-            Vertex<Double> vertex = latentVertices.get(i);
-            vertex.setValue(point[i]);
+    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices, Map<Long, Long> exploreSettingAll) {
+
+        int position = 0;
+        for (Vertex<DoubleTensor> vertex : latentVertices) {
+
+            int dimensions = (int) numDimensions(vertex);
+
+            double[] values = new double[dimensions];
+            System.arraycopy(point, position, values, 0, dimensions);
+
+            DoubleTensor newTensor = DoubleTensor.create(values, vertex.getValue().getShape());
+            vertex.setValue(newTensor);
+
+            position += dimensions;
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
     }
 
-    protected double logOfTotalProbability() {
+    static long numDimensions(Vertex<DoubleTensor> vertex) {
+        return vertex.getValue().getLength();
+    }
+
+    public static double logOfTotalProbability(List<? extends Vertex> probabilisticVertices) {
         double sum = 0.0;
         for (Vertex<?> vertex : probabilisticVertices) {
             sum += vertex.logProbAtValue();

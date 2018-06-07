@@ -1,57 +1,57 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 public class ArcTan2VertexTest {
 
     @Test
-    public void arcTan2OpIsCalculatedCorrectly() {
-        ConstantDoubleVertex y = new ConstantDoubleVertex(1.0);
-        ConstantDoubleVertex x = new ConstantDoubleVertex(0.0);
-
-        ArcTan2Vertex arcTan2 = new ArcTan2Vertex(y, x);
-
-        assertEquals(Math.atan2(1, 0), arcTan2.getValue(), 0.0001);
+    public void tan2TwoScalarVertexValues() {
+        operatesOnTwoScalarVertexValues(
+            1.0,
+            Math.PI,
+            Math.atan2(Math.PI, 1.0),
+            DoubleVertex::atan2
+        );
     }
 
     @Test
-    public void arcTan2OpIsCalculatedCorrectlyWithValue() {
-        ArcTan2Vertex arcTan2 = new ArcTan2Vertex(0, -1);
+    public void calculatesDualNumberOfTwoScalarsTan2() {
+        double a = 0.5;
+        double b = Math.sqrt(3) / 2.0;
+        double wrtA = b / (Math.pow(b, 2) * Math.pow(0.5, 2));
+        double wrtB = -0.5 / (Math.pow(b, 2) * Math.pow(0.5, 2));
 
-        assertEquals(Math.atan2(0, -1), arcTan2.getValue(), 0.0001);
+        calculatesDualNumberOfTwoScalars(
+            a,
+            b,
+            wrtA,
+            wrtB,
+            DoubleVertex::atan2
+        );
     }
 
     @Test
-    public void arcTan2OpIsCalculatedCorrectlyWithValueAsX() {
-        ArcTan2Vertex arcTan2 = new ArcTan2Vertex(new ConstantDoubleVertex(0.0), -1);
-
-        assertEquals(Math.atan2(0, -1), arcTan2.getValue(), 0.0001);
+    public void tan2MatrixVertexValues() {
+        operatesOnTwo2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{2.0, 4.0, 3.0, 8.0},
+            new double[]{Math.atan2(2., 0.), Math.atan2(4, .1), Math.atan2(3, .2), Math.atan2(8, .3)},
+            DoubleVertex::atan2
+        );
     }
 
     @Test
-    public void arcTan2OpIsCalculatedCorrectlyWithValueAsY() {
-        ArcTan2Vertex arcTan2 = new ArcTan2Vertex(0, new ConstantDoubleVertex(-1.0));
-
-        assertEquals(Math.atan2(0, -1), arcTan2.getValue(), 0.0001);
-    }
-
-    @Test
-    public void calculatePartialDerivativesWithRespectToAandB() {
-        UniformVertex A = new UniformVertex(0, 1);
-        UniformVertex B = new UniformVertex(0, 1);
-
-        A.setValue(0.5);
-        double bValue = Math.sqrt(3) / 2.0;
-        B.setValue(Math.sqrt(3) / 2.0);
-
-        ArcTan2Vertex arcTan2 = new ArcTan2Vertex(A, B);
-
-        assertEquals(bValue / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(A), 0.001);
-        assertEquals(-0.5 / (Math.pow(bValue, 2) * Math.pow(0.5, 2)), arcTan2.getDualNumber().getPartialDerivatives().withRespectTo(B), 0.001);
+    public void calculatesDualNumberOfTwoMatricesElementWiseTan2() {
+        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+            new double[]{1.0, 2.0, 3.0, 4.0},
+            new double[]{2.0, 3.0, 4.0, 5.0},
+            new double[]{2. / 4., 3. / 36., 4. / (9. * 16), 5. / (16 * 25)},
+            new double[]{-1. / 4., -2. / 36., -3. / (9 * 16), -4. / (16 * 25)},
+            DoubleVertex::atan2
+        );
     }
 
 }

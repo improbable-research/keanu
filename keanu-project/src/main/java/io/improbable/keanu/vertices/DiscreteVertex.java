@@ -1,10 +1,11 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Map;
 
-public abstract class DiscreteVertex<T> extends Vertex<T> {
+public abstract class DiscreteVertex<T extends Tensor> extends Vertex<T> {
 
     @Override
     public final double logProb(T value) {
@@ -19,5 +20,4 @@ public abstract class DiscreteVertex<T> extends Vertex<T> {
     public abstract double logPmf(T value);
 
     public abstract Map<Long, DoubleTensor> dLogPmf(T value);
-
 }

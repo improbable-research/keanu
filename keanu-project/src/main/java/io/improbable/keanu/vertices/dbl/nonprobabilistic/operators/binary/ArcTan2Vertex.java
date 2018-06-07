@@ -1,47 +1,36 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
     public ArcTan2Vertex(DoubleVertex a, DoubleVertex b) {
-        super(a, b);
-    }
-
-    public ArcTan2Vertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
-    }
-
-    public ArcTan2Vertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b));
-    }
-
-    public ArcTan2Vertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b);
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     @Override
-    protected Double op(Double a, Double b) {
-        return Math.atan2(a, b);
+    protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
+        return a.atan2(b);
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         DualNumber aDual = dualNumbers.get(a);
         DualNumber bDual = dualNumbers.get(b);
 
-        double denominator = (Math.pow(b.getValue(), 2) * Math.pow(a.getValue(), 2));
+        DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
 
-        PartialDerivatives thisInfA = aDual.getPartialDerivatives().multiplyBy(b.getValue() / denominator);
-        PartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy(-(a.getValue() / denominator));
+        PartialDerivatives thisInfA = aDual.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
+        PartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());
         PartialDerivatives newInf = thisInfA.add(thisInfB);
         return new DualNumber(op(a.getValue(), b.getValue()), newInf);
     }
-
 }

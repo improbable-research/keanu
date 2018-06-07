@@ -1,20 +1,23 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CPTVertex<T> extends NonProbabilistic<T> {
+public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
 
-    private final List<Vertex<Boolean>> inputs;
-    private final Map<Condition, Vertex<T>> conditions;
-    private final Vertex<T> defaultResult;
+    private final List<Vertex<? extends Tensor<Boolean>>> inputs;
+    private final Map<Condition, Vertex<OUT>> conditions;
+    private final Vertex<OUT> defaultResult;
 
-    public CPTVertex(List<Vertex<Boolean>> inputs, Map<Condition, Vertex<T>> conditions, Vertex<T> defaultResult) {
+    public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
+                     Map<Condition, Vertex<OUT>> conditions,
+                     Vertex<OUT> defaultResult) {
         this.conditions = conditions;
         this.inputs = inputs;
         this.defaultResult = defaultResult;
@@ -24,20 +27,20 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T sample(KeanuRandom random) {
-        final Condition condition = getCondition((vertex) -> vertex.sample(random));
+    public OUT sample(KeanuRandom random) {
+        final Condition condition = getCondition((vertex) -> vertex.sample(random).scalar());
         return conditions.getOrDefault(condition, defaultResult).sample(random);
     }
 
     @Override
-    public T getDerivedValue() {
-        final Condition condition = getCondition(Vertex::getValue);
+    public OUT getDerivedValue() {
+        final Condition condition = getCondition(v -> v.getValue().scalar());
         return conditions.getOrDefault(condition, defaultResult).getValue();
     }
 
-    private Condition getCondition(Function<Vertex<Boolean>, Boolean> mapper) {
+    private Condition getCondition(Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {
 
-        boolean[] condition = new boolean[inputs.size()];
+        Boolean[] condition = new Boolean[inputs.size()];
 
         for (int i = 0; i < condition.length; i++) {
             condition[i] = mapper.apply(inputs.get(i));
@@ -47,9 +50,9 @@ public class CPTVertex<T> extends NonProbabilistic<T> {
     }
 
     public static class Condition {
-        private final boolean[] conditions;
+        private final Boolean[] conditions;
 
-        public Condition(boolean[] condition) {
+        public Condition(Boolean[] condition) {
             this.conditions = condition;
         }
 

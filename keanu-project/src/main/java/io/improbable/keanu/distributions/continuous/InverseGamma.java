@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import static org.apache.commons.math3.special.Gamma.digamma;
 import static org.apache.commons.math3.special.Gamma.gamma;
@@ -20,18 +20,6 @@ public class InverseGamma {
     public static double pdf(double a, double b, double x) {
         double numerator = Math.pow(b, a) * Math.pow(x, -a - 1) * Math.exp(-b / x);
         return numerator / gamma(a);
-    }
-
-    public static Diff dPdf(double a, double b, double x) {
-        double bToThePowerOfA = Math.pow(b, a);
-        double eToTheMinusBOverX = Math.exp(-b / x);
-        double gammaA = gamma(a);
-
-        double dPda = bToThePowerOfA * Math.pow(x, -a - 1) * eToTheMinusBOverX * (-digamma(a) + Math.log(b) - Math.log(x));
-        double dPdb = (Math.pow(b, a - 1) * Math.pow(x, -a - 2) * eToTheMinusBOverX * (a * x - b)) / gammaA;
-        double dPdx = (bToThePowerOfA * Math.pow(x, -a - 3) * eToTheMinusBOverX * (b - (a + 1) * x)) / gammaA;
-
-        return new Diff(dPda, dPdb, dPdx);
     }
 
     public static double logPdf(double a, double b, double x) {

@@ -1,41 +1,49 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class ArcTanVertexTest {
 
-
     @Test
-    public void arcTanOpIsCalculatedCorrectly() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(Math.PI / 2);
-        ArcTanVertex aTan = new ArcTanVertex(x);
-
-        assertEquals(Math.atan(Math.PI / 2), aTan.getValue(), 0.0001);
+    public void atanScalarVertexValues() {
+        operatesOnScalarVertexValue(
+            Math.PI,
+            Math.atan(Math.PI),
+            DoubleVertex::atan
+        );
     }
 
     @Test
-    public void arcTanOpIsCalculatedCorrectlyWithValue() {
-        ArcTanVertex aTan = new ArcTanVertex(Math.PI / 2);
-
-        assertEquals(Math.atan(Math.PI / 2), aTan.getValue(), 0.0001);
+    public void calculatesDualNumberOfTwoScalarsAtan() {
+        calculatesDualNumberOfScalar(
+            0.5,
+            1.0 / (1.0 + 0.5 * 0.5),
+            DoubleVertex::atan
+        );
     }
 
     @Test
-    public void arcTanDualNumberIsCalculatedCorrectly() {
-        UniformVertex uniformVertex = new UniformVertex(0, 10);
-        uniformVertex.setValue(5.0);
-
-        ArcTanVertex arcTan = new ArcTanVertex(uniformVertex);
-
-        double dArcTan = arcTan.getDualNumber().getPartialDerivatives().withRespectTo(uniformVertex);
-        //dArcTan = 1 / (1 + x^2)
-        double expected = 1 / (1 + Math.pow(5.0, 2));
-
-        assertEquals(expected, dArcTan, 0.001);
+    public void atanMatrixVertexValues() {
+        operatesOn2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{Math.atan(0.0), Math.atan(0.1), Math.atan(0.2), Math.atan(0.3)},
+            DoubleVertex::atan
+        );
     }
 
+    @Test
+    public void calculatesDualNumberOfTwoMatricesElementWiseAtan() {
+        calculatesDualNumberOfMatrixElementWiseOperator(
+            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{1.0 / (1.0 + 0.1 * 0.1),
+                1.0 / (1.0 + 0.2 * 0.2),
+                1.0 / (1.0 + 0.3 * 0.3),
+                1.0 / (1.0 + 0.4 * 0.4)
+            },
+            DoubleVertex::atan
+        );
+    }
 }

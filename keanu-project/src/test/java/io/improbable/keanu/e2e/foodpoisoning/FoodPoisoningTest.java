@@ -9,8 +9,9 @@ import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -41,9 +42,9 @@ public class FoodPoisoningTest {
         int dropCount = 10000;
         NetworkSamples samples = sample(15000).drop(dropCount);
 
-        assertEquals(1.0, samples.get(infectedOysters).probability(v -> v), 0.01);
-        assertEquals(0.0, samples.get(infectedLamb).probability(v -> v), 0.01);
-        assertEquals(0.0, samples.get(infectedToilet).probability(v -> v), 0.01);
+        assertEquals(1.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
+        assertEquals(0.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
+        assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
     }
 
     @Test
@@ -52,9 +53,9 @@ public class FoodPoisoningTest {
         NetworkSamples samples = sample(15000);
 
         int dropCount = 10000;
-        assertEquals(1.0, samples.get(infectedOysters).probability(v -> v), 0.01);
-        assertEquals(1.0, samples.get(infectedLamb).probability(v -> v), 0.01);
-        assertEquals(0.0, samples.get(infectedToilet).probability(v -> v), 0.01);
+        assertEquals(1.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
+        assertEquals(1.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
+        assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
     }
 
     @Test
@@ -63,9 +64,9 @@ public class FoodPoisoningTest {
         NetworkSamples samples = sample(15000);
 
         int dropCount = 10000;
-        assertEquals(0.0, samples.get(infectedOysters).probability(v -> v), 0.01);
-        assertEquals(0.0, samples.get(infectedLamb).probability(v -> v), 0.01);
-        assertEquals(0.0, samples.get(infectedToilet).probability(v -> v), 0.01);
+        assertEquals(0.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
+        assertEquals(0.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
+        assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
     }
 
     public NetworkSamples sample(int n) {
@@ -89,8 +90,11 @@ public class FoodPoisoningTest {
                     )
                 );
 
-            DoubleUnaryOpLambda<Boolean> pIll = plate.add("pIll", new DoubleUnaryOpLambda<>(ingestedPathogen, (i) -> i ? 0.9 : 0.01));
+            DoubleVertex pIll = If.isTrue(ingestedPathogen)
+                .then(0.9)
+                .orElse(0.1);
 
+            plate.add("pIll", pIll);
             plate.add("isIll", new Flip(pIll));
         };
 

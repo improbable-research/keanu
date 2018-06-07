@@ -1,17 +1,21 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 
-public class NotEqualsVertex<T> extends BoolBinaryOpVertex<T, T> {
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
-    public NotEqualsVertex(Vertex<T> a, Vertex<T> b) {
-        super(a, b);
+public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends BoolBinaryOpVertex<A, B> {
+
+    public NotEqualsVertex(Vertex<A> a, Vertex<B> b) {
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     @Override
-    public Boolean op(T a, T b) {
-        return !a.equals(b);
+    public BooleanTensor op(A a, B b) {
+        return a.elementwiseEquals(b).not();
     }
 
 }

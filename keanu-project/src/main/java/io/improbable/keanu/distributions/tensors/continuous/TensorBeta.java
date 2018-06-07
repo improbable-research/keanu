@@ -1,10 +1,8 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
-import io.improbable.keanu.vertices.dbltensor.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
-import org.nd4j.linalg.factory.Nd4j;
 
 public class TensorBeta {
 
@@ -15,8 +13,8 @@ public class TensorBeta {
                                       DoubleTensor xMax,
                                       KeanuRandom random) {
 
-        final DoubleTensor y1 = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, Nd4jDoubleTensor.ONE_SCALAR, alpha);
-        final DoubleTensor y2 = random.nextGamma(shape, Nd4jDoubleTensor.ZERO_SCALAR, Nd4jDoubleTensor.ONE_SCALAR, beta);
+        final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR, alpha);
+        final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR, beta);
 
         final DoubleTensor range = xMax.minus(xMin);
         final DoubleTensor y1PlusY2 = y1.plus(y2);
@@ -27,7 +25,7 @@ public class TensorBeta {
         final DoubleTensor lessMask = alpha.getLessThanMask(beta);
         final DoubleTensor greaterMask = alpha.getGreaterThanOrEqualToMask(beta);
 
-        return lessMask.times(lessThan).plus(greaterMask.times(greaterThan));
+        return lessMask.timesInPlace(lessThan).plusInPlace(greaterMask.timesInPlace(greaterThan));
     }
 
     public static DoubleTensor logPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {

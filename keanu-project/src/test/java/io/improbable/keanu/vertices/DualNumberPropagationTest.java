@@ -18,7 +18,7 @@ public class DualNumberPropagationTest {
     public void doesNotPerformUnneccesaryDualNumberCalculations() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new SinVertex(Math.PI / 3);
+        DoubleVertex start = new SinVertex(ConstantVertex.of(Math.PI / 3));
 
         int links = 20;
         DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);

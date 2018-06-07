@@ -2,10 +2,11 @@ package io.improbable.keanu.e2e.rocket;
 
 import io.improbable.keanu.algorithms.sampling.RejectionSampler;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,16 +23,16 @@ public class RocketTest {
         KeanuRandom random = new KeanuRandom(1);
         Flip oRingFailure = new Flip(0.001);
 
-        Vertex<Boolean> oRingFailureCausesOverheat = new Flip(0.94);
-        Vertex<Boolean> overHeatDueToORing = oRingFailure.and(oRingFailureCausesOverheat);
+        Vertex<BooleanTensor> oRingFailureCausesOverheat = new Flip(0.94);
+        Vertex<BooleanTensor> overHeatDueToORing = oRingFailure.and(oRingFailureCausesOverheat);
 
         Flip residualFuel = new Flip(0.002);
 
-        Vertex<Boolean> residualFuelCausesOverheat = new Flip(0.29);
-        Vertex<Boolean> overHeatDueToResidualFuel = residualFuel.and(residualFuelCausesOverheat);
+        Vertex<BooleanTensor> residualFuelCausesOverheat = new Flip(0.29);
+        Vertex<BooleanTensor> overHeatDueToResidualFuel = residualFuel.and(residualFuelCausesOverheat);
 
-        Vertex<Boolean> bothCauseOverheat = new Flip(0.95);
-        Vertex<Boolean> overHeatDueToBoth = residualFuel
+        Vertex<BooleanTensor> bothCauseOverheat = new Flip(0.95);
+        Vertex<BooleanTensor> overHeatDueToBoth = residualFuel
             .and(oRingFailure)
             .and(bothCauseOverheat);
 
@@ -67,14 +68,14 @@ public class RocketTest {
         double posteriorProbOfORingFailure = RejectionSampler.getPosteriorProbability(
             net.getLatentVertices(),
             net.getObservedVertices(),
-            () -> oRingFailure.getValue() == true,
+            () -> oRingFailure.getValue().scalar() == true,
             10000,
             random
         );
         double posteriorProbOfResidualFuel = RejectionSampler.getPosteriorProbability(
             net.getLatentVertices(),
             net.getObservedVertices(),
-            () -> residualFuel.getValue() == true,
+            () -> residualFuel.getValue().scalar() == true,
             10000,
             random
         );
@@ -82,7 +83,7 @@ public class RocketTest {
         double posteriorProbOfAlarm1FalsePositive = RejectionSampler.getPosteriorProbability(
             net.getLatentVertices(),
             net.getObservedVertices(),
-            () -> alarm1FalsePositive.getValue() == true,
+            () -> alarm1FalsePositive.getValue().scalar() == true,
             10000,
             random
         );

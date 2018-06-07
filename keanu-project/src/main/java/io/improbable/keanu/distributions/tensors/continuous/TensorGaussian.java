@@ -1,7 +1,7 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class TensorGaussian {
 
@@ -13,7 +13,7 @@ public class TensorGaussian {
 
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
         DoubleTensor unityGaussian = random.nextGaussian(shape);
-        return unityGaussian.times(sigma).plus(mu);
+        return unityGaussian.timesInPlace(sigma).plusInPlace(mu);
     }
 
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {

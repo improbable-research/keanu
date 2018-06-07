@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -9,34 +10,55 @@ import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.function.BiConsumer;
 
+import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class NonGradientOptimizer {
 
-    private final BayesNetDoubleAsContinuous bayesNet;
+    private final BayesianNetwork bayesNet;
+    private final List<BiConsumer<double[], Double>> onFitnessCalculations;
 
-    public NonGradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
+    public NonGradientOptimizer(BayesianNetwork bayesNet) {
         this.bayesNet = bayesNet;
+        this.onFitnessCalculations = new ArrayList<>();
     }
 
     public NonGradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNetDoubleAsContinuous(graph);
+        this(new BayesianNetwork(graph));
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<? extends Vertex> outputVertices) {
+    public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
+        this.onFitnessCalculations.add(fitnessCalculationHandler);
+    }
+
+    private void handleFitnessCalculation(double[] point, Double fitness) {
+        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+            fitnessCalculationHandler.accept(point, fitness);
+        }
+    }
+
+    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+
+        bayesNet.cascadeObservations();
 
         if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
-        FitnessFunction fitnessFunction = new FitnessFunction(outputVertices, latentVertices);
+        List<? extends Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
+        FitnessFunction fitnessFunction = new FitnessFunction(
+            outputVertices,
+            latentVertices,
+            this::handleFitnessCalculation
+        );
 
         BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
 
-        double[] startPoint = currentPoint();
+        double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
@@ -56,7 +78,7 @@ public class NonGradientOptimizer {
             new ObjectiveFunction(fitnessFunction.fitness()),
             new SimpleBounds(minBounds, maxBounds),
             MAXIMIZE,
-            new InitialGuess(currentPoint())
+            new InitialGuess(currentPoint(bayesNet.getContinuousLatentVertices()))
         );
 
         return pointValuePair.getValue();
@@ -78,14 +100,6 @@ public class NonGradientOptimizer {
      */
     public double maxLikelihood(int maxEvaluations, double boundsRange) {
         return optimize(maxEvaluations, boundsRange, bayesNet.getObservedVertices());
-    }
-
-    private double[] currentPoint() {
-        double[] point = new double[bayesNet.getContinuousLatentVertices().size()];
-        for (int i = 0; i < point.length; i++) {
-            point[i] = bayesNet.getContinuousLatentVertices().get(i).getValue();
-        }
-        return point;
     }
 
 }

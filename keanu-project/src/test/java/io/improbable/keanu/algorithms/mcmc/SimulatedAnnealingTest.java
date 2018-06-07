@@ -1,20 +1,20 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Map;
 import java.util.stream.Collectors;
 
-import static junit.framework.TestCase.assertEquals;
+import static org.junit.Assert.assertEquals;
 
 public class SimulatedAnnealingTest {
 
@@ -43,21 +43,20 @@ public class SimulatedAnnealingTest {
         network.probeForNonZeroMasterP(100, random);
 
         NetworkState maxAPosterioriSamples = SimulatedAnnealing.getMaxAPosteriori(network, 10000, random);
-        Map<Long, ?> maxValuesFromVariational = findMAPWithOptimizer();
+        NetworkState maxValuesFromVariational = findMAPWithOptimizer();
 
-        for (long id : maxAPosterioriSamples.getVertexIds()) {
-            assertEquals((Double) maxValuesFromVariational.get(id), maxAPosterioriSamples.get(id), 0.01);
-        }
+        assertEquals(maxValuesFromVariational.get(A).scalar(), maxAPosterioriSamples.get(A).scalar(), 0.05);
+        assertEquals(maxValuesFromVariational.get(B).scalar(), maxAPosterioriSamples.get(B).scalar(), 0.05);
     }
 
-    private Map<Long, ?> findMAPWithOptimizer() {
-        BayesNetDoubleAsContinuous network = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
+    private NetworkState findMAPWithOptimizer() {
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroMasterP(100, random);
 
         GradientOptimizer graphOptimizer = new GradientOptimizer(network);
         graphOptimizer.maxAPosteriori(1000);
 
-        return network.getLatentVertices().stream()
-            .collect(Collectors.toMap(Vertex::getId, Vertex::getValue));
+        return new SimpleNetworkState(network.getLatentVertices().stream()
+            .collect(Collectors.toMap(Vertex::getId, Vertex::getValue)));
     }
 }

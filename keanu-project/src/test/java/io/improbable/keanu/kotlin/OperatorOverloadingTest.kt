@@ -423,8 +423,8 @@ class OperatorOverloadingTest {
         val iv2 = ConstantIntegerVertex(2)
         val resultI2 = modelB.add(iv1, iv2)
 
-        assertEquals(resultD1.value, resultD2.value)
-        assertEquals(resultI1.value, resultI2.value)
+        assertEquals(resultD1.value, resultD2.value.scalar())
+        assertEquals(resultI1.value, resultI2.value.scalar())
     }
 
     class SimpleModel<A : DoubleOperators<A>, B : IntegerOperators<B>> {
@@ -442,14 +442,14 @@ class OperatorOverloadingTest {
     fun vertexOperatorTest() {
         val a = ConstantDoubleVertex(0.123)
 
-        assertEquals(Math.acos(a.value), acos(a).value)
-        assertEquals(Math.asin(a.value), asin(a).value)
-        assertEquals(Math.cos(a.value), cos(a).value)
-        assertEquals(Math.sin(a.value), sin(a).value)
-        assertEquals(Math.exp(a.value), exp(a).value)
-        assertEquals(Math.log(a.value), log(a).value)
-        assertEquals(Math.pow(a.value, 2.345), pow(a, 2.345).value)
-        assertEquals(Math.pow(a.value, a.value), pow(a, a).value)
+        assertEquals(Math.acos(a.value.scalar()), acos(a).value.scalar())
+        assertEquals(Math.asin(a.value.scalar()), asin(a).value.scalar())
+        assertEquals(Math.cos(a.value.scalar()), cos(a).value.scalar())
+        assertEquals(Math.sin(a.value.scalar()), sin(a).value.scalar())
+        assertEquals(Math.exp(a.value.scalar()), exp(a).value.scalar())
+        assertEquals(Math.log(a.value.scalar()), log(a).value.scalar())
+        assertEquals(Math.pow(a.value.scalar(), 2.345), pow(a, 2.345).value.scalar())
+        assertEquals(Math.pow(a.value.scalar(), a.value.scalar()), pow(a, a).value.scalar())
     }
 
     @Test

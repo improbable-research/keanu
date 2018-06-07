@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -8,7 +9,6 @@ import org.junit.Test;
 
 import java.util.Map;
 
-import static io.improbable.keanu.kotlin.ExtendPrefixOperatorsKt.exp;
 import static org.junit.Assert.assertEquals;
 
 public class DualNumbersTest {
@@ -39,7 +39,7 @@ public class DualNumbersTest {
 
     @Test
     public void diffOverExponent() {
-        assertDiffIsCorrect(vA, vB, exp(vA.times(vB)));
+        assertDiffIsCorrect(vA, vB, vA.multiply(vB).exp());
     }
 
     @Test
@@ -69,18 +69,18 @@ public class DualNumbersTest {
 
         DualNumber cDual = vC.getDualNumber();
 
-        double C = cDual.getValue();
-        Map<Long, Double> dc = cDual.getPartialDerivatives().asMap();
+        DoubleTensor C = cDual.getValue();
+        Map<Long, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();
 
         double da = 0.00000001;
 
-        vA.setValue(vA.getValue() + da);
+        vA.setValue(vA.getValue().plus(da));
         vB.setValue(B);
         vC.lazyEval();
 
-        double dcdaApprox = (vC.getValue() - C) / da;
+        DoubleTensor dcdaApprox = (vC.getValue().minus(C)).div(da);
 
-        assertEquals(dcdaApprox, dc.get(vA.getId()), 0.00001);
+        assertEquals(dcdaApprox.scalar(), dc.get(vA.getId()).scalar(), 0.00001);
 
         double db = da;
 
@@ -88,8 +88,8 @@ public class DualNumbersTest {
         vB.setValue(B + db);
         vC.lazyEval();
 
-        double dcdbApprox = (vC.getValue() - C) / db;
+        DoubleTensor dcdbApprox = (vC.getValue().minus(C)).div(db);
 
-        assertEquals(dcdbApprox, dc.get(vB.getId()), 0.00001);
+        assertEquals(dcdbApprox.scalar(), dc.get(vB.getId()).scalar(), 0.00001);
     }
 }

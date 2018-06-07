@@ -1,16 +1,19 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 
-public class AndBinaryVertex extends BoolBinaryOpVertex<Boolean, Boolean> {
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
-    public AndBinaryVertex(Vertex<Boolean> a, Vertex<Boolean> b) {
-        super(a, b);
+public class AndBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
+
+    public AndBinaryVertex(Vertex<BooleanTensor> a, Vertex<BooleanTensor> b) {
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
     @Override
-    protected Boolean op(Boolean a, Boolean b) {
-        return a && b;
+    protected BooleanTensor op(BooleanTensor a, BooleanTensor b) {
+        return a.and(b);
     }
 }

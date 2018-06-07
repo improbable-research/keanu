@@ -2,8 +2,9 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -123,12 +124,24 @@ public abstract class Vertex<T> {
         return hasValue() ? value : lazyEval();
     }
 
-    protected T getRawValue(){
+    protected T getRawValue() {
         return value;
     }
 
     public boolean hasValue() {
-        return value != null;
+        if (value instanceof Tensor) {
+            return !((Tensor) value).isShapePlaceholder();
+        } else {
+            return value != null;
+        }
+    }
+
+    public int[] getShape() {
+        if (value instanceof Tensor) {
+            return ((Tensor) value).getShape();
+        } else {
+            return Tensor.SCALAR_SHAPE;
+        }
     }
 
     /**

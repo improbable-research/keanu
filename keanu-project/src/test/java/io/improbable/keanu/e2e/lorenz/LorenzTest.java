@@ -1,11 +1,12 @@
 package io.improbable.keanu.e2e.lorenz;
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,30 +65,30 @@ public class LorenzTest {
                 List<DoubleVertex> timeSlice = graphTimeSteps.get(i);
                 DoubleVertex xt = timeSlice.get(0);
 
-                GaussianVertex observedXt = new GaussianVertex(xt, new ConstantDoubleVertex(1.0));
+                GaussianVertex observedXt = new GaussianVertex(xt, 1.0);
                 observedXt.observe(observed.get(t).x);
             }
 
-            BayesNetDoubleAsContinuous net = new BayesNetDoubleAsContinuous(xt0.getConnectedGraph());
+            BayesianNetwork net = new BayesianNetwork(xt0.getConnectedGraph());
 
             GradientOptimizer graphOptimizer = new GradientOptimizer(net);
 
             graphOptimizer.maxAPosteriori(1000);
 
-            List<Double> posterior = getTimeSliceValues(graphTimeSteps, windowSize - 1);
+            List<DoubleTensor> posterior = getTimeSliceValues(graphTimeSteps, windowSize - 1);
 
             int postT = (window + 1) * (windowSize - 1);
             LorenzModel.Coordinates actualAtPostT = observed.get(postT);
 
             error = Math.sqrt(
-                Math.pow(actualAtPostT.x - posterior.get(0), 2) +
-                    Math.pow(actualAtPostT.y - posterior.get(1), 2) +
-                    Math.pow(actualAtPostT.z - posterior.get(2), 2)
+                Math.pow(actualAtPostT.x - posterior.get(0).scalar(), 2) +
+                    Math.pow(actualAtPostT.y - posterior.get(1).scalar(), 2) +
+                    Math.pow(actualAtPostT.z - posterior.get(2).scalar(), 2)
             );
 
             log.info("Error: " + error);
 
-            priorMu = new double[]{posterior.get(0), posterior.get(1), posterior.get(2)};
+            priorMu = new double[]{posterior.get(0).scalar(), posterior.get(1).scalar(), posterior.get(2).scalar()};
             window++;
         }
 
@@ -102,7 +103,7 @@ public class LorenzTest {
                                        double rho,
                                        double beta) {
 
-        DoubleVertex rhov = new ConstantDoubleVertex(rho);
+        DoubleVertex rhov = ConstantVertex.of(rho);
 
         DoubleVertex xtplus1 = xt.multiply(1 - timestep * sigma).plus(yt.multiply(timestep * sigma));
 
@@ -113,7 +114,7 @@ public class LorenzTest {
         return Arrays.asList(xtplus1, ytplus1, ztplus1);
     }
 
-    private List<Double> getTimeSliceValues(List<List<DoubleVertex>> graphTimeSteps, int time) {
+    private List<DoubleTensor> getTimeSliceValues(List<List<DoubleVertex>> graphTimeSteps, int time) {
         List<DoubleVertex> slice = graphTimeSteps.get(time);
 
         return slice.stream()

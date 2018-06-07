@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Set;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class MarkovBlanketTest {
@@ -38,7 +39,7 @@ public class MarkovBlanketTest {
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 
-        assertTrue(blanket.size() == 4);
+        assertEquals(4, blanket.size());
         assertTrue(blanket.containsAll(Arrays.asList(B, C, F, G)));
     }
 
@@ -55,7 +56,7 @@ public class MarkovBlanketTest {
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 
-        assertTrue(blanket.size() == 4);
+        assertEquals(4, blanket.size());
         assertTrue(blanket.containsAll(Arrays.asList(B, C, F, E)));
     }
 

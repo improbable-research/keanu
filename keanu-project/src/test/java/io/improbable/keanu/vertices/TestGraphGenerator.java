@@ -41,7 +41,7 @@ public class TestGraphGenerator {
         return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
             opCount.incrementAndGet();
             onOp.accept(id);
-            return a + b;
+            return a.plus(b);
         }, (a) -> {
             dualNumberCount.incrementAndGet();
             return a.get(left).add(a.get(right));

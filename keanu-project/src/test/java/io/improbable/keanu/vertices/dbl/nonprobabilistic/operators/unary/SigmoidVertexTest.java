@@ -1,60 +1,58 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import org.apache.commons.math3.analysis.function.Sigmoid;
+import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class SigmoidVertexTest {
 
-    @Test
-    public void sigmoidOpIsCalculatedCorrectly() {
-        ConstantDoubleVertex x = new ConstantDoubleVertex(3.0);
-        SigmoidVertex sigmoidX = new SigmoidVertex(x);
+    private Sigmoid sigmoid;
 
-        double expected = 1 / (1 + Math.exp(-3.0));
-
-        assertEquals(expected, sigmoidX.getValue(), 0.0001);
-        assertEquals(expected, new SigmoidVertex(3.0).getValue(), 0.0001);
+    @Before
+    public void setup() {
+        sigmoid = new Sigmoid();
     }
 
     @Test
-    public void sigmoidDualNumberCalculatedCorrectly() {
-        DoubleVertex input = new UniformVertex(0, 1);
-        input.setAndCascade(0.5);
-
-        DoubleVertex sigmoid = new SigmoidVertex(input);
-        double diffSigmoidWrtInput = sigmoid.getDualNumber().getPartialDerivatives().withRespectTo(input);
-
-        double expected = Math.exp(-input.getValue()) / Math.pow(Math.exp(-input.getValue()) + 1, 2);
-
-        assertEquals(expected, diffSigmoidWrtInput, 0.0001);
+    public void sigmoidScalarVertexValue() {
+        operatesOnScalarVertexValue(
+            5,
+            sigmoid.value(5),
+            DoubleVertex::sigmoid
+        );
     }
 
     @Test
-    public void canSolveSigmoidEquation() {
-        //sigmoid(x) = 0.75
-        //x = -log((1/0.75)-1) = 1.0986
+    public void calculatesDualNumberOScalarSigmoid() {
+        calculatesDualNumberOfScalar(
+            0.5,
+            Math.exp(0.5) / Math.pow(Math.exp(0.5) + 1., 2),
+            DoubleVertex::sigmoid
+        );
+    }
 
-        DoubleVertex unknownX = new UniformVertex(0.0, 10.0);
-        unknownX.setAndCascade(5.0);
+    @Test
+    public void sigmoidMatrixVertexValues() {
+        operatesOn2x2MatrixVertexValues(
+            new double[]{0.0, 0.1, 0.2, 0.3},
+            new double[]{sigmoid.value(0.0), sigmoid.value(0.1), sigmoid.value(0.2), sigmoid.value(0.3)},
+            DoubleVertex::sigmoid
+        );
+    }
 
-        SigmoidVertex sigmoid = new SigmoidVertex(unknownX);
-
-        GaussianVertex observableSigmoid = new GaussianVertex(sigmoid, 1.0);
-        observableSigmoid.observe(0.75);
-
-        BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(unknownX.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesNet);
-        gradientOptimizer.maxLikelihood(5000);
-
-        double mapX = unknownX.getValue();
-
-        assertEquals(1.0986, mapX, 0.001);
+    @Test
+    public void calculatesDualNumberOfMatrixElementWisesigmoid() {
+        calculatesDualNumberOfMatrixElementWiseOperator(
+            new double[]{0.1, 0.2, 0.3, 0.4},
+            new double[]{Math.exp(0.1) / Math.pow(Math.exp(0.1) + 1., 2),
+                Math.exp(0.2) / Math.pow(Math.exp(0.2) + 1., 2),
+                Math.exp(0.3) / Math.pow(Math.exp(0.3) + 1., 2),
+                Math.exp(0.4) / Math.pow(Math.exp(0.4) + 1., 2)
+            },
+            DoubleVertex::sigmoid
+        );
     }
 }

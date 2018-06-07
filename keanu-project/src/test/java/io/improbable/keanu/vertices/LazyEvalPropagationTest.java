@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
@@ -22,7 +21,7 @@ public class LazyEvalPropagationTest {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new FloorVertex(4.2);
+        DoubleVertex start = new FloorVertex(ConstantVertex.of(4.2));
 
         int links = 20;
         DoubleVertex end = addLinks(start, n, m, links);
@@ -30,7 +29,7 @@ public class LazyEvalPropagationTest {
         end.lazyEval();
 
         //Value at the start has been evaluated correctly
-        assertEquals(4.0, start.getValue(), 0.001);
+        assertEquals(4.0, start.getValue().scalar(), 0.001);
 
         //Does the right amount of work
         assertEquals(3 * links, n.get());
@@ -62,9 +61,9 @@ public class LazyEvalPropagationTest {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
 
-        DoubleVertex start1 = new ConstantDoubleVertex(5.0);
-        DoubleVertex start2 = new ConstantDoubleVertex(5.0);
-        DoubleVertex start3 = new ConstantDoubleVertex(5.0);
+        DoubleVertex start1 = ConstantVertex.of(5.0);
+        DoubleVertex start2 = ConstantVertex.of(5.0);
+        DoubleVertex start3 = ConstantVertex.of(5.0);
 
         //start 2 is a shared parent between these sums
         DoubleVertex middleSum1 = TestGraphGenerator.sumVertex(start1, start2, n, m, id -> log.info("OP on id:" + id));

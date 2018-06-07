@@ -1,14 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Uniform;
+import io.improbable.keanu.distributions.tensors.continuous.TensorUniform;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
 
-import java.util.Collections;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
 
 public class UniformVertex extends ProbabilisticDouble {
@@ -16,10 +17,23 @@ public class UniformVertex extends ProbabilisticDouble {
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
 
-    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+    /**
+     * @param shape desired tensor shape
+     * @param xMin  inclusive
+     * @param xMax  exclusive
+     */
+    public UniformVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax) {
+
+        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getShape(), xMax.getShape());
+
         this.xMin = xMin;
         this.xMax = xMax;
         setParents(xMin, xMax);
+        setValue(DoubleTensor.placeHolder(shape));
+    }
+
+    public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
 
     public UniformVertex(DoubleVertex xMin, double xMax) {
@@ -34,6 +48,18 @@ public class UniformVertex extends ProbabilisticDouble {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
+    public UniformVertex(int[] shape, DoubleVertex xMin, double xMax) {
+        this(shape, xMin, new ConstantDoubleVertex(xMax));
+    }
+
+    public UniformVertex(int[] shape, double xMin, DoubleVertex xMax) {
+        this(shape, new ConstantDoubleVertex(xMin), xMax);
+    }
+
+    public UniformVertex(int[] shape, double xMin, double xMax) {
+        this(shape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
+    }
+
     public DoubleVertex getXMin() {
         return xMin;
     }
@@ -43,33 +69,23 @@ public class UniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(Double value) {
-        return Math.log(Uniform.pdf(xMin.getValue(), xMax.getValue(), value));
+    public double logPdf(DoubleTensor value) {
+        return TensorUniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(Double value) {
+    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
 
-        if (isObserved()) {
-            return Collections.emptyMap();
-        }
+        DoubleTensor dlogPdf = DoubleTensor.zeros(this.xMax.getShape());
+        dlogPdf = dlogPdf.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
+        dlogPdf = dlogPdf.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
 
-        double min = this.xMin.getValue();
-        double max = this.xMax.getValue();
-
-        if (this.getValue() <= min) {
-            return singletonMap(getId(), DoubleTensor.scalar(Double.POSITIVE_INFINITY));
-        } else if (this.getValue() >= max) {
-            return singletonMap(getId(), DoubleTensor.scalar(Double.NEGATIVE_INFINITY));
-        } else {
-            return singletonMap(getId(), DoubleTensor.scalar(0.0));
-        }
+        return singletonMap(getId(), dlogPdf);
     }
 
     @Override
-    public Double sample(KeanuRandom random) {
-        return Uniform.sample(xMin.getValue(), xMax.getValue(), random);
+    public DoubleTensor sample(KeanuRandom random) {
+        return TensorUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
     }
-
 
 }

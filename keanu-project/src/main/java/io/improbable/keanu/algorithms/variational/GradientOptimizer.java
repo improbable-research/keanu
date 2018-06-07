@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -9,17 +10,15 @@ import org.apache.commons.math3.optim.SimpleValueChecker;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class GradientOptimizer {
-
-    private final Logger log = LoggerFactory.getLogger(GradientOptimizer.class);
 
     public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
         NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
@@ -28,14 +27,35 @@ public class GradientOptimizer {
 
     private static final double FLAT_GRADIENT = 1e-16;
 
-    private final BayesNetDoubleAsContinuous bayesNet;
+    private final BayesianNetwork bayesNet;
 
-    public GradientOptimizer(BayesNetDoubleAsContinuous bayesNet) {
+    private final List<BiConsumer<double[], double[]>> onGradientCalculations;
+    private final List<BiConsumer<double[], Double>> onFitnessCalculations;
+
+    public GradientOptimizer(BayesianNetwork bayesNet) {
         this.bayesNet = bayesNet;
+        this.onGradientCalculations = new ArrayList<>();
+        this.onFitnessCalculations = new ArrayList<>();
     }
 
-    public GradientOptimizer(List<Vertex<Double>> graph) {
-        bayesNet = new BayesNetDoubleAsContinuous(graph);
+    public void onGradientCalculation(BiConsumer<double[], double[]> gradientCalculationHandler) {
+        this.onGradientCalculations.add(gradientCalculationHandler);
+    }
+
+    private void handleGradientCalculation(double[] point, double[] gradients) {
+        for (BiConsumer<double[], double[]> gradientCalculationHandler : onGradientCalculations) {
+            gradientCalculationHandler.accept(point, gradients);
+        }
+    }
+
+    public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
+        this.onFitnessCalculations.add(fitnessCalculationHandler);
+    }
+
+    private void handleFitnessCalculation(double[] point, Double fitness) {
+        for (BiConsumer<double[], Double> fitnessCalculationHandler : onFitnessCalculations) {
+            fitnessCalculationHandler.accept(point, fitness);
+        }
     }
 
     /**
@@ -59,7 +79,7 @@ public class GradientOptimizer {
      * @return the natural logarithm of the Maximum A Posteriori (MAP)
      */
     public double maxAPosteriori(int maxEvaluations) {
-        return maxAPosteriori(maxEvaluations, DEFAULT_OPTIMIZER);
+        return maxAPosteriori(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     /**
@@ -83,18 +103,26 @@ public class GradientOptimizer {
      * @return the natural logarithm of the maximum likelihood
      */
     public double maxLikelihood(int maxEvaluations) {
-        return maxLikelihood(maxEvaluations, DEFAULT_OPTIMIZER);
+        return maxLikelihood(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     private double optimize(int maxEvaluations,
-                            List<? extends Vertex> outputVertices,
+                            List<Vertex> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
-        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(outputVertices, bayesNet.getContinuousLatentVertices());
+        bayesNet.cascadeObservations();
+
+        FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
+            outputVertices,
+            bayesNet.getContinuousLatentVertices(),
+            this::handleGradientCalculation,
+            this::handleFitnessCalculation
+        );
+
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
         ObjectiveFunctionGradient gradient = new ObjectiveFunctionGradient(fitnessFunction.gradient());
 
-        double[] startingPoint = currentPoint();
+        double[] startingPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitness.getObjectiveFunction().value(startingPoint);
         double[] initialGradient = gradient.getObjectiveFunctionGradient().value(startingPoint);
 
@@ -115,18 +143,33 @@ public class GradientOptimizer {
         return pointValuePair.getValue();
     }
 
-    private double[] currentPoint() {
-        double[] point = new double[bayesNet.getContinuousLatentVertices().size()];
-        for (int i = 0; i < point.length; i++) {
-            point[i] = bayesNet.getContinuousLatentVertices().get(i).getValue();
+    static double[] currentPoint(List<Vertex<DoubleTensor>> continuousVertices) {
+
+        long totalLatentDimensions = 0;
+        for (Vertex<DoubleTensor> vertex : continuousVertices) {
+            totalLatentDimensions += FitnessFunction.numDimensions(vertex);
         }
+
+        if (totalLatentDimensions > Integer.MAX_VALUE) {
+            throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
+        }
+
+        int position = 0;
+        double[] point = new double[(int) totalLatentDimensions];
+
+        for (Vertex<DoubleTensor> vertex : continuousVertices) {
+            double[] values = vertex.getValue().asFlatDoubleArray();
+            System.arraycopy(values, 0, point, position, values.length);
+            position += values.length;
+        }
+
         return point;
     }
 
     private void warnIfGradientIsFlat(double[] gradient) {
         double maxGradient = Arrays.stream(gradient).max().getAsDouble();
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
-            log.warn("The initial gradient is very flat. The largest gradient is {}", maxGradient);
+            throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
         }
     }
 }

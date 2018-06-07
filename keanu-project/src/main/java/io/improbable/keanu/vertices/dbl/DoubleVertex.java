@@ -2,9 +2,9 @@ package io.improbable.keanu.vertices.dbl;
 
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
@@ -13,15 +13,124 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
 import java.util.*;
 import java.util.function.Function;
 
-public abstract class DoubleVertex extends ContinuousVertex<Double> implements DoubleOperators<DoubleVertex> {
+public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
 
-    /**
-     * Calculate the Dual Number of a DoubleVertex.
-     *
-     * @param dualNumbers A Map that is guaranteed to contain the Dual Numbers of the parent of the vertex.
-     * @return The Dual Number of the vertex.
-     */
-    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+    public DoubleVertex minus(DoubleVertex that) {
+        return new DifferenceVertex(this, that);
+    }
+
+    public DoubleVertex plus(DoubleVertex that) {
+        return new AdditionVertex(this, that);
+    }
+
+    public DoubleVertex multiply(DoubleVertex that) {
+        return new MultiplicationVertex(this, that);
+    }
+
+    public DoubleVertex divideBy(DoubleVertex that) {
+        return new DivisionVertex(this, that);
+    }
+
+    public DoubleVertex pow(DoubleVertex exponent) {
+        return new PowerVertex(this, exponent);
+    }
+
+    public DoubleVertex minus(double that) {
+        return new DifferenceVertex(this, new ConstantDoubleVertex(that));
+    }
+
+    public DoubleVertex plus(double that) {
+        return new AdditionVertex(this, new ConstantDoubleVertex(that));
+    }
+
+    public DoubleVertex multiply(double that) {
+        return new MultiplicationVertex(this, new ConstantDoubleVertex(that));
+    }
+
+    public DoubleVertex divideBy(double that) {
+        return new DivisionVertex(this, new ConstantDoubleVertex(that));
+    }
+
+    public DoubleVertex pow(double power) {
+        return new PowerVertex(this, new ConstantDoubleVertex(power));
+    }
+
+    public DoubleVertex abs() {
+        return new AbsVertex(this);
+    }
+
+    public DoubleVertex floor() {
+        return new FloorVertex(this);
+    }
+
+    public DoubleVertex ceil() {
+        return new CeilVertex(this);
+    }
+
+    public DoubleVertex exp() {
+        return new ExpVertex(this);
+    }
+
+    public DoubleVertex log() {
+        return new LogVertex(this);
+    }
+
+    public DoubleVertex sigmoid() {
+        return new SigmoidVertex(this);
+    }
+
+    public DoubleVertex sin() {
+        return new SinVertex(this);
+    }
+
+    public DoubleVertex cos() {
+        return new CosVertex(this);
+    }
+
+    public DoubleVertex tan() {
+        return new TanVertex(this);
+    }
+
+    public DoubleVertex asin() {
+        return new ArcSinVertex(this);
+    }
+
+    public DoubleVertex acos() {
+        return new ArcCosVertex(this);
+    }
+
+    public DoubleVertex atan() {
+        return new ArcTanVertex(this);
+    }
+
+    public DoubleVertex atan2(DoubleVertex that) {
+        return new ArcTan2Vertex(this, that);
+    }
+
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
+    }
+
+    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    public DoubleVertex times(DoubleVertex that) {
+        return multiply(that);
+    }
+
+    public DoubleVertex div(DoubleVertex that) {
+        return divideBy(that);
+    }
+
+    public DoubleVertex times(double that) {
+        return multiply(that);
+    }
+
+    public DoubleVertex div(double that) {
+        return divideBy(that);
+    }
+
+    public DoubleVertex unaryMinus() {
+        return multiply(-1.0);
+    }
 
     public final DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
@@ -66,115 +175,53 @@ public abstract class DoubleVertex extends ContinuousVertex<Double> implements D
         return notCalculatedParents;
     }
 
-    public DoubleVertex minus(DoubleVertex that) {
-        return new DifferenceVertex(this, that);
+    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+
+    public void setValue(double value) {
+        super.setValue(DoubleTensor.create(value, getShape()));
     }
 
-    public DoubleVertex plus(DoubleVertex that) {
-        return new AdditionVertex(this, that);
+    public void setValue(double[] values) {
+        super.setValue(DoubleTensor.create(values, getShape()));
     }
 
-    public DoubleVertex multiply(DoubleVertex that) {
-        return new MultiplicationVertex(this, that);
+    public void setAndCascade(double value) {
+        super.setAndCascade(DoubleTensor.create(value, getShape()));
     }
 
-    public DoubleVertex divideBy(DoubleVertex that) {
-        return new DivisionVertex(this, that);
+    public void setAndCascade(double[] values) {
+        super.setAndCascade(DoubleTensor.create(values, getShape()));
     }
 
-    public DoubleVertex minus(Vertex<Double> that) {
-        return new DifferenceVertex(this, new CastDoubleVertex(that));
+    public void setAndCascade(double value, Map<Long, Long> explored) {
+        super.setAndCascade(DoubleTensor.create(value, getShape()), explored);
     }
 
-    public DoubleVertex plus(Vertex<Double> that) {
-        return new AdditionVertex(this, new CastDoubleVertex(that));
+    public void setAndCascade(double[] values, Map<Long, Long> explored) {
+        super.setAndCascade(DoubleTensor.create(values, getShape()), explored);
     }
 
-    public DoubleVertex multiply(Vertex<Double> that) {
-        return new MultiplicationVertex(this, new CastDoubleVertex(that));
+    public void observe(double value) {
+        super.observe(DoubleTensor.create(value, getShape()));
     }
 
-    public DoubleVertex divideBy(Vertex<Double> that) {
-        return new DivisionVertex(this, new CastDoubleVertex(that));
+    public void observe(double[] values) {
+        super.observe(DoubleTensor.create(values, getShape()));
     }
 
-    public DoubleVertex pow(DoubleVertex power) {
-        return new PowerVertex(this, power);
+    public double logPdf(double value) {
+        return this.logPdf(DoubleTensor.scalar(value));
     }
 
-    public DoubleVertex minus(double value) {
-        return new DifferenceVertex(this, new ConstantDoubleVertex(value));
+    public double logPdf(double[] values) {
+        return this.logPdf(DoubleTensor.create(values));
     }
 
-    public DoubleVertex plus(double value) {
-        return new AdditionVertex(this, new ConstantDoubleVertex(value));
+    public Map<Long, DoubleTensor> dLogPdf(double value) {
+        return this.dLogPdf(DoubleTensor.scalar(value));
     }
 
-    public DoubleVertex multiply(double factor) {
-        return new MultiplicationVertex(this, new ConstantDoubleVertex(factor));
+    public Map<Long, DoubleTensor> dLogPdf(double[] values) {
+        return this.dLogPdf(DoubleTensor.create(values));
     }
-
-    public DoubleVertex divideBy(double divisor) {
-        return new DivisionVertex(this, new ConstantDoubleVertex(divisor));
-    }
-
-    public DoubleVertex pow(double power) {
-        return new PowerVertex(this, power);
-    }
-
-    public DoubleVertex abs() {
-        return new AbsVertex(this);
-    }
-
-    public DoubleVertex lambda(Function<Double, Double> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation);
-    }
-
-
-    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
-    public DoubleVertex times(DoubleVertex that) {
-        return multiply(that);
-    }
-
-    public DoubleVertex div(DoubleVertex that) {
-        return divideBy(that);
-    }
-
-    public DoubleVertex times(double that) {
-        return multiply(that);
-    }
-
-    public DoubleVertex div(double that) {
-        return divideBy(that);
-    }
-
-    public DoubleVertex unaryMinus() {
-        return multiply(-1.0);
-    }
-
-
-    public DoubleVertex log() {
-        return new LogVertex(this);
-    }
-
-    public DoubleVertex exp() {
-        return new ExpVertex(this);
-    }
-
-    public DoubleVertex sin() {
-        return new SinVertex(this);
-    }
-
-    public DoubleVertex cos() {
-        return new CosVertex(this);
-    }
-
-    public DoubleVertex asin() {
-        return new ArcSinVertex(this);
-    }
-
-    public DoubleVertex acos() {
-        return new ArcCosVertex(this);
-    }
-
 }

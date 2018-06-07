@@ -2,12 +2,12 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-import io.improbable.keanu.vertices.dbltensor.DoubleTensor;
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,12 +21,12 @@ import java.util.Map;
  */
 public class NUTS {
 
-    private final static double DELTA_MAX = 1000.0;
+    static private final double DELTA_MAX = 1000.0;
 
     private NUTS() {
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
                                                      final double stepSize) {
@@ -34,27 +34,27 @@ public class NUTS {
         return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(final BayesNetDoubleAsContinuous bayesNet,
+    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final double epsilon,
                                                      final KeanuRandom random) {
 
-        final List<Vertex<Double>> latentVertices = bayesNet.getContinuousLatentVertices();
+        bayesNet.cascadeObservations();
+
+        final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));
 
-        Map<Long, Double> position = new HashMap<>();
+        Map<Long, DoubleTensor> position = new HashMap<>();
         cachePosition(latentVertices, position);
 
-        Map<Long, Double> gradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
-            probabilisticVertices
-        ));
+        Map<Long, DoubleTensor> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
-        Map<Long, Double> momentum = new HashMap<>();
+        Map<Long, DoubleTensor> momentum = new HashMap<>();
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
 
@@ -136,7 +136,7 @@ public class NUTS {
     }
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
-                                                  List<Vertex<Double>> latentVertices,
+                                                  List<Vertex<DoubleTensor>> latentVertices,
                                                   final Map<Long, Long> latentSetAndCascadeCache,
                                                   List<Vertex> probabilisticVertices,
                                                   final List<? extends Vertex> sampleFromVertices,
@@ -193,13 +193,13 @@ public class NUTS {
         return otherHalfTree;
     }
 
-    private static BuiltTree buildTree(List<Vertex<Double>> latentVertices,
+    private static BuiltTree buildTree(List<Vertex<DoubleTensor>> latentVertices,
                                        final Map<Long, Long> latentSetAndCascadeCache,
                                        List<Vertex> probabilisticVertices,
                                        final List<? extends Vertex> sampleFromVertices,
-                                       Map<Long, Double> position,
-                                       Map<Long, Double> gradient,
-                                       Map<Long, Double> momentum,
+                                       Map<Long, DoubleTensor> position,
+                                       Map<Long, DoubleTensor> gradient,
+                                       Map<Long, DoubleTensor> momentum,
                                        double u,
                                        int buildDirection,
                                        int treeHeight,
@@ -207,7 +207,7 @@ public class NUTS {
                                        KeanuRandom random) {
         if (treeHeight == 0) {
 
-            //Base case—take one leapfrog step in the build direction
+            //Base case-take one leapfrog step in the build direction
 
             return builtTreeBaseCase(latentVertices,
                 latentSetAndCascadeCache,
@@ -222,7 +222,7 @@ public class NUTS {
             );
 
         } else {
-            //Recursion—implicitly build the left and right subtrees.
+            //Recursion-implicitly build the left and right subtrees.
 
             BuiltTree tree = buildTree(
                 latentVertices,
@@ -278,13 +278,13 @@ public class NUTS {
 
     }
 
-    private static BuiltTree builtTreeBaseCase(List<Vertex<Double>> latentVertices,
+    private static BuiltTree builtTreeBaseCase(List<Vertex<DoubleTensor>> latentVertices,
                                                final Map<Long, Long> latentSetAndCascadeCache,
                                                List<Vertex> probabilisticVertices,
                                                final List<? extends Vertex> sampleFromVertices,
-                                               Map<Long, Double> position,
-                                               Map<Long, Double> gradient,
-                                               Map<Long, Double> momentum,
+                                               Map<Long, DoubleTensor> position,
+                                               Map<Long, DoubleTensor> gradient,
+                                               Map<Long, DoubleTensor> momentum,
                                                double u,
                                                int buildDirection,
                                                double epsilon) {
@@ -347,87 +347,95 @@ public class NUTS {
         return random.nextDouble() < probability;
     }
 
-    private static boolean isNotUTurning(Map<Long, Double> positionForward,
-                                         Map<Long, Double> positionBackward,
-                                         Map<Long, Double> momentumForward,
-                                         Map<Long, Double> momentumBackward) {
+    private static boolean isNotUTurning(Map<Long, DoubleTensor> positionForward,
+                                         Map<Long, DoubleTensor> positionBackward,
+                                         Map<Long, DoubleTensor> momentumForward,
+                                         Map<Long, DoubleTensor> momentumBackward) {
         double forward = 0.0;
         double backward = 0.0;
 
-        for (Map.Entry<Long, Double> forwardPositionForLatent : positionForward.entrySet()) {
+        for (Map.Entry<Long, DoubleTensor> forwardPositionForLatent : positionForward.entrySet()) {
 
             final long latentId = forwardPositionForLatent.getKey();
-            final double forwardMinusBackward = forwardPositionForLatent.getValue() - positionBackward.get(latentId);
+            final DoubleTensor forwardMinusBackward = forwardPositionForLatent.getValue().minus(
+                positionBackward.get(latentId)
+            );
 
-            forward += forwardMinusBackward * momentumForward.get(latentId);
-            backward += forwardMinusBackward * momentumBackward.get(latentId);
+            forward += forwardMinusBackward.times(momentumForward.get(latentId)).sum();
+            backward += forwardMinusBackward.timesInPlace(momentumBackward.get(latentId)).sum();
         }
 
         return (forward >= 0.0) && (backward >= 0.0);
     }
 
-    private static void cachePosition(List<Vertex<Double>> latentVertices, Map<Long, Double> position) {
-        for (Vertex<Double> vertex : latentVertices) {
+    private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<Long, DoubleTensor> position) {
+        for (Vertex<DoubleTensor> vertex : latentVertices) {
             position.put(vertex.getId(), vertex.getValue());
         }
     }
 
-    private static void initializeMomentumForEachVertex(List<Vertex<Double>> vertices,
-                                                        Map<Long, Double> momentums,
+    private static void initializeMomentumForEachVertex(List<Vertex<DoubleTensor>> vertices,
+                                                        Map<Long, DoubleTensor> momentums,
                                                         KeanuRandom random) {
-        for (Vertex<Double> vertex : vertices) {
-            momentums.put(vertex.getId(), random.nextGaussian());
+        for (Vertex<DoubleTensor> vertex : vertices) {
+            momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
         }
     }
 
-    private static void cache(Map<Long, Double> from, Map<Long, Double> to) {
-        for (Map.Entry<Long, Double> entry : from.entrySet()) {
+    private static void cache(Map<Long, DoubleTensor> from, Map<Long, DoubleTensor> to) {
+        for (Map.Entry<Long, DoubleTensor> entry : from.entrySet()) {
             to.put(entry.getKey(), entry.getValue());
         }
     }
 
-    private static LeapFrogged leapfrog(final List<Vertex<Double>> latentVertices,
+    private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
                                         final Map<Long, Long> latentSetAndCascadeCache,
                                         final List<Vertex> probabilisticVertices,
-                                        final Map<Long, Double> position,
-                                        final Map<Long, Double> gradient,
-                                        final Map<Long, Double> momentum,
+                                        final Map<Long, DoubleTensor> position,
+                                        final Map<Long, DoubleTensor> gradient,
+                                        final Map<Long, DoubleTensor> momentum,
                                         final double epsilon) {
 
         final double halfTimeStep = epsilon / 2.0;
 
-        Map<Long, Double> nextMomentum = new HashMap<>();
-        Map<Long, Double> nextPosition = new HashMap<>();
+        Map<Long, DoubleTensor> nextMomentum = new HashMap<>();
+        Map<Long, DoubleTensor> nextPosition = new HashMap<>();
 
-        for (Map.Entry<Long, Double> rEntry : momentum.entrySet()) {
-            final double updatedMomentum = rEntry.getValue() + halfTimeStep * gradient.get(rEntry.getKey());
+        for (Map.Entry<Long, DoubleTensor> rEntry : momentum.entrySet()) {
+            final DoubleTensor updatedMomentum = (gradient.get(rEntry.getKey()).times(halfTimeStep)).plusInPlace(rEntry.getValue());
             nextMomentum.put(rEntry.getKey(), updatedMomentum);
         }
 
-        for (Vertex<Double> latent : latentVertices) {
-            final double nextPositionForLatent = position.get(latent.getId()) + halfTimeStep * nextMomentum.get(latent.getId());
+        for (Vertex<DoubleTensor> latent : latentVertices) {
+            final DoubleTensor nextPositionForLatent = nextMomentum.get(latent.getId()).
+                times(halfTimeStep).
+                plusInPlace(
+                    position.get(latent.getId())
+                );
             nextPosition.put(latent.getId(), nextPositionForLatent);
             latent.setValue(nextPositionForLatent);
         }
 
         VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
 
-        Map<Long, Double> nextPositionGradient = DoubleTensor.toScalars(LogProbGradient.getJointLogProbGradientWrtLatents(
-            probabilisticVertices
-        ));
+        Map<Long, DoubleTensor> nextPositionGradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
-        for (Map.Entry<Long, Double> nextMomentumForLatent : nextMomentum.entrySet()) {
-            final double nextNextMomentumForLatent = nextMomentumForLatent.getValue() + halfTimeStep * nextPositionGradient.get(nextMomentumForLatent.getKey());
+        for (Map.Entry<Long, DoubleTensor> nextMomentumForLatent : nextMomentum.entrySet()) {
+            final DoubleTensor nextNextMomentumForLatent = nextPositionGradient.get(nextMomentumForLatent.getKey()).
+                times(halfTimeStep).
+                plusInPlace(
+                    nextMomentumForLatent.getValue()
+                );
             nextMomentum.put(nextMomentumForLatent.getKey(), nextNextMomentumForLatent);
         }
 
         return new LeapFrogged(nextPosition, nextMomentum, nextPositionGradient);
     }
 
-    private static double dotProduct(Map<Long, Double> momentums) {
+    private static double dotProduct(Map<Long, DoubleTensor> momentums) {
         double dotProduct = 0.0;
-        for (Double momentum : momentums.values()) {
-            dotProduct += momentum * momentum;
+        for (DoubleTensor momentum : momentums.values()) {
+            dotProduct += momentum.pow(2).sum();
         }
         return dotProduct;
     }
@@ -467,13 +475,13 @@ public class NUTS {
     }
 
     private static class LeapFrogged {
-        final Map<Long, Double> position;
-        final Map<Long, Double> momentum;
-        final Map<Long, Double> gradient;
+        final Map<Long, DoubleTensor> position;
+        final Map<Long, DoubleTensor> momentum;
+        final Map<Long, DoubleTensor> gradient;
 
-        LeapFrogged(Map<Long, Double> position,
-                    Map<Long, Double> momentum,
-                    Map<Long, Double> gradient) {
+        LeapFrogged(Map<Long, DoubleTensor> position,
+                    Map<Long, DoubleTensor> momentum,
+                    Map<Long, DoubleTensor> gradient) {
             this.position = position;
             this.momentum = momentum;
             this.gradient = gradient;
@@ -482,27 +490,27 @@ public class NUTS {
 
     private static class BuiltTree {
 
-        Map<Long, Double> positionBackward;
-        Map<Long, Double> gradientBackward;
-        Map<Long, Double> momentumBackward;
-        Map<Long, Double> positionForward;
-        Map<Long, Double> gradientForward;
-        Map<Long, Double> momentumForward;
-        Map<Long, Double> acceptedPosition;
-        Map<Long, Double> gradientAtAcceptedPosition;
+        Map<Long, DoubleTensor> positionBackward;
+        Map<Long, DoubleTensor> gradientBackward;
+        Map<Long, DoubleTensor> momentumBackward;
+        Map<Long, DoubleTensor> positionForward;
+        Map<Long, DoubleTensor> gradientForward;
+        Map<Long, DoubleTensor> momentumForward;
+        Map<Long, DoubleTensor> acceptedPosition;
+        Map<Long, DoubleTensor> gradientAtAcceptedPosition;
         double logOfMasterPAtAcceptedPosition;
         Map<Long, ?> sampleAtAcceptedPosition;
         int acceptedLeapfrogCount;
         boolean shouldContinueFlag;
 
-        BuiltTree(Map<Long, Double> positionBackward,
-                  Map<Long, Double> gradientBackward,
-                  Map<Long, Double> momentumBackward,
-                  Map<Long, Double> positionForward,
-                  Map<Long, Double> gradientForward,
-                  Map<Long, Double> momentumForward,
-                  Map<Long, Double> acceptedPosition,
-                  Map<Long, Double> gradientAtAcceptedPosition,
+        BuiltTree(Map<Long, DoubleTensor> positionBackward,
+                  Map<Long, DoubleTensor> gradientBackward,
+                  Map<Long, DoubleTensor> momentumBackward,
+                  Map<Long, DoubleTensor> positionForward,
+                  Map<Long, DoubleTensor> gradientForward,
+                  Map<Long, DoubleTensor> momentumForward,
+                  Map<Long, DoubleTensor> acceptedPosition,
+                  Map<Long, DoubleTensor> gradientAtAcceptedPosition,
                   double logOfMasterPAtAcceptedPosition,
                   Map<Long, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,

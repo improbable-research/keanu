@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
-import io.improbable.keanu.vertices.dbltensor.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -12,7 +12,6 @@ public class Uniform {
 
     private Uniform() {
     }
-
 
     /**
      * @param xMin   minimum x value

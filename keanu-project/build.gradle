@@ -14,7 +14,7 @@ plugins {
 }
 
 group = 'io.improbable'
-version = '0.0.7'
+version = '0.0.8'
 archivesBaseName = "keanu"
 
 sourceCompatibility = 1.8
@@ -29,13 +29,12 @@ dependencies {
 
     compile 'org.apache.commons:commons-math3:3.6.1'
     compile 'org.nd4j:nd4j-native-platform:1.0.0-alpha'
-    compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.25'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
+    compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.10'
 
     //testing
     testCompile 'junit:junit:4.12'
     testCompile 'org.jfree:jfreechart:1.0.19'
-    testCompile group: 'org.slf4j', name: 'slf4j-jdk14', version: '1.7.25'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
 
