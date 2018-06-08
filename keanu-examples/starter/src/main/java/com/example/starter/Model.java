@@ -2,7 +2,7 @@ package com.example.starter;
 
 
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
-import io.improbable.keanu.network.BayesNetDoubleAsContinuous;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -56,7 +56,7 @@ public class Model {
         C.observe(2.0);
 
         //Create a BayesNet object from your model
-		BayesNetDoubleAsContinuous bayesNet = new BayesNetDoubleAsContinuous(A.getConnectedGraph());
+        BayesianNetwork bayesNet = new BayesianNetwork(A.getConnectedGraph());
 
         //Find the most probable value for A and B given we've taken a
         //noisy observation of 2.0
@@ -64,7 +64,7 @@ public class Model {
         optimizer.maxAPosteriori(5000);
 
         //Expose model results
-        results = (A.getValue() + B.getValue());
+        results = (A.getValue().scalar() + B.getValue().scalar());
 
         System.out.println("A is most probably " + A.getValue());
         System.out.println("B is most probably " + B.getValue());
