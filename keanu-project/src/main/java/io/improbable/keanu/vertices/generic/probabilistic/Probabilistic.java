@@ -3,10 +3,10 @@ package io.improbable.keanu.vertices.generic.probabilistic;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 
-public abstract class Probabilistic<T, TENSOR extends Tensor<T>> extends Vertex<TENSOR> {
+public abstract class Probabilistic<T> extends Vertex<T> {
 
     @Override
-    public TENSOR updateValue() {
+    public T updateValue() {
         if (!hasValue()) {
             setValue(sampleUsingDefaultRandom());
         }

@@ -15,6 +15,10 @@ public class ConstantVertex {
     private ConstantVertex() {
     }
 
+    public static ConstantBoolVertex of(Boolean value) {
+        return new ConstantBoolVertex(value);
+    }
+
     public static ConstantBoolVertex of(boolean value) {
         return new ConstantBoolVertex(value);
     }
@@ -27,6 +31,10 @@ public class ConstantVertex {
         return new ConstantBoolVertex(value);
     }
 
+    public static ConstantIntegerVertex of(Integer value) {
+        return new ConstantIntegerVertex(value);
+    }
+
     public static ConstantIntegerVertex of(int value) {
         return new ConstantIntegerVertex(value);
     }
@@ -37,6 +45,10 @@ public class ConstantVertex {
 
     public static ConstantIntegerVertex of(IntegerTensor value) {
         return new ConstantIntegerVertex(value);
+    }
+
+    public static ConstantDoubleVertex of(Double value) {
+        return new ConstantDoubleVertex(value);
     }
 
     public static ConstantDoubleVertex of(double value) {

@@ -1,20 +1,19 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Map;
 
-public abstract class NonProbabilistic<TENSOR extends Tensor> extends Vertex<TENSOR> {
+public abstract class NonProbabilistic<T> extends Vertex<T> {
 
     @Override
-    public double logProb(TENSOR value) {
-        return this.getDerivedValue().elementwiseEquals(value).allTrue() ? 0.0 : Double.NEGATIVE_INFINITY;
+    public double logProb(T value) {
+        return this.getDerivedValue().equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(TENSOR value) {
+    public Map<Long, DoubleTensor> dLogProb(T value) {
         throw new UnsupportedOperationException();
     }
 
@@ -24,13 +23,13 @@ public abstract class NonProbabilistic<TENSOR extends Tensor> extends Vertex<TEN
     }
 
     @Override
-    public TENSOR updateValue() {
+    public T updateValue() {
         if (!this.isObserved()) {
             setValue(getDerivedValue());
         }
         return getValue();
     }
 
-    public abstract TENSOR getDerivedValue();
+    public abstract T getDerivedValue();
 
 }
