@@ -293,6 +293,26 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public double average() {
+        return value;
+    }
+
+    @Override
+    public double standardDeviation() {
+        throw new IllegalStateException("Cannot find the standard deviation of a scalar");
+    }
+
+    @Override
+    public DoubleTensor standardize() {
+        throw new IllegalStateException("Cannot standardize a scalar");
+    }
+
+    @Override
+    public DoubleTensor standardizeInPlace() {
+        throw new IllegalStateException("Cannot standardize a scalar");
+    }
+
+    @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
         return duplicate().clampInPlace(min, max);
     }

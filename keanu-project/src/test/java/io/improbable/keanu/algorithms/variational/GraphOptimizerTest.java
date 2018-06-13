@@ -28,7 +28,7 @@ public class GraphOptimizerTest {
 
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
-        optimizer.maxLikelihood(10000);
+        optimizer.maxLikelihood();
         double maxA = A.getValue().scalar();
         double maxB = B.getValue().scalar();
 
@@ -52,7 +52,7 @@ public class GraphOptimizerTest {
 
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
-        optimizer.maxAPosteriori(10000);
+        optimizer.maxAPosteriori();
         double maxA = A.getValue().scalar();
         double maxB = B.getValue().scalar();
 

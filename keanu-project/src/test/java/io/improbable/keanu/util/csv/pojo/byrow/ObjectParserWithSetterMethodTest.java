@@ -1,5 +1,7 @@
-package io.improbable.keanu.util.csv.pojo;
+package io.improbable.keanu.util.csv.pojo.byrow;
 
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
+import io.improbable.keanu.util.csv.pojo.byrow.RowsAsObjectParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +28,7 @@ public class ObjectParserWithSetterMethodTest {
     public void givenExactNameMatchThenResultIsLoadedCorrectly() {
         List<String> titles = Arrays.asList("myInt", "myString", "myDouble", "myFloat", "myBoolean");
 
-        List<TestPOJOWithSettersClass> output = ObjectParser.parse(
+        List<TestPOJOWithSettersClass> output = RowsAsObjectParser.stream(
             TestPOJOWithSettersClass.class,
             data.stream(),
             titles

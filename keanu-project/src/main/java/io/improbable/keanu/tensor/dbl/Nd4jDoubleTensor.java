@@ -130,6 +130,30 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public double average() {
+        return tensor.sumNumber().doubleValue() / tensor.length();
+    }
+
+    @Override
+    public double standardDeviation() {
+        double average = average();
+        return Math.sqrt(Transforms.pow(tensor.sub(average), 2, false)
+            .sumNumber().doubleValue() / (tensor.length() - 1));
+    }
+
+
+    @Override
+    public DoubleTensor standardize() {
+        return duplicate().standardizeInPlace();
+    }
+
+    @Override
+    public DoubleTensor standardizeInPlace() {
+        tensor.subi(average()).divi(standardDeviation());
+        return this;
+    }
+
+    @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
         return duplicate().clampInPlace(min, max);
     }
