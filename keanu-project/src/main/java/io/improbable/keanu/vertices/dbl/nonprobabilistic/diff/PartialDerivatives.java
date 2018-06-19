@@ -140,18 +140,6 @@ public class PartialDerivatives {
         return new PartialDerivatives(powered);
     }
 
-    public PartialDerivatives sum() {
-        Map<Long, DoubleTensor> summed = new HashMap<>();
-
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
-            DoubleTensor v = DoubleTensor.scalar(entry.getValue().sum());
-            summed.put(k, v);
-        }
-
-        return new PartialDerivatives(summed);
-    }
-
     public PartialDerivatives clone() {
         return new PartialDerivatives(cloneInfinitesimals(derivativeWithRespectTo));
     }
