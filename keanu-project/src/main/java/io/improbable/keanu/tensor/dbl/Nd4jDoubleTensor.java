@@ -141,7 +141,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             .sumNumber().doubleValue() / (tensor.length() - 1));
     }
 
-
     @Override
     public DoubleTensor standardize() {
         return duplicate().standardizeInPlace();

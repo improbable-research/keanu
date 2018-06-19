@@ -10,7 +10,8 @@ import static org.junit.Assert.assertEquals;
 
 public class CsvReaderByRowTest {
 
-    String csv = "a,b,c\nhel,lo,world";
+    String csv = "a,b,c\n" +
+        "hel,lo,world";
 
     @Test
     public void givenCsvStringThenLoadAsPOJO() {

@@ -12,7 +12,10 @@ import static org.junit.Assert.assertArrayEquals;
 
 public class CsvReaderByColumnTest {
 
-    String csv = "a,b,c\n0,2.5,t\n1,3,true\n-3,4e3,0";
+    String csv = "a,b,c\n" +
+        "0,2.5,t\n" +
+        "1,3,true\n" +
+        "-3,4e3,0";
 
     @Test
     public void givenCsvStringThenLoadAsPOJO() {
