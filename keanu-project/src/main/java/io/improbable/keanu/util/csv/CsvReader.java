@@ -1,17 +1,18 @@
 package io.improbable.keanu.util.csv;
 
-import io.improbable.keanu.util.csv.pojo.ObjectParser;
+import io.improbable.keanu.util.csv.pojo.bycolumn.ColumnsVectorizedObjectParser;
+import io.improbable.keanu.util.csv.pojo.byrow.RowsAsObjectParser;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
 public class CsvReader {
@@ -66,10 +67,16 @@ public class CsvReader {
             .map(this::splitLine);
     }
 
-    public <T> ObjectParser<T> as(Class<T> clazz) {
+    public <T> RowsAsObjectParser<T> asRowsDefinedBy(Class<T> clazz) {
         //Header required for pojo deserialize
         expectHeader(true);
-        return new ObjectParser<>(clazz, streamLines(), getHeader());
+        return new RowsAsObjectParser<>(clazz, streamLines(), getHeader());
+    }
+
+    public <T> ColumnsVectorizedObjectParser<T> asVectorizedColumnsDefinedBy(Class<T> clazz) {
+        //Header required for pojo deserialize
+        expectHeader(true);
+        return new ColumnsVectorizedObjectParser<>(clazz, streamLines(), getHeader());
     }
 
     /**
@@ -117,6 +124,8 @@ public class CsvReader {
     }
 
     private List<String> splitLine(String line) {
-        return asList(line.split(delimiter));
+        return Arrays.stream(line.split(delimiter))
+            .map(String::trim)
+            .collect(Collectors.toList());
     }
 }

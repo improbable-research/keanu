@@ -53,6 +53,9 @@ public class ReadCsv {
      */
     private static Reader getFileFromResources(String fileOnClassPath) {
         InputStream csvFileStream = ReadCsv.class.getClassLoader().getResourceAsStream(fileOnClassPath);
+        if (csvFileStream == null) {
+            throw new UncheckedIOException(new FileNotFoundException(fileOnClassPath + " not found on class path!"));
+        }
         return new InputStreamReader(csvFileStream);
     }
 }

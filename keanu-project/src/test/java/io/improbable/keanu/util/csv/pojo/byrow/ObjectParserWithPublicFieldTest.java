@@ -1,5 +1,7 @@
-package io.improbable.keanu.util.csv.pojo;
+package io.improbable.keanu.util.csv.pojo.byrow;
 
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
+import io.improbable.keanu.util.csv.pojo.byrow.RowsAsObjectParser;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -26,7 +28,7 @@ public class ObjectParserWithPublicFieldTest {
     public void givenExactNameMatchThenResultIsLoadedCorrectly() {
         List<String> titles = Arrays.asList("id", "name");
 
-        List<TestPOJOWithPublicFieldsClass> output = ObjectParser.parse(
+        List<TestPOJOWithPublicFieldsClass> output = RowsAsObjectParser.stream(
             TestPOJOWithPublicFieldsClass.class,
             data.stream(),
             titles
@@ -42,14 +44,14 @@ public class ObjectParserWithPublicFieldTest {
     @Test(expected = IllegalArgumentException.class)
     public void givenWrongNamesThenResultIsNotLoaded() {
         List<String> titles = Arrays.asList("abc", "efg");
-        ObjectParser.parse(TestPOJOWithPublicFieldsClass.class, data.stream(), titles);
+        RowsAsObjectParser.stream(TestPOJOWithPublicFieldsClass.class, data.stream(), titles);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void givenSetToNotIgnoreFieldsThenThrowsExceptionForMissingField() {
         List<String> titles = Arrays.asList("id", "name", "blah");
 
-        ObjectParser.parse(
+        RowsAsObjectParser.stream(
             TestPOJOWithPublicFieldsClass.class,
             data.stream(),
             titles,
@@ -61,7 +63,7 @@ public class ObjectParserWithPublicFieldTest {
     public void givenCaseDifferenceThenStillExactMatch() {
         List<String> titles = Arrays.asList("Id", "name");
 
-        List<TestPOJOWithPublicFieldsClass> output = ObjectParser.parse(
+        List<TestPOJOWithPublicFieldsClass> output = RowsAsObjectParser.stream(
             TestPOJOWithPublicFieldsClass.class,
             data.stream(),
             titles
