@@ -107,6 +107,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new ArcTan2Vertex(this, that);
     }
 
+    public DoubleVertex sum() {
+        return new SumVertex(this);
+    }
+
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
