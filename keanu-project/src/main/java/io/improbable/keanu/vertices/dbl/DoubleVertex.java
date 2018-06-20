@@ -228,4 +228,8 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     public Map<Long, DoubleTensor> dLogPdf(double[] values) {
         return this.dLogPdf(DoubleTensor.create(values));
     }
+
+    public double getValue(int... index) {
+        return getValue().getValue(index);
+    }
 }
