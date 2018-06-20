@@ -148,4 +148,8 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return this.dLogPmf(IntegerTensor.create(values));
     }
 
+    public int getValue(int... index) {
+        return getValue().getValue(index);
+    }
+
 }
