@@ -165,4 +165,9 @@ public class DualNumber {
         return new DualNumber(value.log(), getPartialDerivatives().divideBy(value));
     }
 
+    public DualNumber sum() {
+        DoubleTensor sumOfAll = DoubleTensor.scalar(value.sum());
+        return new DualNumber(sumOfAll, this.partialDerivatives.clone());
+    }
+
 }
