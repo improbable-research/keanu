@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 
@@ -21,15 +20,9 @@ public class UniformIntVertexTest {
 
     @Before
     public void setup() {
-
         random = new KeanuRandom(1);
-
-        UniformIntVertex testUniformVertex = new UniformIntVertex(lowerBound, upperBound);
-
-        for (int i = 0; i < N; i++) {
-            Integer sample = testUniformVertex.sample(random).scalar();
-            samples.add(sample);
-        }
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        samples.addAll(testUniformVertex.sample(random).asFlatList());
     }
 
     @Test
@@ -69,5 +62,15 @@ public class UniformIntVertexTest {
     @Test
     public void exclusiveUpperBoundIsNeverProduced() {
         assertFalse(samples.contains(upperBound));
+    }
+
+    @Test
+    public void canUseFullIntRange() {
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, 100}, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        IntegerTensor sample = testUniformVertex.sample(random);
+
+        Set<Integer> uniqueValues = new HashSet<>(sample.asFlatList());
+
+        assertTrue(uniqueValues.size() > 1);
     }
 }
