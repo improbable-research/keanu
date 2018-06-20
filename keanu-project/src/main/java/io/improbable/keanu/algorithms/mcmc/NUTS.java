@@ -89,7 +89,7 @@ public class NUTS {
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
 
-        double stepSize = findStartingEpsilon(position,
+        double stepSize = findStartingStepSize(position,
             gradient,
             latentVertices,
             probabilisticVertices,
@@ -627,12 +627,12 @@ public class NUTS {
         }
     }
 
-    private static double findStartingEpsilon(Map<Long, DoubleTensor> position,
-                                              Map<Long, DoubleTensor> gradient,
-                                              List<Vertex<DoubleTensor>> vertices,
-                                              List<Vertex> probabilisticVertices,
-                                              Map<Long, Long> latentSetAndCascadeCache,
-                                              KeanuRandom random) {
+    private static double findStartingStepSize(Map<Long, DoubleTensor> position,
+                                               Map<Long, DoubleTensor> gradient,
+                                               List<Vertex<DoubleTensor>> vertices,
+                                               List<Vertex> probabilisticVertices,
+                                               Map<Long, Long> latentSetAndCascadeCache,
+                                               KeanuRandom random) {
         double stepsize = 1;
         double probBeforeLeapfrog = Math.exp(getLogProb(probabilisticVertices));
         Map<Long, DoubleTensor> momentums = new HashMap<>();
@@ -647,7 +647,7 @@ public class NUTS {
             leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
             likelihoodRatio = Math.exp(getLogProb(probabilisticVertices)) / probBeforeLeapfrog;
         }
-        
+
         return stepsize;
     }
 
