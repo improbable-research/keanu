@@ -15,13 +15,16 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Algorithm 3: "Efficient NUTS".
+ * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
 public class NUTS {
 
-    static private final double DELTA_MAX = 1000.0;
+    private static final double DELTA_MAX = 1000.0;
+    private static final double STABILISER = 10;
+    private static final double SHRINKAGE_FACTOR = 0.05;
+    private static final double k = 0.75;
 
     private NUTS() {
     }
@@ -29,31 +32,32 @@ public class NUTS {
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
-                                                     final int sampleCountAdapt,
-                                                     final double targetAcceptanceProb,
-                                                     double stepSize) {
+                                                     final int samplesToAdaptFor,
+                                                     final double targetAcceptanceProb) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, sampleCountAdapt, targetAcceptanceProb, stepSize, KeanuRandom.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, samplesToAdaptFor, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
     }
 
+
+    /**
+     * No-U-Turn Sampling
+     *
+     * @param bayesNet the bayesian network to sample from
+     * @param sampleFromVertices the vertices inside the bayesNet to sample from
+     * @param sampleCount the number of samples to take
+     * @param samplesToAdaptFor the number of samples that the stepsize will be tuned for
+     * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
+     *                             Beskos et al., 2010; Neal, 2011
+     * @param random the keanu random
+     */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
-                                                     final int sampleCountAdapt,
+                                                     final int samplesToAdaptFor,
                                                      final double targetAcceptanceProb,
-                                                     double stepSize,
                                                      final KeanuRandom random) {
 
         bayesNet.cascadeObservations();
-
-        stepSize = findReasonableEpsilon(stepSize);
-        double h = 0;
-        double emBar = 1;
-        double t0 = 10;
-        double k = 0.75;
-        double u1 = Math.log(10 * stepSize);
-        double logEm = 0;
-        double logEmBar = 0;
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
@@ -70,6 +74,16 @@ public class NUTS {
         Map<Long, DoubleTensor> momentum = new HashMap<>();
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
+
+        double stepSize = findStartingEpsilon(position, gradient, latentVertices, probabilisticVertices, latentSetAndCascadeCache, random);
+        AutoTune autoTune = new AutoTune(stepSize,
+            0,
+            targetAcceptanceProb,
+            Math.log(stepSize),
+            Math.log(1),
+            samplesToAdaptFor,
+            Math.log(10 * stepSize)
+        );
 
         BuiltTree tree = new BuiltTree(
             position,
@@ -142,15 +156,7 @@ public class NUTS {
                 treeHeight++;
             }
 
-            if (sampleNum <= sampleCountAdapt) {
-                double z = (1 / (sampleNum + t0));
-                h = ((1 - z) * h) + (z * (targetAcceptanceProb - (tree.alpha / tree.nAlpha)));
-                logEm = u1 - (Math.sqrt(sampleNum) / 0.05) * h;
-                logEmBar = Math.pow(sampleNum, -k) * logEm + (1 - Math.pow(sampleNum, -k)) * Math.log(emBar);
-                stepSize = Math.exp(logEm);
-            } else {
-                stepSize = Math.exp(logEmBar);
-            }
+            stepSize = adaptStepSize(autoTune, tree, sampleNum);
 
             tree.positionForward = tree.acceptedPosition;
             tree.gradientForward = tree.gradientAtAcceptedPosition;
@@ -582,8 +588,62 @@ public class NUTS {
         }
     }
 
-    private static double findReasonableEpsilon(double stepsize) {
+    private static class AutoTune {
+
+        double stepSize;
+        double averageAcceptanceProb;
+        double targetAcceptanceProb;
+        double logStepSize;
+        double logStepSizeBar;
+        double sampleCountAdapt;
+        double shrinkageTarget;
+
+        AutoTune(double stepSize, double averageAcceptanceProb, double targetAcceptanceProb, double logStepSize, double logStepSizeBar, int sampleCountAdapt, double shrinkageTarget) {
+            this.stepSize = stepSize;
+            this.averageAcceptanceProb = averageAcceptanceProb;
+            this.targetAcceptanceProb = targetAcceptanceProb;
+            this.logStepSize = logStepSize;
+            this.logStepSizeBar = logStepSizeBar;
+            this.sampleCountAdapt = sampleCountAdapt;
+            this.shrinkageTarget = shrinkageTarget;
+        }
+    }
+
+    private static double findStartingEpsilon(Map<Long, DoubleTensor> position,
+                                              Map<Long, DoubleTensor> gradient,
+                                              List<Vertex<DoubleTensor>> vertices,
+                                              List<Vertex> probabilisticVertices,
+                                              Map<Long, Long> latentSetAndCascadeCache,
+                                              KeanuRandom random) {
+        double stepsize = 1;
+        double initialLogProb = Math.exp(getLogProb(probabilisticVertices));
+        Map<Long, DoubleTensor> momentums = new HashMap<>();
+        for (Vertex<DoubleTensor> vertex : vertices) {
+            momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
+        }
+        leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
+        double logProb = Math.exp(getLogProb(probabilisticVertices));
+        double ratioLikelihood = logProb / initialLogProb;
+        double scalingFactor = ratioLikelihood > 0.5 ? 1 : -1;
+
+        while (Math.pow(ratioLikelihood, scalingFactor) > Math.pow(2, -scalingFactor)) {
+            stepsize = stepsize * Math.pow(2, scalingFactor);
+            leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
+            ratioLikelihood = Math.exp(getLogProb(probabilisticVertices)) / initialLogProb;
+        }
         return stepsize;
+    }
+
+    private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
+        if (sampleNum <= autoTune.sampleCountAdapt) {
+            double z = (1 / (sampleNum + STABILISER));
+            autoTune.averageAcceptanceProb = ((1 - z) * autoTune.averageAcceptanceProb) + (z * (autoTune.targetAcceptanceProb - (tree.alpha / tree.nAlpha)));
+            autoTune.logStepSize = autoTune.shrinkageTarget - (Math.sqrt(sampleNum) / SHRINKAGE_FACTOR) * autoTune.averageAcceptanceProb;
+            autoTune.logStepSizeBar = Math.pow(sampleNum, -k) * autoTune.logStepSize + (1 - Math.pow(sampleNum, -k)) * autoTune.logStepSizeBar;
+            return Math.exp(autoTune.logStepSize);
+        } else {
+            return Math.exp(autoTune.logStepSizeBar);
+        }
     }
 
 }

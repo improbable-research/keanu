@@ -27,9 +27,8 @@ public class NUTSTest {
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
             1000,
-            100,
-            0.75,
-            0.25,
+            50,
+            0.65,
             random
         );
 
@@ -48,8 +47,7 @@ public class NUTSTest {
             bayesNet.getLatentVertices(),
             2000,
             100,
-            0.75,
-            0.1,
+            0.65,
             random
         );
 
@@ -68,8 +66,7 @@ public class NUTSTest {
             donutBayesNet.getLatentVertices(),
             1000,
             100,
-            0.8,
-            0.05,
+            0.65,
             random
         );
 
