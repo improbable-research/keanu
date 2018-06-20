@@ -95,9 +95,10 @@ public class UniformIntVertex extends ProbabilisticInteger {
     @Override
     public IntegerTensor sample(KeanuRandom random) {
 
-        DoubleTensor delta = max.getValue().toDouble().minus(min.getValue().toDouble());
+        DoubleTensor minDouble = min.getValue().toDouble();
+        DoubleTensor delta = max.getValue().toDouble().minus(minDouble);
         DoubleTensor randoms = random.nextDouble(getShape());
 
-        return delta.timesInPlace(randoms).toInteger().plusInPlace(min.getValue());
+        return delta.timesInPlace(randoms).plusInPlace(minDouble).toInteger();
     }
 }
