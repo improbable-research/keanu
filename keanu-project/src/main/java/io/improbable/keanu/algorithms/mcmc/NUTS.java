@@ -29,18 +29,31 @@ public class NUTS {
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
-                                                     final double stepSize) {
+                                                     final int sampleCountAdapt,
+                                                     final double targetAcceptanceProb,
+                                                     double stepSize) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, sampleCountAdapt, targetAcceptanceProb, stepSize, KeanuRandom.getDefaultRandom());
     }
 
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
-                                                     final double epsilon,
+                                                     final int sampleCountAdapt,
+                                                     final double targetAcceptanceProb,
+                                                     double stepSize,
                                                      final KeanuRandom random) {
 
         bayesNet.cascadeObservations();
+
+        stepSize = findReasonableEpsilon(stepSize);
+        double h = 0;
+        double emBar = 1;
+        double t0 = 10;
+        double k = 0.75;
+        double u1 = Math.log(10 * stepSize);
+        double logEm = 0;
+        double logEmBar = 0;
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
         final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
@@ -70,7 +83,9 @@ public class NUTS {
             initialLogOfMasterP,
             takeSample(sampleFromVertices),
             1,
-            true
+            true,
+            0,
+            0
         );
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
@@ -98,7 +113,7 @@ public class NUTS {
                     u,
                     buildDirection,
                     treeHeight,
-                    epsilon,
+                    stepSize,
                     random
                 );
 
@@ -114,6 +129,9 @@ public class NUTS {
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
 
+                tree.alpha = otherHalfTree.alpha;
+                tree.nAlpha = otherHalfTree.nAlpha;
+
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
                     tree.positionForward,
                     tree.positionBackward,
@@ -122,6 +140,16 @@ public class NUTS {
                 );
 
                 treeHeight++;
+            }
+
+            if (sampleNum <= sampleCountAdapt) {
+                double z = (1 / (sampleNum + t0));
+                h = ((1 - z) * h) + (z * (targetAcceptanceProb - (tree.alpha / tree.nAlpha)));
+                logEm = u1 - (Math.sqrt(sampleNum) / 0.05) * h;
+                logEmBar = Math.pow(sampleNum, -k) * logEm + (1 - Math.pow(sampleNum, -k)) * Math.log(emBar);
+                stepSize = Math.exp(logEm);
+            } else {
+                stepSize = Math.exp(logEmBar);
             }
 
             tree.positionForward = tree.acceptedPosition;
@@ -147,6 +175,10 @@ public class NUTS {
                                                   KeanuRandom random) {
 
         BuiltTree otherHalfTree;
+
+        final double logOfMasterPBeforeLeapfrog = getLogProb(probabilisticVertices);
+        final double logOfMasterPMinusMomentum = logOfMasterPBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
+
         if (buildDirection == -1) {
 
             otherHalfTree = buildTree(
@@ -161,6 +193,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight,
                 epsilon,
+                logOfMasterPMinusMomentum,
                 random
             );
 
@@ -182,6 +215,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight,
                 epsilon,
+                logOfMasterPMinusMomentum,
                 random
             );
 
@@ -204,6 +238,7 @@ public class NUTS {
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
+                                       double logOfMasterPMinusMomentum,
                                        KeanuRandom random) {
         if (treeHeight == 0) {
 
@@ -218,7 +253,8 @@ public class NUTS {
                 momentum,
                 u,
                 buildDirection,
-                epsilon
+                epsilon,
+                logOfMasterPMinusMomentum
             );
 
         } else {
@@ -236,6 +272,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight - 1,
                 epsilon,
+                logOfMasterPMinusMomentum,
                 random
             );
 
@@ -271,6 +308,8 @@ public class NUTS {
                 );
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
+                tree.alpha += otherHalfTree.alpha;
+                tree.nAlpha += otherHalfTree.nAlpha;
             }
 
             return tree;
@@ -287,7 +326,8 @@ public class NUTS {
                                                Map<Long, DoubleTensor> momentum,
                                                double u,
                                                int buildDirection,
-                                               double epsilon) {
+                                               double epsilon,
+                                               double logOfMasterPMinusMomentumBeforeLeapfrog) {
 
         LeapFrogged leapfrog = leapfrog(
             latentVertices,
@@ -307,6 +347,9 @@ public class NUTS {
 
         final Map<Long, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 
+        double alpha = Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog);
+        alpha = alpha < 1 ? alpha : 1;
+
         return new BuiltTree(
             leapfrog.position,
             leapfrog.gradient,
@@ -319,7 +362,9 @@ public class NUTS {
             logOfMasterPAfterLeapfrog,
             sampleAtAcceptedPosition,
             acceptedLeapfrogCount,
-            shouldContinueFlag
+            shouldContinueFlag,
+            alpha,
+            1
         );
     }
 
@@ -502,6 +547,8 @@ public class NUTS {
         Map<Long, ?> sampleAtAcceptedPosition;
         int acceptedLeapfrogCount;
         boolean shouldContinueFlag;
+        double alpha;
+        double nAlpha;
 
         BuiltTree(Map<Long, DoubleTensor> positionBackward,
                   Map<Long, DoubleTensor> gradientBackward,
@@ -514,7 +561,9 @@ public class NUTS {
                   double logOfMasterPAtAcceptedPosition,
                   Map<Long, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
-                  boolean shouldContinueFlag) {
+                  boolean shouldContinueFlag,
+                  double alpha,
+                  double nAlpha) {
 
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
@@ -528,7 +577,13 @@ public class NUTS {
             this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
             this.acceptedLeapfrogCount = acceptedLeapfrogCount;
             this.shouldContinueFlag = shouldContinueFlag;
+            this.alpha = alpha;
+            this.nAlpha = nAlpha;
         }
+    }
+
+    private static double findReasonableEpsilon(double stepsize) {
+        return stepsize;
     }
 
 }
