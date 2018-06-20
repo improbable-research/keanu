@@ -43,7 +43,7 @@ public class VertexVariationalMAP {
 
         GradientOptimizer gradientOptimizer = new GradientOptimizer(inferNet);
 
-        gradientOptimizer.maxAPosteriori(5000);
+        gradientOptimizer.maxAPosteriori();
     }
 
 }

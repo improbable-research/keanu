@@ -1,10 +1,11 @@
 package io.improbable.keanu.util.csv.pojo;
 
+import io.improbable.keanu.util.csv.pojo.bycolumn.CsvColumnConsumer;
+import io.improbable.keanu.util.csv.pojo.byrow.CsvCellConsumer;
+
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Optional;
-
-import static io.improbable.keanu.util.csv.pojo.ColumnDeserializer.convertToAppropriateType;
 
 /**
  * This finds an appropriate POJO public field for a given csv title.
@@ -22,12 +23,32 @@ import static io.improbable.keanu.util.csv.pojo.ColumnDeserializer.convertToAppr
  * public int id;
  * ...
  */
-class PublicFieldMatcher {
+public class PublicFieldMatcher {
 
     private PublicFieldMatcher() {
     }
 
-    static <T> Optional<CsvColumnConsumer<T>> getFieldConsumer(String title, List<Field> potentialFields) {
+    public static <T> Optional<CsvCellConsumer<T>> getFieldCellConsumer(String title, List<Field> potentialFields) {
+
+        final Optional<Field> matchingField = findMatchingFieldName(title.trim(), potentialFields);
+
+        return matchingField
+            .map(PublicFieldMatcher::createCellConsumerForField);
+    }
+
+    private static <T> CsvCellConsumer<T> createCellConsumerForField(Field matchingField) {
+        return (target, value) -> {
+
+            Object convertedValue = CsvCellDeserializer.convertToAppropriateType(value, matchingField.getType());
+            try {
+                matchingField.set(target, convertedValue);
+            } catch (IllegalAccessException e) {
+                throw new IllegalArgumentException(e);
+            }
+        };
+    }
+
+    public static <T> Optional<CsvColumnConsumer<T>> getFieldColumnConsumer(String title, List<Field> potentialFields) {
 
         final Optional<Field> matchingField = findMatchingFieldName(title.trim(), potentialFields);
 
@@ -38,7 +59,7 @@ class PublicFieldMatcher {
     private static <T> CsvColumnConsumer<T> createColumnConsumerForField(Field matchingField) {
         return (target, value) -> {
 
-            Object convertedValue = convertToAppropriateType(value, matchingField.getType());
+            Object convertedValue = CsvColumnDeserializer.convertToAppropriateType(value, matchingField.getType());
             try {
                 matchingField.set(target, convertedValue);
             } catch (IllegalAccessException e) {

@@ -82,6 +82,10 @@ public class GradientOptimizer {
         return maxAPosteriori(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
+    public double maxAPosteriori() {
+        return maxAPosteriori(Integer.MAX_VALUE, GradientOptimizer.DEFAULT_OPTIMIZER);
+    }
+
     /**
      * This method is here to provide more fine grained control of optimization.
      *
@@ -104,6 +108,10 @@ public class GradientOptimizer {
      */
     public double maxLikelihood(int maxEvaluations) {
         return maxLikelihood(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
+    }
+
+    public double maxLikelihood() {
+        return maxLikelihood(Integer.MAX_VALUE, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     private double optimize(int maxEvaluations,

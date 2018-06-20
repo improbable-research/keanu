@@ -5,8 +5,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
@@ -127,7 +125,19 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor max(DoubleTensor max);
 
+    double max();
+
     DoubleTensor min(DoubleTensor max);
+
+    double min();
+
+    double average();
+
+    double standardDeviation();
+
+    DoubleTensor standardize();
+
+    DoubleTensor standardizeInPlace();
 
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
