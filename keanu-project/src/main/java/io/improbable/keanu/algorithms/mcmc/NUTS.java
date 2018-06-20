@@ -24,18 +24,30 @@ public class NUTS {
     private static final double DELTA_MAX = 1000.0;
     private static final double STABILISER = 10;
     private static final double SHRINKAGE_FACTOR = 0.05;
-    private static final double TEND_TO_ZERO = 0.75;
+    private static final double TEND_TO_ZERO_EXPONENT = 0.75;
 
     private NUTS() {
     }
 
+    /**
+     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
+     *
+     * @param bayesNet             the bayesian network to sample from
+     * @param sampleFromVertices   the vertices to sample from
+     * @param sampleCount          the number of samples to take
+     * @param adaptCount           the number of samples for which the stepsize will be tuned. For the remaining samples
+     *                             in which it is not tuned, the stepsize will be frozen to its last calculated value
+     * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
+     *                             Beskos et al., 2010; Neal, 2011
+     * @return Samples taken with NUTS
+     */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<DoubleVertex> fromVertices,
+                                                     final List<DoubleVertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final int adaptCount,
                                                      final double targetAcceptanceProb) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, adaptCount, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, sampleFromVertices, sampleCount, adaptCount, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
     }
 
 
@@ -45,11 +57,12 @@ public class NUTS {
      * @param bayesNet             the bayesian network to sample from
      * @param sampleFromVertices   the vertices inside the bayesNet to sample from
      * @param sampleCount          the number of samples to take
-     * @param adaptCount           the number of samples that the stepsize will be tuned for
+     * @param adaptCount           the number of samples for which the stepsize will be tuned. For the remaining samples
+     *                             in which it is not tuned, the stepsize will be frozen to its last calculated value
      * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
      *                             Beskos et al., 2010; Neal, 2011
-     * @param random               the keanu random
-     * @return NUTS samples
+     * @param random               the source of randomness
+     * @return Samples taken with NUTS
      */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
@@ -358,8 +371,8 @@ public class NUTS {
 
         final Map<Long, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 
-        double alpha = Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog);
-        alpha = alpha < 1 ? alpha : 1;
+        double deltaLikelihoodOfLeapfrog = Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog);
+        deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog < 1 ? deltaLikelihoodOfLeapfrog : 1;
 
         return new BuiltTree(
             leapfrog.position,
@@ -374,7 +387,7 @@ public class NUTS {
             sampleAtAcceptedPosition,
             acceptedLeapfrogCount,
             shouldContinueFlag,
-            alpha,
+            deltaLikelihoodOfLeapfrog,
             1
         );
     }
@@ -621,21 +634,20 @@ public class NUTS {
                                               Map<Long, Long> latentSetAndCascadeCache,
                                               KeanuRandom random) {
         double stepsize = 1;
-        double initialLogProb = Math.exp(getLogProb(probabilisticVertices));
+        double probBeforeLeapfrog = Math.exp(getLogProb(probabilisticVertices));
         Map<Long, DoubleTensor> momentums = new HashMap<>();
-        for (Vertex<DoubleTensor> vertex : vertices) {
-            momentums.put(vertex.getId(), random.nextGaussian(vertex.getShape()));
-        }
+        initializeMomentumForEachVertex(vertices, momentums, random);
         leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
-        double logProb = Math.exp(getLogProb(probabilisticVertices));
-        double ratioLikelihood = logProb / initialLogProb;
-        double scalingFactor = ratioLikelihood > 0.5 ? 1 : -1;
+        double probAfterLeapfrog = Math.exp(getLogProb(probabilisticVertices));
+        double likelihoodRatio = probAfterLeapfrog / probBeforeLeapfrog;
+        double scalingFactor = likelihoodRatio > 0.5 ? 1 : -1;
 
-        while (Math.pow(ratioLikelihood, scalingFactor) > Math.pow(2, -scalingFactor)) {
+        while (Math.pow(likelihoodRatio, scalingFactor) > Math.pow(2, -scalingFactor)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
             leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
-            ratioLikelihood = Math.exp(getLogProb(probabilisticVertices)) / initialLogProb;
+            likelihoodRatio = Math.exp(getLogProb(probabilisticVertices)) / probBeforeLeapfrog;
         }
+        
         return stepsize;
     }
 
@@ -645,7 +657,7 @@ public class NUTS {
             double acceptanceProbOfFinalInteration = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
             autoTune.averageAcceptanceProb = ((1 - percentageLeftToTune) * autoTune.averageAcceptanceProb) + (percentageLeftToTune * acceptanceProbOfFinalInteration);
             autoTune.logStepSize = autoTune.shrinkageTarget - (Math.sqrt(sampleNum) / SHRINKAGE_FACTOR) * autoTune.averageAcceptanceProb;
-            double tendToZero = Math.pow(sampleNum, -TEND_TO_ZERO);
+            double tendToZero = Math.pow(sampleNum, -TEND_TO_ZERO_EXPONENT);
             autoTune.logStepSizeFrozen = tendToZero * autoTune.logStepSize + (1 - tendToZero) * autoTune.logStepSizeFrozen;
             return Math.exp(autoTune.logStepSize);
         } else {
