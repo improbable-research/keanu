@@ -49,6 +49,7 @@ public class NUTS {
      * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
      *                             Beskos et al., 2010; Neal, 2011
      * @param random the keanu random
+     * @return NUTS samples
      */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
