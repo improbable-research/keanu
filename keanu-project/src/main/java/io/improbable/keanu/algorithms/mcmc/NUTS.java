@@ -24,7 +24,7 @@ public class NUTS {
     private static final double DELTA_MAX = 1000.0;
     private static final double STABILISER = 10;
     private static final double SHRINKAGE_FACTOR = 0.05;
-    private static final double k = 0.75;
+    private static final double TEND_TO_ZERO = 0.75;
 
     private NUTS() {
     }
@@ -32,29 +32,29 @@ public class NUTS {
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<DoubleVertex> fromVertices,
                                                      final int sampleCount,
-                                                     final int samplesToAdaptFor,
+                                                     final int adaptCount,
                                                      final double targetAcceptanceProb) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, samplesToAdaptFor, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, adaptCount, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
     }
 
 
     /**
-     * No-U-Turn Sampling
+     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
      *
-     * @param bayesNet the bayesian network to sample from
-     * @param sampleFromVertices the vertices inside the bayesNet to sample from
-     * @param sampleCount the number of samples to take
-     * @param samplesToAdaptFor the number of samples that the stepsize will be tuned for
+     * @param bayesNet             the bayesian network to sample from
+     * @param sampleFromVertices   the vertices inside the bayesNet to sample from
+     * @param sampleCount          the number of samples to take
+     * @param adaptCount           the number of samples that the stepsize will be tuned for
      * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
      *                             Beskos et al., 2010; Neal, 2011
-     * @param random the keanu random
+     * @param random               the keanu random
      * @return NUTS samples
      */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
-                                                     final int samplesToAdaptFor,
+                                                     final int adaptCount,
                                                      final double targetAcceptanceProb,
                                                      final KeanuRandom random) {
 
@@ -76,14 +76,18 @@ public class NUTS {
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
 
-        double stepSize = findStartingEpsilon(position, gradient, latentVertices, probabilisticVertices, latentSetAndCascadeCache, random);
+        double stepSize = findStartingEpsilon(position,
+            gradient,
+            latentVertices,
+            probabilisticVertices,
+            latentSetAndCascadeCache,
+            random
+        );
+
         AutoTune autoTune = new AutoTune(stepSize,
-            0,
             targetAcceptanceProb,
             Math.log(stepSize),
-            Math.log(1),
-            samplesToAdaptFor,
-            Math.log(10 * stepSize)
+            adaptCount
         );
 
         BuiltTree tree = new BuiltTree(
@@ -144,8 +148,8 @@ public class NUTS {
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
 
-                tree.alpha = otherHalfTree.alpha;
-                tree.nAlpha = otherHalfTree.nAlpha;
+                tree.deltaLikelihoodOfLeapfrog = otherHalfTree.deltaLikelihoodOfLeapfrog;
+                tree.treeSize = otherHalfTree.treeSize;
 
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
                     tree.positionForward,
@@ -315,8 +319,8 @@ public class NUTS {
                 );
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
-                tree.alpha += otherHalfTree.alpha;
-                tree.nAlpha += otherHalfTree.nAlpha;
+                tree.deltaLikelihoodOfLeapfrog += otherHalfTree.deltaLikelihoodOfLeapfrog;
+                tree.treeSize += otherHalfTree.treeSize;
             }
 
             return tree;
@@ -554,8 +558,8 @@ public class NUTS {
         Map<Long, ?> sampleAtAcceptedPosition;
         int acceptedLeapfrogCount;
         boolean shouldContinueFlag;
-        double alpha;
-        double nAlpha;
+        double deltaLikelihoodOfLeapfrog;
+        double treeSize;
 
         BuiltTree(Map<Long, DoubleTensor> positionBackward,
                   Map<Long, DoubleTensor> gradientBackward,
@@ -569,8 +573,8 @@ public class NUTS {
                   Map<Long, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
                   boolean shouldContinueFlag,
-                  double alpha,
-                  double nAlpha) {
+                  double deltaLikelihoodOfLeapfrog,
+                  double treeSize) {
 
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
@@ -584,8 +588,8 @@ public class NUTS {
             this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
             this.acceptedLeapfrogCount = acceptedLeapfrogCount;
             this.shouldContinueFlag = shouldContinueFlag;
-            this.alpha = alpha;
-            this.nAlpha = nAlpha;
+            this.deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog;
+            this.treeSize = treeSize;
         }
     }
 
@@ -595,18 +599,18 @@ public class NUTS {
         double averageAcceptanceProb;
         double targetAcceptanceProb;
         double logStepSize;
-        double logStepSizeBar;
-        double sampleCountAdapt;
+        double logStepSizeFrozen;
+        double adaptCount;
         double shrinkageTarget;
 
-        AutoTune(double stepSize, double averageAcceptanceProb, double targetAcceptanceProb, double logStepSize, double logStepSizeBar, int sampleCountAdapt, double shrinkageTarget) {
+        AutoTune(double stepSize, double targetAcceptanceProb, double logStepSize, int adaptCount) {
             this.stepSize = stepSize;
-            this.averageAcceptanceProb = averageAcceptanceProb;
+            this.averageAcceptanceProb = 0;
             this.targetAcceptanceProb = targetAcceptanceProb;
             this.logStepSize = logStepSize;
-            this.logStepSizeBar = logStepSizeBar;
-            this.sampleCountAdapt = sampleCountAdapt;
-            this.shrinkageTarget = shrinkageTarget;
+            this.logStepSizeFrozen = Math.log(1);
+            this.adaptCount = adaptCount;
+            this.shrinkageTarget = Math.log(10 * stepSize);
         }
     }
 
@@ -636,14 +640,15 @@ public class NUTS {
     }
 
     private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
-        if (sampleNum <= autoTune.sampleCountAdapt) {
-            double z = (1 / (sampleNum + STABILISER));
-            autoTune.averageAcceptanceProb = ((1 - z) * autoTune.averageAcceptanceProb) + (z * (autoTune.targetAcceptanceProb - (tree.alpha / tree.nAlpha)));
+        if (sampleNum <= autoTune.adaptCount) {
+            double percentageLeftToTune = (1 / (sampleNum + STABILISER));
+            System.out.println(tree.treeSize);
+            autoTune.averageAcceptanceProb = ((1 - percentageLeftToTune) * autoTune.averageAcceptanceProb) + (percentageLeftToTune * (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize)));
             autoTune.logStepSize = autoTune.shrinkageTarget - (Math.sqrt(sampleNum) / SHRINKAGE_FACTOR) * autoTune.averageAcceptanceProb;
-            autoTune.logStepSizeBar = Math.pow(sampleNum, -k) * autoTune.logStepSize + (1 - Math.pow(sampleNum, -k)) * autoTune.logStepSizeBar;
+            autoTune.logStepSizeFrozen = Math.pow(sampleNum, -TEND_TO_ZERO) * autoTune.logStepSize + (1 - Math.pow(sampleNum, -TEND_TO_ZERO)) * autoTune.logStepSizeFrozen;
             return Math.exp(autoTune.logStepSize);
         } else {
-            return Math.exp(autoTune.logStepSizeBar);
+            return Math.exp(autoTune.logStepSizeFrozen);
         }
     }
 
