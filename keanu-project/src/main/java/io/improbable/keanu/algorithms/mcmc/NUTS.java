@@ -188,7 +188,7 @@ public class NUTS {
         BuiltTree otherHalfTree;
 
         final double logOfMasterPBeforeLeapfrog = getLogProb(probabilisticVertices);
-        final double logOfMasterPMinusMomentum = logOfMasterPBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
+        final double logOfMasterPMinusMomentumBeforeLeapfrog = logOfMasterPBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
 
         if (buildDirection == -1) {
 
@@ -204,7 +204,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight,
                 epsilon,
-                logOfMasterPMinusMomentum,
+                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -226,7 +226,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight,
                 epsilon,
-                logOfMasterPMinusMomentum,
+                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -249,7 +249,7 @@ public class NUTS {
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
-                                       double logOfMasterPMinusMomentum,
+                                       double logOfMasterPMinusMomentumBeforeLeapfrog,
                                        KeanuRandom random) {
         if (treeHeight == 0) {
 
@@ -265,7 +265,7 @@ public class NUTS {
                 u,
                 buildDirection,
                 epsilon,
-                logOfMasterPMinusMomentum
+                logOfMasterPMinusMomentumBeforeLeapfrog
             );
 
         } else {
@@ -283,7 +283,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight - 1,
                 epsilon,
-                logOfMasterPMinusMomentum,
+                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -642,10 +642,11 @@ public class NUTS {
     private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
         if (sampleNum <= autoTune.adaptCount) {
             double percentageLeftToTune = (1 / (sampleNum + STABILISER));
-            System.out.println(tree.treeSize);
-            autoTune.averageAcceptanceProb = ((1 - percentageLeftToTune) * autoTune.averageAcceptanceProb) + (percentageLeftToTune * (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize)));
+            double acceptanceProbOfFinalInteration = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
+            autoTune.averageAcceptanceProb = ((1 - percentageLeftToTune) * autoTune.averageAcceptanceProb) + (percentageLeftToTune * acceptanceProbOfFinalInteration);
             autoTune.logStepSize = autoTune.shrinkageTarget - (Math.sqrt(sampleNum) / SHRINKAGE_FACTOR) * autoTune.averageAcceptanceProb;
-            autoTune.logStepSizeFrozen = Math.pow(sampleNum, -TEND_TO_ZERO) * autoTune.logStepSize + (1 - Math.pow(sampleNum, -TEND_TO_ZERO)) * autoTune.logStepSizeFrozen;
+            double tendToZero = Math.pow(sampleNum, -TEND_TO_ZERO);
+            autoTune.logStepSizeFrozen = tendToZero * autoTune.logStepSize + (1 - tendToZero) * autoTune.logStepSizeFrozen;
             return Math.exp(autoTune.logStepSize);
         } else {
             return Math.exp(autoTune.logStepSizeFrozen);
