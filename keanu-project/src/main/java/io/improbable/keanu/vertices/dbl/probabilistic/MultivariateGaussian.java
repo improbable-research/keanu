@@ -28,10 +28,6 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor value) {
-
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor covarianceValues = covariance.getValue();
-
         return 0;
     }
 
@@ -52,8 +48,8 @@ public class MultivariateGaussian extends ProbabilisticDouble {
         if (covarianceShape.length != 2 ||
             muShape.length != 2 ||
             covarianceShape[0] != covarianceShape[1] ||
-            muShape[0] != 1 ||
-            muShape[1] != covarianceShape[0]) {
+            muShape[1] != 1 ||
+            muShape[0] != covarianceShape[0]) {
             throw new IllegalArgumentException("Invalid sizing of parameters");
         }
     }
