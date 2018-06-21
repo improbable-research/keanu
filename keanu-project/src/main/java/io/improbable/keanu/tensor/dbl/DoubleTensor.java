@@ -147,6 +147,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor sigmoid();
 
+    DoubleTensor choleskyDecomposition();
+
+    DoubleTensor matrixMultiply(DoubleTensor that);
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();

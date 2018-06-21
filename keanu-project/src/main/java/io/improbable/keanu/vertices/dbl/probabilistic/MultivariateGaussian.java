@@ -7,9 +7,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
 public class MultivariateGaussian extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
@@ -17,9 +14,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     public MultivariateGaussian(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
 
-        //check that mu is a vector
-        //check that covariance is a matrix of size vector x vector
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape(), covariance.getShape());
+        checkValidShape(mu, covariance);
 
         this.mu = mu;
         this.covariance = covariance;
@@ -28,7 +23,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
     }
 
     public MultivariateGaussian(DoubleVertex mu, DoubleVertex covariance) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), covariance.getShape()), mu, covariance);
+        this(mu.getShape(), mu, covariance);
     }
 
     @Override
@@ -48,5 +43,18 @@ public class MultivariateGaussian extends ProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return TensorMultivariateGaussian.sample(getShape(), mu.getValue(), covariance.getValue(), random);
+    }
+
+    private void checkValidShape(DoubleVertex mu, DoubleVertex covariance) {
+        int[] covarianceShape = covariance.getShape();
+        int[] muShape = mu.getShape();
+
+        if (covarianceShape.length != 2 ||
+            muShape.length != 2 ||
+            covarianceShape[0] != covarianceShape[1] ||
+            muShape[0] != 1 ||
+            muShape[1] != covarianceShape[0]) {
+            throw new IllegalArgumentException("Invalid sizing of parameters");
+        }
     }
 }

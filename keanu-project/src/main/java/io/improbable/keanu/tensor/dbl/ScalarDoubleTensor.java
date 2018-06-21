@@ -333,6 +333,16 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor choleskyDecomposition() {
+        throw new IllegalStateException("Cannot find the cholesky decomposition of a scalar");
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor that) {
+        return null;
+    }
+
+    @Override
     public DoubleTensor reciprocalInPlace() {
         value = 1.0 / value;
         return this;

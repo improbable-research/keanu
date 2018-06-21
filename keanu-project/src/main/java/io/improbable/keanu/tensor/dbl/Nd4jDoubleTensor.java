@@ -30,7 +30,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor create(double[] values, int[] shape) {
-        return new Nd4jDoubleTensor(values, shape);
+        return new Nd4jDoubleTensor(shape, values);
     }
 
     public static Nd4jDoubleTensor create(double value, int[] shape) {
@@ -48,7 +48,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     private INDArray tensor;
     private int[] shape;
 
-    public Nd4jDoubleTensor(double[] data, int[] shape) {
+    public Nd4jDoubleTensor(int[] shape, double[] data) {
         DataBuffer buffer = Nd4j.createBuffer(data);
         tensor = Nd4j.create(buffer, shape);
         this.shape = shape;
@@ -106,7 +106,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         for (int i = 0; i < data.length(); i++) {
             data.put(i, function.apply(data.getDouble(i)));
         }
-        return new Nd4jDoubleTensor(data.asDouble(), this.getShape());
+        return new Nd4jDoubleTensor(this.getShape(), data.asDouble());
     }
 
     @Override
@@ -170,6 +170,26 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor sigmoid() {
         return duplicate().sigmoidInPlace();
+    }
+
+    @Override
+    public DoubleTensor choleskyDecomposition() {
+        int length = this.shape[0];
+        DoubleTensor cholesky = Nd4jDoubleTensor.zeros(this.shape);
+
+        for (int i = 0; i < length; i++) {
+            for (int k = 0; k < (i + 1); k++) {
+                double sum = 0;
+                for (int j = 0; j < k; j++) {
+                    sum += cholesky.getValue(i, j) * cholesky.getValue(k, j);
+
+                }
+                double value = (i == k) ? Math.sqrt(getValue(i, i) - sum) :
+                    (1.0 / cholesky.getValue(k, k) * (getValue(i, k) - sum));
+                cholesky.setValue(value, i, k);
+            }
+        }
+        return cholesky;
     }
 
     @Override
@@ -671,6 +691,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor sigmoidInPlace() {
         Transforms.sigmoid(tensor, false);
         return this;
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor that) {
+        INDArray indArray = unsafeGetNd4J(that);
+        INDArray x = tensor.mmul(indArray);
+        return new Nd4jDoubleTensor(x);
     }
 
     // Comparisons
