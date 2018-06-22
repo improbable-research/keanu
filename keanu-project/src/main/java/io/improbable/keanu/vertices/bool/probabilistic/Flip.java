@@ -57,7 +57,7 @@ public class Flip extends ProbabilisticBool {
     @Override
     public BooleanTensor sample(KeanuRandom random) {
 
-        DoubleTensor uniforms = random.nextDouble(probTrue.getShape());
+        DoubleTensor uniforms = random.nextDouble(this.getShape());
 
         return uniforms.lessThan(probTrue.getValue());
     }

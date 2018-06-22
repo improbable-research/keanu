@@ -3,10 +3,10 @@ package io.improbable.keanu.e2e.lorenz;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -73,7 +73,7 @@ public class LorenzTest {
 
             GradientOptimizer graphOptimizer = new GradientOptimizer(net);
 
-            graphOptimizer.maxAPosteriori(1000);
+            graphOptimizer.maxAPosteriori();
 
             List<DoubleTensor> posterior = getTimeSliceValues(graphTimeSteps, windowSize - 1);
 

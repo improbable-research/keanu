@@ -5,7 +5,6 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 public class CsvReaderTest {
@@ -42,19 +41,6 @@ public class CsvReaderTest {
         testWithoutHeader(csvReader);
     }
 
-    @Test
-    public void givenCsvStringThenLoadAsPOJO() {
-        List<TestPOJO> testPOJOS = ReadCsv.fromString(csv)
-            .as(TestPOJO.class)
-            .asList();
-
-        TestPOJO expectedPojo = testPOJOS.get(0);
-
-        assertEquals(expectedPojo.a, "hel");
-        assertEquals(expectedPojo.b, "lo");
-        assertEquals(expectedPojo.c, "world");
-    }
-
     private void testWithHeader(CsvReader csvReader) {
         List<String> header = csvReader.getHeader();
         List<List<String>> lines = csvReader.readLines();
@@ -70,11 +56,5 @@ public class CsvReaderTest {
         assertTrue(lines.size() == 2);
         assertTrue(lines.get(0).equals(line0));
         assertTrue(lines.get(1).equals(line1));
-    }
-
-    public static class TestPOJO {
-        public String a;
-        public String b;
-        public String c;
     }
 }

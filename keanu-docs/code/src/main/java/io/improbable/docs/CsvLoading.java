@@ -10,8 +10,8 @@ public class CsvLoading {
     public static void main(String[] args) {
 
         List<MyClass> myPojos = ReadCsv.fromFile("some/file/path")
-            .as(MyClass.class)
-            .asList();
+            .asRowsDefinedBy(MyClass.class)
+            .load();
     }
 
     public class MyClass {

@@ -55,7 +55,7 @@ public class LinearRegression {
         BayesianNetwork bayesNet = new BayesianNetwork(m.getConnectedGraph());
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
-        optimizer.maxLikelihood(10000);
+        optimizer.maxLikelihood();
 
         log.info("M = " + m.getValue().scalar() + ", B = " + b.getValue().scalar());
         assertEquals(expectedM, m.getValue().scalar(), 0.05);
@@ -95,12 +95,60 @@ public class LinearRegression {
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
-        optimizer.maxLikelihood(10000);
+        optimizer.maxLikelihood();
 
         log.info("W1 = " + w1.getValue().scalar() + " W2 = " + w2.getValue().scalar() + ", B = " + b.getValue().scalar());
         assertEquals(expectedW1, w1.getValue().scalar(), 0.05);
         assertEquals(expectedW2, w2.getValue().scalar(), 0.05);
         assertEquals(expectedB, b.getValue().scalar(), 0.05);
+    }
+
+    @Test
+    public void linearRegressionManyFactorTensorVariationalMAP() {
+
+        // Generate data
+        int N = 1000;
+        int featureCount = 40;
+
+        double[] expectedWeights = new double[featureCount];
+        double expectedB = 20.0;
+        DoubleVertex[] xGenerators = new DoubleVertex[featureCount];
+        DoubleTensor[] xData = new DoubleTensor[featureCount];
+        DoubleVertex yGeneratorMu = ConstantVertex.of(0.0);
+        for (int i = 0; i < expectedWeights.length; i++) {
+            expectedWeights[i] = random.nextDouble() * 100 + 20;
+            xGenerators[i] = new UniformVertex(new int[]{1, N}, 0, 10000);
+            xData[i] = xGenerators[i].sample(random);
+            xGenerators[i].setValue(xData[i]);
+            yGeneratorMu = yGeneratorMu.plus(xGenerators[i].multiply(expectedWeights[i]));
+        }
+
+        yGeneratorMu = yGeneratorMu.plus(expectedB);
+        DoubleVertex yGenerator = new GaussianVertex(yGeneratorMu, 1.0);
+        DoubleTensor yData = yGenerator.sample(random);
+
+        // Run Linear Regression
+        DoubleVertex[] weights = new DoubleVertex[featureCount];
+        DoubleVertex[] x = new DoubleVertex[featureCount];
+        DoubleVertex yMu = ConstantVertex.of(0.0);
+        for (int i = 0; i < weights.length; i++) {
+            weights[i] = new GaussianVertex(0.0, 1.0);
+            weights[i].setValue(0);
+            x[i] = ConstantVertex.of(xData[i]);
+            yMu = yMu.plus(x[i].multiply(weights[i]));
+        }
+
+        DoubleVertex b = new UniformVertex(-50, 50);
+        DoubleVertex y = new GaussianVertex(yMu.plus(b), 1.0);
+        y.observe(yData);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
+        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        optimizer.maxLikelihood();
+
+        for (int i = 0; i < featureCount; i++) {
+            assertEquals(expectedWeights[i], weights[i].getValue().scalar(), 0.05);
+        }
     }
 
 }
