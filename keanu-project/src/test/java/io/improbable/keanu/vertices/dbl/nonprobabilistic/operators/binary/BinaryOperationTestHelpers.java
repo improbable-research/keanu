@@ -63,61 +63,35 @@ public class BinaryOperationTestHelpers {
         assertEquals(expectedTensor.getValue(1, 1), result.getValue(1, 1), 1e-5);
     }
 
-    public static void calculatesDualNumberOfTwoMatricesElementWiseOperator(double[] aValues,
-                                                                            double[] bValues,
-                                                                            double[] expectedGradientWrtA,
-                                                                            double[] expectedGradientWrtB,
+    public static void calculatesDualNumberOfTwoMatricesElementWiseOperator(DoubleTensor aValues,
+                                                                            DoubleTensor bValues,
+                                                                            DoubleTensor expectedGradientWrtA,
+                                                                            DoubleTensor expectedGradientWrtB,
                                                                             BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        int[] matrixShape = new int[]{2, 2};
-        UniformVertex A = new UniformVertex(matrixShape, 0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
-        UniformVertex B = new UniformVertex(matrixShape, 0.0, 1.0);
-        B.setAndCascade(Nd4jDoubleTensor.create(bValues, matrixShape));
+        UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
+        A.setAndCascade(aValues);
+        UniformVertex B = new UniformVertex(bValues.getShape(), 0.0, 1.0);
+        B.setAndCascade(bValues);
 
         DualNumber result = op.apply(A, B).getDualNumber();
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        assertArrayEquals(expectedGradientWrtA, wrtA.asFlatDoubleArray(), 1e-10);
-        assertArrayEquals(TensorShape.concat(matrixShape, matrixShape), wrtA.getShape());
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtA.getShape());
 
         DoubleTensor wrtB = result.getPartialDerivatives().withRespectTo(B);
-        assertArrayEquals(expectedGradientWrtB, wrtB.asFlatDoubleArray(), 1e-10);
-        assertArrayEquals(TensorShape.concat(matrixShape, matrixShape), wrtB.getShape());
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtB.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtB.getShape());
     }
 
-    public static void calculatesDualNumberOfTwoVectorsElementWiseOperator(double[] aValues,
-                                                                           double[] bValues,
-                                                                           double[] expectedGradientWrtA,
-                                                                           double[] expectedGradientWrtB,
-                                                                           BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        UniformVertex A = new UniformVertex(new int[]{1, aValues.length}, 0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{1, aValues.length}));
-        UniformVertex B = new UniformVertex(new int[]{1, bValues.length}, 0.0, 1.0);
-        B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{1, bValues.length}));
-
-        DualNumber result = op.apply(A, B).getDualNumber();
-        DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{1, aValues.length, 1, aValues.length});
-
-        DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        for (int i = 0; i < aValues.length; i++) {
-            assertEquals(expectedTensorA.getValue(0, i, 0, i), wrtA.getValue(0, i, 0, i), 1e-10);
-        }
-
-        DoubleTensor expectedTensorB = Nd4jDoubleTensor.create(expectedGradientWrtB, new int[]{2, 2, 2, 2});
-        DoubleTensor wrtB = result.getPartialDerivatives().withRespectTo(B);
-        for (int i = 0; i < aValues.length; i++) {
-            assertEquals(expectedTensorB.getValue(0, i, 0, i), wrtB.getValue(0, i, 0, i), 1e-10);
-        }
-    }
-
-    public static void calculatesDualNumberOfAVectorsAndScalar(double[] aValues,
+    public static void calculatesDualNumberOfAVectorsAndScalar(DoubleTensor aValues,
                                                                double bValue,
                                                                DoubleTensor expectedGradientWrtA,
                                                                DoubleTensor expectedGradientWrtB,
                                                                BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        UniformVertex A = new UniformVertex(new int[]{1, aValues.length}, 0.0, 1.0);
-        A.setAndCascade(DoubleTensor.create(aValues));
+        UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
+        A.setAndCascade(aValues);
         UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(DoubleTensor.scalar(bValue));
 

@@ -123,10 +123,11 @@ public class PartialDerivatives {
 
         if (TensorShape.isScalar(partialOfShape)) {
 
-            int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
-            //?!?! Maybe?
-            return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
-                .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
+            throw new IllegalArgumentException();
+//            int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
+//            //?!?! Maybe?
+//            return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
+//                .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
         } else {
             return partial.times(multiplierReshaped);
         }
