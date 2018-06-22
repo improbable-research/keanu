@@ -65,7 +65,7 @@ public class PartialDerivatives {
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
             DoubleTensor v = entry.getValue();
-            summed.put(k, v.sum(overDimensions));
+            summed.put(k, reshapeByPrependPad(v.sum(overDimensions), v.getRank()));
         }
 
         return new PartialDerivatives(summed);
@@ -123,7 +123,7 @@ public class PartialDerivatives {
             return partial.times(multiplier.scalar());
         }
 
-        DoubleTensor multiplierReshaped = reshapeByPad(multiplier, partial.getRank());
+        DoubleTensor multiplierReshaped = reshapeByAppendPad(multiplier, partial.getRank());
 
         if (partial.isScalar()) {
             return multiplierReshaped.times(partial.scalar());
@@ -134,17 +134,16 @@ public class PartialDerivatives {
 
         if (TensorShape.isScalar(partialOfShape)) {
 
-            throw new IllegalArgumentException();
-//            int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
-//            //?!?! Maybe?
-//            return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
-//                .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
+            int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
+            //?!?! Maybe?
+            return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
+                .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
         } else {
             return partial.times(multiplierReshaped);
         }
     }
 
-    private DoubleTensor reshapeByPad(DoubleTensor lowRankTensor, int desiredRank) {
+    private DoubleTensor reshapeByAppendPad(DoubleTensor lowRankTensor, int desiredRank) {
         int[] shape = lowRankTensor.getShape();
         if (shape.length == desiredRank) {
             return lowRankTensor;
@@ -153,6 +152,18 @@ public class PartialDerivatives {
         int[] paddedShape = new int[desiredRank];
         Arrays.fill(paddedShape, 1);
         System.arraycopy(shape, 0, paddedShape, 0, shape.length);
+        return lowRankTensor.reshape(paddedShape);
+    }
+
+    private DoubleTensor reshapeByPrependPad(DoubleTensor lowRankTensor, int desiredRank) {
+        int[] shape = lowRankTensor.getShape();
+        if (shape.length == desiredRank) {
+            return lowRankTensor;
+        }
+
+        int[] paddedShape = new int[desiredRank];
+        Arrays.fill(paddedShape, 1);
+        System.arraycopy(shape, 0, paddedShape, shape.length, shape.length);
         return lowRankTensor.reshape(paddedShape);
     }
 
@@ -174,7 +185,7 @@ public class PartialDerivatives {
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
             DoubleTensor partial = entry.getValue();
-            DoubleTensor v = partial.div(reshapeByPad(divisor, partial.getRank()));
+            DoubleTensor v = partial.div(reshapeByAppendPad(divisor, partial.getRank()));
             divided.put(k, v);
         }
 

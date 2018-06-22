@@ -27,5 +27,6 @@ public class SumVertexTest {
             wrtIn.asFlatDoubleArray(),
             1e-5
         );
+        assertArrayEquals(expectedWrtIn.getShape(), wrtIn.getShape());
     }
 }

@@ -61,4 +61,22 @@ public class DualNumberTensorTest {
         assertArrayEquals(expectedWrt.getShape(), wrtA.getShape());
     }
 
+    @Test
+    public void diffWrtScalarOverMultipleMultipliesAndSummation() {
+
+        DoubleVertex A = new UniformVertex(new int[]{2, 2}, 0, 1);
+        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex prod = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
+
+        DualNumber dualNumber = prod.getDualNumber();
+
+        DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
+
+        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 8, 12, 16}).reshape(1, 1, 2, 2);
+
+        assertArrayEquals(expectedWrt.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 0.0);
+        assertArrayEquals(expectedWrt.getShape(), wrtA.getShape());
+    }
+
 }
