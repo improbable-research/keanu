@@ -105,6 +105,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor sum(int... overDimensions) {
+        return duplicate();
+    }
+
+    @Override
     public DoubleTensor reciprocal() {
         return this.duplicate().reciprocalInPlace();
     }

@@ -279,7 +279,12 @@ public class DualNumber {
 
     public DualNumber sum() {
         DoubleTensor sumOfAll = DoubleTensor.scalar(value.sum());
-        return new DualNumber(sumOfAll, this.partialDerivatives.clone());
+        int[] resultDims = new int[value.getRank()];
+        for (int i = 0; i < value.getRank(); i++) {
+            resultDims[i] = i;
+        }
+        return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
     }
+
 
 }

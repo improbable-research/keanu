@@ -105,6 +105,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(Nd4j.diag(tensor));
     }
 
+    @Override
+    public DoubleTensor sum(int... overDimensions) {
+        return new Nd4jDoubleTensor(tensor.sum(overDimensions));
+    }
+
     public Double sum() {
         return tensor.sumNumber().doubleValue();
     }

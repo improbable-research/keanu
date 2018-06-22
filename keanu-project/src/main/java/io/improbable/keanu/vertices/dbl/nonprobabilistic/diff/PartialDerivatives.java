@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Arrays;
@@ -60,6 +59,18 @@ public class PartialDerivatives {
         derivativeWithRespectTo.put(id, value);
     }
 
+    public PartialDerivatives sum(int... overDimensions) {
+        Map<Long, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
+
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
+            DoubleTensor v = entry.getValue();
+            summed.put(k, v.sum(overDimensions));
+        }
+
+        return new PartialDerivatives(summed);
+    }
+
     public PartialDerivatives add(PartialDerivatives toAdd) {
         Map<Long, DoubleTensor> added = cloneInfinitesimals(derivativeWithRespectTo);
 
@@ -114,7 +125,7 @@ public class PartialDerivatives {
 
         DoubleTensor multiplierReshaped = reshapeByPad(multiplier, partial.getRank());
 
-        if(partial.isScalar()){
+        if (partial.isScalar()) {
             return multiplierReshaped.times(partial.scalar());
         }
 
@@ -193,6 +204,7 @@ public class PartialDerivatives {
 
         return new PartialDerivatives(powered);
     }
+
 
     public PartialDerivatives clone() {
         return new PartialDerivatives(cloneInfinitesimals(derivativeWithRespectTo));

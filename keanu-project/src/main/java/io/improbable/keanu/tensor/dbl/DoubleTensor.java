@@ -35,7 +35,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return create(values, 1, values.length);
     }
 
-    static DoubleTensor ones(int[] shape) {
+    static DoubleTensor ones(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
         } else {
@@ -70,6 +70,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor reshape(int... newShape);
 
     DoubleTensor diag();
+
+    DoubleTensor sum(int... overDimensions);
 
     //New tensor Ops and transforms
 
@@ -143,7 +145,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double max();
 
-    DoubleTensor min(DoubleTensor max);
+    DoubleTensor min(DoubleTensor min);
 
     double min();
 
