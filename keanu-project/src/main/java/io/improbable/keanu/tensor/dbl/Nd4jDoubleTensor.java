@@ -41,6 +41,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(Nd4j.ones(shape));
     }
 
+    public static Nd4jDoubleTensor eye(int n) {
+        return new Nd4jDoubleTensor(Nd4j.eye(n));
+    }
+
     public static Nd4jDoubleTensor zeros(int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.zeros(shape));
     }
@@ -89,6 +93,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public void setValue(Double value, int... index) {
         tensor.putScalar(index, value);
+    }
+
+    @Override
+    public DoubleTensor reshape(int... newShape) {
+        return new Nd4jDoubleTensor(tensor.reshape(newShape));
+    }
+
+    @Override
+    public DoubleTensor diag() {
+        return new Nd4jDoubleTensor(Nd4j.diag(tensor));
     }
 
     public Double sum() {
@@ -162,6 +176,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor times(double value) {
         return duplicate().timesInPlace(value);
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor value) {
+        return duplicate().matrixMultiplyInPlace(value);
+    }
+
+    @Override
+    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsA, int[] dimsB) {
+        INDArray that = value.isScalar() ? Nd4j.scalar(value.scalar().doubleValue()).reshape(value.getShape()) : unsafeGetNd4J(value);
+        return new Nd4jDoubleTensor(Nd4j.tensorMmul(tensor, that, new int[][]{dimsA, dimsB}));
     }
 
     @Override
@@ -326,6 +351,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
+        tensor.mmuli(unsafeGetNd4J(that));
+        return this;
+    }
+
+    @Override
     public DoubleTensor divInPlace(double value) {
         tensor.divi(value);
         return this;
@@ -395,8 +426,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
             tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.shape, y.scalar()));
-        }
-        else {
+        } else {
             tensor = Transforms.atan2(tensor, unsafeGetNd4J(y));
         }
         return this;

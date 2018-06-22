@@ -48,8 +48,8 @@ public class ArcTan2VertexTest {
         calculatesDualNumberOfTwoMatricesElementWiseOperator(
             new double[]{1.0, 2.0, 3.0, 4.0},
             new double[]{2.0, 3.0, 4.0, 5.0},
-            new double[]{2. / 4., 3. / 36., 4. / (9. * 16), 5. / (16 * 25)},
-            new double[]{-1. / 4., -2. / 36., -3. / (9 * 16), -4. / (16 * 25)},
+            toDiagonalArray(new double[]{2. / 4., 3. / 36., 4. / (9. * 16), 5. / (16 * 25)}),
+            toDiagonalArray(new double[]{-1. / 4., -2. / 36., -3. / (9 * 16), -4. / (16 * 25)}),
             DoubleVertex::atan2
         );
     }

@@ -85,6 +85,13 @@ public class TensorShape {
     }
 
     public static boolean isScalar(int[] shape) {
-        return Arrays.equals(Tensor.SCALAR_SHAPE, shape);
+        return getLength(shape) == 1;
+    }
+
+    public static int[] concat(int[] shape1, int[] shape2) {
+        int[] result = new int[shape1.length + shape2.length];
+        System.arraycopy(shape1, 0, result, 0, shape1.length);
+        System.arraycopy(shape2, 0, result, shape1.length, shape2.length);
+        return result;
     }
 }

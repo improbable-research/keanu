@@ -5,8 +5,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
@@ -45,6 +43,14 @@ public interface DoubleTensor extends NumberTensor<Double> {
         }
     }
 
+    static DoubleTensor eye(int n) {
+        if (n == 1) {
+            return new ScalarDoubleTensor(1.0);
+        } else {
+            return Nd4jDoubleTensor.eye(n);
+        }
+    }
+
     static DoubleTensor zeros(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
@@ -61,6 +67,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return new ScalarDoubleTensor(shape);
     }
 
+    DoubleTensor reshape(int... newShape);
+
+    DoubleTensor diag();
+
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();
@@ -70,6 +80,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor plus(double value);
 
     DoubleTensor times(double value);
+
+    DoubleTensor matrixMultiply(DoubleTensor value);
+
+    DoubleTensor tensorMultiply(DoubleTensor value, int[] dimA, int[] dimB);
 
     DoubleTensor div(double value);
 
@@ -146,6 +160,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor plusInPlace(double value);
 
     DoubleTensor timesInPlace(double value);
+
+    DoubleTensor matrixMultiplyInPlace(DoubleTensor value);
 
     DoubleTensor divInPlace(double value);
 

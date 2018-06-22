@@ -43,8 +43,8 @@ public class AdditionVertexTest {
         calculatesDualNumberOfTwoMatricesElementWiseOperator(
             new double[]{1.0, 2.0, 3.0, 4.0},
             new double[]{2.0, 3.0, 4.0, 5.0},
-            new double[]{1.0, 1.0, 1.0, 1.0},
-            new double[]{1.0, 1.0, 1.0, 1.0},
+            toDiagonalArray(new double[]{1.0, 1.0, 1.0, 1.0}),
+            toDiagonalArray(new double[]{1.0, 1.0, 1.0, 1.0}),
             DoubleVertex::plus
         );
     }

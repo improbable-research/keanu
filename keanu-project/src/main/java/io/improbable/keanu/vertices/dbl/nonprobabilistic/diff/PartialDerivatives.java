@@ -1,18 +1,28 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+
+import static java.util.Collections.singletonMap;
 
 public class PartialDerivatives {
 
     public static PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
 
     public static PartialDerivatives withRespectToSelf(long withRespectTo, int[] shape) {
-        return new PartialDerivatives(Collections.singletonMap(withRespectTo, DoubleTensor.ones(shape)));
+        return new PartialDerivatives(
+            singletonMap(
+                withRespectTo,
+                DoubleTensor.eye((int) TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
+            )
+        );
     }
 
     private Map<Long, DoubleTensor> derivativeWithRespectTo;
@@ -24,6 +34,10 @@ public class PartialDerivatives {
 
     public PartialDerivatives(Map<Long, DoubleTensor> derivativeWithRespectTo) {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
+    }
+
+    public PartialDerivatives() {
+        this.derivativeWithRespectTo = new HashMap<>();
     }
 
     public DoubleTensor withRespectTo(Vertex vertex) {
@@ -85,11 +99,49 @@ public class PartialDerivatives {
 
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
-            DoubleTensor v = entry.getValue().times(multiplier);
+            DoubleTensor v = elementWiseMultiplyDiff(entry.getValue(), multiplier);
             multiplied.put(k, v);
         }
 
         return new PartialDerivatives(multiplied);
+    }
+
+    private DoubleTensor elementWiseMultiplyDiff(DoubleTensor partial, DoubleTensor multiplier) {
+
+        if (multiplier.isScalar()) {
+            return partial.times(multiplier.scalar());
+        }
+
+        DoubleTensor multiplierReshaped = reshapeByPad(multiplier, partial.getRank());
+
+        if(partial.isScalar()){
+            return multiplierReshaped.times(partial.scalar());
+        }
+
+        int multiplierRank = multiplier.getRank();
+        int[] partialOfShape = Arrays.copyOfRange(partial.getShape(), 0, multiplierRank);
+
+        if (TensorShape.isScalar(partialOfShape)) {
+
+            int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
+            //?!?! Maybe?
+            return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
+                .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
+        } else {
+            return partial.times(multiplierReshaped);
+        }
+    }
+
+    private DoubleTensor reshapeByPad(DoubleTensor lowRankTensor, int desiredRank) {
+        int[] shape = lowRankTensor.getShape();
+        if (shape.length == desiredRank) {
+            return lowRankTensor;
+        }
+
+        int[] paddedShape = new int[desiredRank];
+        Arrays.fill(paddedShape, 1);
+        System.arraycopy(shape, 0, paddedShape, 0, shape.length);
+        return lowRankTensor.reshape(paddedShape);
     }
 
     public PartialDerivatives multiplyBy(double multiplier) {
@@ -109,7 +161,8 @@ public class PartialDerivatives {
 
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
-            DoubleTensor v = entry.getValue().div(divisor);
+            DoubleTensor partial = entry.getValue();
+            DoubleTensor v = partial.div(reshapeByPad(divisor, partial.getRank()));
             divided.put(k, v);
         }
 
