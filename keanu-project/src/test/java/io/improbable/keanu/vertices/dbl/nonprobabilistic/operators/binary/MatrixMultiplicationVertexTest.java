@@ -13,8 +13,8 @@ public class MatrixMultiplicationVertexTest {
 
     @Test
     public void canSimpleMatrixMultiply() {
-        DoubleTensor matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        DoubleTensor matrixB = DoubleTensor.create(new double[]{2, 4, 6, 8}, new int[]{2, 2});
+        DoubleTensor matrixA = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor matrixB = DoubleTensor.create(new double[]{2, 4, 6, 8}, 2, 2);
 
         MatrixMultiplicationVertex mmul = new MatrixMultiplicationVertex(ConstantVertex.of(matrixA), ConstantVertex.of(matrixB));
 
@@ -27,10 +27,10 @@ public class MatrixMultiplicationVertexTest {
     public void canAutoDiffMatrixMultiply() {
 
         DoubleVertex x = new UniformVertex(0, 10);
-        x.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2}));
+        x.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
         DoubleVertex y = new UniformVertex(0, 10);
-        y.setValue(DoubleTensor.create(new double[]{2, 4, 6, 8}, new int[]{2, 2}));
+        y.setValue(DoubleTensor.create(new double[]{2, 4, 6, 8}, 2, 2));
 
         DoubleVertex z = x.matrixMultiply(y);
 

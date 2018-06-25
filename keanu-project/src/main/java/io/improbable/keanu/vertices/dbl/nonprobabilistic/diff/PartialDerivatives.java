@@ -135,7 +135,6 @@ public class PartialDerivatives {
         if (TensorShape.isScalar(partialOfShape)) {
 
             int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
-            //?!?! Maybe?
             return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
                 .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
         } else {
@@ -143,7 +142,7 @@ public class PartialDerivatives {
         }
     }
 
-    private DoubleTensor reshapeByAppendPad(DoubleTensor lowRankTensor, int desiredRank) {
+    private static DoubleTensor reshapeByAppendPad(DoubleTensor lowRankTensor, int desiredRank) {
         int[] shape = lowRankTensor.getShape();
         if (shape.length == desiredRank) {
             return lowRankTensor;
@@ -155,7 +154,7 @@ public class PartialDerivatives {
         return lowRankTensor.reshape(paddedShape);
     }
 
-    private DoubleTensor reshapeByPrependPad(DoubleTensor lowRankTensor, int desiredRank) {
+    private static DoubleTensor reshapeByPrependPad(DoubleTensor lowRankTensor, int desiredRank) {
         int[] shape = lowRankTensor.getShape();
         if (shape.length == desiredRank) {
             return lowRankTensor;
@@ -165,6 +164,28 @@ public class PartialDerivatives {
         Arrays.fill(paddedShape, 1);
         System.arraycopy(shape, 0, paddedShape, shape.length, shape.length);
         return lowRankTensor.reshape(paddedShape);
+    }
+
+    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
+        Map<Long, DoubleTensor> multiplied = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
+            long k = partial.getKey();
+            DoubleTensor v;
+            DoubleTensor reshapedMultiplier = reshapeByAppendPad(multiplier, partial.getValue().getRank());
+            if (partialIsLeft) {
+                v = partial.getValue()
+                    .tensorMultiply(reshapedMultiplier, new int[]{0}, new int[]{0})
+                    .reshape(partial.getValue().getShape());
+            } else {
+                v = reshapedMultiplier
+                    .tensorMultiply(partial.getValue(), new int[]{0}, new int[]{0})
+                    .reshape(partial.getValue().getShape());
+            }
+            multiplied.put(k, v);
+        }
+
+        return new PartialDerivatives(multiplied);
     }
 
     public PartialDerivatives multiplyBy(double multiplier) {

@@ -66,15 +66,13 @@ public class DualNumber {
         if (this.partialDerivatives.isEmpty()) {
             thisInfMultiplied = this.partialDerivatives.clone();
         } else {
-            //TODO: reshape?
-            thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
+            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
         }
 
         if (that.partialDerivatives.isEmpty()) {
             thatInfMultiplied = that.partialDerivatives.clone();
         } else {
-            //TODO: reshape?
-            thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
+            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
         }
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
