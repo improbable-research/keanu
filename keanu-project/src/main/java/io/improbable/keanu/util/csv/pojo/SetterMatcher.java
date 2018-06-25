@@ -1,5 +1,8 @@
 package io.improbable.keanu.util.csv.pojo;
 
+import io.improbable.keanu.util.csv.pojo.bycolumn.CsvColumnConsumer;
+import io.improbable.keanu.util.csv.pojo.byrow.CsvCellConsumer;
+
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.List;
@@ -9,12 +12,34 @@ import java.util.Optional;
  * This finds an appropriate setter method for a given csv title. This is done by case insensitive name
  * or by annotation.
  */
-class SetterMatcher {
+public class SetterMatcher {
 
     private SetterMatcher() {
     }
 
-    static <T> Optional<CsvColumnConsumer<T>> getSetterConsumer(String title, List<Method> potentialMethods) {
+    public static <T> Optional<CsvCellConsumer<T>> getSetterCellConsumer(String title, List<Method> potentialMethods) {
+
+        final Optional<Method> matchingMethodMaybe = findMatchingSetter(title.trim(), potentialMethods);
+
+        return matchingMethodMaybe
+            .map(SetterMatcher::createCellConsumerForMethod);
+    }
+
+    private static <T> CsvCellConsumer<T> createCellConsumerForMethod(Method method) {
+
+        return (target, value) -> {
+
+            Object convertedValue = CsvCellDeserializer.convertToAppropriateType(value, method.getParameterTypes()[0]);
+
+            try {
+                method.invoke(target, convertedValue);
+            } catch (InvocationTargetException | IllegalAccessException e) {
+                throw new IllegalStateException(e);
+            }
+        };
+    }
+
+    public static <T> Optional<CsvColumnConsumer<T>> getSetterColumnConsumer(String title, List<Method> potentialMethods) {
 
         final Optional<Method> matchingMethodMaybe = findMatchingSetter(title.trim(), potentialMethods);
 
@@ -23,10 +48,9 @@ class SetterMatcher {
     }
 
     private static <T> CsvColumnConsumer<T> createColumnConsumerForMethod(Method method) {
-
         return (target, value) -> {
 
-            Object convertedValue = ColumnDeserializer.convertToAppropriateType(value, method.getParameterTypes()[0]);
+            Object convertedValue = CsvColumnDeserializer.convertToAppropriateType(value, method.getParameterTypes()[0]);
 
             try {
                 method.invoke(target, convertedValue);

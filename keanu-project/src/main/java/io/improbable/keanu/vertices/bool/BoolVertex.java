@@ -85,4 +85,8 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
         return this.dLogPmf(BooleanTensor.create(values));
     }
 
+    public boolean getValue(int... index) {
+        return getValue().getValue(index);
+    }
+
 }

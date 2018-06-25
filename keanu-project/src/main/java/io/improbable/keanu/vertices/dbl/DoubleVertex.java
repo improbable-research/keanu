@@ -107,6 +107,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new ArcTan2Vertex(this, that);
     }
 
+    public DoubleVertex sum() {
+        return new SumVertex(this);
+    }
+
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
@@ -223,5 +227,9 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     public Map<Long, DoubleTensor> dLogPdf(double[] values) {
         return this.dLogPdf(DoubleTensor.create(values));
+    }
+
+    public double getValue(int... index) {
+        return getValue().getValue(index);
     }
 }
