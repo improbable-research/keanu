@@ -117,7 +117,7 @@ public class NUTS {
             1,
             true,
             0,
-            0
+            1
         );
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
@@ -634,18 +634,18 @@ public class NUTS {
                                                Map<Long, Long> latentSetAndCascadeCache,
                                                KeanuRandom random) {
         double stepsize = 1;
-        double probBeforeLeapfrog = Math.exp(getLogProb(probabilisticVertices));
+        double probBeforeLeapfrog = getLogProb(probabilisticVertices);
         Map<Long, DoubleTensor> momentums = new HashMap<>();
         initializeMomentumForEachVertex(vertices, momentums, random);
         leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
-        double probAfterLeapfrog = Math.exp(getLogProb(probabilisticVertices));
-        double likelihoodRatio = probAfterLeapfrog / probBeforeLeapfrog;
-        double scalingFactor = likelihoodRatio > 0.5 ? 1 : -1;
+        double probAfterLeapfrog = getLogProb(probabilisticVertices);
+        double likelihoodRatio = probAfterLeapfrog - probBeforeLeapfrog;
+        double scalingFactor = likelihoodRatio > Math.log(0.5) ? 1 : -1;
 
-        while (Math.pow(likelihoodRatio, scalingFactor) > Math.pow(2, -scalingFactor)) {
+        while (scalingFactor * (likelihoodRatio) > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
             leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
-            likelihoodRatio = Math.exp(getLogProb(probabilisticVertices)) / probBeforeLeapfrog;
+            likelihoodRatio = getLogProb(probabilisticVertices) - probBeforeLeapfrog;
         }
 
         return stepsize;
@@ -654,11 +654,18 @@ public class NUTS {
     private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
         if (sampleNum <= autoTune.adaptCount) {
             double percentageLeftToTune = (1 / (sampleNum + STABILISER));
-            double acceptanceProbOfFinalInteration = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
-            autoTune.averageAcceptanceProb = ((1 - percentageLeftToTune) * autoTune.averageAcceptanceProb) + (percentageLeftToTune * acceptanceProbOfFinalInteration);
-            autoTune.logStepSize = autoTune.shrinkageTarget - (Math.sqrt(sampleNum) / SHRINKAGE_FACTOR) * autoTune.averageAcceptanceProb;
+            double acceptanceProb = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
+            double proportionalAcceptanceProb = (1 - percentageLeftToTune) * autoTune.averageAcceptanceProb;
+            autoTune.averageAcceptanceProb = proportionalAcceptanceProb + (percentageLeftToTune * acceptanceProb);
+
+            double shrunkSampleCount = Math.sqrt(sampleNum) / SHRINKAGE_FACTOR;
+            autoTune.logStepSize = autoTune.shrinkageTarget - (shrunkSampleCount * autoTune.averageAcceptanceProb);
+
             double tendToZero = Math.pow(sampleNum, -TEND_TO_ZERO_EXPONENT);
-            autoTune.logStepSizeFrozen = tendToZero * autoTune.logStepSize + (1 - tendToZero) * autoTune.logStepSizeFrozen;
+            double reducedStepSize = tendToZero * autoTune.logStepSize;
+            double increasedStepSizeFrozen = (1 - tendToZero) * autoTune.logStepSizeFrozen;
+            autoTune.logStepSizeFrozen = reducedStepSize + increasedStepSizeFrozen;
+
             return Math.exp(autoTune.logStepSize);
         } else {
             return Math.exp(autoTune.logStepSizeFrozen);
