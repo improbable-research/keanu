@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
 import static org.junit.Assert.assertArrayEquals;
 
 public class MatrixMultiplicationVertexTest {
@@ -37,17 +36,43 @@ public class MatrixMultiplicationVertexTest {
         DoubleTensor dzdx = z.getDualNumber().getPartialDerivatives().withRespectTo(x);
         DoubleTensor dzdy = z.getDualNumber().getPartialDerivatives().withRespectTo(y);
 
+        double[] expectedDzdx = new double[]{
+            2.0, 0.0,
+            6.0, 0.0,
+            0.0, 2.0,
+            0.0, 6.0,
+            4.0, 0.0,
+            8.0, 0.0,
+            0.0, 4.0,
+            0.0, 8.0
+        };
+
         assertArrayEquals(
+            expectedDzdx,
             dzdx.asFlatDoubleArray(),
-            toDiagonalArray(new double[]{2, 4, 6, 8}),
             0.0
         );
 
+        assertArrayEquals(new int[]{2, 2, 2, 2}, dzdx.getShape());
+
+        double[] expectedDzdy = new double[]{
+            1.0, 2.0,
+            0.0, 0.0,
+            3.0, 4.0,
+            0.0, 0.0,
+            0.0, 0.0,
+            1.0, 2.0,
+            0.0, 0.0,
+            3.0, 4.0
+        };
+
         assertArrayEquals(
+            expectedDzdy,
             dzdy.asFlatDoubleArray(),
-            toDiagonalArray(new double[]{1, 2, 3, 4}),
             0.0
         );
+
+        assertArrayEquals(new int[]{2, 2, 2, 2}, dzdy.getShape());
 
     }
 }
