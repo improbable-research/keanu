@@ -63,6 +63,43 @@ public class ProbabilisticDoubleTensorContract {
         }
     }
 
+    public static void sampleUnivariateMethodMatchesLogProbMethod(Vertex<DoubleTensor> vertexUnderTest,
+                                                        double from,
+                                                        double to,
+                                                        double bucketSize,
+                                                        double maxError,
+                                                        KeanuRandom random,
+                                                        int sampleCount) {
+        double bucketCount = ((to - from) / bucketSize);
+
+        if (bucketCount != (int) bucketCount) {
+            throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
+        }
+
+        double[] samples = new double[sampleCount];
+        for (int i = 0; i < sampleCount; i++) {
+            samples[i] = vertexUnderTest.sample(random).scalar();
+        }
+
+        Map<Double, Long> histogram = Arrays.stream(samples)
+            .filter(value -> value >= from && value <= to)
+            .boxed()
+            .collect(groupingBy(
+                x -> bucketCenter(x, bucketSize, from),
+                counting()
+            ));
+
+        for (Map.Entry<Double, Long> sampleBucket : histogram.entrySet()) {
+            double percentage = (double) sampleBucket.getValue() / samples.length;
+            double bucketCenter = sampleBucket.getKey();
+
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
+            double actual = percentage / bucketSize;
+
+            assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
+        }
+    }
+
     private static Double bucketCenter(Double x, double bucketSize, double from) {
         double bucketNumber = Math.floor((x - from) / bucketSize);
         return bucketNumber * bucketSize + bucketSize / 2 + from;

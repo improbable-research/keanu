@@ -274,6 +274,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor inverse() {
+        return this;
+    }
+
+    @Override
     public double max() {
         return value;
     }
@@ -334,12 +339,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor choleskyDecomposition() {
-        throw new IllegalStateException("Cannot find the cholesky decomposition of a scalar");
+        return this;
     }
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
-        throw new IllegalStateException("Cannot matrix multiply a scalar");
+        return that.matrixMultiply(this);
     }
 
     @Override
@@ -349,7 +354,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public double determinant() {
-        throw new IllegalStateException("Cannot find the determinant of a scalar");
+        return value;
     }
 
     @Override

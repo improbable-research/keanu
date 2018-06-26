@@ -125,6 +125,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor max(DoubleTensor max);
 
+    DoubleTensor inverse();
+
     double max();
 
     DoubleTensor min(DoubleTensor max);

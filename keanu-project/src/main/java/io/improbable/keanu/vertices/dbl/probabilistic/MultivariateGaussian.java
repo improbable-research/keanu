@@ -22,6 +22,8 @@ public class MultivariateGaussian extends ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    //constructor where covariance is a scalar and we multiply by identity matrix
+
     public MultivariateGaussian(DoubleVertex mu, DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
@@ -31,9 +33,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
-        DoubleTensor logPdfs = TensorMultivariateGaussian.logPdf(muValues, covarianceValues, value);
-
-        return logPdfs.sum();
+        return TensorMultivariateGaussian.logPdf(muValues, covarianceValues, value);
     }
 
     @Override
@@ -43,7 +43,8 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
+        GaussianVertex gaussianVariates = new GaussianVertex(mu.getShape(), 0, 1);
+        return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), gaussianVariates, random);
     }
 
     private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {
