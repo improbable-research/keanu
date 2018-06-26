@@ -14,7 +14,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     public MultivariateGaussian(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
 
-        checkValidShape(mu, covariance);
+        checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
         this.mu = mu;
         this.covariance = covariance;
@@ -23,12 +23,17 @@ public class MultivariateGaussian extends ProbabilisticDouble {
     }
 
     public MultivariateGaussian(DoubleVertex mu, DoubleVertex covariance) {
-        this(mu.getShape(), mu, covariance);
+        this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return 0;
+        DoubleTensor muValues = mu.getValue();
+        DoubleTensor covarianceValues = covariance.getValue();
+
+        DoubleTensor logPdfs = TensorMultivariateGaussian.logPdf(muValues, covarianceValues, value);
+
+        return logPdfs.sum();
     }
 
     @Override
@@ -38,19 +43,18 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorMultivariateGaussian.sample(getShape(), mu.getValue(), covariance.getValue(), random);
+        return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
     }
 
-    private void checkValidShape(DoubleVertex mu, DoubleVertex covariance) {
-        int[] covarianceShape = covariance.getShape();
-        int[] muShape = mu.getShape();
-
-        if (covarianceShape.length != 2 ||
-            muShape.length != 2 ||
-            covarianceShape[0] != covarianceShape[1] ||
-            muShape[1] != 1 ||
-            muShape[0] != covarianceShape[0]) {
+    private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {
+        if (covarianceShape.length != 2
+            || muShape.length != 2
+            || covarianceShape[0] != covarianceShape[1]
+            || muShape[1] != 1
+            || muShape[0] != covarianceShape[0]) {
             throw new IllegalArgumentException("Invalid sizing of parameters");
+        } else {
+          return muShape;
         }
     }
 }

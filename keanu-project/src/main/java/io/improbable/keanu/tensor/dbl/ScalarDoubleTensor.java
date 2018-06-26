@@ -339,7 +339,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
-        return null;
+        throw new IllegalStateException("Cannot matrix multiply a scalar");
+    }
+
+    @Override
+    public DoubleTensor transpose() {
+        return this;
+    }
+
+    @Override
+    public double determinant() {
+        throw new IllegalStateException("Cannot find the determinant of a scalar");
     }
 
     @Override

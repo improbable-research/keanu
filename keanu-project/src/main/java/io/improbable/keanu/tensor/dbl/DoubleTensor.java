@@ -151,6 +151,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor matrixMultiply(DoubleTensor that);
 
+    DoubleTensor transpose();
+
+    double determinant();
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();

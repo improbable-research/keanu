@@ -6,6 +6,9 @@ import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.LUDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
@@ -174,22 +177,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor choleskyDecomposition() {
-        int length = this.shape[0];
-        DoubleTensor cholesky = Nd4jDoubleTensor.zeros(this.shape);
-
-        for (int i = 0; i < length; i++) {
-            for (int k = 0; k < (i + 1); k++) {
-                double sum = 0;
-                for (int j = 0; j < k; j++) {
-                    sum += cholesky.getValue(i, j) * cholesky.getValue(k, j);
-
-                }
-                double value = (i == k) ? Math.sqrt(getValue(i, i) - sum) :
-                    (1.0 / cholesky.getValue(k, k) * (getValue(i, k) - sum));
-                cholesky.setValue(value, i, k);
-            }
-        }
-        return cholesky;
+        Nd4j.getBlasWrapper().lapack().potrf(tensor, false);
+        return new Nd4jDoubleTensor(tensor);
     }
 
     @Override
@@ -698,6 +687,22 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray indArray = unsafeGetNd4J(that);
         INDArray x = tensor.mmul(indArray);
         return new Nd4jDoubleTensor(x);
+    }
+
+    @Override
+    public DoubleTensor transpose() {
+        DoubleTensor dup = duplicate();
+        INDArray indArray = unsafeGetNd4J(dup);
+        return new Nd4jDoubleTensor(indArray.transpose());
+    }
+
+    @Override
+    public double determinant() {
+        DoubleTensor dup = duplicate();
+        INDArray indArray = unsafeGetNd4J(dup);
+        double[][] asMatrix = indArray.toDoubleMatrix();
+        RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
+        return new LUDecomposition(matrix).getDeterminant();
     }
 
     // Comparisons
