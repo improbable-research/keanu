@@ -71,6 +71,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor diag();
 
+    DoubleTensor transpose();
+
     DoubleTensor sum(int... overDimensions);
 
     //New tensor Ops and transforms
@@ -174,8 +176,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor plusInPlace(double value);
 
     DoubleTensor timesInPlace(double value);
-
-    DoubleTensor matrixMultiplyInPlace(DoubleTensor value);
 
     DoubleTensor divInPlace(double value);
 

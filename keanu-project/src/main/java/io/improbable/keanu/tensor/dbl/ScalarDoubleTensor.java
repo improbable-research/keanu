@@ -105,6 +105,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor transpose() {
+        return duplicate();
+    }
+
+    @Override
     public DoubleTensor sum(int... overDimensions) {
         return duplicate();
     }
@@ -388,11 +393,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor timesInPlace(double that) {
         value = value * that;
         return this;
-    }
-
-    @Override
-    public DoubleTensor matrixMultiplyInPlace(DoubleTensor value) {
-        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override

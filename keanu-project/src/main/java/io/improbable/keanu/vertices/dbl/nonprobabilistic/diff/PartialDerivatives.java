@@ -135,6 +135,7 @@ public class PartialDerivatives {
         if (TensorShape.isScalar(partialOfShape)) {
 
             int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplierRank, partial.getRank());
+            //TODO no hardcoded values
             return partial.tensorMultiply(multiplierReshaped, new int[]{0, 1}, new int[]{2, 3})
                 .reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
         } else {
@@ -173,14 +174,24 @@ public class PartialDerivatives {
             long k = partial.getKey();
             DoubleTensor v;
             DoubleTensor reshapedMultiplier = reshapeByAppendPad(multiplier, partial.getValue().getRank());
+            int[] partialShape = partial.getValue().getShape();
+            int[] resultShape = Arrays.copyOf(partialShape, partialShape.length);
+            int wrtDimsLength = (int) TensorShape.getLength(Arrays.copyOfRange(partialShape, 2, partialShape.length));
+
             if (partialIsLeft) {
+                resultShape[0] = partialShape[0];
+                resultShape[1] = reshapedMultiplier.getShape()[1];
                 v = partial.getValue()
-                    .tensorMultiply(reshapedMultiplier, new int[]{0}, new int[]{0})
-                    .reshape(partial.getValue().getShape());
+                    .tensorMultiply(reshapedMultiplier, new int[]{1}, new int[]{0})
+                    .reshape(wrtDimsLength, resultShape[1])
+                    .transpose()
+                    .reshape(resultShape);
             } else {
+                resultShape[0] = reshapedMultiplier.getShape()[0];
+                resultShape[1] = partialShape[1];
                 v = reshapedMultiplier
-                    .tensorMultiply(partial.getValue(), new int[]{0}, new int[]{0})
-                    .reshape(partial.getValue().getShape());
+                    .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0})
+                    .reshape(resultShape);
             }
             multiplied.put(k, v);
         }

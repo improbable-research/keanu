@@ -106,6 +106,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor transpose() {
+        return new Nd4jDoubleTensor(tensor.transpose());
+    }
+
+    @Override
     public DoubleTensor sum(int... overDimensions) {
         return new Nd4jDoubleTensor(tensor.sum(overDimensions));
     }
@@ -218,7 +223,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
-        return duplicate().matrixMultiplyInPlace(value);
+        return new Nd4jDoubleTensor(tensor.mmul(unsafeGetNd4J(value)));
     }
 
     @Override
@@ -385,12 +390,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor timesInPlace(double value) {
         tensor.muli(value);
-        return this;
-    }
-
-    @Override
-    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
-        tensor.mmuli(unsafeGetNd4J(that));
         return this;
     }
 
@@ -894,12 +893,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public double[] asFlatDoubleArray() {
-        return tensor.data().asDouble();
+        return tensor.dup().data().asDouble();
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return tensor.data().asInt();
+        return tensor.dup().data().asInt();
     }
 
     @Override

@@ -590,12 +590,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public double[] asFlatDoubleArray() {
-        return tensor.data().asDouble();
+        return tensor.dup().data().asDouble();
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return tensor.data().asInt();
+        return tensor.dup().data().asInt();
     }
 
     @Override
