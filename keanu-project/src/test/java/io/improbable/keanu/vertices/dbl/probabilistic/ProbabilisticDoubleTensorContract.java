@@ -58,7 +58,7 @@ public class ProbabilisticDoubleTensorContract {
 
             double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
-
+            System.out.println(actual + " " + densityAtBucketCenter);
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
     }
@@ -95,7 +95,7 @@ public class ProbabilisticDoubleTensorContract {
 
             double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
-
+            System.out.println(actual + " " + densityAtBucketCenter);
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
     }

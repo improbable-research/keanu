@@ -36,7 +36,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void samplingFromUnivariateNormalMatchesLogPdf() {
-        DoubleVertex mu = new ConstantDoubleVertex(new Nd4jDoubleTensor(new int[]{1, 1}, new double[]{5}));
+        DoubleVertex mu = new ConstantDoubleVertex(new Nd4jDoubleTensor(new int[]{1, 1}, new double[]{0}));
         DoubleVertex covarianceMatrix = new ConstantDoubleVertex(new Nd4jDoubleTensor(new int[]{1, 1}, new double[]{1}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
@@ -45,7 +45,7 @@ public class MultivariateGaussianTest {
         double to = 2.;
         double bucketSize = 0.05;
 
-        sampleUnivariateMethodMatchesLogProbMethod(mvg, from, to, bucketSize, 0.05, random, 100000);
+        sampleUnivariateMethodMatchesLogProbMethod(mvg, from, to, bucketSize, 1e-2, random, 1000000);
     }
 
     @Test
@@ -124,7 +124,7 @@ public class MultivariateGaussianTest {
         double to = 1.;
         double bucketSize = 0.05;
 
-        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 1e-2, 50000, random);
+        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.1, 75000, random);
     }
 
     private static void sampleMethodMatchesLogProbMethodMultiVariate(MultivariateGaussian vertexUnderTest,
@@ -167,12 +167,9 @@ public class MultivariateGaussianTest {
             }
         }
 
-        double total = 0;
-
         for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
             double percentage = (double) entry.getValue() / sampleCount;
             Pair<Double, Double> bucketCenter = entry.getKey();
-            total += percentage;
             Nd4jDoubleTensor sample = new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{bucketCenter.fst, bucketCenter.snd});
             double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(sample));
             double actual = percentage / bucketSize;
@@ -180,12 +177,6 @@ public class MultivariateGaussianTest {
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
 
-        sampleBucket.entrySet().stream()
-            .sorted(Map.Entry.comparingByValue())
-            .forEach(System.out::println);
-
-        System.out.println(total);
-        System.out.println(bucketCount);
     }
 
     private static Double bucketCenter(Double x, double bucketSize, double from) {
