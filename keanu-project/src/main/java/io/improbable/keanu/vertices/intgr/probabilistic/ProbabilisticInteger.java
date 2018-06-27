@@ -8,7 +8,7 @@ public abstract class ProbabilisticInteger extends IntegerVertex {
     @Override
     public IntegerTensor updateValue() {
         if (!hasValue()) {
-            setValue(sampleUsingDefaultRandom());
+            setValue(sample());
         }
         return getValue();
     }
