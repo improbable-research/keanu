@@ -50,8 +50,6 @@ public interface Tensor<T> {
 
     Tensor<T> duplicate();
 
-
-
     FlattenedView<T> getFlattenedView();
 
     interface FlattenedView<T> {

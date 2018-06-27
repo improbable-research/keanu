@@ -227,9 +227,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsA, int[] dimsB) {
+    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
         INDArray that = value.isScalar() ? Nd4j.scalar(value.scalar().doubleValue()).reshape(value.getShape()) : unsafeGetNd4J(value);
-        return new Nd4jDoubleTensor(Nd4j.tensorMmul(tensor, that, new int[][]{dimsA, dimsB}));
+        return new Nd4jDoubleTensor(Nd4j.tensorMmul(tensor, that, new int[][]{dimsLeft, dimsRight}));
     }
 
     @Override

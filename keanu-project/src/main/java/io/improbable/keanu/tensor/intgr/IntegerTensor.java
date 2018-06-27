@@ -60,6 +60,14 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         return new ScalarIntegerTensor(shape);
     }
 
+    IntegerTensor reshape(int... newShape);
+
+    IntegerTensor diag();
+
+    IntegerTensor transpose();
+
+    IntegerTensor sum(int... overDimensions);
+
     //New tensor Ops and transforms
 
     IntegerTensor minus(int value);
@@ -79,6 +87,10 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     IntegerTensor plus(IntegerTensor that);
 
     IntegerTensor times(IntegerTensor that);
+
+    IntegerTensor matrixMultiply(IntegerTensor value);
+
+    IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
 
     IntegerTensor div(IntegerTensor that);
 

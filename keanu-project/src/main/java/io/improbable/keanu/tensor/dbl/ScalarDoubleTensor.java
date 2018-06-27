@@ -140,7 +140,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimA, int[] dimB) {
+    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
         throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
 

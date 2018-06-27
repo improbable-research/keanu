@@ -87,7 +87,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor matrixMultiply(DoubleTensor value);
 
-    DoubleTensor tensorMultiply(DoubleTensor value, int[] dimA, int[] dimB);
+    DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
 
     DoubleTensor div(double value);
 
