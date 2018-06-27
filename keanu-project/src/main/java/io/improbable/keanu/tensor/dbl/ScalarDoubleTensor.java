@@ -348,18 +348,13 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
-        if (!that.isScalar()) {
-            return that.matrixMultiply(this);
-        } else {
-            value = value * that.scalar();
-            return this;
-        }
+    public DoubleTensor transposeInPlace() {
+        return this;
     }
 
     @Override
     public DoubleTensor transpose() {
-        return this;
+        return this.duplicate().transposeInPlace();
     }
 
     @Override
@@ -580,6 +575,16 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor sigmoidInPlace() {
         value = 1.0D / (1.0D + FastMath.exp(-value));
         return this;
+    }
+
+    @Override
+    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
+        if (!that.isScalar()) {
+            return that.matrixMultiplyInPlace(this);
+        } else {
+            value = value * that.scalar();
+            return this;
+        }
     }
 
     @Override

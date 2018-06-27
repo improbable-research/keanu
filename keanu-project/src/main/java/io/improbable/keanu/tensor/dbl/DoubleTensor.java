@@ -139,8 +139,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor standardize();
 
-    DoubleTensor standardizeInPlace();
-
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
     DoubleTensor ceil();
@@ -222,6 +220,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor sigmoidInPlace();
 
     DoubleTensor matrixMultiplyInPlace(DoubleTensor that);
+
+    DoubleTensor transposeInPlace();
+
+    DoubleTensor standardizeInPlace();
 
     // Comparisons
     BooleanTensor lessThan(double value);

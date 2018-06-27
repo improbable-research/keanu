@@ -16,15 +16,15 @@ public class TensorMultivariateGaussian {
     }
 
     public static double logPdf(DoubleTensor mu, DoubleTensor covariance, DoubleTensor x) {
-        double logOfCovarianceDeterminant = Math.log(covariance.determinant());
+        double numDimensions = mu.getShape()[0];
+        double kLog2Pi = numDimensions * Math.log(2 * Math.PI);
+        double logCovarianceDeterminant = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu);
         DoubleTensor xMinusMuTransposed = xMinusMu.transpose();
-        double kLog2Pi = mu.getShape()[0] * Math.log(2 * Math.PI);
         DoubleTensor covarianceInverted = covariance.inverse();
         DoubleTensor covInvTimesXMinusMu = covarianceInverted.matrixMultiply(xMinusMu);
-        DoubleTensor foo = xMinusMuTransposed.matrixMultiply(covInvTimesXMinusMu);
-        double scalar = foo.scalar();
-        return (scalar + kLog2Pi + logOfCovarianceDeterminant) * (-0.5);
+        double xMinusMuTransposedTimescovInvTimesXMinusMu = xMinusMuTransposed.matrixMultiply(covInvTimesXMinusMu).scalar();
+        return -0.5 * (xMinusMuTransposedTimescovInvTimesXMinusMu + kLog2Pi + logCovarianceDeterminant);
     }
 
 }

@@ -717,13 +717,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
-        return null;
-    }
-
-    @Override
-    public DoubleTensor matrixMultiply(DoubleTensor that) {
         if (that.isScalar()) {
-            return times(that);
+            return timesInPlace(that);
         }
         INDArray indArray = unsafeGetNd4J(that);
         INDArray x = tensor.mmul(indArray);
@@ -731,10 +726,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor transposeInPlace() {
+        return new Nd4jDoubleTensor(tensor.transpose());
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor that) {
+        return this.duplicate().matrixMultiplyInPlace(that);
+    }
+
+    @Override
     public DoubleTensor transpose() {
-        DoubleTensor dup = duplicate();
-        INDArray indArray = unsafeGetNd4J(dup);
-        return new Nd4jDoubleTensor(indArray.transpose());
+        return this.duplicate().transposeInPlace();
     }
 
     @Override
