@@ -4,6 +4,9 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -41,6 +44,14 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
             return new ScalarIntegerTensor(1);
         } else {
             return Nd4jIntegerTensor.ones(shape);
+        }
+    }
+
+    static IntegerTensor eye(int n) {
+        if (n == 1) {
+            return new ScalarIntegerTensor(1);
+        } else {
+            return Nd4jIntegerTensor.eye(n);
         }
     }
 

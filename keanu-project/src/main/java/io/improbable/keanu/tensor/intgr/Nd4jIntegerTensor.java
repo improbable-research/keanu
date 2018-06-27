@@ -36,6 +36,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(Nd4j.ones(shape));
     }
 
+    public static Nd4jIntegerTensor eye(int n) {
+        return new Nd4jIntegerTensor(Nd4j.eye(n));
+    }
+
     public static Nd4jIntegerTensor zeros(int[] shape) {
         return new Nd4jIntegerTensor(Nd4j.zeros(shape));
     }
