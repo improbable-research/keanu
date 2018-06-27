@@ -171,19 +171,18 @@ public class PartialDerivatives {
         Map<Long, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
-            long k = partial.getKey();
-            DoubleTensor v;
+
             DoubleTensor reshapedMultiplier = reshapeByAppendPad(multiplier, partial.getValue().getRank());
             int[] partialShape = partial.getValue().getShape();
             int[] resultShape = Arrays.copyOf(partialShape, partialShape.length);
-            int wrtDimsLength = (int) TensorShape.getLength(Arrays.copyOfRange(partialShape, 2, partialShape.length));
 
+            DoubleTensor v;
             if (partialIsLeft) {
                 resultShape[0] = partialShape[0];
                 resultShape[1] = reshapedMultiplier.getShape()[1];
                 v = partial.getValue()
                     .tensorMultiply(reshapedMultiplier, new int[]{1}, new int[]{0})
-                    .reshape(wrtDimsLength, resultShape[1])
+                    .reshape(-1, resultShape[1])
                     .transpose()
                     .reshape(resultShape);
             } else {
@@ -193,7 +192,7 @@ public class PartialDerivatives {
                     .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0})
                     .reshape(resultShape);
             }
-            multiplied.put(k, v);
+            multiplied.put(partial.getKey(), v);
         }
 
         return new PartialDerivatives(multiplied);

@@ -101,7 +101,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor diag() {
-        return this;
+        return duplicate();
     }
 
     @Override
@@ -136,13 +136,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
-        // TODO: how do we do this?
         throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimA, int[] dimB) {
-        //TODO: how do we do this?
         throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
 

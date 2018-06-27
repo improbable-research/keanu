@@ -59,22 +59,31 @@ public class MatrixMultiplicationVertexTest {
     public void canDoDoubleMatrixMultiplyAutoDiff() {
 
         DoubleVertex m = new UniformVertex(0, 10);
-        m.setValue(DoubleTensor.create(new double[]{1, 2}, 1, 2));
+        m.setValue(DoubleTensor.create(new double[]{
+            1, 2
+        }, 1, 2));
 
         DoubleVertex alpha = new UniformVertex(0, 10);
-        alpha.setValue(DoubleTensor.create(new double[]{1, 3, 2, 4}, 2, 2));
+        alpha.setValue(DoubleTensor.create(new double[]{
+            1, 3,
+            2, 4
+        }, 2, 2));
 
         DoubleVertex beta = new UniformVertex(0, 10);
-        beta.setValue(DoubleTensor.create(new double[]{5, 7, 6, 8}, 2, 2));
+        beta.setValue(DoubleTensor.create(new double[]{
+            5, 7,
+            6, 8
+        }, 2, 2));
 
         DoubleVertex N = m.matrixMultiply(alpha);
         DoubleVertex y = N.matrixMultiply(beta);
-
         DualNumber yDual = y.getDualNumber();
 
         DoubleTensor dydm = yDual.getPartialDerivatives().withRespectTo(m);
+        DoubleTensor expectedDydm = DoubleTensor.create(new double[]{
+            23, 34, 31, 46
+        }, 1, 2, 1, 2);
 
-        DoubleTensor expectedDydm = DoubleTensor.create(new double[]{23, 34, 31, 46}, 1, 2, 1, 2);
         assertEquals(expectedDydm, dydm);
 
         DoubleTensor dydalpha = yDual.getPartialDerivatives().withRespectTo(alpha);
@@ -84,6 +93,57 @@ public class MatrixMultiplicationVertexTest {
             7, 8,
             14, 16
         }, 1, 2, 2, 2);
+
+        assertEquals(expectedDydalpha, dydalpha);
+
+        DoubleTensor dydbeta = yDual.getPartialDerivatives().withRespectTo(beta);
+        DoubleTensor expectedDydbeta = DoubleTensor.create(new double[]{
+            5, 0,
+            11, 0,
+            0, 5,
+            0, 11
+        }, 1, 2, 2, 2);
+
+        assertEquals(expectedDydbeta, dydbeta);
+    }
+
+    @Test
+    public void canDoTripleMatrixMultiplyAutoDiff() {
+
+        DoubleVertex m = new UniformVertex(0, 10);
+        m.setValue(DoubleTensor.create(new double[]{
+            1,
+            2
+        }, 2, 1));
+
+        DoubleVertex alpha = new UniformVertex(0, 10);
+        alpha.setValue(DoubleTensor.create(new double[]{
+            1, 3,
+            2, 4
+        }, 2, 2));
+
+        DoubleVertex beta = new UniformVertex(0, 10);
+        beta.setValue(DoubleTensor.create(new double[]{
+            5, 8,
+            6, 9,
+            7, 10
+        }, 3, 2));
+
+        DoubleVertex N = alpha.matrixMultiply(m);
+        DoubleVertex L = beta.matrixMultiply(alpha);
+        //y = L x N = (beta x alpha) x (alpha x m)
+        DoubleVertex y = L.matrixMultiply(N);
+        DualNumber yDual = y.getDualNumber();
+
+        DoubleTensor dydalpha = yDual.getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor expectedDydalpha = DoubleTensor.create(new double[]{
+            56, 92,
+            103, 174,
+            66, 108,
+            117, 198,
+            76, 124,
+            131, 222
+        }, 3, 1, 2, 2);
 
         assertEquals(expectedDydalpha, dydalpha);
     }
