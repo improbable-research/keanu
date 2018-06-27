@@ -19,7 +19,11 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.DoubleStream;
 
 import static java.util.Arrays.copyOf;
 
@@ -39,6 +43,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public static Nd4jDoubleTensor create(double value, int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
+    }
+
+    public static Nd4jDoubleTensor create(RealMatrix realMatrix) {
+        double[][] data = realMatrix.getData();
+        double[] flattenedData = new double[data.length * data[0].length];
+        int count = 0;
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[0].length; j++) {
+                flattenedData[count] = data[i][j];
+                count++;
+            }
+        }
+        int[] shape = new int[]{data.length, data[0].length};
+        return create(flattenedData, shape);
     }
 
     public static Nd4jDoubleTensor ones(int[] shape) {
@@ -695,6 +713,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor sigmoidInPlace() {
         Transforms.sigmoid(tensor, false);
         return this;
+    }
+
+    @Override
+    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
+        return null;
     }
 
     @Override

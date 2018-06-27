@@ -10,7 +10,7 @@ public class TensorMultivariateGaussian {
     }
 
     public static DoubleTensor sample(DoubleTensor mu, DoubleTensor covariance, GaussianVertex gaussianVariates, KeanuRandom random) {
-        DoubleTensor choleskyDecompOfCovariance = covariance.choleskyDecomposition().inverse();
+        DoubleTensor choleskyDecompOfCovariance = covariance.choleskyDecomposition();
         DoubleTensor samplesFromGaussianVariates = gaussianVariates.sample(random);
         return choleskyDecompOfCovariance.matrixMultiply(samplesFromGaussianVariates).plus(mu);
     }

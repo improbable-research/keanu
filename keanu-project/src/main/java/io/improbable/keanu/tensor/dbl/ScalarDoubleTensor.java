@@ -344,7 +344,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
-        return that.matrixMultiply(this);
+        return this.duplicate().matrixMultiplyInPlace(that);
+    }
+
+    @Override
+    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
+        if (!that.isScalar()) {
+            return that.matrixMultiply(this);
+        } else {
+            value = value * that.scalar();
+            return this;
+        }
     }
 
     @Override
