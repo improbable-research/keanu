@@ -62,6 +62,11 @@ public class BayesianNetwork {
         VertexValuePropagation.cascadeUpdate(observedVertices);
     }
 
+
+    public void probeForNonZeroMasterP(int attempts) {
+        probeForNonZeroMasterP(attempts, KeanuRandom.getDefaultRandom());
+    }
+
     /**
      * Attempt to find a non-zero master probability
      * by naively sampling vertices in order of data dependency
@@ -103,8 +108,18 @@ public class BayesianNetwork {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
+
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
+        setFromSampleAndCascade(vertices, KeanuRandom.getDefaultRandom());
+    }
+
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
         setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices), random);
+    }
+
+    public static void setFromSampleAndCascade(List<? extends Vertex> vertices,
+                                               Map<Long, Long> setAndCascadeCache) {
+        setFromSampleAndCascade(vertices, setAndCascadeCache, KeanuRandom.getDefaultRandom());
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices,
