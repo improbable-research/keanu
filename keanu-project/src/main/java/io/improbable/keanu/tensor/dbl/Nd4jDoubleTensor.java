@@ -504,7 +504,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor absInPlace() {
-        return duplicate().absInPlace();
+        Transforms.abs(tensor, false);
+        return this;
     }
 
 
