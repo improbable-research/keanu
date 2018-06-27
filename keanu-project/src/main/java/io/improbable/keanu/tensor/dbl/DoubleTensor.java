@@ -221,8 +221,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor matrixMultiplyInPlace(DoubleTensor that);
 
-    DoubleTensor transposeInPlace();
-
     DoubleTensor standardizeInPlace();
 
     // Comparisons

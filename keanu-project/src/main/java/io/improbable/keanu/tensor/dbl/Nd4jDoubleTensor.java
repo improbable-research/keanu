@@ -726,18 +726,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor transposeInPlace() {
-        return new Nd4jDoubleTensor(tensor.transpose());
-    }
-
-    @Override
     public DoubleTensor matrixMultiply(DoubleTensor that) {
         return this.duplicate().matrixMultiplyInPlace(that);
     }
 
     @Override
     public DoubleTensor transpose() {
-        return this.duplicate().transposeInPlace();
+        return new Nd4jDoubleTensor(tensor.transpose());
     }
 
     @Override

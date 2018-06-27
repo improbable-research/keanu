@@ -348,13 +348,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor transposeInPlace() {
-        return this;
-    }
-
-    @Override
     public DoubleTensor transpose() {
-        return this.duplicate().transposeInPlace();
+        return this;
     }
 
     @Override
