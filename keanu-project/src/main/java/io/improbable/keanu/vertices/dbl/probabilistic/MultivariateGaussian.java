@@ -17,6 +17,14 @@ public class MultivariateGaussian extends ProbabilisticDouble {
     private final DoubleVertex covariance;
     private final GaussianVertex variates;
 
+    /**
+     * Multivariate gaussian distribution. The shape is driven from mu, which must be a vector.
+     * The shape of the covariance (matrix) must be a square that is the same height as mu.
+     *
+     * @param shape      the desired shape of the vertex
+     * @param mu         the mu of the Multivariate Gaussian
+     * @param covariance the covariance matrix of the Multivariate Gaussian
+     */
     public MultivariateGaussian(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
 
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
@@ -28,10 +36,25 @@ public class MultivariateGaussian extends ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    /**
+     * Matches a mu and covariance of some shape to a Multivariate Gaussian
+     *
+     * @param mu         the mu of the Multivariate Gaussian
+     * @param covariance the covariance matrix of the Multivariate Gaussian
+     */
     public MultivariateGaussian(DoubleVertex mu, DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
+
+    /**
+     * Matches a mu to a Multivariate Gaussian. The covariance value provided here
+     * is used to create a covariance tensor by multiplying the scalar value against
+     * an identity matrix of the appropriate size.
+     *
+     * @param mu         the mu of the Multivariate Gaussian
+     * @param covariance the scale of the identity matrix
+     */
     public MultivariateGaussian(DoubleVertex mu, double covariance) {
         this(mu, createIdentityMatrixFromScalar(mu, covariance));
     }
@@ -73,7 +96,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
             || muShape[0] != covarianceShape[0]) {
             throw new IllegalArgumentException("Invalid sizing of parameters");
         } else {
-          return muShape;
+            return muShape;
         }
     }
 }
