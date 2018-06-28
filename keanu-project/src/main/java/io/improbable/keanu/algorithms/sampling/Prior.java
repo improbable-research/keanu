@@ -18,14 +18,18 @@ public class Prior {
 
     public static NetworkSamples sample(BayesianNetwork bayesNet,
                                         List<? extends Vertex> fromVertices,
+                                        int sampleCount) {
+        return sample(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
+    }
+
+    public static NetworkSamples sample(BayesianNetwork bayesNet,
+                                        List<? extends Vertex> fromVertices,
                                         int sampleCount,
                                         KeanuRandom random) {
 
         if (!bayesNet.getObservedVertices().isEmpty()) {
             throw new IllegalStateException("Cannot sample prior from graph with observations");
         }
-
-        bayesNet.cascadeObservations();
 
         List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
         Map<Long, List> samplesByVertex = new HashMap<>();

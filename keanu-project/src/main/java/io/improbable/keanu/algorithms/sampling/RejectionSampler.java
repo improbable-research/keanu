@@ -19,6 +19,13 @@ public class RejectionSampler {
     public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
                                                  List<? extends Vertex> observedVertices,
                                                  Supplier<Boolean> isSuccess,
+                                                 int sampleCount) {
+        return getPosteriorProbability(latentVertices, observedVertices, isSuccess, sampleCount, KeanuRandom.getDefaultRandom());
+    }
+
+    public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
+                                                 List<? extends Vertex> observedVertices,
+                                                 Supplier<Boolean> isSuccess,
                                                  int sampleCount,
                                                  KeanuRandom random) {
         int matchedSampleCount = 0;
