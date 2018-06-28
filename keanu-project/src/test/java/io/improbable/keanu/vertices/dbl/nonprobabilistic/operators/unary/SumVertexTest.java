@@ -17,7 +17,7 @@ public class SumVertexTest {
 
         DoubleVertex summed = in.sum();
 
-        assertEquals(1 + 2 + 3 + 4 + 5, summed.lazyEval().scalar(), 1e-5);
+        assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar(), 1e-5);
         assertArrayEquals(
             new double[]{1, 1, 1, 1, 1},
             summed.getDualNumber().getPartialDerivatives().withRespectTo(in).asFlatDoubleArray(),

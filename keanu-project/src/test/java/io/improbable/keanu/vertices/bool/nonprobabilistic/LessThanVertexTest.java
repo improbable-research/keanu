@@ -26,11 +26,11 @@ public class LessThanVertexTest {
 
     private void isLessThan(int a, int b, boolean expected) {
         LessThanVertex<IntegerTensor, IntegerTensor> vertex = new LessThanVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isLessThan(double a, double b, boolean expected) {
         LessThanVertex<DoubleTensor, DoubleTensor> vertex = new LessThanVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 }

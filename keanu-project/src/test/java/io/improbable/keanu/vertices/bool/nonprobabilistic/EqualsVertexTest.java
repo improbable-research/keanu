@@ -31,6 +31,6 @@ public class EqualsVertexTest {
 
     private <T> void equals(T a, T b, boolean expected) {
         EqualsVertex<GenericTensor<T>> vertex = new EqualsVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 }
