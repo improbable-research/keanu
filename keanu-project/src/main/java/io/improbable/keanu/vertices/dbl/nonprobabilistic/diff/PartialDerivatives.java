@@ -35,10 +35,6 @@ public class PartialDerivatives {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
     }
 
-    public PartialDerivatives() {
-        this.derivativeWithRespectTo = new HashMap<>();
-    }
-
     public DoubleTensor withRespectTo(Vertex vertex) {
         return withRespectTo(vertex.getId());
     }
@@ -65,7 +61,8 @@ public class PartialDerivatives {
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
             DoubleTensor v = entry.getValue();
-            summed.put(k, reshapeByPrependPad(v.sum(overDimensions), v.getRank()));
+            DoubleTensor reshapedV = v.sum(overDimensions);
+            summed.put(k, increaseRankByPrependingOnesToShape(reshapedV, v.getRank()));
         }
 
         return new PartialDerivatives(summed);
@@ -123,7 +120,7 @@ public class PartialDerivatives {
             return partial.times(multiplier.scalar());
         }
 
-        DoubleTensor multiplierReshaped = reshapeByAppendPad(multiplier, partial.getRank());
+        DoubleTensor multiplierReshaped = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
 
         if (partial.isScalar()) {
             return multiplierReshaped.times(partial.scalar());
@@ -152,15 +149,15 @@ public class PartialDerivatives {
         return result;
     }
 
-    private static DoubleTensor reshapeByAppendPad(DoubleTensor lowRankTensor, int desiredRank) {
-        return reshapeByPaddingOnes(lowRankTensor, desiredRank, true);
+    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, true);
     }
 
-    private static DoubleTensor reshapeByPrependPad(DoubleTensor lowRankTensor, int desiredRank) {
-        return reshapeByPaddingOnes(lowRankTensor, desiredRank, false);
+    private static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, false);
     }
 
-    private static DoubleTensor reshapeByPaddingOnes(DoubleTensor lowRankTensor, int desiredRank, boolean append) {
+    private static DoubleTensor increaseRankByPaddingOnes(DoubleTensor lowRankTensor, int desiredRank, boolean append) {
         int[] shape = lowRankTensor.getShape();
         if (shape.length == desiredRank) {
             return lowRankTensor;
@@ -181,7 +178,7 @@ public class PartialDerivatives {
 
         for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
 
-            DoubleTensor reshapedMultiplier = reshapeByAppendPad(multiplier, partial.getValue().getRank());
+            DoubleTensor reshapedMultiplier = increaseRankByAppendingOnesToShape(multiplier, partial.getValue().getRank());
             int[] partialShape = partial.getValue().getShape();
             int[] resultShape = Arrays.copyOf(partialShape, partialShape.length);
 
@@ -225,7 +222,7 @@ public class PartialDerivatives {
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
             DoubleTensor partial = entry.getValue();
-            DoubleTensor v = partial.div(reshapeByAppendPad(divisor, partial.getRank()));
+            DoubleTensor v = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
             divided.put(k, v);
         }
 
@@ -255,7 +252,6 @@ public class PartialDerivatives {
 
         return new PartialDerivatives(powered);
     }
-
 
     public PartialDerivatives clone() {
         return new PartialDerivatives(cloneInfinitesimals(derivativeWithRespectTo));

@@ -12,7 +12,6 @@ import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -50,36 +49,29 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     private INDArray tensor;
-    private int[] shape;
 
     public Nd4jDoubleTensor(double[] data, int[] shape) {
         DataBuffer buffer = Nd4j.createBuffer(data);
         tensor = Nd4j.create(buffer, shape);
-        this.shape = shape;
-    }
-
-    public Nd4jDoubleTensor(int[] shape) {
-        this.shape = shape;
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
         this.tensor = tensor;
-        this.shape = tensor.shape();
     }
 
     @Override
     public int getRank() {
-        return shape.length;
+        return tensor.shape().length;
     }
 
     @Override
     public int[] getShape() {
-        return shape;
+        return tensor.shape();
     }
 
     @Override
     public long getLength() {
-        return ArrayUtil.prodLong(shape);
+        return tensor.lengthLong();
     }
 
     @Override
@@ -223,13 +215,14 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixMultiply(DoubleTensor value) {
-        return new Nd4jDoubleTensor(tensor.mmul(unsafeGetNd4J(value)));
+        INDArray mmulResult = tensor.mmul(unsafeGetNd4J(value));
+        return new Nd4jDoubleTensor(mmulResult);
     }
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
-        INDArray that = value.isScalar() ? Nd4j.scalar(value.scalar().doubleValue()).reshape(value.getShape()) : unsafeGetNd4J(value);
-        return new Nd4jDoubleTensor(Nd4j.tensorMmul(tensor, that, new int[][]{dimsLeft, dimsRight}));
+        INDArray tensorMmulResult = Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][]{dimsLeft, dimsRight});
+        return new Nd4jDoubleTensor(tensorMmulResult);
     }
 
     @Override
@@ -456,13 +449,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor atan2InPlace(double y) {
-        return atan2InPlace(DoubleTensor.create(y, this.shape));
+        return atan2InPlace(DoubleTensor.create(y, this.tensor.shape()));
     }
 
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
-            tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.shape, y.scalar()));
+            tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.tensor.shape(), y.scalar()));
         } else {
             tensor = Transforms.atan2(tensor, unsafeGetNd4J(y));
         }
@@ -712,12 +705,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(double value) {
-        return fromMask(tensor.lt(value), copyOf(shape, shape.length));
+        return fromMask(tensor.lt(value), copyOf(getShape(), getShape().length));
     }
 
     @Override
     public BooleanTensor lessThanOrEqual(double value) {
-        return fromMask(tensor.lte(value), copyOf(shape, shape.length));
+        return fromMask(tensor.lte(value), copyOf(getShape(), getShape().length));
     }
 
     @Override
@@ -731,7 +724,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             mask = tensor.lt(indArray);
         }
 
-        return fromMask(mask, copyOf(shape, shape.length));
+        return fromMask(mask, copyOf(getShape(), getShape().length));
     }
 
     @Override
@@ -747,17 +740,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             Nd4j.getExecutioner().exec(new OldLessThanOrEqual(mask, indArray, mask, getLength()));
         }
 
-        return fromMask(mask, copyOf(shape, shape.length));
+        return fromMask(mask, copyOf(getShape(), getShape().length));
     }
 
     @Override
     public BooleanTensor greaterThan(double value) {
-        return fromMask(tensor.gt(value), copyOf(shape, shape.length));
+        return fromMask(tensor.gt(value), copyOf(getShape(), getShape().length));
     }
 
     @Override
     public BooleanTensor greaterThanOrEqual(double value) {
-        return fromMask(tensor.gte(value), copyOf(shape, shape.length));
+        return fromMask(tensor.gte(value), copyOf(getShape(), getShape().length));
     }
 
     @Override
@@ -771,7 +764,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             mask = tensor.gt(indArray);
         }
 
-        return fromMask(mask, copyOf(shape, shape.length));
+        return fromMask(mask, copyOf(getShape(), getShape().length));
     }
 
     @Override
@@ -786,7 +779,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(mask, indArray, mask, getLength()));
         }
 
-        return fromMask(mask, copyOf(shape, shape.length));
+        return fromMask(mask, copyOf(getShape(), getShape().length));
     }
 
     @Override
@@ -794,13 +787,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         if (that instanceof Nd4jDoubleTensor) {
             INDArray eq = tensor.eq(unsafeGetNd4J((Nd4jDoubleTensor) that));
-            return fromMask(eq, shape);
+            return fromMask(eq, getShape());
         } else {
             return Tensor.elementwiseEquals(this, that);
         }
     }
 
     private INDArray unsafeGetNd4J(DoubleTensor that) {
+        if (that.isScalar()) {
+            return Nd4j.scalar(that.scalar().doubleValue()).reshape(that.getShape());
+        }
         return ((Nd4jDoubleTensor) that).tensor;
     }
 
@@ -817,7 +813,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             return tensor.equals(((Nd4jDoubleTensor) o).tensor);
         } else if (o instanceof Tensor) {
             Tensor that = (Tensor) o;
-            if (!Arrays.equals(that.getShape(), shape)) return false;
+            if (!Arrays.equals(that.getShape(), getShape())) return false;
             return Arrays.equals(
                 that.asFlatArray(),
                 this.asFlatArray()

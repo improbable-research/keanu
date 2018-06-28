@@ -135,16 +135,4 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor result = scalarA.sqrt();
         assertEquals(Math.sqrt(2.0), result.scalar(), 0.0);
     }
-
-    @Test
-    public void play() {
-
-        INDArray p = Nd4j.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{1, 2, 2, 2});
-        INDArray m = Nd4j.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1, 1});
-
-        INDArray result = Nd4j.tensorMmul(p, m, new int[][]{new int[]{1}, new int[]{0, 2, 3}});
-
-        System.out.println(result);
-    }
-
 }

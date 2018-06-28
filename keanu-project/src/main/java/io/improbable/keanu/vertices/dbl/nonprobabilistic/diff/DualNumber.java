@@ -64,13 +64,13 @@ public class DualNumber {
         PartialDerivatives thatInfMultiplied;
 
         if (this.partialDerivatives.isEmpty()) {
-            thisInfMultiplied = this.partialDerivatives.clone();
+            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
             thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
         }
 
         if (that.partialDerivatives.isEmpty()) {
-            thatInfMultiplied = that.partialDerivatives.clone();
+            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
             thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
         }
@@ -86,13 +86,13 @@ public class DualNumber {
         PartialDerivatives thatInfMultiplied;
 
         if (this.partialDerivatives.isEmpty()) {
-            thisInfMultiplied = this.partialDerivatives.clone();
+            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
             thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
         }
 
         if (that.partialDerivatives.isEmpty()) {
-            thatInfMultiplied = that.partialDerivatives.clone();
+            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
             thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
         }
@@ -109,19 +109,19 @@ public class DualNumber {
         PartialDerivatives newInf;
 
         if (this.partialDerivatives.isEmpty()) {
-            thisInfMultiplied = this.partialDerivatives.clone();
+            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
             thisInfMultiplied = this.partialDerivatives.multiplyBy(that.value);
         }
 
         if (that.partialDerivatives.isEmpty()) {
-            thatInfMultiplied = that.partialDerivatives.clone();
+            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
             thatInfMultiplied = that.partialDerivatives.multiplyBy(this.value);
         }
 
         if (thisInfMultiplied.isEmpty() && thatInfMultiplied.isEmpty()) {
-            newInf = new PartialDerivatives();
+            newInf = PartialDerivatives.OF_CONSTANT;
         } else {
             newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
         }
@@ -136,13 +136,13 @@ public class DualNumber {
         PartialDerivatives thisInfExponent;
 
         if (this.partialDerivatives.isEmpty()) {
-            thisInfBase = this.partialDerivatives.clone();
+            thisInfBase = PartialDerivatives.OF_CONSTANT;
         } else {
             thisInfBase = this.partialDerivatives.multiplyBy(that.value.times(this.value.pow(that.value.minus(1))));
         }
 
         if (that.partialDerivatives.isEmpty()) {
-            thisInfExponent = that.partialDerivatives.clone();
+            thisInfExponent = PartialDerivatives.OF_CONSTANT;
         } else {
             thisInfExponent = that.partialDerivatives.multiplyBy(this.value.log().timesInPlace(newValue));
         }
@@ -198,7 +198,7 @@ public class DualNumber {
     public DualNumber exp() {
         DoubleTensor newValue = value.exp();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(newValue));
         }
@@ -207,7 +207,7 @@ public class DualNumber {
     public DualNumber sin() {
         DoubleTensor newValue = value.sin();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor dSin = value.cos();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dSin));
@@ -217,7 +217,7 @@ public class DualNumber {
     public DualNumber cos() {
         DoubleTensor newValue = value.cos();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor dCos = value.sin().unaryMinusInPlace();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dCos));
@@ -227,7 +227,7 @@ public class DualNumber {
     public DualNumber tan() {
         DoubleTensor newValue = value.tan();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor dTan = value.cos().powInPlace(2).reciprocalInPlace();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dTan));
@@ -237,7 +237,7 @@ public class DualNumber {
     public DualNumber asin() {
         DoubleTensor newValue = value.asin();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor dArcSin = (value.unaryMinus().timesInPlace(value).plusInPlace(1))
                 .sqrtInPlace().reciprocalInPlace();
@@ -248,7 +248,7 @@ public class DualNumber {
     public DualNumber acos() {
         DoubleTensor newValue = value.acos();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor dArcCos = value.unaryMinus().timesInPlace(value).plusInPlace(1)
                 .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
@@ -259,7 +259,7 @@ public class DualNumber {
     public DualNumber atan() {
         DoubleTensor newValue = value.atan();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dArcTan));
@@ -269,7 +269,7 @@ public class DualNumber {
     public DualNumber log() {
         DoubleTensor newValue = value.log();
         if (this.partialDerivatives.isEmpty()) {
-            return new DualNumber(newValue, this.partialDerivatives.clone());
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             return new DualNumber(newValue, this.partialDerivatives.divideBy(value));
         }
@@ -283,6 +283,5 @@ public class DualNumber {
         }
         return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
     }
-
 
 }
