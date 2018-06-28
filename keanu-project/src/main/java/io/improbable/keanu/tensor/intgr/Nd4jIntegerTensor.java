@@ -36,6 +36,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(Nd4j.ones(shape));
     }
 
+    public static Nd4jIntegerTensor eye(int n) {
+        return new Nd4jIntegerTensor(Nd4j.eye(n));
+    }
+
     public static Nd4jIntegerTensor zeros(int[] shape) {
         return new Nd4jIntegerTensor(Nd4j.zeros(shape));
     }
@@ -70,6 +74,26 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor reshape(int... newShape) {
+        return new Nd4jIntegerTensor(tensor.reshape(newShape));
+    }
+
+    @Override
+    public IntegerTensor diag() {
+        return new Nd4jIntegerTensor(Nd4j.diag(tensor));
+    }
+
+    @Override
+    public IntegerTensor transpose() {
+        return new Nd4jIntegerTensor(tensor.transpose());
+    }
+
+    @Override
+    public IntegerTensor sum(int... overDimensions) {
+        return new Nd4jIntegerTensor(tensor.sum(overDimensions));
+    }
+
+    @Override
     public IntegerTensor minus(int value) {
         return duplicate().minusInPlace(value);
     }
@@ -82,6 +106,17 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor times(int value) {
         return duplicate().timesInPlace(value);
+    }
+
+    @Override
+    public IntegerTensor matrixMultiply(IntegerTensor value) {
+        return new Nd4jIntegerTensor(tensor.mmul(unsafeGetNd4J(value)));
+    }
+
+    @Override
+    public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight) {
+        INDArray that = value.isScalar() ? Nd4j.scalar(value.scalar().doubleValue()).reshape(value.getShape()) : unsafeGetNd4J(value);
+        return new Nd4jIntegerTensor(Nd4j.tensorMmul(tensor, that, new int[][]{dimLeft, dimsRight}));
     }
 
     @Override
@@ -590,12 +625,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public double[] asFlatDoubleArray() {
-        return tensor.data().asDouble();
+        return tensor.dup().data().asDouble();
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return tensor.data().asInt();
+        return tensor.dup().data().asInt();
     }
 
     @Override

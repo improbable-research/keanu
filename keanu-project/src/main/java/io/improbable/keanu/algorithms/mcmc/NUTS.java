@@ -15,29 +15,60 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Algorithm 3: "Efficient NUTS".
+ * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
 public class NUTS {
 
-    static private final double DELTA_MAX = 1000.0;
+    private static final double DELTA_MAX = 1000.0;
+    private static final double STABILISER = 10;
+    private static final double SHRINKAGE_FACTOR = 0.05;
+    private static final double TEND_TO_ZERO_EXPONENT = 0.75;
 
     private NUTS() {
     }
 
+    /**
+     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
+     *
+     * @param bayesNet             the bayesian network to sample from
+     * @param sampleFromVertices   the vertices to sample from
+     * @param sampleCount          the number of samples to take
+     * @param adaptCount           the number of samples for which the stepsize will be tuned. For the remaining samples
+     *                             in which it is not tuned, the stepsize will be frozen to its last calculated value
+     * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
+     *                             Beskos et al., 2010; Neal, 2011
+     * @return Samples taken with NUTS
+     */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<DoubleVertex> fromVertices,
+                                                     final List<DoubleVertex> sampleFromVertices,
                                                      final int sampleCount,
-                                                     final double stepSize) {
+                                                     final int adaptCount,
+                                                     final double targetAcceptanceProb) {
 
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, stepSize, KeanuRandom.getDefaultRandom());
+        return getPosteriorSamples(bayesNet, sampleFromVertices, sampleCount, adaptCount, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
     }
 
+
+    /**
+     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
+     *
+     * @param bayesNet             the bayesian network to sample from
+     * @param sampleFromVertices   the vertices inside the bayesNet to sample from
+     * @param sampleCount          the number of samples to take
+     * @param adaptCount           the number of samples for which the stepsize will be tuned. For the remaining samples
+     *                             in which it is not tuned, the stepsize will be frozen to its last calculated value
+     * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
+     *                             Beskos et al., 2010; Neal, 2011
+     * @param random               the source of randomness
+     * @return Samples taken with NUTS
+     */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
                                                      final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
-                                                     final double epsilon,
+                                                     final int adaptCount,
+                                                     final double targetAcceptanceProb,
                                                      final KeanuRandom random) {
 
         bayesNet.cascadeObservations();
@@ -58,6 +89,20 @@ public class NUTS {
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
 
+        double stepSize = findStartingStepSize(position,
+            gradient,
+            latentVertices,
+            probabilisticVertices,
+            latentSetAndCascadeCache,
+            random
+        );
+
+        AutoTune autoTune = new AutoTune(stepSize,
+            targetAcceptanceProb,
+            Math.log(stepSize),
+            adaptCount
+        );
+
         BuiltTree tree = new BuiltTree(
             position,
             gradient,
@@ -70,7 +115,9 @@ public class NUTS {
             initialLogOfMasterP,
             takeSample(sampleFromVertices),
             1,
-            true
+            true,
+            0,
+            1
         );
 
         for (int sampleNum = 1; sampleNum < sampleCount; sampleNum++) {
@@ -98,7 +145,7 @@ public class NUTS {
                     u,
                     buildDirection,
                     treeHeight,
-                    epsilon,
+                    stepSize,
                     random
                 );
 
@@ -114,6 +161,9 @@ public class NUTS {
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
 
+                tree.deltaLikelihoodOfLeapfrog = otherHalfTree.deltaLikelihoodOfLeapfrog;
+                tree.treeSize = otherHalfTree.treeSize;
+
                 tree.shouldContinueFlag = otherHalfTree.shouldContinueFlag && isNotUTurning(
                     tree.positionForward,
                     tree.positionBackward,
@@ -123,6 +173,8 @@ public class NUTS {
 
                 treeHeight++;
             }
+
+            stepSize = adaptStepSize(autoTune, tree, sampleNum);
 
             tree.positionForward = tree.acceptedPosition;
             tree.gradientForward = tree.gradientAtAcceptedPosition;
@@ -147,6 +199,10 @@ public class NUTS {
                                                   KeanuRandom random) {
 
         BuiltTree otherHalfTree;
+
+        final double logOfMasterPBeforeLeapfrog = getLogProb(probabilisticVertices);
+        final double logOfMasterPMinusMomentumBeforeLeapfrog = logOfMasterPBeforeLeapfrog - 0.5 * dotProduct(currentTree.momentumBackward);
+
         if (buildDirection == -1) {
 
             otherHalfTree = buildTree(
@@ -161,6 +217,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight,
                 epsilon,
+                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -182,6 +239,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight,
                 epsilon,
+                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -204,6 +262,7 @@ public class NUTS {
                                        int buildDirection,
                                        int treeHeight,
                                        double epsilon,
+                                       double logOfMasterPMinusMomentumBeforeLeapfrog,
                                        KeanuRandom random) {
         if (treeHeight == 0) {
 
@@ -218,7 +277,8 @@ public class NUTS {
                 momentum,
                 u,
                 buildDirection,
-                epsilon
+                epsilon,
+                logOfMasterPMinusMomentumBeforeLeapfrog
             );
 
         } else {
@@ -236,6 +296,7 @@ public class NUTS {
                 buildDirection,
                 treeHeight - 1,
                 epsilon,
+                logOfMasterPMinusMomentumBeforeLeapfrog,
                 random
             );
 
@@ -271,6 +332,8 @@ public class NUTS {
                 );
 
                 tree.acceptedLeapfrogCount += otherHalfTree.acceptedLeapfrogCount;
+                tree.deltaLikelihoodOfLeapfrog += otherHalfTree.deltaLikelihoodOfLeapfrog;
+                tree.treeSize += otherHalfTree.treeSize;
             }
 
             return tree;
@@ -287,7 +350,8 @@ public class NUTS {
                                                Map<Long, DoubleTensor> momentum,
                                                double u,
                                                int buildDirection,
-                                               double epsilon) {
+                                               double epsilon,
+                                               double logOfMasterPMinusMomentumBeforeLeapfrog) {
 
         LeapFrogged leapfrog = leapfrog(
             latentVertices,
@@ -307,6 +371,9 @@ public class NUTS {
 
         final Map<Long, ?> sampleAtAcceptedPosition = takeSample(sampleFromVertices);
 
+        double deltaLikelihoodOfLeapfrog = Math.exp(logOfMasterPMinusMomentum - logOfMasterPMinusMomentumBeforeLeapfrog);
+        deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog < 1 ? deltaLikelihoodOfLeapfrog : 1;
+
         return new BuiltTree(
             leapfrog.position,
             leapfrog.gradient,
@@ -319,7 +386,9 @@ public class NUTS {
             logOfMasterPAfterLeapfrog,
             sampleAtAcceptedPosition,
             acceptedLeapfrogCount,
-            shouldContinueFlag
+            shouldContinueFlag,
+            deltaLikelihoodOfLeapfrog,
+            1
         );
     }
 
@@ -502,6 +571,8 @@ public class NUTS {
         Map<Long, ?> sampleAtAcceptedPosition;
         int acceptedLeapfrogCount;
         boolean shouldContinueFlag;
+        double deltaLikelihoodOfLeapfrog;
+        double treeSize;
 
         BuiltTree(Map<Long, DoubleTensor> positionBackward,
                   Map<Long, DoubleTensor> gradientBackward,
@@ -514,7 +585,9 @@ public class NUTS {
                   double logOfMasterPAtAcceptedPosition,
                   Map<Long, ?> sampleAtAcceptedPosition,
                   int acceptedLeapfrogCount,
-                  boolean shouldContinueFlag) {
+                  boolean shouldContinueFlag,
+                  double deltaLikelihoodOfLeapfrog,
+                  double treeSize) {
 
             this.positionBackward = positionBackward;
             this.gradientBackward = gradientBackward;
@@ -528,6 +601,74 @@ public class NUTS {
             this.sampleAtAcceptedPosition = sampleAtAcceptedPosition;
             this.acceptedLeapfrogCount = acceptedLeapfrogCount;
             this.shouldContinueFlag = shouldContinueFlag;
+            this.deltaLikelihoodOfLeapfrog = deltaLikelihoodOfLeapfrog;
+            this.treeSize = treeSize;
+        }
+    }
+
+    private static class AutoTune {
+
+        double stepSize;
+        double averageAcceptanceProb;
+        double targetAcceptanceProb;
+        double logStepSize;
+        double logStepSizeFrozen;
+        double adaptCount;
+        double shrinkageTarget;
+
+        AutoTune(double stepSize, double targetAcceptanceProb, double logStepSize, int adaptCount) {
+            this.stepSize = stepSize;
+            this.averageAcceptanceProb = 0;
+            this.targetAcceptanceProb = targetAcceptanceProb;
+            this.logStepSize = logStepSize;
+            this.logStepSizeFrozen = Math.log(1);
+            this.adaptCount = adaptCount;
+            this.shrinkageTarget = Math.log(10 * stepSize);
+        }
+    }
+
+    private static double findStartingStepSize(Map<Long, DoubleTensor> position,
+                                               Map<Long, DoubleTensor> gradient,
+                                               List<Vertex<DoubleTensor>> vertices,
+                                               List<Vertex> probabilisticVertices,
+                                               Map<Long, Long> latentSetAndCascadeCache,
+                                               KeanuRandom random) {
+        double stepsize = 1;
+        double probBeforeLeapfrog = getLogProb(probabilisticVertices);
+        Map<Long, DoubleTensor> momentums = new HashMap<>();
+        initializeMomentumForEachVertex(vertices, momentums, random);
+        leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
+        double probAfterLeapfrog = getLogProb(probabilisticVertices);
+        double likelihoodRatio = probAfterLeapfrog - probBeforeLeapfrog;
+        double scalingFactor = likelihoodRatio > Math.log(0.5) ? 1 : -1;
+
+        while (scalingFactor * (likelihoodRatio) > -scalingFactor * Math.log(2)) {
+            stepsize = stepsize * Math.pow(2, scalingFactor);
+            leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
+            likelihoodRatio = getLogProb(probabilisticVertices) - probBeforeLeapfrog;
+        }
+
+        return stepsize;
+    }
+
+    private static double adaptStepSize(AutoTune autoTune, BuiltTree tree, int sampleNum) {
+        if (sampleNum <= autoTune.adaptCount) {
+            double percentageLeftToTune = (1 / (sampleNum + STABILISER));
+            double acceptanceProb = (autoTune.targetAcceptanceProb - (tree.deltaLikelihoodOfLeapfrog / tree.treeSize));
+            double proportionalAcceptanceProb = (1 - percentageLeftToTune) * autoTune.averageAcceptanceProb;
+            autoTune.averageAcceptanceProb = proportionalAcceptanceProb + (percentageLeftToTune * acceptanceProb);
+
+            double shrunkSampleCount = Math.sqrt(sampleNum) / SHRINKAGE_FACTOR;
+            autoTune.logStepSize = autoTune.shrinkageTarget - (shrunkSampleCount * autoTune.averageAcceptanceProb);
+
+            double tendToZero = Math.pow(sampleNum, -TEND_TO_ZERO_EXPONENT);
+            double reducedStepSize = tendToZero * autoTune.logStepSize;
+            double increasedStepSizeFrozen = (1 - tendToZero) * autoTune.logStepSizeFrozen;
+            autoTune.logStepSizeFrozen = reducedStepSize + increasedStepSizeFrozen;
+
+            return Math.exp(autoTune.logStepSize);
+        } else {
+            return Math.exp(autoTune.logStepSizeFrozen);
         }
     }
 

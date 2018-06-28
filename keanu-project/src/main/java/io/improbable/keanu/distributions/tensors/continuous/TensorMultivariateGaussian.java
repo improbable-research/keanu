@@ -1,6 +1,7 @@
 package io.improbable.keanu.distributions.tensors.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -10,21 +11,25 @@ public class TensorMultivariateGaussian {
     }
 
     public static DoubleTensor sample(DoubleTensor mu, DoubleTensor covariance, GaussianVertex gaussianVariates, KeanuRandom random) {
-        DoubleTensor choleskyDecompOfCovariance = covariance.choleskyDecomposition();
-        DoubleTensor samplesFromGaussianVariates = gaussianVariates.sample(random);
-        return choleskyDecompOfCovariance.matrixMultiply(samplesFromGaussianVariates).plus(mu);
+        final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
+        final DoubleTensor variateSamples = gaussianVariates.sample(random);
+        final DoubleTensor covTimesVariates = mu.isScalar() ?
+            choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
+        return covTimesVariates.plus(mu);
     }
 
     public static double logPdf(DoubleTensor mu, DoubleTensor covariance, DoubleTensor x) {
-        double numDimensions = mu.getShape()[0];
-        double kLog2Pi = numDimensions * Math.log(2 * Math.PI);
-        double logCovarianceDeterminant = Math.log(covariance.determinant());
+        final double dimensions = mu.getShape()[0];
+        final double kLog2Pi = dimensions * Math.log(2 * Math.PI);
+        final double logCovDet = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu);
-        DoubleTensor xMinusMuTransposed = xMinusMu.transpose();
-        DoubleTensor covarianceInverted = covariance.inverse();
-        DoubleTensor covInvTimesXMinusMu = covarianceInverted.matrixMultiply(xMinusMu);
-        double xMinusMuTransposedTimescovInvTimesXMinusMu = xMinusMuTransposed.matrixMultiply(covInvTimesXMinusMu).scalar();
-        return -0.5 * (xMinusMuTransposedTimescovInvTimesXMinusMu + kLog2Pi + logCovarianceDeterminant);
-    }
+        DoubleTensor xMinusMuT = xMinusMu.transpose();
+        DoubleTensor covInv = covariance.inverse();
 
+        double scalar = mu.isScalar() ?
+            covInv.times(xMinusMu).times(xMinusMuT).scalar() :
+            xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).scalar();
+
+        return -0.5 * (scalar + kLog2Pi + logCovDet);
+    }
 }

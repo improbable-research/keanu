@@ -63,6 +63,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(Nd4j.ones(shape));
     }
 
+    public static Nd4jDoubleTensor eye(int n) {
+        return new Nd4jDoubleTensor(Nd4j.eye(n));
+    }
+
     public static Nd4jDoubleTensor zeros(int[] shape) {
         return new Nd4jDoubleTensor(Nd4j.zeros(shape));
     }
@@ -111,6 +115,26 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     public void setValue(Double value, int... index) {
         tensor.putScalar(index, value);
+    }
+
+    @Override
+    public DoubleTensor reshape(int... newShape) {
+        return new Nd4jDoubleTensor(tensor.reshape(newShape));
+    }
+
+    @Override
+    public DoubleTensor diag() {
+        return new Nd4jDoubleTensor(Nd4j.diag(tensor));
+    }
+
+    @Override
+    public DoubleTensor transpose() {
+        return new Nd4jDoubleTensor(tensor.transpose());
+    }
+
+    @Override
+    public DoubleTensor sum(int... overDimensions) {
+        return new Nd4jDoubleTensor(tensor.sum(overDimensions));
     }
 
     public Double sum() {
@@ -237,6 +261,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor times(double value) {
         return duplicate().timesInPlace(value);
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor value) {
+        return new Nd4jDoubleTensor(tensor.mmul(unsafeGetNd4J(value)));
+    }
+
+    @Override
+    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
+        INDArray that = value.isScalar() ? Nd4j.scalar(value.scalar().doubleValue()).reshape(value.getShape()) : unsafeGetNd4J(value);
+        return new Nd4jDoubleTensor(Nd4j.tensorMmul(tensor, that, new int[][]{dimsLeft, dimsRight}));
     }
 
     @Override
@@ -726,16 +761,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor matrixMultiply(DoubleTensor that) {
-        return this.duplicate().matrixMultiplyInPlace(that);
-    }
-
-    @Override
-    public DoubleTensor transpose() {
-        return new Nd4jDoubleTensor(tensor.transpose());
-    }
-
-    @Override
     public double determinant() {
         if (this.isScalar()) {
             return this.asFlatDoubleArray()[0];
@@ -933,12 +958,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public double[] asFlatDoubleArray() {
-        return tensor.data().asDouble();
+        return tensor.dup().data().asDouble();
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return tensor.data().asInt();
+        return tensor.dup().data().asInt();
     }
 
     @Override

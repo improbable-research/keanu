@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -88,6 +89,32 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor reshape(int[] newShape) {
+        if (!TensorShape.isScalar(newShape)) {
+            throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
+        }
+
+        ScalarDoubleTensor reshapedScalar = new ScalarDoubleTensor(value);
+        reshapedScalar.shape = newShape;
+        return reshapedScalar;
+    }
+
+    @Override
+    public DoubleTensor diag() {
+        return duplicate();
+    }
+
+    @Override
+    public DoubleTensor transpose() {
+        return duplicate();
+    }
+
+    @Override
+    public DoubleTensor sum(int... overDimensions) {
+        return duplicate();
+    }
+
+    @Override
     public DoubleTensor reciprocal() {
         return this.duplicate().reciprocalInPlace();
     }
@@ -105,6 +132,16 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor times(double that) {
         return this.duplicate().timesInPlace(that);
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor value) {
+        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
+    }
+
+    @Override
+    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
+        throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
 
     @Override
@@ -275,7 +312,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor inverse() {
-        return this;
+        return duplicate();
     }
 
     @Override
@@ -339,17 +376,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor choleskyDecomposition() {
-        return this;
-    }
-
-    @Override
-    public DoubleTensor matrixMultiply(DoubleTensor that) {
-        return this.duplicate().matrixMultiplyInPlace(that);
-    }
-
-    @Override
-    public DoubleTensor transpose() {
-        return this;
+        return duplicate();
     }
 
     @Override
