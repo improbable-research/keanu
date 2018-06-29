@@ -7,8 +7,8 @@ public class Gaussian {
     private Gaussian() {
     }
 
-    private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
-    private static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
+    public static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
+    public static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
 
     public static double sample(double mu, double sigma, KeanuRandom random) {
         return random.nextGaussian() * sigma + mu;
@@ -38,7 +38,6 @@ public class Gaussian {
 
         return new Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
     }
-
 
     public static class Diff {
         public final double dPdmu;
