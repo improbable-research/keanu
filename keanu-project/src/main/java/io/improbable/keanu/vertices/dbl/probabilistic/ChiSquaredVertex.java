@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorChiSquared;
+import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -38,12 +38,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorChiSquared.sample(getShape(), k.getValue(), random);
+        return ChiSquared.sample(getShape(), k.getValue(), random);
     }
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return TensorChiSquared.logPdf(k.getValue(), value).sum();
+        return ChiSquared.logPdf(k.getValue(), value).sum();
     }
 
     @Override

@@ -3,15 +3,15 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.distributions.continuous.TensorGaussian.LN_SQRT_2PI;
+import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
 
-public class TensorLogNormal {
+public class LogNormal {
 
-    private TensorLogNormal() {
+    private LogNormal() {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
-        return TensorGaussian.sample(shape, mu, sigma, random).expInPlace();
+        return Gaussian.sample(shape, mu, sigma, random).expInPlace();
     }
 
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
@@ -21,7 +21,7 @@ public class TensorLogNormal {
         return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
-    public static TensorLogNormal.Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
+    public static LogNormal.Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);
 
@@ -31,7 +31,7 @@ public class TensorLogNormal {
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        return new TensorLogNormal.Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
+        return new LogNormal.Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
     }
 
     public static class Diff {

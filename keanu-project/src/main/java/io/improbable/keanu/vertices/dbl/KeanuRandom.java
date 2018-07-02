@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.distributions.continuous.TensorGamma;
-import io.improbable.keanu.distributions.continuous.TensorLaplace;
-import io.improbable.keanu.distributions.discrete.TensorPoisson;
+import io.improbable.keanu.distributions.continuous.Gamma;
+import io.improbable.keanu.distributions.continuous.Laplace;
+import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -75,11 +75,11 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        return TensorGamma.sample(shape, a, theta, k, this);
+        return Gamma.sample(shape, a, theta, k, this);
     }
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
-        return TensorLaplace.sample(shape, mu, beta, this);
+        return Laplace.sample(shape, mu, beta, this);
     }
 
     public double nextGaussian() {
@@ -99,7 +99,7 @@ public class KeanuRandom {
     }
 
     public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
-        return TensorPoisson.sample(shape, mu, this);
+        return Poisson.sample(shape, mu, this);
 
     }
 

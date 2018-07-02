@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorGaussian;
+import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -76,14 +76,14 @@ public class GaussianVertex extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor sigmaValues = sigma.getValue();
 
-        DoubleTensor logPdfs = TensorGaussian.logPdf(muValues, sigmaValues, value);
+        DoubleTensor logPdfs = Gaussian.logPdf(muValues, sigmaValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorGaussian.Diff dlnP = TensorGaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
+        Gaussian.Diff dlnP = Gaussian.dlnPdf(mu.getValue(), sigma.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdsigma, dlnP.dPdx);
     }
 
@@ -104,7 +104,7 @@ public class GaussianVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorGaussian.sample(getShape(), mu.getValue(), sigma.getValue(), random);
+        return Gaussian.sample(getShape(), mu.getValue(), sigma.getValue(), random);
     }
 
 }

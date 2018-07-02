@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorTriangular;
+import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -101,7 +101,7 @@ public class TriangularVertex extends ProbabilisticDouble {
         DoubleTensor xMaxValues = xMax.getValue();
         DoubleTensor cValues = c.getValue();
 
-        DoubleTensor logPdfs = TensorTriangular.logPdf(xMinValues, xMaxValues, cValues, value);
+        DoubleTensor logPdfs = Triangular.logPdf(xMinValues, xMaxValues, cValues, value);
         return logPdfs.sum();
     }
 
@@ -112,6 +112,6 @@ public class TriangularVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorTriangular.sample(getShape(), xMin.getValue(), xMax.getValue(), c.getValue(), random);
+        return Triangular.sample(getShape(), xMin.getValue(), xMax.getValue(), c.getValue(), random);
     }
 }

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorStudentT;
+import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -52,7 +52,7 @@ public class StudentTVertex extends ProbabilisticDouble {
      */
     @Override
     public double logPdf(DoubleTensor t) {
-        return TensorStudentT.logPdf(v.getValue(), t).sum();
+        return StudentT.logPdf(v.getValue(), t).sum();
     }
 
     /**
@@ -61,7 +61,7 @@ public class StudentTVertex extends ProbabilisticDouble {
      */
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
-        TensorStudentT.Diff diff = TensorStudentT.dLogPdf(v.getValue(), t);
+        StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
         Map<Long, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.dPdt);
         return m;
@@ -72,6 +72,6 @@ public class StudentTVertex extends ProbabilisticDouble {
      */
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorStudentT.sample(getShape(), v.getValue(), random);
+        return StudentT.sample(getShape(), v.getValue(), random);
     }
 }

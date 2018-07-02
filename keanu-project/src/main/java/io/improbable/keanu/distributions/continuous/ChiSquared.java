@@ -5,11 +5,11 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
 
-public class TensorChiSquared {
+public class ChiSquared {
 
     private static final double LOG_TWO = Math.log(2);
 
-    private TensorChiSquared() {
+    private ChiSquared() {
     }
 
     public static DoubleTensor sample(int[] shape, IntegerTensor k, KeanuRandom random) {

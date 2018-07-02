@@ -3,7 +3,7 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class TensorTriangular {
+public class Triangular {
 
     public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c, KeanuRandom random) {
         final DoubleTensor p = random.nextDouble(shape);

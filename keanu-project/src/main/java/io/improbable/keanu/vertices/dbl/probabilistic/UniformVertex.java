@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorUniform;
+import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -70,7 +70,7 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return TensorUniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
+        return Uniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
+        return Uniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
     }
 
 }

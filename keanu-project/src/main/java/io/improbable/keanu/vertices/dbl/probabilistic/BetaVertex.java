@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorBeta;
+import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -75,14 +75,14 @@ public class BetaVertex extends ProbabilisticDouble {
         DoubleTensor alphaValues = alpha.getValue();
         DoubleTensor betaValues = beta.getValue();
 
-        DoubleTensor logPdfs = TensorBeta.logPdf(alphaValues, betaValues, value);
+        DoubleTensor logPdfs = Beta.logPdf(alphaValues, betaValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorBeta.Diff dlnP = TensorBeta.dlnPdf(alpha.getValue(), beta.getValue(), value);
+        Beta.Diff dlnP = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdalpha, dlnP.dPdbeta, dlnP.dPdx);
     }
 
@@ -103,7 +103,7 @@ public class BetaVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorBeta.sample(
+        return Beta.sample(
             getShape(),
             alpha.getValue(),
             beta.getValue(),

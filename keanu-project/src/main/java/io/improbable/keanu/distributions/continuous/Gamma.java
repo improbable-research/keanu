@@ -3,16 +3,15 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.util.ArrayUtil;
 
 import static java.lang.Math.*;
 
-public class TensorGamma {
+public class Gamma {
 
     private static final double M_E = 0.577215664901532860606512090082;
 
-    private TensorGamma() {
+    private Gamma() {
     }
 
     /**
@@ -95,7 +94,7 @@ public class TensorGamma {
         final DoubleTensor aMinusXOverTheta = location.minus(x).divInPlace(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
         final DoubleTensor xMinusAPowKMinus1 = x.minus(location).powInPlace(k.minus(1));
-        final DoubleTensor lnXMinusAToKMinus1 = ((xMinusAPowKMinus1).divInPlace(k.apply(Gamma::gamma))).logInPlace();
+        final DoubleTensor lnXMinusAToKMinus1 = ((xMinusAPowKMinus1).divInPlace(k.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
         return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
     }
 
@@ -108,7 +107,7 @@ public class TensorGamma {
         final DoubleTensor dPdx = kMinus1.div(xMinusA).minusInPlace(oneOverTheta);
         final DoubleTensor dPda = kMinus1.div(aMinusX).plusInPlace(oneOverTheta);
         final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(Gamma::digamma));
+        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
         return new Diff(dPda, dPdtheta, dPdk, dPdx);
     }

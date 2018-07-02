@@ -32,9 +32,9 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
  * A = -2 / (Sw^3 * (Sw + Bw))
  * B = 3 / (Sw^3 * Sw^2*Bw)
  */
-public class TensorSmoothUniform {
+public class SmoothUniform {
 
-    private TensorSmoothUniform() {
+    private SmoothUniform() {
     }
 
     /**

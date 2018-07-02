@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorLogistic;
+import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -55,14 +55,14 @@ public class LogisticVertex extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor sValues = s.getValue();
 
-        DoubleTensor logPdfs = TensorLogistic.logPdf(muValues, sValues, value);
+        DoubleTensor logPdfs = Logistic.logPdf(muValues, sValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorLogistic.Diff dlnP = TensorLogistic.dlnPdf(mu.getValue(), s.getValue(), value);
+        Logistic.Diff dlnP = Logistic.dlnPdf(mu.getValue(), s.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPds, dlnP.dPdx);
     }
 
@@ -83,6 +83,6 @@ public class LogisticVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorLogistic.sample(getShape(), mu.getValue(), s.getValue(), random);
+        return Logistic.sample(getShape(), mu.getValue(), s.getValue(), random);
     }
 }

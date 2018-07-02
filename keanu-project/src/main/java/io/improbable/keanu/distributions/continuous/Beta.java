@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
 
-public class TensorBeta {
+public class Beta {
 
     public static DoubleTensor sample(int[] shape,
                                       DoubleTensor alpha,

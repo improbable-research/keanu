@@ -12,7 +12,7 @@ import static java.lang.Math.log;
  * Student T Distribution
  * https://en.wikipedia.org/wiki/Student%27s_t-distribution#Sampling_distribution
  */
-public class TensorStudentT {
+public class StudentT {
 
     private static final double HALF_LOG_PI = log(PI) / 2;
 
@@ -29,7 +29,7 @@ public class TensorStudentT {
      */
     public static DoubleTensor sample(int[] shape, IntegerTensor v, KeanuRandom random) {
 
-        DoubleTensor chi2Samples = TensorChiSquared.sample(shape, v, random);
+        DoubleTensor chi2Samples = ChiSquared.sample(shape, v, random);
         return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }
 

@@ -3,9 +3,9 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class TensorExponential {
+public class Exponential {
 
-    private TensorExponential() {
+    private Exponential() {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor location, DoubleTensor lambda, KeanuRandom random) {

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorSmoothUniform;
+import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -113,7 +113,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor density = TensorSmoothUniform.pdf(min, max, shoulderWidth, value);
+        final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
         return density.logInPlace().sum();
     }
 
@@ -122,8 +122,8 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor dPdfdx = TensorSmoothUniform.dlnPdf(min, max, shoulderWidth, value);
-        final DoubleTensor density = TensorSmoothUniform.pdf(min, max, shoulderWidth, value);
+        final DoubleTensor dPdfdx = SmoothUniform.dlnPdf(min, max, shoulderWidth, value);
+        final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
         final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
 
         return singletonMap(getId(), dlogPdfdx);
@@ -131,6 +131,6 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorSmoothUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
+        return SmoothUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
     }
 }

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorExponential;
+import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -67,14 +67,14 @@ public class ExponentialVertex extends ProbabilisticDouble {
         DoubleTensor locationValues = location.getValue();
         DoubleTensor lambdaValues = lambda.getValue();
 
-        DoubleTensor logPdfs = TensorExponential.logPdf(locationValues, lambdaValues, value);
+        DoubleTensor logPdfs = Exponential.logPdf(locationValues, lambdaValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorExponential.Diff dlnP = TensorExponential.dlnPdf(location.getValue(), lambda.getValue(), value);
+        Exponential.Diff dlnP = Exponential.dlnPdf(location.getValue(), lambda.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdlocation, dlnP.dPdlambda, dlnP.dPdx);
     }
 
@@ -95,7 +95,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorExponential.sample(getShape(), location.getValue(), lambda.getValue(), random);
+        return Exponential.sample(getShape(), location.getValue(), lambda.getValue(), random);
     }
 
 }

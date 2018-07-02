@@ -3,12 +3,12 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class TensorGaussian {
+public class Gaussian {
 
     public static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
     public static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
 
-    private TensorGaussian() {
+    private Gaussian() {
     }
 
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {

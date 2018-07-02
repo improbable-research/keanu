@@ -14,7 +14,7 @@ import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
  * ARL-TR-2168 March 2000
  * 5.2.8 page 49
  */
-public class TensorPoisson {
+public class Poisson {
 
     public static IntegerTensor sample(int[] shape, DoubleTensor mu, KeanuRandom random) {
 

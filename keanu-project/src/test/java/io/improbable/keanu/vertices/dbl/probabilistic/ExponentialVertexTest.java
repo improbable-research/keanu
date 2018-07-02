@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.gradient.Exponential;
-import io.improbable.keanu.distributions.continuous.TensorExponential;
+import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
@@ -37,7 +36,7 @@ public class ExponentialVertexTest {
         DoubleTensor matrixA = Nd4jDoubleTensor.create(new double[]{1, 4}, new int[]{2, 1});
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
-        DoubleTensor maskResult = TensorExponential.logPdf(matrixA, new ScalarDoubleTensor(1.0), matrixX);
+        DoubleTensor maskResult = Exponential.logPdf(matrixA, new ScalarDoubleTensor(1.0), matrixX);
         assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
     }
 
@@ -62,7 +61,7 @@ public class ExponentialVertexTest {
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
 
-        Exponential.Diff exponentialLogDiff = Exponential.dlnPdf(0.5, 2.5, 1.5);
+        io.improbable.keanu.distributions.gradient.Exponential.Diff exponentialLogDiff = io.improbable.keanu.distributions.gradient.Exponential.dlnPdf(0.5, 2.5, 1.5);
 
         UniformVertex aTensor = new UniformVertex(0.0, 5.0);
         aTensor.setValue(0.5);

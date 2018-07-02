@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.TensorInverseGamma;
+import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -73,13 +73,13 @@ public class InverseGammaVertex extends ProbabilisticDouble {
         DoubleTensor alphaValues = alpha.getValue();
         DoubleTensor betaValues = beta.getValue();
 
-        DoubleTensor logPdfs = TensorInverseGamma.logPdf(alphaValues, betaValues, value);
+        DoubleTensor logPdfs = InverseGamma.logPdf(alphaValues, betaValues, value);
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorInverseGamma.Diff dlnP = TensorInverseGamma.dlnPdf(alpha.getValue(), beta.getValue(), value);
+        InverseGamma.Diff dlnP = InverseGamma.dlnPdf(alpha.getValue(), beta.getValue(), value);
 
         return convertDualNumbersToDiff(dlnP.dPdalpha, dlnP.dPdbeta, dlnP.dPdx);
     }
@@ -101,7 +101,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorInverseGamma.sample(getShape(), alpha.getValue(), beta.getValue(), random);
+        return InverseGamma.sample(getShape(), alpha.getValue(), beta.getValue(), random);
     }
 
 }
