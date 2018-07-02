@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorLogNormal;
+import io.improbable.keanu.distributions.continuous.TensorLogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,26 +17,26 @@ public class LogNormalVertex extends ProbabilisticDouble {
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
 
-    public LogNormalVertex(int[] shape, DoubleVertex mu, DoubleVertex sigma) {
+    public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape(), sigma.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
         this.mu = mu;
         this.sigma = sigma;
         setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public LogNormalVertex(int[] shape, DoubleVertex mu, double sigma) {
-        this(shape, mu, ConstantVertex.of(sigma));
+    public LogNormalVertex(int[] tensorShape, DoubleVertex mu, double sigma) {
+        this(tensorShape, mu, ConstantVertex.of(sigma));
     }
 
-    public LogNormalVertex(int[] shape, double mu, DoubleVertex sigma) {
-        this(shape, ConstantVertex.of(mu), sigma);
+    public LogNormalVertex(int[] tensorShape, double mu, DoubleVertex sigma) {
+        this(tensorShape, ConstantVertex.of(mu), sigma);
     }
 
-    public LogNormalVertex(int[] shape, double mu, double sigma) {
-        this(shape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
+    public LogNormalVertex(int[] tensorShape, double mu, double sigma) {
+        this(tensorShape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
     }
 
     public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {

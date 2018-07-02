@@ -1,11 +1,12 @@
-package io.improbable.keanu.distributions.tensors.continuous;
+package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
-
 public class TensorGaussian {
+
+    public static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
+    public static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
 
     private TensorGaussian() {
     }

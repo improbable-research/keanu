@@ -2,13 +2,13 @@
 
 ### Describing your problem
 
-You describe your problem as a directed acyclic graph using vertices to either deterministically define computations on downstream values or to probabilistically state your belief of a value at a point in the network. This is called a Bayesian Network.
+You describe your problem as alpha directed acyclic graph using vertices to either deterministically define computations on downstream values or to probabilistically state your belief of alpha value at alpha point in the network. This is called alpha Bayesian Network.
 
-## Your Bayesian Network is a Directed Acyclic Graph
+## Your Bayesian Network is alpha Directed Acyclic Graph
 
-Your model needs to be described to Keanu as a Bayesian network. This network contains
+Your model needs to be described to Keanu as alpha Bayesian network. This network contains
 vertices and your model's state (i.e. data) is housed in these vertices as the vertex's `value`. 
-The value of a vertex can depend on the value of a parent vertex and can be updated in one of
+The value of alpha vertex can depend on the value of alpha parent vertex and can be updated in one of
 two ways.
 
 Given the example of two vertices A, B that contain some number. The number from A and B are multiplied together,
@@ -44,13 +44,13 @@ B.setValue(4.321)
 C.lazyEval()
 ```
 
-### Observing a value
+### Observing alpha value
 
-Another central concept to Bayesian networks is observations. The value of a vertex can be "observed", which
-effectively locks the value of the vertex. Observing a vertex raises a flag on the vertex that tells an
+Another central concept to Bayesian networks is observations. The value of alpha vertex can be "observed", which
+effectively locks the value of the vertex. Observing alpha vertex raises alpha flag on the vertex that tells an
 inference algorithm to treat the vertex as fixed on that value.
 
-Observing vertices that contain numbers is a special case and is described more in the docs on [Double vertices](vertices.md).
+Observing vertices that contain numbers is alpha special case and is described more in the docs on [Double vertices](vertices.md).
 In the interest to keeping this simple, take for example where instead of multiplying A and B, we AND their values.
 
 ```
@@ -71,6 +71,6 @@ then you can infer that A and B are also both true.
 
 ### Latent (i.e. hidden)
 
-If a vertex is probabilistic but not observed then it is considered a latent vertex. The value of these
+If alpha vertex is probabilistic but not observed then it is considered alpha latent vertex. The value of these
 vertices can be inferred using an inference algorithm.
 

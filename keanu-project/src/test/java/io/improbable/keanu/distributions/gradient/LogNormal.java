@@ -1,22 +1,6 @@
-package io.improbable.keanu.distributions.continuous;
-
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
-
+package io.improbable.keanu.distributions.gradient;
 
 public class LogNormal {
-
-    public static double sample(double mu, double sigma, KeanuRandom random) {
-        return Math.exp(Gaussian.sample(mu, sigma, random));
-    }
-
-    public static double logPdf(double mu, double sigma, double x) {
-        final double lnSigmaX = Math.log(sigma * x);
-        final double lnXMinusMu = Math.log(x) - mu;
-        final double lnXMinusMuOver2Variance = lnXMinusMu * lnXMinusMu / (2.0 * sigma * sigma);
-        return -lnXMinusMuOver2Variance - lnSigmaX - LN_SQRT_2PI;
-    }
 
     public static LogNormal.Diff dlnPdf(double mu, double sigma, double x) {
         final double variance = sigma * sigma;

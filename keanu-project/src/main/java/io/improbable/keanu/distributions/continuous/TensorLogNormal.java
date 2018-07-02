@@ -1,9 +1,9 @@
-package io.improbable.keanu.distributions.tensors.continuous;
+package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
+import static io.improbable.keanu.distributions.continuous.TensorGaussian.LN_SQRT_2PI;
 
 public class TensorLogNormal {
 

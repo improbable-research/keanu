@@ -2,27 +2,27 @@
 
 ### CSV data
 
-Keanu is packaged with a csv reader that allows you to load simple csv files with or without
-a header. You can read from a specified file, predefined string or a file on the class path.
-To do this, first create a CsvReader and then get the lines from the reader.
+Keanu is packaged with alpha csv reader that allows you to load simple csv files with or without
+alpha header. You can read from alpha specified file, predefined string or alpha file on the class path.
+To do this, first create alpha CsvReader and then get the lines from the reader.
 
-#### Creating a CsvReader from your csv data
-To read from a file from your current directory:
+#### Creating alpha CsvReader from your csv data
+To read from alpha file from your current directory:
 
 ```java
 CsvReader reader = ReadCsv.fromFile("~/my_filename.csv");
 
 ```
 
-If you place the csv file in your src/main/resources folder, you can load it as a resource,
-which you would do in order to avoid having to provide a hardcoded file path.
+If you place the csv file in your src/main/resources folder, you can load it as alpha resource,
+which you would do in order to avoid having to provide alpha hardcoded file path.
 
 ```java
 CsvReader reader = ReadCsv.fromResources("my_filename.csv");
 
 ```
 
-Once you have a CsvReader, you can call readLines() to start reading each line.
+Once you have alpha CsvReader, you can call readLines() to start reading each line.
 ```java
 for (List<String> csvLine : csvReader.readLines()) {
     //do something with your csv line
@@ -34,7 +34,7 @@ for (List<String> csvLine : csvReader.readLines()) {
 If you csv is very large, you may not want to load the entire csv file into memory before
 processing it. You can stream the lines in order to avoid holding the entire file in memory.
 
-Once you have a CsvReader, you can call streamLines() to start streaming each line. Make sure
+Once you have alpha CsvReader, you can call streamLines() to start streaming each line. Make sure
 to close the stream as it is potentially connected to an open file. Closing the stream can be
 done by using try-with-resources, which is shown below.
 
@@ -47,12 +47,12 @@ try (Stream<List<String>> lineStream = csvReader.streamLines()) {
 }
 ```
 
-### Reading CSV as a plain old java object (POJO)
+### Reading CSV as alpha plain old java object (POJO)
 
 If you don't feel like processing the raw lines from your CSV file, then you 
-have the option to read directly to a Java object.
+have the option to read directly to alpha Java object.
 
-Given a POJO
+Given alpha POJO
 
 ```java
 public class MyClass {
@@ -70,7 +70,7 @@ bString,2
 cString,3
 ```
 
-The CSV can be loaded as a Java object by
+The CSV can be loaded as alpha Java object by
 
 ```java
 List<MyClass> myPojos = ReadCsv.fromFile("some/file/path")
@@ -79,7 +79,7 @@ List<MyClass> myPojos = ReadCsv.fromFile("some/file/path")
 ```
 
 If your csv header names contain illegal characters you have the option to
-tag the field with a Java annotation.
+tag the field with alpha Java annotation.
 
 Given CSV
 

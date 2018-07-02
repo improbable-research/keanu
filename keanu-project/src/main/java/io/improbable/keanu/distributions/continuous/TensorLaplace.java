@@ -1,15 +1,44 @@
-package io.improbable.keanu.distributions.tensors.continuous;
+package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 public class TensorLaplace {
 
     private TensorLaplace() {
     }
 
+    /**
+     * @param shape  shape of tensor returned
+     * @param mu     location
+     * @param beta   shape
+     * @param random source of randomness
+     * @return a random number from the Laplace distribution
+     */
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor beta, KeanuRandom random) {
-        return random.nextLaplace(shape, mu, beta);
+        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
+        Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
+
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);
+        }
+
+        return DoubleTensor.create(samples, shape);
+    }
+
+    private static double sample(double mu, double beta, KeanuRandom random) {
+        if (beta <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for beta: " + beta);
+        }
+        if (random.nextDouble() > 0.5) {
+            return mu + beta * Math.log(random.nextDouble());
+        } else {
+            return mu - beta * Math.log(random.nextDouble());
+        }
     }
 
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {

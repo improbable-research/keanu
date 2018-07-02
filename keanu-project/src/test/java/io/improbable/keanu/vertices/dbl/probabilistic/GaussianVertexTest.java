@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
+import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.ConstantVertex;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,15 +33,17 @@ public class GaussianVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
+        NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
         GaussianVertex tensorGaussianVertex = new GaussianVertex(0, 1);
-        double expectedDensity = Gaussian.logPdf(0.0, 1.0, 0.5);
+        double expectedDensity = distribution.logDensity(0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        double expectedLogDensity = Gaussian.logPdf(0.0, 1.0, 0.25) + Gaussian.logPdf(0.0, 1.0, -0.75);
+        NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
+        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
         GaussianVertex tensorGaussianVertex = new GaussianVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGaussianVertex, new double[]{0.25, -0.75}, expectedLogDensity);
     }

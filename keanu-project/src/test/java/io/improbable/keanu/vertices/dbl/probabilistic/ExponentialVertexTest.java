@@ -1,14 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Exponential;
-import io.improbable.keanu.distributions.tensors.continuous.TensorExponential;
+import io.improbable.keanu.distributions.gradient.Exponential;
+import io.improbable.keanu.distributions.continuous.TensorExponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.ConstantVertex;
+import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -42,8 +43,9 @@ public class ExponentialVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
+        ExponentialDistribution distribution = new ExponentialDistribution(1.5);
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(0.5, 1.5);
-        double expectedDensity = Exponential.logPdf(0.5, 1.5, 2.0);
+        double expectedDensity = distribution.logDensity(2.0 - 0.5);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorExponentialVertex, 2.0, expectedDensity);
     }
@@ -51,7 +53,8 @@ public class ExponentialVertexTest {
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        double expectedLogDensity = Exponential.logPdf(0.0, 1.0, 0.25) + Exponential.logPdf(0.0, 1.0, .75);
+        ExponentialDistribution distribution = new ExponentialDistribution(1.0);
+        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(.75);
         ExponentialVertex ndExponentialVertex = new ExponentialVertex(0.0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndExponentialVertex, new double[]{0.25, .75}, expectedLogDensity);
     }

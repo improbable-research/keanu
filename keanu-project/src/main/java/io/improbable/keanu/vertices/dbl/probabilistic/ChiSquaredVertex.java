@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorChiSquared;
+import io.improbable.keanu.distributions.continuous.TensorChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -16,16 +16,16 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
 
     private IntegerVertex k;
 
-    public ChiSquaredVertex(int[] shape, IntegerVertex k) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, k.getShape());
+    public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 
         this.k = k;
         setParents(k);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public ChiSquaredVertex(int[] shape, int k) {
-        this(shape, new ConstantIntegerVertex(k));
+    public ChiSquaredVertex(int[] tensorShape, int k) {
+        this(tensorShape, new ConstantIntegerVertex(k));
     }
 
     public ChiSquaredVertex(IntegerTensor k) {

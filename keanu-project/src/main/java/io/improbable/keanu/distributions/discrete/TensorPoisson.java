@@ -1,9 +1,10 @@
-package io.improbable.keanu.distributions.tensors.discrete;
+package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
@@ -16,7 +17,16 @@ import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 public class TensorPoisson {
 
     public static IntegerTensor sample(int[] shape, DoubleTensor mu, KeanuRandom random) {
-        return random.nextPoisson(shape, mu);
+
+        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
+
+        int length = ArrayUtil.prod(shape);
+        int[] samples = new int[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = sample(muWrapped.getOrScalar(i), random);
+        }
+
+        return IntegerTensor.create(samples, shape);
     }
 
     public static int sample(double mu, KeanuRandom random) {

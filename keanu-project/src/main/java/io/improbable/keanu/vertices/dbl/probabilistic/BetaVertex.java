@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorBeta;
+import io.improbable.keanu.distributions.continuous.TensorBeta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -20,26 +20,26 @@ public class BetaVertex extends ProbabilisticDouble {
     /**
      * One alpha or beta or both driving an arbitrarily shaped tensor of Beta
      *
-     * @param shape the desired shape of the vertex
-     * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
-     * @param beta  the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param tensorShape the desired shape of the tensor contained in the vertex
+     * @param alpha       the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
+     * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
-    public BetaVertex(int[] shape, DoubleVertex alpha, DoubleVertex beta) {
+    public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, alpha.getShape(), beta.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
         this.beta = beta;
         setParents(alpha, beta);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
-     * One to one constructor for mapping some shape of alpha and beta to
-     * a matching shaped Beta.
+     * One to one constructor for mapping some tensorShape of alpha and beta to
+     * a matching tensorShaped Beta.
      *
-     * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
-     * @param beta  the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param alpha the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
+     * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
@@ -57,16 +57,16 @@ public class BetaVertex extends ProbabilisticDouble {
         this(new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    public BetaVertex(int[] shape, DoubleVertex alpha, double beta) {
-        this(shape, alpha, new ConstantDoubleVertex(beta));
+    public BetaVertex(int[] tensorShape, DoubleVertex alpha, double beta) {
+        this(tensorShape, alpha, new ConstantDoubleVertex(beta));
     }
 
-    public BetaVertex(int[] shape, double alpha, DoubleVertex beta) {
-        this(shape, new ConstantDoubleVertex(alpha), beta);
+    public BetaVertex(int[] tensorShape, double alpha, DoubleVertex beta) {
+        this(tensorShape, new ConstantDoubleVertex(alpha), beta);
     }
 
-    public BetaVertex(int[] shape, double alpha, double beta) {
-        this(shape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
+    public BetaVertex(int[] tensorShape, double alpha, double beta) {
+        this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
     @Override

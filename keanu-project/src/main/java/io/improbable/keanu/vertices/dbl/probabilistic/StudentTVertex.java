@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorStudentT;
+import io.improbable.keanu.distributions.continuous.TensorStudentT;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,18 +17,18 @@ public class StudentTVertex extends ProbabilisticDouble {
     private final IntegerVertex v;
 
     /**
-     * @param shape expected tensor shape
-     * @param v     Degrees of Freedom
+     * @param tensorShape expected tensor shape
+     * @param v           Degrees of Freedom
      */
-    public StudentTVertex(int[] shape, IntegerVertex v) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, v.getShape());
+    public StudentTVertex(int[] tensorShape, IntegerVertex v) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public StudentTVertex(int[] shape, int v) {
-        this(shape, new ConstantIntegerVertex(v));
+    public StudentTVertex(int[] tensorShape, int v) {
+        this(tensorShape, new ConstantIntegerVertex(v));
     }
 
     public StudentTVertex(IntegerVertex v) {

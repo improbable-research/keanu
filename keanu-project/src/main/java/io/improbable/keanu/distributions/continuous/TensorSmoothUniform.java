@@ -1,13 +1,54 @@
-package io.improbable.keanu.distributions.tensors.continuous;
+package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * The Smooth Uniform distribution is the usual Uniform distribution with the edges
+ * at max and min smoothed by attaching a sigmoid as shoulders.
+ * <p>
+ * Math:
+ * <p>
+ * let sigmoid shoulder function be f(x), Sw be shoulder width, Bw be base (max-min) width,
+ * and h be the bodyHeight of the base.
+ * <p>
+ * f(x) = Ax^3 + Bx^2
+ * f'(x) = 3Ax^2 + 2Bx
+ * integral f = Ax^4/4 + Bx^3/3
+ * <p>
+ * f(Sw) = h
+ * integral of f from 0 to Sw = 1 (area under the curve must be 1)
+ * f'(Sw) = 0
+ * <p>
+ * yields:
+ * <p>
+ * |  0    3Sw^2    2Sw   |   | h |   | 0 |
+ * | -1    Sw^3     Sw^2  | * | A | = | 0 |
+ * | Bw    Sw/4     2Sw/3 |   | B |   | 1 |
+ * <p>
+ * therefore:
+ * <p>
+ * h = 1 / (Sw + Bw)
+ * A = -2 / (Sw^3 * (Sw + Bw))
+ * B = 3 / (Sw^3 * Sw^2*Bw)
+ */
 public class TensorSmoothUniform {
 
     private TensorSmoothUniform() {
     }
 
+    /**
+     * Will return samples between xMin and xMax as well as samples from the left and right shoulder.
+     * The width of the shoulder is determined by the edgeSharpness as a percentage of the body width,
+     * which is (xMax - xMin).
+     *
+     * @param shape         result tensor shape
+     * @param xMin          min value from body
+     * @param xMax          max value from body
+     * @param edgeSharpness sharpness as a percentage of the body width
+     * @param random        source of randomness
+     * @return a uniform random number between xMin and xMax
+     */
     public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness, KeanuRandom random) {
 
         DoubleTensor r1 = random.nextDouble(shape);
@@ -87,7 +128,7 @@ public class TensorSmoothUniform {
         final DoubleTensor secondConditionalResult = dShoulder(shoulderWidth,
             bodyWidth,
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
-            ).unaryMinusInPlace();
+        ).unaryMinusInPlace();
 
         return firstConditional.timesInPlace(firstConditionalResult)
             .plusInPlace(secondConditional.timesInPlace(secondConditionalResult));
