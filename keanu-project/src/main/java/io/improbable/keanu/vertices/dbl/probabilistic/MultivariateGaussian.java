@@ -73,7 +73,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
