@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -50,7 +51,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void bivariateGaussianMatchesLogDensityOfVector() {
-        DoubleVertex mu = new ConstantDoubleVertex(
+        DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{2, 3}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
@@ -66,9 +67,9 @@ public class MultivariateGaussianTest {
 
     @Test
     public void bivariateGaussianMatchesLogDensityOfScipy() {
-        DoubleVertex mu = new ConstantDoubleVertex(
+        DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{1, 2}));
-        DoubleVertex covarianceMatrix = new ConstantDoubleVertex(
+        DoubleVertex covarianceMatrix = ConstantVertex.of(
             new Nd4jDoubleTensor(new int[]{2, 2}, new double[]{1, 0.3, 0.3, 0.6}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
@@ -80,10 +81,10 @@ public class MultivariateGaussianTest {
 
     @Test
     public void multivariateGaussianMatchesLogDensityOfScipy() {
-        DoubleVertex mu = new ConstantDoubleVertex(
+        DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new int[]{3, 1}, new double[]{1, 2, 3}));
 
-        DoubleVertex covarianceMatrix = new ConstantDoubleVertex(
+        DoubleVertex covarianceMatrix = ConstantVertex.of(
             new Nd4jDoubleTensor(
                 new int[]{3, 3}, new double[]{
                 1.0, 0.3, 0.3,
@@ -102,7 +103,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
-        DoubleVertex mu = new ConstantDoubleVertex(
+        DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{0, 0}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
