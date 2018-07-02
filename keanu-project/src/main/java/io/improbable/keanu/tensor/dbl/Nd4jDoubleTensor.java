@@ -18,11 +18,7 @@ import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
-import java.util.stream.DoubleStream;
 
 import static java.util.Arrays.copyOf;
 
@@ -154,12 +150,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor inverse() {
-        if (this.isScalar()) {
-            return this;
-        } else {
-            INDArray tensorInverted = InvertMatrix.invert(tensor, false);
-            return new Nd4jDoubleTensor(tensorInverted);
-        }
+        return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
     }
 
     @Override
@@ -191,13 +182,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor standardize() {
-        return duplicate().standardizeInPlace();
-    }
-
-    @Override
-    public DoubleTensor standardizeInPlace() {
-        tensor.subi(average()).divi(standardDeviation());
-        return this;
+        return new Nd4jDoubleTensor(tensor.subi(average()).divi(standardDeviation()));
     }
 
     @Override
@@ -222,12 +207,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor choleskyDecomposition() {
-        if (this.isScalar()) {
-            return this;
-        } else {
-            Nd4j.getBlasWrapper().lapack().potrf(tensor, false);
-            return new Nd4jDoubleTensor(tensor);
-        }
+        INDArray dup = unsafeGetNd4J(duplicate());
+        Nd4j.getBlasWrapper().lapack().potrf(dup, false);
+        return new Nd4jDoubleTensor(dup);
     }
 
     @Override
@@ -745,26 +727,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor matrixMultiplyInPlace(DoubleTensor that) {
-        if (that.isScalar()) {
-            return timesInPlace(that);
-        }
-        INDArray indArray = unsafeGetNd4J(that);
-        INDArray x = tensor.mmul(indArray);
-        return new Nd4jDoubleTensor(x);
-    }
-
-    @Override
     public double determinant() {
-        if (this.isScalar()) {
-            return this.asFlatDoubleArray()[0];
-        } else {
-            DoubleTensor dup = duplicate();
-            INDArray indArray = unsafeGetNd4J(dup);
-            double[][] asMatrix = indArray.toDoubleMatrix();
-            RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
-            return new LUDecomposition(matrix).getDeterminant();
-        }
+        INDArray tensor = unsafeGetNd4J(duplicate());
+        double[][] asMatrix = tensor.toDoubleMatrix();
+        RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
+        return new LUDecomposition(matrix).getDeterminant();
     }
 
     // Comparisons
