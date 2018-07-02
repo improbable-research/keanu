@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Test;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class ArcCosVertexTest {
@@ -38,11 +39,12 @@ public class ArcCosVertexTest {
     public void calculatesDualNumberOfMatrixElementWiseACos() {
         calculatesDualNumberOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            new double[]{-1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
+            toDiagonalArray(new double[]{
+                -1.0 / Math.sqrt(1.0 - 0.1 * 0.1),
                 -1.0 / Math.sqrt(1.0 - 0.2 * 0.2),
                 -1.0 / Math.sqrt(1.0 - 0.3 * 0.3),
                 -1.0 / Math.sqrt(1.0 - 0.4 * 0.4)
-            },
+            }),
             DoubleVertex::acos
         );
     }
