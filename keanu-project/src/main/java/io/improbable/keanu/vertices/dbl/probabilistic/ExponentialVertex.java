@@ -21,8 +21,8 @@ public class ExponentialVertex extends ProbabilisticDouble {
      * One a or b or both driving an arbitrarily shaped tensor of Exponential
      *
      * @param shape the desired shape of the vertex
-     * @param a     the a of the Exponential with either the same shape as specified for this vertex or a scalar
-     * @param b     the b of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param a     the a, location, of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param b     the b, scale, of the Exponential with either the same shape as specified for this vertex or a scalar
      */
     public ExponentialVertex(int[] shape, DoubleVertex a, DoubleVertex b) {
 
@@ -38,8 +38,8 @@ public class ExponentialVertex extends ProbabilisticDouble {
      * One to one constructor for mapping some shape of a and b to
      * a matching shaped exponential.
      *
-     * @param a the a of the Exponential with either the same shape as specified for this vertex or a scalar
-     * @param b the b of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param a the a, location, of the Exponential with either the same shape as specified for this vertex or a scalar
+     * @param b the b, scale, of the Exponential with either the same shape as specified for this vertex or a scalar
      */
     public ExponentialVertex(DoubleVertex a, DoubleVertex b) {
         this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);

@@ -18,9 +18,9 @@ public class UniformVertex extends ProbabilisticDouble {
     private final DoubleVertex xMax;
 
     /**
-     * @param shape desired tensor shape
-     * @param xMin  inclusive
-     * @param xMax  exclusive
+     * @param shape the desired shape of the vertex
+     * @param xMin  the xMin of the Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax  the xMax of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax) {
 

@@ -21,8 +21,8 @@ public class TriangularVertex extends ProbabilisticDouble {
      * One xMin, xMax, c or all three driving an arbitrarily shaped tensor of Triangular
      *
      * @param shape the desired shape of the vertex
-     * @param xMin  the a of the Triangular with either the same shape as specified for this vertex or a scalar
-     * @param xMax  the b of the Triangular with either the same shape as specified for this vertex or a scalar
+     * @param xMin  the xMin of the Triangular with either the same shape as specified for this vertex or a scalar
+     * @param xMax  the xMax of the Triangular with either the same shape as specified for this vertex or a scalar
      * @param c     the c of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
