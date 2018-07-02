@@ -11,6 +11,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class DivisionVertex extends DoubleBinaryOpVertex {
 
+    /**
+     * Performs a division on two vertices
+     *
+     * @param a the vertex to be divided
+     * @param b the vertex to divide
+     */
     public DivisionVertex(DoubleVertex a, DoubleVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }

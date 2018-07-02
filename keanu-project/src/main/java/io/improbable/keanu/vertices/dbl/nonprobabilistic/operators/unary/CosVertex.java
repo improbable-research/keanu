@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class CosVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the cosine of a vertex, Cos(vertex)
+     *
+     * @param inputVertex the vertex
+     */
     public CosVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

@@ -11,6 +11,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
+    /**
+     * Performs a subtraction on two vertices
+     *
+     * @param a the vertex that will be subtracted from
+     * @param b the vertex to subtract
+     */
     public DifferenceVertex(DoubleVertex a, DoubleVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }

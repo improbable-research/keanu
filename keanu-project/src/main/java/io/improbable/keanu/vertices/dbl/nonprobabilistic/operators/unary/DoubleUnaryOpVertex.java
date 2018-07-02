@@ -9,6 +9,12 @@ public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
 
     protected final DoubleVertex inputVertex;
 
+    /**
+     * A vertex that performs a user defined operation on a singe input vertex
+     *
+     * @param shape the shape of the resulting vertex
+     * @param inputVertex a vertex
+     */
     public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);

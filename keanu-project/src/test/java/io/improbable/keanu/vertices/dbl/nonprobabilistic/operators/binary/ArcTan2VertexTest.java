@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import org.bytedeco.javacpp.annotation.Const;
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
@@ -16,6 +18,13 @@ public class ArcTan2VertexTest {
             Math.atan2(Math.PI, 1.0),
             DoubleVertex::atan2
         );
+    }
+
+    @Test
+    public void poo() {
+        ArcTan2Vertex tan2 = new ArcTan2Vertex(ConstantVertex.of(0.5), ConstantVertex.of(0.7));
+        System.out.println(tan2.getValue().scalar());
+        System.out.println(Math.atan2(0.7, 0.5));
     }
 
     @Test

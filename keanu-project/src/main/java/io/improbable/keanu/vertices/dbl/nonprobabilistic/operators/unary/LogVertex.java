@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class LogVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Returns the natural logarithm, base e, of a vertex
+     *
+     * @param inputVertex the vertex
+     */
     public LogVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

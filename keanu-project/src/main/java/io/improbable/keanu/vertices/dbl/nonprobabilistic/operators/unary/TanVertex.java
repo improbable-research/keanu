@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class TanVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the tangent of a vertex. Tan(vertex).
+     *
+     * @param inputVertex the vertex
+     */
     public TanVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }
