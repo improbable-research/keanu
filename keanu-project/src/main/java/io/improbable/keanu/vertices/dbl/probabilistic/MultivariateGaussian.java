@@ -56,7 +56,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussian(DoubleVertex mu, double covariance) {
-        this(mu, createIdentityMatrixFromScalar(mu, covariance));
+        this(mu, new ConstantDoubleVertex(Nd4jDoubleTensor.eye(mu.getShape()[0])).times(covariance));
     }
 
     public MultivariateGaussian(double mu, double covariance) {
@@ -79,13 +79,6 @@ public class MultivariateGaussian extends ProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), variates, random);
-    }
-
-    private static DoubleVertex createIdentityMatrixFromScalar(DoubleVertex mu, double covariance) {
-        int dimensions = mu.getShape()[0];
-        RealMatrix identityMatrix = MatrixUtils.createRealIdentityMatrix(dimensions).scalarMultiply(covariance);
-        Nd4jDoubleTensor identityTensor = Nd4jDoubleTensor.create(identityMatrix);
-        return new ConstantDoubleVertex(identityTensor);
     }
 
     private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {
