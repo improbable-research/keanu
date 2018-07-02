@@ -1,26 +1,19 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import com.sun.tools.javac.util.Pair;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.stream.Stream;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
@@ -155,10 +148,10 @@ public class MultivariateGaussianTest {
             double sampleY = samples[i][1];
             for (Pair<Double, Double> bucketCenter : sampleBucket.keySet()) {
 
-                if (sampleX > bucketCenter.fst - halfBucket
-                    && sampleX < bucketCenter.fst + halfBucket
-                    && sampleY > bucketCenter.snd - halfBucket
-                    && sampleY < bucketCenter.snd + halfBucket) {
+                if (sampleX > bucketCenter.getFirst() - halfBucket
+                    && sampleX < bucketCenter.getFirst() + halfBucket
+                    && sampleY > bucketCenter.getSecond() - halfBucket
+                    && sampleY < bucketCenter.getSecond() + halfBucket) {
                     sampleBucket.put(bucketCenter, sampleBucket.get(bucketCenter) + 1);
                     break;
                 }
@@ -168,8 +161,8 @@ public class MultivariateGaussianTest {
 
         for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
             double percentage = (double) entry.getValue() / sampleCount;
-            Pair<Double, Double> bucketCenter = entry.getKey();
-            Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{bucketCenter.fst, bucketCenter.snd});
+            double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
+            Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(new int[]{2, 1}, bucketCenter);
             double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketSize;
             double actual = (percentage / bucketSize);
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
