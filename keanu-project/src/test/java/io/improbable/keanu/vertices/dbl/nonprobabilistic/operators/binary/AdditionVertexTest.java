@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Test;
 
@@ -41,10 +42,10 @@ public class AdditionVertexTest {
     @Test
     public void calculatesDualNumberOfTwoMatricesElementWiseAdded() {
         calculatesDualNumberOfTwoMatricesElementWiseOperator(
-            new double[]{1.0, 2.0, 3.0, 4.0},
-            new double[]{2.0, 3.0, 4.0, 5.0},
-            new double[]{1.0, 1.0, 1.0, 1.0},
-            new double[]{1.0, 1.0, 1.0, 1.0},
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 2, 2),
+            DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 2, 2),
+            DoubleTensor.eye(4).reshape(2, 2, 2, 2),
+            DoubleTensor.eye(4).reshape(2, 2, 2, 2),
             DoubleVertex::plus
         );
     }

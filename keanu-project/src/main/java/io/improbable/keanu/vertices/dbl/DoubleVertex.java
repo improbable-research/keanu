@@ -27,6 +27,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new MultiplicationVertex(this, that);
     }
 
+    public DoubleVertex matrixMultiply(DoubleVertex that) {
+        return new MatrixMultiplicationVertex(this, that);
+    }
+
     public DoubleVertex divideBy(DoubleVertex that) {
         return new DivisionVertex(this, that);
     }
