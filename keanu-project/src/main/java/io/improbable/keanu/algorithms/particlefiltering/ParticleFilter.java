@@ -12,6 +12,14 @@ public class ParticleFilter {
     private ParticleFilter() {
     }
 
+
+    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices,
+                                                   int numParticles,
+                                                   int resamplingCycles,
+                                                   double resamplingProportion) {
+        return getProbableValues(vertices, numParticles, resamplingCycles, resamplingProportion, KeanuRandom.getDefaultRandom());
+    }
+
     /***
      * A particle filtering approach is used to find probable values for the latent vertices of a Bayesian network,
      * given a set of observed vertices. This is done by incrementally increasing the proportion of the graph under
@@ -35,9 +43,11 @@ public class ParticleFilter {
      * @param random a random number generator
      * @return a list of particles representing the most probable found values of latent variables
      */
-
-    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices, int numParticles,
-                                                   int resamplingCycles, double resamplingProportion, KeanuRandom random) {
+    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices,
+                                                   int numParticles,
+                                                   int resamplingCycles,
+                                                   double resamplingProportion,
+                                                   KeanuRandom random) {
 
         Map<Vertex, Set<Vertex>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
         List<Vertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());

@@ -151,11 +151,20 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor matrixMultiply(IntegerTensor value) {
+        if (value.isScalar()) {
+            return value.times(value);
+        }
         throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
-    public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight) {
+    public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimsLeft, int[] dimsRight) {
+        if (value.isScalar()) {
+            if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
+                throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
+            }
+            return value.times(value);
+        }
         throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
 
