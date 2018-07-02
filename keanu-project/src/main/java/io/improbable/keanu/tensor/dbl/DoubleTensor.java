@@ -23,7 +23,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
         }
     }
 
-    static DoubleTensor create(double[] values, int[] shape) {
+    static DoubleTensor create(double[] values, int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarDoubleTensor(values[0]);
         } else {
@@ -32,14 +32,22 @@ public interface DoubleTensor extends NumberTensor<Double> {
     }
 
     static DoubleTensor create(double[] values) {
-        return create(values, new int[]{1, values.length});
+        return create(values, 1, values.length);
     }
 
-    static DoubleTensor ones(int[] shape) {
+    static DoubleTensor ones(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
         } else {
             return Nd4jDoubleTensor.ones(shape);
+        }
+    }
+
+    static DoubleTensor eye(int n) {
+        if (n == 1) {
+            return new ScalarDoubleTensor(1.0);
+        } else {
+            return Nd4jDoubleTensor.eye(n);
         }
     }
 
@@ -59,6 +67,14 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return new ScalarDoubleTensor(shape);
     }
 
+    DoubleTensor reshape(int... newShape);
+
+    DoubleTensor diag();
+
+    DoubleTensor transpose();
+
+    DoubleTensor sum(int... overDimensions);
+
     //New tensor Ops and transforms
 
     DoubleTensor reciprocal();
@@ -68,6 +84,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor plus(double value);
 
     DoubleTensor times(double value);
+
+    DoubleTensor matrixMultiply(DoubleTensor value);
+
+    DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
 
     DoubleTensor div(double value);
 
@@ -127,7 +147,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double max();
 
-    DoubleTensor min(DoubleTensor max);
+    DoubleTensor min(DoubleTensor min);
 
     double min();
 

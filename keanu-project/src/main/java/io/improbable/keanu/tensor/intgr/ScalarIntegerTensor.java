@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
@@ -78,6 +79,32 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor reshape(int[] newShape) {
+        if (!TensorShape.isScalar(newShape)) {
+            throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
+        }
+
+        ScalarIntegerTensor reshapedScalar = new ScalarIntegerTensor(value);
+        reshapedScalar.shape = newShape;
+        return reshapedScalar;
+    }
+
+    @Override
+    public IntegerTensor diag() {
+        return duplicate();
+    }
+
+    @Override
+    public IntegerTensor transpose() {
+        return duplicate();
+    }
+
+    @Override
+    public IntegerTensor sum(int... overDimensions) {
+        return duplicate();
+    }
+
+    @Override
     public IntegerTensor minus(int that) {
         return duplicate().minusInPlace(that);
     }
@@ -120,6 +147,25 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor times(IntegerTensor that) {
         return duplicate().timesInPlace(that);
+    }
+
+    @Override
+    public IntegerTensor matrixMultiply(IntegerTensor value) {
+        if (value.isScalar()) {
+            return value.times(value);
+        }
+        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
+    }
+
+    @Override
+    public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimsLeft, int[] dimsRight) {
+        if (value.isScalar()) {
+            if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
+                throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
+            }
+            return value.times(value);
+        }
+        throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
 
     @Override

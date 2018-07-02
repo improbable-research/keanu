@@ -52,7 +52,7 @@ public abstract class Vertex<T> {
      */
     public abstract T sample(KeanuRandom random);
 
-    public T sampleUsingDefaultRandom() {
+    public T sample() {
         return sample(KeanuRandom.getDefaultRandom());
     }
 

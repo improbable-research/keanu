@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Test;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class TanVertexTest {
@@ -38,13 +39,14 @@ public class TanVertexTest {
     public void calculatesDualNumberOfMatrixElementWiseTan() {
         calculatesDualNumberOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            new double[]{1 / Math.pow(Math.cos(0.1), 2),
+            toDiagonalArray(new double[]{
+                1 / Math.pow(Math.cos(0.1), 2),
                 1 / Math.pow(Math.cos(0.2), 2),
                 1 / Math.pow(Math.cos(0.3), 2),
                 1 / Math.pow(Math.cos(0.4), 2)
-            },
+            }),
             DoubleVertex::tan
         );
     }
-    
+
 }
