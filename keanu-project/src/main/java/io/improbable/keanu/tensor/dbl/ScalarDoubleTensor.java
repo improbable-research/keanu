@@ -355,7 +355,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor standardize() {
-        throw new IllegalStateException("Cannot standardize a scalar");
+        return duplicate().standardizeInPlace();
     }
 
     @Override
@@ -601,6 +601,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor sigmoidInPlace() {
         value = 1.0D / (1.0D + FastMath.exp(-value));
         return this;
+    }
+
+    @Override
+    public DoubleTensor standardizeInPlace() {
+        throw new IllegalStateException("Cannot standardize a scalar");
     }
 
     @Override

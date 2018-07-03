@@ -16,7 +16,6 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
-    private final GaussianVertex variates;
 
     /**
      * Multivariate gaussian distribution. The shape is driven from mu, which must be a vector.
@@ -32,7 +31,6 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
         this.mu = mu;
         this.covariance = covariance;
-        this.variates = new GaussianVertex(mu.getShape(), 0, 1);
         setParents(mu, covariance);
         setValue(DoubleTensor.placeHolder(shape));
     }
@@ -57,7 +55,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussian(DoubleVertex mu, double covariance) {
-        this(mu, ConstantVertex.of(Nd4jDoubleTensor.eye(mu.getShape()[0])).times(covariance));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
     }
 
     public MultivariateGaussian(double mu, double covariance) {
@@ -79,7 +77,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), variates, random);
+        return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
     }
 
     private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {

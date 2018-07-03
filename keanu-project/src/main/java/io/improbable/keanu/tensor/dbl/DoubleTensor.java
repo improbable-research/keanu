@@ -235,6 +235,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor sigmoidInPlace();
 
+    DoubleTensor standardizeInPlace();
+
     // Comparisons
     BooleanTensor lessThan(double value);
 

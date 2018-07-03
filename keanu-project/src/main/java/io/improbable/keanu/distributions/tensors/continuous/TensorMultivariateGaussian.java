@@ -10,9 +10,9 @@ public class TensorMultivariateGaussian {
     private TensorMultivariateGaussian() {
     }
 
-    public static DoubleTensor sample(DoubleTensor mu, DoubleTensor covariance, GaussianVertex gaussianVariates, KeanuRandom random) {
+    public static DoubleTensor sample(DoubleTensor mu, DoubleTensor covariance, KeanuRandom random) {
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
-        final DoubleTensor variateSamples = gaussianVariates.sample(random);
+        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
         final DoubleTensor covTimesVariates = mu.isScalar() ?
             choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
         return covTimesVariates.plus(mu);

@@ -138,12 +138,4 @@ public class Nd4jDoubleTensorTest {
         assertEquals(Math.sqrt(2.0), result.scalar(), 0.0);
     }
 
-    @Test
-    public void canCreateFromRealMatrix() {
-        RealMatrix matrix = new Array2DRowRealMatrix(new double[][]{{1, 2}, {3, 4}});
-        DoubleTensor tensor = Nd4jDoubleTensor.create(matrix);
-        assertArrayEquals(new int[]{2, 2}, tensor.getShape());
-        assertArrayEquals(new double[]{1, 2, 3, 4}, tensor.asFlatDoubleArray(), 0.0);
-    }
-
 }
