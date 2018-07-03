@@ -11,30 +11,21 @@ public class LogNormal {
     }
 
     /**
-     *
-     * @param shape shape of result
-     * @param mu
-     * @param sigma
-     * @param random
-     * @return
-     */
-
-    /**
      * @param shape  shape of tensor returned
      * @param mu     location parameter (any real number)
-     * @param sigma  square root of variance (>0)
+     * @param sigma  square root of variance (greater than 0)
      * @param random source or randomness
-     * @return a sample from the distribution
+     * @return a sample from the distribution given mu and sigma
      */
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
         return Gaussian.sample(shape, mu, sigma, random).expInPlace();
     }
 
     /**
-     * @param mu
-     * @param sigma
-     * @param x
-     * @return
+     * @param mu    location parameter (any real number)
+     * @param sigma square root of variance (greater than 0)
+     * @param x     at value
+     * @return the natural log of the pdf given mu and sigma at x
      */
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
         final DoubleTensor lnSigmaX = sigma.times(x).logInPlace();
