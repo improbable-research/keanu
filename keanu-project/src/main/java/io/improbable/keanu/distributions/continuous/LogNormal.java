@@ -10,10 +10,32 @@ public class LogNormal {
     private LogNormal() {
     }
 
+    /**
+     *
+     * @param shape shape of result
+     * @param mu
+     * @param sigma
+     * @param random
+     * @return
+     */
+
+    /**
+     * @param shape  shape of tensor returned
+     * @param mu     location parameter (any real number)
+     * @param sigma  square root of variance (>0)
+     * @param random source or randomness
+     * @return a sample from the distribution
+     */
     public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor sigma, KeanuRandom random) {
         return Gaussian.sample(shape, mu, sigma, random).expInPlace();
     }
 
+    /**
+     * @param mu
+     * @param sigma
+     * @param x
+     * @return
+     */
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
         final DoubleTensor lnSigmaX = sigma.times(x).logInPlace();
         final DoubleTensor lnXMinusMuSquared = x.log().minusInPlace(mu).powInPlace(2);
