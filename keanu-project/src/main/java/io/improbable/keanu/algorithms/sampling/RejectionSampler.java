@@ -23,6 +23,18 @@ public class RejectionSampler {
         return getPosteriorProbability(latentVertices, observedVertices, isSuccess, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
+    /**
+     * Rejection sampling is based on the observation that to sample a random variable one can perform a uniformly
+     * random sampling of the 2D cartesian graph, and keep the samples in the region under the graph of its density
+     * function.
+     *
+     * @param latentVertices
+     * @param observedVertices
+     * @param isSuccess
+     * @param sampleCount
+     * @param random
+     * @return
+     */
     public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
                                                  List<? extends Vertex> observedVertices,
                                                  Supplier<Boolean> isSuccess,

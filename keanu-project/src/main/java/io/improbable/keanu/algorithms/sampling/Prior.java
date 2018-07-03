@@ -16,6 +16,17 @@ public class Prior {
     private Prior() {
     }
 
+    /**
+     * Samples from a Bayesian Network that only contains prior information. No observations can have been made.
+     *<p>
+     * Samples are taken by calculating a linear ordering of the network and cascading the sampled values
+     * through the network in priority order.
+     *
+     * @param bayesNet the prior bayesian network to sample from
+     * @param fromVertices the vertices to sample from
+     * @param sampleCount the number of samples to take
+     * @return prior samples of a bayesian network
+     */
     public static NetworkSamples sample(BayesianNetwork bayesNet,
                                         List<? extends Vertex> fromVertices,
                                         int sampleCount) {
