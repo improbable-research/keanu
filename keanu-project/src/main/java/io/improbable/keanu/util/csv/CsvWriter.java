@@ -39,14 +39,19 @@ public class CsvWriter {
     }
 
     public File toFile(File file) {
+
         try {
             fileWriter = new FileWriter(file);
             writeHeader();
 
             for (List<String> row : data) {
+                int count = 0;
                 for (String dataPoint : row) {
                     fileWriter.append(dataPoint);
-                    fileWriter.append(delimiter);
+                    if (count != row.size() - 1) {
+                        fileWriter.append(delimiter);
+                    }
+                    count ++;
                 }
                 fileWriter.append(NEWLINE);
             }
