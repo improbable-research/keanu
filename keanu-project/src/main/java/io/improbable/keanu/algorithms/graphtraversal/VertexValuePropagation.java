@@ -22,10 +22,7 @@ public class VertexValuePropagation {
     }
 
     public static Map<Long, Long> exploreSetting(Collection<? extends Vertex> toBeSet) {
-        Deque<Vertex> stack = new ArrayDeque<>();
-        for (Vertex<?> v : toBeSet) {
-            stack.push(v);
-        }
+        Deque<Vertex> stack = asDeque(toBeSet);
         return exploreSetting(stack);
     }
 
@@ -86,10 +83,7 @@ public class VertexValuePropagation {
     }
 
     public static void cascadeUpdate(List<? extends Vertex> vertices, Map<Long, Long> explored) {
-        Deque<Vertex> stack = new ArrayDeque<>();
-        for (Vertex<?> v : vertices) {
-            stack.push(v);
-        }
+        Deque<Vertex> stack = asDeque(vertices);
         cascadeUpdate(stack, explored);
     }
 
@@ -131,10 +125,7 @@ public class VertexValuePropagation {
     }
 
     public static void eval(Collection<? extends Vertex> vertices) {
-        Deque<Vertex<?>> stack = new ArrayDeque<>();
-        for (Vertex v : vertices) {
-            stack.push(v);
-        }
+        Deque<Vertex> stack = asDeque(vertices);
 
         Set<Vertex<?>> hasCalculated = new HashSet<>();
 
@@ -175,10 +166,7 @@ public class VertexValuePropagation {
     }
 
     public static void lazyEval(Collection<? extends Vertex> vertices) {
-        Deque<Vertex<?>> stack = new ArrayDeque<>();
-        for (Vertex v : vertices) {
-            stack.push(v);
-        }
+        Deque<Vertex> stack = asDeque(vertices);
 
         while (!stack.isEmpty()) {
 
@@ -209,5 +197,13 @@ public class VertexValuePropagation {
             }
         }
         return notCalculatedParents;
+    }
+
+    private static Deque<Vertex> asDeque(Iterable<? extends Vertex> vertices) {
+        Deque<Vertex> stack = new ArrayDeque<>();
+        for (Vertex<?> v : vertices) {
+            stack.push(v);
+        }
+        return stack;
     }
 }
