@@ -17,6 +17,15 @@ public class LogNormalVertex extends ProbabilisticDouble {
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
 
+    /**
+     * One mu or s or both driving an arbitrarily shaped tensor of LogNormal
+     * https://en.wikipedia.org/wiki/Log-normal_distribution
+     *
+     * @param tensorShape the desired shape of the vertex
+     * @param mu          the mu (location) of the LogNormal with either the same tensor shape as specified for this
+     *                    vertex or mu scalar
+     * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
+     */
     public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());

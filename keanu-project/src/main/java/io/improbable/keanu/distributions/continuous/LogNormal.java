@@ -15,7 +15,7 @@ public class LogNormal {
     }
 
     public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
-        final DoubleTensor lnSigmaX = sigma.times(x).log();
+        final DoubleTensor lnSigmaX = sigma.times(x).logInPlace();
         final DoubleTensor lnXMinusMuSquared = x.log().minusInPlace(mu).powInPlace(2);
         final DoubleTensor lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
         return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
