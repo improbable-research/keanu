@@ -21,13 +21,6 @@ public class ArcTan2VertexTest {
     }
 
     @Test
-    public void poo() {
-        ArcTan2Vertex tan2 = new ArcTan2Vertex(ConstantVertex.of(0.5), ConstantVertex.of(0.7));
-        System.out.println(tan2.getValue().scalar());
-        System.out.println(Math.atan2(0.7, 0.5));
-    }
-
-    @Test
     public void calculatesDualNumberOfTwoScalarsTan2() {
         double a = 0.5;
         double b = Math.sqrt(3) / 2.0;

@@ -18,7 +18,7 @@ public class Prior {
 
     /**
      * Samples from a Bayesian Network that only contains prior information. No observations can have been made.
-     *<p>
+
      * Samples are taken by calculating a linear ordering of the network and cascading the sampled values
      * through the network in priority order.
      *
