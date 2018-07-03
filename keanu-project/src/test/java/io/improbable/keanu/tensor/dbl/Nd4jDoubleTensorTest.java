@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -135,4 +137,5 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor result = scalarA.sqrt();
         assertEquals(Math.sqrt(2.0), result.scalar(), 0.0);
     }
+
 }
