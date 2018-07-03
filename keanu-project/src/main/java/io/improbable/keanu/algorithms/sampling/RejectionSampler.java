@@ -53,7 +53,6 @@ public class RejectionSampler {
      * Rejection Sampling samples from a uniform space and retains the samples in the region
      * under the graph of the network's distribution function.
      *
-     *
      * @param bayesNet the bayesian network to sample from
      * @param fromVertices the vertices to sample from
      * @param sampleCount the number of samples to take

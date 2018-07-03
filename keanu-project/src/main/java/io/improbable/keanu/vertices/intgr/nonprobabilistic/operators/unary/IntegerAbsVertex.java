@@ -8,7 +8,7 @@ public class IntegerAbsVertex extends IntegerUnaryOpVertex {
 
     /**
      * Takes the absolute value of a vertex
-     * @param inputVertex
+     * @param inputVertex the vertex
      */
     public IntegerAbsVertex(IntegerVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
