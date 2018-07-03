@@ -11,7 +11,7 @@ import java.util.Map;
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
 
     /**
-     * Performs matrix multiplication on two vertices. C = AB
+     * Matrix multiplies one vertex by another. C = AB
      *
      * @param a vertex A
      * @param b vertex B

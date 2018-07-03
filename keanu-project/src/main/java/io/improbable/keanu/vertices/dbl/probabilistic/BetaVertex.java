@@ -18,7 +18,9 @@ public class BetaVertex extends ProbabilisticDouble {
     private final DoubleVertex beta;
 
     /**
-     * One alpha or beta or both driving an arbitrarily shaped tensor of Beta
+     * One alpha or beta or both that match a proposed tensor shape of Beta.
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar

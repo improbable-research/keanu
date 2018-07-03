@@ -11,7 +11,7 @@ import java.util.Map;
 public class AbsVertex extends DoubleUnaryOpVertex {
 
     /**
-     * Takes the absolute value of a vertex
+     * Takes the absolute of a vertex
      *
      * @param inputVertex the vertex
      */

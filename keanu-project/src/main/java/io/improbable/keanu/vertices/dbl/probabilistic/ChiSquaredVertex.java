@@ -17,7 +17,9 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     private IntegerVertex k;
 
     /**
-     * One k driving an arbitrarily shaped tensor of ChiSquared
+     * One k that must match a proposed tensor shape of ChiSquared
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param k the number of degrees of freedom
@@ -34,6 +36,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
         this(shape, new ConstantIntegerVertex(k));
     }
 
+    /**
+     * One to one constructor for mapping some shape of k to
+     * a matching shaped ChiSquared.
+     *
+     * @param k the number of degrees of freedom
+     */
     public ChiSquaredVertex(IntegerTensor k) {
         this(k.getShape(), new ConstantIntegerVertex(k));
     }

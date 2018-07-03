@@ -19,7 +19,9 @@ public class GammaVertex extends ProbabilisticDouble {
     private final DoubleVertex k;
 
     /**
-     * One a, theta or k or all three driving an arbitrarily shaped tensor of Gamma
+     * One a, theta or k or all three that match a proposed tensor shape of Gamma
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param a     the a of the Gamma with either the same shape as specified for this vertex or a scalar
@@ -38,7 +40,7 @@ public class GammaVertex extends ProbabilisticDouble {
 
     /**
      * One to one constructor for mapping some shape of a, theta and k to
-     * a matching shaped gamma.
+     * a matching shaped Gamma.
      *
      * @param a     the a of the Gamma with either the same shape as specified for this vertex or a scalar
      * @param theta the theta of the Gamma with either the same shape as specified for this vertex or a scalar

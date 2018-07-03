@@ -19,6 +19,14 @@ public class PoissonVertex extends ProbabilisticInteger {
 
     private final DoubleVertex mu;
 
+    /**
+     * One mu that must match a proposed tensor shape of Poisson.
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * @param shape the desired shape of the vertex
+     * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
+     */
     public PoissonVertex(int[] shape, DoubleVertex mu) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
@@ -32,6 +40,12 @@ public class PoissonVertex extends ProbabilisticInteger {
         this(shape, new ConstantDoubleVertex(mu));
     }
 
+    /**
+     * One to one constructor for mapping some shape of mu to
+     * a matching shaped Poisson.
+     *
+     * @param mu    mu with same shape as desired Poisson tensor or scalar
+     */
     public PoissonVertex(DoubleVertex mu) {
         this(mu.getShape(), mu);
     }

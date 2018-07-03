@@ -17,7 +17,9 @@ public class StudentTVertex extends ProbabilisticDouble {
     private final IntegerVertex v;
 
     /**
-     * One v driving an arbitrarily shaped tensor of StudentT
+     * One v that must match a proposed tensor shape of StudentT
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param v     the number of degrees of freedom

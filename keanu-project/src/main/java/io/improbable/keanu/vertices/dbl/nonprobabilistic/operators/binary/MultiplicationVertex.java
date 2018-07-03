@@ -12,7 +12,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
 
     /**
-     * Performs multiplication between two vertices
+     * Multiplies one vertex by another
      *
      * @param a vertex to be multiplied
      * @param b vertex to be multiplied

@@ -12,7 +12,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 public class DivisionVertex extends DoubleBinaryOpVertex {
 
     /**
-     * Performs a division on two vertices
+     * Divides one vertex by another
      *
      * @param a the vertex to be divided
      * @param b the vertex to divide

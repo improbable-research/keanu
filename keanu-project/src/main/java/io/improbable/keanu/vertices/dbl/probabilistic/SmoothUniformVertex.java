@@ -21,7 +21,9 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     private final double edgeSharpness;
 
     /**
-     * One xMin or Xmax or both driving an arbitrarily shaped tensor of Smooth Uniform
+     * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape         the desired shape of the vertex
      * @param xMin          the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar

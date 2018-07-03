@@ -18,7 +18,9 @@ public class LaplaceVertex extends ProbabilisticDouble {
     private final DoubleVertex beta;
 
     /**
-     * One mu or beta or both driving an arbitrarily shaped tensor of Laplace
+     * One mu or beta or both that match a proposed tensor shape of Laplace
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param mu    the mu of the Laplace with either the same shape as specified for this vertex or a scalar
@@ -36,7 +38,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
 
     /**
      * One to one constructor for mapping some shape of mu and sigma to
-     * a matching shaped laplace.
+     * a matching shaped Laplace.
      *
      * @param mu   the mu of the Laplace with either the same shape as specified for this vertex or a scalar
      * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar

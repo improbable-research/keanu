@@ -18,7 +18,9 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     private final DoubleVertex b;
 
     /**
-     * One a or b or both driving an arbitrarily shaped tensor of Inverse Gamma
+     * One a or b or both that match a proposed tensor shape of Inverse Gamma
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param a     the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
@@ -35,7 +37,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
 
     /**
      * One to one constructor for mapping some shape of a and b to
-     * a matching shaped inverse gamma.
+     * a matching shaped Inverse Gamma.
      *
      * @param a the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
      * @param b the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar

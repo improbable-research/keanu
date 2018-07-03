@@ -23,18 +23,6 @@ public class RejectionSampler {
         return getPosteriorProbability(latentVertices, observedVertices, isSuccess, sampleCount, KeanuRandom.getDefaultRandom());
     }
 
-    /**
-     * Rejection sampling is based on the observation that to sample a random variable one can perform a uniformly
-     * random sampling of the 2D cartesian graph, and keep the samples in the region under the graph of its density
-     * function.
-     *
-     * @param latentVertices
-     * @param observedVertices
-     * @param isSuccess
-     * @param sampleCount
-     * @param random
-     * @return
-     */
     public static double getPosteriorProbability(List<? extends Vertex> latentVertices,
                                                  List<? extends Vertex> observedVertices,
                                                  Supplier<Boolean> isSuccess,
@@ -60,6 +48,17 @@ public class RejectionSampler {
         }
     }
 
+    /**
+     * Samples from the posterior of a Bayesian Network using Rejection Sampling / Accept-Reject.
+     * Rejection Sampling samples from a uniform space and retains the samples in the region
+     * under the graph of the network's distribution function.
+     *
+     *
+     * @param bayesNet the bayesian network to sample from
+     * @param fromVertices the vertices to sample from
+     * @param sampleCount the number of samples to take
+     * @return Samples taken with Rejection sampling.
+     */
     public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount) {

@@ -18,9 +18,13 @@ public class UniformVertex extends ProbabilisticDouble {
     private final DoubleVertex xMax;
 
     /**
+     * One xMin or xMax or both that match a proposed tensor shape of Uniform Vertex
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
      * @param shape the desired shape of the vertex
-     * @param xMin  the xMin of the Uniform with either the same shape as specified for this vertex or a scalar
-     * @param xMax  the xMax of the Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMin  the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax  the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax) {
 
@@ -32,6 +36,13 @@ public class UniformVertex extends ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
+    /**
+     * One to one constructor for mapping some shape of mu and sigma to
+     * a matching shaped Uniform Vertex
+     *
+     * @param xMin  the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMax  the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
+     */
     public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }
