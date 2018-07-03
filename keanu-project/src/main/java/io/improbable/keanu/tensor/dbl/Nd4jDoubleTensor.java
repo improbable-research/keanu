@@ -33,7 +33,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor create(double[] values, int[] shape) {
-        return new Nd4jDoubleTensor(shape, values);
+        return new Nd4jDoubleTensor(values, shape);
     }
 
     public static Nd4jDoubleTensor create(double value, int[] shape) {
@@ -126,7 +126,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         for (int i = 0; i < data.length(); i++) {
             data.put(i, function.apply(data.getDouble(i)));
         }
-        return new Nd4jDoubleTensor(this.getShape(), data.asDouble());
+        return new Nd4jDoubleTensor(data.asDouble(), this.getShape());
     }
 
     @Override

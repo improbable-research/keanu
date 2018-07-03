@@ -52,7 +52,7 @@ public class MultivariateGaussianTest {
     @Test
     public void bivariateGaussianMatchesLogDensityOfVector() {
         DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{2, 3}));
+            new Nd4jDoubleTensor(new double[]{2, 3}, new int[]{2, 1}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
 
@@ -60,7 +60,7 @@ public class MultivariateGaussianTest {
         double expectedDensity2 = Gaussian.logPdf(3.0, 1, 10);
         double expectedDensity = expectedDensity1 + expectedDensity2;
 
-        double density = mvg.logPdf(new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{8, 10}));
+        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{8, 10}, new int[]{2, 1}));
 
         assertEquals(expectedDensity, density, 0.0001);
     }
@@ -68,12 +68,12 @@ public class MultivariateGaussianTest {
     @Test
     public void bivariateGaussianMatchesLogDensityOfScipy() {
         DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{1, 2}));
+            new Nd4jDoubleTensor(new double[]{1, 2}, new int[]{2, 1}));
         DoubleVertex covarianceMatrix = ConstantVertex.of(
-            new Nd4jDoubleTensor(new int[]{2, 2}, new double[]{1, 0.3, 0.3, 0.6}));
+            new Nd4jDoubleTensor(new double[]{1, 0.3, 0.3, 0.6}, new int[]{2, 2}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
-        double density = mvg.logPdf(new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{0.5, 0.4}));
+        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.5, 0.4}, new int[]{2, 1}));
         double expected = -3.6874792995813834;
 
         assertEquals(expected, density, 0.001);
@@ -82,20 +82,21 @@ public class MultivariateGaussianTest {
     @Test
     public void multivariateGaussianMatchesLogDensityOfScipy() {
         DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new int[]{3, 1}, new double[]{1, 2, 3}));
+            new Nd4jDoubleTensor(new double[]{1, 2, 3}, new int[]{3, 1}));
 
         DoubleVertex covarianceMatrix = ConstantVertex.of(
             new Nd4jDoubleTensor(
-                new int[]{3, 3}, new double[]{
+                new double[]{
                 1.0, 0.3, 0.3,
                 0.3, 0.8, 0.3,
                 0.3, 0.3, 0.6
-            }
+                },
+                new int[]{3, 3}
             )
         );
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
-        double density = mvg.logPdf(new Nd4jDoubleTensor(new int[]{3, 1}, new double[]{0.2, 0.3, 0.4}));
+        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.2, 0.3, 0.4}, new int[]{3, 1}));
         double expected = -8.155504532016181;
 
         assertEquals(expected, density, 0.001);
@@ -104,7 +105,7 @@ public class MultivariateGaussianTest {
     @Test
     public void gaussianSampleMethodMatchesLogProbMethod() {
         DoubleVertex mu = ConstantVertex.of(
-            new Nd4jDoubleTensor(new int[]{2, 1}, new double[]{0, 0}));
+            new Nd4jDoubleTensor(new double[]{0, 0}, new int[]{2, 1}));
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
 
@@ -163,7 +164,7 @@ public class MultivariateGaussianTest {
         for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
             double percentage = (double) entry.getValue() / sampleCount;
             double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
-            Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(new int[]{2, 1}, bucketCenter);
+            Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, new int[]{2, 1});
             double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketSize;
             double actual = (percentage / bucketSize);
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
