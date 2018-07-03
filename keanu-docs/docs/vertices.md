@@ -1,11 +1,11 @@
 ## Vertices
 
-There are several families of vertices. Each family shares alpha common value type.
+There are several families of vertices. Each family shares a common value type.
 
 ### Probabilistic
 
 Probabilistic vertices are vertices that do not depend completely on their parent vertices. An example
-of this is alpha vertex that acts as alpha probability distribution like the GaussianVertex.
+of this is a vertex that acts as a probability distribution like the GaussianVertex.
 
 Changing the value of their parent vertices may change the density (from pdf) at their value but it 
 will not change the value of the vertex.
@@ -13,12 +13,12 @@ will not change the value of the vertex.
 ### Non-Probabilistic
 
 The value of these vertices are completely dependent on their parent vertices values. For example,
-given A * B = C, C is alpha non-probabilistic vertex. A or B might be probabilistic vertices, which would
-make C not alpha constant value but still completely dependent on A and B.
+given A * B = C, C is a non-probabilistic vertex. A or B might be probabilistic vertices, which would
+make C not a constant value but still completely dependent on A and B.
 
 ### The Double Family
 
-A DoubleVertex can be used by most arithmetic operators. They can be used to describe alpha problem
+A DoubleVertex can be used by most arithmetic operators. They can be used to describe a problem
 that can be solved using gradient ascent optimization.
 
 * Probabilistic
@@ -60,7 +60,7 @@ A BoolVertex can be used by most boolean operators. These can be observed direct
 
 ### The Generic family
 
-These are the vertices that can have any type as alpha value. This type can be an Enum or alpha user defined object.
+These are the vertices that can have any type as a value. This type can be an Enum or a user defined object.
 An example of this is the SelectVertex<T> where T is any type.
 
 ```java
@@ -80,7 +80,7 @@ An example of this is the SelectVertex<T> where T is any type.
     }
 ```
 
-The getSelectorForMyType() method would return alpha probabilistic vertex that would contain an 
+The getSelectorForMyType() method would return a probabilistic vertex that would contain an 
 object of type MyType A, B, C or D, 25% of the time respectively.
 
 * Probabilistic

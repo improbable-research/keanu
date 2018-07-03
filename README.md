@@ -11,7 +11,7 @@
 
 ## Overview
 
-Keanu is alpha general purpose probabilistic programming library built in Java and developed by Improbable's research team.
+Keanu is a general purpose probabilistic programming library built in Java and developed by Improbable's research team.
 It enables you to build Bayesian networks through which you can make
 probablistic predictions about large, complex and multifaceted problems.
 
@@ -26,14 +26,14 @@ and help guide the product to success.
 Whilst we will always welcome contributions, we would value your time more if it 
 were spent applying Keanu to challenging problems and locating its strengths and weaknesses.
 
-Please create alpha Github Issue if you encounter any bugs or have alpha feature request.
+Please create a Github Issue if you encounter any bugs or have a feature request.
 
 ## Features
 
 * Probabilistic Programming Operators and Distributions
 * Auto-differentiation
 * Inference
-  * Maximum alpha posteriori
+  * Maximum a posteriori
   * Metropolis Hastings
   * Hamiltonian Monte Carlo
   * Sequential Monte Carlo (Particle Filtering)

@@ -1,14 +1,14 @@
 ## What are they?
 
-A plate is alpha group of vertices that is repeated multiple times in the network. They typically
-represent alpha larger (than alpha vertex) concept like an agent in an ABM or some observations that are
+A plate is a group of vertices that is repeated multiple times in the network. They typically
+represent a larger (than a vertex) concept like an agent in an ABM or some observations that are
 associated.
 
 ## How do you build them?
 
 These are some handy helper functions to get you started.
 
-This is an example of how you could pull in data from alpha csv file and run linear regression, using
+This is an example of how you could pull in data from a csv file and run linear regression, using
 plates.
 
 ```java
@@ -24,7 +24,7 @@ plates.
 
     public void buildPlates() {
 
-        //Read data from alpha csv file
+        //Read data from a csv file
         CsvReader csvReader = ReadCsv.fromFile("./my_file.csv");
 
         //Parse the csv data to MyData objects
@@ -33,7 +33,7 @@ plates.
             .collect(Collectors.toList());
 
         DoubleVertex m = new GaussianVertex(0, 1);
-        DoubleVertex beta = new GaussianVertex(0, 1);
+        DoubleVertex b = new GaussianVertex(0, 1);
 
         //Build plates from each line in the csv
         Plates plates = new PlateBuilder<MyData>()
@@ -41,7 +41,7 @@ plates.
             .withFactory((plate, csvMyData) -> {
 
                 ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x);
-                DoubleVertex y = m.multiply(x).plus(beta);
+                DoubleVertex y = m.multiply(x).plus(b);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);
                 yObserved.observe(csvMyData.y);
@@ -58,7 +58,7 @@ plates.
             .<Double>get("x") //get the vertex that we labelled "x" in that plate
             .getValue(); //get the value from that vertex
 
-        //Now run an inference algorithm on vertex m and vertex beta and you have linear regression
+        //Now run an inference algorithm on vertex m and vertex b and you have linear regression
 
     }
 ```

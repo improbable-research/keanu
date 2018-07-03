@@ -41,15 +41,15 @@ public class WetGrass {
 ### Install
 
 It's recommended that you start with the starter project found [here](../keanu-examples/starter).
-The starter project is alpha very simple Keanu project built with gradle. 
+The starter project is a very simple Keanu project built with gradle. 
 
-To quickly create alpha new project from the starter project:
+To quickly create a new project from the starter project:
 ```
 git clone --branch develop --depth 1 https://github.com/improbable-research/keanu.git
 cp -R ./keanu/keanu-examples/starter <NEW_PROJECT_LOCATION>
 ```
 
-If you would like to start using Keanu in an existing project, simply add Keanu as alpha dependency 
+If you would like to start using Keanu in an existing project, simply add Keanu as a dependency 
 in your gradle or maven build file.
 
 #### Gradle

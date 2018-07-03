@@ -157,13 +157,13 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void betaSampleMethodMatchesLogProbMethodForAlphaLessthanBeta() {
+    public void betaSampleMethodMatchesLogProbMethodForAlphaLessThanBeta() {
 
-        int sampleCount = 1000000;
+        int sampleCount = 1100000;
         BetaVertex vertex = new BetaVertex(
             new int[]{sampleCount, 1},
-            5.0,
-            2.0
+            2.0,
+            5.0
         );
 
         double from = 0.3;
