@@ -142,21 +142,8 @@ public abstract class Vertex<T> {
      * @param value The new value at this vertex
      */
     public void setAndCascade(T value) {
-        setAndCascade(value, exploreSetting());
-    }
-
-    /**
-     * @param value    the new value at this vertex
-     * @param explored the results of previously exploring the graph, which
-     *                 allows the efficient propagation of this new value.
-     */
-    public void setAndCascade(T value, Map<Long, Long> explored) {
         setValue(value);
-        VertexValuePropagation.cascadeUpdate(this, explored);
-    }
-
-    public Map<Long, Long> exploreSetting() {
-        return VertexValuePropagation.exploreSetting(this);
+        VertexValuePropagation.cascadeUpdate(this);
     }
 
     /**

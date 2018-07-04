@@ -6,14 +6,12 @@ import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
-import java.util.Map;
 import java.util.function.BiConsumer;
 
 public class FitnessFunction {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
-    private final Map<Long, Long> exploreSettingAll;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
     public FitnessFunction(List<Vertex> probabilisticVertices,
@@ -21,7 +19,6 @@ public class FitnessFunction {
                            BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
-        this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
@@ -32,7 +29,7 @@ public class FitnessFunction {
 
     public MultivariateFunction fitness() {
         return point -> {
-            setAndCascadePoint(point, latentVertices, exploreSettingAll);
+            setAndCascadePoint(point, latentVertices);
             double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
 
             if (onFitnessCalculation != null) {
@@ -43,7 +40,7 @@ public class FitnessFunction {
         };
     }
 
-    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices, Map<Long, Long> exploreSettingAll) {
+    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         int position = 0;
         for (Vertex<DoubleTensor> vertex : latentVertices) {
@@ -59,7 +56,7 @@ public class FitnessFunction {
             position += dimensions;
         }
 
-        VertexValuePropagation.cascadeUpdate(latentVertices, exploreSettingAll);
+        VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
     static long numDimensions(Vertex<DoubleTensor> vertex) {
