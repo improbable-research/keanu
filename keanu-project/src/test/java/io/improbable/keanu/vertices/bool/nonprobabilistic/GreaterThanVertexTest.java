@@ -26,12 +26,12 @@ public class GreaterThanVertexTest {
 
     private void isGreaterThan(int a, int b, boolean expected) {
         GreaterThanVertex<IntegerTensor, IntegerTensor> vertex = new GreaterThanVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isGreaterThan(double a, double b, boolean expected) {
         GreaterThanVertex<DoubleTensor, DoubleTensor> vertex = new GreaterThanVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 
 }

@@ -22,10 +22,7 @@ public class VertexValuePropagation {
     }
 
     public static Map<Long, Long> exploreSetting(Collection<? extends Vertex> toBeSet) {
-        Deque<Vertex> stack = new ArrayDeque<>();
-        for (Vertex<?> v : toBeSet) {
-            stack.push(v);
-        }
+        Deque<Vertex> stack = asDeque(toBeSet);
         return exploreSetting(stack);
     }
 
@@ -86,10 +83,7 @@ public class VertexValuePropagation {
     }
 
     public static void cascadeUpdate(List<? extends Vertex> vertices, Map<Long, Long> explored) {
-        Deque<Vertex> stack = new ArrayDeque<>();
-        for (Vertex<?> v : vertices) {
-            stack.push(v);
-        }
+        Deque<Vertex> stack = asDeque(vertices);
         cascadeUpdate(stack, explored);
     }
 
@@ -124,5 +118,92 @@ public class VertexValuePropagation {
             }
 
         }
+    }
+
+    public static void eval(Vertex... vertices) {
+        eval(Arrays.asList(vertices));
+    }
+
+    public static void eval(Collection<? extends Vertex> vertices) {
+        Deque<Vertex> stack = asDeque(vertices);
+
+        Set<Vertex<?>> hasCalculated = new HashSet<>();
+
+        while (!stack.isEmpty()) {
+
+            Vertex<?> head = stack.peek();
+            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
+
+            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+
+                Vertex<?> top = stack.pop();
+                top.updateValue();
+                hasCalculated.add(top);
+
+            } else {
+
+                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                    stack.push(vertex);
+                }
+
+            }
+
+        }
+    }
+
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!calculated.contains(next)) {
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
+    }
+
+    public static void lazyEval(Vertex... vertices) {
+        lazyEval(Arrays.asList(vertices));
+    }
+
+    public static void lazyEval(Collection<? extends Vertex> vertices) {
+        Deque<Vertex> stack = asDeque(vertices);
+
+        while (!stack.isEmpty()) {
+
+            Vertex<?> head = stack.peek();
+            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
+
+            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+
+                Vertex<?> top = stack.pop();
+                top.updateValue();
+
+            } else {
+
+                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                    stack.push(vertex);
+                }
+
+            }
+
+        }
+    }
+
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
+        for (Vertex<?> next : parents) {
+            if (!next.hasValue()) {
+                notCalculatedParents.add(next);
+            }
+        }
+        return notCalculatedParents;
+    }
+
+    private static Deque<Vertex> asDeque(Iterable<? extends Vertex> vertices) {
+        Deque<Vertex> stack = new ArrayDeque<>();
+        for (Vertex<?> v : vertices) {
+            stack.push(v);
+        }
+        return stack;
     }
 }

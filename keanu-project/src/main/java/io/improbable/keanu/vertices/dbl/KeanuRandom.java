@@ -11,7 +11,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
@@ -63,6 +62,10 @@ public class KeanuRandom {
         return nd4jRandom.nextDouble();
     }
 
+    public double nextDouble(double min, double max) {
+        return nd4jRandom.nextDouble() * (max - min) + min;
+    }
+
     public DoubleTensor nextGaussian(int[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(nextGaussian());
@@ -72,36 +75,19 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-
-        Tensor.FlattenedView<Double> aWrapped = a.getFlattenedView();
-        Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
-        Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
-
-        int length = ArrayUtil.prod(shape);
-        double[] samples = new double[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = Gamma.sample(aWrapped.getOrScalar(i), thetaWrapped.getOrScalar(i), kWrapped.getOrScalar(i), this);
-        }
-
-        return DoubleTensor.create(samples, shape);
+        return Gamma.sample(shape, a, theta, k, this);
     }
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
-
-        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
-        Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
-
-        int length = ArrayUtil.prod(shape);
-        double[] samples = new double[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = Laplace.sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), this);
-        }
-
-        return DoubleTensor.create(samples, shape);
+        return Laplace.sample(shape, mu, beta, this);
     }
 
     public double nextGaussian() {
         return nd4jRandom.nextGaussian();
+    }
+
+    public double nextGaussian(double mu, double sigma) {
+        return nd4jRandom.nextGaussian() * sigma + mu;
     }
 
     public boolean nextBoolean() {
@@ -113,15 +99,7 @@ public class KeanuRandom {
     }
 
     public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
-        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
-
-        int length = ArrayUtil.prod(shape);
-        int[] samples = new int[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = Poisson.sample(muWrapped.getOrScalar(i), this);
-        }
-
-        return IntegerTensor.create(samples, shape);
+        return Poisson.sample(shape, mu, this);
 
     }
 

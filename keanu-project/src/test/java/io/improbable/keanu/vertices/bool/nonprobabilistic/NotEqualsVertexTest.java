@@ -34,6 +34,6 @@ public class NotEqualsVertexTest {
             ConstantVertex.of(a),
             ConstantVertex.of(b)
         );
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 }

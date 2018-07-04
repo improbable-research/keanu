@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorLaplace;
+import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,18 +22,18 @@ public class LaplaceVertex extends ProbabilisticDouble {
      *
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param shape the desired shape of the vertex
-     * @param mu    the mu of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param beta  the beta of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param tensorShape the desired shape of the tensor within the vertex
+     * @param mu          the mu of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
-    public LaplaceVertex(int[] shape, DoubleVertex mu, DoubleVertex beta) {
+    public LaplaceVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape(), beta.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());
 
         this.mu = mu;
         this.beta = beta;
         setParents(mu, beta);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
@@ -65,14 +65,14 @@ public class LaplaceVertex extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor betaValues = beta.getValue();
 
-        DoubleTensor logPdfs = TensorLaplace.logPdf(muValues, betaValues, value);
+        DoubleTensor logPdfs = Laplace.logPdf(muValues, betaValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorLaplace.Diff dlnP = TensorLaplace.dlnPdf(mu.getValue(), beta.getValue(), value);
+        Laplace.Diff dlnP = Laplace.dlnPdf(mu.getValue(), beta.getValue(), value);
         return convertDualNumbersToDiff(dlnP.dPdmu, dlnP.dPdbeta, dlnP.dPdx);
     }
 
@@ -93,7 +93,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorLaplace.sample(getShape(), mu.getValue(), beta.getValue(), random);
+        return Laplace.sample(getShape(), mu.getValue(), beta.getValue(), random);
     }
 
 }

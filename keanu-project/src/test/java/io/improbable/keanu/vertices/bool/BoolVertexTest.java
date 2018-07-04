@@ -40,7 +40,7 @@ public class BoolVertexTest {
         v1.setValue(true);
         v2.setValue(false);
 
-        assertTrue(v3.lazyEval().scalar());
+        assertTrue(v3.eval().scalar());
     }
 
     @Test
@@ -50,7 +50,7 @@ public class BoolVertexTest {
         v1.setValue(true);
         v2.setValue(false);
 
-        assertTrue(!v3.lazyEval().scalar());
+        assertTrue(!v3.eval().scalar());
     }
 
     @Test

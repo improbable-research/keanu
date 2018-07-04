@@ -1,70 +1,67 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-/**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.14 page 27
- */
 public class Logistic {
 
-    private Logistic() {
-    }
-
     /**
-     * @param a      location parameter (any real number)
-     * @param b      scale parameter (b grater than 0)
+     * @param shape  shape of tensor returned
+     * @param mu     location parameter (any real number)
+     * @param s      scale parameter (b greater than 0)
      * @param random source or randomness
      * @return a sample from the distribution
      */
-    public static double sample(double a, double b, KeanuRandom random) {
-        if (b <= 0.0) {
-            throw new IllegalArgumentException("Invalid value for beta: " + b);
-        }
-        return a - b * Math.log(1. / random.nextDouble() - 1.);
+    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor s, KeanuRandom random) {
+        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(mu.minus(s));
     }
 
     /**
-     * @param a location parameter (any real number)
-     * @param b scale parameter (b greater than 0)
-     * @param x at value
+     * @param mu location parameter (any real number)
+     * @param s  scale parameter (b greater than 0)
+     * @param x  at value
      * @return the density at x
      */
-    public static double pdf(double a, double b, double x) {
-        double exponential = Math.exp((x - a) / b);
-        double denominator = (b * (Math.pow(1 + exponential, 2)));
-        return exponential / denominator;
+    public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+        final DoubleTensor xMinusAOverB = x.minus(mu).divInPlace(s);
+        final DoubleTensor ln1OverB = s.reciprocal().logInPlace();
+
+        return xMinusAOverB.plus(ln1OverB).minusInPlace(
+            xMinusAOverB.expInPlace().plusInPlace(1).logInPlace().timesInPlace(2)
+        );
     }
 
-    public static double logPdf(double a, double b, double x) {
-        double xMinusAOverB = (x - a) / b;
-        return Math.log(1 / b) + xMinusAOverB - (2 * Math.log(1 + Math.exp(xMinusAOverB)));
-    }
+    public static Diff dlnPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+        final DoubleTensor expAOverB = mu.div(s).expInPlace();
+        final DoubleTensor expXOverB = x.div(s).expInPlace();
+        final DoubleTensor expPlus = expAOverB.plus(expXOverB);
+        final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
+        final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
 
-    public static Diff dlnPdf(double a, double b, double x) {
-        double expAOverB = Math.exp(a / b);
-        double expXOverB = Math.exp(x / b);
+        final DoubleTensor dPda = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
+        final DoubleTensor dPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
-        double dPda = (expXOverB - expAOverB) / (b * (expAOverB + expXOverB));
-        double dPdx = (expAOverB - expXOverB) / ((b * expAOverB) + (b * expXOverB));
-        double dPdb = -(((a * expXOverB) + (x * expAOverB) + (a * -expAOverB) + (b * expAOverB) + (b * expXOverB) - (x * expXOverB)) /
-            (b * b * (expAOverB + expXOverB)));
+        final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
+            mu.times(expAOverB.unaryMinus())
+        );
+        final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
+        final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
+
+        final DoubleTensor dPdb = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+
         return new Diff(dPda, dPdb, dPdx);
     }
 
     public static class Diff {
-        public final double dPda;
-        public final double dPdb;
-        public final double dPdx;
+        public final DoubleTensor dPdmu;
+        public final DoubleTensor dPds;
+        public final DoubleTensor dPdx;
 
-        public Diff(double dPda, double dPdb, double dPdx) {
-            this.dPda = dPda;
-            this.dPdb = dPdb;
+        public Diff(DoubleTensor dPdmu, DoubleTensor dPds, DoubleTensor dPdx) {
+            this.dPdmu = dPdmu;
+            this.dPds = dPds;
             this.dPdx = dPdx;
         }
     }
-
 
 }

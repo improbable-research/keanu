@@ -6,11 +6,15 @@ import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.linear.Array2DRowRealMatrix;
+import org.apache.commons.math3.linear.LUDecomposition;
+import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
+import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
 import java.util.Arrays;
@@ -131,6 +135,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor inverse() {
+        return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
+    }
+
+    @Override
     public double max() {
         return tensor.maxNumber().doubleValue();
     }
@@ -158,17 +167,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor standardize() {
-        return duplicate().standardizeInPlace();
-    }
-
-    @Override
-    public DoubleTensor standardizeInPlace() {
-        tensor.subi(average()).divi(standardDeviation());
-        return this;
-    }
-
-    @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
         return duplicate().clampInPlace(min, max);
     }
@@ -184,8 +182,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor standardize() {
+        return duplicate().standardizeInPlace();
+    }
+
+    @Override
     public DoubleTensor sigmoid() {
         return duplicate().sigmoidInPlace();
+    }
+
+    @Override
+    public DoubleTensor choleskyDecomposition() {
+        INDArray dup = tensor.dup();
+        Nd4j.getBlasWrapper().lapack().potrf(dup, false);
+        return new Nd4jDoubleTensor(dup);
     }
 
     @Override
@@ -680,6 +690,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor standardizeInPlace() {
+        tensor.subi(average()).divi(standardDeviation());
+        return this;
+    }
+
+    @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
         return minInPlace(min).maxInPlace(max);
     }
@@ -700,6 +716,14 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor sigmoidInPlace() {
         Transforms.sigmoid(tensor, false);
         return this;
+    }
+
+    @Override
+    public double determinant() {
+        INDArray dup = tensor.dup();
+        double[][] asMatrix = dup.toDoubleMatrix();
+        RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
+        return new LUDecomposition(matrix).getDeterminant();
     }
 
     // Comparisons

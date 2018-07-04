@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Beta;
+import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.ConstantVertex;
+import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,14 +33,16 @@ public class BetaVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
         BetaVertex tensorBetaVertex = new BetaVertex(2., 3.);
-        double expectedDensity = Beta.logPdf(2.0, 3.0, 0.5);
+        BetaDistribution betaDistribution = new BetaDistribution(2.0, 3.0);
+        double expectedDensity = betaDistribution.logDensity(0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorBetaVertex, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        double expectedLogDensity = Beta.logPdf(2.0, 3.0, 0.25) + Beta.logPdf(2.0, 3.0, 0.1);
+        BetaDistribution betaDistribution = new BetaDistribution(2, 3);
+        double expectedLogDensity = betaDistribution.logDensity(0.25) + betaDistribution.logDensity(0.1);
         BetaVertex ndBetaVertex = new BetaVertex(2, 3);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndBetaVertex, new double[]{0.25, 0.1}, expectedLogDensity);
     }
@@ -154,13 +157,13 @@ public class BetaVertexTest {
     }
 
     @Test
-    public void betaSampleMethodMatchesLogProbMethodForAlphaLessthanBeta() {
+    public void betaSampleMethodMatchesLogProbMethodForAlphaLessThanBeta() {
 
-        int sampleCount = 1000000;
+        int sampleCount = 1100000;
         BetaVertex vertex = new BetaVertex(
             new int[]{sampleCount, 1},
-            5.0,
-            2.0
+            2.0,
+            5.0
         );
 
         double from = 0.3;

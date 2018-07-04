@@ -15,6 +15,6 @@ public class IntegerSumVertexTest {
         in.setValue(new int[]{1, 2, 3, 4, 5});
         IntegerVertex summed = in.sum();
 
-        assertEquals(1 + 2 + 3 + 4 + 5, summed.lazyEval().scalar().intValue());
+        assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar().intValue());
     }
 }

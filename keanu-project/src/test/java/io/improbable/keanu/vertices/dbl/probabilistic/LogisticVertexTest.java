@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Logistic;
+import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.ConstantVertex;
+import org.apache.commons.math3.distribution.LogisticDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,15 +32,16 @@ public class LogisticVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
         LogisticVertex tensorLogisticVertex = new LogisticVertex(0.5, 1.5);
-        double expectedDensity = Logistic.logPdf(0.5, 1.5, 2.0);
+        LogisticDistribution distribution = new LogisticDistribution(0.5, 1.5);
+        double expectedDensity = distribution.logDensity(2.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorLogisticVertex, 2.0, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
-
-        double expectedLogDensity = Logistic.logPdf(0.0, 1.0, 0.25) + Logistic.logPdf(0.0, 1.0, .75);
+        LogisticDistribution distribution = new LogisticDistribution(0.0, 1.0);
+        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
         LogisticVertex ndLogisticVertex = new LogisticVertex(0.0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLogisticVertex, new double[]{0.25, .75}, expectedLogDensity);
     }

@@ -145,6 +145,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor max(DoubleTensor max);
 
+    DoubleTensor inverse();
+
     double max();
 
     DoubleTensor min(DoubleTensor min);
@@ -157,8 +159,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor standardize();
 
-    DoubleTensor standardizeInPlace();
-
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
     DoubleTensor ceil();
@@ -166,6 +166,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor floor();
 
     DoubleTensor sigmoid();
+
+    DoubleTensor choleskyDecomposition();
+
+    double determinant();
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
@@ -230,6 +234,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor floorInPlace();
 
     DoubleTensor sigmoidInPlace();
+
+    DoubleTensor standardizeInPlace();
 
     // Comparisons
     BooleanTensor lessThan(double value);

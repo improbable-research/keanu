@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Gamma;
+import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.ConstantVertex;
+import org.apache.commons.math3.distribution.GammaDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,25 +32,25 @@ public class GammaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        GammaVertex gamma = new GammaVertex(0.5, 1, 1.5);
-        GammaVertex tensorGamma = new GammaVertex(0.5, 1, 1.5);
 
-        double expectedDensity = gamma.logPdf(0.5);
+        GammaDistribution distribution = new GammaDistribution(1.0, 1.5);
+        GammaVertex tensorGamma = new GammaVertex(0.0, 1.5, 1.0);
+        double expectedDensity = distribution.logDensity(0.5);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGamma, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
-        double expectedLogDensity = Gamma.logPdf(0.0, 1.0, 5., 1) + Gamma.logPdf(0.0, 1.0, 5., 3);
+
+        GammaDistribution distribution = new GammaDistribution(5.0, 1.0);
+        double expectedLogDensity = distribution.logDensity(1) + distribution.logDensity(3);
         GammaVertex tensorGamma = new GammaVertex(0.0, 1., 5.);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGamma, new double[]{1., 3.}, expectedLogDensity);
     }
 
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
-        KeanuRandom keanuRandom = new KeanuRandom(1);
-
         Gamma.Diff gammaLogDiff = Gamma.dlnPdf(0.75, 2, 5.5, 1.5);
 
         UniformVertex aTensor = new UniformVertex(0.5, 1.0);
@@ -77,8 +78,6 @@ public class GammaVertexTest {
 
         double[] vector = new double[]{1.5, 2, 2.5, 3, 3.5};
 
-        KeanuRandom keanuRandom = new KeanuRandom(1);
-
         UniformVertex aTensor = new UniformVertex(0.5, 1.0);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
@@ -97,11 +96,7 @@ public class GammaVertexTest {
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex a = new UniformVertex(1.0, 2.0);
         a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        GammaVertex vertexUnderTest = new GammaVertex(
-            a,
-            ConstantVertex.of(1.5),
-            ConstantVertex.of(5.0)
-        );
+        GammaVertex vertexUnderTest = new GammaVertex(a, 1.5, 5.0);
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
