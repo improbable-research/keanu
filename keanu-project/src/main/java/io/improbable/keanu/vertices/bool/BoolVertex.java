@@ -53,14 +53,6 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
         super.setAndCascade(BooleanTensor.create(values, getShape()));
     }
 
-    public void setAndCascade(boolean value, Map<Long, Long> explored) {
-        super.setAndCascade(BooleanTensor.create(value, getShape()), explored);
-    }
-
-    public void setAndCascade(boolean[] values, Map<Long, Long> explored) {
-        super.setAndCascade(BooleanTensor.create(values, getShape()), explored);
-    }
-
     public void observe(boolean value) {
         super.observe(BooleanTensor.create(value, getShape()));
     }

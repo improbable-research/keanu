@@ -1,6 +1,5 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -20,7 +19,6 @@ public class FitnessFunctionWithGradient {
 
     private final List<Vertex> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
-    private final Map<Long, Long> exploreSettingAll;
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
@@ -30,7 +28,6 @@ public class FitnessFunctionWithGradient {
                                        BiConsumer<double[], Double> onFitnessCalculation) {
         this.probabilisticVertices = probabilisticVertices;
         this.latentVertices = latentVertices;
-        this.exploreSettingAll = VertexValuePropagation.exploreSetting(latentVertices);
         this.onGradientCalculation = onGradientCalculation;
         this.onFitnessCalculation = onFitnessCalculation;
     }
@@ -43,7 +40,7 @@ public class FitnessFunctionWithGradient {
     public MultivariateVectorFunction gradient() {
         return point -> {
 
-            FitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
+            FitnessFunction.setAndCascadePoint(point, latentVertices);
 
             Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
@@ -59,7 +56,7 @@ public class FitnessFunctionWithGradient {
 
     public MultivariateFunction fitness() {
         return point -> {
-            FitnessFunction.setAndCascadePoint(point, latentVertices, exploreSettingAll);
+            FitnessFunction.setAndCascadePoint(point, latentVertices);
             double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
 
             if (onFitnessCalculation != null) {

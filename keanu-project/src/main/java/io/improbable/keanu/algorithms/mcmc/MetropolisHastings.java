@@ -40,14 +40,12 @@ public class MetropolisHastings {
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
-        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
-
         double logP = bayesNet.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
             Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = nextSample(chosenVertex, logP, affectedVertices, 1.0, setAndCascadeCache, random);
+            logP = nextSample(chosenVertex, logP, affectedVertices, 1.0, random);
 
             takeSamples(samplesByVertex, fromVertices);
         }
@@ -59,7 +57,6 @@ public class MetropolisHastings {
                                  final double logPOld,
                                  final Set<Vertex> affectedVertices,
                                  final double T,
-                                 final Map<Long, Map<Long, Long>> setAndCascadeCache,
                                  final KeanuRandom random) {
 
         final double affectedVerticesLogPOld = sumLogP(affectedVertices);
@@ -67,8 +64,7 @@ public class MetropolisHastings {
         final T oldValue = chosenVertex.getValue();
         final T proposedValue = chosenVertex.sample(random);
 
-        Map<Long, Long> cascadeCache = setAndCascadeCache.computeIfAbsent(chosenVertex.getId(), id -> chosenVertex.exploreSetting());
-        chosenVertex.setAndCascade(proposedValue, cascadeCache);
+        chosenVertex.setAndCascade(proposedValue);
 
         final double affectedVerticesLogPNew = sumLogP(affectedVertices);
 
@@ -90,7 +86,7 @@ public class MetropolisHastings {
         }
 
         //reject change
-        chosenVertex.setAndCascade(oldValue, cascadeCache);
+        chosenVertex.setAndCascade(oldValue);
         return logPOld;
     }
 

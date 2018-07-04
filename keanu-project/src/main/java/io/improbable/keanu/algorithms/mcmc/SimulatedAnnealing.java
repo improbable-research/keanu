@@ -62,8 +62,6 @@ public class SimulatedAnnealing {
 
         Map<Vertex, Set<Vertex>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 
-        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
-
         double logP = bayesNet.getLogOfMasterP();
         double maxLogP = logP;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
@@ -74,7 +72,7 @@ public class SimulatedAnnealing {
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
             Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, temperature, setAndCascadeCache, random);
+            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, temperature, random);
 
             if (logP > maxLogP) {
                 maxLogP = logP;

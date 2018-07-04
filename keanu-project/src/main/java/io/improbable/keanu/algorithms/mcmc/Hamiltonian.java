@@ -45,7 +45,6 @@ public class Hamiltonian {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
         final Map<Long, List<?>> samples = new HashMap<>();
@@ -80,7 +79,6 @@ public class Hamiltonian {
             for (int leapFrogNum = 0; leapFrogNum < leapFrogCount; leapFrogNum++) {
                 gradient = leapfrog(
                     latentVertices,
-                    latentSetAndCascadeCache,
                     position,
                     gradient,
                     momentum,
@@ -147,7 +145,6 @@ public class Hamiltonian {
      * return `T, r`
      *
      * @param latentVertices
-     * @param latentSetAndCascadeCache
      * @param position
      * @param gradient                 gradient at current position
      * @param momentums                current vertex momentums
@@ -156,7 +153,6 @@ public class Hamiltonian {
      * @return the gradient at the updated position
      */
     private static Map<Long, DoubleTensor> leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                                    final Map<Long, Long> latentSetAndCascadeCache,
                                                     final Map<Long, DoubleTensor> position,
                                                     final Map<Long, DoubleTensor> gradient,
                                                     final Map<Long, DoubleTensor> momentums,
@@ -180,7 +176,7 @@ public class Hamiltonian {
             latent.setValue(nextPosition);
         }
 
-        VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
+        VertexValuePropagation.cascadeUpdate(latentVertices);
 
         //Set `r = `r + (eps/2)dTL(`T)
         Map<Long, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
