@@ -39,7 +39,7 @@ public class VertexVariationalMAP {
     private static void doInferenceOn(DoubleVertex unknownVertex, KeanuRandom random) {
         BayesianNetwork inferNet = new BayesianNetwork(unknownVertex.getConnectedGraph());
 
-        inferNet.probeForNonZeroMasterP(100, random);
+        inferNet.probeForNonZeroProbability(100, random);
 
         GradientOptimizer gradientOptimizer = new GradientOptimizer(inferNet);
 
