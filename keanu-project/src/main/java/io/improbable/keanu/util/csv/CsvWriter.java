@@ -33,13 +33,11 @@ public class CsvWriter {
         try {
             return toFile(File.createTempFile(filename, DEFAULT_SUFFIX, directory));
         } catch (IOException e) {
-            e.printStackTrace();
-            return null;
+            throw new IllegalArgumentException("Could not create: " + filename + " at: " + directory + ". " + e);
         }
     }
 
     public File toFile(File file) {
-
         try {
             fileWriter = new FileWriter(file);
             writeHeader();
@@ -51,19 +49,18 @@ public class CsvWriter {
                     if (count != row.size() - 1) {
                         fileWriter.append(delimiter);
                     }
-                    count ++;
+                    count++;
                 }
                 fileWriter.append(NEWLINE);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new IllegalStateException("Failed while writing to: " + file + ". " + e);
         } finally {
             try {
                 fileWriter.flush();
                 fileWriter.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                throw new IllegalStateException("Failed while closing File Writer. " + e);
             }
         }
         return file;
@@ -71,9 +68,33 @@ public class CsvWriter {
 
     private void writeHeader() throws IOException {
         if (writeHeader) {
-            fileWriter.append(header.toString());
+            String trimmedHeader = header.toString().substring(1, header.toString().length() - 1);
+            fileWriter.append(trimmedHeader);
             fileWriter.append(NEWLINE);
         }
     }
+
+    public CsvWriter withCustomHeader(List<String> header) {
+        this.header = header;
+        writeHeader = true;
+        return this;
+    }
+
+    public CsvWriter withDefaultHeader() {
+        writeHeader = true;
+        return this;
+    }
+
+    public CsvWriter disableHeader() {
+        writeHeader = false;
+        return this;
+    }
+
+    public CsvWriter enableHeader() {
+        writeHeader = true;
+        return this;
+    }
+
+
 
 }
