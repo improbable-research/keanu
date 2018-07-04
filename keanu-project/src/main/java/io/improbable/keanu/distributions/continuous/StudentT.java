@@ -1,10 +1,12 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.apache.commons.math3.special.Gamma;
 
-import static java.lang.Math.*;
-import static org.apache.commons.math3.special.Gamma.gamma;
-import static org.apache.commons.math3.special.Gamma.logGamma;
+import static java.lang.Math.PI;
+import static java.lang.Math.log;
 
 /**
  * Student T Distribution
@@ -20,31 +22,15 @@ public class StudentT {
      * ARL-TR-2168 March 2000
      * 5.1.23 page 36
      *
+     * @param shape  tensor shape of returned samples
      * @param v      Degrees of Freedom
      * @param random random number generator (RNG) seed
      * @return sample of Student T distribution
      */
-    public static double sample(int v, KeanuRandom random) {
-        if (v <= 0) {
-            throw new IllegalArgumentException("Invalid degrees of freedom (v), expect v > 0");
-        }
-        return Gaussian.sample(0., 1., random) / sqrt(ChiSquared.sample(v, random) / v);
+    public static DoubleTensor sample(int[] shape, IntegerTensor v, KeanuRandom random) {
 
-    }
-
-    /**
-     * @param v Degrees of Freedom
-     * @param t random variable
-     * @return the Probability Density Function
-     */
-    public static double pdf(int v, double t) {
-        double halfVPlusOne = (v + 1.) / 2.;
-        double halfV = v / 2.;
-        double numerator = gamma(halfVPlusOne);
-        double denominator = sqrt(v * PI) * gamma(halfV);
-        double multiplier = pow(1. + (pow(t, 2) / v), -halfVPlusOne);
-
-        return (numerator / denominator) * multiplier;
+        DoubleTensor chi2Samples = ChiSquared.sample(shape, v, random);
+        return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }
 
     /**
@@ -52,12 +38,24 @@ public class StudentT {
      * @param t random variable
      * @return Log of the Probability Density Function
      */
-    public static double logPdf(int v, double t) {
+    public static DoubleTensor logPdf(IntegerTensor v, DoubleTensor t) {
 
-        double halfVPlusOne = (v + 1.) / 2.;
-        double halfV = v / 2.;
+        DoubleTensor vAsDouble = v.toDouble();
+        DoubleTensor halfVPlusOne = vAsDouble.plus(1).divInPlace(2);
 
-        return logGamma(halfVPlusOne) - log(v) / 2 - HALF_LOG_PI - logGamma(halfV) - halfVPlusOne * log(1 + t * t / v);
+        DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.apply(Gamma::logGamma);
+        DoubleTensor logGammaHalfV = vAsDouble.div(2).applyInPlace(Gamma::logGamma);
+        DoubleTensor halfLogV = vAsDouble.log().divInPlace(2);
+
+        return logGammaHalfVPlusOne
+            .minusInPlace(halfLogV)
+            .minusInPlace(HALF_LOG_PI)
+            .minusInPlace(logGammaHalfV)
+            .minusInPlace(
+                halfVPlusOne.timesInPlace(
+                    t.pow(2).divInPlace(vAsDouble).plusInPlace(1).logInPlace()
+                )
+            );
     }
 
     /**
@@ -65,8 +63,14 @@ public class StudentT {
      * @param t random variable
      * @return Differential of the Log of the Probability Density Function
      */
-    public static Diff dLogPdf(int v, double t) {
-        double dPdt = (-t * (v + 1.)) / (pow(t, 2.) + v);
+    public static Diff dLogPdf(IntegerTensor v, DoubleTensor t) {
+
+        DoubleTensor vAsDouble = v.toDouble();
+        DoubleTensor dPdt = t.unaryMinus()
+            .timesInPlace(vAsDouble.plus(1.0))
+            .divInPlace(
+                t.pow(2).plusInPlace(vAsDouble)
+            );
 
         return new Diff(dPdt);
     }
@@ -75,9 +79,9 @@ public class StudentT {
      * Differential Equation Class to store result of d/dv and d/dt
      */
     public static class Diff {
-        public double dPdt;
+        public DoubleTensor dPdt;
 
-        public Diff(double dPdt) {
+        public Diff(DoubleTensor dPdt) {
             this.dPdt = dPdt;
         }
     }

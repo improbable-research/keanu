@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorSmoothUniform;
+import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -23,20 +23,20 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     /**
      * One xMin or Xmax or both driving an arbitrarily shaped tensor of Smooth Uniform
      *
-     * @param shape         the desired shape of the vertex
+     * @param tensorShape   the desired shape of the vertex
      * @param xMin          the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    public SmoothUniformVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
         this.edgeSharpness = edgeSharpness;
         setParents(xMin, xMax);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
@@ -80,32 +80,32 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] shape, DoubleVertex xMin, double xMax, double edgeSharpness) {
-        this(shape, xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
+    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax, double edgeSharpness) {
+        this(tensorShape, xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] shape, double xMin, DoubleVertex xMax, double edgeSharpness) {
-        this(shape, new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
+    public SmoothUniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax, double edgeSharpness) {
+        this(tensorShape, new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] shape, double xMin, double xMax, double edgeSharpness) {
-        this(shape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
+    public SmoothUniformVertex(int[] tensorShape, double xMin, double xMax, double edgeSharpness) {
+        this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax) {
-        this(shape, xMin, xMax, DEFAULT_EDGE_SHARPNESS);
+    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
+        this(tensorShape, xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] shape, DoubleVertex xMin, double xMax) {
-        this(shape, xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax) {
+        this(tensorShape, xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] shape, double xMin, DoubleVertex xMax) {
-        this(shape, new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
+    public SmoothUniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax) {
+        this(tensorShape, new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] shape, double xMin, double xMax) {
-        this(shape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+    public SmoothUniformVertex(int[] tensorShape, double xMin, double xMax) {
+        this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor density = TensorSmoothUniform.pdf(min, max, shoulderWidth, value);
+        final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
         return density.logInPlace().sum();
     }
 
@@ -122,8 +122,8 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor dPdfdx = TensorSmoothUniform.dlnPdf(min, max, shoulderWidth, value);
-        final DoubleTensor density = TensorSmoothUniform.pdf(min, max, shoulderWidth, value);
+        final DoubleTensor dPdfdx = SmoothUniform.dlnPdf(min, max, shoulderWidth, value);
+        final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
         final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
 
         return singletonMap(getId(), dlogPdfdx);
@@ -131,6 +131,6 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorSmoothUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
+        return SmoothUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
     }
 }

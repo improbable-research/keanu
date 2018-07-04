@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import org.apache.commons.math3.distribution.NormalDistribution;
 import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
@@ -43,7 +42,7 @@ public class MultivariateGaussianTest {
     public void univariateGaussianMatchesLogDensityOfScalar() {
         MultivariateGaussian mvg = new MultivariateGaussian(5, 1);
 
-        double expectedDensity = Gaussian.logPdf(5.0, 1, 0.5);
+        double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
         double density = mvg.logPdf(Nd4jDoubleTensor.scalar(0.5));
 
         assertEquals(expectedDensity, density, 1e-2);
@@ -56,8 +55,8 @@ public class MultivariateGaussianTest {
 
         MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
 
-        double expectedDensity1 = Gaussian.logPdf(2.0, 1, 8);
-        double expectedDensity2 = Gaussian.logPdf(3.0, 1, 10);
+        double expectedDensity1 = new NormalDistribution(2, 1).logDensity(8);
+        double expectedDensity2 = new NormalDistribution(3, 1).logDensity(10);
         double expectedDensity = expectedDensity1 + expectedDensity2;
 
         double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{8, 10}, new int[]{2, 1}));
@@ -87,9 +86,9 @@ public class MultivariateGaussianTest {
         DoubleVertex covarianceMatrix = ConstantVertex.of(
             new Nd4jDoubleTensor(
                 new double[]{
-                1.0, 0.3, 0.3,
-                0.3, 0.8, 0.3,
-                0.3, 0.3, 0.6
+                    1.0, 0.3, 0.3,
+                    0.3, 0.8, 0.3,
+                    0.3, 0.3, 0.6
                 },
                 new int[]{3, 3}
             )

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorStudentT;
+import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,18 +17,18 @@ public class StudentTVertex extends ProbabilisticDouble {
     private final IntegerVertex v;
 
     /**
-     * @param shape expected tensor shape
-     * @param v     Degrees of Freedom
+     * @param tensorShape expected tensor shape
+     * @param v           Degrees of Freedom
      */
-    public StudentTVertex(int[] shape, IntegerVertex v) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, v.getShape());
+    public StudentTVertex(int[] tensorShape, IntegerVertex v) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public StudentTVertex(int[] shape, int v) {
-        this(shape, new ConstantIntegerVertex(v));
+    public StudentTVertex(int[] tensorShape, int v) {
+        this(tensorShape, new ConstantIntegerVertex(v));
     }
 
     public StudentTVertex(IntegerVertex v) {
@@ -52,7 +52,7 @@ public class StudentTVertex extends ProbabilisticDouble {
      */
     @Override
     public double logPdf(DoubleTensor t) {
-        return TensorStudentT.logPdf(v.getValue(), t).sum();
+        return StudentT.logPdf(v.getValue(), t).sum();
     }
 
     /**
@@ -61,7 +61,7 @@ public class StudentTVertex extends ProbabilisticDouble {
      */
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
-        TensorStudentT.Diff diff = TensorStudentT.dLogPdf(v.getValue(), t);
+        StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
         Map<Long, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.dPdt);
         return m;
@@ -72,6 +72,6 @@ public class StudentTVertex extends ProbabilisticDouble {
      */
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorStudentT.sample(getShape(), v.getValue(), random);
+        return StudentT.sample(getShape(), v.getValue(), random);
     }
 }
