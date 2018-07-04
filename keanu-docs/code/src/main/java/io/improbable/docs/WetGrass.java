@@ -5,7 +5,7 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.CPT;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Arrays;
@@ -23,7 +23,7 @@ public class WetGrass {
         );
 
         BoolVertex wetGrass = new Flip(
-            CPT.of(sprinkler, rain)
+            ConditionalProbabilityTable.of(sprinkler, rain)
                 .when(false, false).then(1e-2)
                 .when(false, true).then(0.8)
                 .when(true, false).then(0.9)

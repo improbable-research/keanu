@@ -4,15 +4,16 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
 
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class CPT {
+public class ConditionalProbabilityTable {
 
-    private CPT() {
+    private ConditionalProbabilityTable() {
     }
 
     private static final String WHEN_CONDITION_SIZE_MISMATCH = "The 'when' condition size does not match input count";
