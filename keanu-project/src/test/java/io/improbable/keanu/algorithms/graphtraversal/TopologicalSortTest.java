@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.List;
 
+import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertEquals;
 
 public class TopologicalSortTest {
@@ -79,9 +80,12 @@ public class TopologicalSortTest {
         List<? extends Vertex> sorted = TopologicalSort.sort(vertices);
 
         assertEquals(sorted.size(), vertices.size());
-        assertEquals(sorted.get(3), C);
-        assertEquals(sorted.get(4), F);
-        assertEquals(sorted.get(5), E);
+        assertTrue(sorted.indexOf(A) < sorted.indexOf(C));
+        assertTrue(sorted.indexOf(B) < sorted.indexOf(C));
+        assertTrue(sorted.indexOf(E) < sorted.indexOf(M));
+        assertTrue(sorted.indexOf(F) < sorted.indexOf(E));
+        assertTrue(sorted.indexOf(H) < sorted.indexOf(I));
+        assertTrue(sorted.indexOf(K) < sorted.indexOf(L));
     }
 
     private void assertExactOrder(List<? extends Vertex<?>> expected, List<? extends Vertex> actual) {
