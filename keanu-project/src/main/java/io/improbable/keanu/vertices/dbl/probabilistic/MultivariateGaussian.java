@@ -1,14 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorMultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.linear.MatrixUtils;
-import org.apache.commons.math3.linear.RealMatrix;
 
 import java.util.Map;
 
@@ -67,7 +62,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
-        return TensorMultivariateGaussian.logPdf(muValues, covarianceValues, value);
+        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.logPdf(muValues, covarianceValues, value);
     }
 
     @Override
@@ -77,7 +72,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorMultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
+        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
     }
 
     private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {
