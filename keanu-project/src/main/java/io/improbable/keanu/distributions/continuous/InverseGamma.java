@@ -1,47 +1,44 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import static org.apache.commons.math3.special.Gamma.digamma;
-import static org.apache.commons.math3.special.Gamma.gamma;
+import org.apache.commons.math3.special.Gamma;
 
 public class InverseGamma {
 
     private InverseGamma() {
     }
 
-    public static double sample(double a, double b, KeanuRandom random) {
-        if (a <= 0.0 || b <= 0.0) {
-            throw new IllegalArgumentException("Invalid value for a or b. a: " + a + ". b: " + b);
-        }
-        return 1.0 / Gamma.sample(0.0, 1.0 / b, a, random);
+    public static DoubleTensor sample(int[] shape, DoubleTensor alpha, DoubleTensor beta, KeanuRandom random) {
+        final DoubleTensor gammaSample = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, beta.reciprocal(), alpha);
+        return gammaSample.reciprocal();
     }
 
-    public static double pdf(double a, double b, double x) {
-        double numerator = Math.pow(b, a) * Math.pow(x, -a - 1) * Math.exp(-b / x);
-        return numerator / gamma(a);
+    public static DoubleTensor logPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
+        final DoubleTensor aTimesLnB = alpha.times(beta.log());
+        final DoubleTensor negAMinus1TimesLnX = x.log().timesInPlace(alpha.unaryMinus().minusInPlace(1));
+        final DoubleTensor lnGammaA = alpha.apply(Gamma::gamma).logInPlace();
+
+        return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(beta.div(x));
     }
 
-    public static double logPdf(double a, double b, double x) {
-        return a * Math.log(b) + (-a - 1) * Math.log(x) - Math.log(gamma(a)) - (b / x);
-    }
+    public static Diff dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
+        final DoubleTensor dPda = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
+        final DoubleTensor dPdb = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
+        final DoubleTensor dPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-    public static Diff dlnPdf(double a, double b, double x) {
-        double dPda = -digamma(a) + Math.log(b) - Math.log(x);
-        double dPdb = (a / b) - (1 / x);
-        double dPdx = (b - (a + 1) * x) / Math.pow(x, 2);
         return new Diff(dPda, dPdb, dPdx);
     }
 
     public static class Diff {
 
-        public final double dPda;
-        public final double dPdb;
-        public final double dPdx;
+        public final DoubleTensor dPdalpha;
+        public final DoubleTensor dPdbeta;
+        public final DoubleTensor dPdx;
 
-        public Diff(double dPda, double dPdb, double dPdx) {
-            this.dPda = dPda;
-            this.dPdb = dPdb;
+        public Diff(DoubleTensor dPdalpha, DoubleTensor dPdbeta, DoubleTensor dPdx) {
+            this.dPdalpha = dPdalpha;
+            this.dPdbeta = dPdbeta;
             this.dPdx = dPdx;
         }
 

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.discrete.TensorPoisson;
+import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -50,7 +50,7 @@ public class PoissonVertex extends ProbabilisticInteger {
 
     @Override
     public double logPmf(IntegerTensor value) {
-        return TensorPoisson.logPmf(mu.getValue(), value).sum();
+        return Poisson.logPmf(mu.getValue(), value).sum();
     }
 
     @Override
@@ -60,6 +60,6 @@ public class PoissonVertex extends ProbabilisticInteger {
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return TensorPoisson.sample(getShape(), mu.getValue(), random);
+        return Poisson.sample(getShape(), mu.getValue(), random);
     }
 }

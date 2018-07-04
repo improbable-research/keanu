@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorUniform;
+import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -18,18 +18,18 @@ public class UniformVertex extends ProbabilisticDouble {
     private final DoubleVertex xMax;
 
     /**
-     * @param shape desired tensor shape
-     * @param xMin  inclusive
-     * @param xMax  exclusive
+     * @param tensorShape desired tensor shape
+     * @param xMin        inclusive
+     * @param xMax        exclusive
      */
-    public UniformVertex(int[] shape, DoubleVertex xMin, DoubleVertex xMax) {
+    public UniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, xMin.getShape(), xMax.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
         this.xMax = xMax;
         setParents(xMin, xMax);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
@@ -48,16 +48,16 @@ public class UniformVertex extends ProbabilisticDouble {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(int[] shape, DoubleVertex xMin, double xMax) {
-        this(shape, xMin, new ConstantDoubleVertex(xMax));
+    public UniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax) {
+        this(tensorShape, xMin, new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(int[] shape, double xMin, DoubleVertex xMax) {
-        this(shape, new ConstantDoubleVertex(xMin), xMax);
+    public UniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax) {
+        this(tensorShape, new ConstantDoubleVertex(xMin), xMax);
     }
 
-    public UniformVertex(int[] shape, double xMin, double xMax) {
-        this(shape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
+    public UniformVertex(int[] tensorShape, double xMin, double xMax) {
+        this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
     public DoubleVertex getXMin() {
@@ -70,7 +70,7 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return TensorUniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
+        return Uniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
     }
 
     @Override
@@ -85,7 +85,7 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
+        return Uniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
     }
 
 }

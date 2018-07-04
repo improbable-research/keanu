@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorInverseGamma;
+import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,82 +14,82 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 public class InverseGammaVertex extends ProbabilisticDouble {
 
-    private final DoubleVertex a;
-    private final DoubleVertex b;
+    private final DoubleVertex alpha;
+    private final DoubleVertex beta;
 
     /**
-     * One a or b or both driving an arbitrarily shaped tensor of Inverse Gamma
+     * One alpha or beta or both driving an arbitrarily shaped tensor of Inverse Gamma
      *
-     * @param shape the desired shape of the vertex
-     * @param a     the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
-     * @param b     the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
+     * @param tensorShape the desired shape of the vertex
+     * @param alpha       the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
+     * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
-    public InverseGammaVertex(int[] shape, DoubleVertex a, DoubleVertex b) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), b.getShape());
+    public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
-        this.a = a;
-        this.b = b;
-        setParents(a, b);
-        setValue(DoubleTensor.placeHolder(shape));
+        this.alpha = alpha;
+        this.beta = beta;
+        setParents(alpha, beta);
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
-     * One to one constructor for mapping some shape of a and b to
-     * a matching shaped inverse gamma.
+     * One to one constructor for mapping some shape of alpha and beta to
+     * alpha matching shaped inverse gamma.
      *
-     * @param a the a of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
-     * @param b the b of the Inverse Gamma with either the same shape as specified for this vertex or a scalar
+     * @param alpha the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
+     * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
-    public InverseGammaVertex(DoubleVertex a, DoubleVertex b) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+    public InverseGammaVertex(DoubleVertex alpha, DoubleVertex beta) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
     }
 
-    public InverseGammaVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b));
+    public InverseGammaVertex(DoubleVertex alpha, double beta) {
+        this(alpha, new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b);
+    public InverseGammaVertex(double alpha, DoubleVertex beta) {
+        this(new ConstantDoubleVertex(alpha), beta);
     }
 
-    public InverseGammaVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
+    public InverseGammaVertex(double alpha, double beta) {
+        this(new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(int[] shape, DoubleVertex a, double b) {
-        this(shape, a, new ConstantDoubleVertex(b));
+    public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, double beta) {
+        this(tensorShape, alpha, new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(int[] shape, double a, DoubleVertex b) {
-        this(shape, new ConstantDoubleVertex(a), b);
+    public InverseGammaVertex(int[] tensorShape, double alpha, DoubleVertex beta) {
+        this(tensorShape, new ConstantDoubleVertex(alpha), beta);
     }
 
-    public InverseGammaVertex(int[] shape, double a, double b) {
-        this(shape, new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
+    public InverseGammaVertex(int[] tensorShape, double alpha, double beta) {
+        this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
     @Override
     public double logPdf(DoubleTensor value) {
-        DoubleTensor aValues = a.getValue();
-        DoubleTensor bValues = b.getValue();
+        DoubleTensor alphaValues = alpha.getValue();
+        DoubleTensor betaValues = beta.getValue();
 
-        DoubleTensor logPdfs = TensorInverseGamma.logPdf(aValues, bValues, value);
+        DoubleTensor logPdfs = InverseGamma.logPdf(alphaValues, betaValues, value);
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorInverseGamma.Diff dlnP = TensorInverseGamma.dlnPdf(a.getValue(), b.getValue(), value);
+        InverseGamma.Diff dlnP = InverseGamma.dlnPdf(alpha.getValue(), beta.getValue(), value);
 
-        return convertDualNumbersToDiff(dlnP.dPda, dlnP.dPdb, dlnP.dPdx);
+        return convertDualNumbersToDiff(dlnP.dPdalpha, dlnP.dPdbeta, dlnP.dPdx);
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
-                                                             DoubleTensor dPdb,
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdalpha,
+                                                             DoubleTensor dPdbeta,
                                                              DoubleTensor dPdx) {
 
-        PartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
-        PartialDerivatives dPdInputsFromB = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
+        PartialDerivatives dPdInputsFromA = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdalpha);
+        PartialDerivatives dPdInputsFromB = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
 
         if (!this.isObserved()) {
@@ -101,7 +101,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorInverseGamma.sample(getShape(), a.getValue(), b.getValue(), random);
+        return InverseGamma.sample(getShape(), alpha.getValue(), beta.getValue(), random);
     }
 
 }

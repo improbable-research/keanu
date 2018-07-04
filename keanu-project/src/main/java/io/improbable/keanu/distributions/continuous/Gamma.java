@@ -1,34 +1,43 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import static java.lang.Math.*;
-import static org.apache.commons.math3.special.Gamma.digamma;
-import static org.apache.commons.math3.special.Gamma.gamma;
-
-
-/**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.8 page 33
- */
 
 public class Gamma {
+
+    private static final double M_E = 0.577215664901532860606512090082;
 
     private Gamma() {
     }
 
-    private static final double M_E = 0.577215664901532860606512090082;
-
     /**
+     * @param shape  shape of tensor returned
      * @param a      location
      * @param theta  scale
      * @param k      shape
      * @param random source of randomness
      * @return a random number from the Gamma distribution
      */
-    public static double sample(double a, double theta, double k, KeanuRandom random) {
+    public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k, KeanuRandom random) {
+
+        Tensor.FlattenedView<Double> aWrapped = a.getFlattenedView();
+        Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
+        Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
+
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = sample(aWrapped.getOrScalar(i), thetaWrapped.getOrScalar(i), kWrapped.getOrScalar(i), random);
+        }
+
+        return DoubleTensor.create(samples, shape);
+    }
+
+    private static double sample(double a, double theta, double k, KeanuRandom random) {
         if (theta <= 0. || k <= 0.) {
             throw new IllegalArgumentException("Invalid value for theta or k. Theta: " + theta + ". k: " + k);
         }
@@ -41,7 +50,7 @@ public class Gamma {
 
         if (k < 1.) {
             return sampleWhileKLessThanOne(C, k, a, theta, random);
-        } else if (k == 1.0) return Exponential.sample(a, theta, random);
+        } else if (k == 1.0) return exponentialSample(a, theta, random);
         else {
             while (true) {
                 double p1 = random.nextDouble();
@@ -53,37 +62,6 @@ public class Gamma {
                 if (w + D - T * z >= 0. || w >= log(z)) return a + theta * y;
             }
         }
-    }
-
-    public static double pdf(double a, double theta, double k, double x) {
-        return (pow(theta, -k) * pow(x - a, k - 1) * exp(-(x - a) / theta)) / (gamma(k));
-    }
-
-    public static double logPdf(double a, double theta, double k, double x) {
-        return (a - x) / theta - (k * Math.log(theta)) + Math.log((Math.pow(x - a, k - 1)) / gamma(k));
-    }
-
-    public static Diff dPdf(double a, double theta, double k, double x) {
-        double powBminusCminus1 = pow(theta, -k - 1);
-        double expAminusXoverB = exp((a - x) / theta);
-        double powXminusAToKminus2 = pow(x - a, k - 2);
-        double gammaC = gamma(k);
-        double commonToDaAndDb = powBminusCminus1 * expAminusXoverB * powXminusAToKminus2;
-
-        double dPdx = (commonToDaAndDb * (a + (theta * (k - 1)) - x)) / gammaC;
-        double dPda = (commonToDaAndDb * (theta * (-k) + theta + x - a)) / gammaC;
-        double dPdtheta = -(pow(theta, -k - 2) * expAminusXoverB * pow(x - a, k - 1) * (a + (theta * k) - x)) / gammaC;
-        double dPdk = -(pow(theta, -k) * expAminusXoverB * pow(x - a, k - 1) * (-log(x - a) + log(theta) + digamma(k))) / gammaC;
-
-        return new Diff(dPda, dPdtheta, dPdk, dPdx);
-    }
-
-    public static Diff dlnPdf(double a, double theta, double k, double x) {
-        double dPdx = (k - 1) / (x - a) - (1 / theta);
-        double dPda = (k - 1) / (a - x) + (1 / theta);
-        double dPdtheta = -((a + (theta * k) - x) / Math.pow(theta, 2));
-        double dPdk = Math.log(x - a) - Math.log(theta) - digamma(k);
-        return new Diff(dPda, dPdtheta, dPdk, dPdx);
     }
 
     private static double sampleWhileKLessThanOne(double c, double k, double a, double theta, KeanuRandom random) {
@@ -99,17 +77,53 @@ public class Gamma {
         }
     }
 
-    public static class Diff {
-        public final double dPda;
-        public final double dPdtheta;
-        public final double dPdk;
-        public final double dPdx;
+    /**
+     * @param location location
+     * @param lambda   shape
+     * @param random   source of randomness
+     * @return a random number from the Exponential distribution
+     */
+    private static double exponentialSample(double location, double lambda, KeanuRandom random) {
+        if (lambda <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for b");
+        }
+        return location - lambda * Math.log(random.nextDouble());
+    }
 
-        public Diff(double dPda, double dPdtheta, double dPdk, double dPdx) {
-            this.dPda = dPda;
+    public static DoubleTensor logPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
+        final DoubleTensor aMinusXOverTheta = location.minus(x).divInPlace(theta);
+        final DoubleTensor kLnTheta = k.times(theta.log());
+        final DoubleTensor xMinusAPowKMinus1 = x.minus(location).powInPlace(k.minus(1));
+        final DoubleTensor lnXMinusAToKMinus1 = ((xMinusAPowKMinus1).divInPlace(k.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
+        return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
+    }
+
+    public static Diff dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
+        final DoubleTensor xMinusA = x.minus(location);
+        final DoubleTensor aMinusX = location.minus(x);
+        final DoubleTensor kMinus1 = k.minus(1.);
+        final DoubleTensor oneOverTheta = theta.reciprocal();
+
+        final DoubleTensor dPdx = kMinus1.div(xMinusA).minusInPlace(oneOverTheta);
+        final DoubleTensor dPda = kMinus1.div(aMinusX).plusInPlace(oneOverTheta);
+        final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+
+        return new Diff(dPda, dPdtheta, dPdk, dPdx);
+    }
+
+    public static class Diff {
+        public final DoubleTensor dPdlocation;
+        public final DoubleTensor dPdtheta;
+        public final DoubleTensor dPdk;
+        public final DoubleTensor dPdx;
+
+        public Diff(DoubleTensor dPda, DoubleTensor dPdtheta, DoubleTensor dPdk, DoubleTensor dPdx) {
+            this.dPdlocation = dPda;
             this.dPdtheta = dPdtheta;
             this.dPdk = dPdk;
             this.dPdx = dPdx;
         }
     }
+
 }

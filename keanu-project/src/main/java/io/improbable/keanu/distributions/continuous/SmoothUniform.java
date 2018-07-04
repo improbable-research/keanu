@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
@@ -34,7 +35,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class SmoothUniform {
 
     private SmoothUniform() {
-
     }
 
     /**
@@ -42,102 +42,120 @@ public class SmoothUniform {
      * The width of the shoulder is determined by the edgeSharpness as a percentage of the body width,
      * which is (xMax - xMin).
      *
+     * @param shape         result tensor shape
      * @param xMin          min value from body
      * @param xMax          max value from body
      * @param edgeSharpness sharpness as a percentage of the body width
      * @param random        source of randomness
      * @return a uniform random number between xMin and xMax
      */
-    public static double sample(double xMin, double xMax, final double edgeSharpness, KeanuRandom random) {
+    public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness, KeanuRandom random) {
 
-        final double r1 = random.nextDouble();
-        final double bodyWidth = xMax - xMin;
-        final double shoulderWidth = edgeSharpness * bodyWidth;
-        final double rScaled = r1 * (bodyWidth + shoulderWidth) + (xMin - shoulderWidth / 2);
+        DoubleTensor r1 = random.nextDouble(shape);
+        DoubleTensor r2 = random.nextDouble(shape);
 
-        if (rScaled >= xMin && rScaled <= xMax) {
-            return rScaled;
-        }
+        final DoubleTensor bodyWidth = xMax.minus(xMin);
+        final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
+        final DoubleTensor rScaled = r1.timesInPlace(bodyWidth.plus(shoulderWidth)).plusInPlace(xMin.minus(shoulderWidth.div(2)));
+        final DoubleTensor bodyHeight = bodyHeight(shoulderWidth, bodyWidth);
 
-        final double bodyHeight = bodyHeight(shoulderWidth, bodyWidth);
-        final double r2 = random.nextDouble();
+        DoubleTensor firstConditional = rScaled.getGreaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(rScaled.getLessThanOrEqualToMask(xMax));
+        final DoubleTensor inverseFirstConditional = DoubleTensor.ones(firstConditional.getShape()).minusInPlace(firstConditional);
 
-        if (rScaled < xMin) {
+        final DoubleTensor secondConditional = rScaled.getLessThanMask(xMin);
+        DoubleTensor spillOnToShoulder = xMin.minus(rScaled);
+        DoubleTensor shoulderX = shoulderWidth.minus(spillOnToShoulder);
+        DoubleTensor shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
+        DoubleTensor acceptProbability = shoulderDensity.div(bodyHeight);
 
-            double spillOnToShoulder = xMin - rScaled;
-            double shoulderX = shoulderWidth - spillOnToShoulder;
-            double shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
-            double acceptProbability = shoulderDensity / bodyHeight;
+        final DoubleTensor secondConditionalNestedTrue = secondConditional.times(r2.getLessThanOrEqualToMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedFalse = secondConditional.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalNestedFalseResult = xMin.minus(shoulderWidth).plusInPlace(spillOnToShoulder);
 
-            if (r2 <= acceptProbability) {
-                return rScaled;
-            } else {
-                return xMin - shoulderWidth + spillOnToShoulder;
-            }
-        } else {
+        final DoubleTensor secondConditionalFalse = rScaled.getGreaterThanOrEqualToMask(xMin);
+        spillOnToShoulder = rScaled.minus(xMax);
+        shoulderX = shoulderWidth.minus(spillOnToShoulder);
+        shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
+        acceptProbability = shoulderDensity.divInPlace(bodyHeight);
 
-            double spillOnToShoulder = rScaled - xMax;
-            double shoulderX = shoulderWidth - spillOnToShoulder;
-            double shoulderDensity = shoulder(shoulderWidth, bodyWidth, shoulderX);
-            double acceptProbability = shoulderDensity / bodyHeight;
+        final DoubleTensor secondConditionalFalseNestedTrue = secondConditionalFalse.times(r2.getLessThanOrEqualToMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedFalse = secondConditionalFalse.timesInPlace(r2.getGreaterThanMask(acceptProbability));
+        final DoubleTensor secondConditionalFalseNestedFalseResult = shoulderWidth.plusInPlace(xMax).minusInPlace(spillOnToShoulder);
 
-            if (r2 <= acceptProbability) {
-                return rScaled;
-            } else {
-                return xMax + shoulderWidth - spillOnToShoulder;
-            }
-        }
+        return firstConditional.timesInPlace(rScaled)
+            .plusInPlace(inverseFirstConditional.times(secondConditionalNestedTrue).timesInPlace(rScaled))
+            .plusInPlace(inverseFirstConditional.times(secondConditionalNestedFalse).timesInPlace(secondConditionalNestedFalseResult))
+            .plusInPlace(inverseFirstConditional.times(secondConditionalFalseNestedTrue).timesInPlace(rScaled))
+            .plusInPlace(inverseFirstConditional.timesInPlace(secondConditionalFalseNestedFalse).timesInPlace(secondConditionalFalseNestedFalseResult));
     }
 
-    public static double pdf(final double xMin, final double xMax, final double shoulderWidth, final double x) {
+    public static DoubleTensor pdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
 
-        final double bodyWidth = xMax - xMin;
+        final DoubleTensor bodyWidth = xMax.minus(xMin);
+        final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
+        final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
 
-        if (x >= xMin && x <= xMax) {
-            //x is in flat region and this is the bodyHeight
-            return bodyHeight(shoulderWidth, bodyWidth);
-        }
+        DoubleTensor firstConditional = x.getGreaterThanOrEqualToMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
+        firstConditional.timesInPlace(x.getLessThanOrEqualToMask(xMax));
+        final DoubleTensor firstConditionalResult = bodyHeight(shoulderWidth, bodyWidth);
 
-        double leftCutoff = xMin - shoulderWidth;
-        if (x < xMin && x > leftCutoff) {
-            //x is in left shoulder
-            final double nx = x - leftCutoff;
-            return shoulder(shoulderWidth, bodyWidth, nx);
-        }
+        DoubleTensor secondConditional = x.getLessThanMask(xMin);
+        secondConditional = secondConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        final DoubleTensor secondConditionalResult = shoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
 
-        double rightCutoff = xMax + shoulderWidth;
-        if (x > xMax && x < rightCutoff) {
-            //x is in right shoulder
-            final double nx = shoulderWidth - (x - xMax);
-            return shoulder(shoulderWidth, bodyWidth, nx);
-        }
+        DoubleTensor thirdConditional = x.getGreaterThanMask(xMax);
+        thirdConditional = thirdConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        final DoubleTensor thirdConditionalResult = shoulder(shoulderWidth, bodyWidth, shoulderWidth.minus(x).plusInPlace(xMax));
 
-        //x is not in density bounds
-        return 0.0;
+        return firstConditional.timesInPlace(firstConditionalResult)
+            .plusInPlace(secondConditional.timesInPlace(secondConditionalResult))
+            .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
     }
 
-    private static double getCubeCoefficient(final double Sw, final double Bw) {
-        return -2.0 / (Sw * Sw * Sw * (Sw + Bw));
+    public static DoubleTensor dlnPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
+        final DoubleTensor bodyWidth = xMax.minus(xMin);
+        final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
+        final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
+
+        DoubleTensor firstConditional = x.getLessThanMask(xMin);
+        firstConditional = firstConditional.timesInPlace(x.getGreaterThanMask(leftCutoff));
+        final DoubleTensor firstConditionalResult = dShoulder(shoulderWidth, bodyWidth, x.minus(leftCutoff));
+
+        DoubleTensor secondConditional = x.getGreaterThanMask(xMax);
+        secondConditional = secondConditional.timesInPlace(x.getLessThanMask(rightCutoff));
+        final DoubleTensor secondConditionalResult = dShoulder(shoulderWidth,
+            bodyWidth,
+            shoulderWidth.minus(x).plusInPlace(rightCutoff)
+        ).unaryMinusInPlace();
+
+        return firstConditional.timesInPlace(firstConditionalResult)
+            .plusInPlace(secondConditional.timesInPlace(secondConditionalResult));
     }
 
-    private static double getSquareCoefficient(final double Sw, final double Bw) {
-        return 3.0 / (Sw * Sw * (Sw + Bw));
+    private static DoubleTensor shoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
+        final DoubleTensor A = getCubeCoefficient(Sw, Bw);
+        final DoubleTensor B = getSquareCoefficient(Sw, Bw);
+        return x.pow(3).timesInPlace(A).plusInPlace(x.pow(2).timesInPlace(B));
     }
 
-    private static double bodyHeight(double shoulderWidth, double bodyWidth) {
-        return 1.0 / (shoulderWidth + bodyWidth);
+    private static DoubleTensor dShoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
+        final DoubleTensor A = getCubeCoefficient(Sw, Bw);
+        final DoubleTensor B = getSquareCoefficient(Sw, Bw);
+        return A.timesInPlace(3).timesInPlace(x.pow(2)).plusInPlace(B.timesInPlace(x).timesInPlace(2));
     }
 
-    private static double shoulder(final double Sw, final double Bw, final double x) {
-        final double A = getCubeCoefficient(Sw, Bw);
-        final double B = getSquareCoefficient(Sw, Bw);
-        final double xSquared = x * x;
-        return A * xSquared * x + B * xSquared;
+    private static DoubleTensor getCubeCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
+        return (Sw.pow(3).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(-2);
     }
 
-    private static double dshoulder(final double Sw, final double Bw, final double x) {
-        final double A = getCubeCoefficient(Sw, Bw);
-        final double B = getSquareCoefficient(Sw, Bw);
-        return 3 * A * x * x + 2 * B * x;
+    private static DoubleTensor getSquareCoefficient(DoubleTensor Sw, DoubleTensor Bw) {
+        return (Sw.pow(2).timesInPlace(Sw.plus(Bw))).reciprocalInPlace().timesInPlace(3);
     }
+
+    private static DoubleTensor bodyHeight(DoubleTensor shoulderWidth, DoubleTensor bodyWidth) {
+        return shoulderWidth.plus(bodyWidth).reciprocalInPlace();
+    }
+
 }
