@@ -25,7 +25,7 @@ public class IntegerVertexTest {
     @Test
     public void doesMultiply() {
         IntegerVertex result = v1.multiply(v2);
-        result.lazyEval();
+        result.eval();
         Integer expected = 6;
         assertEquals(result.getValue().scalar(), expected);
     }
@@ -33,7 +33,7 @@ public class IntegerVertexTest {
     @Test
     public void doesAdd() {
         IntegerVertex result = v1.plus(v2);
-        result.lazyEval();
+        result.eval();
         Integer expected = 5;
         assertEquals(result.getValue().scalar(), expected);
     }
@@ -41,7 +41,7 @@ public class IntegerVertexTest {
     @Test
     public void doesSubtract() {
         IntegerVertex result = v1.minus(v2);
-        result.lazyEval();
+        result.eval();
         Integer expected = 1;
         assertEquals(result.getValue().scalar(), expected);
     }
@@ -61,7 +61,7 @@ public class IntegerVertexTest {
         Function<IntegerTensor, IntegerTensor> op = val -> val.plus(5);
 
         IntegerVertex result = v1.lambda(op);
-        result.lazyEval();
+        result.eval();
         Integer expected = 8;
         assertEquals(result.getValue().scalar(), expected);
     }

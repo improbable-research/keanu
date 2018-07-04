@@ -17,7 +17,7 @@ public class VertexValuePropagationTest {
     private final Logger log = LoggerFactory.getLogger(VertexValuePropagationTest.class);
 
     @Test
-    public void doesNotDoUnnecessaryOperations() {
+    public void doesNotDoUnnecessaryOperationsOnCascade() {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
@@ -36,7 +36,7 @@ public class VertexValuePropagationTest {
     }
 
     @Test
-    public void doesNotPropagateThroughProbabilisticVertices() {
+    public void doesNotPropagateThroughProbabilisticVerticesOnCascade() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
         DoubleVertex start = new GaussianVertex(0, 1);
@@ -57,7 +57,7 @@ public class VertexValuePropagationTest {
     }
 
     @Test
-    public void doesPropagateAroundProbabilisticVertices() {
+    public void doesPropagateAroundProbabilisticVerticesOnCascade() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
         DoubleVertex firstLayerStart = new GaussianVertex(0, 1);
