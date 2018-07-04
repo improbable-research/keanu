@@ -26,11 +26,11 @@ public class LessThanOrEqualVertexTest {
 
     private void isLessThanOrEqual(int a, int b, boolean expected) {
         LessThanOrEqualVertex<IntegerTensor, IntegerTensor> vertex = new LessThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isLessThanOrEqual(double a, double b, boolean expected) {
         LessThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new LessThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 }

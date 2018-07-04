@@ -31,25 +31,25 @@ public class ReduceVertexTest {
     @Test
     public void calculatesSumCorrectly() {
         DoubleVertex sum = new DoubleReduceVertex(verts, (a, b) -> (a.plus(b)));
-        assertEquals(sum.lazyEval().scalar(), total, 0.0001);
+        assertEquals(sum.eval().scalar(), total, 0.0001);
     }
 
     @Test
     public void calculatesMaxCorrectly() {
         DoubleVertex max = new DoubleReduceVertex(verts, DoubleTensor::max);
-        assertEquals(max.lazyEval().scalar(), maxValue, 0.0001);
+        assertEquals(max.eval().scalar(), maxValue, 0.0001);
     }
 
     @Test
     public void calculatesMinCorrectly() {
         DoubleVertex min = new DoubleReduceVertex(verts, DoubleTensor::min);
-        assertEquals(min.lazyEval().scalar(), minValue, 0.0001);
+        assertEquals(min.eval().scalar(), minValue, 0.0001);
     }
 
     @Test
     public void varargsConstrution() {
         DoubleVertex max = new DoubleReduceVertex(DoubleTensor::max, null, verts.get(0), verts.get(1));
-        assertEquals(max.lazyEval().scalar(), Math.max(verts.get(0).lazyEval().scalar(), verts.get(1).lazyEval().scalar()), 0.0001);
+        assertEquals(max.eval().scalar(), Math.max(verts.get(0).eval().scalar(), verts.get(1).eval().scalar()), 0.0001);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -65,6 +65,6 @@ public class ReduceVertexTest {
     @Test
     public void doubleArgExecutesAsExpected() {
         DoubleVertex min = new DoubleReduceVertex(DoubleTensor::max, null, verts.get(0), verts.get(1));
-        assertEquals(min.lazyEval().scalar(), Math.max(verts.get(0).lazyEval().scalar(), verts.get(1).lazyEval().scalar()), 0.0);
+        assertEquals(min.eval().scalar(), Math.max(verts.get(0).eval().scalar(), verts.get(1).eval().scalar()), 0.0);
     }
 }

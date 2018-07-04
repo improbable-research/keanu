@@ -26,11 +26,11 @@ public class GreaterThanOrEqualVertexTest {
 
     private void isGreaterThanOrEqual(int a, int b, boolean expected) {
         GreaterThanOrEqualVertex<IntegerTensor, IntegerTensor> vertex = new GreaterThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isGreaterThanOrEqual(double a, double b, boolean expected) {
         GreaterThanOrEqualVertex<DoubleTensor, DoubleTensor> vertex = new GreaterThanOrEqualVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.lazyEval().scalar());
+        assertEquals(expected, vertex.eval().scalar());
     }
 }

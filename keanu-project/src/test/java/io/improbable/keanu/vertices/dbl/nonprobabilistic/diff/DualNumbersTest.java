@@ -65,7 +65,7 @@ public class DualNumbersTest {
 
         vA.setValue(A);
         vB.setValue(B);
-        vC.lazyEval();
+        vC.eval();
 
         DualNumber cDual = vC.getDualNumber();
 
@@ -76,7 +76,7 @@ public class DualNumbersTest {
 
         vA.setValue(vA.getValue().plus(da));
         vB.setValue(B);
-        vC.lazyEval();
+        vC.eval();
 
         DoubleTensor dcdaApprox = (vC.getValue().minus(C)).div(da);
 
@@ -86,7 +86,7 @@ public class DualNumbersTest {
 
         vA.setValue(A);
         vB.setValue(B + db);
-        vC.lazyEval();
+        vC.eval();
 
         DoubleTensor dcdbApprox = (vC.getValue().minus(C)).div(db);
 
