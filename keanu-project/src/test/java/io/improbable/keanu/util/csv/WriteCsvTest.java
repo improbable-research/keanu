@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -50,14 +49,14 @@ public class WriteCsvTest {
         integerColumnTensors.addAll(Arrays.asList(i1, i2));
 
         Map<Long, List<DoubleTensor>> networkSamples = new HashMap<>();
-        networkSamples.put(g1.getId(), Arrays.asList(g1.getValue(), g1.times(2).getValue(), g1.times(2.5).getValue(), g1.times(3).getValue()));
-        networkSamples.put(g2.getId(), Arrays.asList(g2.getValue(), g2.times(2).getValue(), g2.times(2.5).getValue(), g2.times(3).getValue()));
-        samples = new NetworkSamples(networkSamples, 4);
+        networkSamples.put(g1.getId(), Arrays.asList(g1.getValue(), g1.times(2).getValue()));
+        networkSamples.put(g2.getId(), Arrays.asList(g2.getValue(), g2.times(2).getValue()));
+        samples = new NetworkSamples(networkSamples, 2);
     }
 
     @Test
     public void writeSamplesToCsv() {
-        File file = WriteCsv.asSamples(samples, rowTensors).withDefaultHeader().toFile("samples", "../");
+        File file = WriteCsv.asSamples(samples, rowTensors).toFile("test", "../");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -91,28 +90,20 @@ public class WriteCsvTest {
         assertTrue(reader.readLines().get(1).equals(
             Arrays.asList("2.0", "4.0", "6.0", "8.0", "10.0", "10.0", "8.0", "6.0", "4.0")));
 
-//        file.delete();
+        file.delete();
     }
 
     @Test
     public void writeColumnOfTensorsToCsv() {
-//        File file = WriteCsv.asColumns(columnTensors).toFile("test", "../");
+        File file = WriteCsv.asColumns(columnTensors).toFile("test", "../");
 
-        ConstantDoubleVertex c1 = new ConstantDoubleVertex(new double[]{0.5, 1.0, 1.5, 2.0});
-        ConstantDoubleVertex c2 = new ConstantDoubleVertex(new double[]{5, 10, 15, 20});
-        ConstantDoubleVertex c3 = new ConstantDoubleVertex(new double[]{50, 100, 150});
+        CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
+        List<List<String>> lines = reader.readLines();
 
-        List<Vertex<DoubleTensor>> constants = Arrays.asList(c1, c2, c3);
-        File file = WriteCsv.asRows(constants).withDefaultHeader().toFile("rowTest", "../");
-
-//
-//        CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
-//        List<List<String>> lines = reader.readLines();
-//
-//        assertTrue(lines.size() == 5);
-//        assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "5.0")));
-//        assertTrue(reader.readLines().get(4).equals(Arrays.asList("5.0", "-")));
-//        file.delete();
+        assertTrue(lines.size() == 5);
+        assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "5.0")));
+        assertTrue(reader.readLines().get(4).equals(Arrays.asList("5.0", "-")));
+        file.delete();
     }
 
     @Test
