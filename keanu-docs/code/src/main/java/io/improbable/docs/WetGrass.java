@@ -14,14 +14,21 @@ public class WetGrass {
 
     public static void main(String[] args) {
 
+        //There's a simple 20% chance of rain and for the purposes
+        //of this example, that doesn't depend on any other variables.
         BoolVertex rain = new Flip(0.2);
 
+        //The probability of the sprinkler being on is dependent on
+        //whether or not it has rained. It's very unlikely that the
+        //sprinkler comes on if it's raining.
         BoolVertex sprinkler = new Flip(
             If.isTrue(rain)
                 .then(0.01)
                 .orElse(0.4)
         );
 
+        //The grass being wet is dependent on whether or not it rained or
+        //the sprinkler was on.
         BoolVertex wetGrass = new Flip(
             ConditionalProbabilityTable.of(sprinkler, rain)
                 .when(false, false).then(1e-2)
@@ -30,8 +37,11 @@ public class WetGrass {
                 .orDefault(0.99)
         );
 
+        //We observe that the grass is wet
         wetGrass.observe(true);
-        
+
+        //What does that observation say about the probability that it rained or that
+        //the sprinkler was on?
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
             new BayesianNetwork(wetGrass.getConnectedGraph()),
             Arrays.asList(sprinkler, rain),
