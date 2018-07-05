@@ -5,6 +5,11 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerSumVertex extends IntegerUnaryOpVertex {
 
+    /**
+     * Performs a sum across each value stored in a vertex
+     *
+     * @param inputVertex the vertex to have its values summed
+     */
     public IntegerSumVertex(IntegerVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

@@ -7,6 +7,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
 
+    /**
+     * Subtracts one vertex from another
+     *
+     * @param a the vertex to be subtracted from
+     * @param b the vertex to subtract
+     */
     public IntegerDifferenceVertex(IntegerVertex a, IntegerVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }

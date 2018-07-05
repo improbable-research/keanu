@@ -19,6 +19,8 @@ public class LogisticVertex extends ProbabilisticDouble {
 
     /**
      * One mu or s or both driving an arbitrarily shaped tensor of Logistic
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
      * @param mu          the mu (location) of the Logistic with either the same shape as specified for this vertex or mu scalar

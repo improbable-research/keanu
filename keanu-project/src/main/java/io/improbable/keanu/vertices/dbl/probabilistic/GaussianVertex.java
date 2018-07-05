@@ -18,7 +18,9 @@ public class GaussianVertex extends ProbabilisticDouble {
     private final DoubleVertex sigma;
 
     /**
-     * One mu or sigma or both driving an arbitrarily shaped tensor of Gaussian
+     * One mu or sigma or both that match a proposed tensor shape of Gaussian
+     *
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
      * @param mu          the mu of the Gaussian with either the same tensorShape as specified for this vertex or a scalar

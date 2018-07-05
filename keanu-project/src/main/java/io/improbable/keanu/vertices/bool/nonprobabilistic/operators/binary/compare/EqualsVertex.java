@@ -13,6 +13,9 @@ public class EqualsVertex<TENSOR extends Tensor> extends BoolBinaryOpVertex<TENS
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
+    /**
+     * Returns true if a is equal to b
+     */
     @Override
     protected BooleanTensor op(TENSOR a, TENSOR b) {
         return a.elementwiseEquals(b);

@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class SinVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the sine of a vertex. Sin(vertex).
+     *
+     * @param inputVertex the vertex
+     */
     public SinVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

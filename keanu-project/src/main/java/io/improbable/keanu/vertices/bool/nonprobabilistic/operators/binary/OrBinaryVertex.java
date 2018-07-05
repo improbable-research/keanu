@@ -11,6 +11,9 @@ public class OrBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTen
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
+    /**
+     * Returns true if a or b are true
+     */
     @Override
     protected BooleanTensor op(BooleanTensor a, BooleanTensor b) {
         return a.or(b);

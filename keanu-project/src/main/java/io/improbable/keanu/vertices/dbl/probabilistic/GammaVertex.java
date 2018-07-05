@@ -20,6 +20,8 @@ public class GammaVertex extends ProbabilisticDouble {
 
     /**
      * One location, theta or k or all three driving an arbitrarily shaped tensor of Gamma
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
      * @param location    the location of the Gamma with either the same shape as specified for this vertex or location scalar

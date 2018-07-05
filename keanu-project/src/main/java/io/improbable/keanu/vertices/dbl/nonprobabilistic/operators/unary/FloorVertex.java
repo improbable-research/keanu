@@ -9,6 +9,12 @@ import java.util.Map;
 
 public class FloorVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Applies the Floor operator to a vertex.
+     * This maps a vertex to the biggest integer less than or equal to its value
+     *
+     * @param inputVertex the vertex to be floor'd
+     */
     public FloorVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

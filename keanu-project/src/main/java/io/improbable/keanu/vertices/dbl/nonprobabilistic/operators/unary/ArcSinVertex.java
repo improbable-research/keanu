@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class ArcSinVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the inverse sin of a vertex, Arcsin(vertex)
+     *
+     * @param inputVertex the vertex
+     */
     public ArcSinVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

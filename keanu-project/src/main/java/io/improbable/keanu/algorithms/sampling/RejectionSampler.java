@@ -48,6 +48,16 @@ public class RejectionSampler {
         }
     }
 
+    /**
+     * Samples from the posterior of a Bayesian Network using Rejection Sampling / Accept-Reject.
+     * Rejection Sampling samples from a uniform space and retains the samples in the region
+     * under the graph of the network's distribution function.
+     *
+     * @param bayesNet the bayesian network to sample from
+     * @param fromVertices the vertices to sample from
+     * @param sampleCount the number of samples to take
+     * @return Samples taken with Rejection sampling.
+     */
     public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                                      List<Vertex<?>> fromVertices,
                                                      int sampleCount) {

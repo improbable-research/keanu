@@ -17,6 +17,10 @@ public class StudentTVertex extends ProbabilisticDouble {
     private final IntegerVertex v;
 
     /**
+     * One v that must match a proposed tensor shape of StudentT
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
      * @param tensorShape expected tensor shape
      * @param v           Degrees of Freedom
      */
@@ -39,26 +43,15 @@ public class StudentTVertex extends ProbabilisticDouble {
         this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(v));
     }
 
-    /**
-     * @return degrees of freedom (v)
-     */
     public IntegerVertex getV() {
         return v;
     }
 
-    /**
-     * @param t random variable
-     * @return Log of the Probability Density of t
-     */
     @Override
     public double logPdf(DoubleTensor t) {
         return StudentT.logPdf(v.getValue(), t).sum();
     }
 
-    /**
-     * @param t random variable
-     * @return Differential of the Log of the Probability Density of t
-     */
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
         StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
@@ -67,9 +60,6 @@ public class StudentTVertex extends ProbabilisticDouble {
         return m;
     }
 
-    /**
-     * @return sample of Student T distribution
-     */
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return StudentT.sample(getShape(), v.getValue(), random);
