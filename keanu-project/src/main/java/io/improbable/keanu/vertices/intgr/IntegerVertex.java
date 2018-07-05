@@ -121,14 +121,6 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         super.setAndCascade(IntegerTensor.create(values, getShape()));
     }
 
-    public void setAndCascade(int value, Map<Long, Long> explored) {
-        super.setAndCascade(IntegerTensor.create(value, getShape()), explored);
-    }
-
-    public void setAndCascade(int[] values, Map<Long, Long> explored) {
-        super.setAndCascade(IntegerTensor.create(values, getShape()), explored);
-    }
-
     public void observe(int value) {
         super.observe(IntegerTensor.create(value, getShape()));
     }

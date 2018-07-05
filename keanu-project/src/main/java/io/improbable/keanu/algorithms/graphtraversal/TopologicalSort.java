@@ -18,11 +18,8 @@ public class TopologicalSort {
      * @return a linear ordering of vertices by order of execution
      */
     public static List<Vertex> sort(Collection<? extends Vertex> vertices) {
-
-        Map<Vertex, Set<Vertex>> dependencies = mapDependencies(vertices);
-
         return vertices.stream().
-            sorted(Comparator.comparingInt(vertexA -> dependencies.get(vertexA).size()))
+            sorted(Comparator.comparingLong(Vertex::getId))
             .collect(Collectors.toList());
     }
 
