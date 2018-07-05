@@ -63,8 +63,8 @@ public class BayesianNetwork {
     }
 
 
-    public void probeForNonZeroMasterP(int attempts) {
-        probeForNonZeroMasterP(attempts, KeanuRandom.getDefaultRandom());
+    public void probeForNonZeroProbability(int attempts) {
+        probeForNonZeroProbability(attempts, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -74,14 +74,14 @@ public class BayesianNetwork {
      * @param attempts sampling attempts to get non-zero probability
      * @param random   random source for sampling
      */
-    public void probeForNonZeroMasterP(int attempts, KeanuRandom random) {
+    public void probeForNonZeroProbability(int attempts, KeanuRandom random) {
 
         if (isInImpossibleState()) {
 
             List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
             setFromSampleAndCascade(sortedByDependency, random);
 
-            probeForNonZeroMasterP(sortedByDependency, attempts, random);
+            probeForNonZeroProbability(sortedByDependency, attempts, random);
         }
     }
 
@@ -89,7 +89,7 @@ public class BayesianNetwork {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts, KeanuRandom random) {
+    private void probeForNonZeroProbability(List<? extends Vertex> latentVertices, int attempts, KeanuRandom random) {
 
         int iteration = 0;
         while (isInImpossibleState()) {

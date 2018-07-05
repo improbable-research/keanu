@@ -17,7 +17,7 @@ public class CPTVertexTest {
 
         BoolVertex A = new Flip(0.2);
 
-        CPTVertex<BooleanTensor> cpt = CPT.of(A)
+        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A)
             .when(true).then(TRUE)
             .orDefault(FALSE);
 
@@ -34,7 +34,7 @@ public class CPTVertexTest {
         BoolVertex A = new Flip(0.5);
         BoolVertex B = new Flip(0.5);
 
-        CPTVertex<BooleanTensor> cpt = CPT.of(A, B)
+        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A, B)
             .when(true, true).then(FALSE)
             .when(false, true).then(TRUE)
             .when(true, false).then(TRUE)
