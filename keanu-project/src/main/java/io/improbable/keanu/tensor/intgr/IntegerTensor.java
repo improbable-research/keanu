@@ -123,6 +123,8 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor apply(Function<Integer, Integer> function);
 
+    IntegerTensor factorial();
+
     // In Place
 
     IntegerTensor minusInPlace(int value);
@@ -150,6 +152,8 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     IntegerTensor absInPlace();
 
     IntegerTensor applyInPlace(Function<Integer, Integer> function);
+
+    IntegerTensor factorialInPlace();
 
     // Comparisons
     BooleanTensor lessThan(int value);

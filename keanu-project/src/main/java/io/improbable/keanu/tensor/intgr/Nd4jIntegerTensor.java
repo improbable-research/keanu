@@ -6,6 +6,7 @@ import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
@@ -281,6 +282,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor factorial() {
+        return duplicate().factorialInPlace();
+    }
+
+    @Override
     public IntegerTensor minusInPlace(int value) {
         tensor.subi(value);
         return this;
@@ -390,6 +396,15 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         DataBuffer data = tensor.data();
         for (int i = 0; i < data.length(); i++) {
             data.put(i, function.apply(data.getInt(i)));
+        }
+        return this;
+    }
+
+    @Override
+    public IntegerTensor factorialInPlace() {
+        DataBuffer tensorData = tensor.data();
+        for (long i = 0; i < tensorData.length(); i++) {
+            tensorData.put(i, (int) CombinatoricsUtils.factorial(tensorData.getInt(i)));
         }
         return this;
     }
