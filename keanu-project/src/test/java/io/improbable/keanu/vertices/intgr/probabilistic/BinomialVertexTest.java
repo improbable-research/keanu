@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.tensor.intgr.IntegerOverflowException;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.junit.Test;
@@ -26,7 +27,7 @@ public class BinomialVertexTest {
     }
 
     @Test
-    public void logPmfIsCorrectForKnownValues() {
+    public void logPmfIsCorrectForKnownScalarValues() {
 
         double p = 0.25;
         int n = 5;
@@ -39,5 +40,30 @@ public class BinomialVertexTest {
             double expected = distribution.logProbability(i);
             assertEquals(expected, actual, 1e-3);
         }
+    }
+
+    @Test
+    public void logPmfIsCorrectForKnownVectorValues() {
+        double p = 0.25;
+        int n = 5;
+
+        BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, 2}, p, n);
+        BinomialDistribution distribution = new BinomialDistribution(n, p);
+
+        double actual = testPoissonVertex.logPmf(new int[]{2, 3});
+        double expected = distribution.logProbability(2) + distribution.logProbability(3);
+        assertEquals(expected, actual, 1e-3);
+    }
+
+    @Test(expected = IntegerOverflowException.class)
+    public void throwsExceptionOnOverflowWithVector() {
+        BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, 2}, 0.25, 15);
+        testPoissonVertex.logPmf(14);
+    }
+
+    @Test(expected = IntegerOverflowException.class)
+    public void throwsExceptionOnOverflowWithScalar() {
+        BinomialVertex testPoissonVertex = new BinomialVertex(0.25, 15);
+        testPoissonVertex.logPmf(14);
     }
 }

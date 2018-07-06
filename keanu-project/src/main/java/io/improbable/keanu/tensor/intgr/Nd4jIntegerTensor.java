@@ -404,7 +404,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public IntegerTensor factorialInPlace() {
         DataBuffer tensorData = tensor.data();
         for (long i = 0; i < tensorData.length(); i++) {
-            tensorData.put(i, (int) CombinatoricsUtils.factorial(tensorData.getInt(i)));
+
+            int k = tensorData.getInt(i);
+            if (k > 12) {
+                throw new IntegerOverflowException();
+            }
+
+            tensorData.put(i, (int) CombinatoricsUtils.factorial(k));
         }
         return this;
     }

@@ -356,7 +356,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor factorialInPlace() {
         if (value > 12) {
-            throw new ArithmeticException();
+            throw new IntegerOverflowException();
         }
         value = (int) CombinatoricsUtils.factorial(value);
         return this;
