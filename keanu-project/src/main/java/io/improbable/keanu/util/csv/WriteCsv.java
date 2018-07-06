@@ -14,16 +14,12 @@ public class WriteCsv {
 
     private static String DEFAULT_EMPTY_VALUE = "-";
 
-    private WriteCsv() {
-    }
-
     /**
      * @param samples the samples to be written to CSV
      * @param vertices the vertices whose samples will be written to CSV
-     * @param <T> the type of the vertices
      * @return a writer for the csv file
      */
-    public static <T extends Tensor> CsvWriter asSamples(NetworkSamples samples, List<Vertex<T>> vertices) {
+    public static CsvWriter asSamples(NetworkSamples samples, List<? extends Vertex<? extends Tensor>> vertices) {
         List<List<String>> data = new ArrayList<>();
         List<String> header = new ArrayList<>();
         String headerStyle = "%d" + "[%d]";
@@ -31,8 +27,8 @@ public class WriteCsv {
 
         for (int i = 0; i < samples.size(); i++) {
             List<String> row = new ArrayList<>();
-            for (Vertex<T> vertex : vertices) {
-                T sample = samples.get(vertex).asList().get(i);
+            for (Vertex<? extends Tensor> vertex : vertices) {
+                Tensor sample = samples.get(vertex).asList().get(i);
                 List<Object> flatList = sample.asFlatList();
                 for (int j = 0; j < flatList.size(); j++) {
                     row.add(flatList.get(j).toString());
@@ -49,20 +45,19 @@ public class WriteCsv {
     }
 
     /**
-     * @param tensors the vertices whose values will be written to CSV in rows
-     * @param <T> the type of the vertices
+     * @param vertices the vertices whose values will be written to CSV in rows
      * @return a writer for the csv file
      */
-    public static <T extends Tensor> CsvWriter asRows(List<Vertex<T>> tensors) {
+    public static CsvWriter asRows(List<? extends Vertex<? extends Tensor>> vertices) {
         List<List<String>> data = new ArrayList<>();
         List<String> header = new ArrayList<>();
         String headerStyle = "[%d]";
-        int longestTensor = findLongestTensor(tensors);
+        int longestTensor = findLongestTensor(vertices);
         boolean populateHeader = true;
 
-        for (Vertex<T> tensor : tensors) {
+        for (Vertex<? extends Tensor> vertex : vertices) {
             List<String> row = new ArrayList<>();
-            List<Object> flatList = tensor.getValue().asFlatList();
+            List<Object> flatList = vertex.getValue().asFlatList();
             for (int i = 0; i < longestTensor; i++) {
                 if (populateHeader) {
                     header.add(String.format(headerStyle, i));
@@ -81,10 +76,9 @@ public class WriteCsv {
 
     /**
      * @param tensors the vertices whose values will be written to CSV in columns
-     * @param <T> the type of the vertices
      * @return a writer for the csv file
      */
-    public static <T extends Tensor> CsvWriter asColumns(List<Vertex<T>> tensors) {
+    public static CsvWriter asColumns(List<? extends Vertex<? extends Tensor>> tensors) {
         List<List<String>> data = new ArrayList<>();
         List<String> header = new ArrayList<>();
         int longestTensor = findLongestTensor(tensors);
@@ -92,7 +86,7 @@ public class WriteCsv {
 
         for (int i = 0; i < longestTensor; i++) {
             List<String> row = new ArrayList<>();
-            for (Vertex<T> tensor : tensors) {
+            for (Vertex<? extends Tensor> tensor : tensors) {
                 List<Object> flatList = tensor.getValue().asFlatList();
                 if (populateHeader) {
                     header.add(String.valueOf(tensor.getId()));
@@ -111,10 +105,10 @@ public class WriteCsv {
 
     }
 
-    private static <T extends Tensor> int findLongestTensor(List<Vertex<T>> tensors) {
+    private static int findLongestTensor(List<? extends Vertex<? extends Tensor>> tensors) {
         int longestTensor = 0;
-        for (Vertex<T> tensor : tensors) {
-            if (tensor.getValue().asFlatList().size() > longestTensor) {
+        for (Vertex<? extends Tensor> tensor : tensors) {
+            if (tensor.getValue().getLength() > longestTensor) {
                 longestTensor = tensor.getValue().asFlatList().size();
             }
         }

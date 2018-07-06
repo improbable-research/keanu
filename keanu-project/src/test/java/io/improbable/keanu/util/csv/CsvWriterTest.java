@@ -25,7 +25,7 @@ public class CsvWriterTest {
     @Test
     public void canWriteFile() {
         CsvWriter writer = new CsvWriter(data);
-        File file = writer.toFile("test", "../");
+        File file = writer.toFile("test.csv", "../");
 
         CsvReader reader = ReadCsv.fromFile(file.toPath()).expectHeader(false);
         List<List<String>> lines = reader.readLines();

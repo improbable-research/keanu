@@ -1,28 +1,31 @@
 package io.improbable.keanu.util.csv;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CsvWriter {
 
     private static final String DEFAULT_DELIMITER = ",";
-    private static final String DEFAULT_SUFFIX = ".csv";
-    private static final String NEWLINE = "\n";
+    private static String DEFAULT_EMPTY_VALUE = "-";
+    private static final String NEWLINE = System.lineSeparator();
 
     private final List<List<String>> data;
+    private List<String> header;
     private String delimiter;
     private boolean writeHeader;
-    private List<String> header;
-    private FileWriter fileWriter;
+    private String emptyValue;
 
-    public CsvWriter(List<List<String>> data) {
+    public CsvWriter(List<List<String>> data, String emptyValue) {
         this.data = data;
         this.delimiter = DEFAULT_DELIMITER;
         this.writeHeader = false;
         this.header = null;
-        this.fileWriter = null;
+        this.emptyValue = emptyValue;
+    }
+
+    public CsvWriter(List<List<String>> data) {
+        this(data, DEFAULT_EMPTY_VALUE);
     }
 
     public File toFile(String filename, String directory) {
@@ -30,48 +33,33 @@ public class CsvWriter {
     }
 
     public File toFile(String filename, File directory) {
-        try {
-            return toFile(File.createTempFile(filename, DEFAULT_SUFFIX, directory));
-        } catch (IOException e) {
-            throw new IllegalArgumentException("Could not create: " + filename + " at: " + directory + ". " + e);
-        }
+        return toFile(directory.toPath().resolve(filename).toFile());
     }
 
     public File toFile(File file) {
-        try {
-            fileWriter = new FileWriter(file);
-            writeHeader();
+        try (BufferedWriter fileWriter = new BufferedWriter(new FileWriter(file))) {
+            if (writeHeader) {
+                writeHeader(fileWriter, delimiter);
+            }
 
             for (List<String> row : data) {
-                int count = 0;
-                for (String dataPoint : row) {
-                    fileWriter.append(dataPoint);
-                    if (count != row.size() - 1) {
-                        fileWriter.append(delimiter);
-                    }
-                    count++;
-                }
-                fileWriter.append(NEWLINE);
+                fileWriter.append(toCsvLine(row, delimiter));
+                fileWriter.newLine();
             }
-        } catch (Exception e) {
-            throw new IllegalStateException("Failed while writing to: " + file + ". " + e);
-        } finally {
-            try {
-                fileWriter.flush();
-                fileWriter.close();
-            } catch (IOException e) {
-                throw new IllegalStateException("Failed while closing File Writer. " + e);
-            }
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
         return file;
     }
 
-    private void writeHeader() throws IOException {
-        if (writeHeader) {
-            String trimmedHeader = header.toString().substring(1, header.toString().length() - 1);
-            fileWriter.append(trimmedHeader);
-            fileWriter.append(NEWLINE);
-        }
+    private void writeHeader(BufferedWriter fileWriter, String delimiter) throws IOException {
+        String csvHeader = toCsvLine(header, delimiter);
+        fileWriter.append(csvHeader);
+        fileWriter.append(NEWLINE);
+    }
+
+    private String toCsvLine(List<String> tokens, String delimiter) {
+        return tokens.stream().collect(Collectors.joining(delimiter));
     }
 
     public CsvWriter withCustomHeader(List<String> header) {
@@ -95,6 +83,18 @@ public class CsvWriter {
         return this;
     }
 
+    public CsvWriter withCustomDelimiter(String delimiter) {
+        this.delimiter = delimiter;
+        return this;
+    }
 
+    public CsvWriter withCustomEmptyValue(String emptyValue) {
+        for (List<String> row : data) {
+            for (String value : row) {
+                row.set(row.indexOf(value), value.replace(this.emptyValue, emptyValue));
+            }
+        }
+        return this;
+    }
 
 }
