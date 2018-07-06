@@ -39,7 +39,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     /**
-     * Reduce vertex that assumes shape shape as inputs
+     * Reduce vertex that assumes shape as inputs
      *
      * @param f                  reduce function
      * @param dualNumberSupplier auto diff supplier
@@ -51,7 +51,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     /**
-     * Reduce vertex that assumes shape shape as inputs
+     * Reduce vertex that assumes shape as inputs
      *
      * @param f      reduce function
      * @param inputs input vertices to reduce

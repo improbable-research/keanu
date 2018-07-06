@@ -10,6 +10,12 @@ import java.util.Map;
 
 public class SigmoidVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Applies the sigmoid function to a vertex.
+     * The sigmoid function is a special case of the Logistic function.
+     *
+     * @param inputVertex the vertex
+     */
     public SigmoidVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

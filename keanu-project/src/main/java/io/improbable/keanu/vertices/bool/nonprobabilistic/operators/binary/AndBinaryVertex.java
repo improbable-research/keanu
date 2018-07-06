@@ -12,6 +12,9 @@ public class AndBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTe
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
+    /**
+     * Returns true if a and b are true
+     */
     @Override
     protected BooleanTensor op(BooleanTensor a, BooleanTensor b) {
         return a.and(b);

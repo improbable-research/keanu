@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class ExpVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Calculates the exponential of an input vertex
+     *
+     * @param inputVertex the vertex
+     */
     public ExpVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

@@ -63,8 +63,8 @@ public class BayesianNetwork {
     }
 
 
-    public void probeForNonZeroMasterP(int attempts) {
-        probeForNonZeroMasterP(attempts, KeanuRandom.getDefaultRandom());
+    public void probeForNonZeroProbability(int attempts) {
+        probeForNonZeroProbability(attempts, KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -74,14 +74,14 @@ public class BayesianNetwork {
      * @param attempts sampling attempts to get non-zero probability
      * @param random   random source for sampling
      */
-    public void probeForNonZeroMasterP(int attempts, KeanuRandom random) {
+    public void probeForNonZeroProbability(int attempts, KeanuRandom random) {
 
         if (isInImpossibleState()) {
 
             List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
             setFromSampleAndCascade(sortedByDependency, random);
 
-            probeForNonZeroMasterP(sortedByDependency, attempts, random);
+            probeForNonZeroProbability(sortedByDependency, attempts, random);
         }
     }
 
@@ -89,12 +89,11 @@ public class BayesianNetwork {
      * Attempt to find a non-zero master probability by repeatedly
      * cascading values from the given vertices
      */
-    private void probeForNonZeroMasterP(List<? extends Vertex> latentVertices, int attempts, KeanuRandom random) {
+    private void probeForNonZeroProbability(List<? extends Vertex> latentVertices, int attempts, KeanuRandom random) {
 
-        Map<Long, Long> setAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         int iteration = 0;
         while (isInImpossibleState()) {
-            setFromSampleAndCascade(latentVertices, setAndCascadeCache, random);
+            setFromSampleAndCascade(latentVertices, random);
             iteration++;
 
             if (iteration > attempts) {
@@ -108,27 +107,15 @@ public class BayesianNetwork {
         return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
     }
 
-
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
         setFromSampleAndCascade(vertices, KeanuRandom.getDefaultRandom());
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices, KeanuRandom random) {
-        setFromSampleAndCascade(vertices, VertexValuePropagation.exploreSetting(vertices), random);
-    }
-
-    public static void setFromSampleAndCascade(List<? extends Vertex> vertices,
-                                               Map<Long, Long> setAndCascadeCache) {
-        setFromSampleAndCascade(vertices, setAndCascadeCache, KeanuRandom.getDefaultRandom());
-    }
-
-    public static void setFromSampleAndCascade(List<? extends Vertex> vertices,
-                                               Map<Long, Long> setAndCascadeCache,
-                                               KeanuRandom random) {
         for (Vertex<?> vertex : vertices) {
             setValueFromSample(vertex, random);
         }
-        VertexValuePropagation.cascadeUpdate(vertices, setAndCascadeCache);
+        VertexValuePropagation.cascadeUpdate(vertices);
     }
 
     private static <T> void setValueFromSample(Vertex<T> vertex, KeanuRandom random) {

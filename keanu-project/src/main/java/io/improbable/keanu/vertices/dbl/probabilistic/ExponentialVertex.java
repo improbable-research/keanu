@@ -21,6 +21,8 @@ public class ExponentialVertex extends ProbabilisticDouble {
      * One location or lambda or both driving an arbitrarily shaped tensor of Exponential
      * <p>
      * pdf = lambda * exp(-lambda*x)
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
      * @param location    the horizontal shift of the Exponential with either the same shape as specified

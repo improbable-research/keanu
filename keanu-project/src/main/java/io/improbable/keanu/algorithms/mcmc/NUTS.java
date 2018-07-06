@@ -5,9 +5,9 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -74,7 +74,6 @@ public class NUTS {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final Map<Long, Long> latentSetAndCascadeCache = VertexValuePropagation.exploreSetting(latentVertices);
         final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
 
         final Map<Long, List<?>> samples = new HashMap<>();
@@ -93,7 +92,6 @@ public class NUTS {
             gradient,
             latentVertices,
             probabilisticVertices,
-            latentSetAndCascadeCache,
             random
         );
 
@@ -139,7 +137,6 @@ public class NUTS {
                 BuiltTree otherHalfTree = buildOtherHalfOfTree(
                     tree,
                     latentVertices,
-                    latentSetAndCascadeCache,
                     probabilisticVertices,
                     sampleFromVertices,
                     u,
@@ -189,7 +186,6 @@ public class NUTS {
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
                                                   List<Vertex<DoubleTensor>> latentVertices,
-                                                  final Map<Long, Long> latentSetAndCascadeCache,
                                                   List<Vertex> probabilisticVertices,
                                                   final List<? extends Vertex> sampleFromVertices,
                                                   double u,
@@ -207,7 +203,6 @@ public class NUTS {
 
             otherHalfTree = buildTree(
                 latentVertices,
-                latentSetAndCascadeCache,
                 probabilisticVertices,
                 sampleFromVertices,
                 currentTree.positionBackward,
@@ -229,7 +224,6 @@ public class NUTS {
 
             otherHalfTree = buildTree(
                 latentVertices,
-                latentSetAndCascadeCache,
                 probabilisticVertices,
                 sampleFromVertices,
                 currentTree.positionForward,
@@ -252,7 +246,6 @@ public class NUTS {
     }
 
     private static BuiltTree buildTree(List<Vertex<DoubleTensor>> latentVertices,
-                                       final Map<Long, Long> latentSetAndCascadeCache,
                                        List<Vertex> probabilisticVertices,
                                        final List<? extends Vertex> sampleFromVertices,
                                        Map<Long, DoubleTensor> position,
@@ -269,7 +262,6 @@ public class NUTS {
             //Base case-take one leapfrog step in the build direction
 
             return builtTreeBaseCase(latentVertices,
-                latentSetAndCascadeCache,
                 probabilisticVertices,
                 sampleFromVertices,
                 position,
@@ -286,7 +278,6 @@ public class NUTS {
 
             BuiltTree tree = buildTree(
                 latentVertices,
-                latentSetAndCascadeCache,
                 probabilisticVertices,
                 sampleFromVertices,
                 position,
@@ -306,7 +297,6 @@ public class NUTS {
                 BuiltTree otherHalfTree = buildOtherHalfOfTree(
                     tree,
                     latentVertices,
-                    latentSetAndCascadeCache,
                     probabilisticVertices,
                     sampleFromVertices,
                     u,
@@ -342,7 +332,6 @@ public class NUTS {
     }
 
     private static BuiltTree builtTreeBaseCase(List<Vertex<DoubleTensor>> latentVertices,
-                                               final Map<Long, Long> latentSetAndCascadeCache,
                                                List<Vertex> probabilisticVertices,
                                                final List<? extends Vertex> sampleFromVertices,
                                                Map<Long, DoubleTensor> position,
@@ -355,7 +344,6 @@ public class NUTS {
 
         LeapFrogged leapfrog = leapfrog(
             latentVertices,
-            latentSetAndCascadeCache,
             probabilisticVertices,
             position,
             gradient,
@@ -458,7 +446,6 @@ public class NUTS {
     }
 
     private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                        final Map<Long, Long> latentSetAndCascadeCache,
                                         final List<Vertex> probabilisticVertices,
                                         final Map<Long, DoubleTensor> position,
                                         final Map<Long, DoubleTensor> gradient,
@@ -485,7 +472,7 @@ public class NUTS {
             latent.setValue(nextPositionForLatent);
         }
 
-        VertexValuePropagation.cascadeUpdate(latentVertices, latentSetAndCascadeCache);
+        VertexValuePropagation.cascadeUpdate(latentVertices);
 
         Map<Long, DoubleTensor> nextPositionGradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
@@ -631,20 +618,19 @@ public class NUTS {
                                                Map<Long, DoubleTensor> gradient,
                                                List<Vertex<DoubleTensor>> vertices,
                                                List<Vertex> probabilisticVertices,
-                                               Map<Long, Long> latentSetAndCascadeCache,
                                                KeanuRandom random) {
         double stepsize = 1;
         double probBeforeLeapfrog = getLogProb(probabilisticVertices);
         Map<Long, DoubleTensor> momentums = new HashMap<>();
         initializeMomentumForEachVertex(vertices, momentums, random);
-        leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
+        leapfrog(vertices, probabilisticVertices, position, gradient, momentums, stepsize);
         double probAfterLeapfrog = getLogProb(probabilisticVertices);
         double likelihoodRatio = probAfterLeapfrog - probBeforeLeapfrog;
         double scalingFactor = likelihoodRatio > Math.log(0.5) ? 1 : -1;
 
         while (scalingFactor * (likelihoodRatio) > -scalingFactor * Math.log(2)) {
             stepsize = stepsize * Math.pow(2, scalingFactor);
-            leapfrog(vertices, latentSetAndCascadeCache, probabilisticVertices, position, gradient, momentums, stepsize);
+            leapfrog(vertices, probabilisticVertices, position, gradient, momentums, stepsize);
             likelihoodRatio = getLogProb(probabilisticVertices) - probBeforeLeapfrog;
         }
 

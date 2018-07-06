@@ -9,6 +9,12 @@ import java.util.Map;
 
 public class CeilVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Applies the Ceiling operator to a vertex.
+     * This maps a vertex to the smallest integer greater than or equal to its value
+     *
+     * @param inputVertex the vertex to be ceil'd
+     */
     public CeilVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

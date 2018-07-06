@@ -10,6 +10,12 @@ import java.util.Map;
 
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
 
+    /**
+     * Matrix multiplies one vertex by another. C = AB
+     *
+     * @param a vertex A
+     * @param b vertex B
+     */
     public MatrixMultiplicationVertex(DoubleVertex a, DoubleVertex b) {
         super(getResultingShape(a.getShape(), b.getShape()), a, b);
     }

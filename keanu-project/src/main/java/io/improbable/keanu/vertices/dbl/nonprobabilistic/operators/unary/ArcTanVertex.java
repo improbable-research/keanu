@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class ArcTanVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the inverse tan of a vertex, Arctan(vertex)
+     *
+     * @param inputVertex the vertex
+     */
     public ArcTanVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

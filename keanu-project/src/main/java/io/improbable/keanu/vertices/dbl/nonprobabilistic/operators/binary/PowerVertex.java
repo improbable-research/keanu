@@ -11,6 +11,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
+    /**
+     * Raises a vertex to the power of another
+     *
+     * @param a the base vertex
+     * @param b the exponent vertex
+     */
     public PowerVertex(DoubleVertex a, DoubleVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }

@@ -13,6 +13,9 @@ public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends BoolBin
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
 
+    /**
+     * Returns true if a is not equal to b
+     */
     @Override
     public BooleanTensor op(A a, B b) {
         return a.elementwiseEquals(b).not();

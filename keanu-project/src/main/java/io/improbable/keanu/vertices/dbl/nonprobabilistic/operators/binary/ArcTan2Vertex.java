@@ -12,6 +12,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
+    /**
+     * Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
+     *
+     * @param a x coordinate
+     * @param b y coordinate
+     */
     public ArcTan2Vertex(DoubleVertex a, DoubleVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }

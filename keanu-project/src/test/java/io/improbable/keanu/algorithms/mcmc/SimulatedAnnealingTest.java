@@ -39,7 +39,7 @@ public class SimulatedAnnealingTest {
     public void findsMaxAposterioriWithAnnealing() {
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        network.probeForNonZeroMasterP(100, random);
+        network.probeForNonZeroProbability(100, random);
 
         NetworkState maxAPosterioriSamples = SimulatedAnnealing.getMaxAPosteriori(network, 10000, random);
         NetworkState maxValuesFromVariational = findMAPWithOptimizer();
@@ -50,7 +50,7 @@ public class SimulatedAnnealingTest {
 
     private NetworkState findMAPWithOptimizer() {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        network.probeForNonZeroMasterP(100, random);
+        network.probeForNonZeroProbability(100, random);
 
         GradientOptimizer graphOptimizer = new GradientOptimizer(network);
         graphOptimizer.maxAPosteriori();

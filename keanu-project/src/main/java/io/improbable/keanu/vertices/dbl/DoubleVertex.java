@@ -201,14 +201,6 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         super.setAndCascade(DoubleTensor.create(values, getShape()));
     }
 
-    public void setAndCascade(double value, Map<Long, Long> explored) {
-        super.setAndCascade(DoubleTensor.create(value, getShape()), explored);
-    }
-
-    public void setAndCascade(double[] values, Map<Long, Long> explored) {
-        super.setAndCascade(DoubleTensor.create(values, getShape()), explored);
-    }
-
     public void observe(double value) {
         super.observe(DoubleTensor.create(value, getShape()));
     }

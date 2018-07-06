@@ -1,13 +1,11 @@
-package io.improbable.keanu.distributions.tensors.continuous;
+package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
-public class TensorMultivariateGaussian {
+public class MultivariateGaussian {
 
-    private TensorMultivariateGaussian() {
+    private MultivariateGaussian() {
     }
 
     public static DoubleTensor sample(DoubleTensor mu, DoubleTensor covariance, KeanuRandom random) {

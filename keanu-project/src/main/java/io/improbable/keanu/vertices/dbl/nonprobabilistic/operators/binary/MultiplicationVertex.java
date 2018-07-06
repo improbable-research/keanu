@@ -11,6 +11,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
 
+    /**
+     * Multiplies one vertex by another
+     *
+     * @param a vertex to be multiplied
+     * @param b vertex to be multiplied
+     */
     public MultiplicationVertex(DoubleVertex a, DoubleVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
     }
