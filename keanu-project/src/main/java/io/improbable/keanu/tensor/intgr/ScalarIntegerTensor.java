@@ -4,7 +4,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import org.apache.commons.math3.util.CombinatoricsUtils;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -246,11 +245,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor factorial() {
-        return duplicate().factorialInPlace();
-    }
-
-    @Override
     public IntegerTensor minusInPlace(int that) {
         value = value - that;
         return this;
@@ -350,15 +344,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor applyInPlace(Function<Integer, Integer> function) {
         value = function.apply(value);
-        return this;
-    }
-
-    @Override
-    public IntegerTensor factorialInPlace() {
-        if (value > 12) {
-            throw new IntegerOverflowException();
-        }
-        value = (int) CombinatoricsUtils.factorial(value);
         return this;
     }
 

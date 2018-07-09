@@ -282,11 +282,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor factorial() {
-        return duplicate().factorialInPlace();
-    }
-
-    @Override
     public IntegerTensor minusInPlace(int value) {
         tensor.subi(value);
         return this;
@@ -396,21 +391,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         DataBuffer data = tensor.data();
         for (int i = 0; i < data.length(); i++) {
             data.put(i, function.apply(data.getInt(i)));
-        }
-        return this;
-    }
-
-    @Override
-    public IntegerTensor factorialInPlace() {
-        DataBuffer tensorData = tensor.data();
-        for (long i = 0; i < tensorData.length(); i++) {
-
-            int k = tensorData.getInt(i);
-            if (k > 12) {
-                throw new IntegerOverflowException();
-            }
-
-            tensorData.put(i, (int) CombinatoricsUtils.factorial(k));
         }
         return this;
     }

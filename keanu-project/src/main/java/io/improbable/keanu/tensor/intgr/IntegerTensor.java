@@ -4,9 +4,6 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -123,8 +120,6 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor apply(Function<Integer, Integer> function);
 
-    IntegerTensor factorial();
-
     // In Place
 
     IntegerTensor minusInPlace(int value);
@@ -152,8 +147,6 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     IntegerTensor absInPlace();
 
     IntegerTensor applyInPlace(Function<Integer, Integer> function);
-
-    IntegerTensor factorialInPlace();
 
     // Comparisons
     BooleanTensor lessThan(int value);

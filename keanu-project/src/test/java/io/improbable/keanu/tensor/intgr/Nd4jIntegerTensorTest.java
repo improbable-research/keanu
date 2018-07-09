@@ -5,7 +5,8 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertFalse;
 
 public class Nd4jIntegerTensorTest {
 
@@ -321,14 +322,6 @@ public class Nd4jIntegerTensorTest {
         BooleanTensor result = matrix.greaterThanOrEqual(3);
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
-    }
-
-    @Test
-    public void doesFactorial() {
-        IntegerTensor values = IntegerTensor.create(new int[]{0, 1, 2, 3, 4, 5}, new int[]{3, 2});
-        IntegerTensor factorial = values.factorial();
-        IntegerTensor expected = IntegerTensor.create(new int[]{1, 1, 2, 6, 24, 120}, new int[]{3, 2});
-        assertEquals(expected, factorial);
     }
 
 }
