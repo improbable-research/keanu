@@ -35,22 +35,31 @@ public class Binomial {
 
     public static DoubleTensor logPmf(IntegerTensor k, DoubleTensor p, IntegerTensor n) {
 
-        Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
+        DoubleTensor logBinomialCoefficient = getLogBinomialCoefficient(k, n);
+
+        DoubleTensor logBinomial = p.pow(k.toDouble())
+            .times(
+                p.unaryMinus().plusInPlace(1.0).powInPlace(n.minus(k).toDouble())
+            ).logInPlace();
+
+        return logBinomialCoefficient.plusInPlace(logBinomial);
+    }
+
+    private static DoubleTensor getLogBinomialCoefficient(IntegerTensor k, IntegerTensor n) {
         Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
         Tensor.FlattenedView<Integer> kWrapped = k.getFlattenedView();
 
         int length = (int) k.getLength();
-        double[] pmf = new double[length];
+        double[] logBinomialCoefficient = new double[length];
         for (int i = 0; i < length; i++) {
-            pmf[i] = logPmf(kWrapped.getOrScalar(i), pWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
+            logBinomialCoefficient[i] = getLogBinomialCoefficient(kWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
         }
 
-        return DoubleTensor.create(pmf, k.getShape());
+        return DoubleTensor.create(logBinomialCoefficient, k.getShape());
     }
 
-    private static double logPmf(int k, double p, int n) {
+    private static double getLogBinomialCoefficient(int k, int n) {
         long binomialCoefficient = CombinatoricsUtils.binomialCoefficient(n, k);
-        double binomial = Math.pow(p, k) * Math.pow(1.0 - p, n - k);
-        return Math.log(binomialCoefficient * binomial);
+        return Math.log(binomialCoefficient);
     }
 }
