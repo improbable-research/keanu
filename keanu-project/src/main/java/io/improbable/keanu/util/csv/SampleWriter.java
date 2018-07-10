@@ -50,7 +50,6 @@ public class SampleWriter extends Writer {
         }
         String[] headerToArray = new String[header.size()];
         withHeader(header.toArray(headerToArray));
-        withHeaderEnabled(true);
         return this;
     }
 }

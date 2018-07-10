@@ -35,12 +35,7 @@ public class ColumnWriter extends Writer {
             List<String> row = new ArrayList<>();
             for (Vertex<? extends Tensor> vertex : vertices) {
                 List<Object> flatList = vertex.getValue().asFlatList();
-                if (i < flatList.size()) {
-                    row.add(flatList.get(i).toString());
-                } else {
-                    row.add(emptyValue);
-                }
-
+                row.add(i < flatList.size() ? flatList.get(i).toString() : emptyValue);
             }
             String[] rowToString = new String[row.size()];
             data.add(row.toArray(rowToString));
@@ -55,7 +50,6 @@ public class ColumnWriter extends Writer {
             header[i] = String.format(HEADER_STYLE, vertices.get(i).getId());
         }
         withHeader(header);
-        withHeaderEnabled(true);
         return this;
     }
 
