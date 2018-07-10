@@ -59,10 +59,6 @@ public class FitnessFunction {
         VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
-    public long numLatentDimensions() {
-        return latentVertices.stream().mapToLong(FitnessFunction::numDimensions).sum();
-    }
-
     static long numDimensions(Vertex<DoubleTensor> vertex) {
         return vertex.getValue().getLength();
     }
