@@ -1,11 +1,9 @@
 package io.improbable.keanu.util.csv;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -58,12 +56,14 @@ public class WriteCsvTest {
 
     @Test
     public void writeSamplesToCsv() {
-        File file = WriteCsv.asSamples(samples, rowTensors).toFile("test.csv", "../");
+        File file = WriteCsv.asSamples(samples, rowTensors).toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
 
         assertTrue(lines.size() == 2);
+        List<String> x = reader.readLines().get(0);
+        List<String> y = Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0", "5.0", "4.0", "3.0", "2.0");
         assertTrue(reader.readLines().get(0).equals(
             Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0", "5.0", "4.0", "3.0", "2.0")));
         assertTrue(reader.readLines().get(1).equals(
@@ -74,7 +74,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeSamplesToCsvWithHeader() {
-        File file = WriteCsv.asSamples(samples, rowTensors).withDefaultHeader().toFile("test.csv", "../");
+        File file = WriteCsv.asSamples(samples, rowTensors).withDefaultHeader().toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -84,8 +84,8 @@ public class WriteCsvTest {
 
         assertTrue(lines.size() == 2);
         assertTrue(reader.getHeader().equals(Arrays.asList(
-            firstId + "[0]", firstId + "[1]", firstId + "[2]", firstId + "[3]", firstId + "[4]",
-            secondId + "[0]", secondId + "[1]", secondId + "[2]", secondId + "[3]"))
+            "{" + firstId + "}" + "[0]", "{" + firstId + "}" + "[1]", "{" + firstId + "}" + "[2]", "{" + firstId + "}" + "[3]", "{" + firstId + "}" + "[4]",
+            "{" + secondId + "}" + "[0]", "{" + secondId + "}" + "[1]", "{" + secondId + "}" + "[2]", "{" + secondId + "}" + "[3]"))
         );
         assertTrue(reader.readLines().get(0).equals(
             Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0", "5.0", "4.0", "3.0", "2.0")));
@@ -97,7 +97,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfTensorsToCsv() {
-        File file = WriteCsv.asColumns(columnTensors).toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(columnTensors).toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -110,7 +110,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfTensorsToCsvWithCustomEmptyValue() {
-        File file = WriteCsv.asColumns(columnTensors).withCustomEmptyValue("None").toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(columnTensors).withEmptyValue("None").toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -123,7 +123,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfIntegerTensorsToCsv() {
-        File file = WriteCsv.asColumns(integerColumnTensors).toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(integerColumnTensors).toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -136,7 +136,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeColumnOfTensorsToCsvWithHeader() {
-        File file = WriteCsv.asColumns(columnTensors).withDefaultHeader().toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(columnTensors).withDefaultHeader().toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -145,7 +145,7 @@ public class WriteCsvTest {
         long secondId = columnTensors.get(1).getId();
 
         assertTrue(lines.size() == 5);
-        assertTrue(reader.getHeader().equals(Arrays.asList(new String[]{String.valueOf(firstId), String.valueOf(secondId)})));
+        assertTrue(reader.getHeader().equals(Arrays.asList("{" + firstId + "}", "{" + secondId + "}")));
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "5.0")));
         assertTrue(reader.readLines().get(4).equals(Arrays.asList("5.0", "-")));
         file.delete();
@@ -154,7 +154,7 @@ public class WriteCsvTest {
 
     @Test
     public void writeRowOfTensorsToCsv() {
-        File file = WriteCsv.asRows(rowTensors).toFile("test.csv", "../");
+        File file = WriteCsv.asRows(rowTensors).toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -163,12 +163,11 @@ public class WriteCsvTest {
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0")));
         assertTrue(reader.readLines().get(1).equals(Arrays.asList("5.0", "4.0", "3.0", "2.0", "-")));
         file.delete();
-
     }
 
     @Test
     public void writeRowOfTensorsToCsvWithHeader() {
-        File file = WriteCsv.asRows(rowTensors).withDefaultHeader().toFile("test.csv", "../");
+        File file = WriteCsv.asRows(rowTensors).withDefaultHeader().toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -178,12 +177,11 @@ public class WriteCsvTest {
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0")));
         assertTrue(reader.readLines().get(1).equals(Arrays.asList("5.0", "4.0", "3.0", "2.0", "-")));
         file.delete();
-
     }
 
     @Test
     public void writeRowOfScalarsToCsv() {
-        File file = WriteCsv.asColumns(scalarTensors).toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(scalarTensors).toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
         List<List<String>> lines = reader.readLines();
@@ -191,12 +189,11 @@ public class WriteCsvTest {
         assertTrue(lines.size() == 1);
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("0.5", "1.5")));
         file.delete();
-
     }
 
     @Test
     public void writeRowOfScalarsToCsvWithHeader() {
-        File file = WriteCsv.asColumns(scalarTensors).withDefaultHeader().toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(scalarTensors).withDefaultHeader().toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
@@ -205,30 +202,28 @@ public class WriteCsvTest {
         long secondId = scalarTensors.get(1).getId();
 
         assertTrue(lines.size() == 1);
-        assertTrue(reader.getHeader().equals(Arrays.asList(new String[]{String.valueOf(firstId), String.valueOf(secondId)})));
+        assertTrue(reader.getHeader().equals(Arrays.asList("{" + firstId + "}", "{" + secondId + "}")));
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("0.5", "1.5")));
         file.delete();
-
     }
 
     @Test
     public void writeRowOfScalarsToCsvWithCustomHeader() {
-        List<String> customHeader = Arrays.asList("Temperature", "Humidity");
-        File file = WriteCsv.asColumns(scalarTensors).withCustomHeader(customHeader).toFile("test.csv", "../");
+        String[] customHeader = new String[]{"Temperature", "Humidity"};
+        File file = WriteCsv.asColumns(scalarTensors).withHeader(customHeader).toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
 
         assertTrue(lines.size() == 1);
-        assertTrue(reader.getHeader().equals(customHeader));
+        assertTrue(reader.getHeader().equals(Arrays.asList(customHeader)));
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("0.5", "1.5")));
         file.delete();
-
     }
 
     @Test
     public void writeRowOfScalarsToCsvWithCustomDelimiter() {
-        File file = WriteCsv.asColumns(scalarTensors).withCustomDelimiter("\t").toFile("test.csv", "../");
+        File file = WriteCsv.asColumns(scalarTensors).withSeparator('\t').toFile("test.csv");
 
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(false).withDelimiter("\t");
         List<List<String>> lines = reader.readLines();
@@ -236,7 +231,6 @@ public class WriteCsvTest {
         assertTrue(lines.size() == 1);
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("0.5", "1.5")));
         file.delete();
-
     }
 
 }
