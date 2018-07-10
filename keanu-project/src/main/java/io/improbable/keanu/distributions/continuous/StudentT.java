@@ -5,8 +5,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
 
-import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
-import static io.improbable.keanu.tensor.TensorShape.concat;
 import static java.lang.Math.PI;
 import static java.lang.Math.log;
 

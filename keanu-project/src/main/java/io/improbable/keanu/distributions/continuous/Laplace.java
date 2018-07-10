@@ -5,9 +5,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.nd4j.linalg.util.ArrayUtil;
 
-import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
-import static io.improbable.keanu.tensor.TensorShape.concat;
-
 public class Laplace {
 
     private Laplace() {

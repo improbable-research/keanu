@@ -3,9 +3,6 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
-import static io.improbable.keanu.tensor.TensorShape.concat;
-
 public class Exponential {
 
     private Exponential() {
