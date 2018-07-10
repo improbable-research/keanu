@@ -609,7 +609,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             // This is necessary to match Python behaviour
             // Which rounds negative numbers down if they end in 0.5
             // e.g.
-            // Java: round(-2.5) == 2.0
+            // Java: round(-2.5) == -2.0
             // Python: round(-2.5) == -3.0
             valueToRound -= 1.;
         }
