@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Before;
@@ -69,7 +70,7 @@ public class LinearRegression {
         int N = 100000;
         double expectedW1 = 3.0;
         double expectedW2 = 7.0;
-        double expectedB = 20.0;
+        double expectedB = 0.0;
 
         DoubleVertex x1Generator = new UniformVertex(new int[]{1, N}, 0, 10);
         DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 50, 100);
@@ -85,22 +86,27 @@ public class LinearRegression {
 
         // Linear Regression
         DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
+        w1.setValue(2);
         DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
-        DoubleVertex b = new GaussianVertex(0.0, 10.0);
+        w2.setValue(2);
         DoubleVertex x1 = ConstantVertex.of(x1Data);
         DoubleVertex x2 = ConstantVertex.of(x2Data);
-        DoubleVertex y = new GaussianVertex(x1.multiply(w1).plus(x2.multiply(w2)).plus(b), 5.0);
+        DoubleVertex yMu = x1.multiply(w1).plus(x2.multiply(w2));
+        DoubleVertex y = new GaussianVertex(yMu, 5.0);
         y.observe(yData);
+
+//        DualNumber yMuDual = yMu.getDualNumber();
+//        DoubleTensor w1Diff = yMuDual.getPartialDerivatives().withRespectTo(w1);
+//        DoubleTensor w2Diff = yMuDual.getPartialDerivatives().withRespectTo(w2);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
         GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
 
         optimizer.maxLikelihood();
 
-        log.info("W1 = " + w1.getValue().scalar() + " W2 = " + w2.getValue().scalar() + ", B = " + b.getValue().scalar());
+        log.info("W1 = " + w1.getValue().scalar() + " W2 = " + w2.getValue().scalar());
         assertEquals(expectedW1, w1.getValue().scalar(), 0.05);
         assertEquals(expectedW2, w2.getValue().scalar(), 0.05);
-        assertEquals(expectedB, b.getValue().scalar(), 0.05);
     }
 
     @Test
@@ -156,25 +162,26 @@ public class LinearRegression {
 
         // Generate data
         int N = 100000;
-        double expectedW1 = 3.0;
+        double expectedW1 = 12.0;
         double expectedW2 = 7.0;
-        double expectedB = 20.0;
 
         DoubleVertex wGenerator = ConstantVertex.of(DoubleTensor.create(new double[]{expectedW1, expectedW2}, 2, 1));
         DoubleVertex xGenerator = new UniformVertex(new int[]{N, 2}, 0, 10);
         DoubleVertex yGenerator = new GaussianVertex(
-            xGenerator.matrixMultiply(wGenerator).plus(expectedB),
+            xGenerator.matrixMultiply(wGenerator),
             1.0
         );
-        DoubleTensor xData = xGenerator.sample(random);
+        DoubleTensor xData = xGenerator.sample(random).reshape(2, 100000).transpose();
         xGenerator.setAndCascade(xData);
         DoubleTensor yData = yGenerator.sample(random);
 
         // Linear Regression
         DoubleVertex w = new GaussianVertex(new int[]{2, 1}, 0.0, 10.0);
-        DoubleVertex b = new GaussianVertex(0.0, 10.0);
+        w.setValue(DoubleTensor.create(new double[]{2, 2}, 2, 1));
+
         DoubleVertex x = ConstantVertex.of(xData);
-        DoubleVertex y = new GaussianVertex(x.matrixMultiply(w).plus(b), 5.0);
+        DoubleVertex yMu = x.matrixMultiply(w);
+        DoubleVertex y = new GaussianVertex(yMu, 5.0);
         y.observe(yData);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
@@ -182,10 +189,9 @@ public class LinearRegression {
 
         optimizer.maxLikelihood();
 
-        log.info("W1 = " + w.getValue(0) + " W2 = " + w.getValue(1) + ", B = " + b.getValue().scalar());
+        System.out.println("W1 = " + w.getValue(0) + " W2 = " + w.getValue(1));
         assertEquals(expectedW1, w.getValue(0), 0.05);
         assertEquals(expectedW2, w.getValue(1), 0.05);
-        assertEquals(expectedB, b.getValue().scalar(), 0.05);
     }
 
 }

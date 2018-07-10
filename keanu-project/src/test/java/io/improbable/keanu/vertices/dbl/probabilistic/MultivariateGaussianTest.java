@@ -29,7 +29,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void samplingFromUnivariateGaussianMatchesLogDensity() {
-        MultivariateGaussian mvg = new MultivariateGaussian(0, 1);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(0, 1);
 
         double from = -2.;
         double to = 2.;
@@ -40,7 +40,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void univariateGaussianMatchesLogDensityOfScalar() {
-        MultivariateGaussian mvg = new MultivariateGaussian(5, 1);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, 1);
 
         double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
         double density = mvg.logPdf(Nd4jDoubleTensor.scalar(0.5));
@@ -53,7 +53,7 @@ public class MultivariateGaussianTest {
         DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new double[]{2, 3}, new int[]{2, 1}));
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, 1);
 
         double expectedDensity1 = new NormalDistribution(2, 1).logDensity(8);
         double expectedDensity2 = new NormalDistribution(3, 1).logDensity(10);
@@ -71,7 +71,7 @@ public class MultivariateGaussianTest {
         DoubleVertex covarianceMatrix = ConstantVertex.of(
             new Nd4jDoubleTensor(new double[]{1, 0.3, 0.3, 0.6}, new int[]{2, 2}));
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
         double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.5, 0.4}, new int[]{2, 1}));
         double expected = -3.6874792995813834;
 
@@ -94,7 +94,7 @@ public class MultivariateGaussianTest {
             )
         );
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
         double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.2, 0.3, 0.4}, new int[]{3, 1}));
         double expected = -8.155504532016181;
 
@@ -106,7 +106,7 @@ public class MultivariateGaussianTest {
         DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new double[]{0, 0}, new int[]{2, 1}));
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
+        MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, 1);
 
         double from = -1.;
         double to = 1.;
@@ -115,7 +115,7 @@ public class MultivariateGaussianTest {
         sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random);
     }
 
-    private static void sampleMethodMatchesLogProbMethodMultiVariate(MultivariateGaussian vertexUnderTest,
+    private static void sampleMethodMatchesLogProbMethodMultiVariate(MultivariateGaussianVertex vertexUnderTest,
                                                                      double from,
                                                                      double to,
                                                                      double bucketSize,

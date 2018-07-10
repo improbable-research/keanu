@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShape.increaseRankByAppendingOnesToShape;
+import static io.improbable.keanu.tensor.TensorShape.increaseRankByPrependingOnesToShape;
 import static java.util.Collections.singletonMap;
 
 public class PartialDerivatives {
@@ -55,14 +57,18 @@ public class PartialDerivatives {
         derivativeWithRespectTo.put(id, value);
     }
 
-    public PartialDerivatives sum(int... overDimensions) {
+    public PartialDerivatives sum(boolean reshape, int... overDimensions) {
         Map<Long, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
         for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
             DoubleTensor v = entry.getValue();
             DoubleTensor reshapedV = v.sum(overDimensions);
-            summed.put(k, increaseRankByPrependingOnesToShape(reshapedV, v.getRank()));
+            if (reshape) {
+                summed.put(k, reshapedV);
+            } else {
+                summed.put(k, increaseRankByPrependingOnesToShape(reshapedV, v.getRank()));
+            }
         }
 
         return new PartialDerivatives(summed);
@@ -133,44 +139,12 @@ public class PartialDerivatives {
             int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplier.getRank(), partial.getRank());
 
             return partial.tensorMultiply(multiplierReshaped,
-                range(0, partialOfShape.length),
-                range(multiplier.getRank(), partial.getRank())
+                TensorShape.dimensionRange(0, partialOfShape.length),
+                TensorShape.dimensionRange(multiplier.getRank(), partial.getRank())
             ).reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
         } else {
             return partial.times(multiplierReshaped);
         }
-    }
-
-    private static int[] range(int from, int to) {
-        int[] result = new int[to - from];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = from + i;
-        }
-        return result;
-    }
-
-    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, true);
-    }
-
-    private static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, false);
-    }
-
-    private static DoubleTensor increaseRankByPaddingOnes(DoubleTensor lowRankTensor, int desiredRank, boolean append) {
-        int[] shape = lowRankTensor.getShape();
-        if (shape.length == desiredRank) {
-            return lowRankTensor;
-        }
-
-        int[] paddedShape = new int[desiredRank];
-        Arrays.fill(paddedShape, 1);
-        if (append) {
-            System.arraycopy(shape, 0, paddedShape, 0, shape.length);
-        } else {
-            System.arraycopy(shape, 0, paddedShape, shape.length, shape.length);
-        }
-        return lowRankTensor.reshape(paddedShape);
     }
 
     public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {

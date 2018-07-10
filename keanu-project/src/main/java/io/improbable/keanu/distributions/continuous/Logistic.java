@@ -3,6 +3,9 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
+
 public class Logistic {
 
     /**
@@ -31,15 +34,15 @@ public class Logistic {
         );
     }
 
-    public static Diff dlnPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
         final DoubleTensor expAOverB = mu.div(s).expInPlace();
         final DoubleTensor expXOverB = x.div(s).expInPlace();
         final DoubleTensor expPlus = expAOverB.plus(expXOverB);
         final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
 
-        final DoubleTensor dPda = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
-        final DoubleTensor dPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
+        DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
+        DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
         final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
             mu.times(expAOverB.unaryMinus())
@@ -47,20 +50,24 @@ public class Logistic {
         final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
         final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
 
-        final DoubleTensor dPdb = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+        DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
-        return new Diff(dPda, dPdb, dPdx);
+        dLogPdmu = dLogPdmu.reshape(concat(SCALAR_SHAPE, dLogPdmu.getShape()));
+        dLogPds = dLogPds.reshape(concat(SCALAR_SHAPE, dLogPds.getShape()));
+        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
+
+        return new DiffLogP(dLogPdmu, dLogPds, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdmu;
-        public final DoubleTensor dPds;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdmu;
+        public final DoubleTensor dLogPds;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPdmu, DoubleTensor dPds, DoubleTensor dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPds = dPds;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPds, DoubleTensor dLogPdx) {
+            this.dLogPdmu = dLogPdmu;
+            this.dLogPds = dLogPds;
+            this.dLogPdx = dLogPdx;
         }
     }
 

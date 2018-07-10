@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,7 +23,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape   the desired shape of the vertex
@@ -124,11 +125,12 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor dPdfdx = SmoothUniform.dlnPdf(min, max, shoulderWidth, value);
+        final DoubleTensor dPdfdx = SmoothUniform.dPdf(min, max, shoulderWidth, value);
         final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
-        final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
+        final DoubleTensor dLogPdfdx = dPdfdx.divInPlace(density);
+        final DoubleTensor dLogPdfdxSummed = dLogPdfdx.sum(TensorShape.dimensionRange(0, getShape().length));
 
-        return singletonMap(getId(), dlogPdfdx);
+        return singletonMap(getId(), dLogPdfdxSummed);
     }
 
     @Override

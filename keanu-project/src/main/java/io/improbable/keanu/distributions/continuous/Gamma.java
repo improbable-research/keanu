@@ -5,6 +5,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.nd4j.linalg.util.ArrayUtil;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
 import static java.lang.Math.*;
 
 public class Gamma {
@@ -98,31 +100,36 @@ public class Gamma {
         return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
     }
 
-    public static Diff dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
-        final DoubleTensor xMinusA = x.minus(location);
-        final DoubleTensor aMinusX = location.minus(x);
+    public static DiffLogP dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
+        final DoubleTensor xMinusLocation = x.minus(location);
+        final DoubleTensor locationMinusX = location.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
         final DoubleTensor oneOverTheta = theta.reciprocal();
 
-        final DoubleTensor dPdx = kMinus1.div(xMinusA).minusInPlace(oneOverTheta);
-        final DoubleTensor dPda = kMinus1.div(aMinusX).plusInPlace(oneOverTheta);
-        final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        DoubleTensor dLogPdx = kMinus1.div(xMinusLocation).minusInPlace(oneOverTheta);
+        DoubleTensor dLogPdlocation = kMinus1.div(locationMinusX).plusInPlace(oneOverTheta);
+        DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
-        return new Diff(dPda, dPdtheta, dPdk, dPdx);
+        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
+        dLogPdlocation = dLogPdlocation.reshape(concat(SCALAR_SHAPE, dLogPdlocation.getShape()));
+        dLogPdtheta = dLogPdtheta.reshape(concat(SCALAR_SHAPE, dLogPdtheta.getShape()));
+        dLogPdk = dLogPdk.reshape(concat(SCALAR_SHAPE, dLogPdk.getShape()));
+
+        return new DiffLogP(dLogPdlocation, dLogPdtheta, dLogPdk, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdlocation;
-        public final DoubleTensor dPdtheta;
-        public final DoubleTensor dPdk;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdlocation;
+        public final DoubleTensor dLogPdtheta;
+        public final DoubleTensor dLogPdk;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPda, DoubleTensor dPdtheta, DoubleTensor dPdk, DoubleTensor dPdx) {
-            this.dPdlocation = dPda;
-            this.dPdtheta = dPdtheta;
-            this.dPdk = dPdk;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdlocation, DoubleTensor dLogPdtheta, DoubleTensor dLogPdk, DoubleTensor dLogPdx) {
+            this.dLogPdlocation = dLogPdlocation;
+            this.dLogPdtheta = dLogPdtheta;
+            this.dLogPdk = dLogPdk;
+            this.dLogPdx = dLogPdx;
         }
     }
 

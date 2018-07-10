@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.InverseGamma;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -81,24 +82,25 @@ public class InverseGammaVertex extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        InverseGamma.Diff dlnP = InverseGamma.dlnPdf(alpha.getValue(), beta.getValue(), value);
+        InverseGamma.DiffLogP dlnP = InverseGamma.dlnPdf(alpha.getValue(), beta.getValue(), value);
 
-        return convertDualNumbersToDiff(dlnP.dPdalpha, dlnP.dPdbeta, dlnP.dPdx);
+        return convertDualNumbersToDiff(dlnP.dLogPdalpha, dlnP.dLogPdbeta, dlnP.dLogPdx);
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdalpha,
-                                                             DoubleTensor dPdbeta,
-                                                             DoubleTensor dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdalpha,
+                                                             DoubleTensor dLogPdbeta,
+                                                             DoubleTensor dLogPdx) {
 
-        PartialDerivatives dPdInputsFromA = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdalpha);
-        PartialDerivatives dPdInputsFromB = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
-        PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
+        PartialDerivatives dLogPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdalpha);
+        PartialDerivatives dLogPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdbeta);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx);
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 
     @Override

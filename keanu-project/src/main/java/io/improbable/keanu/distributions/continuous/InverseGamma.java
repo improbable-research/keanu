@@ -4,6 +4,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.special.Gamma;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
+
 public class InverseGamma {
 
     private InverseGamma() {
@@ -22,24 +25,28 @@ public class InverseGamma {
         return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(beta.div(x));
     }
 
-    public static Diff dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
-        final DoubleTensor dPda = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
-        final DoubleTensor dPdb = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
-        final DoubleTensor dPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
+    public static DiffLogP dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
+        DoubleTensor dLogPdalpha = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
+        DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
+        DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-        return new Diff(dPda, dPdb, dPdx);
+        dLogPdalpha = dLogPdalpha.reshape(concat(SCALAR_SHAPE, dLogPdalpha.getShape()));
+        dLogPdbeta = dLogPdbeta.reshape(concat(SCALAR_SHAPE, dLogPdbeta.getShape()));
+        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
+
+        return new DiffLogP(dLogPdalpha, dLogPdbeta, dLogPdx);
     }
 
-    public static class Diff {
+    public static class DiffLogP {
 
-        public final DoubleTensor dPdalpha;
-        public final DoubleTensor dPdbeta;
-        public final DoubleTensor dPdx;
+        public final DoubleTensor dLogPdalpha;
+        public final DoubleTensor dLogPdbeta;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPdalpha, DoubleTensor dPdbeta, DoubleTensor dPdx) {
-            this.dPdalpha = dPdalpha;
-            this.dPdbeta = dPdbeta;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdalpha, DoubleTensor dLogPdbeta, DoubleTensor dLogPdx) {
+            this.dLogPdalpha = dLogPdalpha;
+            this.dLogPdbeta = dLogPdbeta;
+            this.dLogPdx = dLogPdx;
         }
 
     }

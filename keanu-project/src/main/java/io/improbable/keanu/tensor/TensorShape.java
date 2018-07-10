@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 import java.util.Arrays;
 
 public class TensorShape {
@@ -94,4 +96,48 @@ public class TensorShape {
         System.arraycopy(shape2, 0, result, shape1.length, shape2.length);
         return result;
     }
+
+    /**
+     * @param fromDimension starting from and including this dimension
+     * @param toDimension   up to but excluding this dimension
+     * @return an int array containing the dimension numbers from a given dimension to a higher
+     * dimension. e.g. dimensionRange(0, 3) = int[]{0, 1, 2}
+     */
+    public static int[] dimensionRange(int fromDimension, int toDimension) {
+        if (fromDimension > toDimension) {
+            throw new IllegalArgumentException("from dimension must be less than to dimension");
+        }
+
+        int dimensionCount = toDimension - fromDimension;
+        int[] dims = new int[dimensionCount];
+        for (int i = 0; i < dimensionCount; i++) {
+            dims[i] = i + fromDimension;
+        }
+        return dims;
+    }
+
+    public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, true);
+    }
+
+    public static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, false);
+    }
+
+    private static DoubleTensor increaseRankByPaddingOnes(DoubleTensor lowRankTensor, int desiredRank, boolean append) {
+        int[] shape = lowRankTensor.getShape();
+        if (shape.length == desiredRank) {
+            return lowRankTensor;
+        }
+
+        int[] paddedShape = new int[desiredRank];
+        Arrays.fill(paddedShape, 1);
+        if (append) {
+            System.arraycopy(shape, 0, paddedShape, 0, shape.length);
+        } else {
+            System.arraycopy(shape, 0, paddedShape, shape.length, shape.length);
+        }
+        return lowRankTensor.reshape(paddedShape);
+    }
+
 }

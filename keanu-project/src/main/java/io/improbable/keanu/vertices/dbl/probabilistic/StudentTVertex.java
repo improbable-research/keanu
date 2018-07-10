@@ -2,15 +2,16 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static java.util.Collections.singletonMap;
 
 public class StudentTVertex extends ProbabilisticDouble {
 
@@ -54,10 +55,9 @@ public class StudentTVertex extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
-        StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
-        Map<Long, DoubleTensor> m = new HashMap<>();
-        m.put(getId(), diff.dPdt);
-        return m;
+        StudentT.DiffLogP diff = StudentT.dLnPdf(v.getValue(), t);
+        DoubleTensor dLogPdtSummed = diff.dLogPdt.sum(TensorShape.dimensionRange(0, getShape().length));
+        return singletonMap(getId(), dLogPdtSummed);
     }
 
     @Override

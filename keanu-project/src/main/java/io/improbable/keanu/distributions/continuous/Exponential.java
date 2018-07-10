@@ -3,6 +3,9 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
+
 public class Exponential {
 
     private Exponential() {
@@ -18,21 +21,27 @@ public class Exponential {
         return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(location), Double.NEGATIVE_INFINITY);
     }
 
-    public static Diff dlnPdf(DoubleTensor location, DoubleTensor lambda, DoubleTensor x) {
-        final DoubleTensor dPda = lambda.reciprocal();
-        final DoubleTensor dPdb = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
-        return new Diff(dPda, dPdb, dPda.unaryMinus());
+    public static DiffLogP dlnPdf(DoubleTensor location, DoubleTensor lambda, DoubleTensor x) {
+        DoubleTensor dLogPdlocation = lambda.reciprocal();
+        DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
+        DoubleTensor dLogPdx = dLogPdlocation.unaryMinus();
+
+        dLogPdlocation = dLogPdlocation.reshape(concat(SCALAR_SHAPE, dLogPdlocation.getShape()));
+        dLogPdlambda = dLogPdlambda.reshape(concat(SCALAR_SHAPE, dLogPdlambda.getShape()));
+        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
+
+        return new DiffLogP(dLogPdlocation, dLogPdlambda, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdlocation;
-        public final DoubleTensor dPdlambda;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdlocation;
+        public final DoubleTensor dLogPdlambda;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPda, DoubleTensor dPdb, DoubleTensor dPdx) {
-            this.dPdlocation = dPda;
-            this.dPdlambda = dPdb;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdlocation, DoubleTensor dLogPdlambda, DoubleTensor dLogPdx) {
+            this.dLogPdlocation = dLogPdlocation;
+            this.dLogPdlambda = dLogPdlambda;
+            this.dLogPdx = dLogPdx;
         }
     }
 

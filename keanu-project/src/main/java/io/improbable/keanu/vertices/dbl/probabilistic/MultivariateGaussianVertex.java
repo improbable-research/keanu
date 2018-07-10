@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -7,7 +8,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.Map;
 
-public class MultivariateGaussian extends ProbabilisticDouble {
+public class MultivariateGaussianVertex extends ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
@@ -20,7 +21,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
-    public MultivariateGaussian(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
+    public MultivariateGaussianVertex(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
 
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
@@ -36,7 +37,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
-    public MultivariateGaussian(DoubleVertex mu, DoubleVertex covariance) {
+    public MultivariateGaussianVertex(DoubleVertex mu, DoubleVertex covariance) {
         this(checkValidMultivariateShape(mu.getShape(), covariance.getShape()), mu, covariance);
     }
 
@@ -49,11 +50,11 @@ public class MultivariateGaussian extends ProbabilisticDouble {
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the scale of the identity matrix
      */
-    public MultivariateGaussian(DoubleVertex mu, double covariance) {
+    public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
         this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
     }
 
-    public MultivariateGaussian(double mu, double covariance) {
+    public MultivariateGaussianVertex(double mu, double covariance) {
         this(ConstantVertex.of(mu), ConstantVertex.of(covariance));
     }
 
@@ -72,7 +73,7 @@ public class MultivariateGaussian extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
+        return MultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
     }
 
     private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {

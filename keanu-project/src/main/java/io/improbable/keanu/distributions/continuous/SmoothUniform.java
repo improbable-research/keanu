@@ -3,6 +3,9 @@ package io.improbable.keanu.distributions.continuous;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
+
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges
  * at max and min smoothed by attaching a sigmoid as shoulders.
@@ -114,7 +117,7 @@ public class SmoothUniform {
             .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
     }
 
-    public static DoubleTensor dlnPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
+    public static DoubleTensor dPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
@@ -130,8 +133,12 @@ public class SmoothUniform {
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
         ).unaryMinusInPlace();
 
-        return firstConditional.timesInPlace(firstConditionalResult)
+        DoubleTensor dLogPdx = firstConditional.timesInPlace(firstConditionalResult)
             .plusInPlace(secondConditional.timesInPlace(secondConditionalResult));
+
+        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
+
+        return dLogPdx;
     }
 
     private static DoubleTensor shoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {

@@ -11,6 +11,7 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
@@ -340,7 +341,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             return that.times(this.scalar());
         } else {
             INDArray thatArray = unsafeGetNd4J(that);
-            return new Nd4jDoubleTensor(tensor.mul(thatArray));
+//            if (Arrays.equals(tensor.shape(), thatArray.shape())) {
+                return new Nd4jDoubleTensor(tensor.mul(thatArray));
+//            } else {
+//                INDArray result = Nd4j.createUninitialized(tensor.shape(), tensor.ordering());
+//                int[] broadcastDimensions = new int[]{0};
+//                Nd4j.getExecutioner().exec(
+//                    new BroadcastMulOp(tensor, thatArray, result, broadcastDimensions),
+//                    broadcastDimensions
+//                );
+//
+//                return new Nd4jDoubleTensor(result);
+//            }
         }
     }
 
