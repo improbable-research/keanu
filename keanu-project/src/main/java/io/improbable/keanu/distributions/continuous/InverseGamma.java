@@ -30,10 +30,6 @@ public class InverseGamma {
         DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
         DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-        dLogPdalpha = dLogPdalpha.reshape(concat(SCALAR_SHAPE, dLogPdalpha.getShape()));
-        dLogPdbeta = dLogPdbeta.reshape(concat(SCALAR_SHAPE, dLogPdbeta.getShape()));
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-
         return new DiffLogP(dLogPdalpha, dLogPdbeta, dLogPdx);
     }
 

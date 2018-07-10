@@ -111,11 +111,6 @@ public class Gamma {
         DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
         DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-        dLogPdlocation = dLogPdlocation.reshape(concat(SCALAR_SHAPE, dLogPdlocation.getShape()));
-        dLogPdtheta = dLogPdtheta.reshape(concat(SCALAR_SHAPE, dLogPdtheta.getShape()));
-        dLogPdk = dLogPdk.reshape(concat(SCALAR_SHAPE, dLogPdk.getShape()));
-
         return new DiffLogP(dLogPdlocation, dLogPdtheta, dLogPdk, dLogPdx);
     }
 

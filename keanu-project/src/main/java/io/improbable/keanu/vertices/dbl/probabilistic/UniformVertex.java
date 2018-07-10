@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -90,7 +89,6 @@ public class UniformVertex extends ProbabilisticDouble {
         DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
         dLogPdx = dLogPdx.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
         dLogPdx = dLogPdx.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);
-        dLogPdx = dLogPdx.sum(TensorShape.dimensionRange(0, getShape().length));
 
         return singletonMap(getId(), dLogPdx);
     }

@@ -10,6 +10,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -107,7 +109,7 @@ public class GammaVertex extends ProbabilisticDouble {
         PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromTheta).add(dLogPdInputsFromK);
 
         if (!this.isObserved()) {
-            dLogPdInputs.putWithRespectTo(getId(), dLogPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape())));
         }
 
         PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));

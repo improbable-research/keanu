@@ -60,10 +60,6 @@ public class Laplace {
         DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
         DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-        dLogPdMu = dLogPdMu.reshape(concat(SCALAR_SHAPE, dLogPdMu.getShape()));
-        dLogPdBeta = dLogPdBeta.reshape(concat(SCALAR_SHAPE, dLogPdBeta.getShape()));
-
         return new DiffLogP(dLogPdMu, dLogPdBeta, dLogPdx);
     }
 

@@ -52,10 +52,6 @@ public class Beta {
         DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
         DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
 
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-        dLogPda = dLogPda.reshape(concat(SCALAR_SHAPE, dLogPda.getShape()));
-        dLogPdb = dLogPdb.reshape(concat(SCALAR_SHAPE, dLogPdb.getShape()));
-
         return new DiffLogP(dLogPda, dLogPdb, dLogPdx);
     }
 

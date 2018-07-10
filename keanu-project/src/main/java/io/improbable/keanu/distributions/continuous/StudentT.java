@@ -74,8 +74,6 @@ public class StudentT {
                 t.pow(2).plusInPlace(vAsDouble)
             );
 
-        dPdt = dPdt.reshape(concat(SCALAR_SHAPE, dPdt.getShape()));
-
         return new DiffLogP(dPdt);
     }
 

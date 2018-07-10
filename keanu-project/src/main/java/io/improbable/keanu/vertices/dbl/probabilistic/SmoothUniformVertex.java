@@ -9,6 +9,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
+import static io.improbable.keanu.tensor.TensorShape.concat;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import static java.util.Collections.singletonMap;
@@ -125,12 +127,11 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor dPdfdx = SmoothUniform.dPdf(min, max, shoulderWidth, value);
+        final DoubleTensor dPdx = SmoothUniform.dPdf(min, max, shoulderWidth, value);
         final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
-        final DoubleTensor dLogPdfdx = dPdfdx.divInPlace(density);
-        final DoubleTensor dLogPdfdxSummed = dLogPdfdx.sum(TensorShape.dimensionRange(0, getShape().length));
+        final DoubleTensor dLogPdx = dPdx.divInPlace(density);
 
-        return singletonMap(getId(), dLogPdfdxSummed);
+        return singletonMap(getId(), dLogPdx);
     }
 
     @Override

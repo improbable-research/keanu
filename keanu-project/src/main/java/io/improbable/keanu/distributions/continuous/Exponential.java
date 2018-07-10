@@ -26,10 +26,6 @@ public class Exponential {
         DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
         DoubleTensor dLogPdx = dLogPdlocation.unaryMinus();
 
-        dLogPdlocation = dLogPdlocation.reshape(concat(SCALAR_SHAPE, dLogPdlocation.getShape()));
-        dLogPdlambda = dLogPdlambda.reshape(concat(SCALAR_SHAPE, dLogPdlambda.getShape()));
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-
         return new DiffLogP(dLogPdlocation, dLogPdlambda, dLogPdx);
     }
 

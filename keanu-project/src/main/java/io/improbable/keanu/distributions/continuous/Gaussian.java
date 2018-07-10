@@ -36,10 +36,6 @@ public class Gaussian {
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        dLogPdmu = dLogPdmu.reshape(concat(SCALAR_SHAPE, dLogPdmu.getShape()));
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-        dLogPdsigma = dLogPdsigma.reshape(concat(SCALAR_SHAPE, dLogPdsigma.getShape()));
-
         return new DiffLogP(dLogPdmu, dLogPdsigma, dLogPdx);
     }
 

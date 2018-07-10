@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -56,8 +55,7 @@ public class StudentTVertex extends ProbabilisticDouble {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
         StudentT.DiffLogP diff = StudentT.dLnPdf(v.getValue(), t);
-        DoubleTensor dLogPdtSummed = diff.dLogPdt.sum(TensorShape.dimensionRange(0, getShape().length));
-        return singletonMap(getId(), dLogPdtSummed);
+        return singletonMap(getId(), diff.dLogPdt);
     }
 
     @Override

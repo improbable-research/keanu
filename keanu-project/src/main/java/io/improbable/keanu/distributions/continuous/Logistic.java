@@ -52,10 +52,6 @@ public class Logistic {
 
         DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
-        dLogPdmu = dLogPdmu.reshape(concat(SCALAR_SHAPE, dLogPdmu.getShape()));
-        dLogPds = dLogPds.reshape(concat(SCALAR_SHAPE, dLogPds.getShape()));
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-
         return new DiffLogP(dLogPdmu, dLogPds, dLogPdx);
     }
 

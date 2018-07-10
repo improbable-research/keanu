@@ -46,10 +46,6 @@ public class LogNormal {
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        dLogPdmu = dLogPdmu.reshape(concat(SCALAR_SHAPE, dLogPdmu.getShape()));
-        dlogPdsigma = dlogPdsigma.reshape(concat(SCALAR_SHAPE, dlogPdsigma.getShape()));
-        dlogPdx = dlogPdx.reshape(concat(SCALAR_SHAPE, dlogPdx.getShape()));
-
         return new DiffLogP(dLogPdmu, dlogPdsigma, dlogPdx);
     }
 
