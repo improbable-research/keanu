@@ -374,6 +374,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor round() {
+        return duplicate().roundInPlace();
+    }
+
+    @Override
     public DoubleTensor sigmoid() {
         return duplicate().sigmoidInPlace();
     }
@@ -594,6 +599,21 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor floorInPlace() {
         value = Math.floor(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor roundInPlace() {
+        double valueToRound = value;
+        if (value < 0. && value + 0.5 == (double) value.intValue()) {
+            // This is necessary to match Python behaviour
+            // Which rounds negative numbers down if they end in 0.5
+            // e.g.
+            // Java: round(-2.5) == 2.0
+            // Python: round(-2.5) == -3.0
+            valueToRound -= 1.;
+        }
+        value = new Double(Math.round(valueToRound));
         return this;
     }
 
