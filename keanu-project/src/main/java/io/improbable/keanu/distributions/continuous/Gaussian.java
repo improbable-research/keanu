@@ -30,9 +30,9 @@ public class Gaussian {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 
-        DoubleTensor dLogPdmu = xMinusMu.div(variance);
-        DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
-        DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdmu = xMinusMu.div(variance);
+        final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
+        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 

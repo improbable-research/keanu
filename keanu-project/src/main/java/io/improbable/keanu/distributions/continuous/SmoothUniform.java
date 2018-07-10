@@ -133,12 +133,8 @@ public class SmoothUniform {
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
         ).unaryMinusInPlace();
 
-        DoubleTensor dLogPdx = firstConditional.timesInPlace(firstConditionalResult)
+        return firstConditional.timesInPlace(firstConditionalResult)
             .plusInPlace(secondConditional.timesInPlace(secondConditionalResult));
-
-        dLogPdx = dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape()));
-
-        return dLogPdx;
     }
 
     private static DoubleTensor shoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {

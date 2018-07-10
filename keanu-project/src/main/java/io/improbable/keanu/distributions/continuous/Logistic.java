@@ -41,8 +41,8 @@ public class Logistic {
         final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
 
-        DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
-        DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
+        final DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
+        final DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
         final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
             mu.times(expAOverB.unaryMinus())
@@ -50,7 +50,7 @@ public class Logistic {
         final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
         final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
 
-        DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+        final DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
         return new DiffLogP(dLogPdmu, dLogPds, dLogPdx);
     }

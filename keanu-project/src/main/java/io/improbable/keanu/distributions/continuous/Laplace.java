@@ -56,9 +56,9 @@ public class Laplace {
 
         final DoubleTensor denominator = muMinusXAbs.times(beta);
 
-        DoubleTensor dLogPdx = muMinusX.divInPlace(denominator);
-        DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
-        DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
+        final DoubleTensor dLogPdx = muMinusX.divInPlace(denominator);
+        final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
+        final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
         return new DiffLogP(dLogPdMu, dLogPdBeta, dLogPdx);
     }

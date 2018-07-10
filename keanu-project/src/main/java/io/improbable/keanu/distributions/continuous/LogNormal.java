@@ -40,9 +40,9 @@ public class LogNormal {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);
 
-        DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
-        DoubleTensor dlogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
-        DoubleTensor dlogPdsigma = lnXMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
+        final DoubleTensor dlogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
+        final DoubleTensor dlogPdsigma = lnXMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 

@@ -22,9 +22,9 @@ public class Exponential {
     }
 
     public static DiffLogP dlnPdf(DoubleTensor location, DoubleTensor lambda, DoubleTensor x) {
-        DoubleTensor dLogPdlocation = lambda.reciprocal();
-        DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
-        DoubleTensor dLogPdx = dLogPdlocation.unaryMinus();
+        final DoubleTensor dLogPdlocation = lambda.reciprocal();
+        final DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
+        final DoubleTensor dLogPdx = dLogPdlocation.unaryMinus();
 
         return new DiffLogP(dLogPdlocation, dLogPdlambda, dLogPdx);
     }

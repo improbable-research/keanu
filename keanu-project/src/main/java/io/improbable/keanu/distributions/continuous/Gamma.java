@@ -106,10 +106,10 @@ public class Gamma {
         final DoubleTensor kMinus1 = k.minus(1.);
         final DoubleTensor oneOverTheta = theta.reciprocal();
 
-        DoubleTensor dLogPdx = kMinus1.div(xMinusLocation).minusInPlace(oneOverTheta);
-        DoubleTensor dLogPdlocation = kMinus1.div(locationMinusX).plusInPlace(oneOverTheta);
-        DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdx = kMinus1.div(xMinusLocation).minusInPlace(oneOverTheta);
+        final DoubleTensor dLogPdlocation = kMinus1.div(locationMinusX).plusInPlace(oneOverTheta);
+        final DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
         return new DiffLogP(dLogPdlocation, dLogPdtheta, dLogPdk, dLogPdx);
     }
