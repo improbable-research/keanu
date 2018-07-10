@@ -15,9 +15,15 @@ public class RowWriter extends Writer {
     private static String headerStyle = "[%d]";
 
     private List<? extends Vertex<? extends Tensor>> vertices;
+    private String emptyValue;
+
+    public RowWriter(List<? extends Vertex<? extends Tensor>> vertices, String emptyValue) {
+        this.vertices = vertices;
+        this.emptyValue = emptyValue;
+    }
 
     public RowWriter(List<? extends Vertex<? extends Tensor>> vertices) {
-        this.vertices = vertices;
+        this(vertices, DEFAULT_EMPTY_VALUE);
     }
 
     @Override
@@ -32,7 +38,7 @@ public class RowWriter extends Writer {
                 if (i < flatList.size()) {
                     row.add(flatList.get(i).toString());
                 } else {
-                    row.add(DEFAULT_EMPTY_VALUE);
+                    row.add(emptyValue);
                 }
             }
             String[] rowToString = new String[row.size()];
@@ -50,6 +56,11 @@ public class RowWriter extends Writer {
         }
         withHeader(header);
         withHeaderEnabled(true);
+        return this;
+    }
+
+    public Writer withEmptyValue(String emptyValue) {
+        this.emptyValue = emptyValue;
         return this;
     }
 

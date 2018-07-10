@@ -151,7 +151,6 @@ public class WriteCsvTest {
         file.delete();
     }
 
-
     @Test
     public void writeRowOfTensorsToCsv() {
         File file = WriteCsv.asRows(rowTensors).toFile("test.csv");
@@ -162,6 +161,19 @@ public class WriteCsvTest {
         assertTrue(lines.size() == 2);
         assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0")));
         assertTrue(reader.readLines().get(1).equals(Arrays.asList("5.0", "4.0", "3.0", "2.0", "-")));
+        file.delete();
+    }
+
+    @Test
+    public void writeRowOfTensorsToCsvWithCustomEmptyValue() {
+        File file = WriteCsv.asRows(rowTensors).withEmptyValue("/").toFile("test.csv");
+
+        CsvReader reader = ReadCsv.fromFile(file).expectHeader(false);
+        List<List<String>> lines = reader.readLines();
+
+        assertTrue(lines.size() == 2);
+        assertTrue(reader.readLines().get(0).equals(Arrays.asList("1.0", "2.0", "3.0", "4.0", "5.0")));
+        assertTrue(reader.readLines().get(1).equals(Arrays.asList("5.0", "4.0", "3.0", "2.0", "/")));
         file.delete();
     }
 
