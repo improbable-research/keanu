@@ -12,7 +12,7 @@ import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
 public class ColumnWriter extends Writer {
 
     private static String DEFAULT_EMPTY_VALUE = "-";
-    private static String headerStyle = "{%d}";
+    private static String HEADER_STYLE = "{%d}";
 
     private List<? extends Vertex<? extends Tensor>> vertices;
     private String emptyValue;
@@ -52,7 +52,7 @@ public class ColumnWriter extends Writer {
     Writer withDefaultHeader() {
         String[] header = new String[vertices.size()];
         for (int i = 0; i < vertices.size(); i++) {
-            header[i] = String.format(headerStyle, vertices.get(i).getId());
+            header[i] = String.format(HEADER_STYLE, vertices.get(i).getId());
         }
         withHeader(header);
         withHeaderEnabled(true);

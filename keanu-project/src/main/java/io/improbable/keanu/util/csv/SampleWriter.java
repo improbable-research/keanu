@@ -10,9 +10,10 @@ import java.util.List;
 
 public class SampleWriter extends Writer {
 
+    private static String HEADER_STYLE = "{%d}[%d]";
+
     private NetworkSamples samples;
     private List<? extends Vertex<? extends Tensor>> vertices;
-    private String headerStyle = "{%d}[%d]";
 
     public SampleWriter(NetworkSamples samples, List<? extends Vertex<? extends Tensor>> vertices) {
         this.samples = samples;
@@ -44,7 +45,7 @@ public class SampleWriter extends Writer {
         List<String> header = new ArrayList<>();
         for (Vertex<? extends Tensor> vertex : vertices) {
             for (int j = 0; j < vertex.getValue().getLength(); j++) {
-                header.add(String.format(headerStyle, vertex.getId(), j));
+                header.add(String.format(HEADER_STYLE, vertex.getId(), j));
             }
         }
         String[] headerToArray = new String[header.size()];
