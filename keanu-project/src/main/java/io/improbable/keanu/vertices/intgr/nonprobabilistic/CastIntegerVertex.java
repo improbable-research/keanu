@@ -9,6 +9,7 @@ public class CastIntegerVertex extends NonProbabilisticInteger {
     private final Vertex<IntegerTensor> inputVertex;
 
     public CastIntegerVertex(Vertex<IntegerTensor> inputVertex) {
+        super(v -> ((CastIntegerVertex) v).inputVertex.getValue());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
@@ -18,8 +19,4 @@ public class CastIntegerVertex extends NonProbabilisticInteger {
         return inputVertex.sample(random);
     }
 
-    @Override
-    public IntegerTensor getDerivedValue() {
-        return inputVertex.getValue();
-    }
 }

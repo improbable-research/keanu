@@ -9,13 +9,9 @@ public class CastBoolVertex extends NonProbabilisticBool {
     private final Vertex<? extends BooleanTensor> inputVertex;
 
     public CastBoolVertex(Vertex<? extends BooleanTensor> inputVertex) {
+        super(v -> ((CastBoolVertex) v).inputVertex.getValue());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
-    }
-
-    @Override
-    public BooleanTensor getDerivedValue() {
-        return inputVertex.getValue();
     }
 
     @Override

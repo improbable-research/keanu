@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -15,6 +16,7 @@ public class BoolReduceVertex extends NonProbabilisticBool {
 
     public BoolReduceVertex(int[] shape, Collection<Vertex<BooleanTensor>> input,
                             BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
+        super(v -> ((BoolReduceVertex) v).applyReduce(Vertex::getValue)); // TODO: remove
         if (input.size() < 2) {
             throw new IllegalArgumentException("BoolReduceVertex should have at least two input vertices, called with " + input.size());
         }
@@ -25,6 +27,7 @@ public class BoolReduceVertex extends NonProbabilisticBool {
         setValue(BooleanTensor.placeHolder(shape));
     }
 
+
     public BoolReduceVertex(int[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
     }
@@ -32,11 +35,6 @@ public class BoolReduceVertex extends NonProbabilisticBool {
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return applyReduce((vertex) -> vertex.sample(random));
-    }
-
-    @Override
-    public BooleanTensor getDerivedValue() {
-        return applyReduce(Vertex::getValue);
     }
 
     private BooleanTensor applyReduce(Function<Vertex<BooleanTensor>, BooleanTensor> mapper) {

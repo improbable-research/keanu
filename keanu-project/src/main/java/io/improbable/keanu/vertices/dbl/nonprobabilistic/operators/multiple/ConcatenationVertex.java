@@ -25,16 +25,12 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
      * @param input the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
+        super(v -> ((ConcatenationVertex) v).op(((ConcatenationVertex)v).extractFromInputs(DoubleTensor.class, Vertex::getValue)));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
         int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
         setValue(DoubleTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
     }
 
     @Override

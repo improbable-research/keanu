@@ -11,6 +11,7 @@ import java.util.Map;
 public class ConstantDoubleVertex extends NonProbabilisticDouble {
 
     public ConstantDoubleVertex(DoubleTensor constant) {
+        super(v -> v.getValue());
         setValue(constant);
     }
 
@@ -29,11 +30,6 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return getValue();
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
         return getValue();
     }
 

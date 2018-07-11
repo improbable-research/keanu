@@ -16,11 +16,16 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 import java.util.Map;
 import java.util.function.Function;
 
 public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
+
+    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater) {
+        super(valueUpdater);
+    }
 
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);

@@ -1,17 +1,16 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class BoolConcatenationVertex extends NonProbabilisticBool {
 
@@ -25,6 +24,7 @@ public class BoolConcatenationVertex extends NonProbabilisticBool {
      * @param input the input vertices to concatenate
      */
     public BoolConcatenationVertex(int dimension, BoolVertex... input) {
+        super(v -> ((BoolConcatenationVertex)v).apply());
         this.dimension = dimension;
         this.input = input;
         setParents(input);
@@ -32,8 +32,7 @@ public class BoolConcatenationVertex extends NonProbabilisticBool {
         setValue(BooleanTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
-    @Override
-    public BooleanTensor getDerivedValue() {
+    public BooleanTensor apply() {
         return op(extractFromInputs(BooleanTensor.class, Vertex::getValue));
     }
 

@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
-
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
 
@@ -21,17 +21,12 @@ public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
      * @param index       the index of extraction
      */
     public GenericSliceVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
-
+        super(v -> ((GenericSliceVertex)v).op(inputVertex.getValue()));
         this.inputVertex = inputVertex;
         this.dimension = dimension;
         this.index = index;
         setParents(inputVertex);
         setValue(Tensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
-    }
-
-    @Override
-    public Tensor<T> getDerivedValue() {
-        return op(inputVertex.getValue());
     }
 
     @Override

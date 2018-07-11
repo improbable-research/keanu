@@ -10,6 +10,7 @@ public abstract class BinaryOpVertex<A, B, C> extends NonProbabilistic<C> {
     protected final Vertex<B> b;
 
     public BinaryOpVertex(Vertex<A> a, Vertex<B> b) {
+        super(v -> ((BinaryOpVertex<A, B, C>) v).op(a.getValue(), b.getValue()));
         this.a = a;
         this.b = b;
         setParents(a, b);
@@ -18,10 +19,6 @@ public abstract class BinaryOpVertex<A, B, C> extends NonProbabilistic<C> {
     @Override
     public C sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
-    }
-
-    public C getDerivedValue() {
-        return op(a.getValue(), b.getValue());
     }
 
     protected abstract C op(A a, B b);

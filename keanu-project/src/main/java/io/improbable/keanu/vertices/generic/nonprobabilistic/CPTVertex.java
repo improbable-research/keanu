@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +19,7 @@ public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
     public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
                      Map<Condition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
+        super(v -> ((CPTVertex<OUT>)v).getDerivedValue());
         this.conditions = conditions;
         this.inputs = inputs;
         this.defaultResult = defaultResult;
@@ -33,7 +35,6 @@ public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
         return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
-    @Override
     public OUT getDerivedValue() {
         final Condition condition = getCondition(v -> v.getValue().scalar());
         Vertex<OUT> vertex = conditions.get(condition);

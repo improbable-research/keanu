@@ -12,6 +12,7 @@ public abstract class IntegerBinaryOpVertex extends NonProbabilisticInteger {
     protected final IntegerVertex b;
 
     public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b) {
+        super(v -> ((IntegerBinaryOpVertex)v).op(a.getValue(), b.getValue()));
         this.a = a;
         this.b = b;
         setParents(a, b);
@@ -21,10 +22,6 @@ public abstract class IntegerBinaryOpVertex extends NonProbabilisticInteger {
     @Override
     public IntegerTensor sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
-    }
-
-    public IntegerTensor getDerivedValue() {
-        return op(a.getValue(), b.getValue());
     }
 
     protected abstract IntegerTensor op(IntegerTensor a, IntegerTensor b);

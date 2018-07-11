@@ -1,16 +1,16 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
 
 public class IntegerConcatenationVertex extends NonProbabilisticInteger {
 
@@ -24,6 +24,7 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
      * @param input the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
+        super(v -> ((IntegerConcatenationVertex)v).apply());
         this.dimension = dimension;
         this.input = input;
         setParents(input);
@@ -31,8 +32,7 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
         setValue(IntegerTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
-    @Override
-    public IntegerTensor getDerivedValue() {
+    public IntegerTensor apply() {
         return op(extractFromInputs(IntegerTensor.class, Vertex::getValue));
     }
 

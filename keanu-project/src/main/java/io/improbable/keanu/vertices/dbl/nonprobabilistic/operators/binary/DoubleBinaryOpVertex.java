@@ -19,6 +19,7 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
      * @param right a vertex
      */
     public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
+        super(v -> ((DoubleBinaryOpVertex) v).op(left.getValue(), right.getValue()));
         this.left = left;
         this.right = right;
         setParents(left, right);
@@ -28,11 +29,6 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(left.sample(random), right.sample(random));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op(left.getValue(), right.getValue());
     }
 
     protected abstract DoubleTensor op(DoubleTensor left, DoubleTensor right);

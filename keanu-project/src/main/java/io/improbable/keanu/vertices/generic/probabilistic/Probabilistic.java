@@ -1,15 +1,13 @@
 package io.improbable.keanu.vertices.generic.probabilistic;
 
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class Probabilistic<T> extends Vertex<T> {
 
-    @Override
-    public T updateValue() {
-        if (!hasValue()) {
-            setValue(sample());
-        }
-        return getValue();
+    public Probabilistic() {
+        super(new ProbabilisticValueUpdater<>());
     }
 
     @Override

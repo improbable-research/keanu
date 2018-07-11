@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 
 import java.util.Map;
 import java.util.function.BiFunction;
@@ -24,6 +25,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        super(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(left.getValue(), right.getValue()));
         this.left = left;
         this.right = right;
         this.op = op;
@@ -50,11 +52,6 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op.apply(left.sample(random), right.sample(random));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op.apply(left.getValue(), right.getValue());
     }
 
     @Override

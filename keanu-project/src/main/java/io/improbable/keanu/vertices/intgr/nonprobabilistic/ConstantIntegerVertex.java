@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class ConstantIntegerVertex extends NonProbabilisticInteger {
 
     public ConstantIntegerVertex(IntegerTensor constant) {
+        super(v -> v.getValue());
         setValue(constant);
     }
 
@@ -19,11 +20,6 @@ public class ConstantIntegerVertex extends NonProbabilisticInteger {
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return getValue();
-    }
-
-    @Override
-    public IntegerTensor getDerivedValue() {
         return getValue();
     }
 }

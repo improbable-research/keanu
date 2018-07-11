@@ -4,17 +4,15 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 import java.util.Map;
 
 public abstract class ProbabilisticDouble extends DoubleVertex {
 
-    @Override
-    public DoubleTensor updateValue() {
-        if (!hasValue()) {
-            setValue(sample());
-        }
-        return getValue();
+    public ProbabilisticDouble() {
+        super(new ProbabilisticValueUpdater<>());
     }
 
     @Override
