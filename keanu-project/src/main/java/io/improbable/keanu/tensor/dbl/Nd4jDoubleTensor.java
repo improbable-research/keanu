@@ -348,23 +348,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             if (Arrays.equals(tensor.shape(), thatArray.shape())) {
                 return new Nd4jDoubleTensor(tensor.mul(thatArray));
             } else {
-                int[] broadcastDimensions = Shape.getBroadcastDimensions(tensor.shape(), thatArray.shape());
-                int[] executeAlong = getBroadcastAlongDimensions(tensor.shape(), thatArray.shape());
-
-                INDArray result = broadcastMultiply(tensor, thatArray, broadcastDimensions, executeAlong);
-
+                INDArray result = Nd4j.createUninitialized(tensor.shape(), tensor.ordering());
+                broadcastMultiply(tensor, thatArray, result);
                 return new Nd4jDoubleTensor(result);
             }
         }
     }
 
-    private static INDArray broadcastMultiply(INDArray a, INDArray b, int[] broadcastDimensions, int[] alongDimensions) {
-        INDArray result = Nd4j.createUninitialized(a.shape(), a.ordering());
+    private static void broadcastMultiply(INDArray a, INDArray b, INDArray result) {
+        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
+        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
         Nd4j.getExecutioner().exec(
             new BroadcastMulOp(a, b, result, broadcastDimensions),
-            alongDimensions
+            executeAlong
         );
-        return result;
     }
 
     private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
@@ -552,7 +549,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
             tensor.muli(that.scalar());
         } else {
             INDArray thatArray = unsafeGetNd4J(that);
-            tensor.muli(thatArray);
+            if (Arrays.equals(tensor.shape(), thatArray.shape())) {
+                tensor.muli(thatArray);
+            } else {
+                broadcastMultiply(tensor, thatArray, tensor);
+            }
         }
         return this;
     }
