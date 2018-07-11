@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,7 +33,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
         for (Map.Entry<Long, DoubleTensor> partialDerivative : partialDerivatives.entrySet()) {
             int[] shape = partialDerivative.getValue().getShape();
             int[] wrtShape = extractWrtShape(shape, vertexShape);
-            int[] newPartialShape = combineNewShapeWithWrtShape(proposedShape, wrtShape);
+            int[] newPartialShape = TensorShape.concat(proposedShape, wrtShape);
 
             DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
             partialDerivative.setValue(reshapedPartialDerivative);
@@ -47,14 +48,6 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
             shapeWrt[i - vertexShape.length] = partialDerivativeShape[i];
         }
         return shapeWrt;
-    }
-
-    private int[] combineNewShapeWithWrtShape(int[] newShape, int[] wrtShape) {
-        int[] newPartialShape = new int[proposedShape.length + wrtShape.length];
-        for (int i = 0; i < newPartialShape.length; i++) {
-            newPartialShape[i] = i < proposedShape.length ? proposedShape[i] : wrtShape[i - proposedShape.length];
-        }
-        return newPartialShape;
     }
 
 }
