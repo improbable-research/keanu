@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.CategoricalVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -53,11 +53,11 @@ public class BooleanMultipleOperatorTest {
         List<Vertex<BooleanTensor>> list = new LinkedList<>();
 
         for (int i = 0; i < numberThatAreTrue; i++) {
-            list.add(new Flip(1.0));
+            list.add(new CategoricalVertex(1.0));
         }
 
         for (int i = numberThatAreTrue; i < numberOfVertices; i++) {
-            list.add(new Flip(0.0));
+            list.add(new CategoricalVertex(0.0));
         }
         return list;
     }

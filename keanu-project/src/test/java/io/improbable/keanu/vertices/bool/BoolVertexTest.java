@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.CategoricalVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
@@ -21,16 +21,16 @@ import static org.junit.Assert.assertTrue;
 public class BoolVertexTest {
 
     private KeanuRandom random;
-    private Flip v1;
-    private Flip v2;
+    private CategoricalVertex v1;
+    private CategoricalVertex v2;
     private double pV2 = 0.4;
     private double pV1 = 0.25;
 
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        v1 = new Flip(pV1);
-        v2 = new Flip(pV2);
+        v1 = new CategoricalVertex(pV1);
+        v2 = new CategoricalVertex(pV2);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class BoolVertexTest {
     public void castVertexWorksAsExpected() {
         double p = 0.5;
 
-        Flip f = new Flip(0.5);
+        CategoricalVertex f = new CategoricalVertex(0.5);
 
         CastBoolVertex a = new CastBoolVertex(f);
 
@@ -86,7 +86,7 @@ public class BoolVertexTest {
     public void constantVertexWorksAsExpected() {
         double p = 0.5;
 
-        Flip f = new Flip(0.5);
+        CategoricalVertex f = new CategoricalVertex(0.5);
         ConstantBoolVertex tru = ConstantVertex.of(true);
         ConstantBoolVertex fal = ConstantVertex.of(false);
 

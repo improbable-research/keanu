@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.CategoricalVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -92,13 +92,13 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesSimpleDiscretePrior() {
 
-        Flip A = new Flip(0.5);
+        CategoricalVertex A = new CategoricalVertex(0.5);
 
         DoubleVertex B = If.isTrue(A)
             .then(0.9)
             .orElse(0.1);
 
-        Flip C = new Flip(B);
+        CategoricalVertex C = new CategoricalVertex(B);
 
         C.observe(true);
 
@@ -120,8 +120,8 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesComplexDiscretePrior() {
 
-        Flip A = new Flip(0.5);
-        Flip B = new Flip(0.5);
+        CategoricalVertex A = new CategoricalVertex(0.5);
+        CategoricalVertex B = new CategoricalVertex(0.5);
 
         BoolVertex C = A.or(B);
 
@@ -129,7 +129,7 @@ public class MetropolisHastingsTest {
             .then(0.9)
             .orElse(0.1);
 
-        Flip E = new Flip(D);
+        CategoricalVertex E = new CategoricalVertex(D);
 
         E.observe(true);
 
@@ -151,8 +151,8 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesFromPriorWithObservedDeterministic() {
 
-        Flip A = new Flip(0.5);
-        Flip B = new Flip(0.5);
+        CategoricalVertex A = new CategoricalVertex(0.5);
+        CategoricalVertex B = new CategoricalVertex(0.5);
         BoolVertex C = A.or(B);
         C.observe(false);
 

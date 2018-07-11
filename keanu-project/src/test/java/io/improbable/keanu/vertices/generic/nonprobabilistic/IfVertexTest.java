@@ -6,7 +6,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.CategoricalVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -22,22 +22,22 @@ import static org.junit.Assert.assertTrue;
 public class IfVertexTest {
 
     private KeanuRandom random;
-    private Flip v1;
-    private Flip v2;
+    private CategoricalVertex v1;
+    private CategoricalVertex v2;
     private double pV2 = 0.4;
     private double pV1 = 0.25;
 
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        v1 = new Flip(pV1);
-        v2 = new Flip(pV2);
+        v1 = new CategoricalVertex(pV1);
+        v2 = new CategoricalVertex(pV2);
     }
 
     @Test
     public void functionsAsIf() {
 
-        BoolVertex predicate = new Flip(0.5);
+        BoolVertex predicate = new CategoricalVertex(0.5);
 
         BoolVertex ifIsTrue = If.isTrue(predicate)
             .then(TRUE)
@@ -54,7 +54,7 @@ public class IfVertexTest {
     public void ifProbabilityIsCorrect() {
 
         double pV3 = 0.1;
-        Flip v3 = new Flip(pV3);
+        CategoricalVertex v3 = new CategoricalVertex(pV3);
 
         BoolVertex v4 = If.isTrue(v1)
             .then(v2)
