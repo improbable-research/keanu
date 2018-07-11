@@ -38,27 +38,27 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
     }
 
     public void setValue(boolean value) {
-        super.setValue(BooleanTensor.create(value, getShape()));
+        super.setValue(BooleanTensor.scalar(value));
     }
 
     public void setValue(boolean[] values) {
-        super.setValue(BooleanTensor.create(values, getShape()));
+        super.setValue(BooleanTensor.create(values));
     }
 
     public void setAndCascade(boolean value) {
-        super.setAndCascade(BooleanTensor.create(value, getShape()));
+        super.setAndCascade(BooleanTensor.scalar(value));
     }
 
     public void setAndCascade(boolean[] values) {
-        super.setAndCascade(BooleanTensor.create(values, getShape()));
+        super.setAndCascade(BooleanTensor.create(values));
     }
 
     public void observe(boolean value) {
-        super.observe(BooleanTensor.create(value, getShape()));
+        super.observe(BooleanTensor.scalar(value));
     }
 
     public void observe(boolean[] values) {
-        super.observe(BooleanTensor.create(values, getShape()));
+        super.observe(BooleanTensor.create(values));
     }
 
     public double logPmf(boolean value) {

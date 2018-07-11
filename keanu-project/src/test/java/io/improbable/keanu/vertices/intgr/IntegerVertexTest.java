@@ -2,14 +2,14 @@ package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.function.Function;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class IntegerVertexTest {
 
@@ -64,6 +64,37 @@ public class IntegerVertexTest {
         result.eval();
         Integer expected = 8;
         assertEquals(result.getValue().scalar(), expected);
+    }
+
+    @Test
+    public void canObserveArrayOfValues() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        int[] observation = new int[]{1, 2, 3};
+        binomialVertex.observe(observation);
+        assertArrayEquals(observation, binomialVertex.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canSetAndCascadeArrayOfValues() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        int[] values = new int[]{1, 2, 3};
+        binomialVertex.setAndCascade(values);
+        assertArrayEquals(values, binomialVertex.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canSetValueAsArrayOfValues() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        int[] values = new int[]{1, 2, 3};
+        binomialVertex.setAndCascade(values);
+        assertArrayEquals(values, binomialVertex.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canSetValueAsScalarOnNonScalarVertex() {
+        IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
+        binomialVertex.setValue(2);
+        assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
     }
 
 }

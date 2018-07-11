@@ -186,27 +186,27 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     public void setValue(double value) {
-        super.setValue(DoubleTensor.create(value, getShape()));
+        super.setValue(DoubleTensor.scalar(value));
     }
 
     public void setValue(double[] values) {
-        super.setValue(DoubleTensor.create(values, getShape()));
+        super.setValue(DoubleTensor.create(values));
     }
 
     public void setAndCascade(double value) {
-        super.setAndCascade(DoubleTensor.create(value, getShape()));
+        super.setAndCascade(DoubleTensor.scalar(value));
     }
 
     public void setAndCascade(double[] values) {
-        super.setAndCascade(DoubleTensor.create(values, getShape()));
+        super.setAndCascade(DoubleTensor.create(values));
     }
 
     public void observe(double value) {
-        super.observe(DoubleTensor.create(value, getShape()));
+        super.observe(DoubleTensor.scalar(value));
     }
 
     public void observe(double[] values) {
-        super.observe(DoubleTensor.create(values, getShape()));
+        super.observe(DoubleTensor.create(values));
     }
 
     public double logPdf(double value) {

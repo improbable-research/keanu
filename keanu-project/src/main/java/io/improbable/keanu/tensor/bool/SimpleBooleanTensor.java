@@ -27,7 +27,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
     private final int[] stride;
 
     public SimpleBooleanTensor(boolean[] data, int[] shape) {
-        this.data = data;
+        this.data = new boolean[(int) TensorShape.getLength(shape)];
+        System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
     }
@@ -46,9 +47,9 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     public SimpleBooleanTensor(boolean constant, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
+        Arrays.fill(this.data, constant);
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
-        Arrays.fill(this.data, constant);
     }
 
     @Override
