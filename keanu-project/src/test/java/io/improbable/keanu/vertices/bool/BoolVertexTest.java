@@ -15,7 +15,9 @@ import org.junit.Test;
 
 import java.util.Collections;
 
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 public class BoolVertexTest {
@@ -50,7 +52,16 @@ public class BoolVertexTest {
         v1.setValue(true);
         v2.setValue(false);
 
-        assertTrue(!v3.eval().scalar());
+        assertFalse(v3.eval().scalar());
+    }
+
+    @Test
+    public void doesNot() {
+        BoolVertex v3 = not(v1);
+
+        v1.setValue(true);
+
+        assertFalse(v3.eval().scalar());
     }
 
     @Test
