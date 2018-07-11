@@ -6,13 +6,13 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 
-public class FlipVertexTest {
+public class CategoricalVertexVertexTest {
 
     @Test
     public void doesTensorSample() {
         int[] expectedShape = new int[]{1, 100};
-        Flip flip = new Flip(expectedShape, 0.25);
-        BooleanTensor samples = flip.sample(new KeanuRandom(1));
+        CategoricalVertex categoricalVertex = new CategoricalVertex(expectedShape, 0.25);
+        BooleanTensor samples = categoricalVertex.sample(new KeanuRandom(1));
         assertArrayEquals(expectedShape, samples.getShape());
     }
 }

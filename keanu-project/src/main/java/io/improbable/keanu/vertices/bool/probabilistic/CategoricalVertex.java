@@ -11,7 +11,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class Flip extends ProbabilisticBool {
+public class CategoricalVertex extends ProbabilisticBool {
 
     private final Vertex<DoubleTensor> probTrue;
 
@@ -23,7 +23,7 @@ public class Flip extends ProbabilisticBool {
      * @param shape     the desired shape of the vertex
      * @param probTrue  the probability the flip returns true
      */
-    public Flip(int[] shape, Vertex<DoubleTensor> probTrue) {
+    public CategoricalVertex(int[] shape, Vertex<DoubleTensor> probTrue) {
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
@@ -32,19 +32,19 @@ public class Flip extends ProbabilisticBool {
 
     /**
      * One to one constructor for mapping some shape of probTrue to
-     * a matching shaped Flip.
+     * a matching shaped CategoricalVertex.
      *
      * @param probTrue probTrue with same shape as desired Poisson tensor or scalar
      */
-    public Flip(Vertex<DoubleTensor> probTrue) {
+    public CategoricalVertex(Vertex<DoubleTensor> probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
-    public Flip(double probTrue) {
+    public CategoricalVertex(double probTrue) {
         this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(probTrue));
     }
 
-    public Flip(int[] shape, double probTrue) {
+    public CategoricalVertex(int[] shape, double probTrue) {
         this(shape, new ConstantDoubleVertex(probTrue));
     }
 

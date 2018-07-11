@@ -5,7 +5,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.CategoricalVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -21,22 +21,22 @@ public class RocketTest {
     public void shouldYouLaunch() {
 
         KeanuRandom random = new KeanuRandom(1);
-        Flip oRingFailure = new Flip(0.001);
+        CategoricalVertex oRingFailure = new CategoricalVertex(0.001);
 
-        Vertex<BooleanTensor> oRingFailureCausesOverheat = new Flip(0.94);
+        Vertex<BooleanTensor> oRingFailureCausesOverheat = new CategoricalVertex(0.94);
         Vertex<BooleanTensor> overHeatDueToORing = oRingFailure.and(oRingFailureCausesOverheat);
 
-        Flip residualFuel = new Flip(0.002);
+        CategoricalVertex residualFuel = new CategoricalVertex(0.002);
 
-        Vertex<BooleanTensor> residualFuelCausesOverheat = new Flip(0.29);
+        Vertex<BooleanTensor> residualFuelCausesOverheat = new CategoricalVertex(0.29);
         Vertex<BooleanTensor> overHeatDueToResidualFuel = residualFuel.and(residualFuelCausesOverheat);
 
-        Vertex<BooleanTensor> bothCauseOverheat = new Flip(0.95);
+        Vertex<BooleanTensor> bothCauseOverheat = new CategoricalVertex(0.95);
         Vertex<BooleanTensor> overHeatDueToBoth = residualFuel
             .and(oRingFailure)
             .and(bothCauseOverheat);
 
-        Flip overHeatDueToOther = new Flip(0.001);
+        CategoricalVertex overHeatDueToOther = new CategoricalVertex(0.001);
 
         BoolVertex overHeated = overHeatDueToOther
             .or(overHeatDueToORing)
@@ -46,12 +46,12 @@ public class RocketTest {
         double probOfOverheat = priorProbabilityTrue(overHeated, 10000, random);
         log.info("Prior Probability rocket overheats: " + probOfOverheat);
 
-        Flip alarm1NotFalseNegative = new Flip(0.99);
-        Flip alarm1FalsePositive = new Flip(0.3);
+        CategoricalVertex alarm1NotFalseNegative = new CategoricalVertex(0.99);
+        CategoricalVertex alarm1FalsePositive = new CategoricalVertex(0.3);
         BoolVertex alarm1 = overHeated.and(alarm1NotFalseNegative).or(alarm1FalsePositive);
 
-        Flip alarm2NotFalseNegative = new Flip(0.95);
-        Flip alarm2FalsePositive = new Flip(0.1);
+        CategoricalVertex alarm2NotFalseNegative = new CategoricalVertex(0.95);
+        CategoricalVertex alarm2FalsePositive = new CategoricalVertex(0.1);
         BoolVertex alarm2 = overHeated.and(alarm2NotFalseNegative).or(alarm2FalsePositive);
 
         double probOfAlarm1 = priorProbabilityTrue(alarm1, 10000, random);

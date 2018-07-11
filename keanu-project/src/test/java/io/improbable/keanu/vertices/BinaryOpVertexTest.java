@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.CategoricalVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
@@ -29,11 +29,11 @@ public class BinaryOpVertexTest {
 
     @Test
     public void canSampleFromTwoParents() {
-        Flip flip = new Flip(0.5);
+        CategoricalVertex categoricalVertex = new CategoricalVertex(0.5);
 
         GaussianVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
         BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
-            flip, gaussianVertex,
+            categoricalVertex, gaussianVertex,
             (BooleanTensor f, DoubleTensor g) ->
                 f.setDoubleIf(g, DoubleTensor.scalar(0.0))
         );
