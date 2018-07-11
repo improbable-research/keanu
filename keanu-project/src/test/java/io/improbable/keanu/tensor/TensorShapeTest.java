@@ -21,16 +21,6 @@ public class TensorShapeTest {
     }
 
     @Test
-    public void canReshapeByPaddingOnes() {
-
-    }
-
-    @Test
-    public void canReshapeByAppendingOnes() {
-
-    }
-
-    @Test
     public void canGetDimensionRange() {
         int[] actual = TensorShape.dimensionRange(2, 5);
         int[] expected = new int[]{2, 3, 4};

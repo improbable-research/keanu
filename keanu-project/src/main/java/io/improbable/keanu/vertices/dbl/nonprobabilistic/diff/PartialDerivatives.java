@@ -9,8 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShape.increaseRankByAppendingOnesToShape;
-import static io.improbable.keanu.tensor.TensorShape.increaseRankByPrependingOnesToShape;
 import static java.util.Collections.singletonMap;
 
 public class PartialDerivatives {
@@ -237,5 +235,29 @@ public class PartialDerivatives {
             clone.put(entry.getKey(), entry.getValue());
         }
         return clone;
+    }
+
+    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, true);
+    }
+
+    private static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, false);
+    }
+
+    private static DoubleTensor increaseRankByPaddingOnes(DoubleTensor lowRankTensor, int desiredRank, boolean append) {
+        int[] shape = lowRankTensor.getShape();
+        if (shape.length == desiredRank) {
+            return lowRankTensor;
+        }
+
+        int[] paddedShape = new int[desiredRank];
+        Arrays.fill(paddedShape, 1);
+        if (append) {
+            System.arraycopy(shape, 0, paddedShape, 0, shape.length);
+        } else {
+            System.arraycopy(shape, 0, paddedShape, shape.length, shape.length);
+        }
+        return lowRankTensor.reshape(paddedShape);
     }
 }

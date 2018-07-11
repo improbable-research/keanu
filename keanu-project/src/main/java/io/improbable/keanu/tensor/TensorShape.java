@@ -115,29 +115,4 @@ public class TensorShape {
         }
         return dims;
     }
-
-    public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, true);
-    }
-
-    public static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensor, desiredRank, false);
-    }
-
-    private static DoubleTensor increaseRankByPaddingOnes(DoubleTensor lowRankTensor, int desiredRank, boolean append) {
-        int[] shape = lowRankTensor.getShape();
-        if (shape.length == desiredRank) {
-            return lowRankTensor;
-        }
-
-        int[] paddedShape = new int[desiredRank];
-        Arrays.fill(paddedShape, 1);
-        if (append) {
-            System.arraycopy(shape, 0, paddedShape, 0, shape.length);
-        } else {
-            System.arraycopy(shape, 0, paddedShape, shape.length, shape.length);
-        }
-        return lowRankTensor.reshape(paddedShape);
-    }
-
 }
