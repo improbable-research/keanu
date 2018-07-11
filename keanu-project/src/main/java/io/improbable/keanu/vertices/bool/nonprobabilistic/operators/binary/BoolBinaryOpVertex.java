@@ -12,6 +12,8 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     protected final Vertex<B> b;
 
     public BoolBinaryOpVertex(int[] shape, Vertex<A> a, Vertex<B> b) {
+        super(v -> ((BoolBinaryOpVertex<A, B>) v).op(a.getValue(), b.getValue()));
+
         this.a = a;
         this.b = b;
         setParents(a, b);
@@ -21,11 +23,6 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
-    }
-
-    @Override
-    public BooleanTensor getDerivedValue() {
-        return op(a.getValue(), b.getValue());
     }
 
     protected abstract BooleanTensor op(A a, B b);

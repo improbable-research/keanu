@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBi
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -15,6 +16,10 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
+
+    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater) {
+        super(valueUpdater);
+    }
 
     @SafeVarargs
     public final io.improbable.keanu.vertices.bool.BoolVertex or(Vertex<BooleanTensor>... those) {

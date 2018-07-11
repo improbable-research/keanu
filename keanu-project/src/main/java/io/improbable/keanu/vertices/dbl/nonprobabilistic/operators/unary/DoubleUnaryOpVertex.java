@@ -16,6 +16,7 @@ public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
      * @param inputVertex a vertex
      */
     public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
+        super(v -> ((DoubleUnaryOpVertex) v).op(inputVertex.getValue()));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(DoubleTensor.placeHolder(shape));
@@ -24,11 +25,6 @@ public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(inputVertex.sample(random));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op(inputVertex.getValue());
     }
 
     protected abstract DoubleTensor op(DoubleTensor a);

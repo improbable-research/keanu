@@ -13,6 +13,7 @@ public class IntegerUnaryOpLambda<IN> extends NonProbabilisticInteger {
     protected final Function<IN, IntegerTensor> op;
 
     public IntegerUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+        super(v -> ((IntegerUnaryOpLambda<IN>)v).op.apply(inputVertex.getValue()));
         this.inputVertex = inputVertex;
         this.op = op;
         setParents(inputVertex);
@@ -24,8 +25,4 @@ public class IntegerUnaryOpLambda<IN> extends NonProbabilisticInteger {
         return op.apply(inputVertex.sample(random));
     }
 
-    @Override
-    public IntegerTensor getDerivedValue() {
-        return op.apply(inputVertex.getValue());
-    }
 }

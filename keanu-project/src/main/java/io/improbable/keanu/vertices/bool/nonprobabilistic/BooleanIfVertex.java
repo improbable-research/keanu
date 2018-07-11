@@ -14,6 +14,7 @@ public class BooleanIfVertex extends NonProbabilisticBool {
                            Vertex<? extends BooleanTensor> predicate,
                            Vertex<? extends BooleanTensor> thn,
                            Vertex<? extends BooleanTensor> els) {
+        super(v -> ((BooleanIfVertex) v).op(predicate.getValue(), thn.getValue(), els.getValue()));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
@@ -28,10 +29,5 @@ public class BooleanIfVertex extends NonProbabilisticBool {
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
-    public BooleanTensor getDerivedValue() {
-        return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 }

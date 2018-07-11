@@ -19,6 +19,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     private final Supplier<DualNumber> dualNumberSupplier;
 
     public DoubleReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
+        super(v -> ((DoubleReduceVertex) v).applyReduce(Vertex::getValue));
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("DoubleReduceVertex should have at least two input vertices, called with " + inputs.size());
         }
@@ -65,11 +66,6 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return applyReduce(vertex -> vertex.sample(random));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return applyReduce(Vertex::getValue);
     }
 
     private DoubleTensor applyReduce(Function<Vertex<DoubleTensor>, DoubleTensor> mapper) {

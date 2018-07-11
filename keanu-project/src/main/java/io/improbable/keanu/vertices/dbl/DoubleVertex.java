@@ -9,11 +9,16 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 import java.util.*;
 import java.util.function.Function;
 
 public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
+
+    public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater) {
+        super(valueUpdater);
+    }
 
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);

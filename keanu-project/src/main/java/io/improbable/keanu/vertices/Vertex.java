@@ -5,6 +5,8 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicLong;
@@ -18,6 +20,11 @@ public abstract class Vertex<T> {
     private Set<Vertex> parents = new HashSet<>();
     private T value;
     private boolean observed;
+    private final ValueUpdater<T> valueUpdater;
+
+    public Vertex(ValueUpdater<T> valueUpdater) {
+        this.valueUpdater = valueUpdater;
+    }
 
     /**
      * This is the natural log of the probability at the supplied value. In the
@@ -62,7 +69,12 @@ public abstract class Vertex<T> {
      *
      * @return The updated value
      */
-    public abstract T updateValue();
+    public final T updateValue() {
+        if (!valueUpdater.hasValue(this)) {
+            setValue(valueUpdater.calculateValue(this));
+        }
+        return getValue();
+    };
 
 
     /**

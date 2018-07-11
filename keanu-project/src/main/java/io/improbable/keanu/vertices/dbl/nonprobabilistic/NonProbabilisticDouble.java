@@ -2,11 +2,22 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilisticObservationException;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 import java.util.Map;
+import java.util.function.Function;
 
 public abstract class NonProbabilisticDouble extends DoubleVertex {
+
+    private Function<Vertex<DoubleTensor>, DoubleTensor> updateFunction;
+
+    public NonProbabilisticDouble(Function<Vertex<DoubleTensor>, DoubleTensor> updateFunction) {
+        super(new NonProbabilisticValueUpdater<>(updateFunction));
+        this.updateFunction = updateFunction;
+    }
 
     /**
      * Observing non-probabilistic values of this type causes the probability
@@ -24,7 +35,7 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return this.getDerivedValue().elementwiseEquals(getValue()).allTrue() ? 0.0 : Double.NEGATIVE_INFINITY;
+        return updateFunction.apply(this).elementwiseEquals(getValue()).allTrue() ? 0.0 : Double.NEGATIVE_INFINITY;
     }
 
     @Override
@@ -36,14 +47,4 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
     public boolean isProbabilistic() {
         return false;
     }
-
-    @Override
-    public DoubleTensor updateValue() {
-        if (!this.isObserved()) {
-            setValue(getDerivedValue());
-        }
-        return getValue();
-    }
-
-    public abstract DoubleTensor getDerivedValue();
 }

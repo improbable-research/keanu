@@ -13,6 +13,7 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     private final Vertex<? extends NumberTensor> inputVertex;
 
     public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
+        super(v -> ((CastDoubleVertex)v).inputVertex.getValue().toDouble());
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
@@ -20,11 +21,6 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return inputVertex.sample(random).toDouble();
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return inputVertex.getValue().toDouble();
     }
 
     @Override

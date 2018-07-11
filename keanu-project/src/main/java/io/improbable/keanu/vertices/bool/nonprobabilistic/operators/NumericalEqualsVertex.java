@@ -19,6 +19,7 @@ public class NumericalEqualsVertex extends NonProbabilisticBool {
     public NumericalEqualsVertex(Vertex<? extends NumberTensor> a,
                                  Vertex<? extends NumberTensor> b,
                                  Vertex<? extends NumberTensor> epsilon) {
+        super(v -> ((NumericalEqualsVertex) v).op(a.getValue(), b.getValue(), epsilon.getValue()));
         this.a = a;
         this.b = b;
         this.epsilon = epsilon;
@@ -28,11 +29,6 @@ public class NumericalEqualsVertex extends NonProbabilisticBool {
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random), epsilon.sample(random));
-    }
-
-    @Override
-    public BooleanTensor getDerivedValue() {
-        return op(a.getValue(), b.getValue(), epsilon.getValue());
     }
 
     private BooleanTensor op(NumberTensor a, NumberTensor b, NumberTensor epsilon) {

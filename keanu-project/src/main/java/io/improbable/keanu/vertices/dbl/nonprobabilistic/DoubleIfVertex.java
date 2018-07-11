@@ -18,6 +18,7 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
+        super(v -> ((DoubleIfVertex)v).op(predicate.getValue(), thn.getValue(), els.getValue()));
 
         this.predicate = predicate;
         this.thn = thn;
@@ -29,11 +30,6 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(predicate.sample(random), thn.sample(random), els.sample(random));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {

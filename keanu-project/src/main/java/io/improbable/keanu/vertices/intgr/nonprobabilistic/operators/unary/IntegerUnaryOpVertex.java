@@ -16,6 +16,7 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
      * @param inputVertex a vertex
      */
     public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {
+        super(v -> ((IntegerUnaryOpVertex) v).op(inputVertex.getValue()));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(IntegerTensor.placeHolder(shape));
@@ -24,10 +25,6 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
     @Override
     public IntegerTensor sample(KeanuRandom random) {
         return op(inputVertex.sample(random));
-    }
-
-    public IntegerTensor getDerivedValue() {
-        return op(inputVertex.getValue());
     }
 
     protected abstract IntegerTensor op(IntegerTensor a);

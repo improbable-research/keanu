@@ -10,6 +10,7 @@ public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
     protected final Vertex<IN> inputVertex;
 
     public UnaryOpVertex(Vertex<IN> inputVertex) {
+        super(v -> ((UnaryOpVertex<IN,OUT>)v).op(inputVertex.getValue()));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
@@ -17,10 +18,6 @@ public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
     @Override
     public OUT sample(KeanuRandom random) {
         return op(inputVertex.sample(random));
-    }
-
-    public OUT getDerivedValue() {
-        return op(inputVertex.getValue());
     }
 
     protected abstract OUT op(IN a);

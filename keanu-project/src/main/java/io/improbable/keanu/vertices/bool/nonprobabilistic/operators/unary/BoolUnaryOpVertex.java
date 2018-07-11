@@ -11,6 +11,7 @@ public abstract class BoolUnaryOpVertex<A extends Tensor> extends NonProbabilist
     protected final Vertex<A> a;
 
     public BoolUnaryOpVertex(int[] shape, Vertex<A> a) {
+        super(v -> ((BoolUnaryOpVertex)v).op(a.getValue()));
         this.a = a;
         setParents(a);
         setValue(BooleanTensor.placeHolder(shape));
@@ -19,11 +20,6 @@ public abstract class BoolUnaryOpVertex<A extends Tensor> extends NonProbabilist
     @Override
     public BooleanTensor sample(KeanuRandom random) {
         return op(a.sample(random));
-    }
-
-    @Override
-    public BooleanTensor getDerivedValue() {
-        return op(a.getValue());
     }
 
     protected abstract BooleanTensor op(A a);
