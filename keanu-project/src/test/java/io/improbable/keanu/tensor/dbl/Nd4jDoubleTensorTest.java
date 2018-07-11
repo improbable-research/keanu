@@ -1,11 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
-import org.apache.commons.math3.linear.Array2DRowRealMatrix;
-import org.apache.commons.math3.linear.RealMatrix;
 import org.junit.Before;
 import org.junit.Test;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -136,6 +132,44 @@ public class Nd4jDoubleTensorTest {
     public void canApplySqrt() {
         DoubleTensor result = scalarA.sqrt();
         assertEquals(Math.sqrt(2.0), result.scalar(), 0.0);
+    }
+
+    @Test
+    public void canBroadcastMultiplyRank4ContainingVectorAndMatrix() {
+        DoubleTensor rank4 = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2, 1});
+        DoubleTensor actual = rank4.times(matrixA.reshape(2, 2, 1, 1));
+        DoubleTensor expected = DoubleTensor.create(new double[]{1, 2, 6, 8, 15, 18, 28, 32}, new int[]{2, 2, 2, 1});
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void canBroadcastMultiplyRank4ContainingMatrixAndMatrix() {
+        DoubleTensor rank4 = DoubleTensor.create(new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8,
+            4, 3, 2, 1, 7, 5, 8, 6
+        }, new int[]{2, 2, 2, 2});
+
+        DoubleTensor actual = rank4.times(matrixA.reshape(2, 2, 1, 1));
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            1, 2, 3, 4, 10, 12, 14, 16,
+            12, 9, 6, 3, 28, 20, 32, 24
+        }, new int[]{2, 2, 2, 2});
+        assertEquals(actual, expected);
+    }
+
+    @Test
+    public void canBroadcastMultiplyRank5ContainingMatrixAndMatrix() {
+        DoubleTensor rank4 = DoubleTensor.create(new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
+            6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
+        }, new int[]{2, 2, 2, 2, 2});
+
+        DoubleTensor actual = rank4.times(matrixA.reshape(2, 2, 1, 1, 1));
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8, 8, 6, 4, 2, 14, 10, 16, 12,
+            18, 9, 6, 27, 9, 12, 21, 18, 24, 8, 20, 16, 0, 8, 4, 12
+        }, new int[]{2, 2, 2, 2, 2});
+        assertEquals(actual, expected);
     }
 
 }
