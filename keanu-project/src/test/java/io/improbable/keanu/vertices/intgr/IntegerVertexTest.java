@@ -66,4 +66,9 @@ public class IntegerVertexTest {
         assertEquals(result.getValue().scalar(), expected);
     }
 
+    @Test
+    public void doesReshape() {
+
+    }
+
 }

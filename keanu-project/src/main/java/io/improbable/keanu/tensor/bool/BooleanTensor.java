@@ -26,6 +26,8 @@ public interface BooleanTensor extends Tensor<Boolean> {
         return new SimpleBooleanTensor(shape);
     }
 
+    BooleanTensor reshape(int... newShape);
+
     BooleanTensor and(BooleanTensor that);
 
     BooleanTensor or(BooleanTensor that);

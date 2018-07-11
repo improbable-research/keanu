@@ -151,4 +151,11 @@ public class SimpleBooleanTensorTest {
         assertArrayEquals(new int[]{1, 0, 1, 0}, matrixA.asFlatIntegerArray());
     }
 
+    @Test
+    public void canReshape() {
+        BooleanTensor reshaped = matrixA.reshape(4, 1);
+        assertArrayEquals(reshaped.asFlatIntegerArray(), matrixA.asFlatIntegerArray());
+        assertArrayEquals(new int[]{4, 1}, reshaped.getShape());
+    }
+
 }
