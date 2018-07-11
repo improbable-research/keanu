@@ -10,12 +10,12 @@ public interface BooleanTensor extends Tensor<Boolean> {
         return new SimpleBooleanTensor(value, shape);
     }
 
-    static BooleanTensor create(boolean[] values, int[] shape) {
+    static BooleanTensor create(boolean[] values, int... shape) {
         return new SimpleBooleanTensor(values, shape);
     }
 
     static BooleanTensor create(boolean[] values) {
-        return create(values, new int[]{1, values.length});
+        return create(values, 1, values.length);
     }
 
     static BooleanTensor scalar(boolean scalarValue) {
