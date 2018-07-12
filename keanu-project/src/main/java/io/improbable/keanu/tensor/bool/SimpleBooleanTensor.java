@@ -54,7 +54,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor reshape(int... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
-            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length");
+            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
+            + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
         return new SimpleBooleanTensor(data, newShape);
     }
