@@ -130,7 +130,7 @@ public class PartialDerivatives {
 
         if (TensorShape.isScalar(partialOfShape)) {
 
-            int[] partialWrtShape = Arrays.copyOfRange(partial.getShape(), multiplier.getRank(), partial.getRank());
+            int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
 
             return partial.tensorMultiply(multiplierReshaped,
                 range(0, partialOfShape.length),
@@ -257,6 +257,21 @@ public class PartialDerivatives {
         return new PartialDerivatives(cloneInfinitesimals(derivativeWithRespectTo));
     }
 
+    public PartialDerivatives reshape(int currentRank, int[] proposedShape) {
+        Map<Long, DoubleTensor> reshapedDerivatives = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+            int[] shape = partialDerivative.getValue().getShape();
+            int[] wrtShape = extractWrtShape(shape, currentRank);
+            int[] newPartialShape = TensorShape.concat(proposedShape, wrtShape);
+
+            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
+            reshapedDerivatives.put(partialDerivative.getKey(), reshapedPartialDerivative);
+        }
+
+        return new PartialDerivatives(reshapedDerivatives);
+    }
+
     private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {
         Map<Long, DoubleTensor> clone = new HashMap<>();
         for (Map.Entry<Long, DoubleTensor> entry : infinitesimals.entrySet()) {
@@ -264,4 +279,10 @@ public class PartialDerivatives {
         }
         return clone;
     }
+
+    private int[] extractWrtShape(int[] partialDerivativeShape, int rankOfSource) {
+        int[] wrtShape = Arrays.copyOfRange(partialDerivativeShape, rankOfSource, partialDerivativeShape.length);
+        return wrtShape;
+    }
+
 }
