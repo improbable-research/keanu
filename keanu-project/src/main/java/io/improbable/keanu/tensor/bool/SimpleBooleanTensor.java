@@ -26,6 +26,10 @@ public class SimpleBooleanTensor implements BooleanTensor {
     private final int[] shape;
     private final int[] stride;
 
+    /**
+     * @param data  tensor data used c ordering
+     * @param shape desired shape of tensor
+     */
     public SimpleBooleanTensor(boolean[] data, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
@@ -33,18 +37,28 @@ public class SimpleBooleanTensor implements BooleanTensor {
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
+    /**
+     * @param constant constant boolean value to fill shape
+     */
     public SimpleBooleanTensor(boolean constant) {
         this.data = new boolean[]{constant};
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
     }
 
+    /**
+     * @param shape shape to use as place holder
+     */
     public SimpleBooleanTensor(int[] shape) {
         this.data = null;
         this.shape = shape;
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
+    /**
+     * @param constant constant boolean value to fill shape
+     * @param shape    desired shape of tensor
+     */
     public SimpleBooleanTensor(boolean constant, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);

@@ -86,7 +86,7 @@ public class IntegerVertexTest {
     public void canSetValueAsArrayOfValues() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
         int[] values = new int[]{1, 2, 3};
-        binomialVertex.setAndCascade(values);
+        binomialVertex.setValue(values);
         assertArrayEquals(values, binomialVertex.getValue().asFlatIntegerArray());
     }
 
@@ -94,6 +94,13 @@ public class IntegerVertexTest {
     public void canSetValueAsScalarOnNonScalarVertex() {
         IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
         binomialVertex.setValue(2);
+        assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canSetAndCascadeAsScalarOnNonScalarVertex() {
+        IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
+        binomialVertex.setAndCascade(2);
         assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
     }
 

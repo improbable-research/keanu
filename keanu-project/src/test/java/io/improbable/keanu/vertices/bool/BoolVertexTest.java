@@ -125,6 +125,13 @@ public class BoolVertexTest {
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
+    @Test
+    public void canSetAndCascadeAsScalarOnNonScalarVertex() {
+        BoolVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        flip.setAndCascade(true);
+        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+    }
+
     private double andProbability(double pA, double pB) {
         return pA * pB;
     }
