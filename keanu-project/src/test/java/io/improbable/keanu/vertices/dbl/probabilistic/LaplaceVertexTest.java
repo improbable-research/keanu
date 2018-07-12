@@ -1,12 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Laplace;
+import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.ConstantVertex;
+import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,14 +34,16 @@ public class LaplaceVertexTest {
     public void matchesKnownLogDensityOfScalar() {
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(0.5, 1);
-        double expectedDensity = Laplace.logPdf(0.5, 1.0, 0.5);
+        LaplaceDistribution distribution = new LaplaceDistribution(0.5, 1.0);
+        double expectedDensity = distribution.logDensity(0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorLaplaceVertex, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        double expectedLogDensity = Laplace.logPdf(0.0, 1.0, 0.25) + Laplace.logPdf(0.0, 1.0, 0.75);
+        LaplaceDistribution distribution = new LaplaceDistribution(0.0, 1.0);
+        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
         LaplaceVertex ndLaplaceVertex = new LaplaceVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLaplaceVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }

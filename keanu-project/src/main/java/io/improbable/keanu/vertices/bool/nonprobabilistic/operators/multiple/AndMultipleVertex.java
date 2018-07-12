@@ -15,6 +15,9 @@ public class AndMultipleVertex extends BoolReduceVertex {
         ), input, AndMultipleVertex::and);
     }
 
+    /**
+     * Returns true if all vertices are true
+     */
     private static BooleanTensor and(BooleanTensor a, BooleanTensor b) {
         return a.and(b);
     }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorBeta;
+import io.improbable.keanu.distributions.continuous.Beta;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -9,6 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -18,28 +20,30 @@ public class BetaVertex extends ProbabilisticDouble {
     private final DoubleVertex beta;
 
     /**
-     * One alpha or beta or both driving an arbitrarily shaped tensor of Beta
+     * One alpha or beta or both that match a proposed tensor shape of Beta.
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param shape the desired shape of the vertex
-     * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
-     * @param beta  the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param tensorShape the desired shape of the tensor contained in the vertex
+     * @param alpha       the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
+     * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
-    public BetaVertex(int[] shape, DoubleVertex alpha, DoubleVertex beta) {
+    public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, alpha.getShape(), beta.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
         this.beta = beta;
         setParents(alpha, beta);
-        setValue(DoubleTensor.placeHolder(shape));
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
-     * One to one constructor for mapping some shape of alpha and beta to
-     * a matching shaped Beta.
+     * One to one constructor for mapping some tensorShape of alpha and beta to
+     * a matching tensorShaped Beta.
      *
-     * @param alpha the alpha of the Beta with either the same shape as specified for this vertex or a scalar
-     * @param beta  the beta of the Beta with either the same shape as specified for this vertex or a scalar
+     * @param alpha the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
+     * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
@@ -57,16 +61,16 @@ public class BetaVertex extends ProbabilisticDouble {
         this(new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    public BetaVertex(int[] shape, DoubleVertex alpha, double beta) {
-        this(shape, alpha, new ConstantDoubleVertex(beta));
+    public BetaVertex(int[] tensorShape, DoubleVertex alpha, double beta) {
+        this(tensorShape, alpha, new ConstantDoubleVertex(beta));
     }
 
-    public BetaVertex(int[] shape, double alpha, DoubleVertex beta) {
-        this(shape, new ConstantDoubleVertex(alpha), beta);
+    public BetaVertex(int[] tensorShape, double alpha, DoubleVertex beta) {
+        this(tensorShape, new ConstantDoubleVertex(alpha), beta);
     }
 
-    public BetaVertex(int[] shape, double alpha, double beta) {
-        this(shape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
+    public BetaVertex(int[] tensorShape, double alpha, double beta) {
+        this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
     @Override
@@ -75,35 +79,38 @@ public class BetaVertex extends ProbabilisticDouble {
         DoubleTensor alphaValues = alpha.getValue();
         DoubleTensor betaValues = beta.getValue();
 
-        DoubleTensor logPdfs = TensorBeta.logPdf(alphaValues, betaValues, value);
+        DoubleTensor logPdfs = Beta.logPdf(alphaValues, betaValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorBeta.Diff dlnP = TensorBeta.dlnPdf(alpha.getValue(), beta.getValue(), value);
-        return convertDualNumbersToDiff(dlnP.dPdalpha, dlnP.dPdbeta, dlnP.dPdx);
+        Beta.DiffLogP dlnP = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
+        return convertDualNumbersToDiff(dlnP.dLogPdalpha, dlnP.dLogPdbeta, dlnP.dLogPdx);
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdalpha,
-                                                             DoubleTensor dPdbeta,
-                                                             DoubleTensor dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdalpha,
+                                                             DoubleTensor dLogPdbeta,
+                                                             DoubleTensor dLogPdx) {
 
-        PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdalpha);
-        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
-        PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
+        PartialDerivatives dLogPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdalpha);
+        PartialDerivatives dLogPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdbeta);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorBeta.sample(
+        return Beta.sample(
             getShape(),
             alpha.getValue(),
             beta.getValue(),

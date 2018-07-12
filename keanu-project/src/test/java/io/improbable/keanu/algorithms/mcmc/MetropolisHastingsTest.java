@@ -40,7 +40,7 @@ public class MetropolisHastingsTest {
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroMasterP(100, random);
+        bayesNet.probeForNonZeroProbability(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
             bayesNet,
@@ -70,7 +70,7 @@ public class MetropolisHastingsTest {
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroMasterP(100, random);
+        bayesNet.probeForNonZeroProbability(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
             bayesNet,
@@ -103,7 +103,7 @@ public class MetropolisHastingsTest {
         C.observe(true);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C));
-        bayesNet.probeForNonZeroMasterP(100, random);
+        bayesNet.probeForNonZeroProbability(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
             bayesNet,
@@ -134,7 +134,7 @@ public class MetropolisHastingsTest {
         E.observe(true);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C, D, E));
-        bayesNet.probeForNonZeroMasterP(100, random);
+        bayesNet.probeForNonZeroProbability(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
             bayesNet,
@@ -157,7 +157,7 @@ public class MetropolisHastingsTest {
         C.observe(false);
 
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroMasterP(100, random);
+        net.probeForNonZeroProbability(100, random);
 
         NetworkSamples posteriorSamples = MetropolisHastings.getPosteriorSamples(
             net,

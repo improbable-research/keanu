@@ -6,7 +6,6 @@ plugins {
 mainClassName = "com.example.starter.Model"
 
 group = 'improbable'
-version = '0.0.1'
 
 sourceCompatibility = 1.8
 targetCompatibility = 1.8
@@ -17,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    compile group: 'io.improbable', name: 'keanu', version: '0.0.7'
+    compile group: 'io.improbable', name: 'keanu', version: '0.0.8'
 
     //testing
     testCompile 'junit:junit:4.12'

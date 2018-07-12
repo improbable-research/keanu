@@ -17,6 +17,9 @@ public class OrMultipleVertex extends BoolReduceVertex {
             input, OrMultipleVertex::or);
     }
 
+    /**
+     * Returns true if one of the vertices is true
+     */
     private static BooleanTensor or(BooleanTensor a, BooleanTensor b) {
         return a.or(b);
     }

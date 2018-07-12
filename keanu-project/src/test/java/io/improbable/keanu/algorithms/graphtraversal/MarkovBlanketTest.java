@@ -52,7 +52,6 @@ public class MarkovBlanketTest {
         DoubleVertex D = new GaussianVertex(B, C);
         DoubleVertex E = new GaussianVertex(D, 1.0);
         DoubleVertex F = new GaussianVertex(D, 1.0);
-        DoubleVertex G = new GaussianVertex(E, F);
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 

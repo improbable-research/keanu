@@ -27,6 +27,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new MultiplicationVertex(this, that);
     }
 
+    public DoubleVertex matrixMultiply(DoubleVertex that) {
+        return new MatrixMultiplicationVertex(this, that);
+    }
+
     public DoubleVertex divideBy(DoubleVertex that) {
         return new DivisionVertex(this, that);
     }
@@ -67,6 +71,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new CeilVertex(this);
     }
 
+    public DoubleVertex round() {
+        return new RoundVertex(this);
+    }
+
     public DoubleVertex exp() {
         return new ExpVertex(this);
     }
@@ -105,6 +113,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     public DoubleVertex atan2(DoubleVertex that) {
         return new ArcTan2Vertex(this, that);
+    }
+
+    public DoubleVertex sum() {
+        return new SumVertex(this);
     }
 
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
@@ -178,35 +190,27 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     public void setValue(double value) {
-        super.setValue(DoubleTensor.create(value, getShape()));
+        super.setValue(DoubleTensor.scalar(value));
     }
 
     public void setValue(double[] values) {
-        super.setValue(DoubleTensor.create(values, getShape()));
+        super.setValue(DoubleTensor.create(values));
     }
 
     public void setAndCascade(double value) {
-        super.setAndCascade(DoubleTensor.create(value, getShape()));
+        super.setAndCascade(DoubleTensor.scalar(value));
     }
 
     public void setAndCascade(double[] values) {
-        super.setAndCascade(DoubleTensor.create(values, getShape()));
-    }
-
-    public void setAndCascade(double value, Map<Long, Long> explored) {
-        super.setAndCascade(DoubleTensor.create(value, getShape()), explored);
-    }
-
-    public void setAndCascade(double[] values, Map<Long, Long> explored) {
-        super.setAndCascade(DoubleTensor.create(values, getShape()), explored);
+        super.setAndCascade(DoubleTensor.create(values));
     }
 
     public void observe(double value) {
-        super.observe(DoubleTensor.create(value, getShape()));
+        super.observe(DoubleTensor.scalar(value));
     }
 
     public void observe(double[] values) {
-        super.observe(DoubleTensor.create(values, getShape()));
+        super.observe(DoubleTensor.create(values));
     }
 
     public double logPdf(double value) {
@@ -223,5 +227,9 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     public Map<Long, DoubleTensor> dLogPdf(double[] values) {
         return this.dLogPdf(DoubleTensor.create(values));
+    }
+
+    public double getValue(int... index) {
+        return getValue().getValue(index);
     }
 }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.tensors.continuous.TensorLogistic;
+import io.improbable.keanu.distributions.continuous.Logistic;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -9,87 +10,86 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LogisticVertex extends ProbabilisticDouble {
 
-    private final DoubleVertex a;
-    private final DoubleVertex b;
+    private final DoubleVertex mu;
+    private final DoubleVertex s;
 
     /**
-     * One a or b or both driving an arbitrarily shaped tensor of Logistic
+     * One mu or s or both driving an arbitrarily shaped tensor of Logistic
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param shape the desired shape of the vertex
-     * @param a     the a of the Logistic with either the same shape as specified for this vertex or a scalar
-     * @param b     the b of the Logistic with either the same shape as specified for this vertex or a scalar
+     * @param tensorShape the desired shape of the vertex
+     * @param mu          the mu (location) of the Logistic with either the same shape as specified for this vertex or mu scalar
+     * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
-    public LogisticVertex(int[] shape, DoubleVertex a, DoubleVertex b) {
+    public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, a.getShape(), b.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
 
-        this.a = a;
-        this.b = b;
-        setParents(a, b);
-        setValue(DoubleTensor.placeHolder(shape));
+        this.mu = mu;
+        this.s = s;
+        setParents(mu, s);
+        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    /**
-     * One to one constructor for mapping some shape of a and b to
-     * a matching shaped logistic.
-     *
-     * @param a the a of the Logistic with either the same shape as specified for this vertex or a scalar
-     * @param b the b of the Logistic with either the same shape as specified for this vertex or a scalar
-     */
-    public LogisticVertex(DoubleVertex a, DoubleVertex b) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), a.getShape()), a, b);
+    public LogisticVertex(DoubleVertex mu, DoubleVertex s) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), s.getShape()), mu, s);
     }
 
-    public LogisticVertex(DoubleVertex a, double b) {
-        this(a, new ConstantDoubleVertex(b));
+    public LogisticVertex(DoubleVertex mu, double s) {
+        this(mu, new ConstantDoubleVertex(s));
     }
 
-    public LogisticVertex(double a, DoubleVertex b) {
-        this(new ConstantDoubleVertex(a), b);
+    public LogisticVertex(double mu, DoubleVertex s) {
+        this(new ConstantDoubleVertex(mu), s);
     }
 
-    public LogisticVertex(double a, double b) {
-        this(new ConstantDoubleVertex(a), new ConstantDoubleVertex(b));
+    public LogisticVertex(double mu, double s) {
+        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(s));
     }
 
     @Override
     public double logPdf(DoubleTensor value) {
-        DoubleTensor aValues = a.getValue();
-        DoubleTensor bValues = b.getValue();
+        DoubleTensor muValues = mu.getValue();
+        DoubleTensor sValues = s.getValue();
 
-        DoubleTensor logPdfs = TensorLogistic.logPdf(aValues, bValues, value);
+        DoubleTensor logPdfs = Logistic.logPdf(muValues, sValues, value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        TensorLogistic.Diff dlnP = TensorLogistic.dlnPdf(a.getValue(), b.getValue(), value);
-        return convertDualNumbersToDiff(dlnP.dPda, dlnP.dPdb, dlnP.dPdx);
+        Logistic.DiffLogP dlnP = Logistic.dlnPdf(mu.getValue(), s.getValue(), value);
+        return convertDualNumbersToDiff(dlnP.dLogPdmu, dlnP.dLogPds, dlnP.dLogPdx);
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPda,
-                                                             DoubleTensor dPdb,
-                                                             DoubleTensor dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
+                                                             DoubleTensor dLogPds,
+                                                             DoubleTensor dLogPdx) {
 
-        PartialDerivatives dPdInputsFromA = a.getDualNumber().getPartialDerivatives().multiplyBy(dPda);
-        PartialDerivatives dPdInputsFromB = b.getDualNumber().getPartialDerivatives().multiplyBy(dPdb);
-        PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
+        PartialDerivatives dLogPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromS = s.getDualNumber().getPartialDerivatives().multiplyBy(dLogPds);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromMu.add(dLogPdInputsFromS);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return TensorLogistic.sample(getShape(), a.getValue(), b.getValue(), random);
+        return Logistic.sample(getShape(), mu.getValue(), s.getValue(), random);
     }
 }

@@ -14,10 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class NonGradientOptimizer {
+public class NonGradientOptimizer extends Optimizer {
 
     private final BayesianNetwork bayesNet;
     private final List<BiConsumer<double[], Double>> onFitnessCalculations;
@@ -56,7 +55,7 @@ public class NonGradientOptimizer {
             this::handleFitnessCalculation
         );
 
-        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
+        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(getNumInterpolationPoints(latentVertices));
 
         double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
@@ -82,6 +81,10 @@ public class NonGradientOptimizer {
         );
 
         return pointValuePair.getValue();
+    }
+
+    private int getNumInterpolationPoints(List<? extends Vertex<DoubleTensor>> latentVertices){
+        return (int)(2 * totalNumLatentDimensions(latentVertices) + 1);
     }
 
     /**

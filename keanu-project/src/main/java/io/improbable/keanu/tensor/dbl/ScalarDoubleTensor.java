@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -88,6 +89,32 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor reshape(int[] newShape) {
+        if (!TensorShape.isScalar(newShape)) {
+            throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
+        }
+
+        ScalarDoubleTensor reshapedScalar = new ScalarDoubleTensor(value);
+        reshapedScalar.shape = newShape;
+        return reshapedScalar;
+    }
+
+    @Override
+    public DoubleTensor diag() {
+        return duplicate();
+    }
+
+    @Override
+    public DoubleTensor transpose() {
+        return duplicate();
+    }
+
+    @Override
+    public DoubleTensor sum(int... overDimensions) {
+        return duplicate();
+    }
+
+    @Override
     public DoubleTensor reciprocal() {
         return this.duplicate().reciprocalInPlace();
     }
@@ -105,6 +132,25 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor times(double that) {
         return this.duplicate().timesInPlace(that);
+    }
+
+    @Override
+    public DoubleTensor matrixMultiply(DoubleTensor value) {
+        if (value.isScalar()) {
+            return value.times(value);
+        }
+        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
+    }
+
+    @Override
+    public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
+        if (value.isScalar()) {
+            if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
+                throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
+            }
+            return value.times(value);
+        }
+        throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
     }
 
     @Override
@@ -274,12 +320,42 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor inverse() {
+        return duplicate();
+    }
+
+    @Override
+    public double max() {
+        return value;
+    }
+
+    @Override
     public DoubleTensor min(DoubleTensor min) {
         if (min.isScalar()) {
             return new ScalarDoubleTensor(Math.min(value, min.scalar()));
         } else {
             return DoubleTensor.create(value, shape).minInPlace(min);
         }
+    }
+
+    @Override
+    public double min() {
+        return value;
+    }
+
+    @Override
+    public double average() {
+        return value;
+    }
+
+    @Override
+    public double standardDeviation() {
+        throw new IllegalStateException("Cannot find the standard deviation of a scalar");
+    }
+
+    @Override
+    public DoubleTensor standardize() {
+        return duplicate().standardizeInPlace();
     }
 
     @Override
@@ -298,8 +374,23 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor round() {
+        return duplicate().roundInPlace();
+    }
+
+    @Override
     public DoubleTensor sigmoid() {
         return duplicate().sigmoidInPlace();
+    }
+
+    @Override
+    public DoubleTensor choleskyDecomposition() {
+        return duplicate();
+    }
+
+    @Override
+    public double determinant() {
+        return value;
     }
 
     @Override
@@ -511,10 +602,33 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return this;
     }
 
+    /**
+     * Note that we have modified the native Java behaviour to match Python (and therefore ND4J) behaviour
+     * Which rounds negative numbers down if they end in 0.5
+     * e.g.
+     * Java: round(-2.5) == -2.0
+     * Python: round(-2.5) == -3.0
+     * @return Nearest integer value as a DoubleTensor
+     */
+    @Override
+    public DoubleTensor roundInPlace() {
+        double valueToRound = value;
+        if (value < 0. && value + 0.5 == (double) value.intValue()) {
+            valueToRound -= 1.;
+        }
+        value = new Double(Math.round(valueToRound));
+        return this;
+    }
+
     @Override
     public DoubleTensor sigmoidInPlace() {
         value = 1.0D / (1.0D + FastMath.exp(-value));
         return this;
+    }
+
+    @Override
+    public DoubleTensor standardizeInPlace() {
+        throw new IllegalStateException("Cannot standardize a scalar");
     }
 
     @Override

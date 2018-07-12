@@ -1,7 +1,15 @@
 
+plugins {
+    id 'com.palantir.git-version' version '0.11.0'
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
+}
+
+allprojects {
+    version gitVersion()
 }
 
 dependencies {

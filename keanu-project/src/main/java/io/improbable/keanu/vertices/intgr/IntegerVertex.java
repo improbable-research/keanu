@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 
 import java.util.Map;
@@ -71,6 +72,10 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return new IntegerAbsVertex(this);
     }
 
+    public IntegerVertex sum() {
+        return new IntegerSumVertex(this);
+    }
+
     public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }
@@ -101,31 +106,23 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
     }
 
     public void setValue(int value) {
-        super.setValue(IntegerTensor.create(value, getShape()));
+        super.setValue(IntegerTensor.scalar(value));
     }
 
     public void setValue(int[] values) {
-        super.setValue(IntegerTensor.create(values, getShape()));
+        super.setValue(IntegerTensor.create(values));
     }
 
     public void setAndCascade(int value) {
-        super.setAndCascade(IntegerTensor.create(value, getShape()));
+        super.setAndCascade(IntegerTensor.scalar(value));
     }
 
     public void setAndCascade(int[] values) {
-        super.setAndCascade(IntegerTensor.create(values, getShape()));
-    }
-
-    public void setAndCascade(int value, Map<Long, Long> explored) {
-        super.setAndCascade(IntegerTensor.create(value, getShape()), explored);
-    }
-
-    public void setAndCascade(int[] values, Map<Long, Long> explored) {
-        super.setAndCascade(IntegerTensor.create(values, getShape()), explored);
+        super.setAndCascade(IntegerTensor.create(values));
     }
 
     public void observe(int value) {
-        super.observe(IntegerTensor.create(value, getShape()));
+        super.observe(IntegerTensor.scalar(value));
     }
 
     public void observe(int[] values) {
@@ -146,6 +143,10 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
 
     public Map<Long, DoubleTensor> dLogPmf(int[] values) {
         return this.dLogPmf(IntegerTensor.create(values));
+    }
+
+    public int getValue(int... index) {
+        return getValue().getValue(index);
     }
 
 }

@@ -18,14 +18,14 @@ import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class GradientOptimizer {
+public class GradientOptimizer extends Optimizer {
+
+    private static final double FLAT_GRADIENT = 1e-16;
 
     public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
         NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
         new SimpleValueChecker(1e-8, 1e-8)
     );
-
-    private static final double FLAT_GRADIENT = 1e-16;
 
     private final BayesianNetwork bayesNet;
 
@@ -82,6 +82,10 @@ public class GradientOptimizer {
         return maxAPosteriori(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
+    public double maxAPosteriori() {
+        return maxAPosteriori(Integer.MAX_VALUE, GradientOptimizer.DEFAULT_OPTIMIZER);
+    }
+
     /**
      * This method is here to provide more fine grained control of optimization.
      *
@@ -104,6 +108,10 @@ public class GradientOptimizer {
      */
     public double maxLikelihood(int maxEvaluations) {
         return maxLikelihood(maxEvaluations, GradientOptimizer.DEFAULT_OPTIMIZER);
+    }
+
+    public double maxLikelihood() {
+        return maxLikelihood(Integer.MAX_VALUE, GradientOptimizer.DEFAULT_OPTIMIZER);
     }
 
     private double optimize(int maxEvaluations,
@@ -143,30 +151,7 @@ public class GradientOptimizer {
         return pointValuePair.getValue();
     }
 
-    static double[] currentPoint(List<Vertex<DoubleTensor>> continuousVertices) {
-
-        long totalLatentDimensions = 0;
-        for (Vertex<DoubleTensor> vertex : continuousVertices) {
-            totalLatentDimensions += FitnessFunction.numDimensions(vertex);
-        }
-
-        if (totalLatentDimensions > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
-        }
-
-        int position = 0;
-        double[] point = new double[(int) totalLatentDimensions];
-
-        for (Vertex<DoubleTensor> vertex : continuousVertices) {
-            double[] values = vertex.getValue().asFlatDoubleArray();
-            System.arraycopy(values, 0, point, position, values.length);
-            position += values.length;
-        }
-
-        return point;
-    }
-
-    private void warnIfGradientIsFlat(double[] gradient) {
+    protected void warnIfGradientIsFlat(double[] gradient) {
         double maxGradient = Arrays.stream(gradient).max().getAsDouble();
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
             throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);

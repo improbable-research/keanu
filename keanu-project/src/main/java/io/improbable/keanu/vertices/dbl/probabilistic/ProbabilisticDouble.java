@@ -12,7 +12,7 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     @Override
     public DoubleTensor updateValue() {
         if (!hasValue()) {
-            setValue(sampleUsingDefaultRandom());
+            setValue(sample());
         }
         return getValue();
     }

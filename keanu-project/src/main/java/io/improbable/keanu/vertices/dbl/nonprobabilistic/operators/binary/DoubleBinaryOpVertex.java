@@ -11,6 +11,13 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
     protected final DoubleVertex a;
     protected final DoubleVertex b;
 
+    /**
+     * A vertex that performs a user defined operation on two vertices
+     *
+     * @param shape the shape of the resulting vertex
+     * @param a a vertex
+     * @param b a vertex
+     */
     public DoubleBinaryOpVertex(int[] shape, DoubleVertex a, DoubleVertex b) {
         this.a = a;
         this.b = b;

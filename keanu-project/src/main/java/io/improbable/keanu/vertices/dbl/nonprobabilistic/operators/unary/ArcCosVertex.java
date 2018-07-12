@@ -9,6 +9,11 @@ import java.util.Map;
 
 public class ArcCosVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the inverse cosine of a vertex, Arccos(vertex)
+     *
+     * @param inputVertex the vertex
+     */
     public ArcCosVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

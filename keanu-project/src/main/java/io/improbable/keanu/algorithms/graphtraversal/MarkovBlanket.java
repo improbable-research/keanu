@@ -11,6 +11,13 @@ public class MarkovBlanket {
     private MarkovBlanket() {
     }
 
+    /**
+     * This algorithm finds all of the vertices that shield it from the rest of the Bayesian Network.
+     * By knowing the Markov Blanket of a vertex, we can fully predict the behaviour of that vertex.
+     *
+     * @param aVertex the vertex to find the Markov Blanket for
+     * @return A set of vertices that are affected by, or affect, a given vertex
+     */
     public static Set<Vertex> get(Vertex<?> aVertex) {
 
         Set<Vertex> parents = getUpstreamProbabilisticVertices(aVertex);

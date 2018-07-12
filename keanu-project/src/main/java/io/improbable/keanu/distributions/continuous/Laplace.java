@@ -1,13 +1,9 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-/**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.8 page 25
- */
+import org.nd4j.linalg.util.ArrayUtil;
 
 public class Laplace {
 
@@ -15,12 +11,26 @@ public class Laplace {
     }
 
     /**
+     * @param shape  shape of tensor returned
      * @param mu     location
      * @param beta   shape
      * @param random source of randomness
      * @return a random number from the Laplace distribution
      */
-    public static double sample(double mu, double beta, KeanuRandom random) {
+    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor beta, KeanuRandom random) {
+        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
+        Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
+
+        int length = ArrayUtil.prod(shape);
+        double[] samples = new double[length];
+        for (int i = 0; i < length; i++) {
+            samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);
+        }
+
+        return DoubleTensor.create(samples, shape);
+    }
+
+    private static double sample(double mu, double beta, KeanuRandom random) {
         if (beta <= 0.0) {
             throw new IllegalArgumentException("Invalid value for beta: " + beta);
         }
@@ -31,32 +41,35 @@ public class Laplace {
         }
     }
 
-    public static double pdf(double mu, double beta, double x) {
-        return 1 / (2 * beta) * Math.exp(-Math.abs(x - mu) / beta);
+    public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+        final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().divInPlace(beta);
+        final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
+        return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
     }
 
-    public static double logPdf(double mu, double beta, double x) {
-        return -(Math.abs(mu - x) / beta + Math.log(2 * beta));
+    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+        final DoubleTensor muMinusX = mu.minus(x);
+        final DoubleTensor muMinusXAbs = muMinusX.abs();
+
+        final DoubleTensor denominator = muMinusXAbs.times(beta);
+
+        final DoubleTensor dLogPdx = muMinusX.divInPlace(denominator);
+        final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
+        final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
+
+        return new DiffLogP(dLogPdMu, dLogPdBeta, dLogPdx);
     }
 
-    public static Diff dlnPdf(double mu, double beta, double x) {
-        double denominator = (beta * Math.abs(mu - x));
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdmu;
+        public final DoubleTensor dLogPdbeta;
+        public final DoubleTensor dLogPdx;
 
-        double dPdx = (mu - x) / denominator;
-        double dPdm = (x - mu) / denominator;
-        double dPdb = (Math.abs(mu - x) - beta) / Math.pow(beta, 2);
-        return new Diff(dPdm, dPdb, dPdx);
-    }
-
-    public static class Diff {
-        public final double dPdmu;
-        public final double dPdbeta;
-        public final double dPdx;
-
-        public Diff(double dPdmu, double dPdbeta, double dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPdbeta = dPdbeta;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPdbeta, DoubleTensor dLogPdx) {
+            this.dLogPdmu = dLogPdmu;
+            this.dLogPdbeta = dLogPdbeta;
+            this.dLogPdx = dLogPdx;
         }
     }
+
 }

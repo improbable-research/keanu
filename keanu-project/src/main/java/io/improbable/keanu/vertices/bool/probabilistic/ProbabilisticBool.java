@@ -8,7 +8,7 @@ public abstract class ProbabilisticBool extends BoolVertex {
     @Override
     public BooleanTensor updateValue() {
         if (!hasValue()) {
-            setValue(sampleUsingDefaultRandom());
+            setValue(sample());
         }
         return getValue();
     }
