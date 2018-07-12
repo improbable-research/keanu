@@ -1,23 +1,34 @@
 package io.improbable.keanu.distributions.continuous;
 
+import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.nd4j.linalg.util.ArrayUtil;
 
-public class Laplace {
+import java.util.List;
 
-    private Laplace() {
-    }
+public class Laplace implements ContinuousDistribution {
+
+    private final DoubleTensor mu;
+    private final DoubleTensor beta;
 
     /**
-     * @param shape  shape of tensor returned
      * @param mu     location
      * @param beta   shape
-     * @param random source of randomness
-     * @return a random number from the Laplace distribution
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor beta, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
+        return new Laplace(mu, beta);
+    }
+
+    private Laplace(DoubleTensor mu, DoubleTensor beta) {
+        this.mu = mu;
+        this.beta = beta;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
         Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
@@ -41,13 +52,15 @@ public class Laplace {
         }
     }
 
-    public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().divInPlace(beta);
         final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
         return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
     }
 
-    public static Diff dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+    @Override
+    public List<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
@@ -57,19 +70,7 @@ public class Laplace {
         final DoubleTensor dPdMu = x.minus(mu).divInPlace(denominator);
         final DoubleTensor dPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        return new Diff(dPdMu, dPdBeta, dPdx);
-    }
-
-    public static class Diff {
-        public final DoubleTensor dPdmu;
-        public final DoubleTensor dPdbeta;
-        public final DoubleTensor dPdx;
-
-        public Diff(DoubleTensor dPdmu, DoubleTensor dPdbeta, DoubleTensor dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPdbeta = dPdbeta;
-            this.dPdx = dPdx;
-        }
+        return ImmutableList.of(dPdMu, dPdBeta, dPdx);
     }
 
 }

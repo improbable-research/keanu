@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -14,10 +15,20 @@ import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
  * ARL-TR-2168 March 2000
  * 5.2.8 page 49
  */
-public class Poisson {
+public class Poisson implements DiscreteDistribution {
 
-    public static IntegerTensor sample(int[] shape, DoubleTensor mu, KeanuRandom random) {
+    private final DoubleTensor mu;
 
+    public static DiscreteDistribution withParamters(DoubleTensor mu) {
+        return new Poisson(mu);
+    }
+
+    private Poisson(DoubleTensor mu) {
+        this.mu = mu;
+    }
+
+    @Override
+    public IntegerTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
@@ -29,7 +40,7 @@ public class Poisson {
         return IntegerTensor.create(samples, shape);
     }
 
-    public static int sample(double mu, KeanuRandom random) {
+    private static int sample(double mu, KeanuRandom random) {
         if (mu <= 0.) {
             throw new IllegalArgumentException("Invalid value for mu: " + mu);
         }
@@ -45,8 +56,8 @@ public class Poisson {
         return i - 1;
     }
 
-    public static DoubleTensor logPmf(DoubleTensor mu, IntegerTensor k) {
-
+    @Override
+    public DoubleTensor logProb(IntegerTensor k) {
         Tensor.FlattenedView<Double> muFlattenedView = mu.getFlattenedView();
         Tensor.FlattenedView<Integer> kFlattenedView = k.getFlattenedView();
 
@@ -58,7 +69,7 @@ public class Poisson {
         return DoubleTensor.create(result, k.getShape());
     }
 
-    public static double pmf(double mu, int k) {
+    private static double pmf(double mu, int k) {
         if (k >= 0 && k < 20) {
             return (Math.pow(mu, k) / factorial(k)) * Math.exp(-mu);
         } else if (k >= 20) {

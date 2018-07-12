@@ -1,28 +1,38 @@
 package io.improbable.keanu.distributions.continuous;
 
+import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import sun.rmi.runtime.Log;
 
-public class Logistic {
+import java.util.List;
+
+public class Logistic implements ContinuousDistribution {
+
+    private final DoubleTensor mu;
+    private final DoubleTensor s;
 
     /**
-     * @param shape  shape of tensor returned
      * @param mu     location parameter (any real number)
      * @param s      scale parameter (b greater than 0)
-     * @param random source or randomness
-     * @return a sample from the distribution
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor s, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
+        return new Logistic(mu, s);
+    }
+
+    private Logistic(DoubleTensor mu, DoubleTensor s) {
+        this.mu = mu;
+        this.s = s;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
         return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(mu.minus(s));
     }
 
-    /**
-     * @param mu location parameter (any real number)
-     * @param s  scale parameter (b greater than 0)
-     * @param x  at value
-     * @return the density at x
-     */
-    public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor xMinusAOverB = x.minus(mu).divInPlace(s);
         final DoubleTensor ln1OverB = s.reciprocal().logInPlace();
 
@@ -31,7 +41,8 @@ public class Logistic {
         );
     }
 
-    public static Diff dlnPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+    @Override
+    public List<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor expAOverB = mu.div(s).expInPlace();
         final DoubleTensor expXOverB = x.div(s).expInPlace();
         final DoubleTensor expPlus = expAOverB.plus(expXOverB);
@@ -49,19 +60,6 @@ public class Logistic {
 
         final DoubleTensor dPdb = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
-        return new Diff(dPda, dPdb, dPdx);
+        return ImmutableList.of(dPda, dPdb, dPdx);
     }
-
-    public static class Diff {
-        public final DoubleTensor dPdmu;
-        public final DoubleTensor dPds;
-        public final DoubleTensor dPdx;
-
-        public Diff(DoubleTensor dPdmu, DoubleTensor dPds, DoubleTensor dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPds = dPds;
-            this.dPdx = dPdx;
-        }
-    }
-
 }

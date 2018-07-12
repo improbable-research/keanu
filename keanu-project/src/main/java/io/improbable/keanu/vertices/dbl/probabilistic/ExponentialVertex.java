@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -69,15 +70,15 @@ public class ExponentialVertex extends ProbabilisticDouble {
         DoubleTensor locationValues = location.getValue();
         DoubleTensor lambdaValues = lambda.getValue();
 
-        DoubleTensor logPdfs = Exponential.logPdf(locationValues, lambdaValues, value);
+        DoubleTensor logPdfs = Exponential.withParameters(locationValues, lambdaValues).logProb(value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Exponential.Diff dlnP = Exponential.dlnPdf(location.getValue(), lambda.getValue(), value);
-        return convertDualNumbersToDiff(dlnP.dPdlocation, dlnP.dPdlambda, dlnP.dPdx);
+        List<DoubleTensor> dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdlocation,
@@ -97,7 +98,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Exponential.sample(getShape(), location.getValue(), lambda.getValue(), random);
+        return Exponential.withParameters(location.getValue(), lambda.getValue()).sample(getShape(), random);
     }
 
 }

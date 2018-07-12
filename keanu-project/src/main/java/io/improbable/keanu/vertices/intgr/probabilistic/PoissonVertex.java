@@ -64,7 +64,7 @@ public class PoissonVertex extends ProbabilisticInteger {
 
     @Override
     public double logPmf(IntegerTensor value) {
-        return Poisson.logPmf(mu.getValue(), value).sum();
+        return Poisson.withParamters(mu.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -74,6 +74,6 @@ public class PoissonVertex extends ProbabilisticInteger {
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return Poisson.sample(getShape(), mu.getValue(), random);
+        return Poisson.withParamters(mu.getValue()).sample(getShape(), random);
     }
 }

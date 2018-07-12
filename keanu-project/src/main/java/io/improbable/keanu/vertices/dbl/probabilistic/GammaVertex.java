@@ -114,7 +114,7 @@ public class GammaVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Gamma.sample(getShape(), location.getValue(), theta.getValue(), k.getValue(), random);
+        return Gamma.withParameters(location.getValue(), theta.getValue(), k.getValue()).sample(getShape(), random);
     }
 
 }

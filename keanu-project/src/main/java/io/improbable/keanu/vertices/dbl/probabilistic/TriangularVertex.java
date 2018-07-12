@@ -103,7 +103,7 @@ public class TriangularVertex extends ProbabilisticDouble {
         DoubleTensor xMaxValues = xMax.getValue();
         DoubleTensor cValues = c.getValue();
 
-        DoubleTensor logPdfs = Triangular.logPdf(xMinValues, xMaxValues, cValues, value);
+        DoubleTensor logPdfs = Triangular.withParameters(xMinValues, xMaxValues, cValues).logProb(value);
         return logPdfs.sum();
     }
 
@@ -114,6 +114,6 @@ public class TriangularVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Triangular.sample(getShape(), xMin.getValue(), xMax.getValue(), c.getValue(), random);
+        return Triangular.withParameters(xMin.getValue(), xMax.getValue(), c.getValue()).sample(getShape(), random);
     }
 }

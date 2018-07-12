@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
@@ -49,19 +50,19 @@ public class StudentTVertex extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor t) {
-        return StudentT.logPdf(v.getValue(), t).sum();
+        return StudentT.withParameters(v.getValue()).logProb(t).sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
-        StudentT.Diff diff = StudentT.dLogPdf(v.getValue(), t);
+        List<DoubleTensor> diff = StudentT.withParameters(v.getValue()).dLogProb(t);
         Map<Long, DoubleTensor> m = new HashMap<>();
-        m.put(getId(), diff.dPdt);
+        m.put(getId(), diff.get(0));
         return m;
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return StudentT.sample(getShape(), v.getValue(), random);
+        return StudentT.withParameters(v.getValue()).sample(getShape(), random);
     }
 }

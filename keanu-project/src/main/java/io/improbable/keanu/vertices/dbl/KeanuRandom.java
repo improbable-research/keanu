@@ -75,11 +75,11 @@ public class KeanuRandom {
     }
 
     public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        return Gamma.sample(shape, a, theta, k, this);
+        return Gamma.withParameters(a, theta, k).sample(shape, this);
     }
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
-        return Laplace.sample(shape, mu, beta, this);
+        return Laplace.withParameters(mu, beta).sample(shape, this);
     }
 
     public double nextGaussian() {
@@ -99,7 +99,7 @@ public class KeanuRandom {
     }
 
     public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
-        return Poisson.sample(shape, mu, this);
+        return Poisson.withParamters(mu).sample(shape, this);
 
     }
 

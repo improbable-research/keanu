@@ -1,29 +1,40 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.nd4j.linalg.util.ArrayUtil;
 
+import java.util.List;
+
 import static java.lang.Math.*;
 
-public class Gamma {
+public class Gamma implements ContinuousDistribution {
 
     private static final double M_E = 0.577215664901532860606512090082;
-
-    private Gamma() {
-    }
+    private final DoubleTensor a;
+    private final DoubleTensor theta;
+    private final DoubleTensor k;
 
     /**
-     * @param shape  shape of tensor returned
      * @param a      location
      * @param theta  scale
      * @param k      shape
-     * @param random source of randomness
-     * @return a random number from the Gamma distribution
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+        return new Gamma(a, theta, k);
+    }
 
+    private Gamma(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+        this.a = a;
+        this.theta = theta;
+        this.k = k;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> aWrapped = a.getFlattenedView();
         Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
         Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
@@ -90,12 +101,22 @@ public class Gamma {
         return location - lambda * Math.log(random.nextDouble());
     }
 
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
+        return null;
+    }
+
     public static DoubleTensor logPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
         final DoubleTensor aMinusXOverTheta = location.minus(x).divInPlace(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
         final DoubleTensor xMinusAPowKMinus1 = x.minus(location).powInPlace(k.minus(1));
         final DoubleTensor lnXMinusAToKMinus1 = ((xMinusAPowKMinus1).divInPlace(k.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
         return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
+    }
+
+    @Override
+    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+        return null;
     }
 
     public static Diff dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {

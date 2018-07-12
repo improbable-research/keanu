@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -114,8 +115,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     public double logPdf(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
-        final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
+        final DoubleTensor density = SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
         return density.logInPlace().sum();
     }
 
@@ -123,9 +123,9 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
-        final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor dPdfdx = SmoothUniform.dlnPdf(min, max, shoulderWidth, value);
-        final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
+        ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
+        final DoubleTensor dPdfdx = distribution.dLogProb(value).get(0);
+        final DoubleTensor density = distribution.logProb(value);
         final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
 
         return singletonMap(getId(), dlogPdfdx);
@@ -133,6 +133,6 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return SmoothUniform.sample(getShape(), xMin.getValue(), xMax.getValue(), this.edgeSharpness, random);
+        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness).sample(getShape(), random);
     }
 }
