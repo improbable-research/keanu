@@ -22,7 +22,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape   the desired shape of the vertex
@@ -124,11 +124,11 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor shoulderWidth = (max.minus(min)).timesInPlace(this.edgeSharpness);
-        final DoubleTensor dPdfdx = SmoothUniform.dlnPdf(min, max, shoulderWidth, value);
+        final DoubleTensor dPdx = SmoothUniform.dPdf(min, max, shoulderWidth, value);
         final DoubleTensor density = SmoothUniform.pdf(min, max, shoulderWidth, value);
-        final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
+        final DoubleTensor dLogPdx = dPdx.divInPlace(density);
 
-        return singletonMap(getId(), dlogPdfdx);
+        return singletonMap(getId(), dLogPdx);
     }
 
     @Override

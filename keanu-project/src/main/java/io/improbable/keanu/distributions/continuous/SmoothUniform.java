@@ -114,7 +114,7 @@ public class SmoothUniform {
             .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
     }
 
-    public static DoubleTensor dlnPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
+    public static DoubleTensor dPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);

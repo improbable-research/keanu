@@ -23,28 +23,29 @@ public class Gaussian {
         return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
-    public static Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
+    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 
-        final DoubleTensor dlnP_dmu = xMinusMu.div(variance);
-        final DoubleTensor dlnP_dx = dlnP_dmu.unaryMinus();
-        final DoubleTensor dlnP_dsigma = xMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdmu = xMinusMu.div(variance);
+        final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
+        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        return new Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
+        return new DiffLogP(dLogPdmu, dLogPdsigma, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdmu;
-        public final DoubleTensor dPdsigma;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdmu;
+        public final DoubleTensor dLogPdsigma;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPdmu, DoubleTensor dPdsigma, DoubleTensor dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPdsigma = dPdsigma;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPdsigma, DoubleTensor dLogPdx) {
+            this.dLogPdmu = dLogPdmu;
+            this.dLogPdsigma = dLogPdsigma;
+            this.dLogPdx = dLogPdx;
         }
     }
+
 }

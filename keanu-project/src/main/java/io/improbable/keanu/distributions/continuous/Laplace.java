@@ -47,28 +47,28 @@ public class Laplace {
         return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
     }
 
-    public static Diff dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
         final DoubleTensor denominator = muMinusXAbs.times(beta);
 
-        final DoubleTensor dPdx = muMinusX.divInPlace(denominator);
-        final DoubleTensor dPdMu = x.minus(mu).divInPlace(denominator);
-        final DoubleTensor dPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
+        final DoubleTensor dLogPdx = muMinusX.divInPlace(denominator);
+        final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
+        final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        return new Diff(dPdMu, dPdBeta, dPdx);
+        return new DiffLogP(dLogPdMu, dLogPdBeta, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdmu;
-        public final DoubleTensor dPdbeta;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdmu;
+        public final DoubleTensor dLogPdbeta;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPdmu, DoubleTensor dPdbeta, DoubleTensor dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPdbeta = dPdbeta;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPdbeta, DoubleTensor dLogPdx) {
+            this.dLogPdmu = dLogPdmu;
+            this.dLogPdbeta = dLogPdbeta;
+            this.dLogPdx = dLogPdx;
         }
     }
 

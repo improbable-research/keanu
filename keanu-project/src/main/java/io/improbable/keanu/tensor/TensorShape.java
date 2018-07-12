@@ -94,4 +94,47 @@ public class TensorShape {
         System.arraycopy(shape2, 0, result, shape1.length, shape2.length);
         return result;
     }
+
+    /**
+     * @param fromDimension starting from and including this dimension
+     * @param toDimension   up to but excluding this dimension
+     * @return an int array containing the dimension numbers from a given dimension to a higher
+     * dimension. e.g. dimensionRange(0, 3) = int[]{0, 1, 2}
+     */
+    public static int[] dimensionRange(int fromDimension, int toDimension) {
+        if (fromDimension > toDimension) {
+            throw new IllegalArgumentException("from dimension must be less than to dimension");
+        }
+
+        int dimensionCount = toDimension - fromDimension;
+        int[] dims = new int[dimensionCount];
+        for (int i = 0; i < dimensionCount; i++) {
+            dims[i] = i + fromDimension;
+        }
+        return dims;
+    }
+
+    public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
+    }
+
+    public static int[] shapeToDesiredRankByPrependingOnes(int[] lowRankTensorShape, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false);
+    }
+
+    private static int[] increaseRankByPaddingOnes(int[] lowRankTensorShape, int desiredRank, boolean append) {
+        int[] paddedShape = new int[desiredRank];
+        if (lowRankTensorShape.length > desiredRank) {
+            throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");
+        }
+
+        Arrays.fill(paddedShape, 1);
+        if (append) {
+            System.arraycopy(lowRankTensorShape, 0, paddedShape, 0, lowRankTensorShape.length);
+        } else {
+            System.arraycopy(lowRankTensorShape, 0, paddedShape, lowRankTensorShape.length, lowRankTensorShape.length);
+        }
+
+        return paddedShape;
+    }
 }
