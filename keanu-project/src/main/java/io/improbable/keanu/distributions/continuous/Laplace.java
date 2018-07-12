@@ -17,6 +17,7 @@ public class Laplace implements ContinuousDistribution {
     /**
      * @param mu     location
      * @param beta   shape
+     * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
         return new Laplace(mu, beta);

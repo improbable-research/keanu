@@ -22,6 +22,7 @@ public class Gamma implements ContinuousDistribution {
      * @param a      location
      * @param theta  scale
      * @param k      shape
+     * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
         return new Gamma(a, theta, k);

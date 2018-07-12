@@ -20,6 +20,7 @@ public class Uniform implements ContinuousDistribution {
     /**
      * @param xMin   minimum x value
      * @param xMax   maximum x value
+     * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
         return new Uniform(xMin, xMax);

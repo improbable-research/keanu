@@ -50,6 +50,7 @@ public class SmoothUniform implements ContinuousDistribution {
      * @param xMin          min value from body
      * @param xMax          max value from body
      * @param edgeSharpness sharpness as a percentage of the body width
+     * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);

@@ -28,6 +28,7 @@ public class StudentT implements ContinuousDistribution {
      * 5.1.23 page 36
      *
      * @param v      Degrees of Freedom
+     * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(IntegerTensor v) {
         return new StudentT(v);

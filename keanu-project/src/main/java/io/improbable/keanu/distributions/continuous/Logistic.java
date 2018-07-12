@@ -16,6 +16,7 @@ public class Logistic implements ContinuousDistribution {
     /**
      * @param mu     location parameter (any real number)
      * @param s      scale parameter (b greater than 0)
+     * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
         return new Logistic(mu, s);
