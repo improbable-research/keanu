@@ -20,6 +20,8 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 public class GradientOptimizer extends Optimizer {
 
+    private static final double FLAT_GRADIENT = 1e-16;
+
     public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
         NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
         new SimpleValueChecker(1e-8, 1e-8)
@@ -147,5 +149,12 @@ public class GradientOptimizer extends Optimizer {
         );
 
         return pointValuePair.getValue();
+    }
+
+    protected void warnIfGradientIsFlat(double[] gradient) {
+        double maxGradient = Arrays.stream(gradient).max().getAsDouble();
+        if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
+            throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
+        }
     }
 }
