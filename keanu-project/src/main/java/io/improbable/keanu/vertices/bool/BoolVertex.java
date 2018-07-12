@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBi
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,17 +18,21 @@ import java.util.Map;
 public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
 
     @SafeVarargs
-    public final io.improbable.keanu.vertices.bool.BoolVertex or(Vertex<BooleanTensor>... those) {
+    public final BoolVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new OrBinaryVertex(this, those[0]);
         return new OrMultipleVertex(inputList(those));
     }
 
     @SafeVarargs
-    public final io.improbable.keanu.vertices.bool.BoolVertex and(Vertex<BooleanTensor>... those) {
+    public final BoolVertex and(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
         return new AndMultipleVertex(inputList(those));
+    }
+
+    public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
+        return new NotVertex(vertex);
     }
 
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {

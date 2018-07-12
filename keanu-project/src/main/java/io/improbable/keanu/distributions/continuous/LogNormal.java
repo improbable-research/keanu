@@ -34,28 +34,28 @@ public class LogNormal {
         return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
-    public static LogNormal.Diff dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
+    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor sigma, DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);
 
-        final DoubleTensor dlnP_dmu = lnXMinusMu.div(variance);
-        final DoubleTensor dlnP_dx = dlnP_dmu.plus(1.0).unaryMinus().divInPlace(x);
-        final DoubleTensor dlnP_dsigma = lnXMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
+        final DoubleTensor dlogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
+        final DoubleTensor dlogPdsigma = lnXMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        return new LogNormal.Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
+        return new DiffLogP(dLogPdmu, dlogPdsigma, dlogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdmu;
-        public final DoubleTensor dPdsigma;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdmu;
+        public final DoubleTensor dLogPdsigma;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPdmu, DoubleTensor dPdsigma, DoubleTensor dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPdsigma = dPdsigma;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPdsigma, DoubleTensor dLogPdx) {
+            this.dLogPdmu = dLogPdmu;
+            this.dLogPdsigma = dLogPdsigma;
+            this.dLogPdx = dLogPdx;
         }
     }
 }

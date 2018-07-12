@@ -40,27 +40,27 @@ public class Beta {
         return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLn).minusInPlace(betaFunction);
     }
 
-    public static Diff dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
+    public static DiffLogP dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).applyInPlace(Gamma::digamma);
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
 
-        final DoubleTensor dPdx = alphaMinusOneDivX.minusInPlace(oneMinusX.reciprocal().timesInPlace(beta.minus(1)));
-        final DoubleTensor dPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
-        final DoubleTensor dPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
+        final DoubleTensor dLogPdx = alphaMinusOneDivX.minusInPlace(oneMinusX.reciprocal().timesInPlace(beta.minus(1)));
+        final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
+        final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
 
-        return new Diff(dPda, dPdb, dPdx);
+        return new DiffLogP(dLogPda, dLogPdb, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdalpha;
-        public final DoubleTensor dPdbeta;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdalpha;
+        public final DoubleTensor dLogPdbeta;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPdalpha, DoubleTensor dPdbeta, DoubleTensor dPdx) {
-            this.dPdalpha = dPdalpha;
-            this.dPdbeta = dPdbeta;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdalpha, DoubleTensor dLogPdbeta, DoubleTensor dLogPdx) {
+            this.dLogPdalpha = dLogPdalpha;
+            this.dLogPdbeta = dLogPdbeta;
+            this.dLogPdx = dLogPdx;
         }
     }
 

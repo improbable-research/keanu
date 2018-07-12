@@ -63,7 +63,7 @@ public class StudentT {
      * @param t random variable
      * @return Differential of the Log of the Probability Density Function
      */
-    public static Diff dLogPdf(IntegerTensor v, DoubleTensor t) {
+    public static DiffLogP dLnPdf(IntegerTensor v, DoubleTensor t) {
 
         DoubleTensor vAsDouble = v.toDouble();
         DoubleTensor dPdt = t.unaryMinus()
@@ -72,17 +72,17 @@ public class StudentT {
                 t.pow(2).plusInPlace(vAsDouble)
             );
 
-        return new Diff(dPdt);
+        return new DiffLogP(dPdt);
     }
 
     /**
      * Differential Equation Class to store result of d/dv and d/dt
      */
-    public static class Diff {
-        public DoubleTensor dPdt;
+    public static class DiffLogP {
+        public DoubleTensor dLogPdt;
 
-        public Diff(DoubleTensor dPdt) {
-            this.dPdt = dPdt;
+        public DiffLogP(DoubleTensor dLogPdt) {
+            this.dLogPdt = dLogPdt;
         }
     }
 }

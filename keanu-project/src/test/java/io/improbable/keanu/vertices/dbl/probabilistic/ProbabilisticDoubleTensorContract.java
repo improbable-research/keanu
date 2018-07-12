@@ -63,12 +63,12 @@ public class ProbabilisticDoubleTensorContract {
     }
 
     public static void sampleUnivariateMethodMatchesLogProbMethod(Vertex<DoubleTensor> vertexUnderTest,
-                                                        double from,
-                                                        double to,
-                                                        double bucketSize,
-                                                        double maxError,
-                                                        KeanuRandom random,
-                                                        int sampleCount) {
+                                                                  double from,
+                                                                  double to,
+                                                                  double bucketSize,
+                                                                  double maxError,
+                                                                  KeanuRandom random,
+                                                                  int sampleCount) {
         double bucketCount = ((to - from) / bucketSize);
 
         if (bucketCount != (int) bucketCount) {
@@ -219,13 +219,13 @@ public class ProbabilisticDoubleTensorContract {
     public static void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<DoubleVertex> vertexUnderTestSupplier) {
 
         DoubleVertex[] scalarVertices = new DoubleVertex[vector.length];
-        PartialDerivatives tensorPartialDerivatives = new PartialDerivatives(new HashMap<>());
+        PartialDerivatives expectedPartialDerivatives = new PartialDerivatives(new HashMap<>());
 
         for (int i = 0; i < vector.length; i++) {
 
             scalarVertices[i] = vertexUnderTestSupplier.get();
 
-            tensorPartialDerivatives = tensorPartialDerivatives.add(
+            expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
                     scalarVertices[i].dLogPdf(vector[i])
                 )
@@ -242,12 +242,16 @@ public class ProbabilisticDoubleTensorContract {
         hyperParameterVertices.remove(tensorVertex.getId());
 
         for (Long id : hyperParameterVertices) {
-            assertEquals(tensorPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
+            assertEquals(expectedPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
         }
 
+        double expected = 0;
         for (int i = 0; i < vector.length; i++) {
-            assertEquals(tensorPartialDerivatives.withRespectTo(scalarVertices[i]).scalar(), actualDerivatives.get(tensorVertex.getId()).getValue(i), 1e-5);
+            expected += expectedPartialDerivatives.withRespectTo(scalarVertices[i]).scalar();
         }
+
+        double actual = actualDerivatives.get(tensorVertex.getId()).sum();
+        assertEquals(expected, actual, 1e-5);
     }
 
 }

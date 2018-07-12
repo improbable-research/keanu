@@ -15,7 +15,11 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.junit.Assert.*;
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 public class BoolVertexTest {
 
@@ -49,7 +53,58 @@ public class BoolVertexTest {
         v1.setValue(true);
         v2.setValue(false);
 
-        assertTrue(!v3.eval().scalar());
+        assertFalse(v3.eval().scalar());
+    }
+
+    @Test
+    public void doesNot() {
+        BoolVertex v3 = not(v1);
+
+        v1.setValue(true);
+
+        assertFalse(v3.eval().scalar());
+    }
+
+    @Test
+    public void TheOperatorsAreExecutedInOrder() {
+        Flip v3 = new Flip(0.5);
+
+        BoolVertex v4 = v1.and(v2).or(v3); // (v1 AND v2) OR v3
+        BoolVertex v5 = v1.and(v2.or(v3)); // v1 AND (v2 OR v3)
+
+        v1.setValue(false);
+        v2.setValue(true);
+        v3.setValue(true);
+
+        assertTrue(v4.eval().scalar());
+        assertFalse(v5.eval().scalar());
+    }
+
+    @Test
+    public void YouCanSpecifyYourOwnOrderingOfOperations() {
+        Flip v3 = new Flip(0.5);
+        BoolVertex v5 = v1.and(v2.or(v3));
+
+        v1.setValue(false);
+        v2.setValue(true);
+        v3.setValue(true);
+    }
+
+    @Test
+    public void youCanCombineTheOperatorsInDisjunctiveNormalForm() {
+        assertFalse(xor(false, false));
+        assertTrue(xor(false, true));
+        assertTrue(xor(true, false));
+        assertFalse(xor(true, true));
+    }
+
+    private boolean xor(boolean b1, boolean b2) {
+        BoolVertex v3 =
+            v1.and(not(v2))
+            .or(not(v1).and(v2));
+        v1.setValue(b1);
+        v2.setValue(b2);
+        return v3.eval().scalar();
     }
 
     @Test

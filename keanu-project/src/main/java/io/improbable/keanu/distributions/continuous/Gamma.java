@@ -98,31 +98,31 @@ public class Gamma {
         return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
     }
 
-    public static Diff dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
-        final DoubleTensor xMinusA = x.minus(location);
-        final DoubleTensor aMinusX = location.minus(x);
+    public static DiffLogP dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
+        final DoubleTensor xMinusLocation = x.minus(location);
+        final DoubleTensor locationMinusX = location.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
         final DoubleTensor oneOverTheta = theta.reciprocal();
 
-        final DoubleTensor dPdx = kMinus1.div(xMinusA).minusInPlace(oneOverTheta);
-        final DoubleTensor dPda = kMinus1.div(aMinusX).plusInPlace(oneOverTheta);
-        final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdx = kMinus1.div(xMinusLocation).minusInPlace(oneOverTheta);
+        final DoubleTensor dLogPdlocation = kMinus1.div(locationMinusX).plusInPlace(oneOverTheta);
+        final DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
-        return new Diff(dPda, dPdtheta, dPdk, dPdx);
+        return new DiffLogP(dLogPdlocation, dLogPdtheta, dLogPdk, dLogPdx);
     }
 
-    public static class Diff {
-        public final DoubleTensor dPdlocation;
-        public final DoubleTensor dPdtheta;
-        public final DoubleTensor dPdk;
-        public final DoubleTensor dPdx;
+    public static class DiffLogP {
+        public final DoubleTensor dLogPdlocation;
+        public final DoubleTensor dLogPdtheta;
+        public final DoubleTensor dLogPdk;
+        public final DoubleTensor dLogPdx;
 
-        public Diff(DoubleTensor dPda, DoubleTensor dPdtheta, DoubleTensor dPdk, DoubleTensor dPdx) {
-            this.dPdlocation = dPda;
-            this.dPdtheta = dPdtheta;
-            this.dPdk = dPdk;
-            this.dPdx = dPdx;
+        public DiffLogP(DoubleTensor dLogPdlocation, DoubleTensor dLogPdtheta, DoubleTensor dLogPdk, DoubleTensor dLogPdx) {
+            this.dLogPdlocation = dLogPdlocation;
+            this.dLogPdtheta = dLogPdtheta;
+            this.dLogPdk = dLogPdk;
+            this.dLogPdx = dLogPdx;
         }
     }
 

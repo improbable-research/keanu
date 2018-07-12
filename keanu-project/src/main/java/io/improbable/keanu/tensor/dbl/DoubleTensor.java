@@ -67,6 +67,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return new ScalarDoubleTensor(shape);
     }
 
+    @Override
     DoubleTensor reshape(int... newShape);
 
     DoubleTensor diag();
@@ -165,6 +166,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor floor();
 
+    DoubleTensor round();
+
     DoubleTensor sigmoid();
 
     DoubleTensor choleskyDecomposition();
@@ -232,6 +235,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor ceilInPlace();
 
     DoubleTensor floorInPlace();
+
+    DoubleTensor roundInPlace();
 
     DoubleTensor sigmoidInPlace();
 
