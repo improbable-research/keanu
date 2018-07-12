@@ -284,4 +284,9 @@ public class DualNumber {
         return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
     }
 
+    public DualNumber reshape(int[] proposedShape) {
+        PartialDerivatives reshapedPartialDerivatives = this.partialDerivatives.reshape(getValue().getRank(), proposedShape);
+        return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
+    }
+
 }
