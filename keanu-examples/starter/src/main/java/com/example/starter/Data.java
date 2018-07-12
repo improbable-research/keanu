@@ -38,8 +38,8 @@ public class Data {
         List<CsvLine> csvLines = ReadCsv
             .fromResources(fileName)
             .expectHeader(true)
-            .as(CsvLine.class)
-            .asList();
+            .asRowsDefinedBy(CsvLine.class)
+            .load();
 
         //create new Data object from csv
         return new Data(csvLines);
