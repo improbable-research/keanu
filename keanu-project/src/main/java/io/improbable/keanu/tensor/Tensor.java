@@ -73,6 +73,8 @@ public interface Tensor<T> {
         return Arrays.asList(asFlatArray());
     }
 
+    Tensor<T> reshape(int... newShape);
+
     default BooleanTensor elementwiseEquals(Tensor that) {
         return elementwiseEquals(this, that);
     }
@@ -102,4 +104,5 @@ public interface Tensor<T> {
     static <T> Tensor<T> placeHolder(int[] shape) {
         return new GenericTensor<>(shape);
     }
+
 }

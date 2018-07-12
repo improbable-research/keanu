@@ -1,7 +1,5 @@
 package io.improbable.keanu.tensor;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 import java.util.Arrays;
 
 public class TensorShape {

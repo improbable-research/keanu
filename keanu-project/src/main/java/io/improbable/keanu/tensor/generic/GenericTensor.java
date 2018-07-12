@@ -175,6 +175,15 @@ public class GenericTensor<T> implements Tensor<T> {
         return data;
     }
 
+    @Override
+    public Tensor<T> reshape(int... newShape) {
+        if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
+            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
+                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
+        }
+        return new GenericTensor<>(data, newShape);
+    }
+
     private void assertIsNumber() {
         if (data.length > 0 && !(data[0] instanceof Number)) {
             throw new IllegalStateException(data[0].getClass().getName() + " cannot be converted to number");
