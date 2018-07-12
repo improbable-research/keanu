@@ -106,23 +106,23 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
     }
 
     public void setValue(int value) {
-        super.setValue(IntegerTensor.create(value, getShape()));
+        super.setValue(IntegerTensor.scalar(value));
     }
 
     public void setValue(int[] values) {
-        super.setValue(IntegerTensor.create(values, getShape()));
+        super.setValue(IntegerTensor.create(values));
     }
 
     public void setAndCascade(int value) {
-        super.setAndCascade(IntegerTensor.create(value, getShape()));
+        super.setAndCascade(IntegerTensor.scalar(value));
     }
 
     public void setAndCascade(int[] values) {
-        super.setAndCascade(IntegerTensor.create(values, getShape()));
+        super.setAndCascade(IntegerTensor.create(values));
     }
 
     public void observe(int value) {
-        super.observe(IntegerTensor.create(value, getShape()));
+        super.observe(IntegerTensor.scalar(value));
     }
 
     public void observe(int[] values) {

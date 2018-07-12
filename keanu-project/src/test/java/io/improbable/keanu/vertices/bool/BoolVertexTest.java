@@ -19,6 +19,7 @@ import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertArrayEquals;
 
 public class BoolVertexTest {
 
@@ -146,6 +147,44 @@ public class BoolVertexTest {
         BoolVertex a = f.and(tru).or(fal);
 
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
+    }
+
+    @Test
+    public void canObserveArrayOfValues() {
+        BoolVertex flip = new Flip(0.5);
+        boolean[] observation = new boolean[]{true, false, true};
+        flip.observe(observation);
+        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetAndCascadeArrayOfValues() {
+        BoolVertex flip = new Flip(0.5);
+        boolean[] values = new boolean[]{true, false, true};
+        flip.setAndCascade(values);
+        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetValueArrayOfValues() {
+        BoolVertex flip = new Flip(0.5);
+        boolean[] values = new boolean[]{true, false, true};
+        flip.setValue(values);
+        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetValueAsScalarOnNonScalarVertex() {
+        BoolVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        flip.setValue(true);
+        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetAndCascadeAsScalarOnNonScalarVertex() {
+        BoolVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        flip.setAndCascade(true);
+        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
     private double andProbability(double pA, double pB) {
