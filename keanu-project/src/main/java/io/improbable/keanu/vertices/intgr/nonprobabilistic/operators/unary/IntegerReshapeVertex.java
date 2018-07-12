@@ -8,7 +8,7 @@ public class IntegerReshapeVertex extends IntegerUnaryOpVertex {
     private int[] proposedShape;
 
     public IntegerReshapeVertex(IntegerVertex inputVertex, int... proposedShape) {
-        super(inputVertex.getShape(), inputVertex);
+        super(proposedShape, inputVertex);
         this.proposedShape = proposedShape;
     }
 

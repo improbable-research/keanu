@@ -8,7 +8,7 @@ public class BoolReshapeVertex extends BoolUnaryOpVertex<BooleanTensor> {
     private int[] proposedShape;
 
     public BoolReshapeVertex(BoolVertex inputVertex, int... proposedShape) {
-        super(inputVertex.getShape(), inputVertex);
+        super(proposedShape, inputVertex);
         this.proposedShape = proposedShape;
     }
 

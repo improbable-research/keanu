@@ -68,6 +68,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         return new ScalarIntegerTensor(shape);
     }
 
+    @Override
     IntegerTensor reshape(int... newShape);
 
     IntegerTensor diag();

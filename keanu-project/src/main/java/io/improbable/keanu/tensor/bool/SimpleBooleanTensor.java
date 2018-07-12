@@ -53,14 +53,10 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor reshape(int... newShape) {
-        IntegerTensor convertedForReshape = IntegerTensor.create(asFlatIntegerArray(), shape);
-        IntegerTensor reshapedInteger = convertedForReshape.reshape(newShape);
-        int[] flatInteger = reshapedInteger.asFlatIntegerArray();
-        boolean[] flatBoolean = new boolean[flatInteger.length];
-        for (int i = 0; i < flatInteger.length; i++) {
-            flatBoolean[i] = flatInteger[i] == 1 ? true : false;
+        if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
+            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length");
         }
-        return new SimpleBooleanTensor(flatBoolean, newShape);
+        return new SimpleBooleanTensor(data, newShape);
     }
 
     @Override

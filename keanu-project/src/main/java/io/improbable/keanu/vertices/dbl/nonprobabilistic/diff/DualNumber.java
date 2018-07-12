@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 
 public class DualNumber {
@@ -282,6 +284,31 @@ public class DualNumber {
             resultDims[i] = i;
         }
         return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
+    }
+
+    public DualNumber reshape(int[] proposedShape) {
+        Map<Long, DoubleTensor> partialDerivatives = this.partialDerivatives.asMap();
+        Map<Long, DoubleTensor> reshapedPartialDerivatives = new HashMap<>();
+        int[] vertexShape = this.getValue().getShape();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : partialDerivatives.entrySet()) {
+            int[] shape = partialDerivative.getValue().getShape();
+            int[] wrtShape = extractWrtShape(shape, vertexShape);
+            int[] newPartialShape = TensorShape.concat(proposedShape, wrtShape);
+
+            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
+            reshapedPartialDerivatives.put(partialDerivative.getKey(), reshapedPartialDerivative);
+        }
+
+        return new DualNumber(value, reshapedPartialDerivatives);
+    }
+
+    private int[] extractWrtShape(int[] partialDerivativeShape, int[] vertexShape) {
+        int[] shapeWrt = new int[partialDerivativeShape.length - vertexShape.length];
+        for (int i = vertexShape.length; i < partialDerivativeShape.length; i++) {
+            shapeWrt[i - vertexShape.length] = partialDerivativeShape[i];
+        }
+        return shapeWrt;
     }
 
 }
