@@ -602,15 +602,18 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return this;
     }
 
+    /**
+     * Note that we have modified the native Java behaviour to match Python (and therefore ND4J) behaviour
+     * Which rounds negative numbers down if they end in 0.5
+     * e.g.
+     * Java: round(-2.5) == -2.0
+     * Python: round(-2.5) == -3.0
+     * @return Nearest integer value as a DoubleTensor
+     */
     @Override
     public DoubleTensor roundInPlace() {
         double valueToRound = value;
         if (value < 0. && value + 0.5 == (double) value.intValue()) {
-            // This is necessary to match Python behaviour
-            // Which rounds negative numbers down if they end in 0.5
-            // e.g.
-            // Java: round(-2.5) == -2.0
-            // Python: round(-2.5) == -3.0
             valueToRound -= 1.;
         }
         value = new Double(Math.round(valueToRound));
