@@ -10,8 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.Tensor.SCALAR_SHAPE;
-import static io.improbable.keanu.tensor.TensorShape.concat;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -100,7 +99,9 @@ public class BetaVertex extends ProbabilisticDouble {
         PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(concat(SCALAR_SHAPE, dLogPdx.getShape())));
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
         PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));

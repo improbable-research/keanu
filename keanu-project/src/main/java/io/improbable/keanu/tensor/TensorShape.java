@@ -113,4 +113,28 @@ public class TensorShape {
         }
         return dims;
     }
+
+    public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
+    }
+
+    public static int[] shapeToDesiredRankByPrependingOnes(int[] lowRankTensorShape, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false);
+    }
+
+    private static int[] increaseRankByPaddingOnes(int[] lowRankTensorShape, int desiredRank, boolean append) {
+        int[] paddedShape = new int[desiredRank];
+        if (lowRankTensorShape.length > desiredRank) {
+            throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");
+        }
+
+        Arrays.fill(paddedShape, 1);
+        if (append) {
+            System.arraycopy(lowRankTensorShape, 0, paddedShape, 0, lowRankTensorShape.length);
+        } else {
+            System.arraycopy(lowRankTensorShape, 0, paddedShape, lowRankTensorShape.length, lowRankTensorShape.length);
+        }
+
+        return paddedShape;
+    }
 }
