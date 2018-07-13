@@ -1,15 +1,16 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
-
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SelectVertex<T> extends Probabilistic<T> {
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
+
+public class SelectVertex<T> extends Vertex<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
@@ -26,6 +27,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
     }
 
     public SelectVertex(Map<T, DoubleVertex> selectableValues) {
+        super(new ProbabilisticValueUpdater<>());
         this.selectableValues = selectableValues;
         setParents(this.selectableValues.values());
     }
