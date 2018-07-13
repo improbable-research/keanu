@@ -1,6 +1,8 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
 import lombok.Getter;
@@ -100,12 +102,12 @@ public class GradientOptimizer implements Optimizer {
         return optimize(bayesianNetwork.getObservedVertices());
     }
 
-    private double optimize(List<Vertex> outputVertices) {
+    private double optimize(List<Vertex<?>> outputVertices) {
 
         bayesianNetwork.cascadeObservations();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            outputVertices,
+            Probabilistic.filter(outputVertices),
             bayesianNetwork.getContinuousLatentVertices(),
             this::handleGradientCalculation,
             this::handleFitnessCalculation

@@ -1,15 +1,15 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class Flip extends ProbabilisticBool {
 
@@ -53,7 +53,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public double logPmf(BooleanTensor value) {
+    public double logProb(BooleanTensor value) {
 
         DoubleTensor probTrueClamped = probTrue.getValue()
             .clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
@@ -67,7 +67,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
         throw new UnsupportedOperationException();
     }
 

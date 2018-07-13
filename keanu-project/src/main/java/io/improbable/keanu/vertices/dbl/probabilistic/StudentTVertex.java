@@ -6,6 +6,12 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import java.util.HashMap;
 import java.util.Map;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
@@ -50,12 +56,12 @@ public class StudentTVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor t) {
+    public double logProb(DoubleTensor t) {
         return StudentT.withParameters(v.getValue()).logProb(t).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor t) {
         Diffs diff = StudentT.withParameters(v.getValue()).dLogProb(t);
         Map<Long, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.get(T).getValue());

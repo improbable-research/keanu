@@ -1,16 +1,18 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class FitnessFunctionWithGradientTest {
 
@@ -109,7 +111,7 @@ public class FitnessFunctionWithGradientTest {
     private void assert2DGradientEqualsApproxGradient(double[] topRight,
                                                       double[] bottomLeft,
                                                       double stepSize,
-                                                      List<Vertex> probabilisticVertices,
+                                                      List<Probabilistic<?>> probabilisticVertices,
                                                       List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(probabilisticVertices, latentVertices);

@@ -34,7 +34,7 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         List<DualNumber> duals = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {

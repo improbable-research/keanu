@@ -17,6 +17,10 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 
 @Builder
 public class NonGradientOptimizer implements Optimizer {
@@ -68,7 +72,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-    private double optimize(List<Vertex> outputVertices) {
+    private double optimize(List<Vertex<?>> outputVertices) {
 
         bayesianNetwork.cascadeObservations();
 
@@ -78,7 +82,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         List<? extends Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
         FitnessFunction fitnessFunction = new FitnessFunction(
-            outputVertices,
+            Probabilistic.filter(outputVertices),
             latentVertices,
             this::handleFitnessCalculation
         );

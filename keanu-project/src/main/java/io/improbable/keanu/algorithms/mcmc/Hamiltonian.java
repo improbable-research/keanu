@@ -1,17 +1,18 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 /**
  * Hamiltonian Monte Carlo is a method for obtaining samples from a probability
@@ -55,7 +56,7 @@ public class Hamiltonian {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
+        final List<Probabilistic<?>> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
@@ -65,7 +66,7 @@ public class Hamiltonian {
         Map<Long, DoubleTensor> positionBeforeLeapfrog = new HashMap<>();
 
         Map<Long, DoubleTensor> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-            bayesNet.getLatentAndObservedVertices()
+            Probabilistic.filter(bayesNet.getLatentAndObservedVertices())
         );
         Map<Long, DoubleTensor> gradientBeforeLeapfrog = new HashMap<>();
 
@@ -167,7 +168,7 @@ public class Hamiltonian {
                                                     final Map<Long, DoubleTensor> gradient,
                                                     final Map<Long, DoubleTensor> momentums,
                                                     final double stepSize,
-                                                    final List<? extends Vertex> probabilisticVertices) {
+                                                    final List<Probabilistic<?>> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 
@@ -189,9 +190,7 @@ public class Hamiltonian {
         VertexValuePropagation.cascadeUpdate(latentVertices);
 
         //Set `r = `r + (eps/2)dTL(`T)
-        Map<Long, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-            probabilisticVertices
-        );
+        Map<Long, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
         for (Map.Entry<Long, DoubleTensor> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
             final DoubleTensor updatedMomentum = newGradient.get(halfTimeStepMomentum.getKey()).times(halfTimeStep).plusInPlace(halfTimeStepMomentum.getValue());

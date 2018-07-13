@@ -1,18 +1,45 @@
 package io.improbable.keanu.vertices.dbl;
 
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PluckVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
-
-import java.util.*;
-import java.util.function.Function;
 
 public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
 
@@ -124,7 +151,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new SumVertex(this);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberCalculation) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
 
@@ -158,14 +185,14 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     }
 
     public final DualNumber getDualNumber() {
-        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
+        Map<Vertex<?>, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();
         stack.push(this);
 
         while (!stack.isEmpty()) {
 
             DoubleVertex head = stack.peek();
-            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+            Set<Vertex<?>> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
 
@@ -190,8 +217,8 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return dualNumbers.get(this);
     }
 
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
-        Set<Vertex> notCalculatedParents = new HashSet<>();
+    private Set<Vertex<?>> parentsThatDualNumberIsNotCalculated(Map<Vertex<?>, DualNumber> dualNumbers, Set<Vertex<?>> parents) {
+        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!dualNumbers.containsKey(next)) {
                 notCalculatedParents.add(next);
@@ -200,7 +227,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return notCalculatedParents;
     }
 
-    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+    protected abstract DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers);
 
     public void setValue(double value) {
         super.setValue(DoubleTensor.scalar(value));
@@ -224,22 +251,6 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     public void observe(double[] values) {
         super.observe(DoubleTensor.create(values));
-    }
-
-    public double logPdf(double value) {
-        return this.logPdf(DoubleTensor.scalar(value));
-    }
-
-    public double logPdf(double[] values) {
-        return this.logPdf(DoubleTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPdf(double value) {
-        return this.dLogPdf(DoubleTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPdf(double[] values) {
-        return this.dLogPdf(DoubleTensor.create(values));
     }
 
     public double getValue(int... index) {

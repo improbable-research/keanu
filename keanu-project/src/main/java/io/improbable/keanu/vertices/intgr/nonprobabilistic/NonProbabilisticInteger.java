@@ -1,15 +1,12 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import java.util.function.Function;
+
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilisticObservationException;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
-import io.improbable.keanu.vertices.update.ValueUpdater;
-
-import java.util.Map;
-import java.util.function.Function;
 
 public abstract class NonProbabilisticInteger extends IntegerVertex {
 
@@ -35,13 +32,7 @@ public abstract class NonProbabilisticInteger extends IntegerVertex {
     }
 
     @Override
-    public double logPmf(IntegerTensor value) {
-        return updateFunction.apply(this).equals(value) ? 0.0 : Double.NEGATIVE_INFINITY;
+    public boolean matchesObservation() {
+        return updateFunction.apply(this).elementwiseEquals(getValue()).allTrue();
     }
-
-    @Override
-    public Map<Long, DoubleTensor> dLogPmf(IntegerTensor value) {
-        throw new UnsupportedOperationException();
-    }
-
 }

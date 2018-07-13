@@ -28,7 +28,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).slice(dimension, index);
     }
 

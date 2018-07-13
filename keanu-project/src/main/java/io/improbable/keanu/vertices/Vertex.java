@@ -1,55 +1,31 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 import io.improbable.keanu.vertices.update.ValueUpdater;
-
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
 
 public abstract class Vertex<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private Set<Vertex> children = new HashSet<>();
-    private Set<Vertex> parents = new HashSet<>();
+    private Set<Vertex<?>> children = new HashSet<>();
+    private Set<Vertex<?>> parents = new HashSet<>();
     private T value;
     private boolean observed;
     private final ValueUpdater<T> valueUpdater;
 
     public Vertex(ValueUpdater<T> valueUpdater) {
         this.valueUpdater = valueUpdater;
-    }
-
-    /**
-     * This is the natural log of the probability at the supplied value. In the
-     * case of continuous vertices, this is actually the log of the density, which
-     * will differ from the probability by a constant.
-     *
-     * @param value The supplied value.
-     * @return The natural log of the probability density at the supplied value
-     */
-    public abstract double logProb(T value);
-
-    public double logProbAtValue() {
-        return logProb(getValue());
-    }
-
-    /**
-     * The partial derivatives of the natural log prob.
-     *
-     * @param value at a given value
-     * @return the partial derivatives of the log density
-     */
-    public abstract Map<Long, DoubleTensor> dLogProb(T value);
-
-    public final Map<Long, DoubleTensor> dLogProbAtValue() {
-        return dLogProb(getValue());
     }
 
     /**
@@ -63,6 +39,7 @@ public abstract class Vertex<T> {
         return sample(KeanuRandom.getDefaultRandom());
     }
 
+    public boolean matchesObservation() { throw new UnsupportedOperationException(); };
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's
      * parent's current values.
@@ -193,7 +170,7 @@ public abstract class Vertex<T> {
         return uuid;
     }
 
-    public Set<Vertex> getChildren() {
+    public Set<Vertex<?>> getChildren() {
         return children;
     }
 
@@ -219,7 +196,7 @@ public abstract class Vertex<T> {
         parent.addChild(this);
     }
 
-    public Set<Vertex> getParents() {
+    public Set<Vertex<?>> getParents() {
         return this.parents;
     }
 
@@ -238,7 +215,7 @@ public abstract class Vertex<T> {
         return (int) (uuid ^ (uuid >>> 32));
     }
 
-    public Set<Vertex> getConnectedGraph() {
+    public Set<Vertex<?>> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 

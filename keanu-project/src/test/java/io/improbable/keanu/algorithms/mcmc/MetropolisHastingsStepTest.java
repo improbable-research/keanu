@@ -1,5 +1,19 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.util.Collection;
+import java.util.Collections;
+
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
@@ -12,17 +26,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import lombok.AllArgsConstructor;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import java.util.Collections;
-import java.util.Set;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public class MetropolisHastingsStepTest {
 
@@ -144,9 +147,9 @@ public class MetropolisHastingsStepTest {
         private final double constant;
 
         @Override
-        public Proposal getProposal(Set<Vertex> vertices, KeanuRandom random) {
+        public Proposal getProposal(Collection<Vertex<?>> vertices, KeanuRandom random) {
             Proposal proposal = new Proposal();
-            vertices.forEach(vertex -> proposal.setProposal(vertex, DoubleTensor.scalar(constant)));
+            vertices.forEach(vertex -> proposal.setProposal((Vertex<Object>) vertex, DoubleTensor.scalar(constant)));
             return proposal;
         }
     }

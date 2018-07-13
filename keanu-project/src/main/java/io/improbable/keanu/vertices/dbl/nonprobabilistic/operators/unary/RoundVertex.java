@@ -25,7 +25,7 @@ public class RoundVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         throw new UnsupportedOperationException();
     }
 }

@@ -1,5 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.commons.math3.distribution.LogNormalDistribution;
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.distributions.gradient.LogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -7,17 +20,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.distribution.LogNormalDistribution;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class LogNormalVertexTest {
     private static final double DELTA = 0.0001;
@@ -79,7 +81,7 @@ public class LogNormalVertexTest {
         UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        Supplier<DoubleVertex> vertexSupplier = () -> new LogNormalVertex(muTensor, sigmaTensor);
+        Supplier<ProbabilisticDouble> vertexSupplier = () -> new LogNormalVertex(muTensor, sigmaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }

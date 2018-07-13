@@ -26,7 +26,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         DualNumber dualNumber = dualNumbers.get(inputVertex);
         DoubleTensor x = dualNumber.getValue();
         DoubleTensor xExp = x.exp();

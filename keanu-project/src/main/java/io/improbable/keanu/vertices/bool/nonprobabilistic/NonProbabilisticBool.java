@@ -1,15 +1,11 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
+import java.util.function.Function;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
-import io.improbable.keanu.vertices.update.ValueUpdater;
-
-import java.util.Map;
-import java.util.function.Function;
-import java.util.function.Supplier;
 
 public abstract class NonProbabilisticBool extends BoolVertex {
 
@@ -21,13 +17,7 @@ public abstract class NonProbabilisticBool extends BoolVertex {
     }
 
     @Override
-    public double logPmf(BooleanTensor value) {
-        return updateFunction.apply(this).elementwiseEquals(value).allTrue() ? 0.0 : Double.NEGATIVE_INFINITY;
+    public boolean matchesObservation() {
+        return updateFunction.apply(this).elementwiseEquals(getValue()).allTrue();
     }
-
-    @Override
-    public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
-        throw new UnsupportedOperationException();
-    }
-
 }

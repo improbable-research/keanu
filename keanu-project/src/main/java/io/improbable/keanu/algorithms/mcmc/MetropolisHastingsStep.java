@@ -1,19 +1,20 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.network.LambdaSection;
-import io.improbable.keanu.network.NetworkSnapshot;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.Value;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.network.NetworkSnapshot;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Value;
 
 class MetropolisHastingsStep {
 
@@ -24,7 +25,7 @@ class MetropolisHastingsStep {
 
     private final ProposalDistribution proposalDistribution;
     private final boolean useCacheOnRejection;
-    private final Map<Vertex, LambdaSection> affectedVerticesCache;
+    private final Map<Vertex<?>, LambdaSection> affectedVerticesCache;
     private final KeanuRandom random;
 
     /**
@@ -48,7 +49,7 @@ class MetropolisHastingsStep {
         );
     }
 
-    public StepResult step(final Set<Vertex> chosenVertices,
+    public StepResult step(final Set<Vertex<?>> chosenVertices,
                            final double logProbabilityBeforeStep) {
         return step(chosenVertices, logProbabilityBeforeStep, DEFAULT_TEMPERATURE);
     }
@@ -60,7 +61,7 @@ class MetropolisHastingsStep {
      *                                 should be constant if no annealing is wanted
      * @return the log probability of the network after either accepting or rejecting the sample
      */
-    public StepResult step(final Set<Vertex> chosenVertices,
+    public StepResult step(final Set<Vertex<?>> chosenVertices,
                            final double logProbabilityBeforeStep,
                            final double temperature) {
 
@@ -108,8 +109,8 @@ class MetropolisHastingsStep {
         return new StepResult(false, logProbabilityBeforeStep);
     }
 
-    private static NetworkSnapshot getSnapshotOfAllAffectedVertices(final Set<Vertex> chosenVertices,
-                                                                    final Map<Vertex, LambdaSection> affectedVertices) {
+    private static NetworkSnapshot getSnapshotOfAllAffectedVertices(final Set<Vertex<?>> chosenVertices,
+                                                                    final Map<Vertex<?>, LambdaSection> affectedVertices) {
 
         Set<Vertex> allAffectedVertices = new HashSet<>();
         for (Vertex vertex : chosenVertices) {
@@ -119,10 +120,10 @@ class MetropolisHastingsStep {
         return NetworkSnapshot.create(allAffectedVertices);
     }
 
-    private static double sumLogProbabilityOfAffected(Set<Vertex> vertices,
-                                                      Map<Vertex, LambdaSection> affectedVertices) {
+    private static double sumLogProbabilityOfAffected(Set<Vertex<?>> vertices,
+                                                      Map<Vertex<?>, LambdaSection> affectedVertices) {
         double sumLogProb = 0.0;
-        for (Vertex v : vertices) {
+        for (Vertex<?> v : vertices) {
             sumLogProb += sumLogProbability(affectedVertices.get(v).getLatentAndObservedVertices());
         }
         return sumLogProb;
@@ -134,10 +135,15 @@ class MetropolisHastingsStep {
      * @param vertices Vertices to consider in log probability calculation
      * @return the log probability of the set of vertices
      */
-    private static double sumLogProbability(Set<Vertex> vertices) {
+    private static double sumLogProbability(Set<Vertex<?>> vertices) {
         double sumLogProb = 0.0;
-        for (Vertex v : vertices) {
+        for (Probabilistic<?> v : Probabilistic.filter(vertices)) {
             sumLogProb += v.logProbAtValue();
+        }
+        for (Vertex<?> v : vertices) {
+            if (!v.isProbabilistic() && v.isObserved() && !v.matchesObservation()) {
+                return LOG_ZERO_PROBABILITY;
+            }
         }
         return sumLogProb;
     }
@@ -152,7 +158,7 @@ class MetropolisHastingsStep {
      * @return A vertex to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
      * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
      */
-    private static Map<Vertex, LambdaSection> createVerticesAffectedByCache(List<? extends Vertex> latentVertices,
+    private static Map<Vertex<?>, LambdaSection> createVerticesAffectedByCache(List<? extends Vertex> latentVertices,
                                                                             boolean useCacheOnRejection) {
         return latentVertices.stream()
             .collect(Collectors.toMap(

@@ -1,12 +1,12 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
+
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.vertices.Vertex;
 
 public interface Optimizer {
 
@@ -26,7 +26,7 @@ public interface Optimizer {
         }
     }
 
-    static Optimizer of(Collection<? extends Vertex> vertices) {
+    static Optimizer of(Collection<? extends Vertex<?>> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 

@@ -1,42 +1,43 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
 public class BayesianNetwork {
 
-    private final List<Vertex> latentAndObservedVertices;
+    private final List<Vertex<?>> latentAndObservedVertices;
 
-    public BayesianNetwork(Set<? extends Vertex> vertices) {
+    public BayesianNetwork(Set<? extends Vertex<?>> vertices) {
         latentAndObservedVertices = vertices.stream()
             .filter(v -> v.isObserved() || v.isProbabilistic())
             .collect(Collectors.toList());
     }
 
-    public BayesianNetwork(Collection<? extends Vertex> vertices) {
+    public BayesianNetwork(Collection<? extends Vertex<?>> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public List<Vertex> getLatentAndObservedVertices() {
+    public List<Vertex<?>> getLatentAndObservedVertices() {
         return latentAndObservedVertices;
     }
 
-    public List<Vertex> getLatentVertices() {
+    public List<Vertex<?>> getLatentVertices() {
         return latentAndObservedVertices.stream()
             .filter(v -> !v.isObserved())
             .collect(Collectors.toList());
     }
 
-    public List<Vertex> getObservedVertices() {
+    public List<Vertex<?>> getObservedVertices() {
         return latentAndObservedVertices.stream()
             .filter(Vertex::isObserved)
             .collect(Collectors.toList());
@@ -45,7 +46,9 @@ public class BayesianNetwork {
     public double getLogOfMasterP() {
         double sum = 0.0;
         for (Vertex<?> vertex : latentAndObservedVertices) {
-            sum += vertex.logProbAtValue();
+            if (vertex instanceof Probabilistic) {
+                sum += ((Probabilistic<?>)vertex).logProbAtValue();
+            }
         }
         return sum;
     }
