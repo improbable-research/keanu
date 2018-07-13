@@ -13,7 +13,6 @@ import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class Vertex<T> implements Observable<T> {
@@ -90,7 +89,7 @@ public abstract class Vertex<T> implements Observable<T> {
      * vertex's value may be dependent on it's parents values.
      */
     public final boolean isProbabilistic() {
-        return valueUpdater instanceof ProbabilisticValueUpdater;
+        return this instanceof Probabilistic;
     };
 
     /**
