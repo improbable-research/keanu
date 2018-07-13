@@ -56,12 +56,12 @@ public class BinomialVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double logPmf(IntegerTensor kTensor) {
+    public double logProb(IntegerTensor kTensor) {
         return Binomial.withParameters(p.getValue(), n.getValue()).logProb(kTensor).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPmf(IntegerTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
         throw new UnsupportedOperationException();
     }
 

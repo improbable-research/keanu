@@ -65,7 +65,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
 
         DoubleTensor locationValues = location.getValue();
         DoubleTensor lambdaValues = lambda.getValue();
@@ -76,7 +76,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         List<DoubleTensor> dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
     }

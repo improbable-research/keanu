@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
@@ -115,13 +116,13 @@ public class GradientOptimizer {
     }
 
     private double optimize(int maxEvaluations,
-                            List<Vertex> outputVertices,
+                            List<Vertex<?>> outputVertices,
                             NonLinearConjugateGradientOptimizer optimizer) {
 
         bayesNet.cascadeObservations();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            outputVertices,
+            Probabilistic.filter(outputVertices),
             bayesNet.getContinuousLatentVertices(),
             this::handleGradientCalculation,
             this::handleFitnessCalculation

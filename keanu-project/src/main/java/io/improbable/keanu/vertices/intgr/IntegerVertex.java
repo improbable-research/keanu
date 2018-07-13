@@ -134,22 +134,6 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         super.observe(IntegerTensor.create(values));
     }
 
-    public double logPmf(int value) {
-        return this.logPmf(IntegerTensor.scalar(value));
-    }
-
-    public double logPmf(int[] values) {
-        return this.logPmf(IntegerTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(int value) {
-        return this.dLogPmf(IntegerTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(int[] values) {
-        return this.dLogPmf(IntegerTensor.create(values));
-    }
-
     public int getValue(int... index) {
         return getValue().getValue(index);
     }

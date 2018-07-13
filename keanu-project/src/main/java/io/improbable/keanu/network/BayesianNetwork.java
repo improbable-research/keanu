@@ -1,25 +1,30 @@
 package io.improbable.keanu.network;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.*;
-import java.util.stream.Collectors;
-
 public class BayesianNetwork {
 
-    private final List<Vertex> latentAndObservedVertices;
-    private final List<Vertex> latentVertices;
-    private final List<Vertex> observedVertices;
+    private final List<Vertex<?>> latentAndObservedVertices;
+    private final List<Vertex<?>> latentVertices;
+    private final List<Vertex<?>> observedVertices;
 
     //Lazy evaluated
     private List<Vertex<DoubleTensor>> continuousLatentVertices;
     private List<Vertex> discreteLatentVertices;
 
-    public BayesianNetwork(Set<? extends Vertex> vertices) {
+    public BayesianNetwork(Set<? extends Vertex<?>> vertices) {
 
         latentAndObservedVertices = vertices.stream()
             .filter(v -> v.isObserved() || v.isProbabilistic())
@@ -34,26 +39,28 @@ public class BayesianNetwork {
             .collect(Collectors.toList());
     }
 
-    public BayesianNetwork(Collection<? extends Vertex> vertices) {
+    public BayesianNetwork(Collection<? extends Vertex<?>> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public List<Vertex> getLatentAndObservedVertices() {
+    public List<Vertex<?>> getLatentAndObservedVertices() {
         return latentAndObservedVertices;
     }
 
-    public List<Vertex> getLatentVertices() {
+    public List<Vertex<?>> getLatentVertices() {
         return latentVertices;
     }
 
-    public List<Vertex> getObservedVertices() {
+    public List<Vertex<?>> getObservedVertices() {
         return observedVertices;
     }
 
     public double getLogOfMasterP() {
         double sum = 0.0;
         for (Vertex<?> vertex : latentAndObservedVertices) {
-            sum += vertex.logProbAtValue();
+            if (vertex instanceof Probabilistic) {
+                sum += ((Probabilistic<?>)vertex).logProbAtValue();
+            }
         }
         return sum;
     }

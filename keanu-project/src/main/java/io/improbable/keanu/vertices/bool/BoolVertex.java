@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices.bool;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.DiscreteVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
@@ -9,11 +12,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBin
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 
 public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
 
@@ -64,22 +62,6 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
 
     public void observe(boolean[] values) {
         super.observe(BooleanTensor.create(values, getShape()));
-    }
-
-    public double logPmf(boolean value) {
-        return this.logPmf(BooleanTensor.scalar(value));
-    }
-
-    public double logPmf(boolean[] values) {
-        return this.logPmf(BooleanTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(boolean value) {
-        return this.dLogPmf(BooleanTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(boolean[] values) {
-        return this.dLogPmf(BooleanTensor.create(values));
     }
 
     public boolean getValue(int... index) {

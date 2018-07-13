@@ -112,7 +112,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor density = SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
@@ -120,7 +120,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);

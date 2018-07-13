@@ -79,7 +79,7 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor locationValues = location.getValue();
         DoubleTensor thetaValues = theta.getValue();
         DoubleTensor kValues = k.getValue();
@@ -89,7 +89,7 @@ public class GammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Gamma.Diff dlnP = Gamma.dlnPdf(location.getValue(), theta.getValue(), k.getValue(), value);
 
         return convertDualNumbersToDiff(dlnP.dPdlocation, dlnP.dPdtheta, dlnP.dPdk, dlnP.dPdx);

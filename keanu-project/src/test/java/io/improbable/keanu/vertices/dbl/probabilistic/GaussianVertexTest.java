@@ -60,7 +60,7 @@ public class GaussianVertexTest {
         sigmaTensor.setValue(1.0);
 
         GaussianVertex tensorGaussianVertex = new GaussianVertex(muTensor, sigmaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
@@ -80,7 +80,7 @@ public class GaussianVertexTest {
         UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        Supplier<DoubleVertex> vertexSupplier = () -> new GaussianVertex(muTensor, sigmaTensor);
+        Supplier<ProbabilisticDouble> vertexSupplier = () -> new GaussianVertex(muTensor, sigmaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }

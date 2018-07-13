@@ -1,8 +1,13 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
+import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+
+import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.BiConsumer;
+
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -10,12 +15,10 @@ import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 
 public class NonGradientOptimizer {
 
@@ -41,7 +44,7 @@ public class NonGradientOptimizer {
         }
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+    public double optimize(int maxEvaluations, double boundsRange, List<Vertex<?>> outputVertices) {
 
         bayesNet.cascadeObservations();
 
@@ -51,7 +54,7 @@ public class NonGradientOptimizer {
 
         List<? extends Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
         FitnessFunction fitnessFunction = new FitnessFunction(
-            outputVertices,
+            Probabilistic.filter(outputVertices),
             latentVertices,
             this::handleFitnessCalculation
         );

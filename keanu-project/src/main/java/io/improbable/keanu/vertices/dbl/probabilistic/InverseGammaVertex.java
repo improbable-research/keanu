@@ -72,7 +72,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor alphaValues = alpha.getValue();
         DoubleTensor betaValues = beta.getValue();
 
@@ -81,7 +81,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         List<DoubleTensor> dlnP = InverseGamma.withParameters(alpha.getValue(), beta.getValue()).dLogProb(value);
 
         return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));

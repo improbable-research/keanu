@@ -53,7 +53,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public double logPmf(BooleanTensor value) {
+    public double logProb(BooleanTensor value) {
 
         DoubleTensor probability = value.setDoubleIf(
             probTrue.getValue(),
@@ -64,7 +64,7 @@ public class Flip extends ProbabilisticBool {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
         throw new UnsupportedOperationException();
     }
 

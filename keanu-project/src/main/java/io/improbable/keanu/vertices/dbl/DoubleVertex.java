@@ -188,22 +188,6 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         super.observe(DoubleTensor.create(values, getShape()));
     }
 
-    public double logPdf(double value) {
-        return this.logPdf(DoubleTensor.scalar(value));
-    }
-
-    public double logPdf(double[] values) {
-        return this.logPdf(DoubleTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPdf(double value) {
-        return this.dLogPdf(DoubleTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPdf(double[] values) {
-        return this.dLogPdf(DoubleTensor.create(values));
-    }
-
     public double getValue(int... index) {
         return getValue().getValue(index);
     }

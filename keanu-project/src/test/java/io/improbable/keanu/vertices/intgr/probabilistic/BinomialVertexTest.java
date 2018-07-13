@@ -1,10 +1,11 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import static org.junit.Assert.assertEquals;
+
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public class BinomialVertexTest {
 
@@ -35,7 +36,7 @@ public class BinomialVertexTest {
         BinomialDistribution distribution = new BinomialDistribution(n, p);
 
         for (int i = 0; i < n; i++) {
-            double actual = testPoissonVertex.logPmf(i);
+            double actual = testPoissonVertex.logProb(IntegerTensor.scalar(i));
             double expected = distribution.logProbability(i);
             assertEquals(expected, actual, 1e-3);
         }
@@ -51,7 +52,7 @@ public class BinomialVertexTest {
         BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, 2}, p, n);
         BinomialDistribution distribution = new BinomialDistribution(n, p);
 
-        double actual = testPoissonVertex.logPmf(new int[]{k1, k2});
+        double actual = testPoissonVertex.logProb(IntegerTensor.create(new int[]{k1, k2}));
         double expected = distribution.logProbability(k1) + distribution.logProbability(k2);
         assertEquals(expected, actual, 1e-3);
     }
