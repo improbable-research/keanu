@@ -4,7 +4,7 @@ import java.util.Collections;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -17,7 +17,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     public ConstantDoubleVertex(DoubleTensor constant) {
         super(
             new NonProbabilisticValueUpdater<>(v -> v.getValue()),
-            new Observation<>()
+            Observable.observableTypeFor(ConstantDoubleVertex.class)
         );
         setValue(constant);
     }

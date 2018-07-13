@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
@@ -19,7 +19,7 @@ public class IfVertex<T> extends Vertex<Tensor<T>> {
                     Vertex<? extends Tensor<T>> els) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((IfVertex) v).op(predicate.getValue(), thn.getValue(), els.getValue())),
-            new Observation<>()
+            Observable.observableTypeFor(IfVertex.class)
         );
         this.predicate = predicate;
         this.thn = thn;

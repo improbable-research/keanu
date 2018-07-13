@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -25,7 +25,9 @@ public class BoolConcatenationVertex extends BoolVertex {
      * @param input the input vertices to concatenate
      */
     public BoolConcatenationVertex(int dimension, BoolVertex... input) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((BoolConcatenationVertex)v).apply()), new Observation<>());
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((BoolConcatenationVertex)v).apply()),
+            Observable.observableTypeFor(BoolConcatenationVertex.class));
         this.dimension = dimension;
         this.input = input;
         setParents(input);

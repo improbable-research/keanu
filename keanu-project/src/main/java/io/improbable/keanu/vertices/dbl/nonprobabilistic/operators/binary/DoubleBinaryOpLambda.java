@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -29,7 +29,7 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
                                 Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberCalculation) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(left.getValue(), right.getValue())),
-            new Observation<>()
+            Observable.observableTypeFor(DoubleBinaryOpLambda.class)
         );
         this.left = left;
         this.right = right;

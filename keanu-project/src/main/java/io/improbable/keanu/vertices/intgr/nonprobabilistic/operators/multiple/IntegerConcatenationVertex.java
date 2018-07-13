@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -25,7 +25,9 @@ public class IntegerConcatenationVertex extends IntegerVertex {
      * @param input the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((IntegerConcatenationVertex)v).apply()), new Observation<>());
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((IntegerConcatenationVertex)v).apply()),
+            Observable.observableTypeFor(IntegerConcatenationVertex.class));
         this.dimension = dimension;
         this.input = input;
         setParents(input);

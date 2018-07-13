@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
+
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
@@ -11,7 +12,7 @@ public class ConstantIntegerVertex extends IntegerVertex {
     public ConstantIntegerVertex(IntegerTensor constant) {
         super(
             new NonProbabilisticValueUpdater<>(v -> v.getValue()),
-            new Observation<>()
+            Observable.observableTypeFor(ConstantIntegerVertex.class)
         );
         setValue(constant);
     }

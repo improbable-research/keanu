@@ -4,7 +4,7 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -18,7 +18,7 @@ public class CastDoubleVertex extends DoubleVertex {
     public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((CastDoubleVertex)v).inputVertex.getValue().toDouble()),
-            new Observation<>()
+            Observable.observableTypeFor(CastDoubleVertex.class)
         );
         this.inputVertex = inputVertex;
         setParents(inputVertex);

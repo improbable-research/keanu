@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
@@ -19,7 +19,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex {
     public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpVertex) v).op(inputVertex.getValue())),
-            new Observation<>()
+            Observable.observableTypeFor(DoubleUnaryOpVertex.class)
         );
         this.inputVertex = inputVertex;
         setParents(inputVertex);
