@@ -1,5 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -7,12 +13,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class BetaVertex extends ProbabilisticDouble {
 
@@ -84,16 +84,16 @@ public class BetaVertex extends ProbabilisticDouble {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         List<DoubleTensor> dlnP = distribution().dLogProb(value);
-        return convertDualNumbersToDiff(dlnP);
+        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
     }
 
-    private Map<Long,DoubleTensor> convertDualNumbersToDiff(List<DoubleTensor> dlnP) {
-        PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dlnP.get(0));
-        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dlnP.get(1));
+    private Map<Long,DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdalpha, DoubleTensor dPdbeta, DoubleTensor dPdx) {
+        PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdalpha);
+        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
         PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dlnP.get(2));
+            dPdInputs.putWithRespectTo(getId(), dPdx);
         }
 
         return dPdInputs.asMap();

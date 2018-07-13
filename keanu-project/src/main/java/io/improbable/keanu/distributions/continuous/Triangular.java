@@ -1,10 +1,10 @@
 package io.improbable.keanu.distributions.continuous;
 
+import java.util.List;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.List;
 
 public class Triangular implements ContinuousDistribution {
 
@@ -17,8 +17,7 @@ public class Triangular implements ContinuousDistribution {
     }
 
     private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
-
-       this.xMin = xMin;
+        this.xMin = xMin;
         this.xMax = xMax;
         this.c = c;
     }

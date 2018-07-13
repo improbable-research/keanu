@@ -1,13 +1,14 @@
 package io.improbable.keanu.distributions.discrete;
 
+import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
+
+import org.nd4j.linalg.util.ArrayUtil;
+
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.nd4j.linalg.util.ArrayUtil;
-
-import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -19,7 +20,7 @@ public class Poisson implements DiscreteDistribution {
 
     private final DoubleTensor mu;
 
-    public static DiscreteDistribution withParamters(DoubleTensor mu) {
+    public static DiscreteDistribution withParameters(DoubleTensor mu) {
         return new Poisson(mu);
     }
 

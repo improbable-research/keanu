@@ -1,9 +1,9 @@
 package io.improbable.keanu.distributions;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 import java.util.List;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 public interface ContinuousDistribution extends Distribution<DoubleTensor> {
-    public List<DoubleTensor> dLogProb(DoubleTensor x);
+    List<DoubleTensor> dLogProb(DoubleTensor x);
 }
