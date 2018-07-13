@@ -71,6 +71,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new CeilVertex(this);
     }
 
+    public DoubleVertex round() {
+        return new RoundVertex(this);
+    }
+
     public DoubleVertex exp() {
         return new ExpVertex(this);
     }
