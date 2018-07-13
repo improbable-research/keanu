@@ -1,17 +1,17 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class InverseGammaVertex extends ProbabilisticDouble {
 
@@ -91,8 +91,9 @@ public class InverseGammaVertex extends ProbabilisticDouble {
                                                              DoubleTensor dPdbeta,
                                                              DoubleTensor dPdx) {
 
-        PartialDerivatives dPdInputsFromA = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dPdalpha);
-        PartialDerivatives dPdInputsFromB = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
+        Differentiator differentiator = new Differentiator();
+        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) alpha).getPartialDerivatives().multiplyBy(dPdalpha);
+        PartialDerivatives dPdInputsFromB = differentiator.calculateDual((Differentiable) beta).getPartialDerivatives().multiplyBy(dPdbeta);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
 
         if (!this.isObserved()) {

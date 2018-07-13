@@ -4,9 +4,6 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.Map;
 
 public class CastDoubleVertex extends NonProbabilisticDouble {
 
@@ -21,10 +18,5 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return inputVertex.sample(random).toDouble();
-    }
-
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
     }
 }

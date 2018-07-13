@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
 
 public class DualNumberTensorTest {
 
@@ -25,7 +28,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        DualNumber dualNumber = output.getDualNumber();
+        DualNumber dualNumber = new Differentiator().calculateDual((Differentiable)output);
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 
@@ -51,7 +54,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        DualNumber dualNumber = output.getDualNumber();
+        DualNumber dualNumber = new Differentiator().calculateDual((Differentiable)output);
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 
@@ -69,7 +72,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex prod = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        DualNumber dualNumber = prod.getDualNumber();
+        DualNumber dualNumber = new Differentiator().calculateDual((Differentiable)prod);
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 

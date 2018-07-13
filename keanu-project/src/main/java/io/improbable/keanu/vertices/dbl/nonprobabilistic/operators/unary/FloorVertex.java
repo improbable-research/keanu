@@ -23,9 +23,4 @@ public class FloorVertex extends DoubleUnaryOpVertex {
     protected DoubleTensor op(DoubleTensor a) {
         return a.floor();
     }
-
-    @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        throw new UnsupportedOperationException();
-    }
 }

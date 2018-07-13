@@ -1,10 +1,10 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.improbable.keanu.vertices.Vertex;
 
 public class MarkovBlanket {
 
@@ -41,9 +41,10 @@ public class MarkovBlanket {
     private static Set<Vertex> getUpstreamProbabilisticVertices(Vertex<?> aVertex, Set<Vertex> probabilistic, Set<Vertex> visited) {
         visited.add(aVertex);
 
-        aVertex.getParents().forEach(parent -> {
+        aVertex.getParents().forEach(p -> {
+            Vertex parent = (Vertex) p;
             if (!visited.contains(parent)) {
-                if (parent.isProbabilistic()) {
+                if ((parent).isProbabilistic()) {
                     probabilistic.add(parent);
                 } else {
                     getUpstreamProbabilisticVertices(parent, probabilistic, visited);

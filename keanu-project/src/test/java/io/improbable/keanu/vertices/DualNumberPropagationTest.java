@@ -1,14 +1,17 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
+import static org.junit.Assert.assertEquals;
+
+import java.util.concurrent.atomic.AtomicInteger;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 
 public class DualNumberPropagationTest {
 
@@ -23,7 +26,7 @@ public class DualNumberPropagationTest {
         int links = 20;
         DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
 
-        end.getDualNumber();
+        new Differentiator().calculateDual((Differentiable)end);
 
         //Does the right amount of work
         assertEquals(3 * links, m.get());

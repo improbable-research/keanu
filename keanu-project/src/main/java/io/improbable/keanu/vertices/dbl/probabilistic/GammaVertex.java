@@ -1,16 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class GammaVertex extends ProbabilisticDouble {
 
@@ -100,9 +100,10 @@ public class GammaVertex extends ProbabilisticDouble {
                                                              DoubleTensor dPdk,
                                                              DoubleTensor dPdx) {
 
-        PartialDerivatives dPdInputsFromA = location.getDualNumber().getPartialDerivatives().multiplyBy(dPdlocation);
-        PartialDerivatives dPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dPdtheta);
-        PartialDerivatives dPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dPdk);
+        Differentiator differentiator = new Differentiator();
+        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) location).getPartialDerivatives().multiplyBy(dPdlocation);
+        PartialDerivatives dPdInputsFromTheta = differentiator.calculateDual((Differentiable) theta).getPartialDerivatives().multiplyBy(dPdtheta);
+        PartialDerivatives dPdInputsFromK = differentiator.calculateDual((Differentiable) k).getPartialDerivatives().multiplyBy(dPdk);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromTheta).add(dPdInputsFromK);
 
         if (!this.isObserved()) {

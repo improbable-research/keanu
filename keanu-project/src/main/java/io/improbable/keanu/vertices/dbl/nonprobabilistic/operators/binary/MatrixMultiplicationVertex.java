@@ -1,14 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
 import java.util.Arrays;
 import java.util.Map;
 
-public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+
+public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
 
     /**
      * Matrix multiplies one vertex by another. C = AB
@@ -21,7 +22,7 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         DualNumber aDual = dualNumbers.get(a);
         DualNumber bDual = dualNumbers.get(b);
         return aDual.matrixMultiplyBy(bDual);

@@ -1,8 +1,17 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.PriorityQueue;
+import java.util.Set;
 
-import java.util.*;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 /**
  * This class enables efficient propagation of vertex updates.
@@ -52,24 +61,24 @@ public class VertexValuePropagation {
     }
 
     public static void eval(Collection<? extends Vertex> vertices) {
-        Deque<Vertex> stack = asDeque(vertices);
+        Deque<IVertex> stack = asDeque(vertices);
 
-        Set<Vertex<?>> hasCalculated = new HashSet<>();
+        Set<IVertex<?>> hasCalculated = new HashSet<>();
 
         while (!stack.isEmpty()) {
 
-            Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
+            IVertex<?> head = stack.peek();
+            Set<IVertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
 
-            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+            if (((Vertex)head).isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
-                Vertex<?> top = stack.pop();
+                IVertex<?> top = stack.pop();
                 top.updateValue();
                 hasCalculated.add(top);
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                for (IVertex<?> vertex : parentsThatAreNotYetCalculated) {
                     stack.push(vertex);
                 }
 
@@ -78,9 +87,9 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
+    private static Set<IVertex<?>> parentsThatAreNotCalculated(Set<IVertex<?>> calculated, Set<? extends IVertex> parents) {
+        Set<IVertex<?>> notCalculatedParents = new HashSet<>();
+        for (IVertex<?> next : parents) {
             if (!calculated.contains(next)) {
                 notCalculatedParents.add(next);
             }
@@ -92,22 +101,22 @@ public class VertexValuePropagation {
         lazyEval(Arrays.asList(vertices));
     }
 
-    public static void lazyEval(Collection<? extends Vertex> vertices) {
-        Deque<Vertex> stack = asDeque(vertices);
+    public static void lazyEval(Collection<? extends IVertex> vertices) {
+        Deque<IVertex> stack = asDeque(vertices);
 
         while (!stack.isEmpty()) {
 
-            Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
+            IVertex<?> head = stack.peek();
+            Set<IVertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
 
-            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+            if (((Vertex)head).isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
-                Vertex<?> top = stack.pop();
+                IVertex<?> top = stack.pop();
                 top.updateValue();
 
             } else {
 
-                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
+                for (IVertex<?> vertex : parentsThatAreNotYetCalculated) {
                     stack.push(vertex);
                 }
 
@@ -116,9 +125,9 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
+    private static Set<IVertex<?>> parentsThatAreNotCalculated(Set<? extends IVertex> parents) {
+        Set<IVertex<?>> notCalculatedParents = new HashSet<>();
+        for (IVertex<?> next : parents) {
             if (!next.hasValue()) {
                 notCalculatedParents.add(next);
             }
@@ -126,9 +135,9 @@ public class VertexValuePropagation {
         return notCalculatedParents;
     }
 
-    private static Deque<Vertex> asDeque(Iterable<? extends Vertex> vertices) {
-        Deque<Vertex> stack = new ArrayDeque<>();
-        for (Vertex<?> v : vertices) {
+    private static Deque<IVertex> asDeque(Iterable<? extends IVertex> vertices) {
+        Deque<IVertex> stack = new ArrayDeque<>();
+        for (IVertex<?> v : vertices) {
             stack.push(v);
         }
         return stack;

@@ -24,8 +24,4 @@ public class AbsVertex extends DoubleUnaryOpVertex {
         return a.abs();
     }
 
-    @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        throw new UnsupportedOperationException();
-    }
 }

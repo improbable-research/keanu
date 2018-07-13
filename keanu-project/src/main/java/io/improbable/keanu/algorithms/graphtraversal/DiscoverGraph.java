@@ -1,11 +1,12 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 
 public class DiscoverGraph {
 
@@ -45,10 +46,10 @@ public class DiscoverGraph {
                 }
             }
 
-            for (Vertex<?> parent : visiting.getParents()) {
+            for (IVertex<?> parent : visiting.getParents()) {
                 if (!discoveredGraph.contains(parent)) {
-                    stack.addFirst(parent);
-                    discoveredGraph.add(parent);
+                    stack.addFirst((Vertex)parent);
+                    discoveredGraph.add((Vertex)parent);
                 }
             }
         }

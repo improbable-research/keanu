@@ -1,17 +1,20 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-
-public abstract class Vertex<T> {
+public abstract class Vertex<T> implements IVertex {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
@@ -217,7 +220,8 @@ public abstract class Vertex<T> {
         parent.addChild(this);
     }
 
-    public Set<Vertex> getParents() {
+    @Override
+    public Set<? extends IVertex> getParents() {
         return this.parents;
     }
 

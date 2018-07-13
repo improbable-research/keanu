@@ -1,19 +1,22 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import io.improbable.keanu.distributions.continuous.Gaussian;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class GaussianVertex extends ProbabilisticDouble {
+public class GaussianVertex extends DoubleVertex implements Differentiable {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -28,6 +31,7 @@ public class GaussianVertex extends ProbabilisticDouble {
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -75,13 +79,7 @@ public class GaussianVertex extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor value) {
-
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor sigmaValues = sigma.getValue();
-
-        DoubleTensor logPdfs = Gaussian.withParameters(muValues, sigmaValues).logProb(value);
-
-        return logPdfs.sum();
+        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -94,8 +92,9 @@ public class GaussianVertex extends ProbabilisticDouble {
                                                              DoubleTensor dPdsigma,
                                                              DoubleTensor dPdx) {
 
-        PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
-        PartialDerivatives dPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dPdsigma);
+        Differentiator differentiator = new Differentiator();
+        PartialDerivatives dPdInputsFromMu = differentiator.calculateDual((Differentiable) mu).getPartialDerivatives().multiplyBy(dPdmu);
+        PartialDerivatives dPdInputsFromSigma = differentiator.calculateDual((Differentiable) sigma).getPartialDerivatives().multiplyBy(dPdsigma);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
         if (!this.isObserved()) {
@@ -105,9 +104,23 @@ public class GaussianVertex extends ProbabilisticDouble {
         return dPdInputs.asMap();
     }
 
+
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
     }
 
+    @Override
+    public boolean isProbabilistic() {
+        return true;    // TODO: rip this out
+    }
+
+    @Override
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+        if (isObserved()) {
+            return DualNumber.createConstant(getValue());
+        } else {
+            return DualNumber.createWithRespectToSelf(getId(), getValue());
+        }
+    }
 }

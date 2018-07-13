@@ -1,30 +1,31 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 
-public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
+public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble implements Differentiable {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
     protected final BiFunction<A, B, DoubleTensor> op;
-    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation;
+    protected final Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation;
 
     public DoubleBinaryOpLambda(int[] shape,
                                 Vertex<A> a,
                                 Vertex<B> b,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+                                Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
         super(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(a.getValue(), b.getValue()));
         this.a = a;
         this.b = b;
@@ -41,7 +42,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     public DoubleBinaryOpLambda(Vertex<A> a,
                                 Vertex<B> b,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+                                Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b, op, dualNumberCalculation);
     }
 
@@ -55,7 +56,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         if (dualNumberCalculation != null) {
             return dualNumberCalculation.apply(dualNumbers);
         }

@@ -1,5 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -7,12 +13,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class BetaVertex extends ProbabilisticDouble {
 
@@ -88,8 +88,9 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     private Map<Long,DoubleTensor> convertDualNumbersToDiff(List<DoubleTensor> dlnP) {
-        PartialDerivatives dPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dlnP.get(0));
-        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dlnP.get(1));
+        Differentiator differentiator = new Differentiator();
+        PartialDerivatives dPdInputsFromAlpha = differentiator.calculateDual((Differentiable) alpha).getPartialDerivatives().multiplyBy(dlnP.get(0));
+        PartialDerivatives dPdInputsFromBeta = differentiator.calculateDual((Differentiable) beta).getPartialDerivatives().multiplyBy(dlnP.get(1));
         PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
 
         if (!this.isObserved()) {

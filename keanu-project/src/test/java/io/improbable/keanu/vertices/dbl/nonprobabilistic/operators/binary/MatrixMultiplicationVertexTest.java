@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class MatrixMultiplicationVertexTest {
 
@@ -34,8 +37,8 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex alpha = new UniformVertex(0, 10);
         alpha.setValue(DoubleTensor.create(new double[]{1, 3, 5, 2, 4, 6}, 2, 3));
 
-        DoubleVertex N = m.matrixMultiply(alpha);
-        DualNumber NDual = N.getDualNumber();
+        Differentiable N = (Differentiable) m.matrixMultiply(alpha);
+        DualNumber NDual = new Differentiator().calculateDual(N);
 
         DoubleTensor dNdm = NDual.getPartialDerivatives().withRespectTo(m);
         DoubleTensor expectedDNdm = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 1, 3, 1, 2);
@@ -77,7 +80,7 @@ public class MatrixMultiplicationVertexTest {
 
         DoubleVertex N = m.matrixMultiply(alpha);
         DoubleVertex y = N.matrixMultiply(beta);
-        DualNumber yDual = y.getDualNumber();
+        DualNumber yDual = new Differentiator().calculateDual((Differentiable) y);
 
         DoubleTensor dydm = yDual.getPartialDerivatives().withRespectTo(m);
         DoubleTensor expectedDydm = DoubleTensor.create(new double[]{
@@ -133,7 +136,7 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex L = beta.matrixMultiply(alpha);
         //y = L x N = (beta x alpha) x (alpha x m)
         DoubleVertex y = L.matrixMultiply(N);
-        DualNumber yDual = y.getDualNumber();
+        DualNumber yDual = new Differentiator().calculateDual((Differentiable)y);
 
         DoubleTensor dydalpha = yDual.getPartialDerivatives().withRespectTo(alpha);
         DoubleTensor expectedDydalpha = DoubleTensor.create(new double[]{

@@ -1,14 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import java.util.Map;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 
-import java.util.Map;
-
-public class SigmoidVertex extends DoubleUnaryOpVertex {
+public class SigmoidVertex extends DoubleUnaryOpVertex implements Differentiable {
 
     /**
      * Applies the sigmoid function to a vertex.
@@ -26,7 +27,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         DualNumber dualNumber = dualNumbers.get(inputVertex);
         DoubleTensor x = dualNumber.getValue();
         DoubleTensor xExp = x.exp();

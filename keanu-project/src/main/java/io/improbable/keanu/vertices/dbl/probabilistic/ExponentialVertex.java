@@ -1,17 +1,17 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class ExponentialVertex extends ProbabilisticDouble {
 
@@ -85,8 +85,9 @@ public class ExponentialVertex extends ProbabilisticDouble {
                                                              DoubleTensor dPdlambda,
                                                              DoubleTensor dPdx) {
 
-        PartialDerivatives dPdInputsFromA = location.getDualNumber().getPartialDerivatives().multiplyBy(dPdlocation);
-        PartialDerivatives dPdInputsFromB = lambda.getDualNumber().getPartialDerivatives().multiplyBy(dPdlambda);
+        Differentiator differentiator = new Differentiator();
+        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) location).getPartialDerivatives().multiplyBy(dPdlocation);
+        PartialDerivatives dPdInputsFromB = differentiator.calculateDual((Differentiable) lambda).getPartialDerivatives().multiplyBy(dPdlambda);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
 
         if (!this.isObserved()) {
