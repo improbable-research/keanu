@@ -9,7 +9,7 @@ import java.util.Map;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -33,7 +33,7 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-        super(new ProbabilisticValueUpdater<>(), new Observation<>());
+        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(GaussianVertex.class));
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 

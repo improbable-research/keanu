@@ -7,7 +7,7 @@ import java.util.Map;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -28,7 +28,7 @@ public class Flip extends BoolVertex implements Probabilistic<BooleanTensor> {
      * @param probTrue  the probability the flip returns true
      */
     public Flip(int[] shape, Vertex<DoubleTensor> probTrue) {
-        super(new ProbabilisticValueUpdater<>(), new Observation<>());
+        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(Flip.class));
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;

@@ -5,7 +5,7 @@ import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,7 +22,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue())),
-            new Observation<>()
+            Observable.observableTypeFor(DoubleUnaryOpLambda.class)
         );
         this.inputVertex = inputVertex;
         this.op = op;

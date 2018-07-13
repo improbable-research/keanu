@@ -8,7 +8,7 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -31,7 +31,7 @@ public class LaplaceVertex extends DoubleVertex implements Probabilistic<DoubleT
      * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public LaplaceVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
-        super(new ProbabilisticValueUpdater<>(), new Observation<>());
+        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(LaplaceVertex.class));
 
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());

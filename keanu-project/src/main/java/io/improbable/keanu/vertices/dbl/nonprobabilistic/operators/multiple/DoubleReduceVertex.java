@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -30,7 +30,7 @@ public class DoubleReduceVertex extends DoubleVertex implements Differentiable {
     public DoubleReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleReduceVertex) v).applyReduce(Vertex::getValue)),
-            new Observation<>()
+            Observable.observableTypeFor(DoubleReduceVertex.class)
         );
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("DoubleReduceVertex should have at least two input vertices, called with " + inputs.size());

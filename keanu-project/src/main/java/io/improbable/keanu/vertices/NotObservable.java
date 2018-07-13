@@ -1,23 +1,20 @@
 package io.improbable.keanu.vertices;
 
-public class Observation<T> implements Observable<T> {
+public class NotObservable<T> implements Observable<T> {
     // package private
-    Observation() {}
-
-    private T value = null;
+    NotObservable() {}
 
     @Override
     public void observe(T value) {
-        this.value = value;
+        throw new UnsupportedOperationException("This type of vertex does not support being observed");
     }
 
     @Override
     public void unobserve() {
-        this.value = null;
     }
 
     @Override
     public boolean isObserved() {
-        return this.value != null;
+        return false;
     }
 }
