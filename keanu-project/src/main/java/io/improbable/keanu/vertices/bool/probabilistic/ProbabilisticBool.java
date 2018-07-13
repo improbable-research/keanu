@@ -10,9 +10,4 @@ public abstract class ProbabilisticBool extends BoolVertex {
         super(new ProbabilisticValueUpdater<>());
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return true;
-    }
-
 }

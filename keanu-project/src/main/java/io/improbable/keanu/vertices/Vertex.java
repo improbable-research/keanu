@@ -12,6 +12,7 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class Vertex<T> implements IVertex {
@@ -112,7 +113,9 @@ public abstract class Vertex<T> implements IVertex {
      * not derived from it's parents. However, the probability of the
      * vertex's value may be dependent on it's parents values.
      */
-    public abstract boolean isProbabilistic();
+    public final boolean isProbabilistic() {
+        return valueUpdater instanceof ProbabilisticValueUpdater;
+    };
 
     /**
      * Sets the value if the vertex isn't already observed.

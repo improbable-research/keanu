@@ -111,11 +111,6 @@ public class GaussianVertex extends DoubleVertex implements Differentiable {
     }
 
     @Override
-    public boolean isProbabilistic() {
-        return true;    // TODO: rip this out
-    }
-
-    @Override
     public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());

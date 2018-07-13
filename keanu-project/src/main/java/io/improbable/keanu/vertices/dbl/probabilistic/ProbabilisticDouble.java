@@ -14,11 +14,6 @@ public abstract class ProbabilisticDouble extends DoubleVertex implements Differ
     }
 
     @Override
-    public boolean isProbabilistic() {
-        return true;
-    }
-
-    @Override
     public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());
