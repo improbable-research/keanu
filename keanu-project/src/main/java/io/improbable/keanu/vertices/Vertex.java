@@ -104,10 +104,6 @@ public abstract class Vertex<T> implements IVertex, Observable<T> {
         return hasValue() ? value : lazyEval();
     }
 
-    protected T getRawValue() {
-        return value;
-    }
-
     public boolean hasValue() {
         if (value instanceof Tensor) {
             return !((Tensor) value).isShapePlaceholder();
@@ -149,13 +145,6 @@ public abstract class Vertex<T> implements IVertex, Observable<T> {
     public void observe(T value) {
         this.value = value;
         observation.observe(value);
-    }
-
-    /**
-     * Cause this vertex to observe its own value, for example when generating test data
-     */
-    public void observeOwnValue() {
-        observation.observe(getValue());
     }
 
     @Override
