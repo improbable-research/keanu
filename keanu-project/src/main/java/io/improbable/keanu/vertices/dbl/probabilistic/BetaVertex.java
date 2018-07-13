@@ -89,17 +89,17 @@ public class BetaVertex extends DoubleVertex implements Probabilistic<DoubleTens
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         List<DoubleTensor> dlnP = distribution().dLogProb(value);
-        return convertDualNumbersToDiff(dlnP);
+        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
     }
 
-    private Map<Long,DoubleTensor> convertDualNumbersToDiff(List<DoubleTensor> dlnP) {
-        Differentiator differentiator = new Differentiator();
-        PartialDerivatives dPdInputsFromAlpha = differentiator.calculateDual((Differentiable) alpha).getPartialDerivatives().multiplyBy(dlnP.get(0));
-        PartialDerivatives dPdInputsFromBeta = differentiator.calculateDual((Differentiable) beta).getPartialDerivatives().multiplyBy(dlnP.get(1));
+    private Map<Long,DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdalpha, DoubleTensor dPdbeta, DoubleTensor dPdx) {
+            Differentiator differentiator = new Differentiator();
+            PartialDerivatives dPdInputsFromAlpha = differentiator.calculateDual((Differentiable) alpha).getPartialDerivatives().multiplyBy(dPdalpha);
+            PartialDerivatives dPdInputsFromBeta = differentiator.calculateDual((Differentiable) beta).getPartialDerivatives().multiplyBy(dPdbeta);
         PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dlnP.get(2));
+            dPdInputs.putWithRespectTo(getId(), dPdx);
         }
 
         return dPdInputs.asMap();

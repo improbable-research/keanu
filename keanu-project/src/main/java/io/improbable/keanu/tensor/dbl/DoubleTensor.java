@@ -165,6 +165,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor floor();
 
+    DoubleTensor round();
+
     DoubleTensor sigmoid();
 
     DoubleTensor choleskyDecomposition();
@@ -232,6 +234,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor ceilInPlace();
 
     DoubleTensor floorInPlace();
+
+    DoubleTensor roundInPlace();
 
     DoubleTensor sigmoidInPlace();
 

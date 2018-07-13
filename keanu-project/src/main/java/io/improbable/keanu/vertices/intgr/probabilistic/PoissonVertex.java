@@ -69,7 +69,7 @@ public class PoissonVertex extends IntegerVertex implements Probabilistic<Intege
 
     @Override
     public double logProb(IntegerTensor value) {
-        return Poisson.withParamters(mu.getValue()).logProb(value).sum();
+        return Poisson.withParameters(mu.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -79,6 +79,6 @@ public class PoissonVertex extends IntegerVertex implements Probabilistic<Intege
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return Poisson.withParamters(mu.getValue()).sample(getShape(), random);
+        return Poisson.withParameters(mu.getValue()).sample(getShape(), random);
     }
 }

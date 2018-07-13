@@ -11,6 +11,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBi
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
@@ -31,6 +32,10 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
         return new AndMultipleVertex(inputList(those));
+    }
+
+    public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
+        return new NotVertex(vertex);
     }
 
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {

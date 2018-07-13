@@ -1,12 +1,12 @@
 package io.improbable.keanu.distributions.continuous;
 
+import java.util.List;
+
 import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import sun.rmi.runtime.Log;
-
-import java.util.List;
 
 public class Logistic implements ContinuousDistribution {
 
@@ -50,7 +50,7 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
 
-        final DoubleTensor dPda = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
+        final DoubleTensor dPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
         final DoubleTensor dPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
         final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
@@ -59,8 +59,8 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
         final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
 
-        final DoubleTensor dPdb = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+        final DoubleTensor dPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
-        return ImmutableList.of(dPda, dPdb, dPdx);
+        return ImmutableList.of(dPdmu, dPds, dPdx);
     }
 }

@@ -1,12 +1,12 @@
 package io.improbable.keanu.distributions.continuous;
 
+import java.util.List;
+
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.List;
 
 public class MultivariateGaussian implements ContinuousDistribution {
 
@@ -47,7 +47,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
             covInv.times(xMinusMu).times(xMinusMuT).scalar() :
             xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).scalar();
 
-        return DoubleTensor.create(-0.5 * (scalar + kLog2Pi + logCovDet), new int[] {1});
+        return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
     }
 
     @Override

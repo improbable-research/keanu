@@ -99,7 +99,7 @@ public class KeanuRandom {
     }
 
     public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
-        return Poisson.withParamters(mu).sample(shape, this);
+        return Poisson.withParameters(mu).sample(shape, this);
 
     }
 

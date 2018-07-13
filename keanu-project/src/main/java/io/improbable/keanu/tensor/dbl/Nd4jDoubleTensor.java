@@ -182,6 +182,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor round() {
+        return duplicate().roundInPlace();
+    }
+
+    @Override
     public DoubleTensor standardize() {
         return duplicate().standardizeInPlace();
     }
@@ -709,6 +714,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor floorInPlace() {
         Transforms.floor(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor roundInPlace() {
+        Transforms.round(tensor, false);
         return this;
     }
 

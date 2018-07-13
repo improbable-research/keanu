@@ -28,6 +28,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleU
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
@@ -95,6 +96,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex ceil() {
         return new CeilVertex(this);
+    }
+
+    public DoubleVertex round() {
+        return new RoundVertex(this);
     }
 
     public DoubleVertex exp() {

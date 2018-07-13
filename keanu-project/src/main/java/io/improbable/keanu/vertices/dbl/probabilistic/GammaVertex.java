@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.List;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
@@ -89,15 +90,15 @@ public class GammaVertex extends DoubleVertex implements Probabilistic<DoubleTen
         DoubleTensor thetaValues = theta.getValue();
         DoubleTensor kValues = k.getValue();
 
-        DoubleTensor logPdfs = Gamma.logPdf(locationValues, thetaValues, kValues, value);
+        DoubleTensor logPdfs = Gamma.withParameters(locationValues, thetaValues, kValues).logProb(value);
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        Gamma.Diff dlnP = Gamma.dlnPdf(location.getValue(), theta.getValue(), k.getValue(), value);
+        List<DoubleTensor> dlnP = Gamma.withParameters(location.getValue(), theta.getValue(), k.getValue()).dLogProb(value);
 
-        return convertDualNumbersToDiff(dlnP.dPdlocation, dlnP.dPdtheta, dlnP.dPdk, dlnP.dPdx);
+        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2), dlnP.get(3));
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdlocation,
