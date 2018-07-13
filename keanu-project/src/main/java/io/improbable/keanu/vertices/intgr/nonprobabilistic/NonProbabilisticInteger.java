@@ -44,9 +44,4 @@ public abstract class NonProbabilisticInteger extends IntegerVertex {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return false;
-    }
-
 }

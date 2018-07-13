@@ -43,8 +43,4 @@ public abstract class NonProbabilisticDouble extends DoubleVertex {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return false;
-    }
 }

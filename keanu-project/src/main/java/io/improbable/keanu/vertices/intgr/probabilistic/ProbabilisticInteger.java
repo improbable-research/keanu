@@ -11,9 +11,4 @@ public abstract class ProbabilisticInteger extends IntegerVertex {
         super(new ProbabilisticValueUpdater<>());
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return true;
-    }
-
 }

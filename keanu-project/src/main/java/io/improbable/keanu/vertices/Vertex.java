@@ -109,7 +109,9 @@ public abstract class Vertex<T> {
      * not derived from it's parents. However, the probability of the
      * vertex's value may be dependent on it's parents values.
      */
-    public abstract boolean isProbabilistic();
+    public final boolean isProbabilistic() {
+        return valueUpdater instanceof ProbabilisticValueUpdater;
+    };
 
     /**
      * Sets the value if the vertex isn't already observed.

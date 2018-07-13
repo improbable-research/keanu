@@ -28,9 +28,4 @@ public abstract class NonProbabilistic<T> extends Vertex<T> {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return false;
-    }
-
 }

@@ -30,9 +30,4 @@ public abstract class NonProbabilisticBool extends BoolVertex {
         throw new UnsupportedOperationException();
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return false;
-    }
-
 }

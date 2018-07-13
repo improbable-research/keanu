@@ -16,11 +16,6 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    public boolean isProbabilistic() {
-        return true;
-    }
-
-    @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());

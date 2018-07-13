@@ -10,9 +10,4 @@ public abstract class Probabilistic<T> extends Vertex<T> {
         super(new ProbabilisticValueUpdater<>());
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return true;
-    }
-
 }
