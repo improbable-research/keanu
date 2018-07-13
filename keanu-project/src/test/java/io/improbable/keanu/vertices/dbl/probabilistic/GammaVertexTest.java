@@ -7,7 +7,6 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.commons.math3.distribution.GammaDistribution;
 import org.junit.Before;
@@ -89,9 +88,7 @@ public class GammaVertexTest {
         UniformVertex kTensor = new UniformVertex(1.0, 5.0);
         kTensor.setValue(Nd4jDoubleTensor.scalar(2.5));
 
-        Supplier<ProbabilisticDouble> vertexSupplier = () -> new GammaVertex(aTensor, thetaTensor, kTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new GammaVertex(aTensor, thetaTensor, kTensor));
     }
 
     @Test

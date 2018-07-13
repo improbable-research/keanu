@@ -9,11 +9,13 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class UniformVertex extends ProbabilisticDouble {
+public class UniformVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -28,6 +30,7 @@ public class UniformVertex extends ProbabilisticDouble {
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 

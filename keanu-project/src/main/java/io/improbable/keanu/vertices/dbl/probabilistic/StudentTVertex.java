@@ -16,11 +16,14 @@ import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class StudentTVertex extends ProbabilisticDouble {
+public class StudentTVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final IntegerVertex v;
 
@@ -33,6 +36,8 @@ public class StudentTVertex extends ProbabilisticDouble {
      * @param v           Degrees of Freedom
      */
     public StudentTVertex(int[] tensorShape, IntegerVertex v) {
+        super(new ProbabilisticValueUpdater<>());
+
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);

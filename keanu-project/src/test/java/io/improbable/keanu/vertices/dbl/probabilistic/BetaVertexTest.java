@@ -7,7 +7,6 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
@@ -81,9 +80,7 @@ public class BetaVertexTest {
         UniformVertex betaTensor = new UniformVertex(0.0, 5.0);
         betaTensor.setValue(3.0);
 
-        Supplier<ProbabilisticDouble> vertexSupplier = () -> new BetaVertex(alphaTensor, betaTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new BetaVertex(alphaTensor, betaTensor));
     }
 
     @Test

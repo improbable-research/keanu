@@ -207,4 +207,13 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     public double getValue(int... index) {
         return getValue().getValue(index);
     }
+
+    @Override
+    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+        if (isObserved()) {
+            return DualNumber.createConstant(getValue());
+        } else {
+            return DualNumber.createWithRespectToSelf(getId(), getValue());
+        }
+    }
 }

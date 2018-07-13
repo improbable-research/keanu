@@ -22,7 +22,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class GaussianVertex extends ProbabilisticDouble implements Probabilistic<DoubleTensor> {
+public class GaussianVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -37,6 +37,7 @@ public class GaussianVertex extends ProbabilisticDouble implements Probabilistic
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
