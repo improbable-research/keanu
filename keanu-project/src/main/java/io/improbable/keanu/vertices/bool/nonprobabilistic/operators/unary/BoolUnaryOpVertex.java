@@ -2,16 +2,21 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class BoolUnaryOpVertex<A extends Tensor> extends NonProbabilisticBool {
+public abstract class BoolUnaryOpVertex<A extends Tensor> extends BoolVertex {
 
     protected final Vertex<A> a;
 
     public BoolUnaryOpVertex(int[] shape, Vertex<A> a) {
-        super(v -> ((BoolUnaryOpVertex)v).op(a.getValue()));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((BoolUnaryOpVertex)v).op(a.getValue())),
+            new Observation<>()
+        );
         this.a = a;
         setParents(a);
         setValue(BooleanTensor.placeHolder(shape));

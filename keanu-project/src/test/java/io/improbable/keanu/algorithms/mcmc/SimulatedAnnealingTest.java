@@ -1,19 +1,21 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
 
 public class SimulatedAnnealingTest {
 
@@ -32,7 +34,7 @@ public class SimulatedAnnealingTest {
         B.setValue(2.0);
         C = A.plus(B);
         D = new GaussianVertex(C, 1);
-        D.observe(7.5);
+        D.observe(DoubleTensor.scalar(7.5));
     }
 
     @Test

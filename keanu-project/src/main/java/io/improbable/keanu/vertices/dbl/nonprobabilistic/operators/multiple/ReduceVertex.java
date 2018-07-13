@@ -13,18 +13,24 @@ import java.util.stream.Collectors;
 
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ReduceVertex extends NonProbabilisticDouble {
+public class ReduceVertex extends DoubleVertex implements Differentiable {
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f;
     private final Supplier<DualNumber> dualNumberSupplier;
 
     public ReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
-        super(v -> ((ReduceVertex) v).applyReduce(Vertex::getValue));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((ReduceVertex) v).applyReduce(Vertex::getValue)),
+            new Observation<>()
+        );
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }

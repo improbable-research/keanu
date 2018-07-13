@@ -1,5 +1,13 @@
 package io.improbable.keanu.vertices.intgr;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.function.Function;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
@@ -49,7 +57,7 @@ public class IntegerVertexTest {
     @Test
     public void doesObserve() {
         PoissonVertex testIntegerVertex = new PoissonVertex(1.0);
-        testIntegerVertex.observe(5);
+        testIntegerVertex.observe(IntegerTensor.scalar(5));
 
         Integer expected = 5;
         assertEquals(testIntegerVertex.getValue().scalar(), expected);

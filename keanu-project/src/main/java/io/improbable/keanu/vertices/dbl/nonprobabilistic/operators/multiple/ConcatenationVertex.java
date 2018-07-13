@@ -10,13 +10,15 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConcatenationVertex extends NonProbabilisticDouble {
+public class ConcatenationVertex extends DoubleVertex implements Differentiable {
 
     private final int dimension;
     private final DoubleVertex[] input;
@@ -28,7 +30,12 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
      * @param input the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
-        super(v -> ((ConcatenationVertex) v).op(((ConcatenationVertex)v).extractFromInputs(DoubleTensor.class, Vertex::getValue)));
+        super(
+            new NonProbabilisticValueUpdater<>(
+                v -> ((ConcatenationVertex) v).op(((ConcatenationVertex)v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
+            ),
+            new Observation<>()
+            );
         this.dimension = dimension;
         this.input = input;
         setParents(input);

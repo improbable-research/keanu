@@ -14,6 +14,8 @@ import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -35,7 +37,7 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
-        super(new ProbabilisticValueUpdater<>());
+        super(new ProbabilisticValueUpdater<>(), new Observation<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 

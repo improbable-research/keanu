@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.DiscreteVertex;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
@@ -16,10 +16,10 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolPl
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 
-public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
+public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
-    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater) {
-        super(valueUpdater);
+    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater, Observable<BooleanTensor> observation) {
+        super(valueUpdater, observation);
     }
 
     @SafeVarargs

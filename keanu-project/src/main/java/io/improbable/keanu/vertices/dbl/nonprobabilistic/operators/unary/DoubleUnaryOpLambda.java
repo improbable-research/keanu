@@ -4,19 +4,25 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
+public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentiable {
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, DoubleTensor> op;
     protected final Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberSupplier;
 
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberCalculation) {
-        super(v -> ((DoubleUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue()));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue())),
+            new Observation<>()
+        );
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualNumberSupplier = dualNumberCalculation;

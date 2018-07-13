@@ -5,6 +5,7 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -24,7 +25,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
-        super(new ProbabilisticValueUpdater<>());
+        super(new ProbabilisticValueUpdater<>(), new Observation<>());
 
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 

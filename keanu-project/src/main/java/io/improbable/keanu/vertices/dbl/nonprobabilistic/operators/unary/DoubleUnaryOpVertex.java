@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
+public abstract class DoubleUnaryOpVertex extends DoubleVertex {
 
     protected final DoubleVertex inputVertex;
 
@@ -16,7 +17,10 @@ public abstract class DoubleUnaryOpVertex extends NonProbabilisticDouble {
      * @param inputVertex a vertex
      */
     public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
-        super(v -> ((DoubleUnaryOpVertex) v).op(inputVertex.getValue()));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpVertex) v).op(inputVertex.getValue())),
+            new Observation<>()
+        );
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(DoubleTensor.placeHolder(shape));

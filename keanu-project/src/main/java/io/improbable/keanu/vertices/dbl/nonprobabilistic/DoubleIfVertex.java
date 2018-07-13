@@ -2,13 +2,16 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class DoubleIfVertex extends NonProbabilisticDouble {
+public class DoubleIfVertex extends DoubleVertex {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends DoubleTensor> thn;
@@ -18,7 +21,10 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
-        super(v -> ((DoubleIfVertex)v).op(predicate.getValue(), thn.getValue(), els.getValue()));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleIfVertex)v).op(predicate.getValue(), thn.getValue(), els.getValue())),
+            new Observation<>()
+        );
 
         this.predicate = predicate;
         this.thn = thn;

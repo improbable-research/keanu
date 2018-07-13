@@ -2,17 +2,21 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class IntegerBinaryOpVertex extends NonProbabilisticInteger {
+public abstract class IntegerBinaryOpVertex extends IntegerVertex {
 
     protected final IntegerVertex a;
     protected final IntegerVertex b;
 
     public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b) {
-        super(v -> ((IntegerBinaryOpVertex)v).op(a.getValue(), b.getValue()));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((IntegerBinaryOpVertex)v).op(a.getValue(), b.getValue())),
+            new Observation<>()
+        );
         this.a = a;
         this.b = b;
         setParents(a, b);

@@ -5,9 +5,8 @@ import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
-public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
+public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 
     private final Vertex<? extends Tensor<T>> inputVertex;
     private final int dimension;
@@ -20,8 +19,8 @@ public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericSliceVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
-        super(v -> ((GenericSliceVertex)v).op(inputVertex.getValue()));
+    public GenericSliceVertex(Vertex<Tensor<T>> inputVertex, int dimension, int index) {
+        super(inputVertex);
         this.inputVertex = inputVertex;
         this.dimension = dimension;
         this.index = index;

@@ -9,8 +9,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.junit.Before;
 import org.junit.Test;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collections;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
@@ -40,7 +49,7 @@ public class MetropolisHastingsTest {
 
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
 
-        Cobserved.observe(46.0);
+        Cobserved.observe(DoubleTensor.scalar(46.0));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroProbability(100, random);
@@ -69,7 +78,7 @@ public class MetropolisHastingsTest {
         B.setValue(20.0);
 
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
-        Cobserved.observe(46.0);
+        Cobserved.observe(DoubleTensor.scalar(46.0));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
         bayesNet.probeForNonZeroProbability(100, random);
@@ -101,7 +110,7 @@ public class MetropolisHastingsTest {
 
         Flip C = new Flip(B);
 
-        C.observe(true);
+        C.observe(BooleanTensor.scalar(true));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C));
         bayesNet.probeForNonZeroProbability(100, random);
@@ -131,7 +140,7 @@ public class MetropolisHastingsTest {
 
         Flip E = new Flip(D);
 
-        E.observe(true);
+        E.observe(BooleanTensor.scalar(true));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C, D, E));
         bayesNet.probeForNonZeroProbability(100, random);
@@ -153,7 +162,7 @@ public class MetropolisHastingsTest {
         Flip A = new Flip(0.5);
         Flip B = new Flip(0.5);
         BoolVertex C = A.or(B);
-        C.observe(false);
+        C.observe(BooleanTensor.scalar(false));
 
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
         net.probeForNonZeroProbability(100, random);

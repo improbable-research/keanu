@@ -1,16 +1,9 @@
 package io.improbable.keanu.vertices;
 
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -23,8 +16,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-
-public abstract class Vertex<T> {
+public abstract class Vertex<T> implements Observable<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
@@ -32,11 +24,12 @@ public abstract class Vertex<T> {
     private List<Vertex<?>> children = new ArrayList<>();
     private List<Vertex<?>> parents = new ArrayList<>();
     private T value;
-    private boolean observed;
     private final ValueUpdater<T> valueUpdater;
+    private final Observable<T> observation;
 
-    public Vertex(ValueUpdater<T> valueUpdater) {
+    public Vertex(ValueUpdater<T> valueUpdater, Observable<T> observation) {
         this.valueUpdater = valueUpdater;
+        this.observation = observation;
     }
 
     /**
@@ -50,7 +43,6 @@ public abstract class Vertex<T> {
         return sample(KeanuRandom.getDefaultRandom());
     }
 
-    public boolean matchesObservation() { throw new UnsupportedOperationException(); };
     /**
      * This causes a non-probabilistic vertex to recalculate it's value based off it's
      * parent's current values.
@@ -107,7 +99,7 @@ public abstract class Vertex<T> {
      * @param value the observed value
      */
     public void setValue(T value) {
-        if (!this.observed) {
+        if (!observation.isObserved()) {
             this.value = value;
         }
     }
@@ -157,24 +149,31 @@ public abstract class Vertex<T> {
      *
      * @param value the value to be observed
      */
+    @Override
     public void observe(T value) {
         this.value = value;
-        this.observed = true;
+        observation.observe(value);
     }
 
     /**
      * Cause this vertex to observe its own value, for example when generating test data
      */
     public void observeOwnValue() {
-        this.observed = true;
+        observation.observe(getValue());
     }
 
+    @Override
     public void unobserve() {
-        observed = false;
+        observation.unobserve();
     }
 
+    @Override
     public boolean isObserved() {
-        return observed;
+        return observation.isObserved();
+    }
+
+    public boolean matchesObservation() {
+        throw new UnsupportedOperationException();
     }
 
     public long getId() {
