@@ -1,13 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class SmoothUniformVertexTest {
 
@@ -25,7 +26,7 @@ public class SmoothUniformVertexTest {
 
         SmoothUniformVertex tensorSmoothUniformVertex = new SmoothUniformVertex(0, 1);
         SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
-        double expectedDensity = smoothUniformVertex.logPdf(0.5);
+        double expectedDensity = smoothUniformVertex.logProb(DoubleTensor.scalar(0.5));
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorSmoothUniformVertex, 0.5, expectedDensity);
     }
@@ -34,7 +35,7 @@ public class SmoothUniformVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1);
-        double expectedLogDensity = smoothUniformVertex.logPdf(0.25) + smoothUniformVertex.logPdf(0.75);
+        double expectedLogDensity = smoothUniformVertex.logProb(DoubleTensor.scalar(0.25)) + smoothUniformVertex.logProb(DoubleTensor.scalar(0.75));
         SmoothUniformVertex tensorSmoothUniformVertex = new SmoothUniformVertex(0, 1);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorSmoothUniformVertex,
@@ -49,24 +50,24 @@ public class SmoothUniformVertexTest {
         SmoothUniformVertex smoothUniformVertex = new SmoothUniformVertex(0, 1, 10);
         SmoothUniformVertex tensorSmoothUniformVertex = new SmoothUniformVertex(0, 1, 10);
 
-        Map<Long, DoubleTensor> derivativeFlatRegion = smoothUniformVertex.dLogPdf(0.5);
-        Map<Long, DoubleTensor> tensorDerivativeFlatRegion = tensorSmoothUniformVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> derivativeFlatRegion = smoothUniformVertex.dLogProb(DoubleTensor.scalar(0.5));
+        Map<Long, DoubleTensor> tensorDerivativeFlatRegion = tensorSmoothUniformVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         assertEquals(derivativeFlatRegion.get(smoothUniformVertex.getId()).scalar(),
             tensorDerivativeFlatRegion.get(tensorSmoothUniformVertex.getId()).scalar(),
             DELTA
         );
 
-        Map<Long, DoubleTensor> derivativeLeftRegion = smoothUniformVertex.dLogPdf(-0.5);
-        Map<Long, DoubleTensor> tensorDerivativeLeftRegion = tensorSmoothUniformVertex.dLogPdf(-0.5);
+        Map<Long, DoubleTensor> derivativeLeftRegion = smoothUniformVertex.dLogProb(DoubleTensor.scalar(-0.5));
+        Map<Long, DoubleTensor> tensorDerivativeLeftRegion = tensorSmoothUniformVertex.dLogProb(DoubleTensor.scalar(-0.5));
 
         assertEquals(derivativeLeftRegion.get(smoothUniformVertex.getId()).scalar(),
             tensorDerivativeLeftRegion.get(tensorSmoothUniformVertex.getId()).scalar(),
             DELTA
         );
 
-        Map<Long, DoubleTensor> derivativeRightRegion = smoothUniformVertex.dLogPdf(1.5);
-        Map<Long, DoubleTensor> tensorDerivativeRightRegion = tensorSmoothUniformVertex.dLogPdf(1.5);
+        Map<Long, DoubleTensor> derivativeRightRegion = smoothUniformVertex.dLogProb(DoubleTensor.scalar(1.5));
+        Map<Long, DoubleTensor> tensorDerivativeRightRegion = tensorSmoothUniformVertex.dLogProb(DoubleTensor.scalar(1.5));
 
         assertEquals(derivativeRightRegion.get(smoothUniformVertex.getId()).scalar(),
             tensorDerivativeRightRegion.get(tensorSmoothUniformVertex.getId()).scalar(),

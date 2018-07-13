@@ -7,7 +7,6 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -59,7 +58,7 @@ public class InverseGammaVertexTest {
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
@@ -79,9 +78,7 @@ public class InverseGammaVertexTest {
         UniformVertex bTensor = new UniformVertex(0.0, 1.0);
         bTensor.setValue(1.0);
 
-        Supplier<ProbabilisticDouble> vertexSupplier = () -> new InverseGammaVertex(aTensor, bTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new InverseGammaVertex(aTensor, bTensor));
     }
 
     @Test

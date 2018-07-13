@@ -7,7 +7,6 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.commons.math3.distribution.LogNormalDistribution;
 import org.junit.Before;
@@ -61,7 +60,7 @@ public class LogNormalVertexTest {
         sigmaTensor.setValue(1.0);
 
         LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(muTensor, sigmaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
@@ -81,9 +80,7 @@ public class LogNormalVertexTest {
         UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        Supplier<ProbabilisticDouble> vertexSupplier = () -> new LogNormalVertex(muTensor, sigmaTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new LogNormalVertex(muTensor, sigmaTensor));
     }
 
     @Test

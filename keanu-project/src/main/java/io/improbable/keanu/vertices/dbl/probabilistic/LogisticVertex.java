@@ -8,12 +8,14 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class LogisticVertex extends ProbabilisticDouble {
+public class LogisticVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
@@ -28,6 +30,7 @@ public class LogisticVertex extends ProbabilisticDouble {
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
 

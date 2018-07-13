@@ -7,7 +7,6 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Supplier;
 
 import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.junit.Before;
@@ -62,7 +61,7 @@ public class LaplaceVertexTest {
         betaTensor.setValue(1.0);
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
@@ -82,9 +81,7 @@ public class LaplaceVertexTest {
         UniformVertex betaTensor = new UniformVertex(0.0, 1.0);
         betaTensor.setValue(1.0);
 
-        Supplier<ProbabilisticDouble> vertexSupplier = () -> new LaplaceVertex(muTensor, betaTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new LaplaceVertex(muTensor, betaTensor));
     }
 
     @Test

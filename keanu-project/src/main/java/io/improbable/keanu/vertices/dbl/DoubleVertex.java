@@ -31,9 +31,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.Sigmoid
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
+public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
     public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater) {
         super(valueUpdater);
@@ -190,5 +191,14 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     public double getValue(int... index) {
         return getValue().getValue(index);
+    }
+
+    @Override
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+        if (isObserved()) {
+            return DualNumber.createConstant(getValue());
+        } else {
+            return DualNumber.createWithRespectToSelf(getId(), getValue());
+        }
     }
 }

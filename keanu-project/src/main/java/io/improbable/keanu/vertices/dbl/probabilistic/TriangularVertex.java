@@ -7,11 +7,13 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class TriangularVertex extends ProbabilisticDouble {
+public class TriangularVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -28,6 +30,7 @@ public class TriangularVertex extends ProbabilisticDouble {
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 

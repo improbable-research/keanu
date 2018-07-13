@@ -8,12 +8,14 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class ExponentialVertex extends ProbabilisticDouble {
+public class ExponentialVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final DoubleVertex location;
     private final DoubleVertex lambda;
@@ -32,6 +34,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
      *                    vertex or location scalar.
      */
     public ExponentialVertex(int[] tensorShape, DoubleVertex location, DoubleVertex lambda) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), lambda.getShape());
 

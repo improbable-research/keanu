@@ -8,12 +8,14 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class InverseGammaVertex extends ProbabilisticDouble {
+public class InverseGammaVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -28,6 +30,8 @@ public class InverseGammaVertex extends ProbabilisticDouble {
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+        super(new ProbabilisticValueUpdater<>());
+
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;

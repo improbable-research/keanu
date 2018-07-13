@@ -1,6 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static java.lang.Math.pow;
+
+import static junit.framework.TestCase.assertEquals;
+
+import java.util.List;
+
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
@@ -9,10 +14,8 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-
-import static java.lang.Math.pow;
-import static junit.framework.TestCase.assertEquals;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class StudentTVertexTest {
     private static final double DELTA = 0.0001;
@@ -78,7 +81,7 @@ public class StudentTVertexTest {
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected = apache.logDensity(t);
-            double actual = studentT.logPdf(t);
+            double actual = studentT.logProb(DoubleTensor.scalar(t));
             assertEquals(expected, actual, DELTA);
         }
     }
@@ -88,7 +91,7 @@ public class StudentTVertexTest {
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected;
-            double actual = studentT.dLogPdf(t).get(studentT.getId()).scalar();
+            double actual = studentT.dLogProb(DoubleTensor.scalar(t)).get(studentT.getId()).scalar();
             switch (v) {
                 case 1:
                     expected = (-2 * t) / (pow(t, 2) + 1.);
