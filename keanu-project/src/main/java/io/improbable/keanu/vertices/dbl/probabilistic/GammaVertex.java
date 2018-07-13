@@ -7,6 +7,7 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -31,7 +32,7 @@ public class GammaVertex extends DoubleVertex implements Probabilistic<DoubleTen
      * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex or location scalar
      */
     public GammaVertex(int[] tensorShape, DoubleVertex location, DoubleVertex theta, DoubleVertex k) {
-        super(new ProbabilisticValueUpdater<>());
+        super(new ProbabilisticValueUpdater<>(), new Observation<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), theta.getShape(), k.getShape());
 

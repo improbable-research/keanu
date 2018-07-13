@@ -8,13 +8,15 @@ import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble implements Differentiable {
+public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differentiable {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
@@ -26,7 +28,10 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble implement
                                 Vertex<B> b,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        super(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(a.getValue(), b.getValue()));
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(a.getValue(), b.getValue())),
+            new Observation<>()
+        );
         this.a = a;
         this.b = b;
         this.op = op;

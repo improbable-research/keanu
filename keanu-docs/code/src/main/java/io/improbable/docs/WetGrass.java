@@ -1,14 +1,15 @@
 package io.improbable.docs;
 
+import java.util.Arrays;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-
-import java.util.Arrays;
 
 public class WetGrass {
 
@@ -38,7 +39,7 @@ public class WetGrass {
         );
 
         //We observe that the grass is wet
-        wetGrass.observe(true);
+        wetGrass.observe(BooleanTensor.scalar(true));
 
         //What does that observation say about the probability that it rained or that
         //the sprinkler was on?

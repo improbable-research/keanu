@@ -5,6 +5,7 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -28,7 +29,7 @@ public class SelectVertex<T> extends Vertex<T> implements Probabilistic<T> {
     }
 
     public SelectVertex(Map<T, DoubleVertex> selectableValues) {
-        super(new ProbabilisticValueUpdater<>());
+        super(new ProbabilisticValueUpdater<>(), new Observation<>());
         this.selectableValues = selectableValues;
         setParents(this.selectableValues.values());
     }

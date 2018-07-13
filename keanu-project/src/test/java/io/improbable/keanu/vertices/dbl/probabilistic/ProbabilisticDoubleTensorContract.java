@@ -226,7 +226,7 @@ public class ProbabilisticDoubleTensorContract {
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static <T extends DoubleVertex & Probabilistic> void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<T> vertexUnderTestSupplier) {
+    public static <T extends DoubleVertex & Probabilistic<DoubleTensor>> void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<T> vertexUnderTestSupplier) {
 
         DoubleVertex[] scalarVertices = new DoubleVertex[vector.length];
         PartialDerivatives tensorPartialDerivatives = new PartialDerivatives(new HashMap<>());

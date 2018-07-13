@@ -1,13 +1,15 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class GraphOptimizerTest {
 
@@ -22,7 +24,7 @@ public class GraphOptimizerTest {
 
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
 
-        Cobserved.observe(44.0);
+        Cobserved.observe(DoubleTensor.scalar(44.0));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
@@ -46,7 +48,7 @@ public class GraphOptimizerTest {
 
         DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
 
-        Cobserved.observe(46.0);
+        Cobserved.observe(DoubleTensor.scalar(46.0));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 

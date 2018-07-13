@@ -1,18 +1,22 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class MultiplexerVertex<T> extends NonProbabilistic<T> {
+public class MultiplexerVertex<T> extends Vertex<T> {
 
     private final IntegerVertex selectorControlVertex;
     private final Vertex<T>[] selectVertices;
 
     public MultiplexerVertex(IntegerVertex selectorControlVertex, Vertex<T>... select) {
-        super(v -> ((MultiplexerVertex<T>) v).getSelector().getValue());
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((MultiplexerVertex<T>) v).getSelector().getValue()),
+            new Observation<>()
+        );
 
         if (!TensorShape.isScalar(selectorControlVertex.getShape())) {
             throw new IllegalArgumentException("Select control must be scalar integer");

@@ -1,16 +1,17 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+
+public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
     private final Map<Condition, ? extends Vertex<OUT>> conditions;
@@ -19,7 +20,10 @@ public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
     public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
                      Map<Condition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
-        super(v -> ((CPTVertex<OUT>)v).getDerivedValue());
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((CPTVertex<OUT>)v).getDerivedValue()),
+            new Observation<>()
+        );
         this.conditions = conditions;
         this.inputs = inputs;
         this.defaultResult = defaultResult;

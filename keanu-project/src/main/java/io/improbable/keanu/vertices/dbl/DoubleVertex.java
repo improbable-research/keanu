@@ -6,8 +6,9 @@ import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Observable;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
@@ -34,10 +35,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVert
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
+public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
-    public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater) {
-        super(valueUpdater);
+    public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater, Observable<DoubleTensor> observation) {
+        super(valueUpdater, observation);
     }
 
     public DoubleVertex minus(DoubleVertex that) {
@@ -179,14 +180,6 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     public void setAndCascade(double[] values) {
         super.setAndCascade(DoubleTensor.create(values, getShape()));
-    }
-
-    public void observe(double value) {
-        super.observe(DoubleTensor.create(value, getShape()));
-    }
-
-    public void observe(double[] values) {
-        super.observe(DoubleTensor.create(values, getShape()));
     }
 
     public double getValue(int... index) {

@@ -1,22 +1,30 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BoolReduceVertex extends NonProbabilisticBool {
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+
+public class BoolReduceVertex extends BoolVertex {
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
     public BoolReduceVertex(int[] shape, Collection<Vertex<BooleanTensor>> input,
                             BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
-        super(v -> ((BoolReduceVertex) v).applyReduce(Vertex::getValue)); // TODO: remove
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((BoolReduceVertex) v).applyReduce(Vertex::getValue)),
+            new Observation<>()
+        );
         if (input.size() < 2) {
             throw new IllegalArgumentException("BoolReduceVertex should have at least two input vertices, called with " + input.size());
         }

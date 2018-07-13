@@ -7,7 +7,7 @@ import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public interface Probabilistic<T> {
+public interface Probabilistic<T> extends Observable<T> {
 
     /**
      * This is the natural log of the probability at the supplied value. In the

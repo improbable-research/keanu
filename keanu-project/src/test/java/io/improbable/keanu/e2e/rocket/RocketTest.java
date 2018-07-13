@@ -1,5 +1,13 @@
 package io.improbable.keanu.e2e.rocket;
 
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import io.improbable.keanu.algorithms.sampling.RejectionSampler;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -7,12 +15,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
-import static org.junit.Assert.assertEquals;
 
 public class RocketTest {
     private final Logger log = LoggerFactory.getLogger(RocketTest.class);
@@ -60,8 +62,8 @@ public class RocketTest {
         double probOfAlarm2 = priorProbabilityTrue(alarm2, 10000, random);
         log.info("Prior Probability alarm2 sounds: " + probOfAlarm2);
 
-        alarm1.observe(true);
-        alarm2.observe(false);
+        alarm1  .observe(BooleanTensor.scalar(true));
+        alarm2.observe(BooleanTensor.scalar(false));
 
         BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
 

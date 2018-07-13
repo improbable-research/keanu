@@ -1,9 +1,10 @@
 package io.improbable.keanu.vertices.intgr;
 
+import java.util.function.Function;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.DiscreteVertex;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -16,13 +17,10 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-import java.util.Map;
-import java.util.function.Function;
+public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
-public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
-
-    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater) {
-        super(valueUpdater);
+    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater, Observable<IntegerTensor> observation) {
+        super(valueUpdater, observation);
     }
 
     public IntegerVertex minus(IntegerVertex that) {
@@ -124,14 +122,6 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
 
     public void setAndCascade(int[] values) {
         super.setAndCascade(IntegerTensor.create(values, getShape()));
-    }
-
-    public void observe(int value) {
-        super.observe(IntegerTensor.create(value, getShape()));
-    }
-
-    public void observe(int[] values) {
-        super.observe(IntegerTensor.create(values));
     }
 
     public int getValue(int... index) {

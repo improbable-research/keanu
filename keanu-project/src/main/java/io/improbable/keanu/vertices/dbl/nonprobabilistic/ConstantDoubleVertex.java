@@ -5,14 +5,20 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Observation;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConstantDoubleVertex extends NonProbabilisticDouble implements Differentiable {
+public class ConstantDoubleVertex extends DoubleVertex implements Differentiable {
 
     public ConstantDoubleVertex(DoubleTensor constant) {
-        super(v -> v.getValue());
+        super(
+            new NonProbabilisticValueUpdater<>(v -> v.getValue()),
+            new Observation<>()
+        );
         setValue(constant);
     }
 

@@ -8,6 +8,7 @@ import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Observation;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -28,7 +29,7 @@ public class ChiSquaredVertex extends DoubleVertex implements Probabilistic<Doub
      * @param k           the number of degrees of freedom
      */
     public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
-        super(new ProbabilisticValueUpdater<>());
+        super(new ProbabilisticValueUpdater<>(), new Observation<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 

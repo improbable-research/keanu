@@ -5,7 +5,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.DiscreteVertex;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
@@ -13,21 +13,21 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.And
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
+public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
-    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater) {
-        super(valueUpdater);
+    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater, Observable<BooleanTensor> observation) {
+        super(valueUpdater, observation);
     }
 
     @SafeVarargs
-    public final io.improbable.keanu.vertices.bool.BoolVertex or(Vertex<BooleanTensor>... those) {
+    public final BoolVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new OrBinaryVertex(this, those[0]);
         return new OrMultipleVertex(inputList(those));
     }
 
     @SafeVarargs
-    public final io.improbable.keanu.vertices.bool.BoolVertex and(Vertex<BooleanTensor>... those) {
+    public final BoolVertex and(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
         return new AndMultipleVertex(inputList(those));
@@ -54,14 +54,6 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
 
     public void setAndCascade(boolean[] values) {
         super.setAndCascade(BooleanTensor.create(values, getShape()));
-    }
-
-    public void observe(boolean value) {
-        super.observe(BooleanTensor.create(value, getShape()));
-    }
-
-    public void observe(boolean[] values) {
-        super.observe(BooleanTensor.create(values, getShape()));
     }
 
     public boolean getValue(int... index) {
