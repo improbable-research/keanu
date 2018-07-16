@@ -4,6 +4,7 @@ package com.example.coal;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -78,7 +79,7 @@ public class Model {
 
         PoissonVertex disastersForYear = new PoissonVertex(rateForYear);
 
-        disastersForYear.observe(data.disasters);
+        disastersForYear.observe(IntegerTensor.create(data.disasters));
 
         return new BayesianNetwork(switchpoint.getConnectedGraph());
     }

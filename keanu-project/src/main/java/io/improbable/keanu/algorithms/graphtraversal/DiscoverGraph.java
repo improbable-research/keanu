@@ -5,7 +5,6 @@ import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Vertex;
 
 public class DiscoverGraph {
@@ -46,7 +45,7 @@ public class DiscoverGraph {
                 }
             }
 
-            for (IVertex<?> parent : visiting.getParents()) {
+            for (Vertex<?> parent : visiting.getParents()) {
                 if (!discoveredGraph.contains(parent)) {
                     stack.addFirst((Vertex)parent);
                     discoveredGraph.add((Vertex)parent);

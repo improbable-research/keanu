@@ -12,13 +12,13 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class Vertex<T> implements IVertex, Observable<T> {
+public abstract class Vertex<T> implements IVertex<T, Vertex<?>>, Observable<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private Set<Vertex> children = new HashSet<>();
-    private Set<Vertex> parents = new HashSet<>();
+    private Set<Vertex<?>> children = new HashSet<>();
+    private Set<Vertex<?>> parents = new HashSet<>();
     private T value;
     private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
@@ -94,6 +94,7 @@ public abstract class Vertex<T> implements IVertex, Observable<T> {
      *
      * @param value the observed value
      */
+    @Override
     public void setValue(T value) {
         if (!observation.isObserved()) {
             this.value = value;
@@ -104,6 +105,7 @@ public abstract class Vertex<T> implements IVertex, Observable<T> {
         return hasValue() ? value : lazyEval();
     }
 
+    @Override
     public boolean hasValue() {
         if (value instanceof Tensor) {
             return !((Tensor) value).isShapePlaceholder();
@@ -165,7 +167,7 @@ public abstract class Vertex<T> implements IVertex, Observable<T> {
         return uuid;
     }
 
-    public Set<Vertex> getChildren() {
+    public Set<Vertex<?>> getChildren() {
         return children;
     }
 
@@ -192,7 +194,7 @@ public abstract class Vertex<T> implements IVertex, Observable<T> {
     }
 
     @Override
-    public Set<? extends IVertex> getParents() {
+    public Set<? extends Vertex<?>> getParents() {
         return this.parents;
     }
 

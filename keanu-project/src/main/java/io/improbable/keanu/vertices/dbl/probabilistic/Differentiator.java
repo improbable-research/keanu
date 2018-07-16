@@ -7,18 +7,20 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class Differentiator {
-    public DualNumber calculateDual(Differentiable vertex) {
+    public <V extends IVertex<DoubleTensor, Vertex<?>> & Differentiable> DualNumber calculateDual(V vertex) {
         Map<IVertex, DualNumber> dualNumbers = new HashMap<>();
-        Deque<Differentiable> stack = new ArrayDeque<>();
+        Deque<V> stack = new ArrayDeque<>();
         stack.push(vertex);
 
         while (!stack.isEmpty()) {
 
-            Differentiable head = stack.peek();
+            V head = stack.peek();
             Set<IVertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
@@ -31,7 +33,7 @@ public class Differentiator {
 
                 for (IVertex parent : parentsThatDualNumberIsNotCalculated) {
                     if (parent instanceof Differentiable) {
-                        stack.push((Differentiable) parent);
+                        stack.push((V) parent);
                     } else {
                         throw new IllegalArgumentException("Can only calculate Dual Numbers on a graph made of Differentiable vertices");
                     }
