@@ -4,20 +4,20 @@ public class Observation<T> implements Observable<T> {
     // package private
     Observation() {}
 
-    private T value = null;
+    private T observedValue = null;
 
     @Override
     public void observe(T value) {
-        this.value = value;
+        this.observedValue = value;
     }
 
     @Override
     public void unobserve() {
-        this.value = null;
+        this.observedValue = null;
     }
 
     @Override
     public boolean isObserved() {
-        return this.value != null;
+        return this.observedValue != null;
     }
 }
