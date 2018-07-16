@@ -4,9 +4,10 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> {
+public abstract class UnaryOpVertex<IN, OUT> extends GenericVertex<OUT> {
 
     protected final Vertex<IN> inputVertex;
 

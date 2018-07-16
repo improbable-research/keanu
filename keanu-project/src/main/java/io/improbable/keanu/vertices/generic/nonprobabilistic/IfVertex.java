@@ -5,9 +5,10 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class IfVertex<T> extends Vertex<Tensor<T>> {
+public class IfVertex<T> extends GenericVertex<Tensor<T>> {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends Tensor<T>> thn;

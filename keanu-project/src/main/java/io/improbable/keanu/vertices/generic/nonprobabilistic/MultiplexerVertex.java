@@ -4,10 +4,11 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class MultiplexerVertex<T> extends Vertex<T> {
+public class MultiplexerVertex<T> extends GenericVertex<T> {
 
     private final IntegerVertex selectorControlVertex;
     private final Vertex<T>[] selectVertices;

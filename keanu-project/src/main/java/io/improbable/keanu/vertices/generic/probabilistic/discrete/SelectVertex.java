@@ -7,12 +7,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class SelectVertex<T> extends Vertex<T> implements Probabilistic<T> {
+public class SelectVertex<T> extends GenericVertex<T> implements Probabilistic<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
 

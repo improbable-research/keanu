@@ -3,9 +3,10 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class BinaryOpVertex<A, B, C> extends Vertex<C> {
+public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;

@@ -9,9 +9,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.generic.GenericVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> {
+public class CPTVertex<OUT extends Tensor> extends GenericVertex<OUT> {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
     private final Map<Condition, ? extends Vertex<OUT>> conditions;
