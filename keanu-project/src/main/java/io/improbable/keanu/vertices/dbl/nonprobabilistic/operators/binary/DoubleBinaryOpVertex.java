@@ -18,10 +18,10 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
      * @param a a vertex
      * @param b a vertex
      */
-    public DoubleBinaryOpVertex(int[] shape, DoubleVertex a, DoubleVertex b) {
-        this.a = a;
-        this.b = b;
-        setParents(a, b);
+    public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
+        this.left = left;
+        this.right = right;
+        setParents(left, right);
         setValue(DoubleTensor.placeHolder(shape));
     }
 
@@ -36,5 +36,13 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
     }
 
     protected abstract DoubleTensor op(DoubleTensor a, DoubleTensor b);
+
+    public DoubleVertex getLeft(){
+        return left;
+    }
+
+    public DoubleVertex getRight(){
+        return right;
+    }
 
 }

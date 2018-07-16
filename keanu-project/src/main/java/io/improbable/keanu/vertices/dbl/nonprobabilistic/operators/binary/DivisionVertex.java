@@ -10,10 +10,6 @@ import java.util.Map;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public class DivisionVertex extends DoubleBinaryOpVertex {
-
-    private final DoubleVertex dividend;
-    private final DoubleVertex divsor;
-
     /**
      * Divides one vertex by another
      *
@@ -22,16 +18,14 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
      */
     public DivisionVertex(DoubleVertex a, DoubleVertex b) {
         super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
-        this.dividend = a;
-        this.divsor = b;
     }
 
     public DoubleVertex getDividend(){
-        return dividend;
+        return super.getLeft();
     }
 
     public DoubleVertex getDivsor(){
-        return divsor;
+        return super.getRight();
     }
 
     @Override
