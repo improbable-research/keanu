@@ -25,21 +25,9 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
     
     // New tensor Ops and transforms
     
-    T minus(T that);
-
-    T plus(T that);
-
-    T times(T that);
-
-    T div(T that);
-
-    T pow(T exponent);
-    
     T matrixMultiply(T value);
 
     T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
-    
-    T unaryMinus();
     
     T abs();
 
