@@ -1,12 +1,14 @@
 package io.improbable.keanu.tensor.intgr;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
+import com.google.common.math.IntMath;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
@@ -281,7 +283,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor powInPlace(int exponent) {
-        value = (int) Math.pow(value, exponent);
+        value = IntMath.pow(value, exponent);
         return this;
     }
 

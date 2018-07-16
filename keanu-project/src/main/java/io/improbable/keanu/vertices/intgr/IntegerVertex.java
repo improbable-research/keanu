@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
@@ -55,6 +56,11 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerDivisionVertex(this, new CastIntegerVertex(that));
     }
 
+    @Override
+    public IntegerVertex pow(IntegerVertex exponent) {
+        return new IntegerPowerVertex(this, exponent);
+    }
+
     public IntegerVertex minus(int value) {
         return new IntegerDifferenceVertex(this, new ConstantIntegerVertex(value));
     }
@@ -69,6 +75,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public IntegerVertex divideBy(int divisor) {
         return new IntegerDivisionVertex(this, new ConstantIntegerVertex(divisor));
+    }
+
+    public IntegerVertex pow(int exponent) {
+        return new IntegerPowerVertex(this, new ConstantIntegerVertex(exponent));
     }
 
     public IntegerVertex abs() {

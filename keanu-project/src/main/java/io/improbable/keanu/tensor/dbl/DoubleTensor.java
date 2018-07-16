@@ -2,11 +2,12 @@ package io.improbable.keanu.tensor.dbl;
 
 import java.util.Arrays;
 
+import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public interface DoubleTensor extends NumberTensor<Double, DoubleTensor> {
+public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
     DoubleTensor ZERO_SCALAR = scalar(0.0);
 
