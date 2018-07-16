@@ -40,7 +40,7 @@ public class DiabetesLinearRegression {
         y.observe(data.y);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
         optimizer.maxLikelihood();
 
         assertEquals(938.2378, weight.getValue().scalar(), 0.01);

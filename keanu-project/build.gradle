@@ -9,6 +9,7 @@ buildscript {
 }
 
 plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'java'
     id 'maven'
 }
@@ -134,4 +135,9 @@ tasks.withType(Javadoc) {
 
 artifacts {
     archives javadocJar, sourcesJar
+}
+
+lombok { // optional: values below are the defaults
+    version = "1.16.20"
+    sha256 = ""
 }
