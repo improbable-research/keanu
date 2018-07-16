@@ -8,15 +8,15 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 
 public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
 
-    protected final DoubleVertex a;
-    protected final DoubleVertex b;
+    protected final DoubleVertex left;
+    protected final DoubleVertex right;
 
     /**
      * A vertex that performs a user defined operation on two vertices
      *
      * @param shape the shape of the resulting vertex
-     * @param a a vertex
-     * @param b a vertex
+     * @param left a vertex
+     * @param right a vertex
      */
     public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
         this.left = left;
