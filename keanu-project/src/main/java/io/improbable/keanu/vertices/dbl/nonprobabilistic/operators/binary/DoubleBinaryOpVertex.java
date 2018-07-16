@@ -27,15 +27,15 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
+        return op(left.sample(random), right.sample(random));
     }
 
     @Override
     public DoubleTensor getDerivedValue() {
-        return op(a.getValue(), b.getValue());
+        return op(left.getValue(), right.getValue());
     }
 
-    protected abstract DoubleTensor op(DoubleTensor a, DoubleTensor b);
+    protected abstract DoubleTensor op(DoubleTensor left, DoubleTensor right);
 
     public DoubleVertex getLeft(){
         return left;

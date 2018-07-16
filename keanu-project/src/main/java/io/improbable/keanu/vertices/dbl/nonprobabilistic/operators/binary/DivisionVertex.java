@@ -13,11 +13,11 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     /**
      * Divides one vertex by another
      *
-     * @param a the vertex to be divided
-     * @param b the vertex to divide
+     * @param left the vertex to be divided
+     * @param right the vertex to divide
      */
-    public DivisionVertex(DoubleVertex a, DoubleVertex b) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+    public DivisionVertex(DoubleVertex left, DoubleVertex right) {
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
     }
 
     public DoubleVertex getDividend(){
@@ -30,13 +30,13 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber aDual = dualNumbers.get(a);
-        DualNumber bDual = dualNumbers.get(b);
-        return aDual.divideBy(bDual);
+        DualNumber leftDual = dualNumbers.get(left);
+        DualNumber rightDual = dualNumbers.get(right);
+        return leftDual.divideBy(rightDual);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
-        return a.div(b);
+    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
+        return left.div(right);
     }
 }
