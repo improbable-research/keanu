@@ -1,13 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-public interface DoubleTensor extends NumberTensor<Double> {
+public interface DoubleTensor extends NumberTensor<Double, DoubleTensor> {
 
     DoubleTensor ZERO_SCALAR = scalar(0.0);
 
@@ -121,32 +120,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor exp();
 
-    DoubleTensor minus(DoubleTensor that);
-
-    DoubleTensor plus(DoubleTensor that);
-
-    DoubleTensor times(DoubleTensor that);
-
-    DoubleTensor div(DoubleTensor that);
-
-    DoubleTensor unaryMinus();
-
-    DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis);
-
-    DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis);
-
-    DoubleTensor getLessThanMask(DoubleTensor lessThanThis);
-
-    DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
-
-    DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value);
-
-    DoubleTensor setWithMask(DoubleTensor mask, double value);
-
-    DoubleTensor abs();
-
-    DoubleTensor apply(Function<Double, Double> function);
-
     DoubleTensor max(DoubleTensor max);
 
     DoubleTensor inverse();
@@ -194,8 +167,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor divInPlace(double value);
 
-    DoubleTensor powInPlace(DoubleTensor exponent);
-
     DoubleTensor powInPlace(double exponent);
 
     DoubleTensor sqrtInPlace();
@@ -220,20 +191,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor expInPlace();
 
-    DoubleTensor minusInPlace(DoubleTensor that);
-
-    DoubleTensor plusInPlace(DoubleTensor that);
-
-    DoubleTensor timesInPlace(DoubleTensor that);
-
-    DoubleTensor divInPlace(DoubleTensor that);
-
-    DoubleTensor unaryMinusInPlace();
-
-    DoubleTensor absInPlace();
-
-    DoubleTensor applyInPlace(Function<Double, Double> function);
-
     DoubleTensor maxInPlace(DoubleTensor max);
 
     DoubleTensor minInPlace(DoubleTensor max);
@@ -255,16 +212,9 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     BooleanTensor lessThanOrEqual(double value);
 
-    BooleanTensor lessThan(DoubleTensor value);
-
-    BooleanTensor lessThanOrEqual(DoubleTensor value);
-
     BooleanTensor greaterThan(double value);
 
     BooleanTensor greaterThanOrEqual(double value);
 
-    BooleanTensor greaterThan(DoubleTensor value);
-
-    BooleanTensor greaterThanOrEqual(DoubleTensor value);
 
 }
