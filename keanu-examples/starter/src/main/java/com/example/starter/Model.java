@@ -66,8 +66,8 @@ public class Model {
         //Expose model results
         results = (A.getValue().scalar() + B.getValue().scalar());
 
-        System.out.println("A is most probably " + A.getValue());
-        System.out.println("B is most probably " + B.getValue());
+        System.out.println("A is most probably " + A.getValue().scalar());
+        System.out.println("B is most probably " + B.getValue().scalar());
         System.out.println("Most probable actual value of the sum " + results);
 
     }
