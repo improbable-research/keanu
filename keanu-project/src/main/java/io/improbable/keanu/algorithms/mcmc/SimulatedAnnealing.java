@@ -2,13 +2,15 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.mcmc.proposals.PriorProposal;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
@@ -59,21 +61,19 @@ public class SimulatedAnnealing {
         Map<Long, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
-        Map<Vertex, LambdaSection> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices, true);
-
         double logP = bayesNet.getLogOfMasterP();
         double maxLogP = logP;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
+
+        MCMCStep mcmcStep = new MCMCStep(latentVertices, PriorProposal.SINGLETON, true);
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
-            logP = MetropolisHastings.nextSample(
+            logP = mcmcStep.nextSample(
                 Collections.singleton(chosenVertex),
-                affectedVerticesCache,
-                PriorProposal.SINGLETON,
                 logP,
                 temperature,
                 random

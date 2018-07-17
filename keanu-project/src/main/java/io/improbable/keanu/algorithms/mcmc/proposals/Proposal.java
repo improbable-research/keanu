@@ -43,4 +43,20 @@ public class Proposal {
         }
     }
 
+    public double logProbAtProposalFrom() {
+        double sumLogProb = 0.0;
+        for (Vertex v : perVertexProposalTo.keySet()) {
+            sumLogProb += v.logProb(getProposalFrom(v));
+        }
+        return sumLogProb;
+    }
+
+    public double logProbAtProposalTo() {
+        double sumLogProb = 0.0;
+        for (Vertex v : perVertexProposalTo.keySet()) {
+            sumLogProb += v.logProb(getProposalTo(v));
+        }
+        return sumLogProb;
+    }
+
 }
