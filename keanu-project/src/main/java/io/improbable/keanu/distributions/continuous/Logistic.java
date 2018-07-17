@@ -1,10 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.List;
-
-import com.google.common.collect.ImmutableList;
+import static io.improbable.keanu.distributions.dual.Duals.MU;
+import static io.improbable.keanu.distributions.dual.Duals.S;
+import static io.improbable.keanu.distributions.dual.Duals.X;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -43,7 +44,7 @@ public class Logistic implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Duals dLogProb(DoubleTensor x) {
         final DoubleTensor expAOverB = mu.div(s).expInPlace();
         final DoubleTensor expXOverB = x.div(s).expInPlace();
         final DoubleTensor expPlus = expAOverB.plus(expXOverB);
@@ -61,6 +62,9 @@ public class Logistic implements ContinuousDistribution {
 
         final DoubleTensor dPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
-        return ImmutableList.of(dPdmu, dPds, dPdx);
+        return new Duals()
+            .put(MU, dPdmu)
+            .put(S, dPds)
+            .put(X, dPdx);
     }
 }

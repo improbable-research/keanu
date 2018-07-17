@@ -1,17 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Duals.T;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.HashMap;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.StudentT;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class StudentTVertex extends ProbabilisticDouble {
 
@@ -55,9 +56,9 @@ public class StudentTVertex extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
-        List<DoubleTensor> diff = StudentT.withParameters(v.getValue()).dLogProb(t);
+        Duals diff = StudentT.withParameters(v.getValue()).dLogProb(t);
         Map<Long, DoubleTensor> m = new HashMap<>();
-        m.put(getId(), diff.get(0));
+        m.put(getId(), diff.get(T).getValue());
         return m;
     }
 

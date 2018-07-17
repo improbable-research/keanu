@@ -5,13 +5,15 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-import java.util.List;
+import static io.improbable.keanu.distributions.dual.Duals.A;
+import static io.improbable.keanu.distributions.dual.Duals.K;
+import static io.improbable.keanu.distributions.dual.Duals.THETA;
+import static io.improbable.keanu.distributions.dual.Duals.X;
 
 import org.nd4j.linalg.util.ArrayUtil;
 
-import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -117,7 +119,7 @@ public class Gamma implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Duals dLogProb(DoubleTensor x) {
         final DoubleTensor xMinusA = x.minus(location);
         final DoubleTensor aMinusX = location.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
@@ -128,7 +130,11 @@ public class Gamma implements ContinuousDistribution {
         final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
         final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
-        return ImmutableList.of(dPda, dPdtheta, dPdk, dPdx);
+        return new Duals()
+        .put(A, dPda)
+        .put(THETA, dPdtheta)
+        .put(K, dPdk)
+        .put(X, dPdx);
     }
 
 }

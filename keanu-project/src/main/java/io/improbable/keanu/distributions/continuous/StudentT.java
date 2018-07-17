@@ -1,16 +1,17 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.collect.ImmutableList;
+import static java.lang.Math.PI;
+import static java.lang.Math.log;
+
+import static io.improbable.keanu.distributions.dual.Duals.T;
+
+import org.apache.commons.math3.special.Gamma;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.special.Gamma;
-
-import java.util.List;
-
-import static java.lang.Math.PI;
-import static java.lang.Math.log;
 
 /**
  * Student T Distribution
@@ -66,7 +67,7 @@ public class StudentT implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor t) {
+    public Duals dLogProb(DoubleTensor t) {
         DoubleTensor vAsDouble = v.toDouble();
         DoubleTensor dPdt = t.unaryMinus()
             .timesInPlace(vAsDouble.plus(1.0))
@@ -74,6 +75,7 @@ public class StudentT implements ContinuousDistribution {
                 t.pow(2).plusInPlace(vAsDouble)
             );
 
-        return ImmutableList.of(dPdt);
+        return new Duals()
+            .put(T, dPdt);
     }
 }

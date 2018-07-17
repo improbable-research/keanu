@@ -1,8 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
-import java.util.List;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -57,7 +56,7 @@ public class Triangular implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Duals dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
 

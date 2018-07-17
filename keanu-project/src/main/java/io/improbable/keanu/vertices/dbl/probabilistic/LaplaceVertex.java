@@ -1,17 +1,20 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Duals.BETA;
+import static io.improbable.keanu.distributions.dual.Duals.MU;
+import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Laplace;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LaplaceVertex extends ProbabilisticDouble {
 
@@ -73,8 +76,9 @@ public class LaplaceVertex extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        List<DoubleTensor> dlnP = Laplace.withParameters(mu.getValue(), beta.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
+        Duals dlnP = Laplace.withParameters(mu.getValue(), beta.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(BETA).getValue(), dlnP.get(X).getValue());
+
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,

@@ -1,17 +1,19 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static java.util.Collections.singletonMap;
+
+import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-import static java.util.Collections.singletonMap;
 
 public class SmoothUniformVertex extends ProbabilisticDouble {
 
@@ -124,7 +126,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
-        final DoubleTensor dPdfdx = distribution.dLogProb(value).get(0);
+        final DoubleTensor dPdfdx = distribution.dLogProb(value).get(X).getValue();
         final DoubleTensor density = distribution.logProb(value);
         final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
 

@@ -1,10 +1,9 @@
 package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Duals;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.List;
 
 /**
  * Computer Generation of Statistical Distributions
@@ -46,7 +45,7 @@ public class Uniform implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Duals dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
 }
