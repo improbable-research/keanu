@@ -7,8 +7,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Function;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
@@ -18,6 +17,12 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
     private final int dimension;
     private final DoubleVertex[] input;
 
+    /**
+     * A vertex that can concatenate any amount of vertices along a given dimension.
+     *
+     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
+     * @param input the input vertices to concatenate
+     */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
         this.dimension = dimension;
         this.input = input;
@@ -34,7 +39,20 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return null;
+        Map<Long, DoubleTensor> concatDerivates = new HashMap<>();
+        Map<Long, List<DoubleTensor>> partialDerivates = new HashMap<>();
+
+        for (DoubleVertex vertex : input) {
+            for (Map.Entry<Long, DoubleTensor> partial : dualNumbers.get(vertex).getPartialDerivatives().asMap().entrySet()) {
+                partialDerivates.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
+            }
+        }
+
+        for (Map.Entry<Long, List<DoubleTensor>> partial : partialDerivates.entrySet()) {
+            concatDerivates.put(partial.getKey(), concatPartialDerivates(partial.getValue()));
+        }
+
+        return new DualNumber(dualNumbers.get(input[0]).getValue(), concatDerivates);
     }
 
     @Override
@@ -53,6 +71,16 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
             extract[i] = func.apply(i);
         }
         return extract;
+    }
+
+    private DoubleTensor concatPartialDerivates(List<DoubleTensor> partialDerivates) {
+        if (partialDerivates.size() == 1) {
+            return partialDerivates.get(0);
+        } else {
+            DoubleTensor primaryTensor = partialDerivates.remove(0);
+            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
+            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+        }
     }
 
 
