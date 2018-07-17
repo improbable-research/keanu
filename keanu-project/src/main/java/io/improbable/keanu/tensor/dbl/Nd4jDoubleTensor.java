@@ -772,6 +772,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new LUDecomposition(matrix).getDeterminant();
     }
 
+    @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        INDArray dup = tensor.dup();
+        INDArray[] toConcat = new INDArray[those.length + 1];
+        toConcat[0] = dup;
+        for (int i = 1; i <= those.length; i++) {
+            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+        }
+        INDArray concat = Nd4j.concat(dimension, toConcat);
+        return new Nd4jDoubleTensor(concat);
+    }
+
     // Comparisons
 
     @Override

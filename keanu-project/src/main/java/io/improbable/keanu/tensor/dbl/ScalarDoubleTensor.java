@@ -394,6 +394,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        //todo
+        return null;
+    }
+
+    @Override
     public DoubleTensor reciprocalInPlace() {
         value = 1.0 / value;
         return this;
