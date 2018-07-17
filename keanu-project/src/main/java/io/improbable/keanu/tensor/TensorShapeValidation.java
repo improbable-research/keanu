@@ -1,7 +1,10 @@
 package io.improbable.keanu.tensor;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -88,6 +91,16 @@ public class TensorShapeValidation {
         }
 
         return uniqueShapes.iterator().next().getShape();
+    }
+
+    public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
+        int[][] trimmedShapes = new int[shapes.length][];
+        for (int i = 0; i < shapes.length; i++) {
+            int[] trimmedShape = new int[shapes[i].length - 1];
+            System.arraycopy(shapes[i], dimension + 1, trimmedShape, dimension, shapes[i].length - 1 - dimension);
+            trimmedShapes[i] = trimmedShape;
+        }
+        return checkAllShapesMatch(trimmedShapes);
     }
 
 }
