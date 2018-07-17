@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 import java.util.Collections;
 import java.util.Map;
 
-public class DualNumber {
+import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
+public class DualNumber implements DoubleOperators<DualNumber>  {
 
     public static DualNumber createConstant(DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
@@ -284,4 +285,8 @@ public class DualNumber {
         return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
     }
 
+    @Override
+    public DualNumber pow(double exponent) {
+        throw new UnsupportedOperationException();
+    }
 }

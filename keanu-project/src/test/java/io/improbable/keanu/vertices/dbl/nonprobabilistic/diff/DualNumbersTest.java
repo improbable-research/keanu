@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -58,7 +57,7 @@ public class DualNumbersTest {
         DoubleVertex vC = vA.plus(vB);
         DoubleVertex vD = vA.divideBy(vB);
         DoubleVertex vE = vC.multiply(vD);
-        assertDiffIsCorrect(vA, vB, new LogVertex(vE));
+        assertDiffIsCorrect(vA, vB, vE.log());
     }
 
     private void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, DoubleVertex vC) {

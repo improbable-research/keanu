@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 
@@ -21,7 +20,7 @@ public class DualNumberPropagationTest {
     public void doesNotPerformUnneccesaryDualNumberCalculations() {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new SinVertex(ConstantVertex.of(Math.PI / 3));
+        DoubleVertex start = ConstantVertex.of(Math.PI / 3).sin();
 
         int links = 20;
         DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);

@@ -13,7 +13,6 @@ import org.junit.Test;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class DiscoverGraphTest {
@@ -31,11 +30,11 @@ public class DiscoverGraphTest {
     public void setup() {
         A = ConstantVertex.of(2.0);
         B = ConstantVertex.of(2.0);
-        C = new LogVertex(A);
+        C = A.log();
         D = A.multiply(B);
         E = C.plus(D);
         F = D.minus(E);
-        G = new LogVertex(F);
+        G = F.log();
         allVertices = Arrays.asList(A, B, C, D, E, F, G);
     }
 

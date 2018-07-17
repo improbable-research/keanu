@@ -5,34 +5,18 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
@@ -42,16 +26,18 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         super(valueUpdater, observation);
     }
 
+    @Override
     public DoubleVertex minus(DoubleVertex that) {
-        return new DifferenceVertex(this, that);
+        return new DoubleBinaryOpVertex(this, that,  (a, b) -> a.minus(b), (a, b) -> a.minus(b));
     }
 
+    @Override
     public DoubleVertex plus(DoubleVertex that) {
-        return new AdditionVertex(this, that);
+        return new DoubleBinaryOpVertex(this, that,  (a, b) -> a.plus(b), (a, b) -> a.plus(b));
     }
 
     public DoubleVertex multiply(DoubleVertex that) {
-        return new MultiplicationVertex(this, that);
+        return new DoubleBinaryOpVertex(this, that,  (a, b) -> a.times(b), (a, b) -> a.times(b));
     }
 
     public DoubleVertex matrixMultiply(DoubleVertex that) {
@@ -59,91 +45,114 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex divideBy(DoubleVertex that) {
-        return new DivisionVertex(this, that);
+        return new DoubleBinaryOpVertex(this, that,  (a, b) -> a.div(b), (a, b) -> a.div(b));
     }
 
-    public DoubleVertex pow(DoubleVertex exponent) {
-        return new PowerVertex(this, exponent);
+    @Override
+    public DoubleVertex pow(DoubleVertex that) {
+        return new DoubleBinaryOpVertex(this, that,  (a, b) -> a.pow(b), (a, b) -> a.pow(b));
     }
 
+    @Override
     public DoubleVertex minus(double that) {
-        return new DifferenceVertex(this, new ConstantDoubleVertex(that));
+        return minus(new ConstantDoubleVertex(that));
     }
 
+    @Override
     public DoubleVertex plus(double that) {
-        return new AdditionVertex(this, new ConstantDoubleVertex(that));
+        return plus(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex multiply(double that) {
-        return new MultiplicationVertex(this, new ConstantDoubleVertex(that));
+        return multiply(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex divideBy(double that) {
-        return new DivisionVertex(this, new ConstantDoubleVertex(that));
+        return divideBy(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex pow(double power) {
-        return new PowerVertex(this, new ConstantDoubleVertex(power));
+    @Override
+    public DoubleVertex pow(double that) {
+        return pow(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex abs() {
-        return new AbsVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.abs());
     }
 
     public DoubleVertex floor() {
-        return new FloorVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.floor());
     }
 
     public DoubleVertex ceil() {
-        return new CeilVertex(this);
+        return new DoubleUnaryOpVertex( this, a -> a.ceil());
     }
 
     public DoubleVertex round() {
-        return new RoundVertex(this);
+        return new DoubleUnaryOpVertex( this, a -> a.round());
     }
 
+    @Override
     public DoubleVertex exp() {
-        return new ExpVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.exp(), a -> a.exp());
     }
 
+    @Override
     public DoubleVertex log() {
-        return new LogVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.log(), a -> a.log());
     }
 
     public DoubleVertex sigmoid() {
-        return new SigmoidVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.unaryMinus().expInPlace().plusInPlace(1).reciprocalInPlace(), a -> {
+            DoubleTensor x = a.getValue();
+            DoubleTensor xExp = x.exp();
+            DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
+            PartialDerivatives infinitesimal = a.getPartialDerivatives().multiplyBy(dxdfx);
+            return new DualNumber(x.sigmoid(), infinitesimal);
+        });
     }
 
+    @Override
     public DoubleVertex sin() {
-        return new SinVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.sin(), a -> a.sin());
     }
 
+    @Override
     public DoubleVertex cos() {
-        return new CosVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.cos(), a -> a.cos());
     }
 
     public DoubleVertex tan() {
-        return new TanVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.tan(), a -> a.tan());
     }
 
+    @Override
     public DoubleVertex asin() {
-        return new ArcSinVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.asin(), a -> a.asin());
     }
 
+    @Override
     public DoubleVertex acos() {
-        return new ArcCosVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.acos(), a -> a.acos());
     }
 
     public DoubleVertex atan() {
-        return new ArcTanVertex(this);
+        return new DoubleUnaryOpVertex(this, a -> a.atan(), a -> a.atan());
     }
 
     public DoubleVertex atan2(DoubleVertex that) {
-        return new ArcTan2Vertex(this, that);
+        return new DoubleBinaryOpVertex(this, that, (a, b) -> a.atan2(b), (a, b) -> {
+            DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
+
+            PartialDerivatives thisInfA = a.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
+            PartialDerivatives thisInfB = b.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());
+            PartialDerivatives newInf = thisInfA.add(thisInfB);
+            return new DualNumber(a.getValue().atan2(b.getValue()), newInf);
+        });
     }
 
     public DoubleVertex sum() {
-        return new SumVertex(this);
+        return new DoubleUnaryOpVertex(Tensor.SCALAR_SHAPE, this, a -> DoubleTensor.scalar(a.sum()), a -> a.sum());
     }
 
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
@@ -151,22 +160,27 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    @Override
     public DoubleVertex times(DoubleVertex that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(DoubleVertex that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex times(double that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(double that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
     }
