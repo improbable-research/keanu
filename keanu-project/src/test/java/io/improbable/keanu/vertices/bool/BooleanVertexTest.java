@@ -5,8 +5,8 @@ import io.improbable.keanu.algorithms.sampling.Prior;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -15,12 +15,12 @@ import org.junit.Test;
 
 import java.util.Collections;
 
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+import static io.improbable.keanu.vertices.bool.BooleanVertex.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-public class BoolVertexTest {
+public class BooleanVertexTest {
 
     private KeanuRandom random;
     private Flip v1;
@@ -37,7 +37,7 @@ public class BoolVertexTest {
 
     @Test
     public void doesOr() {
-        BoolVertex v3 = v1.or(v2);
+        BooleanVertex v3 = v1.or(v2);
 
         v1.setValue(true);
         v2.setValue(false);
@@ -47,7 +47,7 @@ public class BoolVertexTest {
 
     @Test
     public void doesAnd() {
-        BoolVertex v3 = v1.and(v2);
+        BooleanVertex v3 = v1.and(v2);
 
         v1.setValue(true);
         v2.setValue(false);
@@ -57,7 +57,7 @@ public class BoolVertexTest {
 
     @Test
     public void doesNot() {
-        BoolVertex v3 = not(v1);
+        BooleanVertex v3 = not(v1);
 
         v1.setValue(true);
 
@@ -68,8 +68,8 @@ public class BoolVertexTest {
     public void TheOperatorsAreExecutedInOrder() {
         Flip v3 = new Flip(0.5);
 
-        BoolVertex v4 = v1.and(v2).or(v3); // (v1 AND v2) OR v3
-        BoolVertex v5 = v1.and(v2.or(v3)); // v1 AND (v2 OR v3)
+        BooleanVertex v4 = v1.and(v2).or(v3); // (v1 AND v2) OR v3
+        BooleanVertex v5 = v1.and(v2.or(v3)); // v1 AND (v2 OR v3)
 
         v1.setValue(false);
         v2.setValue(true);
@@ -82,7 +82,7 @@ public class BoolVertexTest {
     @Test
     public void YouCanSpecifyYourOwnOrderingOfOperations() {
         Flip v3 = new Flip(0.5);
-        BoolVertex v5 = v1.and(v2.or(v3));
+        BooleanVertex v5 = v1.and(v2.or(v3));
 
         v1.setValue(false);
         v2.setValue(true);
@@ -98,7 +98,7 @@ public class BoolVertexTest {
     }
 
     private boolean xor(boolean b1, boolean b2) {
-        BoolVertex v3 =
+        BooleanVertex v3 =
             v1.and(not(v2))
             .or(not(v1).and(v2));
         v1.setValue(b1);
@@ -108,7 +108,7 @@ public class BoolVertexTest {
 
     @Test
     public void orProbabilityIsCorrect() {
-        BoolVertex v3 = v1.or(v2);
+        BooleanVertex v3 = v1.or(v2);
 
         double pV3True = orProbability(pV1, pV2);
 
@@ -117,7 +117,7 @@ public class BoolVertexTest {
 
     @Test
     public void andProbabilityIsCorrect() {
-        BoolVertex v3 = v1.and(v2);
+        BooleanVertex v3 = v1.and(v2);
 
         double pV3True = andProbability(pV1, pV2);
 
@@ -130,7 +130,7 @@ public class BoolVertexTest {
 
         Flip f = new Flip(0.5);
 
-        CastBoolVertex a = new CastBoolVertex(f);
+        CastBooleanVertex a = new CastBooleanVertex(f);
 
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
     }
@@ -140,10 +140,10 @@ public class BoolVertexTest {
         double p = 0.5;
 
         Flip f = new Flip(0.5);
-        ConstantBoolVertex tru = ConstantVertex.of(true);
-        ConstantBoolVertex fal = ConstantVertex.of(false);
+        ConstantBooleanVertex tru = ConstantVertex.of(true);
+        ConstantBooleanVertex fal = ConstantVertex.of(false);
 
-        BoolVertex a = f.and(tru).or(fal);
+        BooleanVertex a = f.and(tru).or(fal);
 
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
     }

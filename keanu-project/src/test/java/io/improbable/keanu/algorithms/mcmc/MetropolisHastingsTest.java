@@ -12,7 +12,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -125,7 +125,7 @@ public class MetropolisHastingsTest {
         Flip A = new Flip(0.5);
         Flip B = new Flip(0.5);
 
-        BoolVertex C = A.or(B);
+        BooleanVertex C = A.or(B);
 
         DoubleVertex D = If.isTrue(C)
             .then(0.9)
@@ -155,7 +155,7 @@ public class MetropolisHastingsTest {
 
         Flip A = new Flip(0.5);
         Flip B = new Flip(0.5);
-        BoolVertex C = A.or(B);
+        BooleanVertex C = A.or(B);
         C.observe(BooleanTensor.scalar(false));
 
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());

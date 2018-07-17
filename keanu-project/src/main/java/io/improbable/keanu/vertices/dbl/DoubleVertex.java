@@ -5,17 +5,20 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.update.ValueUpdater;
@@ -183,6 +186,30 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     @Override
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
+    }
+
+    public <T extends Tensor> BooleanVertex equalTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    }
+
+    public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+    }
+
+    public <T extends NumberTensor> BooleanVertex greaterThan(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThanOrEqual(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThanOrEqual(b.toDouble()));
     }
 
     public void setValue(double value) {

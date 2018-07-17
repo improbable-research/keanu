@@ -10,12 +10,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class Flip extends BoolVertex implements Probabilistic<BooleanTensor> {
+public class Flip extends BooleanVertex implements Probabilistic<BooleanTensor> {
 
     private final Vertex<DoubleTensor> probTrue;
 

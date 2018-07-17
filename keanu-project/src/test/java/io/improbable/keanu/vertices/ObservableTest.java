@@ -8,7 +8,7 @@ import org.junit.Test;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -19,7 +19,7 @@ public class ObservableTest {
 
     @Test
     public void youCanObserveANonProbabilisticBooleanVertex() {
-        BoolVertex vertex = ConstantVertex.of(true);
+        BooleanVertex vertex = ConstantVertex.of(true);
         assertFalse(vertex instanceof Probabilistic);
         vertex.observe(BooleanTensor.scalar(false));
     }
@@ -40,7 +40,7 @@ public class ObservableTest {
 
     @Test
     public void youCanObserveAProbabilisticBooleanVertex() {
-        BoolVertex vertex = new Flip(0.5);
+        BooleanVertex vertex = new Flip(0.5);
         assertTrue(vertex instanceof Probabilistic);
         vertex.observe(BooleanTensor.scalar(false));
     }

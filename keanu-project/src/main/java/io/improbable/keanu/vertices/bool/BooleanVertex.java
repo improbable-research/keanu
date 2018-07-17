@@ -1,48 +1,57 @@
 package io.improbable.keanu.vertices.bool;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BooleanUnaryOpVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class BoolVertex extends Vertex<BooleanTensor> {
+public abstract class BooleanVertex extends Vertex<BooleanTensor> {
 
-    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater, Observable<BooleanTensor> observation) {
+    public BooleanVertex(ValueUpdater<BooleanTensor> valueUpdater, Observable<BooleanTensor> observation) {
         super(valueUpdater, observation);
     }
 
     @SafeVarargs
-    public final BoolVertex or(Vertex<BooleanTensor>... those) {
+    public final BooleanVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
-        if (those.length == 1) return new OrBinaryVertex(this, those[0]);
+        if (those.length == 1) return new BooleanBinaryOpVertex<>(this, those[0], (a, b) -> a.or(b));
         return new OrMultipleVertex(inputList(those));
     }
 
     @SafeVarargs
-    public final BoolVertex and(Vertex<BooleanTensor>... those) {
+    public final BooleanVertex and(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
-        if (those.length == 1) return new AndBinaryVertex(this, those[0]);
+        if (those.length == 1) return new BooleanBinaryOpVertex<>(this, those[0], (a, b) -> a.and(b));
         return new AndMultipleVertex(inputList(those));
     }
 
-    public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
-        return new NotVertex(vertex);
+    public static final BooleanVertex not(Vertex<BooleanTensor> vertex) {
+        return new BooleanUnaryOpVertex<>(vertex, a -> a.not());
+    }
+
+    public <T extends Tensor> BooleanVertex equalTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    }
+
+    public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
     }
 
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {
-        List<Vertex<BooleanTensor>> inputs = new LinkedList<>();
-        inputs.addAll(Arrays.asList(those));
-        inputs.add(this);
-        return inputs;
+        return ImmutableList.<Vertex<BooleanTensor>>builder()
+            .addAll(Arrays.asList(those))
+            .add(this)
+            .build();
     }
 
     public void setValue(boolean value) {

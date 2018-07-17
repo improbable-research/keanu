@@ -3,9 +3,13 @@ package io.improbable.keanu.vertices.intgr;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BooleanBinaryOpVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerBinaryOpVertex;
@@ -116,6 +120,31 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     @Override
     public IntegerVertex unaryMinus() {
         return multiply(-1);
+    }
+
+
+    public <T extends Tensor> BooleanVertex equalTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    }
+
+    public <T extends Tensor> BooleanVertex notEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+    }
+
+    public <T extends NumberTensor> BooleanVertex greaterThan(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BooleanVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThanOrEqual(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThanOrEqual(b.toDouble()));
     }
 
     public void setValue(int value) {

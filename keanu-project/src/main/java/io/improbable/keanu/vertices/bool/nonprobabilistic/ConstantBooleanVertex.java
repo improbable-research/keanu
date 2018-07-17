@@ -2,28 +2,28 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConstantBoolVertex extends BoolVertex {
+public class ConstantBooleanVertex extends BooleanVertex {
 
-    public static final BoolVertex TRUE = new ConstantBoolVertex(true);
-    public static final BoolVertex FALSE = new ConstantBoolVertex(false);
+    public static final BooleanVertex TRUE = new ConstantBooleanVertex(true);
+    public static final BooleanVertex FALSE = new ConstantBooleanVertex(false);
 
-    public ConstantBoolVertex(BooleanTensor constant) {
+    public ConstantBooleanVertex(BooleanTensor constant) {
         super(
             new NonProbabilisticValueUpdater<>(v -> v.getValue()),
-            Observable.observableTypeFor(ConstantBoolVertex.class)
+            Observable.observableTypeFor(ConstantBooleanVertex.class)
         );
         setValue(constant);
     }
 
-    public ConstantBoolVertex(boolean constant) {
+    public ConstantBooleanVertex(boolean constant) {
         this(BooleanTensor.scalar(constant));
     }
 
-    public ConstantBoolVertex(boolean[] vector) {
+    public ConstantBooleanVertex(boolean[] vector) {
         this(BooleanTensor.create(vector));
     }
 

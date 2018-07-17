@@ -4,9 +4,9 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BooleanIfVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
@@ -33,12 +33,12 @@ public class If {
             return new IfThenElseBuilder<>(predicate, thn);
         }
 
-        public BooleanIfThenElseBuilder then(BoolVertex thn) {
+        public BooleanIfThenElseBuilder then(BooleanVertex thn) {
             return new BooleanIfThenElseBuilder(predicate, thn);
         }
 
         public BooleanIfThenElseBuilder then(boolean thn) {
-            return then(new ConstantBoolVertex(thn));
+            return then(new ConstantBooleanVertex(thn));
         }
 
         public DoubleIfThenElseBuilder then(DoubleVertex thn) {
@@ -81,7 +81,7 @@ public class If {
             this.thn = thn;
         }
 
-        public BoolVertex orElse(Vertex<? extends BooleanTensor> els) {
+        public BooleanVertex orElse(Vertex<? extends BooleanTensor> els) {
             if (Arrays.equals(thn.getShape(), els.getShape())) {
                 return new BooleanIfVertex(els.getShape(), predicate, thn, els);
             } else {

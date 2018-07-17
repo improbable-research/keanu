@@ -11,15 +11,15 @@ import org.junit.Test;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class RejectionSamplerTest {
 
-    private BoolVertex v1;
-    private BoolVertex v2;
-    private BoolVertex v3;
+    private BooleanVertex v1;
+    private BooleanVertex v2;
+    private BooleanVertex v3;
     private double v1ProbTrueAccordingToBayes;
     private double v2ProbTrueAccordingToBayes;
     private KeanuRandom random;

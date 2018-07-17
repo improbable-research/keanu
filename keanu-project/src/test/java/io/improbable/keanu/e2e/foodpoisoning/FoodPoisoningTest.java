@@ -17,7 +17,7 @@ import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -86,7 +86,7 @@ public class FoodPoisoningTest {
             Flip didEatLamb = plate.add("didEatLamb", new Flip(0.4));
             Flip didEatPoo = plate.add("didEatPoo", new Flip(0.4));
 
-            BoolVertex ingestedPathogen =
+            BooleanVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
                     didEatLamb.and(infectedLamb).or(
                         didEatPoo.and(infectedToilet)

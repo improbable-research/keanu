@@ -3,18 +3,18 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class CastBoolVertex extends BoolVertex {
+public class CastBooleanVertex extends BooleanVertex {
 
     private final Vertex<? extends BooleanTensor> inputVertex;
 
-    public CastBoolVertex(Vertex<? extends BooleanTensor> inputVertex) {
+    public CastBooleanVertex(Vertex<? extends BooleanTensor> inputVertex) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> ((CastBoolVertex) v).inputVertex.getValue()),
-            Observable.observableTypeFor(CastBoolVertex.class)
+            new NonProbabilisticValueUpdater<>(v -> ((CastBooleanVertex) v).inputVertex.getValue()),
+            Observable.observableTypeFor(CastBooleanVertex.class)
         );
         this.inputVertex = inputVertex;
         setParents(inputVertex);
