@@ -26,7 +26,11 @@ public abstract class Writer {
     private String[] header = null;
     private boolean headerEnabled = false;
 
-    abstract File toFile(String file);
+    abstract File toFile(File file);
+
+    File toFile(String file) {
+        return toFile(new File(file));
+    }
 
     abstract Writer withDefaultHeader();
 
@@ -80,16 +84,8 @@ public abstract class Writer {
         return emptyValue;
     }
 
-    File writeToFile(String file, List<String[]> data) {
-        return writeToFile(new File(file), data);
-    }
-
     File writeToFile(File file, List<String[]> data) {
         return writeToFile(file, data, separator, quoteChar, escapeChar, lineEnd);
-    }
-
-    File writeToFile(String file, List<String[]> data, char separator, char quoteChar, char escapeChar, String lineEnd) {
-        return writeToFile(new File(file), data, separator, quoteChar, escapeChar, lineEnd);
     }
 
     File writeToFile(File file, List<String[]> data, char separator, char quoteChar, char escapeChar, String lineEnd) {

@@ -26,7 +26,7 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    File toFile(String file) {
+    File toFile(File file) {
         List<String[]> data = new ArrayList<>();
         int maxSize = findLongestTensor(vertices);
 

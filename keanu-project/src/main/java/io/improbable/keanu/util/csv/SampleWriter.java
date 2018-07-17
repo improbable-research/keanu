@@ -21,7 +21,7 @@ public class SampleWriter extends Writer {
     }
 
     @Override
-    File toFile(String file) {
+    File toFile(File file) {
         List<String[]> data = new ArrayList<>();
 
         for (int i = 0; i < samples.size(); i++) {
