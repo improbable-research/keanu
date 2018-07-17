@@ -6,20 +6,19 @@ import io.improbable.keanu.vertices.Vertex;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
 
 public class RowWriter extends Writer {
 
-    private static String DEFAULT_EMPTY_VALUE = "-";
-    private static String HEADER_STYLE = "[%d]";
+    private static final String HEADER_STYLE = "[%d]";
 
     private List<? extends Vertex<? extends Tensor>> vertices;
-    private String emptyValue;
 
     public RowWriter(List<? extends Vertex<? extends Tensor>> vertices, String emptyValue) {
         this.vertices = vertices;
-        this.emptyValue = emptyValue;
+        withEmptyValue(emptyValue);
     }
 
     public RowWriter(List<? extends Vertex<? extends Tensor>> vertices) {
@@ -29,13 +28,13 @@ public class RowWriter extends Writer {
     @Override
     File toFile(String file) {
         List<String[]> data = new ArrayList<>();
-        int longestTensor = findLongestTensor(vertices);
+        int maxSize = findLongestTensor(vertices);
 
         for (Vertex<? extends Tensor> vertex : vertices) {
             List<String> row = new ArrayList<>();
             List<Object> flatList = vertex.getValue().asFlatList();
-            for (int i = 0; i < longestTensor; i++) {
-                row.add(i < flatList.size() ? flatList.get(i).toString() : emptyValue);
+            for (int i = 0; i < maxSize; i++) {
+                row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
             }
             String[] rowToString = new String[row.size()];
             data.add(row.toArray(rowToString));
@@ -45,17 +44,9 @@ public class RowWriter extends Writer {
 
     @Override
     Writer withDefaultHeader() {
-        int longestTensor = findLongestTensor(vertices);
-        String[] header = new String[longestTensor];
-        for (int i = 0; i < longestTensor; i++) {
-            header[i] = String.format(HEADER_STYLE, i);
-        }
+        int sizeOfHeader = findLongestTensor(vertices);
+        String[] header = createHeader(sizeOfHeader, HEADER_STYLE, i -> i);
         withHeader(header);
-        return this;
-    }
-
-    public Writer withEmptyValue(String emptyValue) {
-        this.emptyValue = emptyValue;
         return this;
     }
 

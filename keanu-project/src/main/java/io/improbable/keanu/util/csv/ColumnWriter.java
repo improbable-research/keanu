@@ -11,15 +11,13 @@ import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
 
 public class ColumnWriter extends Writer {
 
-    private static String DEFAULT_EMPTY_VALUE = "-";
-    private static String HEADER_STYLE = "{%d}";
+    private static final String HEADER_STYLE = "{%d}";
 
     private List<? extends Vertex<? extends Tensor>> vertices;
-    private String emptyValue;
 
     public ColumnWriter(List<? extends Vertex<? extends Tensor>> vertices, String emptyValue) {
         this.vertices = vertices;
-        this.emptyValue = emptyValue;
+        withEmptyValue(emptyValue);
     }
 
     public ColumnWriter(List<? extends Vertex<? extends Tensor>> vertices) {
@@ -29,13 +27,13 @@ public class ColumnWriter extends Writer {
     @Override
     File toFile(String file) {
         List<String[]> data = new ArrayList<>();
-        int longestTensor = findLongestTensor(vertices);
+        int maxSize = findLongestTensor(vertices);
 
-        for (int i = 0; i < longestTensor; i++) {
+        for (int i = 0; i < maxSize; i++) {
             List<String> row = new ArrayList<>();
             for (Vertex<? extends Tensor> vertex : vertices) {
                 List<Object> flatList = vertex.getValue().asFlatList();
-                row.add(i < flatList.size() ? flatList.get(i).toString() : emptyValue);
+                row.add(i < flatList.size() ? flatList.get(i).toString() : getEmptyValue());
             }
             String[] rowToString = new String[row.size()];
             data.add(row.toArray(rowToString));
@@ -45,16 +43,10 @@ public class ColumnWriter extends Writer {
 
     @Override
     Writer withDefaultHeader() {
-        String[] header = new String[vertices.size()];
-        for (int i = 0; i < vertices.size(); i++) {
-            header[i] = String.format(HEADER_STYLE, vertices.get(i).getId());
-        }
+        int headerSize = vertices.size();
+        String[] header = createHeader(headerSize, HEADER_STYLE, i -> (int) vertices.get(i).getId());
         withHeader(header);
         return this;
     }
 
-    public Writer withEmptyValue(String emptyValue) {
-        this.emptyValue = emptyValue;
-        return this;
-    }
 }

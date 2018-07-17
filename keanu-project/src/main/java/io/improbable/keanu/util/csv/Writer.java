@@ -8,13 +8,21 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.util.List;
+import java.util.function.Function;
 
 public abstract class Writer {
 
-    private char separator = ICSVWriter.DEFAULT_SEPARATOR;
-    private char quoteChar = ICSVWriter.DEFAULT_QUOTE_CHARACTER;
-    private char escapeChar= ICSVWriter.DEFAULT_ESCAPE_CHARACTER;
-    private String lineEnd = ICSVWriter.DEFAULT_LINE_END;
+    public static final char DEFAULT_SEPARATOR = ICSVWriter.DEFAULT_SEPARATOR;
+    public static final char DEFAULT_QUOTE_CHAR = ICSVWriter.DEFAULT_QUOTE_CHARACTER;
+    public static final char  DEFAULT_ESCAPE_CHAR = ICSVWriter.DEFAULT_ESCAPE_CHARACTER;
+    public static final String DEFAULT_LINE_END = ICSVWriter.DEFAULT_LINE_END;
+    public static final String DEFAULT_EMPTY_VALUE = "-";
+
+    private char separator = DEFAULT_SEPARATOR;
+    private char quoteChar = DEFAULT_QUOTE_CHAR;
+    private char escapeChar= DEFAULT_ESCAPE_CHAR;
+    private String lineEnd = DEFAULT_LINE_END;
+    private String emptyValue = DEFAULT_EMPTY_VALUE;
     private String[] header = null;
     private boolean headerEnabled = false;
 
@@ -24,6 +32,11 @@ public abstract class Writer {
 
     public Writer withSeparator(char s) {
         separator = s;
+        return this;
+    }
+
+    public Writer withEmptyValue(String emptyValue) {
+        this.emptyValue = emptyValue;
         return this;
     }
 
@@ -63,10 +76,8 @@ public abstract class Writer {
         return lineEnd;
     }
 
-    public Writer withHeader(String[] h) {
-        header = h;
-        withHeaderEnabled(true);
-        return this;
+    public String getEmptyValue() {
+        return emptyValue;
     }
 
     File writeToFile(String file, List<String[]> data) {
@@ -92,4 +103,19 @@ public abstract class Writer {
         }
         return file;
     }
+
+    String[] createHeader(int size, String headerStyle, Function<Integer, Integer> func) {
+        String[] header = new String[size];
+        for (int i = 0; i < size; i++) {
+            header[i] = String.format(headerStyle, func.apply(i));
+        }
+        return header;
+    }
+
+    public Writer withHeader(String[] h) {
+        header = h;
+        withHeaderEnabled(true);
+        return this;
+    }
+
 }
