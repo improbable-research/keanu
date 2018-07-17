@@ -8,6 +8,8 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 public class ConcatenationVertexTest {
 
     @Test
@@ -21,14 +23,14 @@ public class ConcatenationVertexTest {
         UniformVertex a2 = new UniformVertex(0.0, 1.0);
         a2.setValue(new double[]{7, 8, 9});
 
-        ConcatenationVertex concatAlongZero = new ConcatenationVertex(0, a, a1);
-        ConcatenationVertex concatAlongOne = new ConcatenationVertex(1, a, a1, a2);
+        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, a1);
+        ConcatenationVertex concatOne = new ConcatenationVertex(1, a, a1, a2);
 
-        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatAlongZero.getValue().asFlatDoubleArray(), 0.001);
-        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatAlongOne.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatZero.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatOne.getValue().asFlatDoubleArray(), 0.001);
 
-        Assert.assertArrayEquals(new int[]{2, 3}, concatAlongZero.getShape());
-        Assert.assertArrayEquals(new int[]{1, 9}, concatAlongOne.getShape());
+        Assert.assertArrayEquals(new int[]{2, 3}, concatZero.getShape());
+        Assert.assertArrayEquals(new int[]{1, 9}, concatOne.getShape());
     }
 
     @Test
@@ -39,10 +41,10 @@ public class ConcatenationVertexTest {
         UniformVertex a1 = new UniformVertex(0.0, 1.0);
         a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
-        ConcatenationVertex concatAlongZero = new ConcatenationVertex(1, a, a1);
+        ConcatenationVertex concatZero = new ConcatenationVertex(1, a, a1);
 
-        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatAlongZero.getValue().asFlatDoubleArray(), 0.001);
-        Assert.assertArrayEquals(new int[]{1, 9}, concatAlongZero.getShape());
+        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
     }
 
     @Test (expected = IllegalArgumentException.class)
@@ -53,10 +55,10 @@ public class ConcatenationVertexTest {
         UniformVertex a1 = new UniformVertex(0.0, 1.0);
         a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
-        ConcatenationVertex concatAlongZero = new ConcatenationVertex(0, a, a1);
+        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, a1);
 
-        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatAlongZero.getValue().asFlatDoubleArray(), 0.001);
-        Assert.assertArrayEquals(new int[]{1, 9}, concatAlongZero.getShape());
+        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
     }
 
     @Test
@@ -76,7 +78,36 @@ public class ConcatenationVertexTest {
 
         Assert.assertArrayEquals(new double[]{1, 2, 10, 15, 3, 4, 20, 25}, concatOne.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{2, 4}, concatOne.getShape());
+    }
 
+    @Test
+    public void canConcatHighDimensionalShapes() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 20, 30, 40, 50, 60, 70, 80}, 2, 2, 2));
+
+        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
+
+        Assert.assertArrayEquals(
+            new double[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 20, 30, 40, 50, 60, 70, 80},
+            concatZero.getValue().asFlatDoubleArray(),
+            0.001
+        );
+        Assert.assertArrayEquals(new int[]{4, 2, 2}, concatZero.getShape());
+
+        System.out.println(concatZero.getValue());
+        ConcatenationVertex concatTwo = new ConcatenationVertex(1, a, b);
+        System.out.println(concatTwo.getValue());
+        ConcatenationVertex concatThree = new ConcatenationVertex(2, a, b);
+        System.out.println(concatThree.getValue());
+        Assert.assertArrayEquals(
+            new double[]{1, 2, 10, 20, 3, 4, 30, 40, 5, 6, 50, 60, 7, 8, 70, 80},
+            concatThree.getValue().asFlatDoubleArray(),
+            0.001
+        );
+        Assert.assertArrayEquals(new int[]{2, 2, 4}, concatThree.getShape());
     }
 
     @Test
@@ -179,6 +210,53 @@ public class ConcatenationVertexTest {
         Assert.assertArrayEquals(
             d.getDualNumber().getPartialDerivatives().withRespectTo(b).asFlatDoubleArray(),
             concatPartial.withRespectTo(b).asFlatDoubleArray(),
+            0.0001
+        );
+    }
+
+    @Test
+    public void canConcatenateAutoDiffOfManyMatricesAlongDimensionZero() {
+        DoubleVertex sharedMatrix = new UniformVertex(0, 10);
+        sharedMatrix.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+
+        DoubleVertex f = new UniformVertex(0, 10);
+        f.setValue(DoubleTensor.create(new double[]{90, 91, 92, 93}, 2, 2));
+
+        DoubleVertex c = sharedMatrix.matrixMultiply(a);
+        DoubleVertex d = sharedMatrix.matrixMultiply(b);
+        DoubleVertex e = sharedMatrix.matrixMultiply(f);
+
+        DoubleTensor dCdshared = c.getDualNumber().getPartialDerivatives().withRespectTo(sharedMatrix);
+        DoubleTensor dDdshared = d.getDualNumber().getPartialDerivatives().withRespectTo(sharedMatrix);
+        DoubleTensor dEdshared = e.getDualNumber().getPartialDerivatives().withRespectTo(sharedMatrix);
+
+        ConcatenationVertex concat = new ConcatenationVertex(0, c, d, e);
+        PartialDerivatives concatPartial = concat.getDualNumber().getPartialDerivatives();
+
+        Assert.assertArrayEquals(
+            dCdshared.concat(0, dDdshared, dEdshared).asFlatDoubleArray(),
+            concatPartial.withRespectTo(sharedMatrix).asFlatDoubleArray(),
+            0.0001
+        );
+        Assert.assertArrayEquals(
+            c.getDualNumber().getPartialDerivatives().withRespectTo(a).asFlatDoubleArray(),
+            concatPartial.withRespectTo(a).asFlatDoubleArray(),
+            0.0001
+        );
+        Assert.assertArrayEquals(
+            d.getDualNumber().getPartialDerivatives().withRespectTo(b).asFlatDoubleArray(),
+            concatPartial.withRespectTo(b).asFlatDoubleArray(),
+            0.0001
+        );
+        Assert.assertArrayEquals(
+            e.getDualNumber().getPartialDerivatives().withRespectTo(f).asFlatDoubleArray(),
+            concatPartial.withRespectTo(f).asFlatDoubleArray(),
             0.0001
         );
     }

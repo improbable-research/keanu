@@ -48,8 +48,8 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
             }
         }
 
-        for (Map.Entry<Long, List<DoubleTensor>> partial : partialDerivates.entrySet()) {
-            concatDerivates.put(partial.getKey(), concatPartialDerivates(partial.getValue()));
+        for (Map.Entry<Long, List<DoubleTensor>> partials : partialDerivates.entrySet()) {
+            concatDerivates.put(partials.getKey(), concatPartialDerivates(partials.getValue()));
         }
 
         return new DualNumber(dualNumbers.get(input[0]).getValue(), concatDerivates);
