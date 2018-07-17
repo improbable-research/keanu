@@ -84,9 +84,6 @@ public class ConcatenationVertexTest {
         a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
         ConcatenationVertex concatZero = new ConcatenationVertex(0, a, a1);
-
-        Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
-        Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
     }
 
     @Test
