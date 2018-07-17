@@ -1,20 +1,23 @@
 package io.improbable.keanu.vertices.bool;
 
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
+import com.google.common.collect.ImmutableList;
+
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.update.ValueUpdater;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolPluckVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
@@ -40,11 +43,19 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         return new NotVertex(vertex);
     }
 
+    public <T extends Tensor> BoolVertex equalTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+    }
+
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {
-        List<Vertex<BooleanTensor>> inputs = new LinkedList<>();
-        inputs.addAll(Arrays.asList(those));
-        inputs.add(this);
-        return inputs;
+        return ImmutableList.<Vertex<BooleanTensor>>builder()
+            .addAll(Arrays.asList(those))
+            .add(this)
+            .build();
     }
 
     public BoolVertex slice(int dimension, int index) {

@@ -5,19 +5,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class BoolReshapeVertex extends BoolUnaryOpVertex<BooleanTensor> {
 
-    private int[] proposedShape;
-
     public BoolReshapeVertex(BoolVertex inputVertex, int... proposedShape) {
-        super(proposedShape, inputVertex);
-        this.proposedShape = proposedShape;
+        super(proposedShape, inputVertex, a -> a.reshape(proposedShape));
     }
-
-    /**
-     * Returns the supplied vertex with a new shape of the same length
-     */
-    @Override
-    protected BooleanTensor op(BooleanTensor booleanTensor) {
-        return booleanTensor.reshape(proposedShape);
-    }
-
 }

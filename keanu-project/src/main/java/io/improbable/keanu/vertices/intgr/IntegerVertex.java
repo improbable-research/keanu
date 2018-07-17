@@ -3,9 +3,13 @@ package io.improbable.keanu.vertices.intgr;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
@@ -126,6 +130,31 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public IntegerVertex slice(int dimension, int index) {
         return new IntegerSliceVertex(this, dimension, index);
+    }
+
+
+    public <T extends Tensor> BoolVertex equalTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThanOrEqual(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThanOrEqual(b.toDouble()));
     }
 
     public void setValue(int value) {

@@ -6,14 +6,6 @@ import io.improbable.keanu.vertices.Vertex;
 public class NotVertex extends BoolUnaryOpVertex<BooleanTensor> {
 
     public NotVertex(Vertex<BooleanTensor> a) {
-        super(a.getShape(), a);
-    }
-
-    /**
-     * Returns the inverse of a boolean
-     */
-    @Override
-    protected BooleanTensor op(BooleanTensor aBoolean) {
-        return aBoolean.not();
+        super(a.getShape(), a, BooleanTensor::not);
     }
 }

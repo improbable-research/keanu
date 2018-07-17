@@ -5,9 +5,13 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
@@ -182,6 +186,30 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     @Override
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
+    }
+
+    public <T extends Tensor> BoolVertex equalTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThanOrEqual(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThanOrEqual(b.toDouble()));
     }
 
     public DoubleVertex pluck(int... index) {

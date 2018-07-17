@@ -8,14 +8,7 @@ import io.improbable.keanu.vertices.Vertex;
 public class OrBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
 
     public OrBinaryVertex(Vertex<BooleanTensor> a, Vertex<BooleanTensor> b) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
-    }
-
-    /**
-     * Returns true if a or b are true
-     */
-    @Override
-    protected BooleanTensor op(BooleanTensor a, BooleanTensor b) {
-        return a.or(b);
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b,
+            BooleanTensor::or);
     }
 }
