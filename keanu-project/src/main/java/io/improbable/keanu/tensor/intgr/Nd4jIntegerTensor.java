@@ -282,6 +282,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor concat(int dimension, IntegerTensor... those) {
+        INDArray dup = tensor.dup();
+        INDArray[] toConcat = new INDArray[those.length + 1];
+        toConcat[0] = dup;
+        for (int i = 1; i <= those.length; i++) {
+            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+        }
+        INDArray concat = Nd4j.concat(dimension, toConcat);
+        return new Nd4jIntegerTensor(concat);
+    }
+
+    @Override
     public IntegerTensor minusInPlace(int value) {
         tensor.subi(value);
         return this;

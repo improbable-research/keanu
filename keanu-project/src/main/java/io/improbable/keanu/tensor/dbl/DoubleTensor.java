@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.dbl;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;

@@ -395,8 +395,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
-        //todo
-        return null;
+        return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
     }
 
     @Override

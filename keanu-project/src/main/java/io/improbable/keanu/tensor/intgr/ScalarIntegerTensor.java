@@ -245,6 +245,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor concat(int dimension, IntegerTensor... those) {
+        return Nd4jIntegerTensor.scalar(value).concat(dimension, those);
+    }
+
+    @Override
     public IntegerTensor minusInPlace(int that) {
         value = value - that;
         return this;

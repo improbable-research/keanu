@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -45,6 +47,32 @@ public class ConcatenationVertexTest {
 
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
+    }
+
+    @Test
+    public void canConcatScalarToVector() {
+        UniformVertex a = new UniformVertex(0.0, 1.0);
+        a.setValue(new double[]{1, 2, 3});
+
+        DoubleVertex b = new ConstantDoubleVertex(4.0);
+
+        ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
+
+        Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+    }
+
+    @Test
+    public void canConcatVectorToScalar() {
+        DoubleVertex a = new ConstantDoubleVertex(1.0);
+
+        UniformVertex b = new UniformVertex(0.0, 1.0);
+        b.setValue(new double[]{2, 3, 4});
+
+        ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
+
+        Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
     }
 
     @Test (expected = IllegalArgumentException.class)
