@@ -83,7 +83,7 @@ public class ConcatenationVertexTest {
         UniformVertex a1 = new UniformVertex(0.0, 1.0);
         a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
-        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, a1);
+        new ConcatenationVertex(0, a, a1);
     }
 
     @Test
