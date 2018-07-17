@@ -1,13 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.Map;
-
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class DivisionVertex extends DoubleBinaryOpVertex {
     /**
@@ -17,26 +12,8 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
      * @param right the vertex to divide
      */
     public DivisionVertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
-    }
-
-    public DoubleVertex getDividend(){
-        return super.getLeft();
-    }
-
-    public DoubleVertex getDivsor(){
-        return super.getRight();
-    }
-
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber leftDual = dualNumbers.get(left);
-        DualNumber rightDual = dualNumbers.get(right);
-        return leftDual.divideBy(rightDual);
-    }
-
-    @Override
-    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
-        return left.div(right);
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right,
+            (l, r) -> l.div(r),
+            (l, r) -> l.div(r));
     }
 }

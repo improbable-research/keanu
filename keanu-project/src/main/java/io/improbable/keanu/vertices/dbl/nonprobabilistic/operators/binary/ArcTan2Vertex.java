@@ -1,42 +1,33 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
     /**
      * Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
      *
-     * @param left x coordinate
+     * @param left  x coordinate
      * @param right y coordinate
      */
     public ArcTan2Vertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right,
+            (l, r) -> l.atan2(r),
+            (l, r) -> dualOp(l, r)
+        );
     }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
-        return left.atan2(right);
-    }
+    private static DualNumber dualOp(DualNumber a, DualNumber b) {
+        DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
 
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber leftDual = dualNumbers.get(left);
-        DualNumber rightDual = dualNumbers.get(right);
-
-        DoubleTensor denominator = ((right.getValue().pow(2)).timesInPlace((left.getValue().pow(2))));
-
-        PartialDerivatives thisInfLeft = leftDual.getPartialDerivatives().multiplyBy(right.getValue().div(denominator));
-        PartialDerivatives thisInfRight = rightDual.getPartialDerivatives().multiplyBy((left.getValue().div(denominator)).unaryMinusInPlace());
-        PartialDerivatives newInf = thisInfLeft.add(thisInfRight);
-        return new DualNumber(op(left.getValue(), right.getValue()), newInf);
+        PartialDerivatives thisInfA = a.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
+        PartialDerivatives thisInfB = b.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());
+        PartialDerivatives newInf = thisInfA.add(thisInfB);
+        return new DualNumber(a.getValue().atan2(b.getValue()), newInf);
     }
 }

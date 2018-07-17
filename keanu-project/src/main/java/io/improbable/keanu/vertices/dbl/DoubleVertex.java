@@ -66,24 +66,27 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new PowerVertex(this, exponent);
     }
 
+    @Override
     public DoubleVertex minus(double that) {
-        return new DifferenceVertex(this, new ConstantDoubleVertex(that));
+        return minus(new ConstantDoubleVertex(that));
     }
 
+    @Override
     public DoubleVertex plus(double that) {
-        return new AdditionVertex(this, new ConstantDoubleVertex(that));
+        return plus(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex multiply(double that) {
-        return new MultiplicationVertex(this, new ConstantDoubleVertex(that));
+        return multiply(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex divideBy(double that) {
-        return new DivisionVertex(this, new ConstantDoubleVertex(that));
+        return divideBy(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex pow(double power) {
-        return new PowerVertex(this, new ConstantDoubleVertex(power));
+    @Override
+    public DoubleVertex pow(double that) {
+        return pow(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex abs() {
@@ -102,6 +105,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new RoundVertex(this);
     }
 
+    @Override
     public DoubleVertex exp() {
         return new ExpVertex(this);
     }
@@ -114,10 +118,12 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SigmoidVertex(this);
     }
 
+    @Override
     public DoubleVertex sin() {
         return new SinVertex(this);
     }
 
+    @Override
     public DoubleVertex cos() {
         return new CosVertex(this);
     }
@@ -126,10 +132,12 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new TanVertex(this);
     }
 
+    @Override
     public DoubleVertex asin() {
         return new ArcSinVertex(this);
     }
 
+    @Override
     public DoubleVertex acos() {
         return new ArcCosVertex(this);
     }
@@ -151,22 +159,27 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    @Override
     public DoubleVertex times(DoubleVertex that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(DoubleVertex that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex times(double that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(double that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
     }

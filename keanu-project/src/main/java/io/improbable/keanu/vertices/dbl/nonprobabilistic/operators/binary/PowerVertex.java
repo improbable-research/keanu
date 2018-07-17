@@ -1,13 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.Map;
-
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
@@ -18,19 +13,9 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      * @param right the exponent vertex
      */
     public PowerVertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
-    }
-
-    @Override
-    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
-        return left.pow(right);
-    }
-
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber leftDual = dualNumbers.get(left);
-        DualNumber rightDual = dualNumbers.get(right);
-        return leftDual.pow(rightDual);
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right,
+            (l, r) -> l.pow(r),
+            (l, r) -> l.pow(r));
     }
 
     public DoubleVertex getBase(){
