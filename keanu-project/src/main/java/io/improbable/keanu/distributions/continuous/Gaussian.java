@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Duals.MU;
-import static io.improbable.keanu.distributions.dual.Duals.SIGMA;
-import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -40,7 +40,7 @@ public class Gaussian implements ContinuousDistribution {
     }
 
     @Override
-    public Duals dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 
@@ -50,7 +50,7 @@ public class Gaussian implements ContinuousDistribution {
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        return new Duals()
+        return new Diffs()
             .put(MU, dlnP_dmu)
             .put(SIGMA, dlnP_dsigma)
             .put(X, dlnP_dx);

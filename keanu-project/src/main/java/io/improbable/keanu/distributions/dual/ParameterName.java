@@ -2,10 +2,10 @@ package io.improbable.keanu.distributions.dual;
 
 import java.util.Objects;
 
-public class DualName {
+public class ParameterName {
     private final String name;
 
-    public DualName(String name) {
+    public ParameterName(String name) {
         this.name = name;
     }
 
@@ -17,8 +17,8 @@ public class DualName {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        DualName dualName = (DualName) o;
-        return Objects.equals(name, dualName.name);
+        ParameterName parameterName = (ParameterName) o;
+        return Objects.equals(name, parameterName.name);
     }
 
     @Override

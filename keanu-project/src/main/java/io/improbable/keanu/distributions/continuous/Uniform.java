@@ -1,7 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -45,7 +45,7 @@ public class Uniform implements ContinuousDistribution {
     }
 
     @Override
-    public Duals dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
 }

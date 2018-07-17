@@ -1,13 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Duals.A;
-import static io.improbable.keanu.distributions.dual.Duals.B;
-import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 
 import org.apache.commons.math3.special.Gamma;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -41,12 +41,12 @@ public class InverseGamma implements ContinuousDistribution {
     }
 
     @Override
-    public Duals dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dPda = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
         final DoubleTensor dPdb = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
         final DoubleTensor dPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-        return new Duals()
+        return new Diffs()
             .put(A, dPda)
             .put(B, dPdb)
             .put(X, dPdx);

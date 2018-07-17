@@ -1,16 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Duals.A;
-import static io.improbable.keanu.distributions.dual.Duals.K;
-import static io.improbable.keanu.distributions.dual.Duals.THETA;
-import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.K;
+import static io.improbable.keanu.distributions.dual.Diffs.THETA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -95,7 +95,7 @@ public class GammaVertex extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Duals dlnP = Gamma.withParameters(location.getValue(), theta.getValue(), k.getValue()).dLogProb(value);
+        Diffs dlnP = Gamma.withParameters(location.getValue(), theta.getValue(), k.getValue()).dLogProb(value);
 
         return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
 

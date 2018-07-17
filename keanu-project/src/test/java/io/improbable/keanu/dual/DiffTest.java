@@ -2,49 +2,49 @@ package io.improbable.keanu.dual;
 
 import static org.junit.Assert.assertTrue;
 
-import static io.improbable.keanu.distributions.dual.Duals.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
 
 import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.distributions.dual.Dual;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diff;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public class DualTest {
-    Duals duals;
+public class DiffTest {
+    Diffs diffs;
 
     @Before
     public void initialiseDuals() {
-        duals = new Duals();
+        diffs = new Diffs();
     }
 
     @Test
     public void youCanGetADualByName() {
         DoubleTensor muDualValue = DoubleTensor.scalar(0.1);
-        duals.put(MU, muDualValue);
-        Dual mu = duals.get(MU);
+        diffs.put(MU, muDualValue);
+        Diff mu = diffs.get(MU);
         assertTrue(mu.getName().equals(MU.getName()));
         assertTrue(mu.getValue() == muDualValue);
     }
 
     @Test(expected = NoSuchElementException.class)
     public void itThrowsIfYouAskForAValueThatsAbsent() {
-        duals.get(MU);
+        diffs.get(MU);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfYouTryToAddTheSameDualTwice() {
         DoubleTensor muDualValue = DoubleTensor.scalar(0.1);
-        duals.put(MU, muDualValue);
-        duals.put(MU, muDualValue);
+        diffs.put(MU, muDualValue);
+        diffs.put(MU, muDualValue);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfYouTryToAddTwoDualsWithTheSameName() {
-        duals.put(MU, DoubleTensor.scalar(0.1));
-        duals.put(MU, DoubleTensor.scalar(0.2));
+        diffs.put(MU, DoubleTensor.scalar(0.1));
+        diffs.put(MU, DoubleTensor.scalar(0.2));
     }
 }

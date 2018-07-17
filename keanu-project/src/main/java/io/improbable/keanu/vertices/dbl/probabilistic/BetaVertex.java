@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Duals.A;
-import static io.improbable.keanu.distributions.dual.Duals.B;
-import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -10,7 +10,7 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -86,7 +86,7 @@ public class BetaVertex extends ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Duals dlnP = distribution().dLogProb(value);
+        Diffs dlnP = distribution().dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
     }
 

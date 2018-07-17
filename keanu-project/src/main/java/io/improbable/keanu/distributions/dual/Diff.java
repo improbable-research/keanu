@@ -8,19 +8,19 @@ import org.jetbrains.annotations.NotNull;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 /**
- * A Dual is identified only by its name
- * so that you can store it in io.improbable.keanu.distributions.dual.Duals
+ * A Diff is identified only by its name
+ * so that you can store it in io.improbable.keanu.distributions.dual.Diffs
  */
-public class Dual implements Comparable<Dual> {
+public class Diff implements Comparable<Diff> {
 
-    private final DualName id;
+    private final ParameterName id;
     private final DoubleTensor value;
 
-    public Dual(DualName name) {
+    public Diff(ParameterName name) {
         this(name, null);
     }
 
-    public Dual(DualName name, DoubleTensor value) {
+    public Diff(ParameterName name, DoubleTensor value) {
         this.id = name;
         this.value = value;
     }
@@ -37,8 +37,8 @@ public class Dual implements Comparable<Dual> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Dual dual = (Dual) o;
-        return Objects.equals(id, dual.id);
+        Diff diff = (Diff) o;
+        return Objects.equals(id, diff.id);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class Dual implements Comparable<Dual> {
     }
 
     @Override
-    public int compareTo(@NotNull Dual o) {
+    public int compareTo(@NotNull Diff o) {
         return id.getName().compareTo(o.id.getName());
     }
 }

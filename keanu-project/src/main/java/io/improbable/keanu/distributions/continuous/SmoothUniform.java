@@ -1,9 +1,9 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Duals.X;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Duals;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -129,7 +129,7 @@ public class SmoothUniform implements ContinuousDistribution {
     }
 
     @Override
-    public Duals dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
@@ -146,7 +146,7 @@ public class SmoothUniform implements ContinuousDistribution {
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
         ).unaryMinusInPlace();
 
-        return new Duals()
+        return new Diffs()
             .put(X, firstConditional.timesInPlace(firstConditionalResult)
                 .plusInPlace(secondConditional.timesInPlace(secondConditionalResult)));
     }
