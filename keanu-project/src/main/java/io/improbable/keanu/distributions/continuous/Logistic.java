@@ -51,8 +51,8 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
 
-        final DoubleTensor dPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
-        final DoubleTensor dPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
+        final DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
+        final DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
         final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
             mu.times(expAOverB.unaryMinus())
@@ -60,11 +60,11 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
         final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
 
-        final DoubleTensor dPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+        final DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
         return new Diffs()
-            .put(MU, dPdmu)
-            .put(S, dPds)
-            .put(X, dPdx);
+            .put(MU, dLogPdmu)
+            .put(S, dLogPds)
+            .put(X, dLogPdx);
     }
 }

@@ -44,15 +44,16 @@ public class Gaussian implements ContinuousDistribution {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 
-        final DoubleTensor dlnP_dmu = xMinusMu.div(variance);
-        final DoubleTensor dlnP_dx = dlnP_dmu.unaryMinus();
-        final DoubleTensor dlnP_dsigma = xMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdmu = xMinusMu.div(variance);
+        final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
+        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
         return new Diffs()
-            .put(MU, dlnP_dmu)
-            .put(SIGMA, dlnP_dsigma)
-            .put(X, dlnP_dx);
+            .put(MU, dLogPdmu)
+            .put(SIGMA, dLogPdsigma)
+            .put(X, dLogPdx);
     }
+
 }

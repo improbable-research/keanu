@@ -151,4 +151,41 @@ public class LinearRegression {
         }
     }
 
+    @Test
+    public void linearRegressionTwoFactorTensorWithMatrixMultiplyVariationalMAP() {
+
+        // Generate data
+        int N = 100000;
+        double expectedW1 = 12.0;
+        double expectedW2 = 7.0;
+
+        DoubleVertex wGenerator = ConstantVertex.of(DoubleTensor.create(new double[]{expectedW1, expectedW2}, 2, 1));
+        DoubleVertex xGenerator = new UniformVertex(new int[]{N, 2}, 0, 10);
+        DoubleVertex yGenerator = new GaussianVertex(
+            xGenerator.matrixMultiply(wGenerator),
+            1.0
+        );
+        DoubleTensor xData = xGenerator.sample(random);
+        xGenerator.setAndCascade(xData);
+        DoubleTensor yData = yGenerator.sample(random);
+
+        // Linear Regression
+        DoubleVertex w = new GaussianVertex(new int[]{2, 1}, 0.0, 10.0);
+        w.setValue(DoubleTensor.create(new double[]{2, 2}, 2, 1));
+
+        DoubleVertex x = ConstantVertex.of(xData);
+        DoubleVertex yMu = x.matrixMultiply(w);
+        DoubleVertex y = new GaussianVertex(yMu, 5.0);
+        y.observe(yData);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
+        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+
+        optimizer.maxLikelihood();
+
+        System.out.println("W1 = " + w.getValue(0) + " W2 = " + w.getValue(1));
+        assertEquals(expectedW1, w.getValue(0), 0.05);
+        assertEquals(expectedW2, w.getValue(1), 0.05);
+    }
+
 }

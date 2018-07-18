@@ -10,11 +10,16 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LaplaceVertex extends ProbabilisticDouble {
 
@@ -23,7 +28,7 @@ public class LaplaceVertex extends ProbabilisticDouble {
 
     /**
      * One mu or beta or both that match a proposed tensor shape of Laplace
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor within the vertex
@@ -78,22 +83,24 @@ public class LaplaceVertex extends ProbabilisticDouble {
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         Diffs dlnP = Laplace.withParameters(mu.getValue(), beta.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(BETA).getValue(), dlnP.get(X).getValue());
-
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,
-                                                             DoubleTensor dPdbeta,
-                                                             DoubleTensor dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
+                                                             DoubleTensor dLogPdbeta,
+                                                             DoubleTensor dLogPdx) {
 
-        PartialDerivatives dPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dPdmu);
-        PartialDerivatives dPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dPdbeta);
-        PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromBeta);
+        PartialDerivatives dLogPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdbeta);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromMu.add(dLogPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 
     @Override

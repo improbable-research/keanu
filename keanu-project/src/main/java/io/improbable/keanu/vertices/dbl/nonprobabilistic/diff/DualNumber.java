@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Collections;
@@ -277,11 +278,13 @@ public class DualNumber {
 
     public DualNumber sum() {
         DoubleTensor sumOfAll = DoubleTensor.scalar(value.sum());
-        int[] resultDims = new int[value.getRank()];
-        for (int i = 0; i < value.getRank(); i++) {
-            resultDims[i] = i;
-        }
-        return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
+        int[] resultDims = TensorShape.dimensionRange(0, value.getRank());
+        return new DualNumber(sumOfAll, this.partialDerivatives.sum(false, resultDims));
+    }
+
+    public DualNumber reshape(int[] proposedShape) {
+        PartialDerivatives reshapedPartialDerivatives = this.partialDerivatives.reshape(getValue().getRank(), proposedShape);
+        return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
     }
 
 }

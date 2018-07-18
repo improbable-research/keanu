@@ -47,15 +47,15 @@ public class LogNormal implements ContinuousDistribution {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);
 
-        final DoubleTensor dlnP_dmu = lnXMinusMu.div(variance);
-        final DoubleTensor dlnP_dx = dlnP_dmu.plus(1.0).unaryMinus().divInPlace(x);
-        final DoubleTensor dlnP_dsigma = lnXMinusMu.powInPlace(2)
+        final DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
+        final DoubleTensor dLogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
+        final DoubleTensor dLogPdsigma = lnXMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
         return new Diffs()
-            .put(MU, dlnP_dmu)
-            .put(SIGMA, dlnP_dsigma)
-            .put(X, dlnP_dx);
+            .put(MU, dLogPdmu)
+            .put(SIGMA, dLogPdsigma)
+            .put(X, dLogPdx);
     }
 }

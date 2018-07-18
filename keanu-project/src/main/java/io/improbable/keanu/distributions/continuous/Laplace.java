@@ -70,14 +70,14 @@ public class Laplace implements ContinuousDistribution {
 
         final DoubleTensor denominator = muMinusXAbs.times(beta);
 
-        final DoubleTensor dPdx = muMinusX.divInPlace(denominator);
-        final DoubleTensor dPdMu = x.minus(mu).divInPlace(denominator);
-        final DoubleTensor dPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
+        final DoubleTensor dLogPdx = muMinusX.divInPlace(denominator);
+        final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
+        final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
         return new Diffs()
-            .put(MU, dPdMu)
-            .put(BETA, dPdBeta)
-            .put(X, dPdx);
+            .put(MU, dLogPdMu)
+            .put(BETA, dLogPdBeta)
+            .put(X, dLogPdx);
     }
 
 }

@@ -19,7 +19,7 @@ public class TriangularVertex extends ProbabilisticDouble {
 
     /**
      * One xMin, xMax, c or all three that match a proposed tensor shape of Triangular
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex

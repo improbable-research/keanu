@@ -67,6 +67,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return new ScalarDoubleTensor(shape);
     }
 
+    @Override
     DoubleTensor reshape(int... newShape);
 
     DoubleTensor diag();

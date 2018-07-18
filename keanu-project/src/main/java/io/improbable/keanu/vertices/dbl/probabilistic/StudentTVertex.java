@@ -14,6 +14,11 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
+import java.util.Map;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static java.util.Collections.singletonMap;
+
 public class StudentTVertex extends ProbabilisticDouble {
 
     private final IntegerVertex v;

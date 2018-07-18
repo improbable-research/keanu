@@ -37,11 +37,11 @@ public class Exponential implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dPda = lambda.reciprocal();
-        final DoubleTensor dPdb = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
+        final DoubleTensor dLogPdlocation = lambda.reciprocal();
+        final DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
         return new Diffs()
-            .put(A, dPda)
-            .put(B, dPdb)
-            .put(X, dPda.unaryMinus());
+            .put(A, dLogPdlocation)
+            .put(B, dLogPdlambda)
+            .put(X, dLogPdlocation.unaryMinus());
     }
 }
