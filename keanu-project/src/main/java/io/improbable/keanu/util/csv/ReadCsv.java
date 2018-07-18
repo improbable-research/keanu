@@ -21,6 +21,10 @@ public class ReadCsv {
         return new CsvReader(() -> getFileFromResources(fileOnClassPath));
     }
 
+    public static CsvReader fromFile(File file) {
+        return fromFile(file.toPath());
+    }
+
     public static CsvReader fromFile(String filePath) {
         return fromFile(Paths.get(filePath));
     }
