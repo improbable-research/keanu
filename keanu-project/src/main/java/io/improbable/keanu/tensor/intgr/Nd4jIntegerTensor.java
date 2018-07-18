@@ -29,7 +29,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(values, shape);
     }
 
-    public static Nd4jIntegerTensor create(double value, int[] shape) {
+    public static Nd4jIntegerTensor create(int value, int[] shape) {
         return new Nd4jIntegerTensor(Nd4j.valueArrayOf(shape, value));
     }
 
@@ -583,7 +583,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     private INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isScalar()) {
-            Nd4j.scalar(that.scalar().doubleValue()).reshape(that.getShape());
+            return Nd4j.scalar(that.scalar().doubleValue()).reshape(that.getShape());
         }
         return ((Nd4jIntegerTensor) that).tensor;
     }
