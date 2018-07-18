@@ -635,4 +635,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return ArrayUtils.toObject(asFlatIntegerArray());
     }
 
+    public INDArray getInternalRepresentation(){
+        return tensor;
+    }
 }

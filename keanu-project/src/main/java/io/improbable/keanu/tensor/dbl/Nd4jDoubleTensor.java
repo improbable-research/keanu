@@ -972,4 +972,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public Double[] asFlatArray() {
         return ArrayUtils.toObject(asFlatDoubleArray());
     }
+
+    public INDArray getInternalRepresentation(){
+        return tensor;
+    }
 }
