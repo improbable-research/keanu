@@ -39,20 +39,18 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        Map<Long, DoubleTensor> concatDerivates = new HashMap<>();
-        Map<Long, List<DoubleTensor>> partialDerivates = new HashMap<>();
+        Map<Long, List<DoubleTensor>> combinedPartialDerivativesOfInputs = new HashMap<>();
 
         for (DoubleVertex vertex : input) {
             for (Map.Entry<Long, DoubleTensor> partial : dualNumbers.get(vertex).getPartialDerivatives().asMap().entrySet()) {
-                partialDerivates.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
+                combinedPartialDerivativesOfInputs.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
             }
         }
 
-        for (Map.Entry<Long, List<DoubleTensor>> partials : partialDerivates.entrySet()) {
-            concatDerivates.put(partials.getKey(), concatPartialDerivates(partials.getValue()));
-        }
-
-        return new DualNumber(dualNumbers.get(input[0]).getValue(), concatDerivates);
+        DualNumber dualOfPrimary = dualNumbers.get(input[0]);
+        DoubleTensor[] inputValues = extractFromInputs(i -> input[i].getValue());
+        DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
+        return dualOfPrimary.concat(dimension, combinedPartialDerivativesOfInputs, dualToConcat);
     }
 
     @Override
@@ -61,8 +59,9 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
+        DoubleTensor primary = inputs[0];
         DoubleTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return inputs[0].concat(dimension, toConcat);
+        return primary.concat(dimension, toConcat);
     }
 
     private DoubleTensor[] extractFromInputs(Function<Integer, DoubleTensor> func) {
@@ -71,16 +70,6 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
             extract[i] = func.apply(i);
         }
         return extract;
-    }
-
-    private DoubleTensor concatPartialDerivates(List<DoubleTensor> partialDerivates) {
-        if (partialDerivates.size() == 1) {
-            return partialDerivates.get(0);
-        } else {
-            DoubleTensor primaryTensor = partialDerivates.remove(0);
-            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
-            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
-        }
     }
 
 

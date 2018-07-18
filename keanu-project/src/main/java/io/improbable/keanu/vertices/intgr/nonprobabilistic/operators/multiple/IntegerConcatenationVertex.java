@@ -41,8 +41,9 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
     }
 
     protected IntegerTensor op(IntegerTensor... inputs) {
+        IntegerTensor primary = inputs[0];
         IntegerTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return inputs[0].concat(dimension, toConcat);
+        return primary.concat(dimension, toConcat);
     }
 
     private IntegerTensor[] extractFromInputs(Function<Integer, IntegerTensor> func) {

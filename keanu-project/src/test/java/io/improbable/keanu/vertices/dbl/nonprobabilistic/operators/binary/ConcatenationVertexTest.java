@@ -19,14 +19,14 @@ public class ConcatenationVertexTest {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
 
-        UniformVertex a1 = new UniformVertex(0.0, 1.0);
-        a1.setValue(new double[]{4, 5, 6});
+        UniformVertex b = new UniformVertex(0.0, 1.0);
+        b.setValue(new double[]{4, 5, 6});
 
-        UniformVertex a2 = new UniformVertex(0.0, 1.0);
-        a2.setValue(new double[]{7, 8, 9});
+        UniformVertex c = new UniformVertex(0.0, 1.0);
+        c.setValue(new double[]{7, 8, 9});
 
-        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, a1);
-        ConcatenationVertex concatOne = new ConcatenationVertex(1, a, a1, a2);
+        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
+        ConcatenationVertex concatOne = new ConcatenationVertex(1, a, b, c);
 
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatOne.getValue().asFlatDoubleArray(), 0.001);
@@ -40,10 +40,10 @@ public class ConcatenationVertexTest {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
 
-        UniformVertex a1 = new UniformVertex(0.0, 1.0);
-        a1.setValue(new double[]{4, 5, 6, 7, 8, 9});
+        UniformVertex b = new UniformVertex(0.0, 1.0);
+        b.setValue(new double[]{4, 5, 6, 7, 8, 9});
 
-        ConcatenationVertex concatZero = new ConcatenationVertex(1, a, a1);
+        ConcatenationVertex concatZero = new ConcatenationVertex(1, a, b);
 
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
@@ -88,18 +88,18 @@ public class ConcatenationVertexTest {
 
     @Test
     public void canConcatMatricesOfSameSize() {
-        DoubleVertex m = new UniformVertex(0, 10);
-        m.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
-
         DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+        a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        ConcatenationVertex concatZero = new ConcatenationVertex(0, m, a);
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+
+        ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
 
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 10, 15, 20, 25}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{4, 2}, concatZero.getShape());
 
-        ConcatenationVertex concatOne = new ConcatenationVertex(1, m, a);
+        ConcatenationVertex concatOne = new ConcatenationVertex(1, a, b);
 
         Assert.assertArrayEquals(new double[]{1, 2, 10, 15, 3, 4, 20, 25}, concatOne.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{2, 4}, concatOne.getShape());
@@ -122,11 +122,7 @@ public class ConcatenationVertexTest {
         );
         Assert.assertArrayEquals(new int[]{4, 2, 2}, concatZero.getShape());
 
-        System.out.println(concatZero.getValue());
-        ConcatenationVertex concatTwo = new ConcatenationVertex(1, a, b);
-        System.out.println(concatTwo.getValue());
         ConcatenationVertex concatThree = new ConcatenationVertex(2, a, b);
-        System.out.println(concatThree.getValue());
         Assert.assertArrayEquals(
             new double[]{1, 2, 10, 20, 3, 4, 30, 40, 5, 6, 50, 60, 7, 8, 70, 80},
             concatThree.getValue().asFlatDoubleArray(),
@@ -160,6 +156,27 @@ public class ConcatenationVertexTest {
         Assert.assertArrayEquals(
             cPartial.withRespectTo(b).concat(0, dPartial.withRespectTo(b)).asFlatDoubleArray(),
             concatPartial.withRespectTo(b).asFlatDoubleArray(),
+            0.0001
+        );
+    }
+
+    @Test
+    public void canCalculateValueOfConcatenated() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+
+        DoubleVertex c = a.times(b);
+        DoubleVertex d = a.plus(b);
+
+        ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
+        DoubleTensor dualNumberValue = concat.getDualNumber().getValue();
+
+        Assert.assertArrayEquals(
+            new double[]{50, 90, 140, 200, 15, 21, 27, 33},
+            dualNumberValue.asFlatDoubleArray(),
             0.0001
         );
     }

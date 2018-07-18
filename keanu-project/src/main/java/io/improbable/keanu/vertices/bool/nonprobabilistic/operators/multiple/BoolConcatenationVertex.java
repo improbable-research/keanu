@@ -41,8 +41,9 @@ public class BoolConcatenationVertex extends NonProbabilisticBool {
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {
+        BooleanTensor primary = inputs[0];
         BooleanTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return inputs[0].concat(dimension, toConcat);
+        return primary.concat(dimension, toConcat);
     }
 
     private BooleanTensor[] extractFromInputs(Function<Integer, BooleanTensor> func) {
