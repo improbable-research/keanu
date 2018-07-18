@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static java.util.Collections.singletonMap;
 
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -129,7 +130,7 @@ public class SmoothUniformVertex extends DoubleVertex implements Probabilistic<D
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
-        final DoubleTensor dPdfdx = distribution.dLogProb(value).get(0);
+        final DoubleTensor dPdfdx = distribution.dLogProb(value).get(X).getValue();
         final DoubleTensor density = distribution.logProb(value);
         final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
 

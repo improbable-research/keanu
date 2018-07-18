@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.collect.ImmutableList;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.List;
 
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges
@@ -129,7 +129,7 @@ public class SmoothUniform implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
         final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
@@ -146,8 +146,9 @@ public class SmoothUniform implements ContinuousDistribution {
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
         ).unaryMinusInPlace();
 
-        return ImmutableList.of(firstConditional.timesInPlace(firstConditionalResult)
-            .plusInPlace(secondConditional.timesInPlace(secondConditionalResult)));
+        return new Diffs()
+            .put(X, firstConditional.timesInPlace(firstConditionalResult)
+                .plusInPlace(secondConditional.timesInPlace(secondConditionalResult)));
     }
 
     private static DoubleTensor shoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {

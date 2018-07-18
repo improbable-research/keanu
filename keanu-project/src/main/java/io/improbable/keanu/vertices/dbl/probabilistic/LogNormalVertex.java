@@ -4,9 +4,16 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.List;
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.LogNormal;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Observable;
@@ -81,8 +88,9 @@ public class LogNormalVertex extends DoubleVertex implements Probabilistic<Doubl
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        List<DoubleTensor> dlnP = LogNormal.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
+        Diffs dlnP = LogNormal.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(SIGMA).getValue(), dlnP.get(X).getValue());
+
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,

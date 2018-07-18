@@ -1,13 +1,15 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.Distribution;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
 import org.apache.commons.math3.special.Gamma;
 
-import java.util.List;
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class Beta implements ContinuousDistribution {
 
@@ -59,7 +61,7 @@ public class Beta implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).applyInPlace(Gamma::digamma);
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
@@ -68,6 +70,9 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor dPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
         final DoubleTensor dPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
 
-        return ImmutableList.of(dPda, dPdb, dPdx);
+        return new Diffs()
+            .put(A, dPda)
+            .put(B, dPdb)
+            .put(X, dPdx);
     }
 }

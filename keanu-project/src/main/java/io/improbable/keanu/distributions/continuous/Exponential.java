@@ -1,12 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.collect.ImmutableList;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.Distribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.List;
 
 public class Exponential implements ContinuousDistribution {
 
@@ -35,9 +36,12 @@ public class Exponential implements ContinuousDistribution {
     }
 
     @Override
-    public List<DoubleTensor> dLogProb(DoubleTensor x) {
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dPda = lambda.reciprocal();
         final DoubleTensor dPdb = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
-        return ImmutableList.of(dPda, dPdb, dPda.unaryMinus());
+        return new Diffs()
+            .put(A, dPda)
+            .put(B, dPdb)
+            .put(X, dPda.unaryMinus());
     }
 }

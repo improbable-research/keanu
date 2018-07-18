@@ -4,9 +4,16 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.List;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Exponential;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -81,8 +88,8 @@ public class ExponentialVertex extends DoubleVertex implements Probabilistic<Dou
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        List<DoubleTensor> dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(0), dlnP.get(1), dlnP.get(2));
+        Diffs dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdlocation,
