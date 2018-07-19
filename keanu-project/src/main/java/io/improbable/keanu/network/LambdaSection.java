@@ -11,6 +11,22 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * A Lambda Section is defined as a given vertex and all the vertices that it affects (downstream) OR
+ * all of the vertices that affects it (upstream), stopping at observed or probabilistic vertices.
+ * <p>
+ * For example:
+ * <p>
+ * A = SomeDistribution(...)
+ * B = A.cos()
+ * C = SomeDistribution(B, ...)
+ * D = C.times(2)
+ * <p>
+ * <p>
+ * The downstream Lambda Section of A would be [A, B, C]
+ * The upstream Lambda Section of D would be [D, C]
+ * The upstream Lambda Section of C would be [C, B, A]
+ */
 @Value
 public class LambdaSection {
 
@@ -27,6 +43,13 @@ public class LambdaSection {
             .collect(Collectors.toSet());
     }
 
+    /**
+     * @param aVertex                 the starting vertex
+     * @param includeNonProbabilistic
+     * @return All upstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
+     * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
+     * includeNonProbabilistic is false.
+     */
     public static LambdaSection getUpstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_AND_OBSERVED_ONLY;
@@ -40,6 +63,13 @@ public class LambdaSection {
         return new LambdaSection(upstreamVertices);
     }
 
+    /**
+     * @param aVertex                 the starting vertex
+     * @param includeNonProbabilistic
+     * @return All downstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
+     * is true. All downstream probabilistic or observed vertices stopping at probabilistic or observed if
+     * includeNonProbabilistic is false.
+     */
     public static LambdaSection getDownstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
 
         Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_AND_OBSERVED_ONLY;

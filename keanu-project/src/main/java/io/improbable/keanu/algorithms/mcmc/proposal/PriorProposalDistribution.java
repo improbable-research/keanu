@@ -16,12 +16,13 @@ public class PriorProposalDistribution implements ProposalDistribution {
         return proposal;
     }
 
-    private <T> void setFor(Vertex<T> vertex, KeanuRandom random, Proposal proposal) {
-        proposal.setProposal(vertex, vertex.sample(random));
-    }
-
     @Override
     public <T> double logProb(Vertex<T> vertex, T ofValue, T givenValue) {
         return vertex.logProb(ofValue);
     }
+
+    private <T> void setFor(Vertex<T> vertex, KeanuRandom random, Proposal proposal) {
+        proposal.setProposal(vertex, vertex.sample(random));
+    }
+
 }
