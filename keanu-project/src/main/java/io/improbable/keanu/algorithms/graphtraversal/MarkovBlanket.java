@@ -23,11 +23,11 @@ public class MarkovBlanket {
 
         LambdaSection parents = LambdaSection.getUpstreamLambdaSection(aVertex, false);
         LambdaSection children = LambdaSection.getDownstreamLambdaSection(aVertex, false);
-        Set<Vertex> childrensParents = getUpstreamProbabilisticVertices(children.getProbabilisticVertices());
+        Set<Vertex> childrensParents = getUpstreamProbabilisticVertices(children.getLatentAndObservedVertices());
 
         Set<Vertex> blanket = new HashSet<>();
-        blanket.addAll(parents.getProbabilisticVertices());
-        blanket.addAll(children.getProbabilisticVertices());
+        blanket.addAll(parents.getLatentAndObservedVertices());
+        blanket.addAll(children.getLatentAndObservedVertices());
         blanket.addAll(childrensParents);
 
         blanket.remove(aVertex);
@@ -41,7 +41,7 @@ public class MarkovBlanket {
 
         for (Vertex<?> vertex : vertices) {
             LambdaSection upstreamLambdaSection = LambdaSection.getUpstreamLambdaSection(vertex, false);
-            probabilistic.addAll(upstreamLambdaSection.getProbabilisticVertices());
+            probabilistic.addAll(upstreamLambdaSection.getLatentAndObservedVertices());
         }
 
         return probabilistic;

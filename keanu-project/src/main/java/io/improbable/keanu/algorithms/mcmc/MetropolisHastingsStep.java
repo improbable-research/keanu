@@ -1,12 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.mcmc.proposals.Proposal;
-import io.improbable.keanu.algorithms.mcmc.proposals.ProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.LambdaSection;
 import io.improbable.keanu.network.NetworkSnapshot;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Value;
 
 import java.util.HashSet;
 import java.util.List;
@@ -14,15 +15,15 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class MCMCStep {
+class MetropolisHastingsStep {
 
-    public static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
+    private static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
 
     private final ProposalDistribution proposalDistribution;
     private final boolean useCacheOnRejection;
     private final Map<Vertex, LambdaSection> affectedVerticesCache;
 
-    MCMCStep(List<? extends Vertex> latentVertices, ProposalDistribution proposalDistribution, boolean useCacheOnRejection) {
+    MetropolisHastingsStep(List<? extends Vertex> latentVertices, ProposalDistribution proposalDistribution, boolean useCacheOnRejection) {
         this.proposalDistribution = proposalDistribution;
         this.useCacheOnRejection = useCacheOnRejection;
         this.affectedVerticesCache = getVerticesAffectedByLatents(
@@ -31,11 +32,10 @@ public class MCMCStep {
         );
     }
 
-
-    public double nextSample(final Set<Vertex> chosenVertices,
-                             final double totalLogProbOld,
-                             final KeanuRandom random) {
-        return nextSample(chosenVertices, totalLogProbOld, 1.0, random);
+    public StepResult step(final Set<Vertex> chosenVertices,
+                           final double totalLogProbOld,
+                           final KeanuRandom random) {
+        return step(chosenVertices, totalLogProbOld, 1.0, random);
     }
 
     /**
@@ -46,10 +46,10 @@ public class MCMCStep {
      * @param random          source of randomness
      * @return the log probability of the network after either accepting or rejecting the sample
      */
-    public double nextSample(final Set<Vertex> chosenVertices,
-                             final double totalLogProbOld,
-                             final double T,
-                             final KeanuRandom random) {
+    public StepResult step(final Set<Vertex> chosenVertices,
+                           final double totalLogProbOld,
+                           final double T,
+                           final KeanuRandom random) {
 
         final double affectedVerticesLogProbOld = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
@@ -77,7 +77,7 @@ public class MCMCStep {
             final boolean shouldAccept = r >= random.nextDouble();
 
             if (shouldAccept) {
-                return totalLogProbNew;
+                return new StepResult(true, totalLogProbNew);
             }
         }
 
@@ -89,7 +89,7 @@ public class MCMCStep {
             VertexValuePropagation.cascadeUpdate(chosenVertices);
         }
 
-        return totalLogProbOld;
+        return new StepResult(false, totalLogProbOld);
     }
 
     private static NetworkSnapshot getSnapshotOfAllAffectedVertices(final Set<Vertex> chosenVertices,
@@ -107,7 +107,7 @@ public class MCMCStep {
                                                       Map<Vertex, LambdaSection> affectedVertices) {
         double sumLogProb = 0.0;
         for (Vertex v : vertices) {
-            sumLogProb += sumLogProbability(affectedVertices.get(v).getProbabilisticVertices());
+            sumLogProb += sumLogProbability(affectedVertices.get(v).getLatentAndObservedVertices());
         }
         return sumLogProb;
     }
@@ -133,6 +133,12 @@ public class MCMCStep {
                 v -> v,
                 v -> LambdaSection.getDownstreamLambdaSection(v, includeNonProbabilistic)
             ));
+    }
+
+    @Value
+    static class StepResult {
+        boolean accepted;
+        double logProbAfterStep;
     }
 
 }

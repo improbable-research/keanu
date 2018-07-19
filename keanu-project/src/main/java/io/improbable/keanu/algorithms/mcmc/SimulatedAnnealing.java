@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.mcmc.proposals.PriorProposal;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
@@ -61,26 +61,30 @@ public class SimulatedAnnealing {
         Map<Long, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
-        double logP = bayesNet.getLogOfMasterP();
-        double maxLogP = logP;
+        double logProbabilityAfterStep = bayesNet.getLogOfMasterP();
+        double maxLogP = logProbabilityAfterStep;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
 
-        MCMCStep mcmcStep = new MCMCStep(latentVertices, PriorProposal.SINGLETON, true);
+        MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
+            latentVertices,
+            ProposalDistribution.usePrior,
+            true
+        );
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
-            logP = mcmcStep.nextSample(
+            logProbabilityAfterStep = mhStep.step(
                 Collections.singleton(chosenVertex),
-                logP,
+                logProbabilityAfterStep,
                 temperature,
                 random
-            );
+            ).getLogProbAfterStep();
 
-            if (logP > maxLogP) {
-                maxLogP = logP;
+            if (logProbabilityAfterStep > maxLogP) {
+                maxLogP = logProbabilityAfterStep;
                 setSamplesAsMax(maxSamplesByVertex, latentVertices);
             }
         }

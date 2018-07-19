@@ -2,14 +2,17 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
-import io.improbable.keanu.algorithms.mcmc.proposals.PriorProposal;
-import io.improbable.keanu.algorithms.mcmc.proposals.ProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 
 import java.util.*;
+
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.singleVariablePerSample;
+import static io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution.usePrior;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
@@ -19,13 +22,17 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     public static MetropolisHastings withDefaultConfig() {
         return MetropolisHastings.builder()
-            .proposalDistribution(PriorProposal.SINGLETON)
+            .proposalDistribution(usePrior)
+            .variableSelector(singleVariablePerSample)
             .useCacheOnRejection(true)
             .build();
     }
 
     @Builder.Default
-    private final ProposalDistribution proposalDistribution = PriorProposal.SINGLETON;
+    private final ProposalDistribution proposalDistribution = usePrior;
+
+    @Builder.Default
+    private final MHStepVariableSelector variableSelector = singleVariablePerSample;
 
     @Builder.Default
     private final boolean useCacheOnRejection = true;
@@ -53,17 +60,23 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesianNetwork.getLatentVertices();
-        MCMCStep mcmcStep = new MCMCStep(latentVertices, proposalDistribution, useCacheOnRejection);
 
-        double totalLogProbability = bayesianNetwork.getLogOfMasterP();
+        MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
+            latentVertices,
+            proposalDistribution,
+            useCacheOnRejection
+        );
+
+        double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
-            totalLogProbability = mcmcStep.nextSample(
-                Collections.singleton(chosenVertex),
-                totalLogProbability,
+            Set<Vertex> chosenVertices = variableSelector.select(latentVertices, sampleNum);
+
+            logProbabilityBeforeStep = mhStep.step(
+                chosenVertices,
+                logProbabilityBeforeStep,
                 random
-            );
+            ).getLogProbAfterStep();
 
             takeSamples(samplesByVertex, verticesToSampleFrom);
         }

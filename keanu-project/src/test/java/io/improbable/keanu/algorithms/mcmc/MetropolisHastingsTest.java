@@ -170,7 +170,7 @@ public class MetropolisHastingsTest {
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
 
-        assertEquals(0.5, postProbTrue, 0.01);
+        assertEquals(0.0, postProbTrue, 0.01);
     }
 
     @Test

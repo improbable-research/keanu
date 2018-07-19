@@ -1,15 +1,15 @@
-package io.improbable.keanu.algorithms.mcmc.proposals;
+package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 import java.util.Set;
 
-public class PriorProposal implements ProposalDistribution {
+public class PriorProposalDistribution implements ProposalDistribution {
 
-    public static final PriorProposal SINGLETON = new PriorProposal();
+    static final PriorProposalDistribution SINGLETON = new PriorProposalDistribution();
 
-    private PriorProposal() {
+    private PriorProposalDistribution() {
     }
 
     @Override
@@ -22,6 +22,6 @@ public class PriorProposal implements ProposalDistribution {
     }
 
     private <T> void setFor(Vertex<T> vertex, KeanuRandom random, Proposal proposal) {
-        proposal.setProposal(vertex, vertex.getValue(), vertex.sample(random));
+        proposal.setProposal(vertex, vertex.sample(random));
     }
 }

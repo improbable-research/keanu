@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.mcmc.proposals;
+package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.vertices.Vertex;
 
@@ -16,8 +16,8 @@ public class Proposal {
         this.perVertexProposalFrom = new HashMap<>();
     }
 
-    public <T> void setProposal(Vertex<T> vertex, T from, T to) {
-        perVertexProposalFrom.put(vertex, from);
+    public <T> void setProposal(Vertex<T> vertex, T to) {
+        perVertexProposalFrom.put(vertex, vertex.getValue());
         perVertexProposalTo.put(vertex, to);
     }
 

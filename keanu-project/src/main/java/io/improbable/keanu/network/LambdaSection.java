@@ -15,21 +15,21 @@ import java.util.stream.Collectors;
 public class LambdaSection {
 
     private static final Predicate<Vertex> ADD_ALL = vertex -> true;
-    private static final Predicate<Vertex> PROBABILISTIC_ONLY = Vertex::isProbabilistic;
+    private static final Predicate<Vertex> PROBABILISTIC_AND_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
 
     private final Set<Vertex> allVertices;
-    private final Set<Vertex> probabilisticVertices;
+    private final Set<Vertex> latentAndObservedVertices;
 
     private LambdaSection(Set<Vertex> allVertices) {
         this.allVertices = allVertices;
-        this.probabilisticVertices = allVertices.stream()
-            .filter(Vertex::isProbabilistic)
+        this.latentAndObservedVertices = allVertices.stream()
+            .filter(PROBABILISTIC_AND_OBSERVED_ONLY)
             .collect(Collectors.toSet());
     }
 
     public static LambdaSection getUpstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
 
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_ONLY;
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_AND_OBSERVED_ONLY;
 
         Set<Vertex> upstreamVertices = getVerticesDepthFirst(
             aVertex,
@@ -42,7 +42,7 @@ public class LambdaSection {
 
     public static LambdaSection getDownstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
 
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_ONLY;
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_AND_OBSERVED_ONLY;
 
         Set<Vertex> downstreamVertices = getVerticesDepthFirst(
             aVertex,
@@ -76,7 +76,7 @@ public class LambdaSection {
                 result.add(visiting);
             }
 
-            if (visiting.isProbabilistic()) {
+            if (visiting.isObserved() || visiting.isProbabilistic()) {
                 continue;
             }
 
