@@ -12,7 +12,6 @@ import lombok.Builder;
 import java.util.*;
 
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.singleVariablePerSample;
-import static io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution.usePrior;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
@@ -21,15 +20,20 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution.
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     public static MetropolisHastings withDefaultConfig() {
+        return withDefaultConfig(KeanuRandom.getDefaultRandom());
+    }
+
+    public static MetropolisHastings withDefaultConfig(KeanuRandom random) {
         return MetropolisHastings.builder()
-            .proposalDistribution(usePrior)
+            .proposalDistribution(ProposalDistribution.usePrior())
             .variableSelector(singleVariablePerSample)
             .useCacheOnRejection(true)
+            .random(random)
             .build();
     }
 
-    @Builder.Default
-    private final ProposalDistribution proposalDistribution = usePrior;
+    private final KeanuRandom random;
+    private final ProposalDistribution proposalDistribution;
 
     @Builder.Default
     private final MHStepVariableSelector variableSelector = singleVariablePerSample;
@@ -37,25 +41,16 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Builder.Default
     private final boolean useCacheOnRejection = true;
 
-    @Override
-    public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
-                                              List<? extends Vertex> verticesToSampleFrom,
-                                              int sampleCount) {
-        return getPosteriorSamples(bayesianNetwork, verticesToSampleFrom, sampleCount, KeanuRandom.getDefaultRandom());
-    }
-
     /**
      * @param bayesianNetwork      a bayesian network containing latent vertices
      * @param verticesToSampleFrom the vertices to include in the returned samples
      * @param sampleCount          number of samples to take using the algorithm
-     * @param random               the source of randomness
      * @return Samples for each vertex ordered by MCMC iteration
      */
     @Override
     public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesianNetwork,
                                               final List<? extends Vertex> verticesToSampleFrom,
-                                              final int sampleCount,
-                                              final KeanuRandom random) {
+                                              final int sampleCount) {
         checkBayesNetInHealthyState(bayesianNetwork);
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
@@ -64,7 +59,8 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             latentVertices,
             proposalDistribution,
-            useCacheOnRejection
+            useCacheOnRejection,
+            random
         );
 
         double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
@@ -74,9 +70,8 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
             logProbabilityBeforeStep = mhStep.step(
                 chosenVertices,
-                logProbabilityBeforeStep,
-                random
-            ).getLogProbAfterStep();
+                logProbabilityBeforeStep
+            ).getLogProbabilityAfterStep();
 
             takeSamples(samplesByVertex, verticesToSampleFrom);
         }

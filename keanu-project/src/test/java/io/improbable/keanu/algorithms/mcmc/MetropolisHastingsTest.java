@@ -47,8 +47,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Arrays.asList(A, B),
-            100000,
-            random
+            100000
         );
 
         double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
@@ -77,8 +76,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Arrays.asList(A, B),
-            100000,
-            random
+            100000
         );
 
         DoubleTensor averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages();
@@ -110,8 +108,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Collections.singletonList(A),
-            10000,
-            random
+            10000
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
@@ -141,8 +138,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Collections.singletonList(A),
-            100000,
-            random
+            100000
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
@@ -164,8 +160,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             net,
             Collections.singletonList(A),
-            10000,
-            random
+            10000
         );
 
         double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());

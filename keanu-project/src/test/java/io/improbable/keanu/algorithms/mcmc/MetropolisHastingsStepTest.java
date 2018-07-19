@@ -1,19 +1,23 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.mcmc.proposal.PriorProposalDistribution;
 import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import lombok.AllArgsConstructor;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import java.util.Collections;
+import java.util.Set;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
@@ -49,17 +53,17 @@ public class MetropolisHastingsStepTest {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             network.getLatentVertices(),
-            ProposalDistribution.usePrior,
-            true
+            ProposalDistribution.usePrior(),
+            true,
+            KeanuRandom.getDefaultRandom()
         );
 
         MetropolisHastingsStep.StepResult result = mhStep.step(
             Collections.singleton(A),
-            logProbBeforeStep,
-            KeanuRandom.getDefaultRandom()
+            logProbBeforeStep
         );
 
-        assertEquals(network.getLogOfMasterP(), result.getLogProbAfterStep(), 1e-10);
+        assertEquals(network.getLogOfMasterP(), result.getLogProbabilityAfterStep(), 1e-10);
         assertTrue(result.isAccepted());
     }
 
@@ -69,12 +73,11 @@ public class MetropolisHastingsStepTest {
         A.setValue(0.0);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(network, 1.0);
+        MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(network, 1.0, alwaysAccept);
 
         MetropolisHastingsStep.StepResult result = mhStep.step(
             Collections.singleton(A),
-            network.getLogOfMasterP(),
-            alwaysAccept
+            network.getLogOfMasterP()
         );
 
         assertTrue(result.isAccepted());
@@ -87,12 +90,11 @@ public class MetropolisHastingsStepTest {
         A.setValue(0.5);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(network, -1);
+        MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(network, -1, alwaysAccept);
 
         MetropolisHastingsStep.StepResult result = mhStep.step(
             Collections.singleton(A),
-            network.getLogOfMasterP(),
-            alwaysAccept
+            network.getLogOfMasterP()
         );
 
         assertFalse(result.isAccepted());
@@ -109,32 +111,41 @@ public class MetropolisHastingsStepTest {
         C.observe(5.0);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(network, 10);
+        MetropolisHastingsStep mhStep = stepFunctionWithConstantProposal(network, 10, alwaysReject);
 
         MetropolisHastingsStep.StepResult result = mhStep.step(
             Collections.singleton(A),
-            network.getLogOfMasterP(),
-            alwaysReject
+            network.getLogOfMasterP()
         );
 
         assertFalse(result.isAccepted());
         assertEquals(0.5, A.getValue(0), 1e-10);
     }
 
-    private MetropolisHastingsStep stepFunctionWithConstantProposal(BayesianNetwork network, double constant) {
+    private MetropolisHastingsStep stepFunctionWithConstantProposal(BayesianNetwork network, double constant, KeanuRandom random) {
         return new MetropolisHastingsStep(
             network.getLatentVertices(),
             constantProposal(constant),
-            true
+            true,
+            random
         );
     }
 
     private ProposalDistribution constantProposal(double constant) {
-        return (vertices, random) -> {
+        return new ConstantProposalDistribution(constant);
+    }
+
+    @AllArgsConstructor
+    private static class ConstantProposalDistribution extends PriorProposalDistribution {
+
+        private final double constant;
+
+        @Override
+        public Proposal getProposal(Set<Vertex> vertices, KeanuRandom random) {
             Proposal proposal = new Proposal();
             vertices.forEach(vertex -> proposal.setProposal(vertex, DoubleTensor.scalar(constant)));
             return proposal;
-        };
+        }
     }
 
 }

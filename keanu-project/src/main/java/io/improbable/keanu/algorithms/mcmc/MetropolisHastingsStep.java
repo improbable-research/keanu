@@ -22,10 +22,23 @@ class MetropolisHastingsStep {
     private final ProposalDistribution proposalDistribution;
     private final boolean useCacheOnRejection;
     private final Map<Vertex, LambdaSection> affectedVerticesCache;
+    private final KeanuRandom random;
 
-    MetropolisHastingsStep(List<? extends Vertex> latentVertices, ProposalDistribution proposalDistribution, boolean useCacheOnRejection) {
+    /**
+     * @param latentVertices       Vertices that are unknown/hidden variables
+     * @param proposalDistribution The proposal distribution
+     * @param useCacheOnRejection  True if caching values of the network such that recalculation isn't required
+     *                             on step rejection
+     * @param random               Source of randomness
+     */
+    MetropolisHastingsStep(List<? extends Vertex> latentVertices,
+                           ProposalDistribution proposalDistribution,
+                           boolean useCacheOnRejection,
+                           KeanuRandom random) {
+
         this.proposalDistribution = proposalDistribution;
         this.useCacheOnRejection = useCacheOnRejection;
+        this.random = random;
         this.affectedVerticesCache = getVerticesAffectedByLatents(
             latentVertices,
             useCacheOnRejection
@@ -33,23 +46,20 @@ class MetropolisHastingsStep {
     }
 
     public StepResult step(final Set<Vertex> chosenVertices,
-                           final double totalLogProbOld,
-                           final KeanuRandom random) {
-        return step(chosenVertices, totalLogProbOld, 1.0, random);
+                           final double logProbabilityBeforeStep) {
+        return step(chosenVertices, logProbabilityBeforeStep, 1.0);
     }
 
     /**
-     * @param chosenVertices  vertices to get a proposed change for
-     * @param totalLogProbOld The log of the previous state's probability
-     * @param T               Temperature for simulated annealing. This
-     *                        should be constant if no annealing is wanted
-     * @param random          source of randomness
+     * @param chosenVertices           vertices to get a proposed change for
+     * @param logProbabilityBeforeStep The log of the previous state's probability
+     * @param T                        Temperature for simulated annealing. This
+     *                                 should be constant if no annealing is wanted
      * @return the log probability of the network after either accepting or rejecting the sample
      */
     public StepResult step(final Set<Vertex> chosenVertices,
-                           final double totalLogProbOld,
-                           final double T,
-                           final KeanuRandom random) {
+                           final double logProbabilityBeforeStep,
+                           final double T) {
 
         final double affectedVerticesLogProbOld = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
@@ -66,18 +76,18 @@ class MetropolisHastingsStep {
 
         if (affectedVerticesLogProbNew != LOG_ZERO_PROBABILITY) {
 
-            final double totalLogProbNew = totalLogProbOld - affectedVerticesLogProbOld + affectedVerticesLogProbNew;
+            final double logProbabilityAfterStep = logProbabilityBeforeStep - affectedVerticesLogProbOld + affectedVerticesLogProbNew;
 
-            final double pqxOld = proposal.logProbAtProposalFrom();
-            final double pqxNew = proposal.logProbAtProposalTo();
+            final double pqxOld = proposalDistribution.logProbAtFromGivenTo(proposal);
+            final double pqxNew = proposalDistribution.logProbAtToGivenFrom(proposal);
 
-            final double logR = (totalLogProbNew * (1.0 / T) + pqxOld) - (totalLogProbOld * (1.0 / T) + pqxNew);
+            final double logR = (logProbabilityAfterStep * (1.0 / T) + pqxOld) - (logProbabilityBeforeStep * (1.0 / T) + pqxNew);
             final double r = Math.exp(logR);
 
             final boolean shouldAccept = r >= random.nextDouble();
 
             if (shouldAccept) {
-                return new StepResult(true, totalLogProbNew);
+                return new StepResult(true, logProbabilityAfterStep);
             }
         }
 
@@ -89,7 +99,7 @@ class MetropolisHastingsStep {
             VertexValuePropagation.cascadeUpdate(chosenVertices);
         }
 
-        return new StepResult(false, totalLogProbOld);
+        return new StepResult(false, logProbabilityBeforeStep);
     }
 
     private static NetworkSnapshot getSnapshotOfAllAffectedVertices(final Set<Vertex> chosenVertices,
@@ -138,7 +148,7 @@ class MetropolisHastingsStep {
     @Value
     static class StepResult {
         boolean accepted;
-        double logProbAfterStep;
+        double logProbabilityAfterStep;
     }
 
 }

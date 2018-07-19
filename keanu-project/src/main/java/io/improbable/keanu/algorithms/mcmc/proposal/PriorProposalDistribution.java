@@ -7,11 +7,6 @@ import java.util.Set;
 
 public class PriorProposalDistribution implements ProposalDistribution {
 
-    static final PriorProposalDistribution SINGLETON = new PriorProposalDistribution();
-
-    private PriorProposalDistribution() {
-    }
-
     @Override
     public Proposal getProposal(Set<Vertex> vertices, KeanuRandom random) {
         Proposal proposal = new Proposal();
@@ -23,5 +18,10 @@ public class PriorProposalDistribution implements ProposalDistribution {
 
     private <T> void setFor(Vertex<T> vertex, KeanuRandom random, Proposal proposal) {
         proposal.setProposal(vertex, vertex.sample(random));
+    }
+
+    @Override
+    public <T> double logProb(Vertex<T> vertex, T ofValue, T givenValue) {
+        return vertex.logProb(ofValue);
     }
 }

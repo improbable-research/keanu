@@ -29,6 +29,10 @@ public class Proposal {
         return (T) perVertexProposalFrom.get(vertex);
     }
 
+    public Set<Vertex> getVerticesWithProposal() {
+        return perVertexProposalTo.keySet();
+    }
+
     public void apply() {
         Set<Vertex> vertices = perVertexProposalTo.keySet();
         for (Vertex v : vertices) {
@@ -41,22 +45,6 @@ public class Proposal {
         for (Vertex v : vertices) {
             v.setValue(getProposalFrom(v));
         }
-    }
-
-    public double logProbAtProposalFrom() {
-        double sumLogProb = 0.0;
-        for (Vertex v : perVertexProposalTo.keySet()) {
-            sumLogProb += v.logProb(getProposalFrom(v));
-        }
-        return sumLogProb;
-    }
-
-    public double logProbAtProposalTo() {
-        double sumLogProb = 0.0;
-        for (Vertex v : perVertexProposalTo.keySet()) {
-            sumLogProb += v.logProb(getProposalTo(v));
-        }
-        return sumLogProb;
     }
 
 }
