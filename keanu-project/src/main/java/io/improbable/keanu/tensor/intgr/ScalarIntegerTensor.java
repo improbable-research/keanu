@@ -245,6 +245,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor tad(int dimension, int index) {
+        throw new IllegalStateException("Cannot tad a scalar");
+    }
+
+    @Override
     public IntegerTensor minusInPlace(int that) {
         value = value - that;
         return this;

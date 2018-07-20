@@ -84,6 +84,16 @@ public class TensorShape {
         return flatIndex;
     }
 
+    public static int[] getShapeIndices(int[] shape, int[] stride, int flatIndex) {
+        int[] shapeIndices = new int[shape.length];
+        int remainder = flatIndex;
+        for (int i = 0; i < shape.length; i++) {
+            shapeIndices[i] = remainder / stride[i];
+            remainder -= shapeIndices[i] * stride[i];
+        }
+        return shapeIndices;
+    }
+
     public static boolean isScalar(int[] shape) {
         return getLength(shape) == 1;
     }
@@ -138,3 +148,4 @@ public class TensorShape {
         return paddedShape;
     }
 }
+

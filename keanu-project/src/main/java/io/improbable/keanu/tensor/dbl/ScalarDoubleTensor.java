@@ -89,6 +89,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public int[] getStride() {
+        return new int[0];
+    }
+
+    @Override
     public DoubleTensor reshape(int[] newShape) {
         if (!TensorShape.isScalar(newShape)) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
@@ -391,6 +396,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public double determinant() {
         return value;
+    }
+
+    @Override
+    public DoubleTensor tad(int dimension, int index) {
+        throw new IllegalStateException("Cannot tad a scalar");
     }
 
     @Override

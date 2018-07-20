@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.bool;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -198,6 +199,17 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public IntegerTensor toIntegerMask() {
         int[] doubles = asFlatIntegerArray();
         return IntegerTensor.create(doubles, copyOf(shape, shape.length));
+    }
+
+    @Override
+    public BooleanTensor tad(int dimension, int index) {
+        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).tad(dimension, index);
+        double[] tadFlat = tadDoubles.asFlatDoubleArray();
+        boolean[] tadToBooleans = new boolean[tadFlat.length];
+        for (int i = 0; i <tadFlat.length; i++) {
+            tadToBooleans[i] = tadFlat[i] == 1;
+        }
+        return new SimpleBooleanTensor(tadToBooleans, tadDoubles.getShape());
     }
 
     @Override

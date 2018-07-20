@@ -244,6 +244,20 @@ public class PartialDerivatives {
         return new PartialDerivatives(reshapedDerivatives);
     }
 
+    public PartialDerivatives split(int dimension, int index) {
+        Map<Long, DoubleTensor> splitDerivatives = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+            int[] partialDerivativeShape = partialDerivative.getValue().getShape();
+            partialDerivativeShape[dimension] = 1;
+            DoubleTensor splitPartialDerivative = partialDerivative.getValue().tad(dimension, index);
+            splitPartialDerivative = splitPartialDerivative.reshape(partialDerivativeShape);
+            splitDerivatives.put(partialDerivative.getKey(), splitPartialDerivative);
+        }
+
+        return new PartialDerivatives(splitDerivatives);
+    }
+
     private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {
         Map<Long, DoubleTensor> clone = new HashMap<>();
         for (Map.Entry<Long, DoubleTensor> entry : infinitesimals.entrySet()) {

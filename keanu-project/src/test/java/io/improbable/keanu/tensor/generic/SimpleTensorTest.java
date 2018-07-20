@@ -66,4 +66,25 @@ public class SimpleTensorTest {
         assertArrayEquals(somethingTensor.asFlatArray(), reshapedSomething.asFlatArray());
     }
 
+    @Test
+    public void canTAD() {
+
+        Tensor<Something> somethingTensor = new GenericTensor<>(
+            new Something[]{
+                Something.A, Something.B, Something.B,
+                Something.C, Something.D, Something.B,
+                Something.D, Something.A, Something.C
+            },
+            new int[]{3, 3}
+        );
+
+        Tensor<Something> taddedSomethingRow = somethingTensor.tad(0, 1);
+        assertArrayEquals(new int[]{1, 3}, taddedSomethingRow.getShape());
+        assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
+
+        Tensor<Something> taddedSomethingColumn = somethingTensor.tad(1, 1);
+        assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
+        assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
+    }
+
 }

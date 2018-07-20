@@ -68,6 +68,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         this.tensor = tensor;
     }
 
+    public INDArray getTensor() {
+        return tensor;
+    }
+
     @Override
     public int getRank() {
         return tensor.shape().length;
@@ -76,6 +80,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public int[] getShape() {
         return tensor.shape();
+    }
+
+    @Override
+    public int[] getStride() {
+        return tensor.stride();
     }
 
     @Override
@@ -770,6 +779,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
         return new LUDecomposition(matrix).getDeterminant();
+    }
+
+    @Override
+    public DoubleTensor tad(int dimension, int index) {
+        INDArray dup = tensor.dup();
+        INDArray tad = dup.slice(index, dimension);
+        return new Nd4jDoubleTensor(tad);
     }
 
     // Comparisons

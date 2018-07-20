@@ -287,4 +287,9 @@ public class DualNumber {
         return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
     }
 
+    public DualNumber split(int dimension, int index) {
+        PartialDerivatives splitPartialDerivatives = this.partialDerivatives.split(dimension, index);
+        return new DualNumber(value.tad(dimension, index), splitPartialDerivatives);
+    }
+
 }

@@ -105,4 +105,6 @@ public interface Tensor<T> {
         return new GenericTensor<>(shape);
     }
 
+    Tensor<T> tad(int dimension, int index);
+
 }

@@ -3,7 +3,9 @@ package io.improbable.keanu.tensor.generic;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import static java.util.Arrays.copyOf;
@@ -182,6 +184,21 @@ public class GenericTensor<T> implements Tensor<T> {
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
         return new GenericTensor<>(data, newShape);
+    }
+
+    @Override
+    public Tensor<T> tad(int dimension, int index) {
+        T[] flat = asFlatArray();
+        List<T> tadded = new ArrayList();
+        for (int i = 0; i < flat.length; i++) {
+            int[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
+            if (indicesOfCurrent[dimension] == index) {
+                tadded.add(getValue(indicesOfCurrent));
+            }
+        }
+        int[] taddedShape = Arrays.copyOf(shape, shape.length);
+        taddedShape[dimension] = 1;
+        return new GenericTensor(tadded.toArray(), taddedShape);
     }
 
     private void assertIsNumber() {
