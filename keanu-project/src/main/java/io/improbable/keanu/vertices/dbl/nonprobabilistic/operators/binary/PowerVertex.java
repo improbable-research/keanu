@@ -14,22 +14,30 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     /**
      * Raises a vertex to the power of another
      *
-     * @param a the base vertex
-     * @param b the exponent vertex
+     * @param left the base vertex
+     * @param right the exponent vertex
      */
-    public PowerVertex(DoubleVertex a, DoubleVertex b) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+    public PowerVertex(DoubleVertex left, DoubleVertex right) {
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
-        return a.pow(b);
+    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
+        return left.pow(right);
     }
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber aDual = dualNumbers.get(a);
-        DualNumber bDual = dualNumbers.get(b);
-        return aDual.pow(bDual);
+        DualNumber leftDual = dualNumbers.get(left);
+        DualNumber rightDual = dualNumbers.get(right);
+        return leftDual.pow(rightDual);
+    }
+
+    public DoubleVertex getBase(){
+        return super.getLeft();
+    }
+
+    public DoubleVertex getExponent(){
+        return super.getRight();
     }
 }

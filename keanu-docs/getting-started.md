@@ -44,13 +44,12 @@ public class WetGrass {
 
 ### Install
 
-It's recommended that you start with the starter project found [here](../keanu-examples/starter).
+It's recommended that you start with the starter project found [here](https://github.com/improbable-research/keanu-starter).
 The starter project is a very simple Keanu project built with gradle. 
 
 To quickly create a new project from the starter project:
 ```
-git clone --branch develop --depth 1 https://github.com/improbable-research/keanu.git
-cp -R ./keanu/keanu-examples/starter <NEW_PROJECT_LOCATION>
+git clone --branch basic --depth 1 https://github.com/improbable-research/keanu-starter.git
 ```
 
 If you would like to start using Keanu in an existing project, simply add Keanu as a dependency 
@@ -61,7 +60,7 @@ in your gradle or maven build file.
 In your project's build.gradle:
 
 ```$groovy
-compile group: 'io.improbable', name: 'keanu', version: '0.0.8'
+compile group: 'io.improbable', name: 'keanu', version: '0.0.9'
 ```
 
 #### Maven
@@ -72,6 +71,6 @@ In your project's pom.xml:
 <dependency>
     <groupId>io.improbable</groupId>
     <artifactId>keanu</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.9</version>
 </dependency>
 ```
