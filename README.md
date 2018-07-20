@@ -28,6 +28,9 @@ were spent applying Keanu to challenging problems and locating its strengths and
 
 Please create a Github Issue if you encounter any bugs or have a feature request.
 
+* Slack: [#keanu](https://join.slack.com/t/improbable-eng/shared_invite/enQtMzQ1ODcyMzQ5MjM4LWY5ZWZmNGM2ODc5MmViNmQ3ZTA3ZTY3NzQwOTBlMTkzZmIxZTIxODk0OWU3YjZhNWVlNDU3MDlkZGViZjhkMjc)
+* Issue Tracker: [GitHub Issues](https://github.com/improbable-research/keanu/issues)
+
 ## Features
 
 * Probabilistic Programming Operators and Distributions
