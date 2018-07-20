@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
  * C = SomeDistribution(B, ...)
  * D = C.times(2)
  * <p>
- * <p>
  * The downstream Lambda Section of A would be [A, B, C]
  * The upstream Lambda Section of D would be [D, C]
  * The upstream Lambda Section of C would be [C, B, A]
@@ -45,7 +44,7 @@ public class LambdaSection {
 
     /**
      * @param aVertex                 the starting vertex
-     * @param includeNonProbabilistic
+     * @param includeNonProbabilistic false if only the probabilistic and observed are wanted
      * @return All upstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
@@ -65,7 +64,7 @@ public class LambdaSection {
 
     /**
      * @param aVertex                 the starting vertex
-     * @param includeNonProbabilistic
+     * @param includeNonProbabilistic false if only the probabilistic and observed are wanted
      * @return All downstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
      * is true. All downstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
