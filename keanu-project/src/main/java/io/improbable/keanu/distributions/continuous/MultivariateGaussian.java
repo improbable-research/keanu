@@ -1,9 +1,8 @@
 package io.improbable.keanu.distributions.continuous;
 
-import com.google.common.base.Preconditions;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -22,10 +21,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        for (int i = 0; i < shape.length; i++) {
-            Preconditions.checkArgument(mu.getShape()[i] == shape[i],
-                "shape must match mu's shape");
-        }
+        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
         final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
         final DoubleTensor covTimesVariates = mu.isScalar() ?
