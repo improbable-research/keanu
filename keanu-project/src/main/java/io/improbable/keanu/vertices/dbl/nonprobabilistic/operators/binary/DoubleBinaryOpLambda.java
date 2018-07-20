@@ -14,47 +14,47 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
 
-    protected final Vertex<A> a;
-    protected final Vertex<B> b;
+    protected final Vertex<A> left;
+    protected final Vertex<B> right;
     protected final BiFunction<A, B, DoubleTensor> op;
     protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation;
 
     public DoubleBinaryOpLambda(int[] shape,
-                                Vertex<A> a,
-                                Vertex<B> b,
+                                Vertex<A> left,
+                                Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        this.a = a;
-        this.b = b;
+        this.left = left;
+        this.right = right;
         this.op = op;
         this.dualNumberCalculation = dualNumberCalculation;
-        setParents(a, b);
+        setParents(left, right);
         setValue(DoubleTensor.placeHolder(shape));
     }
 
-    public DoubleBinaryOpLambda(int[] shape, Vertex<A> a, Vertex<B> b, BiFunction<A, B, DoubleTensor> op) {
-        this(shape, a, b, op, null);
+    public DoubleBinaryOpLambda(int[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+        this(shape, left, right, op, null);
     }
 
-    public DoubleBinaryOpLambda(Vertex<A> a,
-                                Vertex<B> b,
+    public DoubleBinaryOpLambda(Vertex<A> left,
+                                Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b, op, dualNumberCalculation);
+        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, dualNumberCalculation);
     }
 
-    public DoubleBinaryOpLambda(Vertex<A> a, Vertex<B> b, BiFunction<A, B, DoubleTensor> op) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b, op, null);
+    public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, null);
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(a.sample(random), b.sample(random));
+        return op.apply(left.sample(random), right.sample(random));
     }
 
     @Override
     public DoubleTensor getDerivedValue() {
-        return op.apply(a.getValue(), b.getValue());
+        return op.apply(left.getValue(), right.getValue());
     }
 
     @Override
