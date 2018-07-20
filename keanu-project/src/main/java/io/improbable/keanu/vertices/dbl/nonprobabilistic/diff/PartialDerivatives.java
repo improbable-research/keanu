@@ -244,7 +244,7 @@ public class PartialDerivatives {
         return new PartialDerivatives(reshapedDerivatives);
     }
 
-    public PartialDerivatives split(int dimension, int index) {
+    public PartialDerivatives tad(int dimension, int index) {
         Map<Long, DoubleTensor> splitDerivatives = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {

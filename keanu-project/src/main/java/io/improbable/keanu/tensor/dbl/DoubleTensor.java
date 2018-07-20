@@ -68,8 +68,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
         return new ScalarDoubleTensor(shape);
     }
 
-    int[] getStride();
-
     @Override
     DoubleTensor reshape(int... newShape);
 
@@ -177,6 +175,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double determinant();
 
+    @Override
     DoubleTensor tad(int dimension, int index);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).

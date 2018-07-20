@@ -83,11 +83,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int[] getStride() {
-        return tensor.stride();
-    }
-
-    @Override
     public long getLength() {
         return tensor.lengthLong();
     }

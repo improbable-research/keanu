@@ -89,11 +89,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int[] getStride() {
-        return new int[0];
-    }
-
-    @Override
     public DoubleTensor reshape(int[] newShape) {
         if (!TensorShape.isScalar(newShape)) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");

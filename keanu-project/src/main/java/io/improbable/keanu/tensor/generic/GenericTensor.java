@@ -189,7 +189,7 @@ public class GenericTensor<T> implements Tensor<T> {
     @Override
     public Tensor<T> tad(int dimension, int index) {
         T[] flat = asFlatArray();
-        List<T> tadded = new ArrayList();
+        List<T> tadded = new ArrayList<>();
         for (int i = 0; i < flat.length; i++) {
             int[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
             if (indicesOfCurrent[dimension] == index) {

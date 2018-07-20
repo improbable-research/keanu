@@ -121,6 +121,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor apply(Function<Integer, Integer> function);
 
+    @Override
     IntegerTensor tad(int dimension, int index);
 
     // In Place

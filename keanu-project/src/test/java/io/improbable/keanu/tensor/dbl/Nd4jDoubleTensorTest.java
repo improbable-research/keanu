@@ -11,26 +11,12 @@ public class Nd4jDoubleTensorTest {
 
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
-    Nd4jDoubleTensor matrixC;
     Nd4jDoubleTensor scalarA;
-
-    @Test
-    public void poo() {
-        System.out.println(matrixA);
-
-        INDArray y = matrixA.getTensor().slice(0, 1);
-        System.out.println(y);
-        INDArray x = matrixA.getTensor().slice(1, 1);
-        System.out.println(x);
-
-
-    }
 
     @Before
     public void setup() {
-//        matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, new int[]{2, 3});
+        matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
     }
 

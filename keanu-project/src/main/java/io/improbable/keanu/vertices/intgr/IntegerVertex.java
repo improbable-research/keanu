@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTADVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 
 import java.util.Map;
@@ -103,6 +104,10 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
 
     public IntegerVertex unaryMinus() {
         return multiply(-1);
+    }
+
+    public IntegerVertex tad(int dimension, int index) {
+        return new IntegerTADVertex(this, dimension, index);
     }
 
     public void setValue(int value) {

@@ -144,7 +144,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return multiply(-1.0);
     }
 
-    public DoubleVertex split(int dimension, int index) {
+    public DoubleVertex tad(int dimension, int index) {
         return new TADVertex(this, dimension, index);
     }
 

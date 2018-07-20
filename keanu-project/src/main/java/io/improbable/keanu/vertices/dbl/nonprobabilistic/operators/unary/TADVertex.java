@@ -15,7 +15,7 @@ public class TADVertex extends DoubleUnaryOpVertex {
     private final int index;
 
     /**
-     * Takes the tensor along a dimension of a vertex
+     * Takes the tensor along a dimension for a vertex
      *
      * @param inputVertex the input vertex
      * @param dimension the dimension to extract along
@@ -29,7 +29,7 @@ public class TADVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).split(dimension, index);
+        return dualNumbers.get(inputVertex).tad(dimension, index);
     }
 
     @Override
