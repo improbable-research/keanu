@@ -4,6 +4,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -46,7 +47,7 @@ public class Differentiator {
         return dualNumbers.get(vertex);
     }
 
-    private Set<IVertex> parentsThatDualNumberIsNotCalculated(Map<IVertex, DualNumber> dualNumbers, Set<? extends IVertex> parents) {
+    private Set<IVertex> parentsThatDualNumberIsNotCalculated(Map<IVertex, DualNumber> dualNumbers, List<? extends IVertex> parents) {
         Set<IVertex> notCalculatedParents = new HashSet<>();
         for (IVertex next : parents) {
             if (!dualNumbers.containsKey(next)) {

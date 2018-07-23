@@ -89,4 +89,16 @@ public class DistributionVertexBuilder {
             throw new MissingParameterException("Missing one or more parameters");
         }
     }
+
+    public StudentTVertex studentT() {
+        try {
+            Vertex<?> param = parameters.get(ParameterName.V).getValue();
+            if (shape == null) {
+                shape = param.getShape();
+            }
+            return new StudentTVertex(shape, (IntegerVertex) param);
+        } catch (NoSuchElementException | ClassCastException e) {
+            throw new MissingParameterException("Missing one or more parameters");
+        }
+    }
 }

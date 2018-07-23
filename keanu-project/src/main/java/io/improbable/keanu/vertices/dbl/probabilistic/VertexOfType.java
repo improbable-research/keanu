@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 
 public class VertexOfType {
@@ -39,5 +40,15 @@ public class VertexOfType {
             .withInput(ParameterName.A, a)
             .withInput(ParameterName.B, b)
             .inverseGamma();
+    }
+
+    public static StudentTVertex studentT(int v) {
+        return studentT(ConstantVertex.of(v));
+    }
+
+    private static StudentTVertex studentT(ConstantIntegerVertex v) {
+        return new DistributionVertexBuilder()
+            .withInput(ParameterName.V, v)
+            .studentT();
     }
 }

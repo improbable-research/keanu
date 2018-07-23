@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.List;
 import java.util.PriorityQueue;
 import java.util.Set;
 
@@ -86,7 +87,7 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<? extends Vertex> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, List<? extends Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {
@@ -124,7 +125,7 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<? extends Vertex> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(List<? extends Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!next.hasValue()) {

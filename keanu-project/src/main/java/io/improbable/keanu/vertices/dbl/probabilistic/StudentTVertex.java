@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static io.improbable.keanu.distributions.dual.ParameterName.T;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -10,15 +9,12 @@ import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class StudentTVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class StudentTVertex extends DistributionBackedDoubleVertex<IntegerVertex, IntegerTensor> {
 
     private final IntegerVertex v;
 
@@ -30,34 +26,10 @@ public class StudentTVertex extends DoubleVertex implements Probabilistic<Double
      * @param tensorShape expected tensor shape
      * @param v           Degrees of Freedom
      */
-    public StudentTVertex(int[] tensorShape, IntegerVertex v) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(StudentTVertex.class));
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
+    // package private
+    StudentTVertex(int[] tensorShape, IntegerVertex v) {
+        super(tensorShape, StudentT::withParameters, v);
         this.v = v;
-        setParents(v);
-        setValue(DoubleTensor.placeHolder(tensorShape));
-    }
-
-    public StudentTVertex(int[] tensorShape, int v) {
-        this(tensorShape, new ConstantIntegerVertex(v));
-    }
-
-    public StudentTVertex(IntegerVertex v) {
-        this(v.getShape(), v);
-    }
-
-    public StudentTVertex(int v) {
-        this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(v));
-    }
-
-    public IntegerVertex getV() {
-        return v;
-    }
-
-    @Override
-    public double logProb(DoubleTensor t) {
-        return StudentT.withParameters(v.getValue()).logProb(t).sum();
     }
 
     @Override
@@ -66,10 +38,5 @@ public class StudentTVertex extends DoubleVertex implements Probabilistic<Double
         Map<Long, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.get(T).getValue());
         return m;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return StudentT.withParameters(v.getValue()).sample(getShape(), random);
     }
 }

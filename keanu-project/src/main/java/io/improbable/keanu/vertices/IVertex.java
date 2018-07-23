@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices;
 
-import java.util.Set;
+import java.util.List;
 
 public interface IVertex<T, V extends IVertex<?, V>> {
-    public Set<? extends V> getParents();
+    public List<? extends V> getParents();
 
     boolean hasValue();
     T updateValue();

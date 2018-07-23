@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -38,7 +39,10 @@ public class StudentTVertexTest {
 
         int v = 3;
 
-        StudentTVertex studentT = new StudentTVertex(new int[]{N, 1}, v);
+        StudentTVertex studentT = new DistributionVertexBuilder()
+            .shaped(N, 1)
+            .withInput(ParameterName.V, v)
+        .studentT();
 
         List<Double> samples = studentT.sample(random).asFlatList();
 
@@ -77,7 +81,7 @@ public class StudentTVertexTest {
 
     private void testLogPdfAtGivenDegreesOfFreedom(int v) {
         TDistribution apache = new TDistribution(v);
-        StudentTVertex studentT = new StudentTVertex(v);
+        StudentTVertex studentT = VertexOfType.studentT(v);
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected = apache.logDensity(t);
@@ -87,7 +91,7 @@ public class StudentTVertexTest {
     }
 
     private void testDLogPdfAtGivenDegreesOfFreedom(int v) {
-        StudentTVertex studentT = new StudentTVertex(v);
+        StudentTVertex studentT = VertexOfType.studentT(v);
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected;

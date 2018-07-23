@@ -10,6 +10,7 @@ public class ParameterName {
     public static final ParameterName P = new ParameterName("P");
     public static final ParameterName S = new ParameterName("S");
     public static final ParameterName T = new ParameterName("T");
+    public static final ParameterName V = new ParameterName("V");
     public static final ParameterName X = new ParameterName("X");
     public static final ParameterName BETA = new ParameterName("BETA");
     public static final ParameterName MU = new ParameterName("MU");

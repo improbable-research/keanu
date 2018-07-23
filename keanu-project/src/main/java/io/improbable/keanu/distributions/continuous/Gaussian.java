@@ -4,6 +4,11 @@ import static io.improbable.keanu.distributions.dual.ParameterName.MU;
 import static io.improbable.keanu.distributions.dual.ParameterName.SIGMA;
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
+import java.util.List;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,7 +22,14 @@ public class Gaussian implements ContinuousDistribution {
     private final DoubleTensor sigma;
 
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
-        return new Gaussian(mu, sigma);
+        return withParameters(ImmutableList.of(mu, sigma));
+    }
+
+    public static ContinuousDistribution withParameters(List<DoubleTensor> inputs) {
+        Gaussian distribution = new Gaussian(inputs.get(0), inputs.get(1));
+        Preconditions.checkArgument(inputs.size() == 2,
+            "Too many input parameters - expected 2, got {}", inputs.size());
+        return distribution;
     }
 
     private Gaussian(DoubleTensor mu, DoubleTensor sigma) {

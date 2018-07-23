@@ -5,7 +5,12 @@ import static java.lang.Math.log;
 
 import static io.improbable.keanu.distributions.dual.ParameterName.T;
 
+import java.util.List;
+
 import org.apache.commons.math3.special.Gamma;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.ParameterMap;
@@ -32,7 +37,14 @@ public class StudentT implements ContinuousDistribution {
      * @return       a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(IntegerTensor v) {
-        return new StudentT(v);
+        return withParameters(ImmutableList.of(v));
+    }
+
+    public static ContinuousDistribution withParameters(List<IntegerTensor> inputs) {
+        StudentT distribution = new StudentT(inputs.get(0));
+        Preconditions.checkArgument(inputs.size() == 1,
+            "Too many input parameters - expected 1, got {}", inputs.size());
+        return distribution;
     }
 
     private StudentT(IntegerTensor v) {

@@ -3,23 +3,16 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.ParameterName.MU;
 import static io.improbable.keanu.distributions.dual.ParameterName.SIGMA;
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
-import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class GaussianVertex extends DoubleVertex implements Differentiable, Probabilistic<DoubleTensor> {
+public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleVertex, DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -35,14 +28,9 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
      */
     // package private
     GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(GaussianVertex.class));
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
-
+        super(tensorShape, Gaussian::withParameters, mu, sigma);
         this.mu = mu;
         this.sigma = sigma;
-        setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     public DoubleVertex getMu() {
@@ -54,13 +42,8 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
     @Override
-    public double logProb(DoubleTensor value) {
-        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).logProb(value).sum();
-    }
-
-    @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        ParameterMap<DoubleTensor> dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
+        ParameterMap<DoubleTensor> dlnP = distribution().dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(SIGMA).getValue(), dlnP.get(X).getValue());
 
     }
@@ -82,17 +65,4 @@ public class GaussianVertex extends DoubleVertex implements Differentiable, Prob
     }
 
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
-    }
-
-    @Override
-    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
-        if (isObserved()) {
-            return DualNumber.createConstant(getValue());
-        } else {
-            return DualNumber.createWithRespectToSelf(getId(), getValue());
-        }
-    }
 }

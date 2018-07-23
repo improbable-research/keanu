@@ -1,9 +1,11 @@
 package io.improbable.keanu.tensor;
 
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -22,9 +24,11 @@ public class TensorShapeValidation {
      *                                  not match the proposal shape.
      */
     public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, int[]... shapes) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(proposalShape, toTensorShapes(shapes));
+    }
 
+    public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, List<TensorShape> shapes) {
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
-
         if (!nonScalarShapes.isEmpty()) {
 
             boolean moreThanOneNonScalarShape = nonScalarShapes.size() > 1;
@@ -52,7 +56,7 @@ public class TensorShapeValidation {
      * @throws TensorShapeException if there is more than one non-scalar shape
      */
     public static int[] checkHasSingleNonScalarShapeOrAllScalar(int[]... shapes) {
-        Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
+        Set<TensorShape> nonScalarShapes = getNonScalarShapes(toTensorShapes(shapes));
 
         if (nonScalarShapes.isEmpty()) {
             return Tensor.SCALAR_SHAPE;
@@ -63,9 +67,14 @@ public class TensorShapeValidation {
         }
     }
 
-    private static Set<TensorShape> getNonScalarShapes(int[]... shapes) {
+    private static List<TensorShape> toTensorShapes(int[][] shapes) {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
+            .collect(toList());
+    }
+
+    private static Set<TensorShape> getNonScalarShapes(List<TensorShape> shapes) {
+        return shapes.stream()
             .filter(shape -> !shape.isScalar())
             .collect(toSet());
     }
