@@ -14,8 +14,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class LatentIncrementSortTest {
 
@@ -25,10 +25,10 @@ public class LatentIncrementSortTest {
         DoubleVertex muB = ConstantVertex.of(3.0);
         DoubleVertex sigma = new UniformVertex(1.0, 2.0);
 
-        DoubleVertex gA = new GaussianVertex(muA, sigma);
-        DoubleVertex gB = new GaussianVertex(muB, sigma);
+        DoubleVertex gA = VertexOfType.gaussian(muA, sigma);
+        DoubleVertex gB = VertexOfType.gaussian(muB, sigma);
         DoubleVertex sum = gA.plus(gB);
-        DoubleVertex fuzzySum = new GaussianVertex(sum, sigma);
+        DoubleVertex fuzzySum = VertexOfType.gaussian(sum, sigma);
 
         gA.observe(DoubleTensor.scalar(0.1));
         fuzzySum.observe(DoubleTensor.scalar(1.0));
@@ -46,22 +46,22 @@ public class LatentIncrementSortTest {
     public void moreComplexGraph() {
         DoubleVertex mu = ConstantVertex.of(0.0);
         DoubleVertex sigma1 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g1 = new GaussianVertex(mu, sigma1);
+        DoubleVertex g1 = VertexOfType.gaussian(mu, sigma1);
         g1.observe(DoubleTensor.scalar(0.0));
 
         DoubleVertex sigma2 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g2 = new GaussianVertex(g1, sigma2);
+        DoubleVertex g2 = VertexOfType.gaussian(g1, sigma2);
 
         DoubleVertex sigma3 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g3 = new GaussianVertex(g2, sigma3);
+        DoubleVertex g3 = VertexOfType.gaussian(g2, sigma3);
         g3.observe(DoubleTensor.scalar(0.0));
 
-        DoubleVertex g4 = new GaussianVertex(g3, sigma3);
+        DoubleVertex g4 = VertexOfType.gaussian(g3, sigma3);
         DoubleVertex sigma4 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g5 = new GaussianVertex(g4, sigma4);
+        DoubleVertex g5 = VertexOfType.gaussian(g4, sigma4);
 
         DoubleVertex sigma5 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g6 = new GaussianVertex(g5, sigma5);
+        DoubleVertex g6 = VertexOfType.gaussian(g5, sigma5);
         g6.observe(DoubleTensor.scalar(0.0));
 
         Map<Vertex, Set<Vertex>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());

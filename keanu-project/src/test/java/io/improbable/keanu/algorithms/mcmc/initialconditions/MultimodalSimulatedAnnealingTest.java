@@ -12,14 +12,15 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class MultimodalSimulatedAnnealingTest {
 
@@ -39,7 +40,7 @@ public class MultimodalSimulatedAnnealingTest {
         DoubleVertex A = new UniformVertex(-3.0, 3.0);
         A.setValue(0.0);
         DoubleVertex B = A.multiply(A);
-        DoubleVertex C = new GaussianVertex(B, 1.5);
+        DoubleVertex C = VertexOfType.gaussian(B, ConstantVertex.of(1.5));
         C.observe(DoubleTensor.scalar(4.0));
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
@@ -68,7 +69,7 @@ public class MultimodalSimulatedAnnealingTest {
             .then(B)
             .orElse(D);
 
-        DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
+        DoubleVertex G = VertexOfType.gaussian(new CastDoubleVertex(F), ConstantVertex.of(1.5));
         G.observe(DoubleTensor.scalar(4.0));
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());

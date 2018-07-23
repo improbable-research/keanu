@@ -9,14 +9,17 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class MetropolisHastingsTest {
@@ -31,13 +34,13 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesContinuousPrior() {
 
-        DoubleVertex A = new GaussianVertex(20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(20.0, 1.0);
+        DoubleVertex A = VertexOfType.gaussian(20.0, 1.0);
+        DoubleVertex B = VertexOfType.gaussian(20.0, 1.0);
 
         A.setValue(20.0);
         B.setValue(20.0);
 
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+        DoubleVertex Cobserved = VertexOfType.gaussian(A.plus(B), ConstantVertex.of(1.0));
 
         Cobserved.observe(DoubleTensor.scalar(46.0));
 
@@ -62,13 +65,21 @@ public class MetropolisHastingsTest {
     public void samplesContinuousTensorPrior() {
 
         int[] shape = new int[]{1, 1};
-        DoubleVertex A = new GaussianVertex(shape, 20.0, 1.0);
-        DoubleVertex B = new GaussianVertex(shape, 20.0, 1.0);
+        DoubleVertex A = new DistributionVertexBuilder()
+            .shaped(shape)
+            .withInput(ParameterName.MU, 20.0)
+            .withInput(ParameterName.SIGMA, 1.0)
+            .gaussian();
+        DoubleVertex B = new DistributionVertexBuilder()
+            .shaped(shape)
+            .withInput(ParameterName.MU, 20.0)
+            .withInput(ParameterName.SIGMA, 1.0)
+            .gaussian();
 
         A.setValue(20.0);
         B.setValue(20.0);
 
-        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+        DoubleVertex Cobserved = VertexOfType.gaussian(A.plus(B), ConstantVertex.of(1.0));
         Cobserved.observe(DoubleTensor.scalar(46.0));
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));

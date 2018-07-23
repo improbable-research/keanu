@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Map;
@@ -8,7 +7,6 @@ import java.util.Map;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,6 +19,7 @@ public class BinomialVertex extends IntegerVertex implements Probabilistic<Integ
     private final DoubleVertex p;
     private final IntegerVertex n;
 
+    // package private
     public BinomialVertex(int[] tensorShape, DoubleVertex p, IntegerVertex n) {
         super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(BinomialVertex.class));
 
@@ -30,34 +29,6 @@ public class BinomialVertex extends IntegerVertex implements Probabilistic<Integ
 
         setParents(p, n);
         setValue(IntegerTensor.placeHolder(tensorShape));
-    }
-
-    public BinomialVertex(int[] tensorShape, double p, IntegerVertex n) {
-        this(tensorShape, ConstantVertex.of(p), n);
-    }
-
-    public BinomialVertex(int[] tensorShape, DoubleVertex p, int n) {
-        this(tensorShape, p, ConstantVertex.of(n));
-    }
-
-    public BinomialVertex(int[] tensorShape, double p, int n) {
-        this(tensorShape, ConstantVertex.of(p), ConstantVertex.of(n));
-    }
-
-    public BinomialVertex(DoubleVertex p, IntegerVertex n) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(p.getShape(), n.getShape()), p, n);
-    }
-
-    public BinomialVertex(double p, IntegerVertex n) {
-        this(ConstantVertex.of(p), n);
-    }
-
-    public BinomialVertex(DoubleVertex p, int n) {
-        this(p, ConstantVertex.of(n));
-    }
-
-    public BinomialVertex(double p, int n) {
-        this(ConstantVertex.of(p), ConstantVertex.of(n));
     }
 
     @Override

@@ -18,6 +18,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class LorenzTest {
     private final Logger log = LoggerFactory.getLogger(LorenzTest.class);
@@ -37,9 +38,9 @@ public class LorenzTest {
 
         while (error > convergedError && window < maxWindows) {
 
-            GaussianVertex xt0 = new GaussianVertex(priorMu[0], 1.0);
-            GaussianVertex yt0 = new GaussianVertex(priorMu[1], 1.0);
-            GaussianVertex zt0 = new GaussianVertex(priorMu[2], 1.0);
+            GaussianVertex xt0 = VertexOfType.gaussian(priorMu[0], 1.0);
+            GaussianVertex yt0 = VertexOfType.gaussian(priorMu[1], 1.0);
+            GaussianVertex zt0 = VertexOfType.gaussian(priorMu[2], 1.0);
 
             List<List<DoubleVertex>> graphTimeSteps = new ArrayList<>();
             graphTimeSteps.add(Arrays.asList(xt0, yt0, zt0));
@@ -66,7 +67,7 @@ public class LorenzTest {
                 List<DoubleVertex> timeSlice = graphTimeSteps.get(i);
                 DoubleVertex xt = timeSlice.get(0);
 
-                GaussianVertex observedXt = new GaussianVertex(xt, 1.0);
+                GaussianVertex observedXt = VertexOfType.gaussian(xt, ConstantVertex.of(1.0));
                 observedXt.observe(DoubleTensor.scalar(observed.get(t).x));
             }
 

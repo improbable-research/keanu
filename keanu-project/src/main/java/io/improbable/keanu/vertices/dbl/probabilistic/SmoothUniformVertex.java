@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static java.util.Collections.singletonMap;
 
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 

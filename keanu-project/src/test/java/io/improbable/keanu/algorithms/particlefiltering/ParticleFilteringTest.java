@@ -13,10 +13,11 @@ import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class ParticleFilteringTest {
 
@@ -29,18 +30,18 @@ public class ParticleFilteringTest {
     public void findsCorrectTemp() {
 
         DoubleVertex temperature = new UniformVertex(0.0, 100.0);
-        DoubleVertex noiseAMu = new GaussianVertex(0.0, 2.0);
-        DoubleVertex noiseA = new GaussianVertex(noiseAMu, 2.0);
-        DoubleVertex noiseBMu = new GaussianVertex(0.0, 2.0);
-        DoubleVertex noiseB = new GaussianVertex(noiseBMu, 2.0);
-        DoubleVertex noiseCMu = new GaussianVertex(0.0, 2.0);
-        DoubleVertex noiseC = new GaussianVertex(noiseCMu, 2.0);
-        DoubleVertex noiseDMu = new GaussianVertex(0.0, 2.0);
-        DoubleVertex noiseD = new GaussianVertex(noiseDMu, 2.0);
-        DoubleVertex thermometerA = new GaussianVertex(temperature.plus(noiseA), 1.0);
-        DoubleVertex thermometerB = new GaussianVertex(temperature.plus(noiseB), 1.0);
-        DoubleVertex thermometerC = new GaussianVertex(temperature.plus(noiseC), 1.0);
-        DoubleVertex thermometerD = new GaussianVertex(temperature.plus(noiseD), 1.0);
+        DoubleVertex noiseAMu = VertexOfType.gaussian(0.0, 2.0);
+        DoubleVertex noiseA = VertexOfType.gaussian(noiseAMu, ConstantVertex.of(2.0));
+        DoubleVertex noiseBMu = VertexOfType.gaussian(0.0, 2.0);
+        DoubleVertex noiseB = VertexOfType.gaussian(noiseBMu, ConstantVertex.of(2.0));
+        DoubleVertex noiseCMu = VertexOfType.gaussian(0.0, 2.0);
+        DoubleVertex noiseC = VertexOfType.gaussian(noiseCMu, ConstantVertex.of(2.0));
+        DoubleVertex noiseDMu = VertexOfType.gaussian(0.0, 2.0);
+        DoubleVertex noiseD = VertexOfType.gaussian(noiseDMu, ConstantVertex.of(2.0));
+        DoubleVertex thermometerA = VertexOfType.gaussian(temperature.plus(noiseA), ConstantVertex.of(1.0));
+        DoubleVertex thermometerB = VertexOfType.gaussian(temperature.plus(noiseB), ConstantVertex.of(1.0));
+        DoubleVertex thermometerC = VertexOfType.gaussian(temperature.plus(noiseC), ConstantVertex.of(1.0));
+        DoubleVertex thermometerD = VertexOfType.gaussian(temperature.plus(noiseD), ConstantVertex.of(1.0));
         thermometerA.observe(DoubleTensor.scalar(21.0));
         thermometerB.observe(DoubleTensor.scalar(19.5));
         thermometerC.observe(DoubleTensor.scalar(22.0));

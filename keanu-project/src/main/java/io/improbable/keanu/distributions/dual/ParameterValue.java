@@ -1,26 +1,18 @@
 package io.improbable.keanu.distributions.dual;
 
-
 import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
-/**
- * A Diff is identified only by its name
- * so that you can store it in io.improbable.keanu.distributions.dual.Diffs
- */
-public class Diff implements Comparable<Diff> {
-
+public class ParameterValue<T>  implements Comparable<ParameterValue<T>> {
     private final ParameterName id;
-    private final DoubleTensor value;
+    private final T value;
 
-    public Diff(ParameterName name) {
+    public ParameterValue(ParameterName name) {
         this(name, null);
     }
 
-    public Diff(ParameterName name, DoubleTensor value) {
+    public ParameterValue(ParameterName name, T value) {
         this.id = name;
         this.value = value;
     }
@@ -29,7 +21,7 @@ public class Diff implements Comparable<Diff> {
         return id.getName();
     }
 
-    public DoubleTensor getValue() {
+    public T getValue() {
         return value;
     }
 
@@ -37,7 +29,7 @@ public class Diff implements Comparable<Diff> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        Diff diff = (Diff) o;
+        ParameterValue diff = (ParameterValue) o;
         return Objects.equals(id, diff.id);
     }
 
@@ -48,7 +40,7 @@ public class Diff implements Comparable<Diff> {
     }
 
     @Override
-    public int compareTo(@NotNull Diff o) {
+    public int compareTo(@NotNull ParameterValue o) {
         return id.getName().compareTo(o.id.getName());
     }
 }

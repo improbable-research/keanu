@@ -5,15 +5,15 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.K;
-import static io.improbable.keanu.distributions.dual.Diffs.THETA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.A;
+import static io.improbable.keanu.distributions.dual.ParameterName.K;
+import static io.improbable.keanu.distributions.dual.ParameterName.THETA;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -119,7 +119,7 @@ public class Gamma implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor xMinusA = x.minus(location);
         final DoubleTensor aMinusX = location.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
@@ -130,7 +130,7 @@ public class Gamma implements ContinuousDistribution {
         final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
         final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
         .put(A, dPda)
         .put(THETA, dPdtheta)
         .put(K, dPdk)

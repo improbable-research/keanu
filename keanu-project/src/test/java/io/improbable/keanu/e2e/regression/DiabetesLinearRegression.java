@@ -1,15 +1,16 @@
 package io.improbable.keanu.e2e.regression;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html
@@ -31,12 +32,12 @@ public class DiabetesLinearRegression {
             .load(true);
 
         // Linear Regression
-        DoubleVertex weight = new GaussianVertex(0.0, 2.0);
-        DoubleVertex b = new GaussianVertex(0.0, 2.0);
+        DoubleVertex weight = VertexOfType.gaussian(0.0, 2.0);
+        DoubleVertex b = VertexOfType.gaussian(0.0, 2.0);
         DoubleVertex x = ConstantVertex.of(data.bmi);
         DoubleVertex yMu = x.multiply(weight);
 
-        DoubleVertex y = new GaussianVertex(yMu.plus(b), 1.0);
+        DoubleVertex y = VertexOfType.gaussian(yMu.plus(b), ConstantVertex.of(1.0));
         y.observe(data.y);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());

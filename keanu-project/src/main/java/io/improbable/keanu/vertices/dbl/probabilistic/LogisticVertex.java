@@ -1,19 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.List;
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.S;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.S;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Logistic;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -76,7 +72,7 @@ public class LogisticVertex extends DoubleVertex implements Probabilistic<Double
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        Diffs dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
+        ParameterMap<DoubleTensor> dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 

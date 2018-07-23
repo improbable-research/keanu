@@ -1,13 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.BETA;
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.BETA;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -64,7 +64,7 @@ public class Laplace implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
@@ -74,7 +74,7 @@ public class Laplace implements ContinuousDistribution {
         final DoubleTensor dPdMu = x.minus(mu).divInPlace(denominator);
         final DoubleTensor dPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(MU, dPdMu)
             .put(BETA, dPdBeta)
             .put(X, dPdx);

@@ -13,7 +13,7 @@ import org.junit.Test;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class DiscoverGraphTest {
 
@@ -58,7 +58,7 @@ public class DiscoverGraphTest {
     @Test
     public void findsVeryLongGraph() {
 
-        DoubleVertex start = new GaussianVertex(0, 1);
+        DoubleVertex start = VertexOfType.gaussian(0., 1.);
 
         DoubleVertex end = start;
 

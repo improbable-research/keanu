@@ -11,6 +11,7 @@ import org.junit.Test;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class IntegerVertexTest {
 
@@ -49,7 +50,7 @@ public class IntegerVertexTest {
 
     @Test
     public void doesObserve() {
-        PoissonVertex testIntegerVertex = new PoissonVertex(1.0);
+        PoissonVertex testIntegerVertex = VertexOfType.poisson(1.0);
         testIntegerVertex.observe(IntegerTensor.scalar(5));
 
         Integer expected = 5;

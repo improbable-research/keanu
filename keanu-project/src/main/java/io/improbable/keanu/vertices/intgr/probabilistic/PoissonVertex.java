@@ -5,8 +5,6 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import java.util.Map;
 
 import io.improbable.keanu.distributions.discrete.Poisson;
-import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Observable;
@@ -14,8 +12,6 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
@@ -31,6 +27,7 @@ public class PoissonVertex extends IntegerVertex implements Probabilistic<Intege
      * @param shape the desired shape of the vertex
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
+    // package private
     public PoissonVertex(int[] shape, DoubleVertex mu) {
         super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(PoissonVertex.class));
 
@@ -39,28 +36,6 @@ public class PoissonVertex extends IntegerVertex implements Probabilistic<Intege
         this.mu = mu;
         setParents(mu);
         setValue(IntegerTensor.placeHolder(shape));
-    }
-
-    public PoissonVertex(int[] shape, double mu) {
-        this(shape, new ConstantDoubleVertex(mu));
-    }
-
-    /**
-     * One to one constructor for mapping some shape of mu to
-     * a matching shaped Poisson.
-     *
-     * @param mu    mu with same shape as desired Poisson tensor or scalar
-     */
-    public PoissonVertex(DoubleVertex mu) {
-        this(mu.getShape(), mu);
-    }
-
-    public PoissonVertex(Vertex<? extends NumberTensor> mu) {
-        this(mu.getShape(), new CastDoubleVertex(mu));
-    }
-
-    public PoissonVertex(double mu) {
-        this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(mu));
     }
 
     public Vertex<DoubleTensor> getMu() {

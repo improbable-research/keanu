@@ -3,12 +3,12 @@ package io.improbable.keanu.distributions.continuous;
 import static java.lang.Math.PI;
 import static java.lang.Math.log;
 
-import static io.improbable.keanu.distributions.dual.Diffs.T;
+import static io.improbable.keanu.distributions.dual.ParameterName.T;
 
 import org.apache.commons.math3.special.Gamma;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -67,7 +67,7 @@ public class StudentT implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor t) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor t) {
         DoubleTensor vAsDouble = v.toDouble();
         DoubleTensor dPdt = t.unaryMinus()
             .timesInPlace(vAsDouble.plus(1.0))
@@ -75,7 +75,7 @@ public class StudentT implements ContinuousDistribution {
                 t.pow(2).plusInPlace(vAsDouble)
             );
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(T, dPdt);
     }
 }

@@ -11,7 +11,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class DualNumbersTest {
 
@@ -20,8 +20,8 @@ public class DualNumbersTest {
 
     @Before
     public void setup() {
-        vA = new GaussianVertex(1.0, 0.0);
-        vB = new GaussianVertex(2.0, 0.0);
+        vA = VertexOfType.gaussian(1.0, 0.0);
+        vB = VertexOfType.gaussian(2.0, 0.0);
     }
 
     @Test

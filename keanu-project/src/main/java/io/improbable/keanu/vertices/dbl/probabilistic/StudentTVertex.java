@@ -1,13 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.T;
+import static io.improbable.keanu.distributions.dual.ParameterName.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.HashMap;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.StudentT;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Observable;
@@ -62,7 +62,7 @@ public class StudentTVertex extends DoubleVertex implements Probabilistic<Double
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor t) {
-        Diffs diff = StudentT.withParameters(v.getValue()).dLogProb(t);
+        ParameterMap<DoubleTensor> diff = StudentT.withParameters(v.getValue()).dLogProb(t);
         Map<Long, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.get(T).getValue());
         return m;

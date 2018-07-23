@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class EvalPropagationTest {
 
@@ -61,11 +61,11 @@ public class EvalPropagationTest {
     private void assertDoesNotPropagateThroughProbabilisticVertices(Consumer<Vertex> evalFunction) {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new GaussianVertex(0, 1);
+        DoubleVertex start = VertexOfType.gaussian(0., 1.);
 
         DoubleVertex end = addLinks(start, n, m, 1);
 
-        DoubleVertex nextLayerStart = new GaussianVertex(end, 1);
+        DoubleVertex nextLayerStart = VertexOfType.gaussian(end, ConstantVertex.of(1.));
 
         DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
@@ -111,7 +111,7 @@ public class EvalPropagationTest {
     public void doesNotRedoWorkAlreadyDoneOnLazyEval() {
         AtomicInteger n = new AtomicInteger(0);
 
-        DoubleVertex start = new GaussianVertex(0, 1);
+        DoubleVertex start = VertexOfType.gaussian(0., 1.);
 
         DoubleVertex blackBox = new DoubleUnaryOpLambda<>(start,
             (startValue) -> {
