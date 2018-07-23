@@ -17,11 +17,11 @@ public class Flip extends ProbabilisticBool {
 
     /**
      * One probTrue that must match a proposed tensor shape of Poisson.
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param shape     the desired shape of the vertex
-     * @param probTrue  the probability the flip returns true
+     * @param shape    the desired shape of the vertex
+     * @param probTrue the probability the flip returns true
      */
     public Flip(int[] shape, Vertex<DoubleTensor> probTrue) {
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
@@ -55,12 +55,12 @@ public class Flip extends ProbabilisticBool {
     @Override
     public double logPmf(BooleanTensor value) {
 
-        DoubleTensor probability = value.setDoubleIf(
+        DoubleTensor logProbability = value.setDoubleIf(
             probTrue.getValue(),
             probTrue.getValue().unaryMinus().plusInPlace(1.0)
-        );
+        ).logInPlace();
 
-        return Math.log(probability.sum());
+        return logProbability.sum();
     }
 
     @Override
