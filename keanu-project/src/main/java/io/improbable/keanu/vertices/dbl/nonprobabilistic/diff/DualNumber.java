@@ -2,9 +2,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
 
 public class DualNumber {
 
@@ -286,5 +286,28 @@ public class DualNumber {
         PartialDerivatives reshapedPartialDerivatives = this.partialDerivatives.reshape(getValue().getRank(), proposedShape);
         return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
     }
+
+    public DualNumber concat(int dimension, Map<Long, List<DoubleTensor>> combinedPartialDerivatives, DoubleTensor... toConcat) {
+        Map<Long, DoubleTensor> concatenatedPartialDerivates = new HashMap<>();
+
+        for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivatives.entrySet()) {
+            concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+        }
+
+        DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
+        return new DualNumber(concatValue, concatenatedPartialDerivates);
+
+    }
+
+    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+        if (partialDerivates.size() == 1) {
+            return partialDerivates.get(0);
+        } else {
+            DoubleTensor primaryTensor = partialDerivates.remove(0);
+            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
+            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+        }
+    }
+
 
 }

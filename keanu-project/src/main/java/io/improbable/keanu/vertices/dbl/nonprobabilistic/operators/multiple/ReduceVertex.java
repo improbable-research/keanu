@@ -13,14 +13,14 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DoubleReduceVertex extends NonProbabilisticDouble {
+public class ReduceVertex extends NonProbabilisticDouble {
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f;
     private final Supplier<DualNumber> dualNumberSupplier;
 
-    public DoubleReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
+    public ReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
         if (inputs.size() < 2) {
-            throw new IllegalArgumentException("DoubleReduceVertex should have at least two input vertices, called with " + inputs.size());
+            throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }
 
         this.inputs = new ArrayList<>(inputs);
@@ -30,11 +30,11 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(shape));
     }
 
-    public DoubleReduceVertex(int[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier, Vertex<DoubleTensor>... input) {
+    public ReduceVertex(int[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier, Vertex<DoubleTensor>... input) {
         this(shape, Arrays.asList(input), f, dualNumberSupplier);
     }
 
-    public DoubleReduceVertex(int[] shape, List<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f) {
+    public ReduceVertex(int[] shape, List<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f) {
         this(shape, inputs, f, null);
     }
 
@@ -45,7 +45,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
      * @param dualNumberSupplier auto diff supplier
      * @param input              input vertices to reduce
      */
-    public DoubleReduceVertex(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier, Vertex<DoubleTensor>... input) {
+    public ReduceVertex(BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier, Vertex<DoubleTensor>... input) {
         this(TensorShapeValidation.checkAllShapesMatch(Arrays.stream(input).map(Vertex::getShape).collect(Collectors.toList())),
             Arrays.asList(input), f, dualNumberSupplier);
     }
@@ -56,7 +56,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
      * @param f      reduce function
      * @param inputs input vertices to reduce
      */
-    public DoubleReduceVertex(List<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f) {
+    public ReduceVertex(List<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f) {
         this(TensorShapeValidation.checkAllShapesMatch(inputs.stream().map(Vertex::getShape).collect(Collectors.toList())),
             inputs, f, null
         );
