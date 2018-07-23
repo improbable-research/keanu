@@ -7,7 +7,10 @@
 ```
 
 
-[![Build Status](https://travis-ci.org/improbable-research/keanu.svg?branch=develop)](https://travis-ci.org/improbable-research/keanu) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status)](https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project)
+[![Build Status][travis-image]][travis-url]
+[![Quality Gate][sonar-image]][sonar-url]
+[![Maven Central][maven-image]][maven-url]
+[![Javadocs][javadoc-image]][javadoc-url]
 
 ## Overview
 
@@ -61,3 +64,12 @@ Interested in more technical examples? Explore [Examples](keanu-docs/examples.md
 ## Hiring
 
 Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)
+
+[travis-image]: https://travis-ci.org/improbable-research/keanu.svg?branch=develop
+[travis-url]: https://travis-ci.org/improbable-research/keanu
+[javadoc-image]: https://www.javadoc.io/badge/io.improbable/keanu.svg
+[javadoc-url]: https://www.javadoc.io/doc/io.improbable/keanu
+[maven-image]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu/badge.svg
+[maven-url]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu
+[sonar-image]: https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status
+[sonar-url]: https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project
