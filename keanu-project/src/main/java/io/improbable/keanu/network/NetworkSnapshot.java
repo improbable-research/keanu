@@ -2,13 +2,10 @@ package io.improbable.keanu.network;
 
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
- * Saves the value of a specified collection of vertices for later use.
+ * Saves the state (value and observed) of a specified collection of vertices.
  */
 public class NetworkSnapshot {
 
@@ -16,21 +13,32 @@ public class NetworkSnapshot {
         return new NetworkSnapshot(vertices);
     }
 
-    private final Map<Vertex, Object> snapshot;
+    private final Map<Vertex, Object> values;
+    private final Set<Vertex> observed;
 
     private NetworkSnapshot(Collection<Vertex> vertices) {
-        snapshot = new HashMap<>();
+        values = new HashMap<>();
+        observed = new HashSet<>();
         for (Vertex v : vertices) {
-            snapshot.put(v, v.getValue());
+            values.put(v, v.getValue());
+            if (v.isObserved()) {
+                observed.add(v);
+            }
         }
     }
 
     /**
-     * Revert the state of the network to the previously saved snapshot
+     * Revert the state of the network to the previously saved values
      */
     public void apply() {
-        for (Vertex v : snapshot.keySet()) {
-            v.setValue(snapshot.get(v));
+        for (Vertex v : values.keySet()) {
+            v.unobserve();
+            if (observed.contains(v)) {
+                v.observe(values.get(v));
+            } else {
+                v.setValue(values.get(v));
+            }
+
         }
     }
 
