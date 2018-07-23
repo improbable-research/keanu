@@ -4,8 +4,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
 
@@ -13,17 +15,17 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 public class Flip extends ProbabilisticBool {
 
-    private final Vertex<DoubleTensor> probTrue;
+    private final DoubleVertex probTrue;
 
     /**
      * One probTrue that must match a proposed tensor shape of Poisson.
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param shape     the desired shape of the vertex
-     * @param probTrue  the probability the flip returns true
+     * @param shape    the desired shape of the vertex
+     * @param probTrue the probability the flip returns true
      */
-    public Flip(int[] shape, Vertex<DoubleTensor> probTrue) {
+    public Flip(int[] shape, DoubleVertex probTrue) {
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
@@ -36,7 +38,7 @@ public class Flip extends ProbabilisticBool {
      *
      * @param probTrue probTrue with same shape as desired Poisson tensor or scalar
      */
-    public Flip(Vertex<DoubleTensor> probTrue) {
+    public Flip(DoubleVertex probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
@@ -55,16 +57,22 @@ public class Flip extends ProbabilisticBool {
     @Override
     public double logPmf(BooleanTensor value) {
 
-        DoubleTensor probability = value.setDoubleIf(
+        DoubleTensor logProbability = value.setDoubleIf(
             probTrue.getValue(),
             probTrue.getValue().unaryMinus().plusInPlace(1.0)
-        );
+        ).logInPlace();
 
-        return Math.log(probability.sum());
+        return logProbability.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
+
+        DualNumber probTrueDual = probTrue.getDualNumber();
+
+        DoubleTensor t = value.setDoubleIf(DoubleTensor.scalar(1), DoubleTensor.scalar(-1));
+
+
         throw new UnsupportedOperationException();
     }
 
