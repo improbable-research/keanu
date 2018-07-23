@@ -49,7 +49,7 @@ public interface Optimizer {
         return point;
     }
 
-    static long totalNumberOfLatentDimensions(List<? extends Vertex> continuousLatentVertices) {
+    static long totalNumberOfLatentDimensions(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
         return continuousLatentVertices.stream().mapToLong(FitnessFunction::numDimensions).sum();
     }
 }
