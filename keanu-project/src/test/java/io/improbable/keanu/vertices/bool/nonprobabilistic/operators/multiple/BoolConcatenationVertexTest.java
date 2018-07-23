@@ -16,11 +16,11 @@ public class BoolConcatenationVertexTest {
         BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, a, b);
         BoolConcatenationVertex concatOne = new BoolConcatenationVertex(1, a, b, c);
 
-        Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
-        Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0, 1, 1, 1}, concatOne.getValue().asFlatDoubleArray(), 0.001);
-
         Assert.assertArrayEquals(new int[]{2, 3}, concatZero.getShape());
         Assert.assertArrayEquals(new int[]{1, 9}, concatOne.getShape());
+
+        Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
+        Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0, 1, 1, 1}, concatOne.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
@@ -30,8 +30,8 @@ public class BoolConcatenationVertexTest {
 
         BoolConcatenationVertex concatZero = new BoolConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
+        Assert.assertArrayEquals(new double[]{1, 1, 1, 0, 0, 0, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
@@ -41,8 +41,8 @@ public class BoolConcatenationVertexTest {
 
         BoolConcatenationVertex concat = new BoolConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new double[]{1, 1, 1, 0}, concat.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new double[]{1, 1, 1, 0}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
@@ -52,8 +52,8 @@ public class BoolConcatenationVertexTest {
 
         BoolConcatenationVertex concat = new BoolConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new double[]{0, 1, 1, 1}, concat.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new double[]{0, 1, 1, 1}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test (expected = IllegalArgumentException.class)
@@ -71,13 +71,13 @@ public class BoolConcatenationVertexTest {
 
         BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, m, a);
 
-        Assert.assertArrayEquals(new double[]{1, 1, 1, 1, 0, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{4, 2}, concatZero.getShape());
+        Assert.assertArrayEquals(new double[]{1, 1, 1, 1, 0, 0, 0, 0}, concatZero.getValue().asFlatDoubleArray(), 0.001);
 
         BoolConcatenationVertex concatOne = new BoolConcatenationVertex(1, m, a);
 
-        Assert.assertArrayEquals(new double[]{1, 1, 0, 0, 1, 1, 0, 0}, concatOne.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new int[]{2, 4}, concatOne.getShape());
+        Assert.assertArrayEquals(new double[]{1, 1, 0, 0, 1, 1, 0, 0}, concatOne.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
@@ -89,20 +89,21 @@ public class BoolConcatenationVertexTest {
 
         BoolConcatenationVertex concatZero = new BoolConcatenationVertex(0, a, b);
 
+        Assert.assertArrayEquals(new int[]{4, 2, 2}, concatZero.getShape());
         Assert.assertArrayEquals(
             new double[]{1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0},
             concatZero.getValue().asFlatDoubleArray(),
             0.001
         );
-        Assert.assertArrayEquals(new int[]{4, 2, 2}, concatZero.getShape());
 
         BoolConcatenationVertex concatThree = new BoolConcatenationVertex(2, a, b);
+
+        Assert.assertArrayEquals(new int[]{2, 2, 4}, concatThree.getShape());
         Assert.assertArrayEquals(
             new double[]{1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0, 1, 1, 0, 0},
             concatThree.getValue().asFlatDoubleArray(),
             0.001
         );
-        Assert.assertArrayEquals(new int[]{2, 2, 4}, concatThree.getShape());
     }
 
 }

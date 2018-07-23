@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
+import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
 
@@ -27,14 +28,13 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
         this.dimension = dimension;
         this.input = input;
         setParents(input);
-        int[][] shapes = new int[input.length][];
-        for (int i = 0; i < input.length; i++) shapes[i] = input[i].getShape();
+        int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
         setValue(DoubleTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
     @Override
     public DoubleTensor getDerivedValue() {
-        return op(extractFromInputs(i -> input[i].getValue()));
+        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
     }
 
     @Override
@@ -48,14 +48,14 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
         }
 
         DualNumber dualOfPrimary = dualNumbers.get(input[0]);
-        DoubleTensor[] inputValues = extractFromInputs(i -> input[i].getValue());
+        DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
         DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
         return dualOfPrimary.concat(dimension, combinedPartialDerivativesOfInputs, dualToConcat);
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(i -> input[i].sample()));
+        return op(extractFromInputs(DoubleTensor.class, Vertex::sample));
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
@@ -64,10 +64,10 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
         return primary.concat(dimension, toConcat);
     }
 
-    private DoubleTensor[] extractFromInputs(Function<Integer, DoubleTensor> func) {
-        DoubleTensor[] extract = new DoubleTensor[input.length];
+    private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func) {
+        T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
-            extract[i] = func.apply(i);
+            extract[i] = func.apply(input[i]);
         }
         return extract;
     }

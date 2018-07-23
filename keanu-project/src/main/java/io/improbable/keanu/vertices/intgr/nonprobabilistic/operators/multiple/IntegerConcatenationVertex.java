@@ -1,10 +1,13 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -25,19 +28,18 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
         this.dimension = dimension;
         this.input = input;
         setParents(input);
-        int[][] shapes = new int[input.length][];
-        for (int i = 0; i < input.length; i++) shapes[i] = input[i].getShape();
+        int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
         setValue(IntegerTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
     @Override
     public IntegerTensor getDerivedValue() {
-        return op(extractFromInputs(i -> input[i].getValue()));
+        return op(extractFromInputs(IntegerTensor.class, Vertex::getValue));
     }
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return op(extractFromInputs(i -> input[i].sample()));
+        return op(extractFromInputs(IntegerTensor.class, Vertex::sample));
     }
 
     protected IntegerTensor op(IntegerTensor... inputs) {
@@ -46,10 +48,10 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
         return primary.concat(dimension, toConcat);
     }
 
-    private IntegerTensor[] extractFromInputs(Function<Integer, IntegerTensor> func) {
-        IntegerTensor[] extract = new IntegerTensor[input.length];
+    private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<IntegerTensor>, T> func) {
+        T[] extract = (T[]) Array.newInstance(clazz, input.length);
         for (int i = 0; i < input.length; i++) {
-            extract[i] = func.apply(i);
+            extract[i] = func.apply(input[i]);
         }
         return extract;
     }

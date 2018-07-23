@@ -94,13 +94,24 @@ public class TensorShapeValidation {
     }
 
     public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
-        int[][] trimmedShapes = new int[shapes.length][];
-        for (int i = 0; i < shapes.length; i++) {
-            int[] trimmedShape = new int[shapes[i].length - 1];
-            System.arraycopy(shapes[i], dimension + 1, trimmedShape, dimension, shapes[i].length - 1 - dimension);
-            trimmedShapes[i] = trimmedShape;
+        int[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
+        
+        for (int i = 1; i < shapes.length; i++) {
+            if (shapes[i].length != concatShape.length) {
+                throw new IllegalArgumentException("Cannot concat shapes of different ranks");
+            }
+
+            for (int dim = 0; dim < shapes[i].length; dim++) {
+                if (dim == dimension) {
+                    concatShape[dim] += shapes[i][dim];
+                } else {
+                    if (shapes[i][dim] != concatShape[dim]) {
+                        throw new IllegalArgumentException("Cannot concat mismatched shapes");
+                    }
+                }
+            }
         }
-        return checkAllShapesMatch(trimmedShapes);
+        return concatShape;
     }
 
 }
