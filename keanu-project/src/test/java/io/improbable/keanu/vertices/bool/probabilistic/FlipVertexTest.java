@@ -105,12 +105,12 @@ public class FlipVertexTest {
         assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
     }
 
-//    @Test
+    @Test
     public void canUseWithGradientOptimizer() {
 
-        DoubleVertex A = new UniformVertex(new int[]{1, 2}, -3.0, 3.0);
-        A.setValue(DoubleTensor.create(new double[]{-0.5, 0.5}, new int[]{1, 2}));
-        DoubleVertex B = A.minus(2.0).sigmoid();
+        DoubleVertex A = new UniformVertex(new int[]{1, 2}, -4.0, 8.0);
+        A.setValue(DoubleTensor.create(new double[]{-0.5, 0.5}));
+        DoubleVertex B = A.sigmoid();
         Flip flip = new Flip(B);
         flip.observe(new boolean[]{true, false});
 
@@ -123,10 +123,10 @@ public class FlipVertexTest {
             System.out.println("Fitness @" + Arrays.toString(point) + " -> " + fitness);
         });
 
-        optimizer.maxAPosteriori();
+        optimizer.maxLikelihood();
 
         double[] actual = A.getValue().asFlatDoubleArray();
-        assertArrayEquals(new double[]{2.0, -2.0}, actual, 0.1);
+        assertArrayEquals(new double[]{8.0, -4.0}, actual, 0.1);
     }
 
 }
