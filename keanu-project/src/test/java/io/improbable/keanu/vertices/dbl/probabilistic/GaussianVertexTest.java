@@ -55,10 +55,10 @@ public class GaussianVertexTest {
 
         Gaussian.Diff gaussianLogDiff = Gaussian.dlnPdf(0.0, 1.0, 0.5);
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex sigmaTensor = VertexOfType.uniform(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
         GaussianVertex tensorGaussianVertex = VertexOfType.gaussian(muTensor, sigmaTensor);
@@ -76,10 +76,10 @@ public class GaussianVertexTest {
 
         double[] vector = new double[]{0.25, -0.75, 0.1, -2, 1.3};
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex sigmaTensor = VertexOfType.uniform(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> VertexOfType.gaussian(muTensor, sigmaTensor));
@@ -87,7 +87,7 @@ public class GaussianVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex mu = new UniformVertex(0.0, 1.0);
+        UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         GaussianVertex vertexUnderTest = VertexOfType.gaussian(
             mu,
@@ -100,7 +100,7 @@ public class GaussianVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         GaussianVertex gaussian = VertexOfType.gaussian(uniformA, ConstantVertex.of(3.0));
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
@@ -121,7 +121,7 @@ public class GaussianVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdsigma() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         GaussianVertex gaussian = VertexOfType.gaussian(ConstantVertex.of(3.0), uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
@@ -168,9 +168,9 @@ public class GaussianVertexTest {
         muSigma.add(ConstantVertex.of(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
-        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        UniformVertex latentMu = VertexOfType.uniform(0.01, 10.0);
         latentMu.setAndCascade(DoubleTensor.scalar(9.9));
-        UniformVertex latentSigma = new UniformVertex(0.01, 10.0);
+        UniformVertex latentSigma = VertexOfType.uniform(0.01, 10.0);
         latentSigma.setAndCascade(DoubleTensor.scalar(0.1));
         latentMuSigma.add(latentMu);
         latentMuSigma.add(latentSigma);

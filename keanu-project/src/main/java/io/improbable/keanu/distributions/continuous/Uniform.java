@@ -21,10 +21,8 @@ public class Uniform implements ContinuousDistribution {
      * @param xMax   maximum x value
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
-        return new Uniform(xMin, xMax);
-    }
-    private Uniform(DoubleTensor xMin, DoubleTensor xMax) {
+    // package private
+    Uniform(DoubleTensor xMin, DoubleTensor xMax) {
         this.xMin = xMin;
         this.xMax = xMax;
     }

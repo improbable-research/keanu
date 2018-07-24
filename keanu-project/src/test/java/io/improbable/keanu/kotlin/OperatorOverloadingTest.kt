@@ -3,11 +3,9 @@ package io.improbable.keanu.kotlin
 import io.improbable.keanu.DeterministicRule
 import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType
 import io.improbable.keanu.vertices.intgr.IntegerVertex
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
@@ -408,7 +406,7 @@ class OperatorOverloadingTest {
         val b = VertexOfType.gaussian(0.0, 1.0)
         val c = VertexOfType.gaussian(0.0, 1.0)
         val d = ConstantDoubleVertex(1.0)
-        val e = UniformVertex(1.0, 10.0)
+        val e = VertexOfType.uniform(1.0, 10.0)
         val f = 10.0
         val g = 5.0
 
@@ -438,7 +436,7 @@ class OperatorOverloadingTest {
         val b = VertexOfType.poisson(1.0)
         val c = VertexOfType.poisson(2.0)
         val d = ConstantIntegerVertex(1)
-        val e = UniformIntVertex(1, 10)
+        val e = VertexOfType.uniform(1, 10)
         val f = 10
         val g = 5
 

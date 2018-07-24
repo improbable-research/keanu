@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.function.Function;
 
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -14,7 +15,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class UnaryOperationTestHelpers {
 
@@ -31,7 +34,7 @@ public class UnaryOperationTestHelpers {
                                                     double expectedGradientWrtA,
                                                     Function<DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(0.0, 1.0);
+        UniformVertex A = VertexOfType.uniform(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
 
         DualNumber resultDualNumber = new Differentiator().calculateDual((Differentiable)op.apply(A));
@@ -59,7 +62,11 @@ public class UnaryOperationTestHelpers {
                                                                        Function<DoubleVertex, DoubleVertex> op) {
 
         int[] matrixShape = new int[]{2, 2};
-        UniformVertex A = new UniformVertex(matrixShape, 0.0, 1.0);
+        UniformVertex A = new DistributionVertexBuilder()
+            .shaped(matrixShape)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
 
         DualNumber result = new Differentiator().calculateDual((Differentiable)op.apply(A));

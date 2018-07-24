@@ -52,10 +52,10 @@ public class InverseGammaVertexTest {
 
         InverseGamma.Diff inverseGammaLogDiff = InverseGamma.dlnPdf(2.0, 1.0, 0.5);
 
-        UniformVertex aTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex aTensor = VertexOfType.uniform(0.0, 5.0);
         aTensor.setValue(2.0);
 
-        UniformVertex bTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex bTensor = VertexOfType.uniform(0.0, 1.0);
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = VertexOfType.inverseGamma(aTensor, bTensor);
@@ -73,10 +73,10 @@ public class InverseGammaVertexTest {
 
         double[] vector = new double[]{0.25, 0.75, 0.1, 0.9, 0.3};
 
-        UniformVertex aTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex aTensor = VertexOfType.uniform(0.0, 1.0);
         aTensor.setValue(2.0);
 
-        UniformVertex bTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex bTensor = VertexOfType.uniform(0.0, 1.0);
         bTensor.setValue(1.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> VertexOfType.inverseGamma(aTensor, bTensor));
@@ -84,7 +84,7 @@ public class InverseGammaVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex a = new UniformVertex(0.0, 1.0);
+        UniformVertex a = VertexOfType.uniform(0.0, 1.0);
         a.setAndCascade(Nd4jDoubleTensor.scalar(2.5));
         InverseGammaVertex vertexUnderTest = VertexOfType.inverseGamma(
             a,
@@ -97,7 +97,7 @@ public class InverseGammaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.0, 3.0);
         InverseGammaVertex inverseGamma = VertexOfType.inverseGamma(uniformA, ConstantVertex.of(3.0));
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
@@ -118,7 +118,7 @@ public class InverseGammaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.0, 3.0);
         InverseGammaVertex inverseGamma = VertexOfType.inverseGamma(ConstantVertex.of(3.0), uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
@@ -165,9 +165,9 @@ public class InverseGammaVertexTest {
         aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
-        UniformVertex latentA = new UniformVertex(0.01, 10.0);
+        UniformVertex latentA = VertexOfType.uniform(0.01, 10.0);
         latentA.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        UniformVertex latentB = new UniformVertex(0.01, 10.0);
+        UniformVertex latentB = VertexOfType.uniform(0.01, 10.0);
         latentB.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
         latentAB.add(latentA);
         latentAB.add(latentB);

@@ -16,7 +16,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class ParticleFilteringTest {
@@ -29,7 +28,7 @@ public class ParticleFilteringTest {
     @Test
     public void findsCorrectTemp() {
 
-        DoubleVertex temperature = new UniformVertex(0.0, 100.0);
+        DoubleVertex temperature = VertexOfType.uniform(0.0, 100.0);
         DoubleVertex noiseAMu = VertexOfType.gaussian(0.0, 2.0);
         DoubleVertex noiseA = VertexOfType.gaussian(noiseAMu, ConstantVertex.of(2.0));
         DoubleVertex noiseBMu = VertexOfType.gaussian(0.0, 2.0);

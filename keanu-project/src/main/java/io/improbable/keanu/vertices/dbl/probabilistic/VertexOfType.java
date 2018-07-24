@@ -3,8 +3,10 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
 public class VertexOfType {
     private VertexOfType() {
@@ -50,5 +52,27 @@ public class VertexOfType {
         return new DistributionVertexBuilder()
             .withInput(ParameterName.V, v)
             .studentT();
+    }
+
+    public static UniformVertex uniform(double min, double max) {
+        return uniform(ConstantVertex.of(min), ConstantVertex.of(max));
+    }
+
+    public static UniformVertex uniform(DoubleVertex min, DoubleVertex max) {
+        return new DistributionVertexBuilder()
+            .withInput(ParameterName.MIN, min)
+            .withInput(ParameterName.MAX, max)
+            .uniform();
+    }
+
+    public static UniformIntVertex uniform(int min, int max) {
+        return uniform(ConstantVertex.of(min), ConstantVertex.of(max));
+    }
+
+    public static UniformIntVertex uniform(IntegerVertex min, IntegerVertex max) {
+        return new DistributionVertexBuilder()
+            .withInput(ParameterName.MIN, min)
+            .withInput(ParameterName.MAX, max)
+            .uniformInt();
     }
 }

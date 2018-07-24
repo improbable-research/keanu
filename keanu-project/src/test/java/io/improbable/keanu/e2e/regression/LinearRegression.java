@@ -10,12 +10,13 @@ import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class LinearRegression {
@@ -39,7 +40,11 @@ public class LinearRegression {
         double expectedM = 3.0;
         double expectedB = 20.0;
 
-        DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex xGenerator = new DistributionVertexBuilder()
+            .shaped(1, N)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 10.)
+            .uniform();
         DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
         DoubleVertex yGenerator = VertexOfType.gaussian(mu, ConstantVertex.of(1.0));
         DoubleTensor xData = xGenerator.sample(random);
@@ -72,8 +77,16 @@ public class LinearRegression {
         double expectedW2 = 7.0;
         double expectedB = 20.0;
 
-        DoubleVertex x1Generator = new UniformVertex(new int[]{1, N}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 50, 100);
+        DoubleVertex x1Generator = new DistributionVertexBuilder()
+            .shaped(1, N)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 10.)
+            .uniform();
+        DoubleVertex x2Generator = new DistributionVertexBuilder()
+            .shaped(1, N)
+            .withInput(ParameterName.MIN, 50.)
+            .withInput(ParameterName.MAX, 100.)
+            .uniform();
         DoubleVertex yGenerator = VertexOfType.gaussian(
             x1Generator.multiply(expectedW1).plus(x2Generator.multiply(expectedW2)).plus(expectedB),
             ConstantVertex.of(1.0)
@@ -118,7 +131,11 @@ public class LinearRegression {
         DoubleVertex yGeneratorMu = ConstantVertex.of(0.0);
         for (int i = 0; i < expectedWeights.length; i++) {
             expectedWeights[i] = random.nextDouble() * 100 + 20;
-            xGenerators[i] = new UniformVertex(new int[]{1, N}, 0, 10000);
+            xGenerators[i] = new DistributionVertexBuilder()
+                .shaped(1, N)
+                .withInput(ParameterName.MIN, 0.)
+                .withInput(ParameterName.MAX, 10000.)
+                .uniform();
             xData[i] = xGenerators[i].sample(random);
             xGenerators[i].setValue(xData[i]);
             yGeneratorMu = yGeneratorMu.plus(xGenerators[i].multiply(expectedWeights[i]));
@@ -139,7 +156,7 @@ public class LinearRegression {
             yMu = yMu.plus(x[i].multiply(weights[i]));
         }
 
-        DoubleVertex b = new UniformVertex(-50, 50);
+        DoubleVertex b = VertexOfType.uniform(-50., 50.);
         DoubleVertex y = VertexOfType.gaussian(yMu.plus(b), ConstantVertex.of(1.0));
         y.observe(yData);
 

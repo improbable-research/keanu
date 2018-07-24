@@ -65,10 +65,10 @@ public class ExponentialVertexTest {
 
         io.improbable.keanu.distributions.gradient.Exponential.Diff exponentialLogDiff = io.improbable.keanu.distributions.gradient.Exponential.dlnPdf(0.5, 2.5, 1.5);
 
-        UniformVertex aTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex aTensor = VertexOfType.uniform(0.0, 5.0);
         aTensor.setValue(0.5);
 
-        UniformVertex bTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex bTensor = VertexOfType.uniform(0.0, 5.0);
         bTensor.setValue(2.5);
 
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(aTensor, bTensor);
@@ -83,7 +83,7 @@ public class ExponentialVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex mu = new UniformVertex(0.0, 1.0);
+        UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         ExponentialVertex vertexUnderTest = new ExponentialVertex(
             mu,
@@ -96,7 +96,7 @@ public class ExponentialVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        UniformVertex uniformA = new UniformVertex(0.0, 1.0);
+        UniformVertex uniformA = VertexOfType.uniform(0.0, 1.0);
         ExponentialVertex exponential = new ExponentialVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
@@ -117,7 +117,7 @@ public class ExponentialVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        UniformVertex uniformA = new UniformVertex(1., 3.);
+        UniformVertex uniformA = VertexOfType.uniform(1., 3.);
         ExponentialVertex exponential = new ExponentialVertex(0.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
@@ -166,7 +166,7 @@ public class ExponentialVertexTest {
         aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
-        UniformVertex latentB = new UniformVertex(0.01, 10.0);
+        UniformVertex latentB = VertexOfType.uniform(0.01, 10.0);
         latentB.setAndCascade(0.1);
         latentAB.add(ConstantVertex.of(trueA));
         latentAB.add(latentB);

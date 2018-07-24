@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class MatrixMultiplicationVertexTest {
 
@@ -31,10 +31,10 @@ public class MatrixMultiplicationVertexTest {
     @Test
     public void canDoMatrixMultiplyAutoDiff() {
 
-        DoubleVertex m = new UniformVertex(0, 10);
+        DoubleVertex m = VertexOfType.uniform(0., 10.);
         m.setValue(DoubleTensor.create(new double[]{1, 2}, 1, 2));
 
-        DoubleVertex alpha = new UniformVertex(0, 10);
+        DoubleVertex alpha = VertexOfType.uniform(0., 10.);
         alpha.setValue(DoubleTensor.create(new double[]{1, 3, 5, 2, 4, 6}, 2, 3));
 
         Differentiable N = (Differentiable) m.matrixMultiply(alpha);
@@ -61,18 +61,18 @@ public class MatrixMultiplicationVertexTest {
     @Test
     public void canDoDoubleMatrixMultiplyAutoDiff() {
 
-        DoubleVertex m = new UniformVertex(0, 10);
+        DoubleVertex m = VertexOfType.uniform(0., 10.);
         m.setValue(DoubleTensor.create(new double[]{
             1, 2
         }, 1, 2));
 
-        DoubleVertex alpha = new UniformVertex(0, 10);
+        DoubleVertex alpha = VertexOfType.uniform(0., 10.);
         alpha.setValue(DoubleTensor.create(new double[]{
             1, 3,
             2, 4
         }, 2, 2));
 
-        DoubleVertex beta = new UniformVertex(0, 10);
+        DoubleVertex beta = VertexOfType.uniform(0., 10.);
         beta.setValue(DoubleTensor.create(new double[]{
             5, 7,
             6, 8
@@ -113,19 +113,19 @@ public class MatrixMultiplicationVertexTest {
     @Test
     public void canDoTripleMatrixMultiplyAutoDiff() {
 
-        DoubleVertex m = new UniformVertex(0, 10);
+        DoubleVertex m = VertexOfType.uniform(0., 10.);
         m.setValue(DoubleTensor.create(new double[]{
             1,
             2
         }, 2, 1));
 
-        DoubleVertex alpha = new UniformVertex(0, 10);
+        DoubleVertex alpha = VertexOfType.uniform(0., 10.);
         alpha.setValue(DoubleTensor.create(new double[]{
             1, 3,
             2, 4
         }, 2, 2));
 
-        DoubleVertex beta = new UniformVertex(0, 10);
+        DoubleVertex beta = VertexOfType.uniform(0., 10.);
         beta.setValue(DoubleTensor.create(new double[]{
             5, 8,
             6, 9,

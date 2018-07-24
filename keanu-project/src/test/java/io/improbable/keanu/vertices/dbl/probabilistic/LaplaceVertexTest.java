@@ -54,10 +54,10 @@ public class LaplaceVertexTest {
 
         Laplace.Diff laplaceLogDiff = Laplace.dlnPdf(0.0, 1.0, 0.5);
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex betaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex betaTensor = VertexOfType.uniform(0.0, 1.0);
         betaTensor.setValue(1.0);
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
@@ -75,10 +75,10 @@ public class LaplaceVertexTest {
 
         double[] vector = new double[]{0.25, 0.75, 0.1, 22, 1.3};
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex betaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex betaTensor = VertexOfType.uniform(0.0, 1.0);
         betaTensor.setValue(1.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new LaplaceVertex(muTensor, betaTensor));
@@ -86,7 +86,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex mu = new UniformVertex(0.0, 1.0);
+        UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         LaplaceVertex vertexUnderTest = new LaplaceVertex(
             mu,
@@ -99,7 +99,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         LaplaceVertex laplace = new LaplaceVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
@@ -120,7 +120,7 @@ public class LaplaceVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         LaplaceVertex laplace = new LaplaceVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
@@ -167,9 +167,9 @@ public class LaplaceVertexTest {
         muBeta.add(ConstantVertex.of(trueBeta));
 
         List<DoubleVertex> latentMuBeta = new ArrayList<>();
-        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        UniformVertex latentMu = VertexOfType.uniform(0.01, 10.0);
         latentMu.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
+        UniformVertex latentBeta = VertexOfType.uniform(0.01, 10.0);
         latentBeta.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
         latentMuBeta.add(latentMu);
         latentMuBeta.add(latentBeta);

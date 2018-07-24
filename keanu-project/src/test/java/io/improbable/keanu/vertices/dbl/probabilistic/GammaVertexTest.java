@@ -54,13 +54,13 @@ public class GammaVertexTest {
     public void matchesKnownDerivativeLogDensityOfScalar() {
         Gamma.Diff gammaLogDiff = Gamma.dlnPdf(0.75, 2, 5.5, 1.5);
 
-        UniformVertex aTensor = new UniformVertex(0.5, 1.0);
+        UniformVertex aTensor = VertexOfType.uniform(0.5, 1.0);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
+        UniformVertex thetaTensor = VertexOfType.uniform(0.5, 1.0);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(2));
 
-        UniformVertex kTensor = new UniformVertex(1.0, 5.0);
+        UniformVertex kTensor = VertexOfType.uniform(1.0, 5.0);
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(aTensor, thetaTensor, kTensor);
@@ -79,13 +79,13 @@ public class GammaVertexTest {
 
         double[] vector = new double[]{1.5, 2, 2.5, 3, 3.5};
 
-        UniformVertex aTensor = new UniformVertex(0.5, 1.0);
+        UniformVertex aTensor = VertexOfType.uniform(0.5, 1.0);
         aTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
+        UniformVertex thetaTensor = VertexOfType.uniform(0.5, 1.0);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
 
-        UniformVertex kTensor = new UniformVertex(1.0, 5.0);
+        UniformVertex kTensor = VertexOfType.uniform(1.0, 5.0);
         kTensor.setValue(Nd4jDoubleTensor.scalar(2.5));
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new GammaVertex(aTensor, thetaTensor, kTensor));
@@ -93,7 +93,7 @@ public class GammaVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex a = new UniformVertex(1.0, 2.0);
+        UniformVertex a = VertexOfType.uniform(1.0, 2.0);
         a.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         GammaVertex vertexUnderTest = new GammaVertex(a, 1.5, 5.0);
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
@@ -104,7 +104,7 @@ public class GammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
 
-        UniformVertex uniformA = new UniformVertex(0.0, 1.0);
+        UniformVertex uniformA = VertexOfType.uniform(0.0, 1.0);
         GammaVertex gamma = new GammaVertex(uniformA, 2.0, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
@@ -126,7 +126,7 @@ public class GammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdtheta() {
 
-        UniformVertex uniformA = new UniformVertex(1.0, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.0, 3.0);
         GammaVertex gamma = new GammaVertex(0.0, uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
@@ -148,7 +148,7 @@ public class GammaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdk() {
 
-        UniformVertex uniformA = new UniformVertex(2.0, 5.0);
+        UniformVertex uniformA = VertexOfType.uniform(2.0, 5.0);
         GammaVertex gamma = new GammaVertex(0.0, 2.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(3.);
@@ -204,9 +204,9 @@ public class GammaVertexTest {
         aThetaK.add(constK);
 
         List<DoubleVertex> latentAThetaK = new ArrayList<>();
-        UniformVertex latentTheta = new UniformVertex(0.01, 10.0);
+        UniformVertex latentTheta = VertexOfType.uniform(0.01, 10.0);
         latentTheta.setAndCascade(Nd4jDoubleTensor.scalar(9.9));
-        UniformVertex latentK = new UniformVertex(0.01, 10.0);
+        UniformVertex latentK = VertexOfType.uniform(0.01, 10.0);
         latentK.setAndCascade(Nd4jDoubleTensor.scalar(0.1));
 
         latentAThetaK.add(constA2);

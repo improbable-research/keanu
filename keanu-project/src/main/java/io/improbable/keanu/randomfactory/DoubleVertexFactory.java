@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 
@@ -19,7 +20,7 @@ public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
 
     @Override
     public UniformVertex nextDouble(double min, double max) {
-        UniformVertex uniformVertex = new UniformVertex(min, max);
+        UniformVertex uniformVertex = VertexOfType.uniform(min, max);
         uniformVertex.setValue(uniformVertex.sample(random));
         return uniformVertex;
     }

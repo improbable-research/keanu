@@ -11,9 +11,8 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
 public class ObservableTest {
 
@@ -47,14 +46,14 @@ public class ObservableTest {
 
     @Test
     public void youCanObserveAProbabilisticIntegerVertex() {
-        IntegerVertex vertex = new UniformIntVertex(1, 1);
+        IntegerVertex vertex = VertexOfType.uniform(1, 1);
         assertTrue(vertex instanceof Probabilistic);
         vertex.observe(IntegerTensor.scalar(0));
     }
 
     @Test
     public void youCanObserveAProbabilisticDoubleVertex() {
-        DoubleVertex vertex = new UniformVertex(1.0, 1.0);
+        DoubleVertex vertex = VertexOfType.uniform(1.0, 1.0);
         assertTrue(vertex instanceof Probabilistic);
         vertex.observe(DoubleTensor.scalar(1.0));
     }

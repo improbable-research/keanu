@@ -3,6 +3,8 @@ package io.improbable.keanu.distributions.dual;
 import java.util.Objects;
 
 public class ParameterName {
+    public static final ParameterName MIN = new ParameterName("MIN");
+    public static final ParameterName MAX = new ParameterName("MAX");
     public static final ParameterName A = new ParameterName("A");
     public static final ParameterName B = new ParameterName("B");
     public static final ParameterName K = new ParameterName("K");

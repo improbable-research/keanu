@@ -43,4 +43,9 @@ public class ParameterValue<T>  implements Comparable<ParameterValue<T>> {
     public int compareTo(@NotNull ParameterValue o) {
         return id.getName().compareTo(o.id.getName());
     }
+
+    @Override
+    public String toString() {
+        return id + "=" + value;
+    }
 }

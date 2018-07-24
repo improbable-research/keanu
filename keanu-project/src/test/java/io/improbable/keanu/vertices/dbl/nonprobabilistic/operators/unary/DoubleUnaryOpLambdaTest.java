@@ -1,17 +1,24 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import static org.junit.Assert.assertArrayEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertArrayEquals;
+import io.improbable.keanu.distributions.dual.ParameterName;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 public class DoubleUnaryOpLambdaTest {
 
     @Test
     public void GIVEN_a_double_tensor_THEN_transform() {
 
-        UniformVertex matrix = new UniformVertex(new int[]{2, 2}, 0, 5);
+        UniformVertex matrix = new DistributionVertexBuilder()
+            .shaped(2, 2)
+            .withInput(ParameterName.MIN, 0.0)
+            .withInput(ParameterName.MAX, 5.0)
+            .uniform();
         matrix.setAndCascade(2.5);
         DoubleVertex matrixLambda = new DoubleUnaryOpLambda<>(matrix.getShape(), matrix, (val) -> val.times(2));
 

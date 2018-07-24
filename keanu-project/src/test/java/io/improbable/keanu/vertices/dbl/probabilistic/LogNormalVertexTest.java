@@ -53,10 +53,10 @@ public class LogNormalVertexTest {
 
         LogNormal.Diff logNormalLogDiff = LogNormal.dlnPdf(0.0, 1.0, 0.5);
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex sigmaTensor = VertexOfType.uniform(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
         LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(muTensor, sigmaTensor);
@@ -74,10 +74,10 @@ public class LogNormalVertexTest {
 
         double[] vector = new double[]{0.25, -0.75, 0.1, -2, 1.3};
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex sigmaTensor = VertexOfType.uniform(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new LogNormalVertex(muTensor, sigmaTensor));
@@ -85,7 +85,7 @@ public class LogNormalVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex mu = new UniformVertex(0.0, 1.0);
+        UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(0.5);
         LogNormalVertex vertexUnderTest = new LogNormalVertex(mu, 3.0);
         vertexUnderTest.setAndCascade(1.0);
@@ -95,7 +95,7 @@ public class LogNormalVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         LogNormalVertex logNormal = new LogNormalVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
@@ -116,7 +116,7 @@ public class LogNormalVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdsigma() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         LogNormalVertex logNormal = new LogNormalVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
@@ -159,9 +159,9 @@ public class LogNormalVertexTest {
         muSigma.add(ConstantVertex.of(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
-        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        UniformVertex latentMu = VertexOfType.uniform(0.01, 10.0);
         latentMu.setAndCascade(DoubleTensor.scalar(9.9));
-        UniformVertex latentSigma = new UniformVertex(0.01, 10.0);
+        UniformVertex latentSigma = VertexOfType.uniform(0.01, 10.0);
         latentSigma.setAndCascade(DoubleTensor.scalar(0.1));
         latentMuSigma.add(latentMu);
         latentMuSigma.add(latentSigma);

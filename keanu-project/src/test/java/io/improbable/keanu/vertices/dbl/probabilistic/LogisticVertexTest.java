@@ -53,10 +53,10 @@ public class LogisticVertexTest {
 
         Logistic.Diff logisticLogDiff = Logistic.dlnPdf(0.0, 0.5, 1.5);
 
-        UniformVertex aTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex aTensor = VertexOfType.uniform(0.0, 5.0);
         aTensor.setValue(0.0);
 
-        UniformVertex bTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex bTensor = VertexOfType.uniform(0.0, 5.0);
         bTensor.setValue(0.5);
 
         LogisticVertex tensorLogisticVertex = new LogisticVertex(aTensor, bTensor);
@@ -71,7 +71,7 @@ public class LogisticVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex mu = new UniformVertex(0.0, 1.0);
+        UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         LogisticVertex vertexUnderTest = new LogisticVertex(
             mu,
@@ -84,7 +84,7 @@ public class LogisticVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
-        UniformVertex uniformA = new UniformVertex(0.0, 1.0);
+        UniformVertex uniformA = VertexOfType.uniform(0.0, 1.0);
         LogisticVertex logistic = new LogisticVertex(uniformA, 1.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
@@ -105,7 +105,7 @@ public class LogisticVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
-        UniformVertex uniformA = new UniformVertex(0., 1.);
+        UniformVertex uniformA = VertexOfType.uniform(0., 1.);
         LogisticVertex logistic = new LogisticVertex(0.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
@@ -154,7 +154,7 @@ public class LogisticVertexTest {
         aB.add(ConstantVertex.of(trueB));
 
         List<DoubleVertex> latentAB = new ArrayList<>();
-        UniformVertex latentB = new UniformVertex(0.01, 10.0);
+        UniformVertex latentB = VertexOfType.uniform(0.01, 10.0);
         latentB.setAndCascade(0.1);
         latentAB.add(ConstantVertex.of(trueA));
         latentAB.add(latentB);

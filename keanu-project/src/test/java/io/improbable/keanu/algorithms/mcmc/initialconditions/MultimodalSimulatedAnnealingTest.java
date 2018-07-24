@@ -37,7 +37,7 @@ public class MultimodalSimulatedAnnealingTest {
     @Test
     public void findsBothModesForContinuousNetwork() {
 
-        DoubleVertex A = new UniformVertex(-3.0, 3.0);
+        DoubleVertex A = VertexOfType.uniform(-3.0, 3.0);
         A.setValue(0.0);
         DoubleVertex B = A.multiply(A);
         DoubleVertex C = VertexOfType.gaussian(B, ConstantVertex.of(1.5));
@@ -56,11 +56,11 @@ public class MultimodalSimulatedAnnealingTest {
     @Test
     public void findsModesForDiscreteContinuousHybridNetwork() {
 
-        UniformVertex A = new UniformVertex(0.0, 3.0);
+        UniformVertex A = VertexOfType.uniform(0.0, 3.0);
         A.setValue(1.0);
         DoubleVertex B = A.multiply(A);
 
-        DoubleVertex C = new UniformVertex(-3.0, 0.0);
+        DoubleVertex C = VertexOfType.uniform(-3.0, 0.0);
         DoubleVertex D = C.multiply(C);
 
         BooleanVertex E = new Flip(0.5);

@@ -53,10 +53,10 @@ public class BetaVertexTest {
 
         Beta.Diff betaLogDiff = Beta.dlnPdf(2.0, 3.0, 0.5);
 
-        UniformVertex alphaTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex alphaTensor = VertexOfType.uniform(0.0, 5.0);
         alphaTensor.setValue(2.0);
 
-        UniformVertex betaTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex betaTensor = VertexOfType.uniform(0.0, 5.0);
         betaTensor.setValue(3.0);
 
         BetaVertex tensorBetaVertex = new BetaVertex(alphaTensor, betaTensor);
@@ -74,10 +74,10 @@ public class BetaVertexTest {
 
         double[] vector = new double[]{0.25, 0.75, 0.1, 0.9, 0.3};
 
-        UniformVertex alphaTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex alphaTensor = VertexOfType.uniform(0.0, 5.0);
         alphaTensor.setValue(2.0);
 
-        UniformVertex betaTensor = new UniformVertex(0.0, 5.0);
+        UniformVertex betaTensor = VertexOfType.uniform(0.0, 5.0);
         betaTensor.setValue(3.0);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new BetaVertex(alphaTensor, betaTensor));
@@ -85,7 +85,7 @@ public class BetaVertexTest {
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex alpha = new UniformVertex(0.0, 1.0);
+        UniformVertex alpha = VertexOfType.uniform(0.0, 1.0);
         alpha.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         BetaVertex vertexUnderTest = new BetaVertex(
             alpha,
@@ -98,7 +98,7 @@ public class BetaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdalpha() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         BetaVertex beta = new BetaVertex(uniformA, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
@@ -119,7 +119,7 @@ public class BetaVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
         BetaVertex beta = new BetaVertex(3.0, uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
@@ -183,9 +183,9 @@ public class BetaVertexTest {
         alphaBeta.add(ConstantVertex.of(trueBeta));
 
         List<DoubleVertex> latentAlphaBeta = new ArrayList<>();
-        UniformVertex latentAlpha = new UniformVertex(0.01, 10.0);
+        UniformVertex latentAlpha = VertexOfType.uniform(0.01, 10.0);
         latentAlpha.setAndCascade(DoubleTensor.scalar(9.9));
-        UniformVertex latentBeta = new UniformVertex(0.01, 10.0);
+        UniformVertex latentBeta = VertexOfType.uniform(0.01, 10.0);
         latentBeta.setAndCascade(DoubleTensor.scalar(0.1));
         latentAlphaBeta.add(latentAlpha);
         latentAlphaBeta.add(latentBeta);
