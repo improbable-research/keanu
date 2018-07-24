@@ -1,13 +1,17 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
+import java.util.Arrays;
 import java.util.Map;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -30,8 +34,8 @@ public class FlipVertexTest {
     public void doesExpectedLogProbOnTensor() {
         double probTrue = 0.25;
         Flip flip = new Flip(new int[]{1, 2}, probTrue);
-        double actualLogPmf = flip.logPmf(BooleanTensor.create(new boolean[]{true, true}));
-        double expectedLogPmf = Math.log(probTrue) + Math.log(probTrue);
+        double actualLogPmf = flip.logPmf(BooleanTensor.create(new boolean[]{true, false}));
+        double expectedLogPmf = Math.log(probTrue) + Math.log(1 - probTrue);
         assertEquals(expectedLogPmf, actualLogPmf, 1e-10);
     }
 
@@ -52,6 +56,77 @@ public class FlipVertexTest {
 
         assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
         assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
-
     }
+
+    @Test
+    public void doesCalculateDiffLogProbWithRespectToRank3HyperParam() {
+
+        int[] shape = new int[]{2, 2, 2};
+        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        A.setValue(DoubleTensor.create(new double[]{
+            0.1, 0.2,
+            0.3, 0.4,
+            0.5, 0.3,
+            0.2, 0.8
+        }, shape));
+
+        DoubleVertex B = new GaussianVertex(shape, 0, 1);
+        B.setValue(DoubleTensor.create(new double[]{
+            0.55, 0.65,
+            0.45, 0.25,
+            0.3, 0.4,
+            0.5, 0.3,
+        }, shape));
+        DoubleVertex C = A.times(B);
+        Flip D = new Flip(C);
+
+        Map<Long, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{
+            true, false,
+            false, true,
+            false, false,
+            true, true
+        }, shape));
+
+        DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{
+            0.55, -0.65,
+            -0.45, 0.25,
+            -0.3, -0.4,
+            0.5, 0.3,
+        }, shape);
+
+        DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{
+            0.1, -0.2,
+            -0.3, 0.4,
+            -0.5, -0.3,
+            0.2, 0.8
+        }, shape);
+
+        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
+        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
+    }
+
+    @Test
+    public void canUseWithGradientOptimizer() {
+
+        DoubleVertex A = new UniformVertex(new int[]{1, 2}, -3.0, 3.0);
+        A.setValue(DoubleTensor.create(new double[]{-0.5, 0.5}, new int[]{1, 2}));
+        DoubleVertex B = A.minus(2.0).sigmoid();
+        Flip flip = new Flip(B);
+        flip.observe(new boolean[]{true, false});
+
+        GradientOptimizer optimizer = new GradientOptimizer(new BayesianNetwork(flip.getConnectedGraph()));
+        optimizer.onGradientCalculation((point, gradient) -> {
+            System.out.println("Gradient: @" + Arrays.toString(point) + " -> " + Arrays.toString(gradient));
+        });
+
+        optimizer.onFitnessCalculation((point, fitness) -> {
+            System.out.println("Fitness @" + Arrays.toString(point) + " -> " + fitness);
+        });
+
+        optimizer.maxAPosteriori();
+
+        double[] actual = A.getValue().asFlatDoubleArray();
+        assertArrayEquals(new double[]{2.0, -2.0}, actual, 0.1);
+    }
+
 }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -8,6 +9,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 
@@ -57,12 +59,12 @@ public class Flip extends ProbabilisticBool {
     @Override
     public double logPmf(BooleanTensor value) {
 
-        DoubleTensor logProbability = value.setDoubleIf(
+        DoubleTensor probability = value.setDoubleIf(
             probTrue.getValue(),
             probTrue.getValue().unaryMinus().plusInPlace(1.0)
-        ).logInPlace();
+        ).clampInPlace(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
 
-        return logProbability.sum();
+        return probability.logInPlace().sum();
     }
 
     @Override
@@ -70,10 +72,17 @@ public class Flip extends ProbabilisticBool {
 
         DualNumber probTrueDual = probTrue.getDualNumber();
 
-        DoubleTensor t = value.setDoubleIf(DoubleTensor.scalar(1), DoubleTensor.scalar(-1));
+        DoubleTensor dLogPdp = value.setDoubleIf(
+            DoubleTensor.ONE_SCALAR,
+            DoubleTensor.MINUS_ONE_SCALAR
+        );
 
+        PartialDerivatives partials = probTrueDual
+            .getPartialDerivatives()
+            .multiplyBy(dLogPdp)
+            .sum(true, TensorShape.dimensionRange(0, value.getRank()));
 
-        throw new UnsupportedOperationException();
+        return partials.asMap();
     }
 
     @Override

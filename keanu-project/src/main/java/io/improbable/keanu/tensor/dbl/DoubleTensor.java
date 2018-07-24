@@ -3,12 +3,13 @@ package io.improbable.keanu.tensor.dbl;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
+
+    DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
 
     DoubleTensor ZERO_SCALAR = scalar(0.0);
 
