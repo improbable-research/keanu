@@ -557,7 +557,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor tad(int dimension, int index) {
+    public IntegerTensor alongDimension(int dimension, int index) {
         INDArray dup = tensor.dup();
         INDArray split = dup.slice(index, dimension);
         return new Nd4jIntegerTensor(split);

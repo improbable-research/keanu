@@ -202,8 +202,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor tad(int dimension, int index) {
-        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).tad(dimension, index);
+    public BooleanTensor alongDimension(int dimension, int index) {
+        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).alongDimension(dimension, index);
         double[] tadFlat = tadDoubles.asFlatDoubleArray();
         boolean[] tadToBooleans = new boolean[tadFlat.length];
         for (int i = 0; i <tadFlat.length; i++) {

@@ -105,6 +105,6 @@ public interface Tensor<T> {
         return new GenericTensor<>(shape);
     }
 
-    Tensor<T> tad(int dimension, int index);
+    Tensor<T> alongDimension(int dimension, int index);
 
 }

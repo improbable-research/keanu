@@ -394,8 +394,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor tad(int dimension, int index) {
-        throw new IllegalStateException("Cannot tad a scalar");
+    public DoubleTensor alongDimension(int dimension, int index) {
+        if (dimension == 0 && index == 0) {
+            return duplicate();
+        } else {
+            throw new IllegalStateException("Cannot alongDimension a scalar");
+        }
     }
 
     @Override

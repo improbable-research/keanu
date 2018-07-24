@@ -187,7 +187,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> tad(int dimension, int index) {
+    public Tensor<T> alongDimension(int dimension, int index) {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();
         for (int i = 0; i < flat.length; i++) {

@@ -58,7 +58,7 @@ public interface BooleanTensor extends Tensor<Boolean> {
     IntegerTensor toIntegerMask();
 
     @Override
-    BooleanTensor tad(int dimension, int index);
+    BooleanTensor alongDimension(int dimension, int index);
 
     BooleanTensor concat(int dimension, BooleanTensor... those);
 

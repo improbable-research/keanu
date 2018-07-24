@@ -1,13 +1,9 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpVertex;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.shapeAlongDimension;
 
@@ -44,7 +40,7 @@ public class GenericTADVertex<T> extends NonProbabilistic<Tensor<T>> {
     }
 
     protected Tensor<T> op(Tensor<T> a) {
-        return a.tad(dimension, index);
+        return a.alongDimension(dimension, index);
     }
 
 }

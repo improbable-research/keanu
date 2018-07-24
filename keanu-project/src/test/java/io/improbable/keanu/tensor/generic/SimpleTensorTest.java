@@ -3,8 +3,6 @@ package io.improbable.keanu.tensor.generic;
 import io.improbable.keanu.tensor.Tensor;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -78,11 +76,11 @@ public class SimpleTensorTest {
             new int[]{3, 3}
         );
 
-        Tensor<Something> taddedSomethingRow = somethingTensor.tad(0, 1);
+        Tensor<Something> taddedSomethingRow = somethingTensor.alongDimension(0, 1);
         assertArrayEquals(new int[]{1, 3}, taddedSomethingRow.getShape());
         assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
 
-        Tensor<Something> taddedSomethingColumn = somethingTensor.tad(1, 1);
+        Tensor<Something> taddedSomethingColumn = somethingTensor.alongDimension(1, 1);
         assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
     }

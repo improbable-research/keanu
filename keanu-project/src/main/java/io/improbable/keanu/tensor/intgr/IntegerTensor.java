@@ -122,7 +122,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     IntegerTensor apply(Function<Integer, Integer> function);
 
     @Override
-    IntegerTensor tad(int dimension, int index);
+    IntegerTensor alongDimension(int dimension, int index);
 
     IntegerTensor concat(int dimension, IntegerTensor... those);
 

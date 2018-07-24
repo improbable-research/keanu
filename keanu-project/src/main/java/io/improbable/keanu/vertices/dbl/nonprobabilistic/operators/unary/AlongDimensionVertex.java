@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.shapeAlongDimension;
 
-public class TADVertex extends DoubleUnaryOpVertex {
+public class AlongDimensionVertex extends DoubleUnaryOpVertex {
 
     private final int dimension;
     private final int index;
@@ -21,7 +21,7 @@ public class TADVertex extends DoubleUnaryOpVertex {
      * @param dimension the dimension to extract along
      * @param index the index of extraction
      */
-    public TADVertex(DoubleVertex inputVertex, int dimension, int index) {
+    public AlongDimensionVertex(DoubleVertex inputVertex, int dimension, int index) {
         super(shapeAlongDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
@@ -29,11 +29,11 @@ public class TADVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).tad(dimension, index);
+        return dualNumbers.get(inputVertex).alongDimension(dimension, index);
     }
 
     @Override
     protected DoubleTensor op(DoubleTensor a) {
-        return a.tad(dimension, index);
+        return a.alongDimension(dimension, index);
     }
 }

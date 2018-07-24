@@ -245,8 +245,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor tad(int dimension, int index) {
-        throw new IllegalStateException("Cannot tad a scalar");
+    public IntegerTensor alongDimension(int dimension, int index) {
+        if (dimension == 0 && index == 0) {
+            return duplicate();
+        } else {
+            throw new IllegalStateException("Cannot alongDimension a scalar");
+        }
     }
 
     @Override
