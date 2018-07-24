@@ -737,7 +737,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minInPlace(min).maxInPlace(max);
+        return minInPlace(max).maxInPlace(min);
     }
 
     @Override
