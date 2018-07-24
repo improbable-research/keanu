@@ -1,11 +1,28 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Triangular {
+public class Triangular implements ContinuousDistribution {
 
-    public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c, KeanuRandom random) {
+    private final DoubleTensor xMin;
+    private final DoubleTensor xMax;
+    private final DoubleTensor c;
+
+    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+        return new Triangular(xMin, xMax, c);
+    }
+
+    private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.c = c;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
         final DoubleTensor p = random.nextDouble(shape);
         final DoubleTensor q = p.unaryMinus().plusInPlace(1);
         final DoubleTensor range = xMax.minus(xMin);
@@ -21,7 +38,8 @@ public class Triangular {
         return (lessThan.timesInPlace(lessThanMask).plusInPlace(greaterThan.timesInPlace(greaterThanMask)));
     }
 
-    public static DoubleTensor logPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor range = xMax.minus(xMin);
 
         final DoubleTensor conditionalFirstHalf = x.getGreaterThanMask(xMin);
@@ -37,5 +55,9 @@ public class Triangular {
         return (conditionalResult.timesInPlace(conditionalAnd).plusInPlace(elseIfConditionalResult.timesInPlace(elseIfConditionalAnd))).logInPlace();
     }
 
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
+        throw new UnsupportedOperationException();
+    }
 
 }

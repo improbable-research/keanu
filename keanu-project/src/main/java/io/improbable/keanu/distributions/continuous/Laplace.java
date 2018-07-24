@@ -1,23 +1,38 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.BETA;
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
+import org.nd4j.linalg.util.ArrayUtil;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.nd4j.linalg.util.ArrayUtil;
 
-public class Laplace {
+public class Laplace implements ContinuousDistribution {
 
-    private Laplace() {
-    }
+    private final DoubleTensor mu;
+    private final DoubleTensor beta;
 
     /**
-     * @param shape  shape of tensor returned
      * @param mu     location
      * @param beta   shape
-     * @param random source of randomness
-     * @return a random number from the Laplace distribution
+     * @return       a new ContinuousDistribution object
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor beta, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
+        return new Laplace(mu, beta);
+    }
+
+    private Laplace(DoubleTensor mu, DoubleTensor beta) {
+        this.mu = mu;
+        this.beta = beta;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
         Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
@@ -41,13 +56,15 @@ public class Laplace {
         }
     }
 
-    public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().divInPlace(beta);
         final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
         return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
     }
 
-    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor beta, DoubleTensor x) {
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
@@ -57,19 +74,10 @@ public class Laplace {
         final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
         final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        return new DiffLogP(dLogPdMu, dLogPdBeta, dLogPdx);
-    }
-
-    public static class DiffLogP {
-        public final DoubleTensor dLogPdmu;
-        public final DoubleTensor dLogPdbeta;
-        public final DoubleTensor dLogPdx;
-
-        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPdbeta, DoubleTensor dLogPdx) {
-            this.dLogPdmu = dLogPdmu;
-            this.dLogPdbeta = dLogPdbeta;
-            this.dLogPdx = dLogPdx;
-        }
+        return new Diffs()
+            .put(MU, dLogPdMu)
+            .put(BETA, dLogPdBeta)
+            .put(X, dLogPdx);
     }
 
 }
