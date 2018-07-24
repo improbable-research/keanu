@@ -398,7 +398,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
-            throw new IllegalStateException("Cannot alongDimension a scalar");
+            throw new IllegalStateException("Can along retrieve from dimension and index zero in a scalar");
         }
     }
 
