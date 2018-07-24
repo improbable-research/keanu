@@ -10,7 +10,7 @@
 [![Build Status][travis-image]][travis-url]
 [![Quality Gate][sonar-image]][sonar-url]
 [![Maven Central][maven-image]][maven-url]
-[![Javadocs][javadoc-image]][javadoc-url]
+[![Javadocs](https://www.javadoc.io/badge/io.improbable/keanu.svg)](https://www.javadoc.io/doc/io.improbable/keanu)
 
 ## Overview
 
@@ -67,8 +67,6 @@ Interested in working for Improbable on cool problems? Start [here](https://impr
 
 [travis-image]: https://travis-ci.org/improbable-research/keanu.svg?branch=develop
 [travis-url]: https://travis-ci.org/improbable-research/keanu
-[javadoc-image]: https://www.javadoc.io/badge/io.improbable/keanu.svg
-[javadoc-url]: https://www.javadoc.io/doc/io.improbable/keanu
 [maven-image]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu/badge.svg
 [maven-url]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu
 [sonar-image]: https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status
