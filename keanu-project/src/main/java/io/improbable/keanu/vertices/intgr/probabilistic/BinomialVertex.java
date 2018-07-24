@@ -9,11 +9,10 @@ import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class BinomialVertex extends DistributionBackedIntegerVertex<Vertex<? extends NumberTensor<?,?>>, NumberTensor<?,?>> implements Probabilistic<IntegerTensor> {
+public class BinomialVertex extends DistributionBackedIntegerVertex<NumberTensor<?,?>> implements Probabilistic<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;

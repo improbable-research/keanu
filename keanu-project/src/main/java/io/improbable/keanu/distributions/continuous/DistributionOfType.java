@@ -23,7 +23,7 @@ public class DistributionOfType {
     private DistributionOfType() {
     }
 
-    public static ContinuousDistribution gaussian(List<NumberTensor<?,?>> inputs) {
+    public static ContinuousDistribution gaussian(List<DoubleTensor> inputs) {
         return construct(Gaussian.class, inputs, 2);
     }
 
@@ -35,7 +35,7 @@ public class DistributionOfType {
         return construct(Binomial.class, inputs, 2);
     }
 
-    private static <D extends Distribution<? extends Tensor>> D construct(Class<D> clazz, List<NumberTensor<?,?>> inputs, int expectedNumInputs) {
+    private static <D extends Distribution<? extends Tensor>> D construct(Class<D> clazz, List<? extends NumberTensor<?,?>> inputs, int expectedNumInputs) {
         Preconditions.checkArgument(inputs.size() == expectedNumInputs,
             "Too many input parameters - expected {}, got {}", expectedNumInputs, inputs.size());
         try {
@@ -49,7 +49,7 @@ public class DistributionOfType {
         }
     }
 
-    private static <D extends Distribution<? extends Tensor>> D construct(Class<D> clazz, List<NumberTensor<?,?>> inputs)
+    private static <D extends Distribution<? extends Tensor>> D construct(Class<D> clazz, List<? extends NumberTensor<?,?>> inputs)
         throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor[] constructors = clazz.getDeclaredConstructors();
         Constructor constructor = constructors[0];

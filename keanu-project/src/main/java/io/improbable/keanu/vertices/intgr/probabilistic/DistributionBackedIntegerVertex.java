@@ -19,11 +19,11 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public abstract class DistributionBackedIntegerVertex<V extends Vertex<? extends T>, T extends Tensor<?>>
+public abstract class DistributionBackedIntegerVertex<T extends Tensor<?>>
     extends IntegerVertex implements Probabilistic<IntegerTensor> {
     private final Function<List<T>, DiscreteDistribution> distributionCreator;
 
-    public DistributionBackedIntegerVertex(int[] tensorShape, Function<List<T>, DiscreteDistribution> distributionCreator, V... parents) {
+    public DistributionBackedIntegerVertex(int[] tensorShape, Function<List<T>, DiscreteDistribution> distributionCreator, Vertex<? extends T>... parents) {
         super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(DistributionBackedIntegerVertex.class));
         this.distributionCreator = distributionCreator;
 
@@ -56,7 +56,7 @@ public abstract class DistributionBackedIntegerVertex<V extends Vertex<? extends
         return distributionCreator.apply(getInputs());
     }
 
-    protected <V extends Vertex<T>, T extends Tensor<?>> List<T> getInputs() {
-        return getParents().stream().map(v -> ((V)v).getValue()).collect(Collectors.toList());
+    protected List<T> getInputs() {
+        return getParents().stream().map(v -> ((Vertex<? extends T>)v).getValue()).collect(Collectors.toList());
     }
 }

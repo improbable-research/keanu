@@ -14,7 +14,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public class GaussianVertex extends DistributionBackedDoubleVertex<Vertex<? extends NumberTensor<?,?>>, NumberTensor<?,?>> {
+public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian

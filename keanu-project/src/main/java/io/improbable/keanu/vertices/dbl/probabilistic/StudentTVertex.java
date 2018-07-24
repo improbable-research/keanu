@@ -7,14 +7,11 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.ParameterMap;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class StudentTVertex extends DistributionBackedDoubleVertex<IntegerVertex, IntegerTensor> {
+public class StudentTVertex extends DistributionBackedDoubleVertex<IntegerTensor> {
 
     private final IntegerVertex v;
 
