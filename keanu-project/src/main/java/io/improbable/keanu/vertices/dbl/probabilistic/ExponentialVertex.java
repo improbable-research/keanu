@@ -1,6 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Exponential;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -71,15 +80,15 @@ public class ExponentialVertex extends ProbabilisticDouble {
         DoubleTensor locationValues = location.getValue();
         DoubleTensor lambdaValues = lambda.getValue();
 
-        DoubleTensor logPdfs = Exponential.logPdf(locationValues, lambdaValues, value);
+        DoubleTensor logPdfs = Exponential.withParameters(locationValues, lambdaValues).logProb(value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Exponential.DiffLogP dlnP = Exponential.dlnPdf(location.getValue(), lambda.getValue(), value);
-        return convertDualNumbersToDiff(dlnP.dLogPdlocation, dlnP.dLogPdlambda, dlnP.dLogPdx);
+        Diffs dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
@@ -102,7 +111,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Exponential.sample(getShape(), location.getValue(), lambda.getValue(), random);
+        return Exponential.withParameters(location.getValue(), lambda.getValue()).sample(getShape(), random);
     }
 
 }

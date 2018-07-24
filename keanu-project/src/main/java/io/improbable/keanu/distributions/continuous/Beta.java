@@ -1,17 +1,36 @@
 package io.improbable.keanu.distributions.continuous;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
 import org.apache.commons.math3.special.Gamma;
 
-public class Beta {
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-    public static DoubleTensor sample(int[] shape,
-                                      DoubleTensor alpha,
-                                      DoubleTensor beta,
-                                      DoubleTensor xMin,
-                                      DoubleTensor xMax,
-                                      KeanuRandom random) {
+public class Beta implements ContinuousDistribution {
+
+    private final DoubleTensor alpha;
+    private final DoubleTensor beta;
+    private final DoubleTensor xMin;
+    private final DoubleTensor xMax;
+
+    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
+        return new Beta(alpha, beta, xMin, xMax);
+    }
+
+    private Beta(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
+        this.alpha = alpha;
+        this.beta = beta;
+        this.xMin = xMin;
+        this.xMax = xMax;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
 
         final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR, alpha);
         final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR, beta);
@@ -28,7 +47,8 @@ public class Beta {
         return lessMask.timesInPlace(lessThan).plusInPlace(greaterMask.timesInPlace(greaterThan));
     }
 
-    public static DoubleTensor logPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor lnGammaAlpha = alpha.apply(Gamma::logGamma);
         final DoubleTensor lnGammaBeta = beta.apply(Gamma::logGamma);
         final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).applyInPlace(Gamma::logGamma);
@@ -40,7 +60,8 @@ public class Beta {
         return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLn).minusInPlace(betaFunction);
     }
 
-    public static DiffLogP dlnPdf(DoubleTensor alpha, DoubleTensor beta, DoubleTensor x) {
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).applyInPlace(Gamma::digamma);
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
@@ -49,19 +70,9 @@ public class Beta {
         final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
         final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
 
-        return new DiffLogP(dLogPda, dLogPdb, dLogPdx);
+        return new Diffs()
+            .put(A, dLogPda)
+            .put(B, dLogPdb)
+            .put(X, dLogPdx);
     }
-
-    public static class DiffLogP {
-        public final DoubleTensor dLogPdalpha;
-        public final DoubleTensor dLogPdbeta;
-        public final DoubleTensor dLogPdx;
-
-        public DiffLogP(DoubleTensor dLogPdalpha, DoubleTensor dLogPdbeta, DoubleTensor dLogPdx) {
-            this.dLogPdalpha = dLogPdalpha;
-            this.dLogPdbeta = dLogPdbeta;
-            this.dLogPdx = dLogPdx;
-        }
-    }
-
 }

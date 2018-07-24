@@ -63,7 +63,7 @@ public class MultivariateGaussianVertex extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
-        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.logPdf(muValues, covarianceValues, value);
+        return io.improbable.keanu.distributions.continuous.MultivariateGaussian.withParameters(muValues, covarianceValues).logProb(value).scalar();
     }
 
     @Override
@@ -73,7 +73,7 @@ public class MultivariateGaussianVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return MultivariateGaussian.sample(mu.getValue(), covariance.getValue(), random);
+        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(mu.getShape(), random);
     }
 
     private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {

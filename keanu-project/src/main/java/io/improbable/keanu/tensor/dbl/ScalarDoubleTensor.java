@@ -592,7 +592,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minusInPlace(min).maxInPlace(max);
+        return minInPlace(max).maxInPlace(min);
     }
 
     @Override
@@ -613,6 +613,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      * e.g.
      * Java: round(-2.5) == -2.0
      * Python: round(-2.5) == -3.0
+     *
      * @return Nearest integer value as a DoubleTensor
      */
     @Override
