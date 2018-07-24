@@ -3,26 +3,16 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.ParameterName.MU;
 import static io.improbable.keanu.distributions.dual.ParameterName.S;
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Map;
 
-import io.improbable.keanu.distributions.continuous.Logistic;
+import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class LogisticVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
-
-    private final DoubleVertex mu;
-    private final DoubleVertex s;
+public class LogisticVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
 
     /**
      * One mu or s or both driving an arbitrarily shaped tensor of Logistic
@@ -33,46 +23,14 @@ public class LogisticVertex extends DoubleVertex implements Probabilistic<Double
      * @param mu          the mu (location) of the Logistic with either the same shape as specified for this vertex or mu scalar
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
-    public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(LogisticVertex.class));
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
-
-        this.mu = mu;
-        this.s = s;
-        setParents(mu, s);
-        setValue(DoubleTensor.placeHolder(tensorShape));
-    }
-
-    public LogisticVertex(DoubleVertex mu, DoubleVertex s) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), s.getShape()), mu, s);
-    }
-
-    public LogisticVertex(DoubleVertex mu, double s) {
-        this(mu, new ConstantDoubleVertex(s));
-    }
-
-    public LogisticVertex(double mu, DoubleVertex s) {
-        this(new ConstantDoubleVertex(mu), s);
-    }
-
-    public LogisticVertex(double mu, double s) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(s));
-    }
-
-    @Override
-    public double logProb(DoubleTensor value) {
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor sValues = s.getValue();
-
-        DoubleTensor logPdfs = Logistic.withParameters(muValues, sValues).logProb(value);
-
-        return logPdfs.sum();
+    // package private
+    LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
+    super(tensorShape, DistributionOfType::logistic, mu, s);
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        ParameterMap<DoubleTensor> dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
+        ParameterMap<DoubleTensor> dlnP = distribution().dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
@@ -81,8 +39,8 @@ public class LogisticVertex extends DoubleVertex implements Probabilistic<Double
                                                              DoubleTensor dPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) mu).getPartialDerivatives().multiplyBy(dPdmu);
-        PartialDerivatives dPdInputsFromB = differentiator.calculateDual((Differentiable) s).getPartialDerivatives().multiplyBy(dPds);
+        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dPdmu);
+        PartialDerivatives dPdInputsFromB = differentiator.calculateDual((Differentiable) getS()).getPartialDerivatives().multiplyBy(dPds);
         PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
 
         if (!this.isObserved()) {
@@ -92,8 +50,11 @@ public class LogisticVertex extends DoubleVertex implements Probabilistic<Double
         return dPdInputs.asMap();
     }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Logistic.withParameters(mu.getValue(), s.getValue()).sample(getShape(), random);
+    private DoubleVertex getMu() {
+        return (DoubleVertex) getParents().get(0);
+    }
+
+    private DoubleVertex getS() {
+        return (DoubleVertex) getParents().get(1);
     }
 }

@@ -20,11 +20,8 @@ public class LogNormal implements ContinuousDistribution {
      * @param sigma  square root of variance (greater than 0)
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
-        return new LogNormal(mu, sigma);
-    }
-
-    private LogNormal(DoubleTensor mu, DoubleTensor sigma) {
+    // package private
+    LogNormal(DoubleTensor mu, DoubleTensor sigma) {
         this.mu = mu;
         this.sigma = sigma;
     }

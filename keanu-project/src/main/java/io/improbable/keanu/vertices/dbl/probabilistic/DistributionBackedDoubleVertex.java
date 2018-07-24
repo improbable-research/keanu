@@ -24,9 +24,22 @@ public abstract class DistributionBackedDoubleVertex<T extends Tensor<?>>
     private final Function<List<T>, ContinuousDistribution> distributionCreator;
 
     public  DistributionBackedDoubleVertex(int[] tensorShape, Function<List<T>, ContinuousDistribution> distributionCreator, Vertex<? extends T>... parents) {
+        this(true, tensorShape, distributionCreator, parents);
+    }
+
+    protected DistributionBackedDoubleVertex(boolean checkTensorShapes, int[] tensorShape, Function<List<T>,ContinuousDistribution> distributionCreator, Vertex<? extends T>... parents) {
         super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(DistributionBackedDoubleVertex.class));
+
         this.distributionCreator = distributionCreator;
 
+        if (checkTensorShapes) {
+            checkTensorShapesMatch(tensorShape, parents);
+        }
+        setParents(parents);
+        setValue(DoubleTensor.placeHolder(tensorShape));
+    }
+
+    private void checkTensorShapesMatch(int[] tensorShape, Vertex<? extends T>[] parents) {
         List<TensorShape> inputShapes = ImmutableList.copyOf(parents)
             .stream()
             .map(v -> v.getShape())
@@ -37,9 +50,6 @@ public abstract class DistributionBackedDoubleVertex<T extends Tensor<?>>
             tensorShape,
             inputShapes
         );
-
-        setParents(parents);
-        setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     @Override

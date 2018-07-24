@@ -12,6 +12,7 @@ import org.apache.commons.math3.distribution.LaplaceDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -34,7 +35,7 @@ public class LaplaceVertexTest {
     @Test
     public void matchesKnownLogDensityOfScalar() {
 
-        LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(0.5, 1);
+        LaplaceVertex tensorLaplaceVertex = VertexOfType.laplace(0.5, 1.);
         LaplaceDistribution distribution = new LaplaceDistribution(0.5, 1.0);
         double expectedDensity = distribution.logDensity(0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorLaplaceVertex, 0.5, expectedDensity);
@@ -45,7 +46,7 @@ public class LaplaceVertexTest {
 
         LaplaceDistribution distribution = new LaplaceDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
-        LaplaceVertex ndLaplaceVertex = new LaplaceVertex(0, 1);
+        LaplaceVertex ndLaplaceVertex = VertexOfType.laplace(0., 1.);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndLaplaceVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
 
@@ -60,7 +61,7 @@ public class LaplaceVertexTest {
         UniformVertex betaTensor = VertexOfType.uniform(0.0, 1.0);
         betaTensor.setValue(1.0);
 
-        LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
+        LaplaceVertex tensorLaplaceVertex = VertexOfType.laplace(muTensor, betaTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
@@ -81,16 +82,16 @@ public class LaplaceVertexTest {
         UniformVertex betaTensor = VertexOfType.uniform(0.0, 1.0);
         betaTensor.setValue(1.0);
 
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new LaplaceVertex(muTensor, betaTensor));
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> VertexOfType.laplace(muTensor, betaTensor));
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        LaplaceVertex vertexUnderTest = new LaplaceVertex(
+        LaplaceVertex vertexUnderTest = VertexOfType.laplace(
             mu,
-            3.0
+            ConstantVertex.of(3.0)
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -100,7 +101,7 @@ public class LaplaceVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
         UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
-        LaplaceVertex laplace = new LaplaceVertex(uniformA, 3.0);
+        LaplaceVertex laplace = VertexOfType.laplace(uniformA, ConstantVertex.of(3.0));
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -121,7 +122,7 @@ public class LaplaceVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
         UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
-        LaplaceVertex laplace = new LaplaceVertex(3.0, uniformA);
+        LaplaceVertex laplace = VertexOfType.laplace(ConstantVertex.of(3.0), uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
@@ -143,11 +144,11 @@ public class LaplaceVertexTest {
     public void laplaceSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        LaplaceVertex vertex = new LaplaceVertex(
-            new int[]{sampleCount, 1},
-            ConstantVertex.of(0.0),
-            ConstantVertex.of(2.0)
-        );
+        LaplaceVertex vertex = new DistributionVertexBuilder()
+            .shaped(sampleCount, 1)
+            .withInput(ParameterName.MU, 0.0)
+            .withInput(ParameterName.BETA, 2.0)
+            .laplace();
 
         double from = -4;
         double to = 4;
@@ -176,7 +177,11 @@ public class LaplaceVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LaplaceVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new DistributionVertexBuilder()
+                .shaped(numSamples, 1)
+                .withInput(ParameterName.MU, hyperParams.get(0))
+                .withInput(ParameterName.BETA, hyperParams.get(1))
+                .laplace(),
             muBeta,
             latentMuBeta,
             random

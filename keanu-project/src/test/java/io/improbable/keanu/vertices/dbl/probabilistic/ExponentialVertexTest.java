@@ -13,7 +13,8 @@ import org.apache.commons.math3.distribution.ExponentialDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.distributions.continuous.Exponential;
+import io.improbable.keanu.distributions.continuous.DistributionOfType;
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
@@ -38,14 +39,14 @@ public class ExponentialVertexTest {
         DoubleTensor matrixA = Nd4jDoubleTensor.create(new double[]{1, 4}, new int[]{2, 1});
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
-        DoubleTensor maskResult = Exponential.withParameters(matrixA, new ScalarDoubleTensor(1.0)).logProb(matrixX);
+        DoubleTensor maskResult = DistributionOfType.exponential(matrixA, new ScalarDoubleTensor(1.0)).logProb(matrixX);
         assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
     }
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
         ExponentialDistribution distribution = new ExponentialDistribution(1.5);
-        ExponentialVertex tensorExponentialVertex = new ExponentialVertex(0.5, 1.5);
+        ExponentialVertex tensorExponentialVertex = VertexOfType.exponential(0.5, 1.5);
         double expectedDensity = distribution.logDensity(2.0 - 0.5);
 
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorExponentialVertex, 2.0, expectedDensity);
@@ -56,7 +57,7 @@ public class ExponentialVertexTest {
 
         ExponentialDistribution distribution = new ExponentialDistribution(1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(.75);
-        ExponentialVertex ndExponentialVertex = new ExponentialVertex(0.0, 1);
+        ExponentialVertex ndExponentialVertex = VertexOfType.exponential(0.0, 1.);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndExponentialVertex, new double[]{0.25, .75}, expectedLogDensity);
     }
 
@@ -71,7 +72,7 @@ public class ExponentialVertexTest {
         UniformVertex bTensor = VertexOfType.uniform(0.0, 5.0);
         bTensor.setValue(2.5);
 
-        ExponentialVertex tensorExponentialVertex = new ExponentialVertex(aTensor, bTensor);
+        ExponentialVertex tensorExponentialVertex = VertexOfType.exponential(aTensor, bTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogProb(DoubleTensor.scalar(1.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
@@ -85,9 +86,9 @@ public class ExponentialVertexTest {
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        ExponentialVertex vertexUnderTest = new ExponentialVertex(
+        ExponentialVertex vertexUnderTest = VertexOfType.exponential(
             mu,
-            3.
+            ConstantVertex.of(3.0)
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -97,7 +98,7 @@ public class ExponentialVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPda() {
         UniformVertex uniformA = VertexOfType.uniform(0.0, 1.0);
-        ExponentialVertex exponential = new ExponentialVertex(uniformA, 3.0);
+        ExponentialVertex exponential = VertexOfType.exponential(uniformA, ConstantVertex.of(3.0));
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -118,7 +119,7 @@ public class ExponentialVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdb() {
         UniformVertex uniformA = VertexOfType.uniform(1., 3.);
-        ExponentialVertex exponential = new ExponentialVertex(0.0, uniformA);
+        ExponentialVertex exponential = VertexOfType.exponential(ConstantVertex.of(0.0), uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -142,11 +143,11 @@ public class ExponentialVertexTest {
         KeanuRandom random = new KeanuRandom(1);
 
         int sampleCount = 1000000;
-        ExponentialVertex vertex = new ExponentialVertex(
-            new int[]{sampleCount, 1},
-            ConstantVertex.of(0.0),
-            ConstantVertex.of(0.5)
-        );
+        ExponentialVertex vertex = new DistributionVertexBuilder()
+            .shaped(sampleCount, 1)
+            .withInput(ParameterName.LOCATION, 0.0)
+            .withInput(ParameterName.LAMBDA, 0.5)
+            .exponential();
 
         double from = 0.5;
         double to = 4;
@@ -173,7 +174,11 @@ public class ExponentialVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ExponentialVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new DistributionVertexBuilder()
+                .shaped(numSamples, 1)
+                .withInput(ParameterName.LOCATION, hyperParams.get(0))
+                .withInput(ParameterName.LAMBDA, hyperParams.get(1))
+                .exponential(),
             aB,
             latentAB,
             random

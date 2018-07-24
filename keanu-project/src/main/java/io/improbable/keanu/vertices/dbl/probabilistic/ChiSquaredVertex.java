@@ -1,24 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
 import java.util.Map;
 
-import io.improbable.keanu.distributions.continuous.ChiSquared;
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class ChiSquaredVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
-
-    private IntegerVertex k;
+public class ChiSquaredVertex extends DistributionBackedDoubleVertex<IntegerTensor> {
 
     /**
      * One k that must match a proposed tensor shape of ChiSquared
@@ -28,42 +17,9 @@ public class ChiSquaredVertex extends DoubleVertex implements Probabilistic<Doub
      * @param tensorShape the desired shape of the vertex
      * @param k           the number of degrees of freedom
      */
-    public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(ChiSquaredVertex.class));
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
-
-        this.k = k;
-        setParents(k);
-        setValue(DoubleTensor.placeHolder(tensorShape));
-    }
-
-    public ChiSquaredVertex(int[] tensorShape, int k) {
-        this(tensorShape, new ConstantIntegerVertex(k));
-    }
-
-    /**
-     * One to one constructor for mapping some shape of k to
-     * a matching shaped ChiSquared.
-     *
-     * @param k the number of degrees of freedom
-     */
-    public ChiSquaredVertex(IntegerTensor k) {
-        this(k.getShape(), new ConstantIntegerVertex(k));
-    }
-
-    public ChiSquaredVertex(int k) {
-        this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(k));
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return ChiSquared.withParameters(k.getValue()).sample(getShape(), random);
-    }
-
-    @Override
-    public double logProb(DoubleTensor value) {
-        return ChiSquared.withParameters(k.getValue()).logProb(value).sum();
+    // package private
+    ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
+        super(tensorShape, DistributionOfType::chiSquared, k);
     }
 
     @Override

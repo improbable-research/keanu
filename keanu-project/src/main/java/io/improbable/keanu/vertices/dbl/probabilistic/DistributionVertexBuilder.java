@@ -40,6 +40,8 @@ public class DistributionVertexBuilder {
         return this;
     }
 
+    // withInput()
+
     public DistributionVertexBuilder withInput(ParameterName name, Double input) {
         return withInput(name, ConstantVertex.of(input));
     }
@@ -66,30 +68,26 @@ public class DistributionVertexBuilder {
         return this;
     }
 
-    public BinomialVertex binomial() {
-        try {
-            Vertex<?> n = parameters.get(ParameterName.N).getValue();
-            Vertex<?> p = parameters.get(ParameterName.P).getValue();
-            if (shape == null) {
-                shape = checkHasSingleNonScalarShapeOrAllScalar(p.getShape(), n.getShape());
-            }
-            return new BinomialVertex(shape, (DoubleVertex) p, (IntegerVertex) n);
-        } catch (NoSuchElementException | ClassCastException e) {
-            throw new MissingParameterException("Missing one or more parameters");
-        }
+    // distributions
+
+    public BetaVertex beta() {
+        return build(BetaVertex.class, ParameterName.A, ParameterName.B);
     }
 
-    public PoissonVertex poisson() {
+    public BinomialVertex binomial() {
+        return build(BinomialVertex.class, ParameterName.P, ParameterName.N);
+    }
 
-        try {
-            Vertex<?> mu = parameters.get(ParameterName.MU).getValue();
-            if (shape == null) {
-                shape = mu.getShape();
-            }
-            return new PoissonVertex(shape, (DoubleVertex) mu);
-        } catch (NoSuchElementException | ClassCastException e) {
-            throw new MissingParameterException("Missing one or more parameters");
-        }
+    public ChiSquaredVertex chiSquared() {
+        return build(ChiSquaredVertex.class, ParameterName.K);
+    }
+
+    public ExponentialVertex exponential() {
+        return build(ExponentialVertex.class, ParameterName.LOCATION, ParameterName.LAMBDA);
+    }
+
+    public GammaVertex gamma() {
+        return build(GammaVertex.class, ParameterName.LOCATION, ParameterName.THETA, ParameterName.K);
     }
 
     public GaussianVertex gaussian() {
@@ -97,21 +95,52 @@ public class DistributionVertexBuilder {
     }
 
     public InverseGammaVertex inverseGamma() {
-        try {
-            Vertex<?> param1 = parameters.get(ParameterName.A).getValue();
-            Vertex<?> param2 = parameters.get(ParameterName.B).getValue();
-            if (shape == null) {
-                shape = checkHasSingleNonScalarShapeOrAllScalar(param1.getShape(), param2.getShape());
-            }
-            return new InverseGammaVertex(shape, (DoubleVertex) param1, (DoubleVertex) param2);
-        } catch (NoSuchElementException | ClassCastException e) {
-            throw new MissingParameterException("Missing one or more parameters");
-        }
+        return build(InverseGammaVertex.class, ParameterName.A, ParameterName.B);
     }
 
+    public LaplaceVertex laplace() {
+        return build(LaplaceVertex.class, ParameterName.MU, ParameterName.BETA);
+    }
+
+    public LogisticVertex logistic() {
+        return build(LogisticVertex.class, ParameterName.MU, ParameterName.S);
+    }
+
+    public LogNormalVertex logNormal() {
+        return build(LogNormalVertex.class, ParameterName.MU, ParameterName.SIGMA);
+    }
+
+    /**
+     * NB this one is a special case.
+     * MU and SIGMA have different tensor shapes
+     * and the resulting tensor has the same shape as MU
+     * @return new MultivariateGaussian object
+     */
+    public MultivariateGaussian multivariateGaussian() {
+        int[] requiredShape = this.parameters.get(ParameterName.MU).getValue().getShape();
+        if (shape != null && !Arrays.equals(shape, requiredShape)) {
+            throw new BuilderParameterException(
+                String.format("Shape %s does not match mu's shape %s",
+                    Arrays.toString(shape), Arrays.toString(requiredShape)));
+        }
+        shape = requiredShape;
+        return build(MultivariateGaussian.class, ParameterName.MU, ParameterName.SIGMA);
+    }
+
+    public PoissonVertex poisson() {
+        return build(PoissonVertex.class, ParameterName.MU);
+    }
+
+    public SmoothUniformVertex smoothUniform() {
+        return build(SmoothUniformVertex.class, ParameterName.MIN, ParameterName.MAX, ParameterName.SHARPNESS);
+    }
 
     public StudentTVertex studentT() {
         return build(StudentTVertex.class, ParameterName.V);
+    }
+
+    public TriangularVertex triangular() {
+        return build(TriangularVertex.class, ParameterName.MIN, ParameterName.MAX, ParameterName.C);
     }
 
     public UniformVertex uniform() {
@@ -152,7 +181,7 @@ public class DistributionVertexBuilder {
                 "Failed to construct Distribution Vertex class %s with parameters %s",
                 clazz.getSimpleName(), parameters);
             log.error(message, e);
-            throw new IllegalArgumentException(message, e);
+            throw new BuilderParameterException(message, e);
 
         } catch (NoSuchElementException | ClassCastException e) {
             throw new MissingParameterException("Missing one or more parameters");

@@ -13,11 +13,8 @@ public class ChiSquared implements ContinuousDistribution {
     private static final double LOG_TWO = Math.log(2);
     private final IntegerTensor k;
 
-    public static ContinuousDistribution withParameters(IntegerTensor k) {
-        return new ChiSquared(k);
-    }
-
-    private ChiSquared(IntegerTensor k) {
+    // package private
+    ChiSquared(IntegerTensor k) {
         this.k = k;
     }
 

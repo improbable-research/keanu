@@ -14,8 +14,10 @@ import org.apache.commons.math3.util.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.BuilderParameterException;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -29,9 +31,18 @@ public class MultivariateGaussianTest {
         random = new KeanuRandom(1);
     }
 
+    @Test(expected = BuilderParameterException.class)
+    public void itThrowsIfYouTryToSetAShapeThatDoesntMatchMu() {
+        new DistributionVertexBuilder()
+            .shaped(1, 3)
+            .withInput(ParameterName.MU, ConstantVertex.of(DoubleTensor.create(1., new int[]{1, 4})))
+            .withInput(ParameterName.SIGMA, ConstantVertex.of(DoubleTensor.create(1., new int[] {4, 4})))
+            .multivariateGaussian();
+    }
+
     @Test
     public void samplingFromUnivariateGaussianMatchesLogDensity() {
-        MultivariateGaussian mvg = new MultivariateGaussian(0, 1);
+        MultivariateGaussian mvg = VertexOfType.multivariateGaussian(0., 1.);
 
         double from = -2.;
         double to = 2.;
@@ -42,7 +53,7 @@ public class MultivariateGaussianTest {
 
     @Test
     public void univariateGaussianMatchesLogDensityOfScalar() {
-        MultivariateGaussian mvg = new MultivariateGaussian(5, 1);
+        MultivariateGaussian mvg = VertexOfType.multivariateGaussian(5., 1.);
 
         double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
         double density = mvg.logProb(Nd4jDoubleTensor.scalar(0.5));
@@ -55,7 +66,7 @@ public class MultivariateGaussianTest {
         DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new double[]{2, 3}, new int[]{2, 1}));
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
+        MultivariateGaussian mvg = VertexOfType.multivariateGaussian(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(1.));
 
         double expectedDensity1 = new NormalDistribution(2, 1).logDensity(8);
         double expectedDensity2 = new NormalDistribution(3, 1).logDensity(10);
@@ -73,7 +84,7 @@ public class MultivariateGaussianTest {
         DoubleVertex covarianceMatrix = ConstantVertex.of(
             new Nd4jDoubleTensor(new double[]{1, 0.3, 0.3, 0.6}, new int[]{2, 2}));
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
+        MultivariateGaussian mvg = VertexOfType.multivariateGaussian(mu, covarianceMatrix);
         double density = mvg.logProb(new Nd4jDoubleTensor(new double[]{0.5, 0.4}, new int[]{2, 1}));
         double expected = -3.6874792995813834;
 
@@ -96,7 +107,7 @@ public class MultivariateGaussianTest {
             )
         );
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, covarianceMatrix);
+        MultivariateGaussian mvg = VertexOfType.multivariateGaussian(mu, covarianceMatrix);
         double density = mvg.logProb(new Nd4jDoubleTensor(new double[]{0.2, 0.3, 0.4}, new int[]{3, 1}));
         double expected = -8.155504532016181;
 
@@ -108,7 +119,7 @@ public class MultivariateGaussianTest {
         DoubleVertex mu = ConstantVertex.of(
             new Nd4jDoubleTensor(new double[]{0, 0}, new int[]{2, 1}));
 
-        MultivariateGaussian mvg = new MultivariateGaussian(mu, 1);
+        MultivariateGaussian mvg = VertexOfType.multivariateGaussian(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(1.));
 
         double from = -1.;
         double to = 1.;

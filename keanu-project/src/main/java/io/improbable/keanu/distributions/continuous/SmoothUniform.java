@@ -2,6 +2,8 @@ package io.improbable.keanu.distributions.continuous;
 
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
+import com.google.common.base.Preconditions;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -52,13 +54,12 @@ public class SmoothUniform implements ContinuousDistribution {
      * @param edgeSharpness sharpness as a percentage of the body width
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
-        return new SmoothUniform(xMin, xMax, edgeSharpness);
-    }
-    private SmoothUniform(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
+    // package private
+    SmoothUniform(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor edgeSharpness) {
+        Preconditions.checkArgument(edgeSharpness.isScalar());
         this.xMin = xMin;
         this.xMax = xMax;
-        this.edgeSharpness = edgeSharpness;
+        this.edgeSharpness = edgeSharpness.scalar();
     }
 
     @Override

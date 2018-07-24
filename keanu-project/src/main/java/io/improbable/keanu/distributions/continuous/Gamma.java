@@ -31,11 +31,8 @@ public class Gamma implements ContinuousDistribution {
      * @param k      shape
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        return new Gamma(a, theta, k);
-    }
-
-    private Gamma(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+    // package private
+    Gamma(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
         this.location = a;
         this.theta = theta;
         this.k = k;

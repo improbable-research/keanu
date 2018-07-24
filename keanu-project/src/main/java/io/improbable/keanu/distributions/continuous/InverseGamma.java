@@ -16,11 +16,8 @@ public class InverseGamma implements ContinuousDistribution {
     private final DoubleTensor alpha;
     private final DoubleTensor beta;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta) {
-        return new InverseGamma(alpha, beta);
-    }
-
-    private InverseGamma(DoubleTensor alpha, DoubleTensor beta) {
+    // package private
+    InverseGamma(DoubleTensor alpha, DoubleTensor beta) {
         this.alpha = alpha;
         this.beta = beta;
     }

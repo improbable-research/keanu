@@ -6,8 +6,8 @@ import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.junit.Test;
 
 import io.improbable.keanu.distributions.dual.ParameterName;
-import io.improbable.keanu.tensor.TensorShapeException;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.BuilderParameterException;
 import io.improbable.keanu.vertices.MissingParameterException;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
@@ -74,7 +74,7 @@ public class BinomialVertexTest {
         assertEquals(expected, actual, 1e-3);
     }
 
-    @Test(expected = TensorShapeException.class)
+    @Test(expected = BuilderParameterException.class)
     public void itThrowsIfTheInputDimensionsDontMatch() {
         new DistributionVertexBuilder()
             .withInput(ParameterName.P, new ConstantDoubleVertex(new double[] {1.,2.,3.}))

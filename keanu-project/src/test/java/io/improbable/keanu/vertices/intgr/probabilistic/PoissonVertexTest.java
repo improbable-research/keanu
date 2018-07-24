@@ -12,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.distributions.dual.ParameterName;
-import io.improbable.keanu.tensor.TensorShapeException;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.BuilderParameterException;
 import io.improbable.keanu.vertices.MissingParameterException;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -67,7 +67,7 @@ public class PoissonVertexTest {
     }
 
 
-    @Test(expected = TensorShapeException.class)
+    @Test(expected = BuilderParameterException.class)
     public void itThrowsIfTheInputDimensionsDontMatch() {
         new DistributionVertexBuilder()
             .withInput(ParameterName.P, new ConstantDoubleVertex(new double[] {1.,2.,3.}))

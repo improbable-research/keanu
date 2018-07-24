@@ -12,6 +12,7 @@ import org.apache.commons.math3.distribution.BetaDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -33,7 +34,7 @@ public class BetaVertexTest {
 
     @Test
     public void matchesKnownLogDensityOfScalar() {
-        BetaVertex tensorBetaVertex = new BetaVertex(2., 3.);
+        BetaVertex tensorBetaVertex = VertexOfType.beta(2., 3.);
         BetaDistribution betaDistribution = new BetaDistribution(2.0, 3.0);
         double expectedDensity = betaDistribution.logDensity(0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorBetaVertex, 0.5, expectedDensity);
@@ -44,7 +45,7 @@ public class BetaVertexTest {
 
         BetaDistribution betaDistribution = new BetaDistribution(2, 3);
         double expectedLogDensity = betaDistribution.logDensity(0.25) + betaDistribution.logDensity(0.1);
-        BetaVertex ndBetaVertex = new BetaVertex(2, 3);
+        BetaVertex ndBetaVertex = VertexOfType.beta(2., 3.);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndBetaVertex, new double[]{0.25, 0.1}, expectedLogDensity);
     }
 
@@ -59,7 +60,7 @@ public class BetaVertexTest {
         UniformVertex betaTensor = VertexOfType.uniform(0.0, 5.0);
         betaTensor.setValue(3.0);
 
-        BetaVertex tensorBetaVertex = new BetaVertex(alphaTensor, betaTensor);
+        BetaVertex tensorBetaVertex = VertexOfType.beta(alphaTensor, betaTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
@@ -80,16 +81,16 @@ public class BetaVertexTest {
         UniformVertex betaTensor = VertexOfType.uniform(0.0, 5.0);
         betaTensor.setValue(3.0);
 
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new BetaVertex(alphaTensor, betaTensor));
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> VertexOfType.beta(alphaTensor, betaTensor));
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
         UniformVertex alpha = VertexOfType.uniform(0.0, 1.0);
         alpha.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
-        BetaVertex vertexUnderTest = new BetaVertex(
+        BetaVertex vertexUnderTest = VertexOfType.beta(
             alpha,
-            3.0
+            ConstantVertex.of(3.0)
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(0.5));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
@@ -99,7 +100,7 @@ public class BetaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdalpha() {
         UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
-        BetaVertex beta = new BetaVertex(uniformA, 3.0);
+        BetaVertex beta = VertexOfType.beta(uniformA, ConstantVertex.of(3.0));
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.9);
@@ -120,7 +121,7 @@ public class BetaVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdbeta() {
         UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
-        BetaVertex beta = new BetaVertex(3.0, uniformA);
+        BetaVertex beta = VertexOfType.beta(ConstantVertex.of(3.0), uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
@@ -142,11 +143,11 @@ public class BetaVertexTest {
     public void betaSampleMethodMatchesLogProbMethodForAlphaGreaterThanBeta() {
 
         int sampleCount = 1000000;
-        BetaVertex vertex = new BetaVertex(
-            new int[]{sampleCount, 1},
-            5.0,
-            2.0
-        );
+        BetaVertex vertex = new DistributionVertexBuilder()
+            .shaped(sampleCount, 1)
+            .withInput(ParameterName.A, 5.0)
+            .withInput(ParameterName.B, 2.0)
+            .beta();
 
         double from = 0.3;
         double to = 0.5;
@@ -159,11 +160,11 @@ public class BetaVertexTest {
     public void betaSampleMethodMatchesLogProbMethodForAlphaLessThanBeta() {
 
         int sampleCount = 1100000;
-        BetaVertex vertex = new BetaVertex(
-            new int[]{sampleCount, 1},
-            2.0,
-            5.0
-        );
+        BetaVertex vertex = new DistributionVertexBuilder()
+            .shaped(sampleCount, 1)
+            .withInput(ParameterName.A, 2.0)
+            .withInput(ParameterName.B, 5.0)
+            .beta();
 
         double from = 0.3;
         double to = 0.5;
@@ -192,7 +193,10 @@ public class BetaVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new BetaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new DistributionVertexBuilder().shaped(numSamples, 1)
+            .withInput(ParameterName.A, hyperParams.get(0))
+            .withInput(ParameterName.B, hyperParams.get(1))
+            .beta(),
             alphaBeta,
             latentAlphaBeta,
             random

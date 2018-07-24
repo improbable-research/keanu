@@ -11,11 +11,8 @@ public class Triangular implements ContinuousDistribution {
     private final DoubleTensor xMax;
     private final DoubleTensor c;
 
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
-        return new Triangular(xMin, xMax, c);
-    }
-
-    private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+    // package private
+    Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
         this.xMin = xMin;
         this.xMax = xMax;
         this.c = c;

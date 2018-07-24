@@ -5,12 +5,7 @@ import static java.lang.Math.log;
 
 import static io.improbable.keanu.distributions.dual.ParameterName.T;
 
-import java.util.List;
-
 import org.apache.commons.math3.special.Gamma;
-
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.ParameterMap;
@@ -36,24 +31,14 @@ public class StudentT implements ContinuousDistribution {
      * @param v      Degrees of Freedom
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(IntegerTensor v) {
-        return withParameters(ImmutableList.of(v));
-    }
-
-    public static ContinuousDistribution withParameters(List<IntegerTensor> inputs) {
-        StudentT distribution = new StudentT(inputs.get(0));
-        Preconditions.checkArgument(inputs.size() == 1,
-            "Too many input parameters - expected 1, got {}", inputs.size());
-        return distribution;
-    }
-
-    private StudentT(IntegerTensor v) {
+    // package private
+    StudentT(IntegerTensor v) {
         this.v = v;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        DoubleTensor chi2Samples = ChiSquared.withParameters(v).sample(shape, random);
+        DoubleTensor chi2Samples = DistributionOfType.chiSquared(v).sample(shape, random);
         return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }
 

@@ -22,11 +22,8 @@ public class Laplace implements ContinuousDistribution {
      * @param beta   shape
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
-        return new Laplace(mu, beta);
-    }
-
-    private Laplace(DoubleTensor mu, DoubleTensor beta) {
+    // package private
+    Laplace(DoubleTensor mu, DoubleTensor beta) {
         this.mu = mu;
         this.beta = beta;
     }
