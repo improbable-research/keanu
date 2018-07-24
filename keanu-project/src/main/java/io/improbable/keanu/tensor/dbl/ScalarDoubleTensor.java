@@ -399,6 +399,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
+    }
+
+    @Override
     public DoubleTensor reciprocalInPlace() {
         value = 1.0 / value;
         return this;

@@ -4,6 +4,8 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class DualNumber {
@@ -291,5 +293,28 @@ public class DualNumber {
         PartialDerivatives splitPartialDerivatives = this.partialDerivatives.tad(dimension, index);
         return new DualNumber(value.tad(dimension, index), splitPartialDerivatives);
     }
+
+    public DualNumber concat(int dimension, Map<Long, List<DoubleTensor>> combinedPartialDerivatives, DoubleTensor... toConcat) {
+        Map<Long, DoubleTensor> concatenatedPartialDerivates = new HashMap<>();
+
+        for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivatives.entrySet()) {
+            concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+        }
+
+        DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
+        return new DualNumber(concatValue, concatenatedPartialDerivates);
+
+    }
+
+    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+        if (partialDerivates.size() == 1) {
+            return partialDerivates.get(0);
+        } else {
+            DoubleTensor primaryTensor = partialDerivates.remove(0);
+            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
+            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+        }
+    }
+
 
 }

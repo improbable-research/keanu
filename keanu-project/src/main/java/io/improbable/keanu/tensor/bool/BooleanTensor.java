@@ -60,4 +60,6 @@ public interface BooleanTensor extends Tensor<Boolean> {
     @Override
     BooleanTensor tad(int dimension, int index);
 
+    BooleanTensor concat(int dimension, BooleanTensor... those);
+
 }

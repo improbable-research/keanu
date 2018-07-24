@@ -124,6 +124,8 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     @Override
     IntegerTensor tad(int dimension, int index);
 
+    IntegerTensor concat(int dimension, IntegerTensor... those);
+
     // In Place
 
     IntegerTensor minusInPlace(int value);
