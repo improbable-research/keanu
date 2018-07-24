@@ -6,16 +6,14 @@ import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import java.util.Map;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
+import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleVertex, DoubleTensor> {
-
-    private final DoubleVertex mu;
-    private final DoubleVertex sigma;
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -28,17 +26,15 @@ public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleVertex,
      */
     // package private
     GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-        super(tensorShape, Gaussian::withParameters, mu, sigma);
-        this.mu = mu;
-        this.sigma = sigma;
+        super(tensorShape, DistributionOfType::gaussian, mu, sigma);
     }
 
-    public DoubleVertex getMu() {
-        return mu;
+    public Vertex<?> getMu() {
+        return getParents().get(0);
     }
 
-    public DoubleVertex getSigma() {
-        return sigma;
+    public Vertex<?> getSigma() {
+        return getParents().get(1);
     }
 
     @Override
@@ -53,8 +49,8 @@ public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleVertex,
                                                              DoubleTensor dPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dPdInputsFromMu = differentiator.calculateDual((Differentiable) mu).getPartialDerivatives().multiplyBy(dPdmu);
-        PartialDerivatives dPdInputsFromSigma = differentiator.calculateDual((Differentiable) sigma).getPartialDerivatives().multiplyBy(dPdsigma);
+        PartialDerivatives dPdInputsFromMu = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dPdmu);
+        PartialDerivatives dPdInputsFromSigma = differentiator.calculateDual((Differentiable) getSigma()).getPartialDerivatives().multiplyBy(dPdsigma);
         PartialDerivatives dPdInputs = dPdInputsFromMu.add(dPdInputsFromSigma);
 
         if (!this.isObserved()) {
