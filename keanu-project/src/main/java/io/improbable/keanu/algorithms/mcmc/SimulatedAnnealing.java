@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.singleVariablePerSample;
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
@@ -30,7 +30,7 @@ public class SimulatedAnnealing {
     public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
         return SimulatedAnnealing.builder()
             .proposalDistribution(ProposalDistribution.usePrior())
-            .variableSelector(singleVariablePerSample)
+            .variableSelector(SINGLE_VARIABLE_SELECTOR)
             .useCacheOnRejection(true)
             .random(random)
             .build();
@@ -40,7 +40,7 @@ public class SimulatedAnnealing {
     private final ProposalDistribution proposalDistribution;
 
     @Builder.Default
-    private final MHStepVariableSelector variableSelector = singleVariablePerSample;
+    private final MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
 
     @Builder.Default
     private final boolean useCacheOnRejection = true;

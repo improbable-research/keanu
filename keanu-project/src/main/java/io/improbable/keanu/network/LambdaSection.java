@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 public class LambdaSection {
 
     private static final Predicate<Vertex> ADD_ALL = vertex -> true;
-    private static final Predicate<Vertex> PROBABILISTIC_AND_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
+    private static final Predicate<Vertex> PROBABILISTIC_OR_OBSERVED_ONLY = vertex -> vertex.isObserved() || vertex.isProbabilistic();
 
     private final Set<Vertex> allVertices;
     private final Set<Vertex> latentAndObservedVertices;
@@ -38,20 +38,20 @@ public class LambdaSection {
     private LambdaSection(Set<Vertex> allVertices) {
         this.allVertices = allVertices;
         this.latentAndObservedVertices = allVertices.stream()
-            .filter(PROBABILISTIC_AND_OBSERVED_ONLY)
+            .filter(PROBABILISTIC_OR_OBSERVED_ONLY)
             .collect(Collectors.toSet());
     }
 
     /**
      * @param aVertex                 the starting vertex
-     * @param includeNonProbabilistic false if only the probabilistic and observed are wanted
+     * @param includeNonProbabilistic false if only the probabilistic or observed vertices are wanted
      * @return All upstream vertices up to probabilistic or observed vertices if includeNonProbabilistic
      * is true. All upstream probabilistic or observed vertices stopping at probabilistic or observed if
      * includeNonProbabilistic is false.
      */
     public static LambdaSection getUpstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
 
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_AND_OBSERVED_ONLY;
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
         Set<Vertex> upstreamVertices = getVerticesDepthFirst(
             aVertex,
@@ -71,7 +71,7 @@ public class LambdaSection {
      */
     public static LambdaSection getDownstreamLambdaSection(Vertex<?> aVertex, boolean includeNonProbabilistic) {
 
-        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_AND_OBSERVED_ONLY;
+        Predicate<Vertex> shouldAdd = includeNonProbabilistic ? ADD_ALL : PROBABILISTIC_OR_OBSERVED_ONLY;
 
         Set<Vertex> downstreamVertices = getVerticesDepthFirst(
             aVertex,
@@ -84,7 +84,8 @@ public class LambdaSection {
 
     /**
      * @param vertex       Vertex to start propagation from
-     * @param nextVertices The next vertices to move to give a current vertex
+     * @param nextVertices The next vertices to move to given a current vertex. E.g getChildren for downstream or
+     *                     getParents for upstream.
      * @param shouldAdd    true when a give vertex should be included in the result false otherwise
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */

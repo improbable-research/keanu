@@ -6,9 +6,12 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-public class SingleVariableSelector implements MHStepVariableSelector {
+public final class SingleVariableSelector implements MHStepVariableSelector {
 
-    static final SingleVariableSelector SINGLETON = new SingleVariableSelector();
+    static final SingleVariableSelector INSTANCE = new SingleVariableSelector();
+
+    private SingleVariableSelector() {
+    }
 
     @Override
     public Set<Vertex> select(List<? extends Vertex> latentVertices, int sampleNumber) {

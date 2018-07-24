@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 public interface MHStepVariableSelector {
-    MHStepVariableSelector singleVariablePerSample = SingleVariableSelector.SINGLETON;
+    MHStepVariableSelector SINGLE_VARIABLE_SELECTOR = SingleVariableSelector.INSTANCE;
 
     Set<Vertex> select(List<? extends Vertex> vertices, int sampleNumber);
 }

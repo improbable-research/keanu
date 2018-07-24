@@ -55,7 +55,7 @@ public class MetropolisHastingsStepTest {
             network.getLatentVertices(),
             ProposalDistribution.usePrior(),
             true,
-            KeanuRandom.getDefaultRandom()
+            alwaysAccept
         );
 
         MetropolisHastingsStep.StepResult result = mhStep.step(

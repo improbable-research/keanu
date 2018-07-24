@@ -19,6 +19,9 @@ class MetropolisHastingsStep {
 
     private static final double LOG_ZERO_PROBABILITY = Double.NEGATIVE_INFINITY;
 
+    //Temperature for standard MH step accept/reject calculation
+    private static final double DEFAULT_TEMPERATURE = 1.0;
+
     private final ProposalDistribution proposalDistribution;
     private final boolean useCacheOnRejection;
     private final Map<Vertex, LambdaSection> affectedVerticesCache;
@@ -39,7 +42,7 @@ class MetropolisHastingsStep {
         this.proposalDistribution = proposalDistribution;
         this.useCacheOnRejection = useCacheOnRejection;
         this.random = random;
-        this.affectedVerticesCache = getVerticesAffectedByLatents(
+        this.affectedVerticesCache = createVerticesAffectedByCache(
             latentVertices,
             useCacheOnRejection
         );
@@ -47,19 +50,19 @@ class MetropolisHastingsStep {
 
     public StepResult step(final Set<Vertex> chosenVertices,
                            final double logProbabilityBeforeStep) {
-        return step(chosenVertices, logProbabilityBeforeStep, 1.0);
+        return step(chosenVertices, logProbabilityBeforeStep, DEFAULT_TEMPERATURE);
     }
 
     /**
      * @param chosenVertices           vertices to get a proposed change for
      * @param logProbabilityBeforeStep The log of the previous state's probability
-     * @param T                        Temperature for simulated annealing. This
+     * @param temperature              Temperature for simulated annealing. This
      *                                 should be constant if no annealing is wanted
      * @return the log probability of the network after either accepting or rejecting the sample
      */
     public StepResult step(final Set<Vertex> chosenVertices,
                            final double logProbabilityBeforeStep,
-                           final double T) {
+                           final double temperature) {
 
         final double affectedVerticesLogProbOld = sumLogProbabilityOfAffected(chosenVertices, affectedVerticesCache);
 
@@ -76,12 +79,15 @@ class MetropolisHastingsStep {
 
         if (affectedVerticesLogProbNew != LOG_ZERO_PROBABILITY) {
 
-            final double logProbabilityAfterStep = logProbabilityBeforeStep - affectedVerticesLogProbOld + affectedVerticesLogProbNew;
+            final double logProbabilityDelta = affectedVerticesLogProbNew - affectedVerticesLogProbOld;
+            final double logProbabilityAfterStep = logProbabilityBeforeStep + logProbabilityDelta;
 
             final double pqxOld = proposalDistribution.logProbAtFromGivenTo(proposal);
             final double pqxNew = proposalDistribution.logProbAtToGivenFrom(proposal);
 
-            final double logR = (logProbabilityAfterStep * (1.0 / T) + pqxOld) - (logProbabilityBeforeStep * (1.0 / T) + pqxNew);
+            final double annealFactor = (1.0 / temperature);
+            final double hastingsCorrection = pqxOld - pqxNew;
+            final double logR = annealFactor * logProbabilityDelta + hastingsCorrection;
             final double r = Math.exp(logR);
 
             final boolean shouldAccept = r >= random.nextDouble();
@@ -136,12 +142,22 @@ class MetropolisHastingsStep {
         return sumLogProb;
     }
 
-    private static Map<Vertex, LambdaSection> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices,
-                                                                           boolean includeNonProbabilistic) {
+    /**
+     * This creates a cache of potentially all vertices downstream to an observed or probabilistic vertex
+     * from each latent vertex. If useCacheOnRejection is false then only the downstream observed or probabilistic
+     * is cached.
+     *
+     * @param latentVertices      The latent vertices to create a cache for
+     * @param useCacheOnRejection Whether or not to cache the entire downstream set or just the observed/probabilistic
+     * @return A vertex to Lambda Section map that represents the downstream Lambda Section for each latent vertex.
+     * This Lambda Section may include all of the nonprobabilistic vertices if useCacheOnRejection is enabled.
+     */
+    private static Map<Vertex, LambdaSection> createVerticesAffectedByCache(List<? extends Vertex> latentVertices,
+                                                                            boolean useCacheOnRejection) {
         return latentVertices.stream()
             .collect(Collectors.toMap(
                 v -> v,
-                v -> LambdaSection.getDownstreamLambdaSection(v, includeNonProbabilistic)
+                v -> LambdaSection.getDownstreamLambdaSection(v, useCacheOnRejection)
             ));
     }
 
