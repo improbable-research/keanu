@@ -68,10 +68,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         this.tensor = tensor;
     }
 
-    public INDArray getTensor() {
-        return tensor;
-    }
-
     @Override
     public int getRank() {
         return tensor.shape().length;
