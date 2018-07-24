@@ -20,6 +20,7 @@ import java.util.Collections;
 import java.util.Set;
 
 import static org.junit.Assert.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -35,9 +36,11 @@ public class MetropolisHastingsStepTest {
     public void setup() {
         alwaysAccept = mock(KeanuRandom.class);
         when(alwaysAccept.nextDouble()).thenReturn(0.0);
+        when(alwaysAccept.nextGaussian(any())).thenReturn(DoubleTensor.ZERO_SCALAR);
 
         alwaysReject = mock(KeanuRandom.class);
         when(alwaysReject.nextDouble()).thenReturn(1.0);
+        when(alwaysReject.nextGaussian(any())).thenReturn(DoubleTensor.ZERO_SCALAR);
     }
 
     @Test
@@ -63,8 +66,8 @@ public class MetropolisHastingsStepTest {
             logProbBeforeStep
         );
 
-        assertEquals(network.getLogOfMasterP(), result.getLogProbabilityAfterStep(), 1e-10);
         assertTrue(result.isAccepted());
+        assertEquals(network.getLogOfMasterP(), result.getLogProbabilityAfterStep(), 1e-10);
     }
 
     @Test
