@@ -2,9 +2,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-import java.util.*;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DualNumber {
 
@@ -291,15 +293,14 @@ public class DualNumber {
         Map<Long, DoubleTensor> concatenatedPartialDerivates = new HashMap<>();
 
         for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivatives.entrySet()) {
-            concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+            concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivatives(dimension, partials.getValue()));
         }
 
         DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
         return new DualNumber(concatValue, concatenatedPartialDerivates);
-
     }
 
-    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+    private DoubleTensor concatPartialDerivatives(int dimension, List<DoubleTensor> partialDerivates) {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {

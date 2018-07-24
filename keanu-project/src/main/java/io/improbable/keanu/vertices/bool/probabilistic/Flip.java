@@ -59,10 +59,13 @@ public class Flip extends ProbabilisticBool {
     @Override
     public double logPmf(BooleanTensor value) {
 
+        DoubleTensor probTrueClamped = probTrue.getValue()
+            .clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+
         DoubleTensor probability = value.setDoubleIf(
-            probTrue.getValue(),
-            probTrue.getValue().unaryMinus().plusInPlace(1.0)
-        ).clampInPlace(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+            probTrueClamped,
+            probTrueClamped.unaryMinus().plusInPlace(1.0)
+        );
 
         return probability.logInPlace().sum();
     }
@@ -71,6 +74,8 @@ public class Flip extends ProbabilisticBool {
     public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
 
         DualNumber probTrueDual = probTrue.getDualNumber();
+
+        probTrueDual.getPartialDerivatives().asMap();
 
         DoubleTensor dLogPdp = value.setDoubleIf(
             DoubleTensor.ONE_SCALAR,
