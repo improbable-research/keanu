@@ -8,12 +8,13 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleVertex, DoubleTensor> {
+public class GaussianVertex extends DistributionBackedDoubleVertex<Vertex<? extends NumberTensor<?,?>>, NumberTensor<?,?>> {
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian

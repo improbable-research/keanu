@@ -19,7 +19,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public abstract class DistributionBackedDoubleVertex<V extends Vertex<T>, T extends Tensor<?>>
+public abstract class DistributionBackedDoubleVertex<V extends Vertex<? extends T>, T extends Tensor<?>>
     extends DoubleVertex implements Probabilistic<DoubleTensor> {
     private final Function<List<T>, ContinuousDistribution> distributionCreator;
 

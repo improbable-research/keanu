@@ -11,8 +11,10 @@ import com.google.common.base.Preconditions;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.DiscreteDistribution;
+import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class DistributionOfType {
@@ -21,7 +23,7 @@ public class DistributionOfType {
     private DistributionOfType() {
     }
 
-    public static ContinuousDistribution gaussian(List<DoubleTensor> inputs) {
+    public static ContinuousDistribution gaussian(List<NumberTensor<?,?>> inputs) {
         return construct(Gaussian.class, inputs, 2);
     }
 
@@ -30,31 +32,10 @@ public class DistributionOfType {
     }
 
     public static DiscreteDistribution binomial(List<NumberTensor<?,?>> inputs) {
-        return constructDiscreteDistribution(Binomial.class, inputs, 2);
+        return construct(Binomial.class, inputs, 2);
     }
 
-    private static DiscreteDistribution constructDiscreteDistribution(Class<Binomial> clazz, List<NumberTensor<?,?>> inputs, int expectedNumInputs) {
-        Preconditions.checkArgument(inputs.size() == expectedNumInputs,
-            "Too many input parameters - expected {}, got {}", expectedNumInputs, inputs.size());
-        try {
-            return constructDiscreteDistribution(clazz, inputs);
-        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
-            String message = String.format(
-                "Failed to construct Distribution class %s with inputs %s",
-                clazz.getSimpleName(), inputs);
-            log.error(message, e);
-            throw new IllegalArgumentException(message, e);
-        }
-    }
-
-    private static DiscreteDistribution constructDiscreteDistribution(Class clazz, List<NumberTensor<?,?>> inputs)
-        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
-        Constructor[] constructors = clazz.getDeclaredConstructors();
-        Constructor constructor = constructors[0];
-        return (DiscreteDistribution) constructor.newInstance(inputs.toArray());
-    }
-
-    private static ContinuousDistribution construct(Class clazz, List<DoubleTensor> inputs, int expectedNumInputs) {
+    private static <D extends Distribution<? extends Tensor>> D construct(Class<D> clazz, List<NumberTensor<?,?>> inputs, int expectedNumInputs) {
         Preconditions.checkArgument(inputs.size() == expectedNumInputs,
             "Too many input parameters - expected {}, got {}", expectedNumInputs, inputs.size());
         try {
@@ -68,10 +49,10 @@ public class DistributionOfType {
         }
     }
 
-    private static ContinuousDistribution construct(Class clazz, List<DoubleTensor> inputs)
+    private static <D extends Distribution<? extends Tensor>> D construct(Class<D> clazz, List<NumberTensor<?,?>> inputs)
         throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
         Constructor[] constructors = clazz.getDeclaredConstructors();
         Constructor constructor = constructors[0];
-        return (ContinuousDistribution) constructor.newInstance(inputs.toArray());
+        return (D) constructor.newInstance(inputs.toArray());
     }
 }
