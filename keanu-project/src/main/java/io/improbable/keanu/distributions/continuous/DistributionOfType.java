@@ -8,9 +8,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.DiscreteDistribution;
+import io.improbable.keanu.distributions.discrete.Binomial;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class DistributionOfType {
@@ -25,6 +27,31 @@ public class DistributionOfType {
 
     public static ContinuousDistribution gaussian(DoubleTensor mu, DoubleTensor sigma) {
         return new Gaussian(mu, sigma);
+    }
+
+    public static DiscreteDistribution binomial(List<NumberTensor<?,?>> inputs) {
+        return constructDiscreteDistribution(Binomial.class, inputs, 2);
+    }
+
+    private static DiscreteDistribution constructDiscreteDistribution(Class<Binomial> clazz, List<NumberTensor<?,?>> inputs, int expectedNumInputs) {
+        Preconditions.checkArgument(inputs.size() == expectedNumInputs,
+            "Too many input parameters - expected {}, got {}", expectedNumInputs, inputs.size());
+        try {
+            return constructDiscreteDistribution(clazz, inputs);
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException | InstantiationException e) {
+            String message = String.format(
+                "Failed to construct Distribution class %s with inputs %s",
+                clazz.getSimpleName(), inputs);
+            log.error(message, e);
+            throw new IllegalArgumentException(message, e);
+        }
+    }
+
+    private static DiscreteDistribution constructDiscreteDistribution(Class clazz, List<NumberTensor<?,?>> inputs)
+        throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+        Constructor[] constructors = clazz.getDeclaredConstructors();
+        Constructor constructor = constructors[0];
+        return (DiscreteDistribution) constructor.newInstance(inputs.toArray());
     }
 
     private static ContinuousDistribution construct(Class clazz, List<DoubleTensor> inputs, int expectedNumInputs) {

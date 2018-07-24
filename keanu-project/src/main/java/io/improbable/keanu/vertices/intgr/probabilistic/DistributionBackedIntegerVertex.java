@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.probabilistic;
+package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -8,23 +8,23 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 
-import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public abstract class DistributionBackedDoubleVertex<V extends Vertex<T>, T extends Tensor<?>>
-    extends DoubleVertex implements Probabilistic<DoubleTensor> {
-    private final Function<List<T>, ContinuousDistribution> distributionCreator;
+public abstract class DistributionBackedIntegerVertex<V extends Vertex<? extends T>, T extends Tensor<?>>
+    extends IntegerVertex implements Probabilistic<IntegerTensor> {
+    private final Function<List<T>, DiscreteDistribution> distributionCreator;
 
-    public  DistributionBackedDoubleVertex(int[] tensorShape, Function<List<T>, ContinuousDistribution> distributionCreator, V... parents) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(DistributionBackedDoubleVertex.class));
+    public DistributionBackedIntegerVertex(int[] tensorShape, Function<List<T>, DiscreteDistribution> distributionCreator, V... parents) {
+        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(DistributionBackedIntegerVertex.class));
         this.distributionCreator = distributionCreator;
 
         List<TensorShape> inputShapes = ImmutableList.copyOf(parents)
@@ -39,20 +39,20 @@ public abstract class DistributionBackedDoubleVertex<V extends Vertex<T>, T exte
         );
 
         setParents(parents);
-        setValue(DoubleTensor.placeHolder(tensorShape));
+        setValue(IntegerTensor.placeHolder(tensorShape));
     }
 
     @Override
-    public double logProb(DoubleTensor value) {
+    public double logProb(IntegerTensor value) {
         return distribution().logProb(value).sum();
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
+    public IntegerTensor sample(KeanuRandom random) {
         return distribution().sample(getShape(), random);
     }
 
-    protected ContinuousDistribution distribution() {
+    protected DiscreteDistribution distribution() {
         return distributionCreator.apply(getInputs());
     }
 
