@@ -1,13 +1,11 @@
 package io.improbable.docs;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.sampling.RejectionSampler;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.CPT;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 import java.util.Arrays;
@@ -16,25 +14,39 @@ public class WetGrass {
 
     public static void main(String[] args) {
 
-        Flip rain = new Flip(0.2);
+        //There's a simple 20% chance of rain and for the purposes
+        //of this example, that doesn't depend on any other variables.
+        BoolVertex rain = new Flip(0.2);
 
-        BoolVertex sprinkler = If.isTrue(rain)
-            .then(new Flip(0.01))
-            .orElse(new Flip(0.4));
+        //The probability of the sprinkler being on is dependent on
+        //whether or not it has rained. It's very unlikely that the
+        //sprinkler comes on if it's raining.
+        BoolVertex sprinkler = new Flip(
+            If.isTrue(rain)
+                .then(0.01)
+                .orElse(0.4)
+        );
 
-        CPTVertex<BooleanTensor> wetGrass = CPT.of(sprinkler, rain)
-            .when(false, false).then(new Flip(0.0))
-            .when(false, true).then(new Flip(0.8))
-            .when(true, false).then(new Flip(0.9))
-            .orDefault(new Flip(0.99));
+        //The grass being wet is dependent on whether or not it rained or
+        //the sprinkler was on.
+        BoolVertex wetGrass = new Flip(
+            ConditionalProbabilityTable.of(sprinkler, rain)
+                .when(false, false).then(1e-2)
+                .when(false, true).then(0.8)
+                .when(true, false).then(0.9)
+                .orDefault(0.99)
+        );
 
-        wetGrass.observe(BooleanTensor.scalar(true));
+        //We observe that the grass is wet
+        wetGrass.observe(true);
 
-        NetworkSamples posteriorSamples = RejectionSampler.getPosteriorSamples(
+        //What does that observation say about the probability that it rained or that
+        //the sprinkler was on?
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             new BayesianNetwork(wetGrass.getConnectedGraph()),
             Arrays.asList(sprinkler, rain),
             100000
-        );
+        ).drop(10000).downSample(2);
 
         double probabilityOfRainGivenWetGrass = posteriorSamples.get(rain).probability(isRaining -> isRaining.scalar() == true);
 

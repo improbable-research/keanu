@@ -12,25 +12,31 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
-    public ArcTan2Vertex(DoubleVertex a, DoubleVertex b) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+    /**
+     * Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
+     *
+     * @param left x coordinate
+     * @param right y coordinate
+     */
+    public ArcTan2Vertex(DoubleVertex left, DoubleVertex right) {
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
-        return a.atan2(b);
+    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
+        return left.atan2(right);
     }
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber aDual = dualNumbers.get(a);
-        DualNumber bDual = dualNumbers.get(b);
+        DualNumber leftDual = dualNumbers.get(left);
+        DualNumber rightDual = dualNumbers.get(right);
 
-        DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
+        DoubleTensor denominator = ((right.getValue().pow(2)).timesInPlace((left.getValue().pow(2))));
 
-        PartialDerivatives thisInfA = aDual.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
-        PartialDerivatives thisInfB = bDual.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());
-        PartialDerivatives newInf = thisInfA.add(thisInfB);
-        return new DualNumber(op(a.getValue(), b.getValue()), newInf);
+        PartialDerivatives thisInfLeft = leftDual.getPartialDerivatives().multiplyBy(right.getValue().div(denominator));
+        PartialDerivatives thisInfRight = rightDual.getPartialDerivatives().multiplyBy((left.getValue().div(denominator)).unaryMinusInPlace());
+        PartialDerivatives newInf = thisInfLeft.add(thisInfRight);
+        return new DualNumber(op(left.getValue(), right.getValue()), newInf);
     }
 }

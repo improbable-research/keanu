@@ -24,7 +24,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         }
     }
 
-    static IntegerTensor create(int[] values, int[] shape) {
+    static IntegerTensor create(int[] values, int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarIntegerTensor(values[0]);
         } else {
@@ -33,7 +33,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     }
 
     static IntegerTensor create(int[] values) {
-        return create(values, new int[]{1, values.length});
+        return create(values, 1, values.length);
     }
 
     static IntegerTensor ones(int[] shape) {
@@ -41,6 +41,14 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
             return new ScalarIntegerTensor(1);
         } else {
             return Nd4jIntegerTensor.ones(shape);
+        }
+    }
+
+    static IntegerTensor eye(int n) {
+        if (n == 1) {
+            return new ScalarIntegerTensor(1);
+        } else {
+            return Nd4jIntegerTensor.eye(n);
         }
     }
 
@@ -59,6 +67,15 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     static IntegerTensor placeHolder(int[] shape) {
         return new ScalarIntegerTensor(shape);
     }
+
+    @Override
+    IntegerTensor reshape(int... newShape);
+
+    IntegerTensor diag();
+
+    IntegerTensor transpose();
+
+    IntegerTensor sum(int... overDimensions);
 
     //New tensor Ops and transforms
 
@@ -80,6 +97,10 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor times(IntegerTensor that);
 
+    IntegerTensor matrixMultiply(IntegerTensor value);
+
+    IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
+
     IntegerTensor div(IntegerTensor that);
 
     IntegerTensor unaryMinus();
@@ -99,6 +120,8 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     IntegerTensor setWithMask(IntegerTensor mask, int value);
 
     IntegerTensor apply(Function<Integer, Integer> function);
+
+    IntegerTensor concat(int dimension, IntegerTensor... those);
 
     // In Place
 

@@ -1,7 +1,5 @@
 package io.improbable.keanu.randomfactory;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.kotlin.ArithmeticDouble;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -16,7 +14,7 @@ public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
 
     @Override
     public ArithmeticDouble nextDouble(double min, double max) {
-        double randomDouble = Uniform.sample(min, max, random);
+        double randomDouble = random.nextDouble(min, max);
         return new ArithmeticDouble(randomDouble);
     }
 
@@ -27,25 +25,25 @@ public class RandomDoubleFactory implements RandomFactory<ArithmeticDouble> {
 
     @Override
     public ArithmeticDouble nextGaussian(ArithmeticDouble mu, ArithmeticDouble sigma) {
-        double randomDouble = Gaussian.sample(mu.getValue(), sigma.getValue(), random);
+        double randomDouble = random.nextGaussian(mu.getValue(), sigma.getValue());
         return new ArithmeticDouble(randomDouble);
     }
 
     @Override
     public ArithmeticDouble nextGaussian(double mu, ArithmeticDouble sigma) {
-        double randomDouble = Gaussian.sample(mu, sigma.getValue(), random);
+        double randomDouble = random.nextGaussian(mu, sigma.getValue());
         return new ArithmeticDouble(randomDouble);
     }
 
     @Override
     public ArithmeticDouble nextGaussian(ArithmeticDouble mu, double sigma) {
-        double randomDouble = Gaussian.sample(mu.getValue(), sigma, random);
+        double randomDouble = random.nextGaussian(mu.getValue(), sigma);
         return new ArithmeticDouble(randomDouble);
     }
 
     @Override
     public ArithmeticDouble nextGaussian(double mu, double sigma) {
-        double randomDouble = Gaussian.sample(mu, sigma, random);
+        double randomDouble = random.nextGaussian(mu, sigma);
         return new ArithmeticDouble(randomDouble);
     }
 }

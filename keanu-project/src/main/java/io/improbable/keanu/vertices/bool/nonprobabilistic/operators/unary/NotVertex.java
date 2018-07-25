@@ -9,6 +9,9 @@ public class NotVertex extends BoolUnaryOpVertex<BooleanTensor> {
         super(a.getShape(), a);
     }
 
+    /**
+     * Returns the inverse of a boolean
+     */
     @Override
     protected BooleanTensor op(BooleanTensor aBoolean) {
         return aBoolean.not();

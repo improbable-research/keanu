@@ -21,6 +21,10 @@ public class ReadCsv {
         return new CsvReader(() -> getFileFromResources(fileOnClassPath));
     }
 
+    public static CsvReader fromFile(File file) {
+        return fromFile(file.toPath());
+    }
+
     public static CsvReader fromFile(String filePath) {
         return fromFile(Paths.get(filePath));
     }
@@ -53,6 +57,9 @@ public class ReadCsv {
      */
     private static Reader getFileFromResources(String fileOnClassPath) {
         InputStream csvFileStream = ReadCsv.class.getClassLoader().getResourceAsStream(fileOnClassPath);
+        if (csvFileStream == null) {
+            throw new UncheckedIOException(new FileNotFoundException(fileOnClassPath + " not found on class path!"));
+        }
         return new InputStreamReader(csvFileStream);
     }
 }

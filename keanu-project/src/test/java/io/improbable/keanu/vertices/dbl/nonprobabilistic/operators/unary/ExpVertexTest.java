@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.junit.Test;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.*;
 
 public class ExpVertexTest {
@@ -38,7 +39,7 @@ public class ExpVertexTest {
     public void calculatesDualNumberOfMatrixElementWiseexp() {
         calculatesDualNumberOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
-            new double[]{Math.exp(0.1), Math.exp(0.2), Math.exp(0.3), Math.exp(0.4)},
+            toDiagonalArray(new double[]{Math.exp(0.1), Math.exp(0.2), Math.exp(0.3), Math.exp(0.4)}),
             DoubleVertex::exp
         );
     }

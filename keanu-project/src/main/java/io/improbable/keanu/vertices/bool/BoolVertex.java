@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBi
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 
 import java.util.Arrays;
 import java.util.LinkedList;
@@ -17,17 +18,21 @@ import java.util.Map;
 public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
 
     @SafeVarargs
-    public final io.improbable.keanu.vertices.bool.BoolVertex or(Vertex<BooleanTensor>... those) {
+    public final BoolVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new OrBinaryVertex(this, those[0]);
         return new OrMultipleVertex(inputList(those));
     }
 
     @SafeVarargs
-    public final io.improbable.keanu.vertices.bool.BoolVertex and(Vertex<BooleanTensor>... those) {
+    public final BoolVertex and(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
         return new AndMultipleVertex(inputList(those));
+    }
+
+    public static final BoolVertex not(Vertex<BooleanTensor> vertex) {
+        return new NotVertex(vertex);
     }
 
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {
@@ -38,35 +43,27 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
     }
 
     public void setValue(boolean value) {
-        super.setValue(BooleanTensor.create(value, getShape()));
+        super.setValue(BooleanTensor.scalar(value));
     }
 
     public void setValue(boolean[] values) {
-        super.setValue(BooleanTensor.create(values, getShape()));
+        super.setValue(BooleanTensor.create(values));
     }
 
     public void setAndCascade(boolean value) {
-        super.setAndCascade(BooleanTensor.create(value, getShape()));
+        super.setAndCascade(BooleanTensor.scalar(value));
     }
 
     public void setAndCascade(boolean[] values) {
-        super.setAndCascade(BooleanTensor.create(values, getShape()));
-    }
-
-    public void setAndCascade(boolean value, Map<Long, Long> explored) {
-        super.setAndCascade(BooleanTensor.create(value, getShape()), explored);
-    }
-
-    public void setAndCascade(boolean[] values, Map<Long, Long> explored) {
-        super.setAndCascade(BooleanTensor.create(values, getShape()), explored);
+        super.setAndCascade(BooleanTensor.create(values));
     }
 
     public void observe(boolean value) {
-        super.observe(BooleanTensor.create(value, getShape()));
+        super.observe(BooleanTensor.scalar(value));
     }
 
     public void observe(boolean[] values) {
-        super.observe(BooleanTensor.create(values, getShape()));
+        super.observe(BooleanTensor.create(values));
     }
 
     public double logPmf(boolean value) {
@@ -83,6 +80,10 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
 
     public Map<Long, DoubleTensor> dLogPmf(boolean[] values) {
         return this.dLogPmf(BooleanTensor.create(values));
+    }
+
+    public boolean getValue(int... index) {
+        return getValue().getValue(index);
     }
 
 }

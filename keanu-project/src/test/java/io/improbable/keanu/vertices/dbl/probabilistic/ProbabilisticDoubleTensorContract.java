@@ -58,7 +58,42 @@ public class ProbabilisticDoubleTensorContract {
 
             double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
+            assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
+        }
+    }
 
+    public static void sampleUnivariateMethodMatchesLogProbMethod(Vertex<DoubleTensor> vertexUnderTest,
+                                                                  double from,
+                                                                  double to,
+                                                                  double bucketSize,
+                                                                  double maxError,
+                                                                  KeanuRandom random,
+                                                                  int sampleCount) {
+        double bucketCount = ((to - from) / bucketSize);
+
+        if (bucketCount != (int) bucketCount) {
+            throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
+        }
+
+        double[] samples = new double[sampleCount];
+        for (int i = 0; i < sampleCount; i++) {
+            samples[i] = vertexUnderTest.sample(random).scalar();
+        }
+
+        Map<Double, Long> histogram = Arrays.stream(samples)
+            .filter(value -> value >= from && value <= to)
+            .boxed()
+            .collect(groupingBy(
+                x -> bucketCenter(x, bucketSize, from),
+                counting()
+            ));
+
+        for (Map.Entry<Double, Long> sampleBucket : histogram.entrySet()) {
+            double percentage = (double) sampleBucket.getValue() / samples.length;
+            double bucketCenter = sampleBucket.getKey();
+
+            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
+            double actual = percentage / bucketSize;
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
     }
@@ -171,26 +206,26 @@ public class ProbabilisticDoubleTensorContract {
 
     public static void matchesKnownLogDensityOfVector(DoubleVertex vertexUnderTest, double[] vector, double expectedLogDensity) {
 
-        double actualDensity = vertexUnderTest.logPdf(DoubleTensor.create(vector, new int[]{vector.length, 1}));
+        double actualDensity = vertexUnderTest.logPdf(DoubleTensor.create(vector, vector.length, 1));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
     public static void matchesKnownLogDensityOfScalar(DoubleVertex vertexUnderTest, double scalar, double expectedLogDensity) {
 
-        double actualDensity = vertexUnderTest.logPdf(Nd4jDoubleTensor.scalar(scalar));
+        double actualDensity = vertexUnderTest.logPdf(DoubleTensor.scalar(scalar));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
     public static void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<DoubleVertex> vertexUnderTestSupplier) {
 
         DoubleVertex[] scalarVertices = new DoubleVertex[vector.length];
-        PartialDerivatives tensorPartialDerivatives = new PartialDerivatives(new HashMap<>());
+        PartialDerivatives expectedPartialDerivatives = new PartialDerivatives(new HashMap<>());
 
         for (int i = 0; i < vector.length; i++) {
 
             scalarVertices[i] = vertexUnderTestSupplier.get();
 
-            tensorPartialDerivatives = tensorPartialDerivatives.add(
+            expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
                     scalarVertices[i].dLogPdf(vector[i])
                 )
@@ -207,12 +242,16 @@ public class ProbabilisticDoubleTensorContract {
         hyperParameterVertices.remove(tensorVertex.getId());
 
         for (Long id : hyperParameterVertices) {
-            assertEquals(tensorPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
+            assertEquals(expectedPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
         }
 
+        double expected = 0;
         for (int i = 0; i < vector.length; i++) {
-            assertEquals(tensorPartialDerivatives.withRespectTo(scalarVertices[i]).scalar(), actualDerivatives.get(tensorVertex.getId()).getValue(i), 1e-5);
+            expected += expectedPartialDerivatives.withRespectTo(scalarVertices[i]).scalar();
         }
+
+        double actual = actualDerivatives.get(tensorVertex.getId()).sum();
+        assertEquals(expected, actual, 1e-5);
     }
 
 }

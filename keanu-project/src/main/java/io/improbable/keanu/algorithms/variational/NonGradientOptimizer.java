@@ -14,10 +14,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.GradientOptimizer.currentPoint;
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class NonGradientOptimizer {
+public class NonGradientOptimizer extends Optimizer {
 
     private final BayesianNetwork bayesNet;
     private final List<BiConsumer<double[], Double>> onFitnessCalculations;
@@ -41,7 +40,19 @@ public class NonGradientOptimizer {
         }
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+    public double optimize(int maxEvaluations,
+                           double boundsRange,
+                           List<Vertex> outputVertices){
+        double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
+        double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+        return optimize(maxEvaluations, boundsRange, outputVertices, initialTrustRegionRadius, stoppingTrustRegionRadius);
+    }
+
+    public double optimize(int maxEvaluations,
+                           double boundsRange,
+                           List<Vertex> outputVertices,
+                           double initialTrustRegionRadius,
+                           double stoppingTrustRegionRadius) {
 
         bayesNet.cascadeObservations();
 
@@ -56,7 +67,11 @@ public class NonGradientOptimizer {
             this::handleFitnessCalculation
         );
 
-        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(2 * latentVertices.size() + 1);
+        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
+            getNumInterpolationPoints(latentVertices),
+            initialTrustRegionRadius,
+            stoppingTrustRegionRadius
+        );
 
         double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
@@ -84,6 +99,10 @@ public class NonGradientOptimizer {
         return pointValuePair.getValue();
     }
 
+    private int getNumInterpolationPoints(List<? extends Vertex<DoubleTensor>> latentVertices){
+        return (int)(2 * totalNumLatentDimensions(latentVertices) + 1);
+    }
+
     /**
      * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
      * @param boundsRange    bounding box around starting point
@@ -91,6 +110,25 @@ public class NonGradientOptimizer {
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
         return optimize(maxEvaluations, boundsRange, bayesNet.getLatentAndObservedVertices());
+    }
+
+    /**
+     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * @param boundsRange    bounding box around starting point
+     * @param initialTrustRegionRadius    radius around region to start testing points
+     * @param stoppingTrustRegionRadius    stopping trust region radius
+     * @param boundsRange    bounding box around starting point
+     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     */
+    public double maxAPosteriori(int maxEvaluations,
+                                 double boundsRange,
+                                 double initialTrustRegionRadius,
+                                 double stoppingTrustRegionRadius) {
+        return optimize(maxEvaluations,
+                        boundsRange,
+                        bayesNet.getLatentAndObservedVertices(),
+                        initialTrustRegionRadius,
+                        stoppingTrustRegionRadius);
     }
 
     /**

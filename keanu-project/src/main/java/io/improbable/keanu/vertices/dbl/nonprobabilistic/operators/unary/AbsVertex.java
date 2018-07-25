@@ -10,6 +10,11 @@ import java.util.Map;
 
 public class AbsVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Takes the absolute of a vertex
+     *
+     * @param inputVertex the vertex
+     */
     public AbsVertex(DoubleVertex inputVertex) {
         super(inputVertex.getShape(), inputVertex);
     }

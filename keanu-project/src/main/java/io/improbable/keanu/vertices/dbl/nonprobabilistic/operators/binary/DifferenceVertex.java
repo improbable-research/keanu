@@ -11,18 +11,24 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
-    public DifferenceVertex(DoubleVertex a, DoubleVertex b) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+    /**
+     * Subtracts one vertex from another
+     *
+     * @param left the vertex that will be subtracted from
+     * @param right the vertex to subtract
+     */
+    public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
+        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
     }
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber aDual = dualNumbers.get(a);
-        DualNumber bDual = dualNumbers.get(b);
-        return aDual.minus(bDual);
+        DualNumber leftDual = dualNumbers.get(left);
+        DualNumber rightDual = dualNumbers.get(right);
+        return leftDual.minus(rightDual);
     }
 
-    protected DoubleTensor op(DoubleTensor a, DoubleTensor b) {
-        return a.minus(b);
+    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
+        return left.minus(right);
     }
 }

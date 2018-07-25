@@ -1,54 +1,59 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Gaussian {
+public class Gaussian implements ContinuousDistribution {
 
-    private Gaussian() {
+    public static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
+    public static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
+    private final DoubleTensor mu;
+    private final DoubleTensor sigma;
+
+    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
+        return new Gaussian(mu, sigma);
     }
 
-    private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
-    private static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
-
-    public static double sample(double mu, double sigma, KeanuRandom random) {
-        return random.nextGaussian() * sigma + mu;
+    private Gaussian(DoubleTensor mu, DoubleTensor sigma) {
+        this.mu = mu;
+        this.sigma = sigma;
     }
 
-    public static double pdf(double mu, double sigma, double x) {
-        final double normalizer = 1.0 / (sigma * SQRT_2PI);
-        final double xMinusMu = x - mu;
-        final double exponent = -(xMinusMu * xMinusMu) / (2.0 * sigma * sigma);
-        return normalizer * Math.exp(exponent);
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+        DoubleTensor unityGaussian = random.nextGaussian(shape);
+        return unityGaussian.timesInPlace(sigma).plusInPlace(mu);
     }
 
-    public static double logPdf(double mu, double sigma, double x) {
-        final double lnSigma = Math.log(sigma);
-        final double xMinusMu = x - mu;
-        final double xMinusMuOver2Variance = xMinusMu * xMinusMu / (2 * sigma * sigma);
-        return -xMinusMuOver2Variance - lnSigma - LN_SQRT_2PI;
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
+        final DoubleTensor lnSigma = sigma.log();
+        final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2);
+        final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
+        return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
-    public static Diff dlnPdf(double mu, double sigma, double x) {
-        final double variance = sigma * sigma;
-        final double xMinusMu = x - mu;
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
+        final DoubleTensor variance = sigma.pow(2);
+        final DoubleTensor xMinusMu = x.minus(mu);
 
-        final double dlnP_dmu = xMinusMu / variance;
-        final double dlnP_dx = -dlnP_dmu;
-        final double dlnP_dsigma = ((xMinusMu * xMinusMu) / (variance * sigma)) - 1 / sigma;
+        final DoubleTensor dLogPdmu = xMinusMu.div(variance);
+        final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
+        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
+            .divInPlace(variance.timesInPlace(sigma))
+            .minusInPlace(sigma.reciprocal());
 
-        return new Diff(dlnP_dmu, dlnP_dsigma, dlnP_dx);
+        return new Diffs()
+            .put(MU, dLogPdmu)
+            .put(SIGMA, dLogPdsigma)
+            .put(X, dLogPdx);
     }
 
-
-    public static class Diff {
-        public final double dPdmu;
-        public final double dPdsigma;
-        public final double dPdx;
-
-        public Diff(double dPdmu, double dPdsigma, double dPdx) {
-            this.dPdmu = dPdmu;
-            this.dPdsigma = dPdsigma;
-            this.dPdx = dPdx;
-        }
-    }
 }

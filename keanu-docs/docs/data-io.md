@@ -74,8 +74,8 @@ The CSV can be loaded as a Java object by
 
 ```java
 List<MyClass> myPojos = ReadCsv.fromFile("some/file/path")
-                               .as(MyClass.class)
-                               .asList();
+                               .asRowsDefinedBy(MyClass.class)
+                               .load();
 ```
 
 If your csv header names contain illegal characters you have the option to

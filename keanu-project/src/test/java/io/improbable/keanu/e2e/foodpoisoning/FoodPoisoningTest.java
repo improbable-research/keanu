@@ -71,9 +71,9 @@ public class FoodPoisoningTest {
 
     public NetworkSamples sample(int n) {
         BayesianNetwork myNet = new BayesianNetwork(infectedOysters.getConnectedGraph());
-        myNet.probeForNonZeroMasterP(100, random);
+        myNet.probeForNonZeroProbability(100, random);
         assertNotEquals(Double.NEGATIVE_INFINITY, myNet.getLogOfMasterP());
-        return MetropolisHastings.getPosteriorSamples(myNet, myNet.getLatentVertices(), n, random);
+        return MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(myNet, myNet.getLatentVertices(), n);
     }
 
     public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {

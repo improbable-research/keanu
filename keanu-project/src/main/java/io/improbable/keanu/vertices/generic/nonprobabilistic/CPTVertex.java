@@ -12,11 +12,11 @@ import java.util.function.Function;
 public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-    private final Map<Condition, Vertex<OUT>> conditions;
+    private final Map<Condition, ? extends Vertex<OUT>> conditions;
     private final Vertex<OUT> defaultResult;
 
     public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
-                     Map<Condition, Vertex<OUT>> conditions,
+                     Map<Condition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
         this.conditions = conditions;
         this.inputs = inputs;
@@ -29,13 +29,15 @@ public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
     @Override
     public OUT sample(KeanuRandom random) {
         final Condition condition = getCondition((vertex) -> vertex.sample(random).scalar());
-        return conditions.getOrDefault(condition, defaultResult).sample(random);
+        Vertex<OUT> vertex = conditions.get(condition);
+        return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
     @Override
     public OUT getDerivedValue() {
         final Condition condition = getCondition(v -> v.getValue().scalar());
-        return conditions.getOrDefault(condition, defaultResult).getValue();
+        Vertex<OUT> vertex = conditions.get(condition);
+        return vertex == null ? defaultResult.getValue() : vertex.getValue();
     }
 
     private Condition getCondition(Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {

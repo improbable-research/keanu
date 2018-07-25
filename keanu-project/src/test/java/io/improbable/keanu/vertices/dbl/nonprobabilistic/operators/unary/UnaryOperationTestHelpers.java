@@ -1,15 +1,17 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
 
 import java.util.function.Function;
 
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class UnaryOperationTestHelpers {
@@ -54,16 +56,14 @@ public class UnaryOperationTestHelpers {
                                                                        double[] expectedGradientWrtA,
                                                                        Function<DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
+        int[] matrixShape = new int[]{2, 2};
+        UniformVertex A = new UniformVertex(matrixShape, 0.0, 1.0);
+        A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
 
         DualNumber result = op.apply(A).getDualNumber();
-        DoubleTensor expectedTensorA = Nd4jDoubleTensor.create(expectedGradientWrtA, new int[]{2, 2});
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        assertEquals(expectedTensorA.getValue(0, 0), wrtA.getValue(0, 0), 1e-5);
-        assertEquals(expectedTensorA.getValue(0, 1), wrtA.getValue(0, 1), 1e-5);
-        assertEquals(expectedTensorA.getValue(1, 0), wrtA.getValue(1, 0), 1e-5);
-        assertEquals(expectedTensorA.getValue(1, 1), wrtA.getValue(1, 1), 1e-5);
+        assertArrayEquals(expectedGradientWrtA, wrtA.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(TensorShape.concat(matrixShape, matrixShape), wrtA.getShape());
     }
 }

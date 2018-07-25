@@ -1,50 +1,55 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
+import org.apache.commons.math3.special.Gamma;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static org.apache.commons.math3.special.Gamma.digamma;
-import static org.apache.commons.math3.special.Gamma.gamma;
+public class InverseGamma implements ContinuousDistribution {
 
-public class InverseGamma {
+    private final DoubleTensor alpha;
+    private final DoubleTensor beta;
 
-    private InverseGamma() {
+    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta) {
+        return new InverseGamma(alpha, beta);
     }
 
-    public static double sample(double a, double b, KeanuRandom random) {
-        if (a <= 0.0 || b <= 0.0) {
-            throw new IllegalArgumentException("Invalid value for a or b. a: " + a + ". b: " + b);
-        }
-        return 1.0 / Gamma.sample(0.0, 1.0 / b, a, random);
+    private InverseGamma(DoubleTensor alpha, DoubleTensor beta) {
+        this.alpha = alpha;
+        this.beta = beta;
     }
 
-    public static double pdf(double a, double b, double x) {
-        double numerator = Math.pow(b, a) * Math.pow(x, -a - 1) * Math.exp(-b / x);
-        return numerator / gamma(a);
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+        final DoubleTensor gammaSample = random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, beta.reciprocal(), alpha);
+        return gammaSample.reciprocal();
     }
 
-    public static double logPdf(double a, double b, double x) {
-        return a * Math.log(b) + (-a - 1) * Math.log(x) - Math.log(gamma(a)) - (b / x);
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
+        final DoubleTensor aTimesLnB = alpha.times(beta.log());
+        final DoubleTensor negAMinus1TimesLnX = x.log().timesInPlace(alpha.unaryMinus().minusInPlace(1));
+        final DoubleTensor lnGammaA = alpha.apply(Gamma::gamma).logInPlace();
+
+        return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(beta.div(x));
     }
 
-    public static Diff dlnPdf(double a, double b, double x) {
-        double dPda = -digamma(a) + Math.log(b) - Math.log(x);
-        double dPdb = (a / b) - (1 / x);
-        double dPdx = (b - (a + 1) * x) / Math.pow(x, 2);
-        return new Diff(dPda, dPdb, dPdx);
-    }
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
+        final DoubleTensor dPdalpha = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
+        final DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
+        final DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-    public static class Diff {
-
-        public final double dPda;
-        public final double dPdb;
-        public final double dPdx;
-
-        public Diff(double dPda, double dPdb, double dPdx) {
-            this.dPda = dPda;
-            this.dPdb = dPdb;
-            this.dPdx = dPdx;
-        }
-
+        return new Diffs()
+            .put(A, dPdalpha)
+            .put(B, dLogPdbeta)
+            .put(X, dLogPdx);
     }
 
 }

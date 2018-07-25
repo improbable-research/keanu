@@ -1,40 +1,54 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Builder;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
  * tend towards the Maximum A Posteriori (MAP)
  */
+@Builder
 public class SimulatedAnnealing {
 
-    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
-                                                 int sampleCount,
-                                                 AnnealingSchedule schedule) {
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, KeanuRandom.getDefaultRandom());
+    public static SimulatedAnnealing withDefaultConfig() {
+        return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
-                                                 int sampleCount,
-                                                 KeanuRandom random) {
-        AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, random);
+    public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
+        return SimulatedAnnealing.builder()
+            .proposalDistribution(ProposalDistribution.usePrior())
+            .variableSelector(SINGLE_VARIABLE_SELECTOR)
+            .useCacheOnRejection(true)
+            .random(random)
+            .build();
     }
 
-    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet, int sampleCount) {
+    private final KeanuRandom random;
+    private final ProposalDistribution proposalDistribution;
 
+    @Builder.Default
+    private final MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+
+    @Builder.Default
+    private final boolean useCacheOnRejection = true;
+
+    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
+                                          int sampleCount) {
         AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
-
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule, KeanuRandom.getDefaultRandom());
+        return getMaxAPosteriori(bayesNet, sampleCount, schedule);
     }
 
     /**
@@ -43,13 +57,11 @@ public class SimulatedAnnealing {
      * @param bayesNet          a bayesian network containing latent vertices
      * @param sampleCount       the number of samples to take
      * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
-     * @param random            the source of randomness
      * @return the NetworkState that represents the Max A Posteriori
      */
-    public static NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
-                                                 int sampleCount,
-                                                 AnnealingSchedule annealingSchedule,
-                                                 KeanuRandom random) {
+    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
+                                          int sampleCount,
+                                          AnnealingSchedule annealingSchedule) {
 
         bayesNet.cascadeObservations();
 
@@ -60,24 +72,30 @@ public class SimulatedAnnealing {
         Map<Long, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
-        Map<Vertex, Set<Vertex>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
-
-        Map<Long, Map<Long, Long>> setAndCascadeCache = new HashMap<>();
-
-        double logP = bayesNet.getLogOfMasterP();
-        double maxLogP = logP;
+        double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
+        double maxLogP = logProbabilityBeforeStep;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
+
+        MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
+            latentVertices,
+            proposalDistribution,
+            true,
+            random
+        );
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
             double temperature = annealingSchedule.getTemperature(sampleNum);
-            Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = MetropolisHastings.nextSample(chosenVertex, logP, affectedVertices, temperature, setAndCascadeCache, random);
+            logProbabilityBeforeStep = mhStep.step(
+                Collections.singleton(chosenVertex),
+                logProbabilityBeforeStep,
+                temperature
+            ).getLogProbabilityAfterStep();
 
-            if (logP > maxLogP) {
-                maxLogP = logP;
+            if (logProbabilityBeforeStep > maxLogP) {
+                maxLogP = logProbabilityBeforeStep;
                 setSamplesAsMax(maxSamplesByVertex, latentVertices);
             }
         }

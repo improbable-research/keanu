@@ -1,47 +1,63 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-/**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.24 page 37
- */
-public class Triangular {
+public class Triangular implements ContinuousDistribution {
 
-    private Triangular() {
+    private final DoubleTensor xMin;
+    private final DoubleTensor xMax;
+    private final DoubleTensor c;
+
+    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+        return new Triangular(xMin, xMax, c);
     }
 
-    /**
-     * @param xMin   minimum x value
-     * @param xMax   maximum x value
-     * @param c      mode
-     * @param random source of randomness
-     * @return a random number from the Triangular distribution
-     */
-    public static double sample(double xMin, double xMax, double c, KeanuRandom random) {
-        if (xMax > xMin || c > xMin || c > xMax) {
-            throw new IllegalArgumentException("Invalid value for xMax, xMin or c. xMax: " + xMax + ". xMin: " + xMin + ". c: " + c);
-        }
-
-        double p = random.nextDouble();
-        double q = 1.0 - p;
-
-        if (p <= (c - xMin) / (xMax - xMin))
-            return xMin + Math.sqrt((xMax - xMin) * (c - xMin) * p);
-        else
-            return xMax - Math.sqrt((xMax - xMin) * (xMax - c) * q);
+    private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.c = c;
     }
 
-    public static double pdf(double xMin, double xMax, double c, double x) {
-        double range = xMax - xMin;
-        if (x >= xMin && x < c) {
-            return (2 / range) * (x - xMin) / (c - xMin);
-        } else if (x >= c && x <= xMax) {
-            return (2 / range) * (xMax - x) / (xMax - c);
-        } else {
-            return 0;
-        }
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+        final DoubleTensor p = random.nextDouble(shape);
+        final DoubleTensor q = p.unaryMinus().plusInPlace(1);
+        final DoubleTensor range = xMax.minus(xMin);
+
+        final DoubleTensor conditional = (c.minus(xMin)).divInPlace(xMax.minus(xMin));
+
+        final DoubleTensor lessThan = xMin.plus((range.times(c.minus(xMin).timesInPlace(p))).sqrtInPlace());
+        final DoubleTensor greaterThan = xMax.minus((range.timesInPlace(xMax.minus(c).timesInPlace(q))).sqrtInPlace());
+
+        final DoubleTensor lessThanMask = p.getLessThanOrEqualToMask(conditional);
+        final DoubleTensor greaterThanMask = p.getGreaterThanMask(conditional);
+
+        return (lessThan.timesInPlace(lessThanMask).plusInPlace(greaterThan.timesInPlace(greaterThanMask)));
     }
+
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
+        final DoubleTensor range = xMax.minus(xMin);
+
+        final DoubleTensor conditionalFirstHalf = x.getGreaterThanMask(xMin);
+        final DoubleTensor conditionalSecondHalf = x.getLessThanMask(c);
+        final DoubleTensor conditionalAnd = conditionalFirstHalf.timesInPlace(conditionalSecondHalf);
+        final DoubleTensor conditionalResult = range.reciprocal().timesInPlace(2).timesInPlace(x.minus(xMin)).divInPlace(c.minus(xMin));
+
+        final DoubleTensor elseIfConditionalFirstHalf = x.getGreaterThanMask(c);
+        final DoubleTensor elseIfConditionalSecondHalf = x.getLessThanOrEqualToMask(xMax);
+        final DoubleTensor elseIfConditionalAnd = elseIfConditionalFirstHalf.timesInPlace(elseIfConditionalSecondHalf);
+        final DoubleTensor elseIfConditionalResult = range.reciprocalInPlace().timesInPlace(2).timesInPlace(xMax.minus(x)).divInPlace(xMax.minus(c));
+
+        return (conditionalResult.timesInPlace(conditionalAnd).plusInPlace(elseIfConditionalResult.timesInPlace(elseIfConditionalAnd))).logInPlace();
+    }
+
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
+        throw new UnsupportedOperationException();
+    }
+
 }

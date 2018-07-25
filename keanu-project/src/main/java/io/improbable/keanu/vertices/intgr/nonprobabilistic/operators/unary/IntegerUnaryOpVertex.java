@@ -9,6 +9,12 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
 
     protected final IntegerVertex inputVertex;
 
+    /**
+     * A vertex that performs a user defined operation on a singe input vertex
+     *
+     * @param shape the shape of the resulting vertex
+     * @param inputVertex a vertex
+     */
     public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);

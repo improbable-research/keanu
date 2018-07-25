@@ -1,40 +1,41 @@
 package io.improbable.keanu.distributions.continuous;
 
+import org.apache.commons.math3.special.Gamma;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static org.apache.commons.math3.special.Gamma.gamma;
+public class ChiSquared implements ContinuousDistribution {
 
-public class ChiSquared {
+    private static final double LOG_TWO = Math.log(2);
+    private final IntegerTensor k;
 
-    private ChiSquared() {
+    public static ContinuousDistribution withParameters(IntegerTensor k) {
+        return new ChiSquared(k);
     }
 
-    public static double sample(int k, KeanuRandom random) {
-        if (k < 1) {
-            throw new IllegalArgumentException("Invalid value of k: " + k);
-        }
-        return Gamma.sample(0.0, 2.0, 0.5 * (double) k, random);
+    private ChiSquared(IntegerTensor k) {
+        this.k = k;
     }
 
-    public static double pdf(int k, double x) {
-        if (x > 0) {
-            double halfK = (double) k / 2;
-            double numerator = Math.pow(x, halfK - 1) * Math.exp(-x / 2);
-            double denominator = Math.pow(2, halfK) * gamma(halfK);
-            return numerator / denominator;
-        } else {
-            return 0;
-        }
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+        return random.nextGamma(shape, DoubleTensor.ZERO_SCALAR, DoubleTensor.TWO_SCALAR, k.toDouble().div(2));
     }
 
-    public static double logPdf(int k, double x) {
-        if (x <= 0) {
-            throw new IllegalArgumentException("Invalid value of x: " + x);
-        }
-        double halfK = (double) k / 2;
-        double numerator = ((halfK - 1) * Math.log(x)) - (x / 2);
-        double denominator = (halfK * Math.log(2) + Math.log(gamma(halfK)));
-        return numerator - denominator;
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
+        DoubleTensor halfK = k.toDouble().div(2);
+        DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
+        DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.apply(Gamma::gamma).logInPlace());
+        return numerator.minusInPlace(denominator);
     }
 
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
+        throw new UnsupportedOperationException();
+    }
 }

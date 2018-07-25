@@ -54,11 +54,10 @@ public class Model {
         BayesianNetwork net = buildBayesianNetwork();
         Integer numSamples = 50000;
 
-        NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(
+        NetworkSamples posteriorDistSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             net,
             net.getLatentVertices(),
-            numSamples,
-            KeanuRandom.getDefaultRandom()
+            numSamples
         );
 
         results = posteriorDistSamples.drop(10000).downSample(3);

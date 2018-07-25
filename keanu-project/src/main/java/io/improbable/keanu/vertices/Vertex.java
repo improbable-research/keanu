@@ -52,7 +52,7 @@ public abstract class Vertex<T> {
      */
     public abstract T sample(KeanuRandom random);
 
-    public T sampleUsingDefaultRandom() {
+    public T sample() {
         return sample(KeanuRandom.getDefaultRandom());
     }
 
@@ -64,6 +64,19 @@ public abstract class Vertex<T> {
      */
     public abstract T updateValue();
 
+
+    /**
+     * This is similar to eval() except it only propagates as far up the graph as required until
+     * there are values present to operate on. On a graph that is completely uninitialized,
+     * this would be the same as eval()
+     *
+     * @return the value of the vertex based on the already calculated upstream values
+     */
+    public final T lazyEval() {
+        VertexValuePropagation.lazyEval(this);
+        return this.getValue();
+    }
+
     /**
      * This causes a backwards propagating calculation of the vertex value. This
      * propagation only happens for vertices with values dependent on parent values
@@ -73,31 +86,8 @@ public abstract class Vertex<T> {
      * @return The value at this vertex after recalculating any parent non-probabilistic
      * vertices.
      */
-    public final T lazyEval() {
-        Deque<Vertex<?>> stack = new ArrayDeque<>();
-        stack.push(this);
-        Set<Vertex<?>> hasCalculated = new HashSet<>();
-
-        while (!stack.isEmpty()) {
-
-            Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
-
-            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
-
-                Vertex<?> top = stack.pop();
-                top.updateValue();
-                hasCalculated.add(top);
-
-            } else {
-
-                for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
-                    stack.push(vertex);
-                }
-
-            }
-
-        }
+    public final T eval() {
+        VertexValuePropagation.eval(this);
         return this.getValue();
     }
 
@@ -152,21 +142,8 @@ public abstract class Vertex<T> {
      * @param value The new value at this vertex
      */
     public void setAndCascade(T value) {
-        setAndCascade(value, exploreSetting());
-    }
-
-    /**
-     * @param value    the new value at this vertex
-     * @param explored the results of previously exploring the graph, which
-     *                 allows the efficient propagation of this new value.
-     */
-    public void setAndCascade(T value, Map<Long, Long> explored) {
         setValue(value);
-        VertexValuePropagation.cascadeUpdate(this, explored);
-    }
-
-    public Map<Long, Long> exploreSetting() {
-        return VertexValuePropagation.exploreSetting(this);
+        VertexValuePropagation.cascadeUpdate(this);
     }
 
     /**
@@ -251,13 +228,4 @@ public abstract class Vertex<T> {
         return DiscoverGraph.getEntireGraph(this);
     }
 
-    private Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
-            if (!calculated.contains(next)) {
-                notCalculatedParents.add(next);
-            }
-        }
-        return notCalculatedParents;
-    }
 }
