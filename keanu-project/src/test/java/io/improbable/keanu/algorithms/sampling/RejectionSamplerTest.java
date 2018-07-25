@@ -1,22 +1,25 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static java.util.Arrays.asList;
+import static java.util.Collections.singletonList;
+
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static java.util.Arrays.asList;
-import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class RejectionSamplerTest {
 
-    private BoolVertex v1;
-    private BoolVertex v2;
-    private BoolVertex v3;
+    private BooleanVertex v1;
+    private BooleanVertex v2;
+    private BooleanVertex v3;
     private double v1ProbTrueAccordingToBayes;
     private double v2ProbTrueAccordingToBayes;
     private KeanuRandom random;
@@ -37,7 +40,7 @@ public class RejectionSamplerTest {
         v1ProbTrueAccordingToBayes = v1ProbTrue / v3ProbTrue;
         v2ProbTrueAccordingToBayes = v2ProbTrue / v3ProbTrue;
 
-        v3.observe(true);
+        v3.observe(BooleanTensor.scalar(true));
     }
 
     @Test

@@ -1,14 +1,15 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.util.FastMath;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.FastMath;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -289,7 +290,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, double valueToApply) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, Double valueToApply) {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
@@ -300,7 +301,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return this.duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -391,6 +392,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public double determinant() {
         return value;
+    }
+
+    @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
     }
 
     @Override
@@ -587,7 +593,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minusInPlace(min).maxInPlace(max);
+        return minInPlace(max).maxInPlace(min);
     }
 
     @Override
@@ -608,6 +614,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      * e.g.
      * Java: round(-2.5) == -2.0
      * Python: round(-2.5) == -3.0
+     *
      * @return Nearest integer value as a DoubleTensor
      */
     @Override

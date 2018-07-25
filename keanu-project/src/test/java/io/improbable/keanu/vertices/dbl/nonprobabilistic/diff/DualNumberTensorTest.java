@@ -1,20 +1,29 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class DualNumberTensorTest {
 
     @Test
     public void diffWrtVectorOverMultipleMultiplies() {
 
-        DoubleVertex A = new UniformVertex(new int[]{1, 4}, 0, 1);
+        DoubleVertex A = new DistributionVertexBuilder()
+            .shaped(1, 4)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         A.setValue(new double[]{-1, 3, 5, -2});
 
         DoubleVertex prod = A.times(ConstantVertex.of(new double[]{1, 2, 3, 4}));
@@ -25,7 +34,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        DualNumber dualNumber = output.getDualNumber();
+        DualNumber dualNumber = new Differentiator().calculateDual((Differentiable)output);
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 
@@ -40,7 +49,7 @@ public class DualNumberTensorTest {
     @Test
     public void diffWrtScalarOverMultipleMultiplies() {
 
-        DoubleVertex A = new UniformVertex(0, 1);
+        DoubleVertex A = VertexOfType.uniform(0., 1.);
         A.setValue(2);
 
         DoubleVertex prod = A.times(ConstantVertex.of(new double[]{1, 2, 3, 4}));
@@ -51,7 +60,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        DualNumber dualNumber = output.getDualNumber();
+        DualNumber dualNumber = new Differentiator().calculateDual((Differentiable)output);
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 
@@ -64,12 +73,16 @@ public class DualNumberTensorTest {
     @Test
     public void diffWrtScalarOverMultipleMultipliesAndSummation() {
 
-        DoubleVertex A = new UniformVertex(new int[]{2, 2}, 0, 1);
+        DoubleVertex A = new DistributionVertexBuilder()
+            .shaped(2, 2)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
         DoubleVertex prod = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        DualNumber dualNumber = prod.getDualNumber();
+        DualNumber dualNumber = new Differentiator().calculateDual((Differentiable)prod);
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 

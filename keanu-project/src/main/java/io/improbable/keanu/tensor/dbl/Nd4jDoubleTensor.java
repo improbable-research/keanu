@@ -1,11 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
-import com.google.common.primitives.Ints;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import static java.util.Arrays.copyOf;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
@@ -13,19 +14,24 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.Function;
+import com.google.common.primitives.Ints;
 
-import static java.util.Arrays.copyOf;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -404,7 +410,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -680,7 +686,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
@@ -737,7 +743,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minInPlace(min).maxInPlace(max);
+        return minInPlace(max).maxInPlace(min);
     }
 
     @Override
@@ -770,6 +776,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
         return new LUDecomposition(matrix).getDeterminant();
+    }
+
+    @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        INDArray dup = tensor.dup();
+        INDArray[] toConcat = new INDArray[those.length + 1];
+        toConcat[0] = dup;
+        for (int i = 1; i <= those.length; i++) {
+            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+        }
+        INDArray concat = Nd4j.concat(dimension, toConcat);
+        return new Nd4jDoubleTensor(concat);
     }
 
     // Comparisons

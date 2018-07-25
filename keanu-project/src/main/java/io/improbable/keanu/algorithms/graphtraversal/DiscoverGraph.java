@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
+
+import io.improbable.keanu.vertices.Vertex;
 
 public class DiscoverGraph {
 
@@ -25,9 +25,9 @@ public class DiscoverGraph {
      * @return a set containing EVERY vertex in a graph that the
      * starting vertex is apart of.
      */
-    public static Set<Vertex> getEntireGraph(Vertex<?> initialVertex) {
+    public static Set<Vertex<?>> getEntireGraph(Vertex<?> initialVertex) {
 
-        Set<Vertex> discoveredGraph = new HashSet<>();
+        Set<Vertex<?>> discoveredGraph = new HashSet<>();
 
         Deque<Vertex<?>> stack = new ArrayDeque<>();
 
@@ -47,8 +47,8 @@ public class DiscoverGraph {
 
             for (Vertex<?> parent : visiting.getParents()) {
                 if (!discoveredGraph.contains(parent)) {
-                    stack.addFirst(parent);
-                    discoveredGraph.add(parent);
+                    stack.addFirst((Vertex)parent);
+                    discoveredGraph.add((Vertex)parent);
                 }
             }
         }

@@ -1,13 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.B;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.A;
+import static io.improbable.keanu.distributions.dual.ParameterName.B;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import org.apache.commons.math3.special.Gamma;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -16,11 +16,8 @@ public class InverseGamma implements ContinuousDistribution {
     private final DoubleTensor alpha;
     private final DoubleTensor beta;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta) {
-        return new InverseGamma(alpha, beta);
-    }
-
-    private InverseGamma(DoubleTensor alpha, DoubleTensor beta) {
+    // package private
+    InverseGamma(DoubleTensor alpha, DoubleTensor beta) {
         this.alpha = alpha;
         this.beta = beta;
     }
@@ -41,12 +38,12 @@ public class InverseGamma implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor dPdalpha = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
         final DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
         final DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(A, dPdalpha)
             .put(B, dLogPdbeta)
             .put(X, dLogPdx);

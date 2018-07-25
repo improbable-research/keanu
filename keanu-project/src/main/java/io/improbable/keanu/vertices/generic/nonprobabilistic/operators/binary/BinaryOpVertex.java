@@ -1,15 +1,21 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
+import io.improbable.keanu.vertices.generic.GenericVertex;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class BinaryOpVertex<A, B, C> extends NonProbabilistic<C> {
+public abstract class BinaryOpVertex<A, B, C> extends GenericVertex<C> {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
 
     public BinaryOpVertex(Vertex<A> a, Vertex<B> b) {
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((BinaryOpVertex<A, B, C>) v).op(a.getValue(), b.getValue())),
+            Observable.observableTypeFor(BinaryOpVertex.class)
+        );
         this.a = a;
         this.b = b;
         setParents(a, b);
@@ -18,10 +24,6 @@ public abstract class BinaryOpVertex<A, B, C> extends NonProbabilistic<C> {
     @Override
     public C sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
-    }
-
-    public C getDerivedValue() {
-        return op(a.getValue(), b.getValue());
     }
 
     protected abstract C op(A a, B b);

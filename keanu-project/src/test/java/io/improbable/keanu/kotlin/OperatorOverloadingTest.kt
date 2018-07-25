@@ -3,15 +3,14 @@ package io.improbable.keanu.kotlin
 import io.improbable.keanu.DeterministicRule
 import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType
 import io.improbable.keanu.vertices.intgr.IntegerVertex
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
+
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
+import kotlin.math.pow
 
 
 class OperatorOverloadingTest {
@@ -22,8 +21,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexPlus() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = GaussianVertex(0.0, 1.0)
+        val a = VertexOfType.gaussian(0.0, 1.0)
+        val b = VertexOfType.gaussian(0.0, 1.0)
 
         val e1 = a.value + b.value
         val r1 = a + b
@@ -58,8 +57,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexPlus() {
-        val a = PoissonVertex(1.0)
-        val b = PoissonVertex(2.0)
+        val a = VertexOfType.poisson(1.0)
+        val b = VertexOfType.poisson(2.0)
 
         val e1 = a.value + b.value
         val r1 = a + b
@@ -94,8 +93,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexMinus() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = GaussianVertex(0.0, 1.0)
+        val a = VertexOfType.gaussian(0.0, 1.0)
+        val b = VertexOfType.gaussian(0.0, 1.0)
 
         val e1 = a.value - b.value
         val r1 = a - b
@@ -130,8 +129,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexMinus() {
-        val a = PoissonVertex(1.0)
-        val b = PoissonVertex(2.0)
+        val a = VertexOfType.poisson(1.0)
+        val b = VertexOfType.poisson(2.0)
 
         val e1 = a.value - b.value
         val r1 = a - b
@@ -166,7 +165,7 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexUnaryMinus() {
-        val a = GaussianVertex(0.0, 1.0)
+        val a = VertexOfType.gaussian(0.0, 1.0)
 
         val e1 = -a.value
         val r1 = -a
@@ -184,7 +183,7 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexUnaryMinus() {
-        val a = PoissonVertex(1.0)
+        val a = VertexOfType.poisson(1.0)
 
         val e1 = -a.value
         val r1 = -a
@@ -202,8 +201,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun doubleVertexTimes() {
-        val a = GaussianVertex(0.0, 1.0)
-        val b = GaussianVertex(0.0, 1.0)
+        val a = VertexOfType.gaussian(0.0, 1.0)
+        val b = VertexOfType.gaussian(0.0, 1.0)
 
         val e1 = a.value * b.value
         val r1 = a * b
@@ -234,8 +233,8 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexTimes() {
-        val a = PoissonVertex(1.0)
-        val b = PoissonVertex(2.0)
+        val a = VertexOfType.poisson(1.0)
+        val b = VertexOfType.poisson(2.0)
 
         val e1 = a.value * b.value
         val r1 = a * b
@@ -269,8 +268,69 @@ class OperatorOverloadingTest {
     }
 
     @Test
+    fun doubleVertexPow() {
+        val a = VertexOfType.gaussian(0.0, 2.0)
+        val b = VertexOfType.gaussian(0.0, 3.0)
+
+        val e1 = a.value.pow(b.value)
+        val r1 = a.pow(b)
+        assertEquals(e1, r1.value)
+
+        val e2 = a.value.pow(3.0)
+        val r2 = a.pow(3.0)
+        assertEquals(e2, r2.value)
+
+    }
+
+    @Test
+    fun arithmeticDoublePow() {
+        val a = ArithmeticDouble(2.0)
+        val b = ArithmeticDouble(3.0)
+
+        val e1 = a.value.pow(b.value)
+        val r1 = a.pow(b)
+        assertEquals(e1, r1.value)
+
+        val e2 = a.value.pow(3.0)
+        val r2 = a.pow(3.0)
+        assertEquals(e2, r2.value)
+    }
+
+    @Test
+    fun integerVertexPow() {
+        val a = VertexOfType.poisson(2.0)
+        val b = VertexOfType.poisson(3.0)
+
+        val e1 = a.value.pow(b.value)
+        val r1 = a.pow(b)
+        assertEquals(e1, r1.value)
+
+        val e2 = a.value.pow(3)
+        val r2 = a.pow(3)
+        assertEquals(e2, r2.value)
+    }
+
+    @Test
+    fun arithmeticIntegerPow() {
+        val a = ArithmeticInteger(2)
+        val b = ArithmeticInteger(3)
+
+        val e1 = 8
+        val r1 = a.pow(b)
+        assertEquals(e1, r1.value)
+
+        val e2 = 8
+        val r2 = a.pow(3)
+        assertEquals(e2, r2.value)
+
+        val e3 = 2 * a.value
+        val r3 = 2 * a
+        assertEquals(e3, r3.value)
+    }
+
+    @Test
     fun doubleVertexDivide() {
-        val a = GaussianVertex(0.0, 1.0)
+        val a = VertexOfType.gaussian(0.0, 1.0)
         val b = ConstantDoubleVertex(2.0)
 
         val e1 = a.value / b.value
@@ -307,7 +367,7 @@ class OperatorOverloadingTest {
 
     @Test
     fun integerVertexDivide() {
-        val a = PoissonVertex(1.0)
+        val a = VertexOfType.poisson(1.0)
         val b = ConstantIntegerVertex(2)
 
         val e1 = a.value / b.value
@@ -344,10 +404,10 @@ class OperatorOverloadingTest {
     @Test
     fun doubleVertexNestedOperators() {
         val a = 4.0
-        val b = GaussianVertex(0.0, 1.0)
-        val c = GaussianVertex(0.0, 1.0)
+        val b = VertexOfType.gaussian(0.0, 1.0)
+        val c = VertexOfType.gaussian(0.0, 1.0)
         val d = ConstantDoubleVertex(1.0)
-        val e = UniformVertex(1.0, 10.0)
+        val e = VertexOfType.uniform(1.0, 10.0)
         val f = 10.0
         val g = 5.0
 
@@ -374,10 +434,10 @@ class OperatorOverloadingTest {
     @Test
     fun integerVertexNestedOperators() {
         val a = 4
-        val b = PoissonVertex(1.0)
-        val c = PoissonVertex(2.0)
+        val b = VertexOfType.poisson(1.0)
+        val c = VertexOfType.poisson(2.0)
         val d = ConstantIntegerVertex(1)
-        val e = UniformIntVertex(1, 10)
+        val e = VertexOfType.uniform(1, 10)
         val f = 10
         val g = 5
 

@@ -1,14 +1,17 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import static junit.framework.TestCase.assertEquals;
+
 import org.junit.Before;
 import org.junit.Test;
 
-import static junit.framework.TestCase.assertEquals;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class PriorSamplingTest {
 
@@ -20,9 +23,9 @@ public class PriorSamplingTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        A = new GaussianVertex(100.0, 1);
-        B = new GaussianVertex(A, 1);
-        C = new GaussianVertex(B, 1);
+        A = VertexOfType.gaussian(100.0, 1.0);
+        B = VertexOfType.gaussian(A, ConstantVertex.of(1.0));
+        C = VertexOfType.gaussian(B, ConstantVertex.of(1.0));
     }
 
     @Test
@@ -42,7 +45,7 @@ public class PriorSamplingTest {
     @Test(expected = IllegalStateException.class)
     public void doesNotSamplePriorFromNetWithObservations() {
 
-        B.observe(95.0);
+        B.observe(DoubleTensor.scalar(95.0));
         BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
 
         final int sampleCount = 10000;

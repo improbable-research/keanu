@@ -1,26 +1,21 @@
 package io.improbable.keanu.distributions.discrete;
 
+import org.apache.commons.math3.util.CombinatoricsUtils;
+import org.nd4j.linalg.util.ArrayUtil;
+
 import io.improbable.keanu.distributions.DiscreteDistribution;
-import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.nd4j.linalg.util.ArrayUtil;
-
-import java.util.List;
 
 public class Binomial implements DiscreteDistribution {
 
     private final DoubleTensor p;
     private final IntegerTensor n;
 
-    public static DiscreteDistribution withParameters(DoubleTensor p, IntegerTensor n) {
-        return new Binomial(p, n);
-    }
-
-    private Binomial(DoubleTensor p, IntegerTensor n) {
+    // TODO: make package private
+    public Binomial(DoubleTensor p, IntegerTensor n) {
         this.p = p;
         this.n = n;
     }

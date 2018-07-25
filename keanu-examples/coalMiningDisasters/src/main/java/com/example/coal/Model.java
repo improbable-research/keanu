@@ -4,11 +4,12 @@ package com.example.coal;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
@@ -66,19 +67,19 @@ public class Model {
 
     private BayesianNetwork buildBayesianNetwork() {
 
-        switchpoint = new UniformIntVertex(data.startYear, data.endYear + 1);
-        earlyRate = new ExponentialVertex(1.0, 1.0);
-        lateRate = new ExponentialVertex(1.0, 1.0);
+        switchpoint = VertexOfType.uniform(data.startYear, data.endYear + 1);
+        earlyRate = VertexOfType.exponential(1.0, 1.0);
+        lateRate = VertexOfType.exponential(1.0, 1.0);
 
         ConstantIntegerVertex years = ConstantVertex.of(data.years);
 
-        DoubleVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
+        DoubleVertex rateForYear = If.isTrue(switchpoint.greaterThan(years))
             .then(earlyRate)
             .orElse(lateRate);
 
-        PoissonVertex disastersForYear = new PoissonVertex(rateForYear);
+        PoissonVertex disastersForYear = VertexOfType.poisson(rateForYear);
 
-        disastersForYear.observe(data.disasters);
+        disastersForYear.observe(IntegerTensor.create(data.disasters));
 
         return new BayesianNetwork(switchpoint.getConnectedGraph());
     }

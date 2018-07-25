@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.B;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.LAMBDA;
+import static io.improbable.keanu.distributions.dual.ParameterName.LOCATION;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -14,11 +14,8 @@ public class Exponential implements ContinuousDistribution {
     private final DoubleTensor location;
     private final DoubleTensor lambda;
 
-    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor lambda) {
-        return new Exponential(location, lambda);
-    }
-
-    private Exponential(DoubleTensor location, DoubleTensor lambda) {
+    // package private
+    Exponential(DoubleTensor location, DoubleTensor lambda) {
         this.location = location;
         this.lambda = lambda;
     }
@@ -36,12 +33,12 @@ public class Exponential implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdlocation = lambda.reciprocal();
         final DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
-        return new Diffs()
-            .put(A, dLogPdlocation)
-            .put(B, dLogPdlambda)
+        return new ParameterMap<DoubleTensor>()
+            .put(LOCATION, dLogPdlocation)
+            .put(LAMBDA, dLogPdlambda)
             .put(X, dLogPdlocation.unaryMinus());
     }
 }

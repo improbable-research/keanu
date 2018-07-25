@@ -1,15 +1,15 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
@@ -58,7 +58,7 @@ public class SimulatedAnnealing {
         }
 
         Map<Long, ?> maxSamplesByVertex = new HashMap<>();
-        List<Vertex> latentVertices = bayesNet.getLatentVertices();
+        List<Vertex<?>> latentVertices = bayesNet.getLatentVertices();
 
         Map<Vertex, Set<Vertex>> affectedVerticesCache = MetropolisHastings.getVerticesAffectedByLatents(latentVertices);
 

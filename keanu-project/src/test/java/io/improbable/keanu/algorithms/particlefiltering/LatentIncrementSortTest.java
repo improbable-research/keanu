@@ -1,19 +1,20 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
-import org.junit.Test;
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class LatentIncrementSortTest {
 
@@ -21,15 +22,15 @@ public class LatentIncrementSortTest {
     public void simpleGraph() {
         DoubleVertex muA = ConstantVertex.of(0.0);
         DoubleVertex muB = ConstantVertex.of(3.0);
-        DoubleVertex sigma = new UniformVertex(1.0, 2.0);
+        DoubleVertex sigma = VertexOfType.uniform(1.0, 2.0);
 
-        DoubleVertex gA = new GaussianVertex(muA, sigma);
-        DoubleVertex gB = new GaussianVertex(muB, sigma);
+        DoubleVertex gA = VertexOfType.gaussian(muA, sigma);
+        DoubleVertex gB = VertexOfType.gaussian(muB, sigma);
         DoubleVertex sum = gA.plus(gB);
-        DoubleVertex fuzzySum = new GaussianVertex(sum, sigma);
+        DoubleVertex fuzzySum = VertexOfType.gaussian(sum, sigma);
 
-        gA.observe(0.1);
-        fuzzySum.observe(1.0);
+        gA.observe(DoubleTensor.scalar(0.1));
+        fuzzySum.observe(DoubleTensor.scalar(1.0));
 
         Map<Vertex, Set<Vertex>> dependencies = LatentIncrementSort.sort(sigma.getConnectedGraph());
 
@@ -43,24 +44,24 @@ public class LatentIncrementSortTest {
     @Test
     public void moreComplexGraph() {
         DoubleVertex mu = ConstantVertex.of(0.0);
-        DoubleVertex sigma1 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g1 = new GaussianVertex(mu, sigma1);
-        g1.observe(0.0);
+        DoubleVertex sigma1 = VertexOfType.uniform(1.0, 2.0);
+        DoubleVertex g1 = VertexOfType.gaussian(mu, sigma1);
+        g1.observe(DoubleTensor.scalar(0.0));
 
-        DoubleVertex sigma2 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g2 = new GaussianVertex(g1, sigma2);
+        DoubleVertex sigma2 = VertexOfType.uniform(1.0, 2.0);
+        DoubleVertex g2 = VertexOfType.gaussian(g1, sigma2);
 
-        DoubleVertex sigma3 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g3 = new GaussianVertex(g2, sigma3);
-        g3.observe(0.0);
+        DoubleVertex sigma3 = VertexOfType.uniform(1.0, 2.0);
+        DoubleVertex g3 = VertexOfType.gaussian(g2, sigma3);
+        g3.observe(DoubleTensor.scalar(0.0));
 
-        DoubleVertex g4 = new GaussianVertex(g3, sigma3);
-        DoubleVertex sigma4 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g5 = new GaussianVertex(g4, sigma4);
+        DoubleVertex g4 = VertexOfType.gaussian(g3, sigma3);
+        DoubleVertex sigma4 = VertexOfType.uniform(1.0, 2.0);
+        DoubleVertex g5 = VertexOfType.gaussian(g4, sigma4);
 
-        DoubleVertex sigma5 = new UniformVertex(1.0, 2.0);
-        DoubleVertex g6 = new GaussianVertex(g5, sigma5);
-        g6.observe(0.0);
+        DoubleVertex sigma5 = VertexOfType.uniform(1.0, 2.0);
+        DoubleVertex g6 = VertexOfType.gaussian(g5, sigma5);
+        g6.observe(DoubleTensor.scalar(0.0));
 
         Map<Vertex, Set<Vertex>> dependencies = LatentIncrementSort.sort(mu.getConnectedGraph());
 

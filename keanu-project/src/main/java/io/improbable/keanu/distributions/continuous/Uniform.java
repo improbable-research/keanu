@@ -1,7 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -21,10 +21,8 @@ public class Uniform implements ContinuousDistribution {
      * @param xMax   maximum x value
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
-        return new Uniform(xMin, xMax);
-    }
-    private Uniform(DoubleTensor xMin, DoubleTensor xMax) {
+    // package private
+    Uniform(DoubleTensor xMin, DoubleTensor xMax) {
         this.xMin = xMin;
         this.xMax = xMax;
     }
@@ -45,7 +43,7 @@ public class Uniform implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
 }

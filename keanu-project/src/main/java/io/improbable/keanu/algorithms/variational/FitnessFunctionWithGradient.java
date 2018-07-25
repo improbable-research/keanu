@@ -1,28 +1,30 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-import org.apache.commons.math3.analysis.MultivariateFunction;
-import org.apache.commons.math3.analysis.MultivariateVectorFunction;
+import static io.improbable.keanu.algorithms.variational.FitnessFunction.logOfTotalProbability;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.FitnessFunction.logOfTotalProbability;
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.analysis.MultivariateVectorFunction;
+
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 
 public class FitnessFunctionWithGradient {
 
-    private final List<Vertex> probabilisticVertices;
+    private final List<Probabilistic<?>> probabilisticVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<Probabilistic<?>> probabilisticVertices,
                                        List<? extends Vertex<DoubleTensor>> latentVertices,
                                        BiConsumer<double[], double[]> onGradientCalculation,
                                        BiConsumer<double[], Double> onFitnessCalculation) {
@@ -32,7 +34,7 @@ public class FitnessFunctionWithGradient {
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<Probabilistic<?>> probabilisticVertices,
                                        List<? extends Vertex<DoubleTensor>> latentVertices) {
         this(probabilisticVertices, latentVertices, null, null);
     }

@@ -1,9 +1,15 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.improbable.keanu.vertices.Vertex;
 
 public class TopologicalSort {
 
@@ -41,7 +47,8 @@ public class TopologicalSort {
 
         dependencies.computeIfAbsent(aVertex, v -> new HashSet<>());
 
-        aVertex.getParents().forEach(parent -> {
+        aVertex.getParents().forEach(p -> {
+            Vertex parent = (Vertex) p;
 
             if (!dependencies.containsKey(parent)) {
                 insertParentDependencies(parent, dependencies, verticesToCount);

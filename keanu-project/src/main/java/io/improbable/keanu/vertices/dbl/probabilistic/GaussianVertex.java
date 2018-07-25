@@ -1,32 +1,22 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.SIGMA;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
 import java.util.Map;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.continuous.DistributionOfType;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import java.util.Map;
+public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
 
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class GaussianVertex extends ProbabilisticDouble {
-
-    private final DoubleVertex mu;
-    private final DoubleVertex sigma;
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -37,66 +27,22 @@ public class GaussianVertex extends ProbabilisticDouble {
      * @param mu          the mu of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
-    public GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
-
-        this.mu = mu;
-        this.sigma = sigma;
-        setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(tensorShape));
+    // package private
+    GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+        super(tensorShape, DistributionOfType::gaussian, mu, sigma);
     }
 
-    public GaussianVertex(DoubleVertex mu, DoubleVertex sigma) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
+    public Vertex<?> getMu() {
+        return getParents().get(0);
     }
 
-    public GaussianVertex(DoubleVertex mu, double sigma) {
-        this(mu, new ConstantDoubleVertex(sigma));
-    }
-
-    public GaussianVertex(double mu, DoubleVertex sigma) {
-        this(new ConstantDoubleVertex(mu), sigma);
-    }
-
-    public GaussianVertex(double mu, double sigma) {
-        this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
-    }
-
-    public GaussianVertex(int[] tensorShape, DoubleVertex mu, double sigma) {
-        this(tensorShape, mu, new ConstantDoubleVertex(sigma));
-    }
-
-    public GaussianVertex(int[] tensorShape, double mu, DoubleVertex sigma) {
-        this(tensorShape, new ConstantDoubleVertex(mu), sigma);
-    }
-
-    public GaussianVertex(int[] tensorShape, double mu, double sigma) {
-        this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
-    }
-
-    public DoubleVertex getMu() {
-        return mu;
-    }
-
-    public DoubleVertex getSigma() {
-        return sigma;
+    public Vertex<?> getSigma() {
+        return getParents().get(1);
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
-
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor sigmaValues = sigma.getValue();
-
-        DoubleTensor logPdfs = Gaussian.withParameters(muValues, sigmaValues).logProb(value);
-
-        return logPdfs.sum();
-    }
-
-    @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+        ParameterMap<DoubleTensor> dlnP = distribution().dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(SIGMA).getValue(), dlnP.get(X).getValue());
     }
 
@@ -104,8 +50,9 @@ public class GaussianVertex extends ProbabilisticDouble {
                                                              DoubleTensor dLogPdsigma,
                                                              DoubleTensor dLogPdx) {
 
-        PartialDerivatives dLogPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdmu);
-        PartialDerivatives dLogPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdsigma);
+        Differentiator differentiator = new Differentiator();
+        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromSigma = differentiator.calculateDual((Differentiable) getSigma()).getPartialDerivatives().multiplyBy(dLogPdsigma);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromMu.add(dLogPdInputsFromSigma);
 
         if (!this.isObserved()) {
@@ -119,9 +66,5 @@ public class GaussianVertex extends ProbabilisticDouble {
         return summed.asMap();
     }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
-    }
 
 }

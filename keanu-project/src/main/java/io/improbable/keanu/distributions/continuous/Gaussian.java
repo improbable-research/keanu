@@ -1,11 +1,11 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.SIGMA;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -16,11 +16,8 @@ public class Gaussian implements ContinuousDistribution {
     private final DoubleTensor mu;
     private final DoubleTensor sigma;
 
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
-        return new Gaussian(mu, sigma);
-    }
-
-    private Gaussian(DoubleTensor mu, DoubleTensor sigma) {
+    // package private
+    Gaussian(DoubleTensor mu, DoubleTensor sigma) {
         this.mu = mu;
         this.sigma = sigma;
     }
@@ -40,7 +37,7 @@ public class Gaussian implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor xMinusMu = x.minus(mu);
 
@@ -50,7 +47,7 @@ public class Gaussian implements ContinuousDistribution {
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(MU, dLogPdmu)
             .put(SIGMA, dLogPdsigma)
             .put(X, dLogPdx);

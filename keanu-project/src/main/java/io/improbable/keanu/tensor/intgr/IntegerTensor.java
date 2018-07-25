@@ -1,14 +1,13 @@
 package io.improbable.keanu.tensor.intgr;
 
+import java.util.Arrays;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<IntegerTensor> {
+public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
     IntegerTensor ZERO_SCALAR = scalar(0);
 
@@ -68,14 +67,6 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         return new ScalarIntegerTensor(shape);
     }
 
-    @Override
-    IntegerTensor reshape(int... newShape);
-
-    IntegerTensor diag();
-
-    IntegerTensor transpose();
-
-    IntegerTensor sum(int... overDimensions);
 
     //New tensor Ops and transforms
 
@@ -87,39 +78,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor div(int value);
 
-    IntegerTensor pow(IntegerTensor exponent);
-
     IntegerTensor pow(int exponent);
-
-    IntegerTensor minus(IntegerTensor that);
-
-    IntegerTensor plus(IntegerTensor that);
-
-    IntegerTensor times(IntegerTensor that);
-
-    IntegerTensor matrixMultiply(IntegerTensor value);
-
-    IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
-
-    IntegerTensor div(IntegerTensor that);
-
-    IntegerTensor unaryMinus();
-
-    IntegerTensor abs();
-
-    IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis);
-
-    IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanThis);
-
-    IntegerTensor getLessThanMask(IntegerTensor lessThanThis);
-
-    IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanThis);
-
-    IntegerTensor setWithMaskInPlace(IntegerTensor mask, int value);
-
-    IntegerTensor setWithMask(IntegerTensor mask, int value);
-
-    IntegerTensor apply(Function<Integer, Integer> function);
 
     // In Place
 
@@ -131,39 +90,16 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor divInPlace(int value);
 
-    IntegerTensor powInPlace(IntegerTensor exponent);
-
     IntegerTensor powInPlace(int exponent);
 
-    IntegerTensor minusInPlace(IntegerTensor that);
-
-    IntegerTensor plusInPlace(IntegerTensor that);
-
-    IntegerTensor timesInPlace(IntegerTensor that);
-
-    IntegerTensor divInPlace(IntegerTensor that);
-
-    IntegerTensor unaryMinusInPlace();
-
-    IntegerTensor absInPlace();
-
-    IntegerTensor applyInPlace(Function<Integer, Integer> function);
-
     // Comparisons
+
     BooleanTensor lessThan(int value);
 
     BooleanTensor lessThanOrEqual(int value);
 
-    BooleanTensor lessThan(IntegerTensor value);
-
-    BooleanTensor lessThanOrEqual(IntegerTensor value);
-
     BooleanTensor greaterThan(int value);
 
     BooleanTensor greaterThanOrEqual(int value);
-
-    BooleanTensor greaterThan(IntegerTensor value);
-
-    BooleanTensor greaterThanOrEqual(IntegerTensor value);
 
 }

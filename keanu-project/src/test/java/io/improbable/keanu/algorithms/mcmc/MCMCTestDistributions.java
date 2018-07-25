@@ -1,21 +1,29 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.OptionalDouble;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.distributions.dual.ParameterName;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class MCMCTestDistributions {
 
     public static BayesianNetwork createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
-        GaussianVertex A = new GaussianVertex(new int[]{2, 1}, mu, sigma);
+        GaussianVertex A = new DistributionVertexBuilder()
+            .shaped(new int[]{2, 1})
+            .withInput(ParameterName.MU, mu)
+            .withInput(ParameterName.SIGMA, sigma)
+            .gaussian();
         A.setAndCascade(A.sample(random));
         return new BayesianNetwork(A.getConnectedGraph());
     }
@@ -46,11 +54,11 @@ public class MCMCTestDistributions {
 
     public static BayesianNetwork createSumOfGaussianDistribution(double mu, double sigma, double observedSum) {
 
-        GaussianVertex A = new GaussianVertex(mu, sigma);
-        GaussianVertex B = new GaussianVertex(mu, sigma);
+        GaussianVertex A = VertexOfType.gaussian(mu, sigma);
+        GaussianVertex B = VertexOfType.gaussian(mu, sigma);
 
-        GaussianVertex C = new GaussianVertex(A.plus(B), 1.0);
-        C.observe(observedSum);
+        GaussianVertex C = VertexOfType.gaussian(A.plus(B), ConstantVertex.of(1.0));
+        C.observe(DoubleTensor.scalar(observedSum));
 
         A.setValue(mu);
         B.setAndCascade(mu);
@@ -72,11 +80,11 @@ public class MCMCTestDistributions {
     }
 
     public static BayesianNetwork create2DDonutDistribution() {
-        GaussianVertex A = new GaussianVertex(0, 1);
-        GaussianVertex B = new GaussianVertex(0, 1);
+        GaussianVertex A = VertexOfType.gaussian(0., 1.);
+        GaussianVertex B = VertexOfType.gaussian(0., 1.);
 
-        GaussianVertex D = new GaussianVertex((A.multiply(A)).plus(B.multiply(B)), 0.03);
-        D.observe(0.5);
+        GaussianVertex D = VertexOfType.gaussian((A.multiply(A)).plus(B.multiply(B)), ConstantVertex.of(0.03));
+        D.observe(DoubleTensor.scalar(0.5));
 
         A.setValue(Math.sqrt(0.5));
         B.setAndCascade(0.0);

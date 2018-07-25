@@ -1,10 +1,10 @@
 package io.improbable.keanu.tensor.dbl;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class Nd4jDoubleTensorTest {
 
@@ -70,7 +70,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canSetWhereGreaterThanAMatrix() {
         DoubleTensor mask = matrixA.getGreaterThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
-        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2);
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
     }
@@ -78,7 +78,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canSetWhereGreaterThanAScalar() {
         DoubleTensor mask = matrixA.getGreaterThanMask(Nd4jDoubleTensor.scalar(2.0));
-        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2);
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
     }
@@ -86,7 +86,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canSetWhereLessThanOrEqualAMatrix() {
         DoubleTensor mask = matrixA.getLessThanOrEqualToMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
-        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2);
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
     }
@@ -94,7 +94,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canSetWhereLessThanOrEqualAScalar() {
         DoubleTensor mask = matrixA.getLessThanOrEqualToMask(Nd4jDoubleTensor.scalar(2.0));
-        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2);
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
     }
@@ -102,7 +102,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canSetWhereLessThanAMatrix() {
         DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
-        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2);
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
     }
@@ -110,7 +110,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void canSetWhereLessThanAScalar() {
         DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.scalar(2.0));
-        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2);
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
     }
@@ -177,6 +177,14 @@ public class Nd4jDoubleTensorTest {
 
         assertTimesOperationEquals(rank5, matrix, expected);
         assertTimesInPlaceOperationEquals(rank5, matrix, expected);
+    }
+
+    @Test
+    public void doesClampTensor() {
+        DoubleTensor A = DoubleTensor.create(new double[]{0.25, 3, -4, -5});
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
+        DoubleTensor expected = DoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5});
+        assertEquals(expected, clampedA);
     }
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {

@@ -1,26 +1,39 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
-public class DoubleReduceVertex extends NonProbabilisticDouble {
+import io.improbable.keanu.tensor.TensorShapeValidation;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Observable;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+
+public class DoubleReduceVertex extends DoubleVertex implements Differentiable {
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f;
     private final Supplier<DualNumber> dualNumberSupplier;
 
     public DoubleReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleReduceVertex) v).applyReduce(Vertex::getValue)),
+            Observable.observableTypeFor(DoubleReduceVertex.class)
+        );
         if (inputs.size() < 2) {
-            throw new IllegalArgumentException("DoubleReduceVertex should have at least two input vertices, called with " + inputs.size());
+            throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }
 
         this.inputs = new ArrayList<>(inputs);
@@ -67,11 +80,6 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
         return applyReduce(vertex -> vertex.sample(random));
     }
 
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return applyReduce(Vertex::getValue);
-    }
-
     private DoubleTensor applyReduce(Function<Vertex<DoubleTensor>, DoubleTensor> mapper) {
         Iterator<? extends Vertex<DoubleTensor>> inputIterator = inputs.iterator();
 
@@ -84,7 +92,7 @@ public class DoubleReduceVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.get();
         }

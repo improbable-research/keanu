@@ -2,30 +2,30 @@ package io.improbable.keanu.dual;
 
 import static org.junit.Assert.assertTrue;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
 
 import java.util.NoSuchElementException;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.distributions.dual.Diff;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterValue;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class DiffTest {
-    Diffs diffs;
+    ParameterMap<DoubleTensor> diffs;
 
     @Before
     public void initialiseDuals() {
-        diffs = new Diffs();
+        diffs = new ParameterMap<DoubleTensor>();
     }
 
     @Test
     public void youCanGetADualByName() {
         DoubleTensor muDualValue = DoubleTensor.scalar(0.1);
         diffs.put(MU, muDualValue);
-        Diff mu = diffs.get(MU);
+        ParameterValue<DoubleTensor> mu = diffs.get(MU);
         assertTrue(mu.getName().equals(MU.getName()));
         assertTrue(mu.getValue() == muDualValue);
     }

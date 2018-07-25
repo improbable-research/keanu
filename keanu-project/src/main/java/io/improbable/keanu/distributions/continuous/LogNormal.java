@@ -1,12 +1,12 @@
 package io.improbable.keanu.distributions.continuous;
 
 import static io.improbable.keanu.distributions.continuous.Gaussian.LN_SQRT_2PI;
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.SIGMA;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -20,18 +20,15 @@ public class LogNormal implements ContinuousDistribution {
      * @param sigma  square root of variance (greater than 0)
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
-        return new LogNormal(mu, sigma);
-    }
-
-    private LogNormal(DoubleTensor mu, DoubleTensor sigma) {
+    // package private
+    LogNormal(DoubleTensor mu, DoubleTensor sigma) {
         this.mu = mu;
         this.sigma = sigma;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return Gaussian.withParameters(mu, sigma).sample(shape, random).expInPlace();
+        return DistributionOfType.gaussian(mu, sigma).sample(shape, random).expInPlace();
     }
 
     @Override
@@ -43,7 +40,7 @@ public class LogNormal implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor variance = sigma.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(mu);
 
@@ -53,7 +50,7 @@ public class LogNormal implements ContinuousDistribution {
             .divInPlace(variance.timesInPlace(sigma))
             .minusInPlace(sigma.reciprocal());
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(MU, dLogPdmu)
             .put(SIGMA, dLogPdsigma)
             .put(X, dLogPdx);

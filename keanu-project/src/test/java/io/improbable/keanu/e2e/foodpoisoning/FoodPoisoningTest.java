@@ -1,24 +1,27 @@
 package io.improbable.keanu.e2e.foodpoisoning;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+import java.util.function.Consumer;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.function.Consumer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 public class FoodPoisoningTest {
 
@@ -83,7 +86,7 @@ public class FoodPoisoningTest {
             Flip didEatLamb = plate.add("didEatLamb", new Flip(0.4));
             Flip didEatPoo = plate.add("didEatPoo", new Flip(0.4));
 
-            BoolVertex ingestedPathogen =
+            BooleanVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
                     didEatLamb.and(infectedLamb).or(
                         didEatPoo.and(infectedToilet)
@@ -103,17 +106,17 @@ public class FoodPoisoningTest {
             .withFactory(personMaker)
             .build();
 
-        infectedOysters.observe(oystersAreInfected);
-        infectedLamb.observe(lambIsInfected);
-        infectedToilet.observe(toiletIsInfected);
+        infectedOysters.observe(BooleanTensor.scalar(oystersAreInfected));
+        infectedLamb.observe(BooleanTensor.scalar(lambIsInfected));
+        infectedToilet.observe(BooleanTensor.scalar(toiletIsInfected));
 
         sample(10000);
 
         personPlates.asList().forEach(plate -> {
-            plate.get("didEatOysters").observeOwnValue();
-            plate.get("didEatLamb").observeOwnValue();
-            plate.get("didEatPoo").observeOwnValue();
-            plate.get("isIll").observeOwnValue();
+            for (String name : new String[] {"didEatOysters", "didEatLamb", "didEatPoo", "isIll"}) {
+                Vertex<Object> vertex = plate.get(name);
+                vertex.observe(vertex.getValue());
+            }
         });
 
         infectedOysters.unobserve();

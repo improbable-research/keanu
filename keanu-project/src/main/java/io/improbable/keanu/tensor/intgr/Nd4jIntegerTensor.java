@@ -1,23 +1,27 @@
 package io.improbable.keanu.tensor.intgr;
 
+import static java.util.Arrays.copyOf;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.conditions.Conditions;
+import org.nd4j.linalg.ops.transforms.Transforms;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.CombinatoricsUtils;
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.conditions.Conditions;
-import org.nd4j.linalg.ops.transforms.Transforms;
-
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static java.util.Arrays.copyOf;
 
 public class Nd4jIntegerTensor implements IntegerTensor {
 
@@ -29,7 +33,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(values, shape);
     }
 
-    public static Nd4jIntegerTensor create(double value, int[] shape) {
+    public static Nd4jIntegerTensor create(int value, int[] shape) {
         return new Nd4jIntegerTensor(Nd4j.valueArrayOf(shape, value));
     }
 
@@ -159,7 +163,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMask(IntegerTensor mask, int value) {
+    public IntegerTensor setWithMask(IntegerTensor mask, Integer value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -256,7 +260,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMaskInPlace(IntegerTensor mask, int value) {
+    public IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value) {
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
@@ -279,6 +283,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor apply(Function<Integer, Integer> function) {
         return duplicate().applyInPlace(function);
+    }
+
+    @Override
+    public IntegerTensor concat(int dimension, IntegerTensor... those) {
+        INDArray dup = tensor.dup();
+        INDArray[] toConcat = new INDArray[those.length + 1];
+        toConcat[0] = dup;
+        for (int i = 1; i <= those.length; i++) {
+            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+        }
+        INDArray concat = Nd4j.concat(dimension, toConcat);
+        return new Nd4jIntegerTensor(concat);
     }
 
     @Override
@@ -571,7 +587,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     private INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isScalar()) {
-            Nd4j.scalar(that.scalar().doubleValue()).reshape(that.getShape());
+            return Nd4j.scalar(that.scalar().doubleValue()).reshape(that.getShape());
         }
         return ((Nd4jIntegerTensor) that).tensor;
     }

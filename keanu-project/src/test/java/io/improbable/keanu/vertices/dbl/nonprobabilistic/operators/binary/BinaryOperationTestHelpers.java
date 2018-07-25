@@ -1,16 +1,20 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.TensorShape;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+import java.util.function.BiFunction;
+
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-
-import java.util.function.BiFunction;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class BinaryOperationTestHelpers {
 
@@ -19,9 +23,9 @@ public class BinaryOperationTestHelpers {
                                                        double expected,
                                                        BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(0.0, 1.0);
+        UniformVertex A = VertexOfType.uniform(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
-        UniformVertex B = new UniformVertex(0.0, 1.0);
+        UniformVertex B = VertexOfType.uniform(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
 
         assertEquals(expected, op.apply(A, B).getValue().scalar(), 1e-5);
@@ -33,12 +37,12 @@ public class BinaryOperationTestHelpers {
                                                         double expectedGradientWrtB,
                                                         BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(0.0, 1.0);
+        UniformVertex A = VertexOfType.uniform(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
-        UniformVertex B = new UniformVertex(0.0, 1.0);
+        UniformVertex B = VertexOfType.uniform(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
 
-        DualNumber resultDualNumber = op.apply(A, B).getDualNumber();
+        DualNumber resultDualNumber = new Differentiator().calculateDual((Differentiable)(op.apply(A, B)));
         assertEquals(expectedGradientWrtA, resultDualNumber.getPartialDerivatives().withRespectTo(A).scalar(), 1e-5);
         assertEquals(expectedGradientWrtB, resultDualNumber.getPartialDerivatives().withRespectTo(B).scalar(), 1e-5);
     }
@@ -48,9 +52,17 @@ public class BinaryOperationTestHelpers {
                                                           double[] expected,
                                                           BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
+        UniformVertex A = new DistributionVertexBuilder()
+            .shaped(2, 2)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        UniformVertex B = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
+        UniformVertex B = new DistributionVertexBuilder()
+            .shaped(2, 2)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
 
         DoubleTensor result = op.apply(A, B).getValue();
@@ -69,12 +81,20 @@ public class BinaryOperationTestHelpers {
                                                                             DoubleTensor expectedGradientWrtB,
                                                                             BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
+        UniformVertex A = new DistributionVertexBuilder()
+            .shaped(aValues.getShape())
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         A.setAndCascade(aValues);
-        UniformVertex B = new UniformVertex(bValues.getShape(), 0.0, 1.0);
+        UniformVertex B = new DistributionVertexBuilder()
+            .shaped(bValues.getShape())
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         B.setAndCascade(bValues);
 
-        DualNumber result = op.apply(A, B).getDualNumber();
+        DualNumber result = new Differentiator().calculateDual((Differentiable)op.apply(A, B));
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);
@@ -90,12 +110,16 @@ public class BinaryOperationTestHelpers {
                                                                DoubleTensor expectedGradientWrtA,
                                                                DoubleTensor expectedGradientWrtB,
                                                                BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
-        UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
+        UniformVertex A = new DistributionVertexBuilder()
+            .shaped(aValues.getShape())
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 1.)
+            .uniform();
         A.setAndCascade(aValues);
-        UniformVertex B = new UniformVertex(0.0, 1.0);
+        UniformVertex B = VertexOfType.uniform(0.0, 1.0);
         B.setAndCascade(DoubleTensor.scalar(bValue));
 
-        DualNumber result = op.apply(A, B).getDualNumber();
+        DualNumber result = new Differentiator().calculateDual((Differentiable)op.apply(A, B));
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);
