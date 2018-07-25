@@ -1,8 +1,17 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
+import java.util.ArrayDeque;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Deque;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Set;
 
-import java.util.*;
+import io.improbable.keanu.vertices.Vertex;
 
 /**
  * This class enables efficient propagation of vertex updates.
@@ -61,7 +70,7 @@ public class VertexValuePropagation {
             Vertex<?> head = stack.peek();
             Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
 
-            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+            if (((Vertex)head).isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
                 Vertex<?> top = stack.pop();
                 top.updateValue();
@@ -78,7 +87,7 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, List<? extends Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {
@@ -100,7 +109,7 @@ public class VertexValuePropagation {
             Vertex<?> head = stack.peek();
             Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
 
-            if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
+            if (((Vertex)head).isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
                 Vertex<?> top = stack.pop();
                 top.updateValue();
@@ -116,7 +125,7 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(List<? extends Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!next.hasValue()) {

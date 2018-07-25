@@ -1,13 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.B;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.A;
+import static io.improbable.keanu.distributions.dual.ParameterName.B;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import org.apache.commons.math3.special.Gamma;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -18,11 +18,8 @@ public class Beta implements ContinuousDistribution {
     private final DoubleTensor xMin;
     private final DoubleTensor xMax;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
-        return new Beta(alpha, beta, xMin, xMax);
-    }
-
-    private Beta(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
+    // package private
+    Beta(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
         this.alpha = alpha;
         this.beta = beta;
         this.xMin = xMin;
@@ -61,7 +58,7 @@ public class Beta implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).applyInPlace(Gamma::digamma);
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
@@ -70,7 +67,7 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
         final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(A, dLogPda)
             .put(B, dLogPdb)
             .put(X, dLogPdx);

@@ -1,20 +1,21 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
+import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class MultiplexerVertexTest {
     private final Logger log = LoggerFactory.getLogger(MultiplexerVertexTest.class);
@@ -28,7 +29,7 @@ public class MultiplexerVertexTest {
 
         IntegerVertex selectorOrigin = ConstantVertex.of(0);
         IntegerVertex selectorBound = ConstantVertex.of(2);
-        IntegerVertex selectorControlVertex = new UniformIntVertex(selectorOrigin, selectorBound);
+        IntegerVertex selectorControlVertex = VertexOfType.uniform(selectorOrigin, selectorBound);
         Map<TestEnum, Double> expected = new HashMap<>();
         expected.put(TestEnum.A, 0.25);
         expected.put(TestEnum.B, 0.25);

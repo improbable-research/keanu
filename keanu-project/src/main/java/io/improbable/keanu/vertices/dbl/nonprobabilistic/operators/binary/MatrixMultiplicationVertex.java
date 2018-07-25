@@ -1,14 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
 import java.util.Arrays;
-import java.util.Map;
 
-public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+
+public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements Differentiable {
 
     /**
      * Matrix multiplies one vertex by another. C = AB
@@ -17,19 +14,8 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
      * @param right vertex B
      */
     public MatrixMultiplicationVertex(DoubleVertex left, DoubleVertex right) {
-        super(getResultingShape(left.getShape(), right.getShape()), left, right);
-    }
+        super(getResultingShape(left.getShape(), right.getShape()), left, right, (l,r) -> l.matrixMultiply(r), (a_,b_) -> a_.matrixMultiplyBy(b_));
 
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber leftDual = dualNumbers.get(left);
-        DualNumber rightDual = dualNumbers.get(right);
-        return leftDual.matrixMultiplyBy(rightDual);
-    }
-
-    @Override
-    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
-        return left.matrixMultiply(right);
     }
 
     private static int[] getResultingShape(int[] left, int[] right) {

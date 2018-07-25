@@ -1,21 +1,23 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.binary.BinaryOpLambda;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class BinaryOpVertexTest {
     private final Logger log = LoggerFactory.getLogger(BinaryOpVertexTest.class);
@@ -31,7 +33,7 @@ public class BinaryOpVertexTest {
     public void canSampleFromTwoParents() {
         Flip flip = new Flip(0.5);
 
-        GaussianVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
+        GaussianVertex gaussianVertex = VertexOfType.gaussian(0.0, 1.0);
         BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom = new BinaryOpLambda<>(
             flip, gaussianVertex,
             (BooleanTensor f, DoubleTensor g) ->

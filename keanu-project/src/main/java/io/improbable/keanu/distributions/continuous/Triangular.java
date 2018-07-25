@@ -1,7 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -11,11 +11,8 @@ public class Triangular implements ContinuousDistribution {
     private final DoubleTensor xMax;
     private final DoubleTensor c;
 
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
-        return new Triangular(xMin, xMax, c);
-    }
-
-    private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+    // package private
+    Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
         this.xMin = xMin;
         this.xMax = xMax;
         this.c = c;
@@ -56,7 +53,7 @@ public class Triangular implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
 

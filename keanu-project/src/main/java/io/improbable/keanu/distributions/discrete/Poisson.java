@@ -20,11 +20,8 @@ public class Poisson implements DiscreteDistribution {
 
     private final DoubleTensor mu;
 
-    public static DiscreteDistribution withParameters(DoubleTensor mu) {
-        return new Poisson(mu);
-    }
-
-    private Poisson(DoubleTensor mu) {
+    // TODO: package private
+    public Poisson(DoubleTensor mu) {
         this.mu = mu;
     }
 

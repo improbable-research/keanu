@@ -1,19 +1,22 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.stream.Collectors;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class SimulatedAnnealingTest {
 
@@ -26,13 +29,13 @@ public class SimulatedAnnealingTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        A = new GaussianVertex(5, 1);
+        A = VertexOfType.gaussian(5., 1.);
         A.setValue(5.0);
-        B = new GaussianVertex(2, 1);
+        B = VertexOfType.gaussian(2., 1.);
         B.setValue(2.0);
         C = A.plus(B);
-        D = new GaussianVertex(C, 1);
-        D.observe(7.5);
+        D = VertexOfType.gaussian(C, ConstantVertex.of(1.0));
+        D.observe(DoubleTensor.scalar(7.5));
     }
 
     @Test

@@ -1,41 +1,72 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
+import java.util.Map;
+import java.util.function.BinaryOperator;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
+public class DoubleBinaryOpVertex extends DoubleVertex {
 
-    protected final DoubleVertex left;
-    protected final DoubleVertex right;
+    private final DoubleVertex left;
+    private final DoubleVertex right;
+    private final BinaryOperator<DoubleTensor> op;
+    private final BinaryOperator<DualNumber> dualOp;
 
     /**
-     * A vertex that performs a user defined operation on two vertices
-     *
-     * @param shape the shape of the resulting vertex
-     * @param left a vertex
-     * @param right a vertex
+     * A vertex that performs left user defined operation on two input vertices
+     * @param a first input vertex
+     * @param b second input vertex
+     * @param op operation used to sample
+     * @param dualOp operation used to calculate Dual
      */
-    public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
-        this.left = left;
-        this.right = right;
-        setParents(left, right);
+    public DoubleBinaryOpVertex(
+        DoubleVertex a, DoubleVertex b,
+        BinaryOperator<DoubleTensor> op, BinaryOperator<DualNumber> dualOp) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()),
+            a, b, op, dualOp);
+    }
+
+    /**
+     * A vertex that performs left user defined operation on two input vertices
+     * @param shape the shape of the tensor
+     * @param a first input vertex
+     * @param b second input vertex
+     * @param op operation used to sample
+     * @param dualOp operation used to calculate Dual
+     */
+    public DoubleBinaryOpVertex(
+        int[] shape,
+        DoubleVertex a, DoubleVertex b,
+        BinaryOperator<DoubleTensor> op, BinaryOperator<DualNumber> dualOp) {
+        super(
+            new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue(), b.getValue())),
+            Observable.observableTypeFor(DoubleBinaryOpVertex.class)
+        );
+        this.left = a;
+        this.right = b;
+        this.op = op;
+        this.dualOp = dualOp;
+        setParents(a, b);
         setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return op(left.sample(random), right.sample(random));
+        return op.apply(left.sample(random), right.sample(random));
     }
 
     @Override
-    public DoubleTensor getDerivedValue() {
-        return op(left.getValue(), right.getValue());
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+        return dualOp.apply(dualNumbers.get(left), dualNumbers.get(right));
     }
-
-    protected abstract DoubleTensor op(DoubleTensor left, DoubleTensor right);
 
     public DoubleVertex getLeft(){
         return left;
@@ -44,5 +75,4 @@ public abstract class DoubleBinaryOpVertex extends NonProbabilisticDouble {
     public DoubleVertex getRight(){
         return right;
     }
-
 }

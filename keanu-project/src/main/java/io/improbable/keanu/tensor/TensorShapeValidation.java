@@ -1,14 +1,13 @@
 package io.improbable.keanu.tensor;
 
-import org.apache.commons.lang3.ArrayUtils;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
 
 public class TensorShapeValidation {
 
@@ -21,26 +20,28 @@ public class TensorShapeValidation {
      *
      * @param proposalShape the tensor shape being validated
      * @param shapes        the tensors being validated against
-     * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the non-scalar shape does
+     * @throws TensorShapeException if there is more than one non-scalar shape OR if the non-scalar shape does
      *                                  not match the proposal shape.
      */
     public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, int[]... shapes) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(proposalShape, toTensorShapes(shapes));
+    }
 
+    public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, List<TensorShape> shapes) {
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
-
         if (!nonScalarShapes.isEmpty()) {
 
             boolean moreThanOneNonScalarShape = nonScalarShapes.size() > 1;
 
             if (moreThanOneNonScalarShape) {
-                throw new IllegalArgumentException("More than a single non-scalar shape");
+                throw new TensorShapeException("More than a single non-scalar shape");
             }
 
             int[] nonScalarShape = nonScalarShapes.iterator().next().getShape();
             boolean nonScalarShapeDoesNotMatchProposal = !Arrays.equals(nonScalarShape, proposalShape);
 
             if (nonScalarShapeDoesNotMatchProposal) {
-                throw new IllegalArgumentException(
+                throw new TensorShapeException(
                     "Proposed shape " + Arrays.toString(proposalShape) + " does not match other non scalar shapes"
                 );
             }
@@ -52,23 +53,32 @@ public class TensorShapeValidation {
      *
      * @param shapes the tensors for shape checking
      * @return either a scalar shape OR the single non-scalar shape.
-     * @throws IllegalArgumentException if there is more than one non-scalar shape
+     * @throws TensorShapeException if there is more than one non-scalar shape
      */
     public static int[] checkHasSingleNonScalarShapeOrAllScalar(int[]... shapes) {
-        Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
+        Set<TensorShape> nonScalarShapes = getNonScalarShapes(toTensorShapes(shapes));
 
         if (nonScalarShapes.isEmpty()) {
             return Tensor.SCALAR_SHAPE;
         } else if (nonScalarShapes.size() == 1) {
             return nonScalarShapes.iterator().next().getShape();
         } else {
-            throw new IllegalArgumentException("Shapes must match or be scalar");
+            throw new TensorShapeException(
+                String.format(
+                    "Shapes must match or be scalar: %s",
+                    nonScalarShapes
+                    ));
         }
     }
 
-    private static Set<TensorShape> getNonScalarShapes(int[]... shapes) {
+    private static List<TensorShape> toTensorShapes(int[][] shapes) {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
+            .collect(toList());
+    }
+
+    private static Set<TensorShape> getNonScalarShapes(List<TensorShape> shapes) {
+        return shapes.stream()
             .filter(shape -> !shape.isScalar())
             .collect(toSet());
     }
@@ -87,7 +97,7 @@ public class TensorShapeValidation {
             .collect(toSet());
 
         if (uniqueShapes.size() != 1) {
-            throw new IllegalArgumentException("Shapes must match");
+            throw new TensorShapeException("Shapes must match");
         }
 
         return uniqueShapes.iterator().next().getShape();

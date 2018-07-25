@@ -1,15 +1,17 @@
 package io.improbable.docs;
 
-import io.improbable.keanu.plating.PlateBuilder;
-import io.improbable.keanu.plating.Plates;
-import io.improbable.keanu.util.csv.CsvReader;
-import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-
 import java.util.List;
 import java.util.stream.Collectors;
+
+import io.improbable.keanu.plating.PlateBuilder;
+import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.util.csv.CsvReader;
+import io.improbable.keanu.util.csv.ReadCsv;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class PlatesExample {
 
@@ -33,8 +35,8 @@ public class PlatesExample {
             .map(line -> new MyData(line.get(0), line.get(1)))
             .collect(Collectors.toList());
 
-        DoubleVertex m = new GaussianVertex(0, 1);
-        DoubleVertex b = new GaussianVertex(0, 1);
+        DoubleVertex m = VertexOfType.gaussian(0., 1.);
+        DoubleVertex b = VertexOfType.gaussian(0., 1.);
 
         //Build plates from each line in the csv
         Plates plates = new PlateBuilder<MyData>()
@@ -44,8 +46,8 @@ public class PlatesExample {
                 ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x);
                 DoubleVertex y = m.multiply(x).plus(b);
 
-                DoubleVertex yObserved = new GaussianVertex(y, 1);
-                yObserved.observe(csvMyData.y);
+                DoubleVertex yObserved = VertexOfType.gaussian(y, ConstantVertex.of(1.));
+                yObserved.observe(DoubleTensor.scalar(csvMyData.y));
 
                 // this labels the x and y vertex for later use
                 plate.add("x", x);

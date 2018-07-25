@@ -1,5 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.math3.distribution.LogNormalDistribution;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.distributions.gradient.LogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -7,17 +20,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.distribution.LogNormalDistribution;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class LogNormalVertexTest {
     private static final double DELTA = 0.0001;
@@ -33,7 +35,7 @@ public class LogNormalVertexTest {
     public void matchesKnownLogDensityOfScalar() {
 
         LogNormalDistribution distribution = new LogNormalDistribution(0, 1);
-        LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(0, 1);
+        LogNormalVertex tensorLogNormalVertex = VertexOfType.logNormal(0., 1.);
         double expectedDensity = distribution.logDensity(0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorLogNormalVertex, 0.5, expectedDensity);
     }
@@ -43,7 +45,7 @@ public class LogNormalVertexTest {
 
         LogNormalDistribution distribution = new LogNormalDistribution(0, 1);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75);
-        LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(0, 1);
+        LogNormalVertex tensorLogNormalVertex = VertexOfType.logNormal(0., 1.);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorLogNormalVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
 
@@ -52,14 +54,14 @@ public class LogNormalVertexTest {
 
         LogNormal.Diff logNormalLogDiff = LogNormal.dlnPdf(0.0, 1.0, 0.5);
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex sigmaTensor = VertexOfType.uniform(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(muTensor, sigmaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5);
+        LogNormalVertex tensorLogNormalVertex = VertexOfType.logNormal(muTensor, sigmaTensor);
+        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogProb(DoubleTensor.scalar(0.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
@@ -73,22 +75,20 @@ public class LogNormalVertexTest {
 
         double[] vector = new double[]{0.25, -0.75, 0.1, -2, 1.3};
 
-        UniformVertex muTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex muTensor = VertexOfType.uniform(0.0, 1.0);
         muTensor.setValue(0.0);
 
-        UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
+        UniformVertex sigmaTensor = VertexOfType.uniform(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        Supplier<DoubleVertex> vertexSupplier = () -> new LogNormalVertex(muTensor, sigmaTensor);
-
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> VertexOfType.logNormal(muTensor, sigmaTensor));
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        UniformVertex mu = new UniformVertex(0.0, 1.0);
+        UniformVertex mu = VertexOfType.uniform(0.0, 1.0);
         mu.setAndCascade(0.5);
-        LogNormalVertex vertexUnderTest = new LogNormalVertex(mu, 3.0);
+        LogNormalVertex vertexUnderTest = VertexOfType.logNormal(mu, ConstantVertex.of(3.0));
         vertexUnderTest.setAndCascade(1.0);
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
         ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
@@ -96,8 +96,8 @@ public class LogNormalVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdmu() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
-        LogNormalVertex logNormal = new LogNormalVertex(uniformA, 3.0);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
+        LogNormalVertex logNormal = VertexOfType.logNormal(uniformA, ConstantVertex.of(3.0));
 
         DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = DoubleTensor.scalar(5.0);
@@ -117,8 +117,8 @@ public class LogNormalVertexTest {
 
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdsigma() {
-        UniformVertex uniformA = new UniformVertex(1.5, 3.0);
-        LogNormalVertex logNormal = new LogNormalVertex(3.0, uniformA);
+        UniformVertex uniformA = VertexOfType.uniform(1.5, 3.0);
+        LogNormalVertex logNormal = VertexOfType.logNormal(ConstantVertex.of(3.0), uniformA);
 
         DoubleTensor vertexStartValue = DoubleTensor.scalar(0.1);
         DoubleTensor vertexEndValue = DoubleTensor.scalar(1.0);
@@ -140,7 +140,11 @@ public class LogNormalVertexTest {
     public void logNormalSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        LogNormalVertex vertex = new LogNormalVertex(new int[]{sampleCount, 1}, 0.0, 2.0);
+        LogNormalVertex vertex = new DistributionVertexBuilder()
+            .shaped(sampleCount, 1)
+            .withInput(ParameterName.MU, 0.0)
+            .withInput(ParameterName.SIGMA, 2.0)
+            .logNormal();
 
         double from = 0.1;
         double to = 8;
@@ -160,16 +164,20 @@ public class LogNormalVertexTest {
         muSigma.add(ConstantVertex.of(trueSigma));
 
         List<DoubleVertex> latentMuSigma = new ArrayList<>();
-        UniformVertex latentMu = new UniformVertex(0.01, 10.0);
+        UniformVertex latentMu = VertexOfType.uniform(0.01, 10.0);
         latentMu.setAndCascade(DoubleTensor.scalar(9.9));
-        UniformVertex latentSigma = new UniformVertex(0.01, 10.0);
+        UniformVertex latentSigma = VertexOfType.uniform(0.01, 10.0);
         latentSigma.setAndCascade(DoubleTensor.scalar(0.1));
         latentMuSigma.add(latentMu);
         latentMuSigma.add(latentSigma);
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LogNormalVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new DistributionVertexBuilder()
+                .shaped(numSamples, 1)
+                .withInput(ParameterName.MU, hyperParams.get(0))
+                .withInput(ParameterName.SIGMA, hyperParams.get(1))
+                .logNormal(),
             muSigma,
             latentMuSigma,
             random

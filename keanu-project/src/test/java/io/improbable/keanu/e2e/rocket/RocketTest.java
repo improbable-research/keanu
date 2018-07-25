@@ -1,18 +1,20 @@
 package io.improbable.keanu.e2e.rocket;
 
-import io.improbable.keanu.algorithms.sampling.RejectionSampler;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.bool.BooleanVertexTest.priorProbabilityTrue;
+
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.algorithms.sampling.RejectionSampler;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class RocketTest {
     private final Logger log = LoggerFactory.getLogger(RocketTest.class);
@@ -38,7 +40,7 @@ public class RocketTest {
 
         Flip overHeatDueToOther = new Flip(0.001);
 
-        BoolVertex overHeated = overHeatDueToOther
+        BooleanVertex overHeated = overHeatDueToOther
             .or(overHeatDueToORing)
             .or(overHeatDueToResidualFuel)
             .or(overHeatDueToBoth);
@@ -48,11 +50,11 @@ public class RocketTest {
 
         Flip alarm1NotFalseNegative = new Flip(0.99);
         Flip alarm1FalsePositive = new Flip(0.3);
-        BoolVertex alarm1 = overHeated.and(alarm1NotFalseNegative).or(alarm1FalsePositive);
+        BooleanVertex alarm1 = overHeated.and(alarm1NotFalseNegative).or(alarm1FalsePositive);
 
         Flip alarm2NotFalseNegative = new Flip(0.95);
         Flip alarm2FalsePositive = new Flip(0.1);
-        BoolVertex alarm2 = overHeated.and(alarm2NotFalseNegative).or(alarm2FalsePositive);
+        BooleanVertex alarm2 = overHeated.and(alarm2NotFalseNegative).or(alarm2FalsePositive);
 
         double probOfAlarm1 = priorProbabilityTrue(alarm1, 10000, random);
         log.info("Prior Probability alarm1 sounds: " + probOfAlarm1);
@@ -60,8 +62,8 @@ public class RocketTest {
         double probOfAlarm2 = priorProbabilityTrue(alarm2, 10000, random);
         log.info("Prior Probability alarm2 sounds: " + probOfAlarm2);
 
-        alarm1.observe(true);
-        alarm2.observe(false);
+        alarm1  .observe(BooleanTensor.scalar(true));
+        alarm2.observe(BooleanTensor.scalar(false));
 
         BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
 

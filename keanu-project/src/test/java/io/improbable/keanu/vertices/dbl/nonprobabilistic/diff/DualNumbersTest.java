@@ -1,15 +1,17 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class DualNumbersTest {
 
@@ -18,8 +20,8 @@ public class DualNumbersTest {
 
     @Before
     public void setup() {
-        vA = new GaussianVertex(1.0, 0.0);
-        vB = new GaussianVertex(2.0, 0.0);
+        vA = VertexOfType.gaussian(1.0, 0.0);
+        vB = VertexOfType.gaussian(2.0, 0.0);
     }
 
     @Test
@@ -55,7 +57,7 @@ public class DualNumbersTest {
         DoubleVertex vC = vA.plus(vB);
         DoubleVertex vD = vA.divideBy(vB);
         DoubleVertex vE = vC.multiply(vD);
-        assertDiffIsCorrect(vA, vB, new LogVertex(vE));
+        assertDiffIsCorrect(vA, vB, vE.log());
     }
 
     private void assertDiffIsCorrect(DoubleVertex vA, DoubleVertex vB, DoubleVertex vC) {
@@ -67,7 +69,7 @@ public class DualNumbersTest {
         vB.setValue(B);
         vC.eval();
 
-        DualNumber cDual = vC.getDualNumber();
+        DualNumber cDual = new Differentiator().calculateDual((Differentiable)vC);
 
         DoubleTensor C = cDual.getValue();
         Map<Long, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();

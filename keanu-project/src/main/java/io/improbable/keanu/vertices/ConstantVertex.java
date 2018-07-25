@@ -5,7 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -15,20 +15,20 @@ public class ConstantVertex {
     private ConstantVertex() {
     }
 
-    public static ConstantBoolVertex of(Boolean value) {
-        return new ConstantBoolVertex(value);
+    public static ConstantBooleanVertex of(Boolean value) {
+        return new ConstantBooleanVertex(value);
     }
 
-    public static ConstantBoolVertex of(boolean value) {
-        return new ConstantBoolVertex(value);
+    public static ConstantBooleanVertex of(boolean value) {
+        return new ConstantBooleanVertex(value);
     }
 
-    public static ConstantBoolVertex of(boolean[] value) {
-        return new ConstantBoolVertex(value);
+    public static ConstantBooleanVertex of(boolean[] value) {
+        return new ConstantBooleanVertex(value);
     }
 
-    public static ConstantBoolVertex of(BooleanTensor value) {
-        return new ConstantBoolVertex(value);
+    public static ConstantBooleanVertex of(BooleanTensor value) {
+        return new ConstantBooleanVertex(value);
     }
 
     public static ConstantIntegerVertex of(Integer value) {

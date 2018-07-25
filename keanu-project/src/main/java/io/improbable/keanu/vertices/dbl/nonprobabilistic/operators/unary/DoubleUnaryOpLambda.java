@@ -1,21 +1,29 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
 import java.util.Map;
 import java.util.function.Function;
 
-public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Observable;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+
+public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentiable {
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, DoubleTensor> op;
-    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
+    protected final Function<Map<IVertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue())),
+            Observable.observableTypeFor(DoubleUnaryOpLambda.class)
+        );
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualNumberSupplier = dualNumberCalculation;
@@ -27,7 +35,7 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
         this(shape, inputVertex, op, null);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation);
     }
 
@@ -41,12 +49,7 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor getDerivedValue() {
-        return op.apply(inputVertex.getValue());
-    }
-
-    @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.apply(dualNumbers);
         }

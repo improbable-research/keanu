@@ -1,24 +1,26 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.Set;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class MarkovBlanketTest {
 
     @Test
     public void findBlanketFromSimpleGraph() {
 
-        DoubleVertex A = new GaussianVertex(5.0, 1.0);
-        DoubleVertex B = new GaussianVertex(5.0, 1.0);
-        DoubleVertex C = new GaussianVertex(A, B);
+        DoubleVertex A = VertexOfType.gaussian(5.0, 1.0);
+        DoubleVertex B = VertexOfType.gaussian(5.0, 1.0);
+        DoubleVertex C = VertexOfType.gaussian(A, B);
 
         Set<Vertex> blanket = MarkovBlanket.get(C);
 
@@ -29,13 +31,13 @@ public class MarkovBlanketTest {
     @Test
     public void findBlanketFromDoubleDiamondWithDeterministicGraph() {
 
-        DoubleVertex A = new GaussianVertex(5.0, 1.0);
-        DoubleVertex B = new GaussianVertex(A, 1.0);
-        DoubleVertex C = new GaussianVertex(A, 1.0);
-        DoubleVertex D = new GaussianVertex(B, C);
+        DoubleVertex A = VertexOfType.gaussian(5.0, 1.0);
+        DoubleVertex B = VertexOfType.gaussian(A, ConstantVertex.of(1.0));
+        DoubleVertex C = VertexOfType.gaussian(A, ConstantVertex.of(1.0));
+        DoubleVertex D = VertexOfType.gaussian(B, C);
         DoubleVertex E = D.multiply(2.0);
-        DoubleVertex F = new GaussianVertex(D, 1.0);
-        DoubleVertex G = new GaussianVertex(E, F);
+        DoubleVertex F = VertexOfType.gaussian(D, ConstantVertex.of(1.0));
+        DoubleVertex G = VertexOfType.gaussian(E, F);
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 
@@ -46,12 +48,12 @@ public class MarkovBlanketTest {
     @Test
     public void findBlanketFromDoubleDiamondGraph() {
 
-        DoubleVertex A = new GaussianVertex(5.0, 1.0);
-        DoubleVertex B = new GaussianVertex(A, 1.0);
-        DoubleVertex C = new GaussianVertex(A, 1.0);
-        DoubleVertex D = new GaussianVertex(B, C);
-        DoubleVertex E = new GaussianVertex(D, 1.0);
-        DoubleVertex F = new GaussianVertex(D, 1.0);
+        DoubleVertex A = VertexOfType.gaussian(5.0, 1.0);
+        DoubleVertex B = VertexOfType.gaussian(A, ConstantVertex.of(1.0));
+        DoubleVertex C = VertexOfType.gaussian(A, ConstantVertex.of(1.0));
+        DoubleVertex D = VertexOfType.gaussian(B, C);
+        DoubleVertex E = VertexOfType.gaussian(D, ConstantVertex.of(1.0));
+        DoubleVertex F = VertexOfType.gaussian(D, ConstantVertex.of(1.0));
 
         Set<Vertex> blanket = MarkovBlanket.get(D);
 

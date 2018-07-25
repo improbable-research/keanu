@@ -1,13 +1,19 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
@@ -37,7 +43,7 @@ public class MetropolisHastings {
         checkBayesNetInHealthyState(bayesNet);
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
-        List<Vertex> latentVertices = bayesNet.getLatentVertices();
+        List<Vertex<?>> latentVertices = bayesNet.getLatentVertices();
         Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
 
         double logP = bayesNet.getLogOfMasterP();
@@ -72,8 +78,8 @@ public class MetropolisHastings {
 
             final double logPNew = logPOld - affectedVerticesLogPOld + affectedVerticesLogPNew;
 
-            final double pqxOld = chosenVertex.logProb(oldValue);
-            final double pqxNew = chosenVertex.logProb(proposedValue);
+            final double pqxOld = ((Probabilistic)chosenVertex).logProb(oldValue);
+            final double pqxNew = ((Probabilistic)chosenVertex).logProb(proposedValue);
 
             final double logr = (logPNew * (1.0 / T) + pqxOld) - (logPOld * (1.0 / T) + pqxNew);
             final double r = Math.exp(logr);
@@ -105,7 +111,7 @@ public class MetropolisHastings {
     private static double sumLogP(Set<Vertex> vertices) {
         double sum = 0.0;
         for (Vertex v : vertices) {
-            sum += v.logProbAtValue();
+            sum += ((Probabilistic)v).logProbAtValue();
         }
         return sum;
     }

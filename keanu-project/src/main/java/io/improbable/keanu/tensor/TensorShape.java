@@ -33,6 +33,13 @@ public class TensorShape {
         return Arrays.hashCode(shape);
     }
 
+    @Override
+    public String toString() {
+        return "TensorShape{" +
+            Arrays.toString(shape) +
+            '}';
+    }
+
     /**
      * @param shape for finding length of
      * @return the number of elements in a tensor. This

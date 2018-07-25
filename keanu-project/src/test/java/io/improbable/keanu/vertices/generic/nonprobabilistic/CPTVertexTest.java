@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.FALSE;
-import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.TRUE;
+import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex.FALSE;
+import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
 
@@ -15,7 +15,7 @@ public class CPTVertexTest {
     @Test
     public void canSetAndCascade() {
 
-        BoolVertex A = new Flip(0.2);
+        BooleanVertex A = new Flip(0.2);
 
         CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A)
             .when(true).then(TRUE)
@@ -31,8 +31,8 @@ public class CPTVertexTest {
     @Test
     public void canBeXOR() {
 
-        BoolVertex A = new Flip(0.5);
-        BoolVertex B = new Flip(0.5);
+        BooleanVertex A = new Flip(0.5);
+        BooleanVertex B = new Flip(0.5);
 
         CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A, B)
             .when(true, true).then(FALSE)

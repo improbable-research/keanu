@@ -1,25 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.T;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+import static io.improbable.keanu.distributions.dual.ParameterName.T;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import io.improbable.keanu.distributions.continuous.StudentT;
-import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.distributions.continuous.DistributionOfType;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-import java.util.Map;
+public class StudentTVertex extends DistributionBackedDoubleVertex<IntegerTensor> {
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-import static java.util.Collections.singletonMap;
-
-public class StudentTVertex extends ProbabilisticDouble {
 
     private final IntegerVertex v;
 
@@ -31,44 +24,17 @@ public class StudentTVertex extends ProbabilisticDouble {
      * @param tensorShape expected tensor shape
      * @param v           Degrees of Freedom
      */
-    public StudentTVertex(int[] tensorShape, IntegerVertex v) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
+    // package private
+    StudentTVertex(int[] tensorShape, IntegerVertex v) {
+        super(tensorShape, DistributionOfType::studentT, v);
         this.v = v;
-        setParents(v);
-        setValue(DoubleTensor.placeHolder(tensorShape));
-    }
-
-    public StudentTVertex(int[] tensorShape, int v) {
-        this(tensorShape, new ConstantIntegerVertex(v));
-    }
-
-    public StudentTVertex(IntegerVertex v) {
-        this(v.getShape(), v);
-    }
-
-    public StudentTVertex(int v) {
-        this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(v));
-    }
-
-    public IntegerVertex getV() {
-        return v;
     }
 
     @Override
-    public double logPdf(DoubleTensor t) {
-        return StudentT.withParameters(v.getValue()).logProb(t).sum();
-    }
-
-    @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor t) {
-        Diffs diff = StudentT.withParameters(v.getValue()).dLogProb(t);
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor t) {
+        ParameterMap<DoubleTensor> diff = distribution().dLogProb(t);
         Map<Long, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.get(T).getValue());
         return m;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return StudentT.withParameters(v.getValue()).sample(getShape(), random);
     }
 }

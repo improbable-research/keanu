@@ -1,21 +1,31 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-
-import java.util.*;
-import java.util.function.Supplier;
-
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.*;
 
 public class ProbabilisticDoubleTensorContract {
 
@@ -56,7 +66,7 @@ public class ProbabilisticDoubleTensorContract {
             double percentage = (double) sampleBucket.getValue() / samples.length;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
+            double densityAtBucketCenter = Math.exp(((Probabilistic)vertexUnderTest).logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
@@ -92,7 +102,7 @@ public class ProbabilisticDoubleTensorContract {
             double percentage = (double) sampleBucket.getValue() / samples.length;
             double bucketCenter = sampleBucket.getKey();
 
-            double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
+            double densityAtBucketCenter = Math.exp(((Probabilistic)vertexUnderTest).logProb(Nd4jDoubleTensor.scalar(bucketCenter)));
             double actual = percentage / bucketSize;
             assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
         }
@@ -144,7 +154,7 @@ public class ProbabilisticDoubleTensorContract {
                 hyperParameterValueIncrement,
                 hyperParameterVertex,
                 value,
-                vertexUnderTest,
+                (Probabilistic) vertexUnderTest,
                 gradientDelta
             );
         }
@@ -155,7 +165,7 @@ public class ProbabilisticDoubleTensorContract {
                                                                       double hyperParameterValueIncrement,
                                                                       Vertex<DoubleTensor> hyperParameterVertex,
                                                                       DoubleTensor vertexValue,
-                                                                      Vertex<DoubleTensor> vertexUnderTest,
+                                                                      Probabilistic<DoubleTensor> vertexUnderTest,
                                                                       double gradientDelta) {
 
         for (DoubleTensor parameterValue = hyperParameterStartValue; parameterValue.scalar() <= hyperParameterEndValue.scalar(); parameterValue.plusInPlace(hyperParameterValueIncrement)) {
@@ -172,7 +182,7 @@ public class ProbabilisticDoubleTensorContract {
     public static void testGradientAtHyperParameterValue(DoubleTensor hyperParameterValue,
                                                          Vertex<DoubleTensor> hyperParameterVertex,
                                                          DoubleTensor vertexValue,
-                                                         Vertex<DoubleTensor> vertexUnderTest,
+                                                         Probabilistic<DoubleTensor> vertexUnderTest,
                                                          double gradientDelta) {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue.minus(gradientDelta));
@@ -195,28 +205,28 @@ public class ProbabilisticDoubleTensorContract {
 
     public static void isTreatedAsConstantWhenObserved(DoubleVertex vertexUnderTest) {
         vertexUnderTest.observe(DoubleTensor.ones(vertexUnderTest.getValue().getShape()));
-        assertTrue(vertexUnderTest.getDualNumber().isOfConstant());
+        assertTrue(new Differentiator().calculateDual((Differentiable)vertexUnderTest).isOfConstant());
     }
 
     public static void hasNoGradientWithRespectToItsValueWhenObserved(DoubleVertex vertexUnderTest) {
         DoubleTensor ones = DoubleTensor.ones(vertexUnderTest.getValue().getShape());
         vertexUnderTest.observe(ones);
-        assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest.getId()));
+        assertNull(((Probabilistic)vertexUnderTest).dLogProb(ones).get(vertexUnderTest.getId()));
     }
 
-    public static void matchesKnownLogDensityOfVector(DoubleVertex vertexUnderTest, double[] vector, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfVector(Probabilistic vertexUnderTest, double[] vector, double expectedLogDensity) {
 
-        double actualDensity = vertexUnderTest.logPdf(DoubleTensor.create(vector, vector.length, 1));
+        double actualDensity = vertexUnderTest.logProb(DoubleTensor.create(vector, vector.length, 1));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static void matchesKnownLogDensityOfScalar(DoubleVertex vertexUnderTest, double scalar, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfScalar(Probabilistic vertexUnderTest, double scalar, double expectedLogDensity) {
 
-        double actualDensity = vertexUnderTest.logPdf(DoubleTensor.scalar(scalar));
+        double actualDensity = vertexUnderTest.logProb(DoubleTensor.scalar(scalar));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<DoubleVertex> vertexUnderTestSupplier) {
+    public static <T extends DoubleVertex & Probabilistic<DoubleTensor>> void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<T> vertexUnderTestSupplier) {
 
         DoubleVertex[] scalarVertices = new DoubleVertex[vector.length];
         PartialDerivatives expectedPartialDerivatives = new PartialDerivatives(new HashMap<>());
@@ -227,14 +237,14 @@ public class ProbabilisticDoubleTensorContract {
 
             expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
-                    scalarVertices[i].dLogPdf(vector[i])
+                    ((Probabilistic) scalarVertices[i]).dLogProb(DoubleTensor.scalar(vector[i]))
                 )
             );
         }
 
         DoubleVertex tensorVertex = vertexUnderTestSupplier.get();
 
-        Map<Long, DoubleTensor> actualDerivatives = tensorVertex.dLogPdf(
+        Map<Long, DoubleTensor> actualDerivatives = ((Probabilistic) tensorVertex).dLogProb(
             DoubleTensor.create(vector, new int[]{vector.length, 1})
         );
 

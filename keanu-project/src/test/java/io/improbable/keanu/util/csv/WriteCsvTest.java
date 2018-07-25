@@ -1,20 +1,27 @@
 package io.improbable.keanu.util.csv;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static org.junit.Assert.assertTrue;
 
 public class WriteCsvTest {
 
@@ -26,11 +33,27 @@ public class WriteCsvTest {
 
     @Before
     public void setup() {
-        GaussianVertex g1 = new GaussianVertex(new int[]{1, 5}, 0, 1);
-        GaussianVertex g2 = new GaussianVertex(new int[]{1, 4}, 0, 1);
+        GaussianVertex g1 = new DistributionVertexBuilder()
+            .shaped(1, 5)
+            .withInput(ParameterName.MU, 0.)
+            .withInput(ParameterName.SIGMA, 1.)
+            .gaussian();
+        GaussianVertex g2 = new DistributionVertexBuilder()
+            .shaped(1, 4)
+            .withInput(ParameterName.MU, 0.)
+            .withInput(ParameterName.SIGMA, 1.)
+            .gaussian();
 
-        GaussianVertex f1 = new GaussianVertex(new int[]{5, 1}, 0, 1);
-        GaussianVertex f2 = new GaussianVertex(new int[]{4, 1}, 0, 1);
+        GaussianVertex f1 = new DistributionVertexBuilder()
+            .shaped(5, 1)
+            .withInput(ParameterName.MU, 0.)
+            .withInput(ParameterName.SIGMA, 1.)
+            .gaussian();
+        GaussianVertex f2 = new DistributionVertexBuilder()
+            .shaped(4, 1)
+            .withInput(ParameterName.MU, 0.)
+            .withInput(ParameterName.SIGMA, 1.)
+            .gaussian();
 
         g1.setValue(new double[]{1, 2, 3, 4, 5});
         g2.setValue(new double[]{5, 4, 3, 2});

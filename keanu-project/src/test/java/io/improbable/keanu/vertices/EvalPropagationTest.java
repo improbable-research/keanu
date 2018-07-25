@@ -1,19 +1,20 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
 public class EvalPropagationTest {
 
@@ -33,7 +34,7 @@ public class EvalPropagationTest {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new FloorVertex(ConstantVertex.of(4.2));
+        DoubleVertex start = ConstantVertex.of(4.2).floor();
 
         int links = 20;
         DoubleVertex end = addLinks(start, n, m, links);
@@ -60,11 +61,11 @@ public class EvalPropagationTest {
     private void assertDoesNotPropagateThroughProbabilisticVertices(Consumer<Vertex> evalFunction) {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new GaussianVertex(0, 1);
+        DoubleVertex start = VertexOfType.gaussian(0., 1.);
 
         DoubleVertex end = addLinks(start, n, m, 1);
 
-        DoubleVertex nextLayerStart = new GaussianVertex(end, 1);
+        DoubleVertex nextLayerStart = VertexOfType.gaussian(end, ConstantVertex.of(1.));
 
         DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
@@ -110,7 +111,7 @@ public class EvalPropagationTest {
     public void doesNotRedoWorkAlreadyDoneOnLazyEval() {
         AtomicInteger n = new AtomicInteger(0);
 
-        DoubleVertex start = new GaussianVertex(0, 1);
+        DoubleVertex start = VertexOfType.gaussian(0., 1.);
 
         DoubleVertex blackBox = new DoubleUnaryOpLambda<>(start,
             (startValue) -> {

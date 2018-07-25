@@ -1,13 +1,13 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.BETA;
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.dual.ParameterName.BETA;
+import static io.improbable.keanu.distributions.dual.ParameterName.MU;
+import static io.improbable.keanu.distributions.dual.ParameterName.X;
 
 import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,11 +22,8 @@ public class Laplace implements ContinuousDistribution {
      * @param beta   shape
      * @return       a new ContinuousDistribution object
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
-        return new Laplace(mu, beta);
-    }
-
-    private Laplace(DoubleTensor mu, DoubleTensor beta) {
+    // package private
+    Laplace(DoubleTensor mu, DoubleTensor beta) {
         this.mu = mu;
         this.beta = beta;
     }
@@ -64,7 +61,7 @@ public class Laplace implements ContinuousDistribution {
     }
 
     @Override
-    public Diffs dLogProb(DoubleTensor x) {
+    public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
         final DoubleTensor muMinusX = mu.minus(x);
         final DoubleTensor muMinusXAbs = muMinusX.abs();
 
@@ -74,7 +71,7 @@ public class Laplace implements ContinuousDistribution {
         final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
         final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        return new Diffs()
+        return new ParameterMap<DoubleTensor>()
             .put(MU, dLogPdMu)
             .put(BETA, dLogPdBeta)
             .put(X, dLogPdx);

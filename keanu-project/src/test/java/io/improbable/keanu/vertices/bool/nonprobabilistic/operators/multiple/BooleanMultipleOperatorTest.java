@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
@@ -27,25 +27,25 @@ public class BooleanMultipleOperatorTest {
 
     @Test
     public void testMultipleAnd() {
-        BoolVertex andTrue = new AndMultipleVertex(allTrue);
+        BooleanVertex andTrue = new AndMultipleVertex(allTrue);
         assertEquals(true, andTrue.sample(random).scalar());
 
-        BoolVertex andMixed = new AndMultipleVertex(allMixed);
+        BooleanVertex andMixed = new AndMultipleVertex(allMixed);
         assertEquals(false, andMixed.sample(random).scalar());
 
-        BoolVertex andFalse = new AndMultipleVertex(allFalse);
+        BooleanVertex andFalse = new AndMultipleVertex(allFalse);
         assertEquals(false, andFalse.sample(random).scalar());
     }
 
     @Test
     public void testMultipleOr() {
-        BoolVertex orTrue = new OrMultipleVertex(allTrue);
+        BooleanVertex orTrue = new OrMultipleVertex(allTrue);
         assertEquals(true, orTrue.sample(random).scalar());
 
-        BoolVertex orMixed = new OrMultipleVertex(allMixed);
+        BooleanVertex orMixed = new OrMultipleVertex(allMixed);
         assertEquals(true, orMixed.sample(random).scalar());
 
-        BoolVertex orFalse = new OrMultipleVertex(allFalse);
+        BooleanVertex orFalse = new OrMultipleVertex(allFalse);
         assertEquals(false, orFalse.sample(random).scalar());
     }
 
