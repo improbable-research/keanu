@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.SmoothUniformVertex;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -131,13 +131,14 @@ public class FlipVertexTest {
     @Test
     public void canUseWithGradientOptimizer() {
 
+        int n = 5;
         double min = -4.0;
         double max = 8.0;
-        DoubleVertex A = new UniformVertex(new int[]{1, 2}, min, max);
-        A.setValue(DoubleTensor.create(new double[]{-0.5, 0.5}));
+        DoubleVertex A = new SmoothUniformVertex(new int[]{1, n}, min, max);
         DoubleVertex B = A.sigmoid();
         Flip flip = new Flip(B);
-        flip.observe(new boolean[]{true, false});
+        BooleanTensor flipObservation = flip.sample();
+        flip.observe(flipObservation);
 
         BayesianNetwork network = new BayesianNetwork(flip.getConnectedGraph());
         GradientOptimizer optimizer = new GradientOptimizer(network);
@@ -151,8 +152,15 @@ public class FlipVertexTest {
 
         optimizer.maxAPosteriori();
 
+        double[] expected = flipObservation.setDoubleIf(
+            DoubleTensor.scalar(max),
+            DoubleTensor.scalar(min)
+        ).asFlatDoubleArray();
+
+        System.out.println("Expected " + Arrays.toString(expected));
+
         double[] actual = A.getValue().asFlatDoubleArray();
-        assertArrayEquals(new double[]{max, min}, actual, 0.1);
+        assertArrayEquals(expected, actual, 0.1);
     }
 
 }
