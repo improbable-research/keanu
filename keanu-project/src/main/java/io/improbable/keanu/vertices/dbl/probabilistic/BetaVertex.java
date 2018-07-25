@@ -1,6 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -29,7 +39,6 @@ public class BetaVertex extends ProbabilisticDouble {
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
-
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
@@ -38,6 +47,9 @@ public class BetaVertex extends ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    ContinuousDistribution distribution() {
+        return Beta.withParameters(alpha.getValue(), beta.getValue(), DoubleTensor.scalar(0.), DoubleTensor.scalar(1.));
+    }
     /**
      * One to one constructor for mapping some tensorShape of alpha and beta to
      * a matching tensorShaped Beta.
@@ -75,25 +87,19 @@ public class BetaVertex extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor value) {
-
-        DoubleTensor alphaValues = alpha.getValue();
-        DoubleTensor betaValues = beta.getValue();
-
-        DoubleTensor logPdfs = Beta.logPdf(alphaValues, betaValues, value);
-
+        DoubleTensor logPdfs = distribution().logProb(value);
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Beta.DiffLogP dlnP = Beta.dlnPdf(alpha.getValue(), beta.getValue(), value);
-        return convertDualNumbersToDiff(dlnP.dLogPdalpha, dlnP.dLogPdbeta, dlnP.dLogPdx);
+        Diffs dlnP = distribution().dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdalpha,
                                                              DoubleTensor dLogPdbeta,
                                                              DoubleTensor dLogPdx) {
-
         PartialDerivatives dLogPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdalpha);
         PartialDerivatives dLogPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdbeta);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);
@@ -110,14 +116,7 @@ public class BetaVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Beta.sample(
-            getShape(),
-            alpha.getValue(),
-            beta.getValue(),
-            DoubleTensor.scalar(0.),
-            DoubleTensor.scalar(1.),
-            random
-        );
+        return distribution().sample(getShape(), random);
     }
 
 }

@@ -57,7 +57,7 @@ public class BinomialVertex extends ProbabilisticInteger {
 
     @Override
     public double logPmf(IntegerTensor kTensor) {
-        return Binomial.logPmf(kTensor, p.getValue(), n.getValue()).sum();
+        return Binomial.withParameters(p.getValue(), n.getValue()).logProb(kTensor).sum();
     }
 
     @Override
@@ -67,6 +67,6 @@ public class BinomialVertex extends ProbabilisticInteger {
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return Binomial.sample(getShape(), p.getValue(), n.getValue(), random);
+        return Binomial.withParameters(p.getValue(), n.getValue()).sample(getShape(), random);
     }
 }

@@ -41,6 +41,18 @@ public class NonGradientOptimizer implements Optimizer {
     @Builder.Default
     private final double boundsRange = Double.POSITIVE_INFINITY;
 
+    /**
+     * radius around region to start testing points
+     */
+    @Builder.Default
+    double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
+
+    /**
+     * stopping trust region radius
+     */
+    @Builder.Default
+    double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
 
     @Override
@@ -69,7 +81,11 @@ public class NonGradientOptimizer implements Optimizer {
             this::handleFitnessCalculation
         );
 
-        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(getNumInterpolationPoints(latentVertices));
+        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
+            getNumInterpolationPoints(latentVertices),
+            initialTrustRegionRadius,
+            stoppingTrustRegionRadius
+        );
 
         double[] startPoint = Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);

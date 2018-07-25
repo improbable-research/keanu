@@ -1,7 +1,10 @@
 package io.improbable.keanu.tensor;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -88,6 +91,27 @@ public class TensorShapeValidation {
         }
 
         return uniqueShapes.iterator().next().getShape();
+    }
+
+    public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
+        int[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
+        
+        for (int i = 1; i < shapes.length; i++) {
+            if (shapes[i].length != concatShape.length) {
+                throw new IllegalArgumentException("Cannot concat shapes of different ranks");
+            }
+
+            for (int dim = 0; dim < shapes[i].length; dim++) {
+                if (dim == dimension) {
+                    concatShape[dim] += shapes[i][dim];
+                } else {
+                    if (shapes[i][dim] != concatShape[dim]) {
+                        throw new IllegalArgumentException("Cannot concat mismatched shapes");
+                    }
+                }
+            }
+        }
+        return concatShape;
     }
 
 }
