@@ -81,7 +81,7 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return Uniform.logPdf(xMin.getValue(), xMax.getValue(), value).sum();
+        return Uniform.withParameters(xMin.getValue(), xMax.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -95,7 +95,7 @@ public class UniformVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Uniform.sample(getShape(), xMin.getValue(), xMax.getValue(), random);
+        return Uniform.withParameters(xMin.getValue(), xMax.getValue()).sample(getShape(), random);
     }
 
 }

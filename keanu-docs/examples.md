@@ -2,10 +2,8 @@
 
 ### Starter Project
 
-This is a simple project that is intended to kick-start development on a new
-Keanu project.
-
-[Code](../keanu-examples/starter)
+A simple starter project (intended to kick-start development on a new
+Keanu project) is available on github [here](https://github.com/improbable-research/keanu-starter).
 
 ### Coal Mining Disasters
 

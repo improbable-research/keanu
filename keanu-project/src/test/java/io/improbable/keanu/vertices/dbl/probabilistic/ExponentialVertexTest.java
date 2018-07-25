@@ -36,7 +36,7 @@ public class ExponentialVertexTest {
         DoubleTensor matrixA = Nd4jDoubleTensor.create(new double[]{1, 4}, new int[]{2, 1});
         DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{2, 2}, new int[]{2, 1});
 
-        DoubleTensor maskResult = Exponential.logPdf(matrixA, new ScalarDoubleTensor(1.0), matrixX);
+        DoubleTensor maskResult = Exponential.withParameters(matrixA, new ScalarDoubleTensor(1.0)).logProb(matrixX);
         assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
     }
 

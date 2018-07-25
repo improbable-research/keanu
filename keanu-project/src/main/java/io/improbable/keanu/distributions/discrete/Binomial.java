@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -7,10 +8,22 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.nd4j.linalg.util.ArrayUtil;
 
-public class Binomial {
+public class Binomial implements DiscreteDistribution {
 
-    public static IntegerTensor sample(int[] shape, DoubleTensor p, IntegerTensor n, KeanuRandom random) {
+    private final DoubleTensor p;
+    private final IntegerTensor n;
 
+    public static DiscreteDistribution withParameters(DoubleTensor p, IntegerTensor n) {
+        return new Binomial(p, n);
+    }
+
+    private Binomial(DoubleTensor p, IntegerTensor n) {
+        this.p = p;
+        this.n = n;
+    }
+
+    @Override
+    public IntegerTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
         Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
 
@@ -23,7 +36,7 @@ public class Binomial {
         return IntegerTensor.create(samples, shape);
     }
 
-    public static int sample(double p, int n, KeanuRandom random) {
+    private static int sample(double p, int n, KeanuRandom random) {
         int sum = 0;
         for (int i = 0; i < n; i++) {
             if (random.nextDouble() < p) {
@@ -33,7 +46,8 @@ public class Binomial {
         return sum;
     }
 
-    public static DoubleTensor logPmf(IntegerTensor k, DoubleTensor p, IntegerTensor n) {
+    @Override
+    public DoubleTensor logProb(IntegerTensor k) {
 
         int[] shape = n.getShape();
         Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();

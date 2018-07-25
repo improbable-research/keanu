@@ -179,6 +179,14 @@ public class Nd4jDoubleTensorTest {
         assertTimesInPlaceOperationEquals(rank5, matrix, expected);
     }
 
+    @Test
+    public void doesClampTensor() {
+        DoubleTensor A = DoubleTensor.create(new double[]{0.25, 3, -4, -5});
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
+        DoubleTensor expected = DoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5});
+        assertEquals(expected, clampedA);
+    }
+
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.times(right);
         assertEquals(actual, expected);
