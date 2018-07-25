@@ -1,5 +1,6 @@
 package io.improbable.keanu.e2e.bm4h;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -11,35 +12,29 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.Collections;
+
+import static org.junit.Assert.assertEquals;
 
 public class CheatingStudents {
 
-    public static void main(String[] args) {
-        CheatingStudents model = new CheatingStudents(100, 35);
-        model.run(10000, 2);
-        System.out.println(
-            model.posteriorSamples
-                .getDoubleTensorSamples(model.p)
-                .getAverages()
-                .scalar()
-        );
-    }
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
-    CheatingStudents(int nStudents, int nYesAnswers) {
-        this.nStudents = nStudents;
-        this.nYesAnswers = nYesAnswers;
-    }
+    private final int numberOfStudents = 100;
+    private final int numberOfYesAnswers = 35;
 
-    int nStudents;
-    int nYesAnswers;
-    UniformVertex p;
-    NetworkSamples posteriorSamples;
+    @Test
+    public void doesWorkWithHigherDimensionDescription() {
 
-    private BayesianNetwork buildNetwork1() {
-        p = new UniformVertex(0.0, 1.0);
-        BoolVertex studentCheated = new Flip(new int[]{1, nStudents}, p);
-        BoolVertex answerIsTrue = new Flip(new int[]{1, nStudents}, 0.5);
-        BoolVertex randomAnswer = new Flip(new int[]{1, nStudents}, 0.5);
+        int numberOfSamples = 10000;
+        UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
+        BoolVertex studentCheated = new Flip(new int[]{1, numberOfStudents}, probabilityOfCheating);
+        BoolVertex answerIsTrue = new Flip(new int[]{1, numberOfStudents}, 0.5);
+        BoolVertex randomAnswer = new Flip(new int[]{1, numberOfStudents}, 0.5);
 
         DoubleVertex answer = If.isTrue(answerIsTrue)
             .then(
@@ -53,35 +48,47 @@ public class CheatingStudents {
             );
 
         DoubleVertex answerTotal = new GaussianVertex(answer.sum(), 1);
-        answerTotal.observe(nYesAnswers);
+        answerTotal.observe(numberOfYesAnswers);
 
-        return new BayesianNetwork(answerTotal.getConnectedGraph());
+        BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
+
+        NetworkSamples networkSamples = MetropolisHastings.getPosteriorSamples(
+            network,
+            Collections.singletonList(probabilityOfCheating),
+            numberOfSamples
+        ).drop(numberOfSamples / 10).downSample(network.getLatentVertices().size());
+
+        double approximateProbabilityOfCheating = networkSamples
+            .getDoubleTensorSamples(probabilityOfCheating)
+            .getAverages()
+            .scalar();
+
+        assertEquals(0.2, approximateProbabilityOfCheating, 0.05);
     }
 
-    private BayesianNetwork buildNetwork2() {
-        p = new UniformVertex(0.0, 1.0);
-        DoubleVertex pYesAnswer = p.times(0.5).plus(0.25);
-        IntegerVertex answerTotal = new BinomialVertex(pYesAnswer, nStudents);
-        answerTotal.observe(nYesAnswers);
+    @Test
+    public void doesWorkWithBinomial() {
+        int numberOfSamples = 10000;
 
-        return new BayesianNetwork(answerTotal.getConnectedGraph());
-    }
+        UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
+        DoubleVertex pYesAnswer = probabilityOfCheating.times(0.5).plus(0.25);
+        IntegerVertex answerTotal = new BinomialVertex(pYesAnswer, numberOfStudents);
+        answerTotal.observe(numberOfYesAnswers);
 
+        BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
 
-    public void run(int nSamples, int version) {
-        BayesianNetwork net;
-        if (version == 1) {
-            net = buildNetwork1();
-        } else {
-            net = buildNetwork2();
-        }
-        System.out.println(net.getLatentVertices());
-        net.probeForNonZeroProbability(100000);
-        posteriorSamples = MetropolisHastings.getPosteriorSamples(
-            net,
-            net.getLatentVertices(),
-            nSamples
-        ).drop(nSamples / 10).downSample(5);
+        NetworkSamples networkSamples = MetropolisHastings.getPosteriorSamples(
+            network,
+            Collections.singletonList(probabilityOfCheating),
+            numberOfSamples
+        ).drop(numberOfSamples / 10).downSample(network.getLatentVertices().size());
+
+        double approximateProbabilityOfCheating = networkSamples
+            .getDoubleTensorSamples(probabilityOfCheating)
+            .getAverages()
+            .scalar();
+
+        assertEquals(0.2, approximateProbabilityOfCheating, 0.05);
     }
 
 }
