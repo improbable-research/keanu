@@ -354,6 +354,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public boolean equalsWithEps(DoubleTensor o, double epsilon) {
+        if (this == o) return true;
+        if (!this.hasSameShapeAs(o)) return false;
+        double difference = value - o.asFlatList().get(0);
+        return (Math.abs(difference) <= epsilon);
+    }
+
+    @Override
     public DoubleTensor standardize() {
         return duplicate().standardizeInPlace();
     }
@@ -629,6 +637,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardizeInPlace() {
         throw new IllegalStateException("Cannot standardize a scalar");
+    }
+
+    @Override
+    public DoubleTensor zero() {
+        return this.setAll(0.0);
+    }
+
+    @Override
+    public DoubleTensor setAll(double value) {
+        this.value = value;
+        return this;
     }
 
     @Override
