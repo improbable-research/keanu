@@ -1,113 +1,82 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.graphtraversal.MarkovBlanket;
+import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Builder;
 
 import java.util.*;
-import java.util.stream.Collectors;
+
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
  */
-public class MetropolisHastings {
+@Builder
+public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
-    private MetropolisHastings() {
+    public static MetropolisHastings withDefaultConfig() {
+        return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
 
-    public static NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
-                                                     List<? extends Vertex> fromVertices,
-                                                     int sampleCount) {
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, KeanuRandom.getDefaultRandom());
+    public static MetropolisHastings withDefaultConfig(KeanuRandom random) {
+        return MetropolisHastings.builder()
+            .proposalDistribution(ProposalDistribution.usePrior())
+            .variableSelector(SINGLE_VARIABLE_SELECTOR)
+            .useCacheOnRejection(true)
+            .random(random)
+            .build();
     }
+
+    private final KeanuRandom random;
+    private final ProposalDistribution proposalDistribution;
+
+    @Builder.Default
+    private final MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+
+    @Builder.Default
+    private final boolean useCacheOnRejection = true;
 
     /**
-     * @param bayesNet     a bayesian network containing latent vertices
-     * @param fromVertices the vertices to include in the returned samples
-     * @param sampleCount  number of samples to take using the algorithm
-     * @param random       the source of randomness
+     * @param bayesianNetwork      a bayesian network containing latent vertices
+     * @param verticesToSampleFrom the vertices to include in the returned samples
+     * @param sampleCount          number of samples to take using the algorithm
      * @return Samples for each vertex ordered by MCMC iteration
      */
-    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<? extends Vertex> fromVertices,
-                                                     final int sampleCount,
-                                                     final KeanuRandom random) {
-        checkBayesNetInHealthyState(bayesNet);
+    @Override
+    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesianNetwork,
+                                              final List<? extends Vertex> verticesToSampleFrom,
+                                              final int sampleCount) {
+        checkBayesNetInHealthyState(bayesianNetwork);
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
-        List<Vertex> latentVertices = bayesNet.getLatentVertices();
-        Map<Vertex, Set<Vertex>> affectedVerticesCache = getVerticesAffectedByLatents(latentVertices);
+        List<Vertex> latentVertices = bayesianNetwork.getLatentVertices();
 
-        double logP = bayesNet.getLogOfMasterP();
+        MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
+            latentVertices,
+            proposalDistribution,
+            useCacheOnRejection,
+            random
+        );
+
+        double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
-            Set<Vertex> affectedVertices = affectedVerticesCache.get(chosenVertex);
-            logP = nextSample(chosenVertex, logP, affectedVertices, 1.0, random);
+            Set<Vertex> chosenVertices = variableSelector.select(latentVertices, sampleNum);
 
-            takeSamples(samplesByVertex, fromVertices);
+            logProbabilityBeforeStep = mhStep.step(
+                chosenVertices,
+                logProbabilityBeforeStep
+            ).getLogProbabilityAfterStep();
+
+            takeSamples(samplesByVertex, verticesToSampleFrom);
         }
 
         return new NetworkSamples(samplesByVertex, sampleCount);
-    }
-
-    static <T> double nextSample(final Vertex<T> chosenVertex,
-                                 final double logPOld,
-                                 final Set<Vertex> affectedVertices,
-                                 final double T,
-                                 final KeanuRandom random) {
-
-        final double affectedVerticesLogPOld = sumLogP(affectedVertices);
-
-        final T oldValue = chosenVertex.getValue();
-        final T proposedValue = chosenVertex.sample(random);
-
-        chosenVertex.setAndCascade(proposedValue);
-
-        final double affectedVerticesLogPNew = sumLogP(affectedVertices);
-
-        if (affectedVerticesLogPNew != Double.NEGATIVE_INFINITY) {
-
-            final double logPNew = logPOld - affectedVerticesLogPOld + affectedVerticesLogPNew;
-
-            final double pqxOld = chosenVertex.logProb(oldValue);
-            final double pqxNew = chosenVertex.logProb(proposedValue);
-
-            final double logr = (logPNew * (1.0 / T) + pqxOld) - (logPOld * (1.0 / T) + pqxNew);
-            final double r = Math.exp(logr);
-
-            final boolean shouldAccept = r >= random.nextDouble();
-
-            if (shouldAccept) {
-                return logPNew;
-            }
-        }
-
-        //reject change
-        chosenVertex.setAndCascade(oldValue);
-        return logPOld;
-    }
-
-    static Map<Vertex, Set<Vertex>> getVerticesAffectedByLatents(List<? extends Vertex> latentVertices) {
-        return latentVertices.stream()
-            .collect(Collectors.toMap(
-                v -> v,
-                v -> {
-                    Set<Vertex> affectedVertices = new HashSet<>();
-                    affectedVertices.add(v);
-                    affectedVertices.addAll(MarkovBlanket.getDownstreamProbabilisticVertices(v));
-                    return affectedVertices;
-                }));
-    }
-
-    private static double sumLogP(Set<Vertex> vertices) {
-        double sum = 0.0;
-        for (Vertex v : vertices) {
-            sum += v.logProbAtValue();
-        }
-        return sum;
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {
