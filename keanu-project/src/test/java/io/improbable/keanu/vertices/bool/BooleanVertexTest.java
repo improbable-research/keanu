@@ -1,24 +1,27 @@
 package io.improbable.keanu.vertices.bool;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import static io.improbable.keanu.vertices.bool.BooleanVertex.not;
+
+import java.util.Collections;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.Prior;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBooleanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBooleanVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.ConstantVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Collections;
-
-import static io.improbable.keanu.vertices.bool.BooleanVertex.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 public class BooleanVertexTest {
 
@@ -148,6 +151,43 @@ public class BooleanVertexTest {
         assertEquals(priorProbabilityTrue(a, 10000, random), p, 0.01);
     }
 
+    @Test
+    public void canObserveArrayOfValues() {
+        BooleanVertex flip = new Flip(0.5);
+        boolean[] observation = new boolean[]{true, false, true};
+        flip.observe(observation);
+        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetAndCascadeArrayOfValues() {
+        BooleanVertex flip = new Flip(0.5);
+        boolean[] values = new boolean[]{true, false, true};
+        flip.setAndCascade(values);
+        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetValueArrayOfValues() {
+        BooleanVertex flip = new Flip(0.5);
+        boolean[] values = new boolean[]{true, false, true};
+        flip.setValue(values);
+        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetValueAsScalarOnNonScalarVertex() {
+        BooleanVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        flip.setValue(true);
+        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canSetAndCascadeAsScalarOnNonScalarVertex() {
+        BooleanVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        flip.setAndCascade(true);
+        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+    }
 
     private double andProbability(double pA, double pB) {
         return pA * pB;

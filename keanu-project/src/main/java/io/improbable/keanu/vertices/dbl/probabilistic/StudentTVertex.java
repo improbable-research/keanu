@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class StudentTVertex extends DistributionBackedDoubleVertex<IntegerTensor> {
 
+
     private final IntegerVertex v;
 
     /**

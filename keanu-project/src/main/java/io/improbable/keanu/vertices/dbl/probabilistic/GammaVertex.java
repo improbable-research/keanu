@@ -4,16 +4,19 @@ import static io.improbable.keanu.distributions.dual.ParameterName.A;
 import static io.improbable.keanu.distributions.dual.ParameterName.K;
 import static io.improbable.keanu.distributions.dual.ParameterName.THETA;
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class GammaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
+
 
     /**
      * One location, theta or k or all three driving an arbitrarily shaped tensor of Gamma
@@ -35,24 +38,26 @@ public class GammaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
         ParameterMap<DoubleTensor> dlnP = distribution().dLogProb(value);
 
         return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
-
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdlocation,
-                                                             DoubleTensor dPdtheta,
-                                                             DoubleTensor dPdk,
-                                                             DoubleTensor dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
+                                                             DoubleTensor dLogPdtheta,
+                                                             DoubleTensor dLogPdk,
+                                                             DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) getParents().get(0)).getPartialDerivatives().multiplyBy(dPdlocation);
-        PartialDerivatives dPdInputsFromTheta = differentiator.calculateDual((Differentiable) getParents().get(1)).getPartialDerivatives().multiplyBy(dPdtheta);
-        PartialDerivatives dPdInputsFromK = differentiator.calculateDual((Differentiable) getParents().get(2)).getPartialDerivatives().multiplyBy(dPdk);
-        PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromTheta).add(dPdInputsFromK);
+        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual((Differentiable) getParents().get(0)).getPartialDerivatives().multiplyBy(dLogPdlocation);
+        PartialDerivatives dLogPdInputsFromTheta = differentiator.calculateDual((Differentiable) getParents().get(1)).getPartialDerivatives().multiplyBy(dLogPdtheta);
+        PartialDerivatives dLogPdInputsFromK = differentiator.calculateDual((Differentiable) getParents().get(2)).getPartialDerivatives().multiplyBy(dLogPdk);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromTheta).add(dLogPdInputsFromK);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 }

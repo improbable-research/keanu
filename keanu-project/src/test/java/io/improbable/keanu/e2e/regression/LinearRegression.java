@@ -169,4 +169,49 @@ public class LinearRegression {
         }
     }
 
+    @Test
+    public void linearRegressionTwoFactorTensorWithMatrixMultiplyVariationalMAP() {
+
+        // Generate data
+        int N = 100000;
+        double expectedW1 = 12.0;
+        double expectedW2 = 7.0;
+
+        DoubleVertex wGenerator = ConstantVertex.of(DoubleTensor.create(new double[]{expectedW1, expectedW2}, 2, 1));
+        DoubleVertex xGenerator = new DistributionVertexBuilder()
+            .shaped(N,2)
+            .withInput(ParameterName.MIN, 0.)
+            .withInput(ParameterName.MAX, 10.)
+            .uniform();
+        DoubleVertex yGenerator = VertexOfType.gaussian(
+            xGenerator.matrixMultiply(wGenerator),
+            ConstantVertex.of(1.0)
+        );
+        DoubleTensor xData = xGenerator.sample(random);
+        xGenerator.setAndCascade(xData);
+        DoubleTensor yData = yGenerator.sample(random);
+
+        // Linear Regression
+        DoubleVertex w =         new DistributionVertexBuilder()
+            .shaped(2,1)
+            .withInput(ParameterName.MU, 0.)
+            .withInput(ParameterName.SIGMA, 10.)
+            .gaussian();
+        w.setValue(DoubleTensor.create(new double[]{2, 2}, 2, 1));
+
+        DoubleVertex x = ConstantVertex.of(xData);
+        DoubleVertex yMu = x.matrixMultiply(w);
+        DoubleVertex y = VertexOfType.gaussian(yMu, ConstantVertex.of(5.0));
+        y.observe(yData);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
+        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+
+        optimizer.maxLikelihood();
+
+        System.out.println("W1 = " + w.getValue(0) + " W2 = " + w.getValue(1));
+        assertEquals(expectedW1, w.getValue(0), 0.05);
+        assertEquals(expectedW2, w.getValue(1), 0.05);
+    }
+
 }

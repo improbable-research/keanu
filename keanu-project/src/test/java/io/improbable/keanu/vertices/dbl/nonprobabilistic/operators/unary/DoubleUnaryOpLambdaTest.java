@@ -5,6 +5,7 @@ import static org.junit.Assert.assertArrayEquals;
 import org.junit.Test;
 
 import io.improbable.keanu.distributions.dual.ParameterName;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -19,7 +20,7 @@ public class DoubleUnaryOpLambdaTest {
             .withInput(ParameterName.MIN, 0.0)
             .withInput(ParameterName.MAX, 5.0)
             .uniform();
-        matrix.setAndCascade(2.5);
+        matrix.setAndCascade(DoubleTensor.create(2.5, new int[] {2, 2}));
         DoubleVertex matrixLambda = new DoubleUnaryOpLambda<>(matrix.getShape(), matrix, (val) -> val.times(2));
 
         assertArrayEquals(new double[]{5, 5, 5, 5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);

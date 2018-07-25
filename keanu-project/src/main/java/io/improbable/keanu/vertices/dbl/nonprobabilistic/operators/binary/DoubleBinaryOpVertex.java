@@ -15,13 +15,13 @@ import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
 public class DoubleBinaryOpVertex extends DoubleVertex {
 
-    private final DoubleVertex a;
-    private final DoubleVertex b;
+    private final DoubleVertex left;
+    private final DoubleVertex right;
     private final BinaryOperator<DoubleTensor> op;
     private final BinaryOperator<DualNumber> dualOp;
 
     /**
-     * A vertex that performs a user defined operation on two input vertices
+     * A vertex that performs left user defined operation on two input vertices
      * @param a first input vertex
      * @param b second input vertex
      * @param op operation used to sample
@@ -35,7 +35,7 @@ public class DoubleBinaryOpVertex extends DoubleVertex {
     }
 
     /**
-     * A vertex that performs a user defined operation on two input vertices
+     * A vertex that performs left user defined operation on two input vertices
      * @param shape the shape of the tensor
      * @param a first input vertex
      * @param b second input vertex
@@ -50,8 +50,8 @@ public class DoubleBinaryOpVertex extends DoubleVertex {
             new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue(), b.getValue())),
             Observable.observableTypeFor(DoubleBinaryOpVertex.class)
         );
-        this.a = a;
-        this.b = b;
+        this.left = a;
+        this.right = b;
         this.op = op;
         this.dualOp = dualOp;
         setParents(a, b);
@@ -60,11 +60,19 @@ public class DoubleBinaryOpVertex extends DoubleVertex {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return op.apply(a.sample(random), b.sample(random));
+        return op.apply(left.sample(random), right.sample(random));
     }
 
     @Override
     public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
-        return dualOp.apply(dualNumbers.get(a), dualNumbers.get(b));
+        return dualOp.apply(dualNumbers.get(left), dualNumbers.get(right));
+    }
+
+    public DoubleVertex getLeft(){
+        return left;
+    }
+
+    public DoubleVertex getRight(){
+        return right;
     }
 }

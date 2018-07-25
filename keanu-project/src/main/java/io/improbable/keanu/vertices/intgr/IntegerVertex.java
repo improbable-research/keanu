@@ -90,6 +90,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerUnaryOpVertex(this, a -> IntegerTensor.scalar(a.sum()));
     }
 
+    public IntegerVertex reshape(int... proposedShape) {
+        return new IntegerUnaryOpVertex(this, a -> a.reshape(proposedShape));
+    }
+
     public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }
@@ -122,7 +126,6 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(-1);
     }
 
-
     public <T extends Tensor> BooleanVertex equalTo(Vertex<T> rhs) {
         return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
     }
@@ -141,6 +144,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public <T extends NumberTensor> BooleanVertex lessThan(Vertex<T> rhs) {
         return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+
     }
 
     public <T extends NumberTensor> BooleanVertex lessThanOrEqualTo(Vertex<T> rhs) {
@@ -148,19 +152,27 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     }
 
     public void setValue(int value) {
-        super.setValue(IntegerTensor.create(value, getShape()));
+        super.setValue(IntegerTensor.scalar(value));
     }
 
     public void setValue(int[] values) {
-        super.setValue(IntegerTensor.create(values, getShape()));
+        super.setValue(IntegerTensor.create(values));
     }
 
     public void setAndCascade(int value) {
-        super.setAndCascade(IntegerTensor.create(value, getShape()));
+        super.setAndCascade(IntegerTensor.scalar(value));
     }
 
     public void setAndCascade(int[] values) {
-        super.setAndCascade(IntegerTensor.create(values, getShape()));
+        super.setAndCascade(IntegerTensor.create(values));
+    }
+
+    public void observe(int value) {
+        this.observe(IntegerTensor.scalar(value));
+    }
+
+    public void observe(int[] values) {
+        this.observe(IntegerTensor.create(values));
     }
 
     public int getValue(int... index) {

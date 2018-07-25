@@ -39,6 +39,10 @@ public abstract class BooleanVertex extends Vertex<BooleanTensor> {
         return new BooleanUnaryOpVertex<>(vertex, a -> a.not());
     }
 
+    public BooleanVertex reshape(int... proposedShape) {
+        return new BooleanUnaryOpVertex<>(this, a -> a.reshape(proposedShape));
+    }
+
     public <T extends Tensor> BooleanVertex equalTo(Vertex<T> rhs) {
         return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
     }
@@ -55,19 +59,27 @@ public abstract class BooleanVertex extends Vertex<BooleanTensor> {
     }
 
     public void setValue(boolean value) {
-        super.setValue(BooleanTensor.create(value, getShape()));
+        super.setValue(BooleanTensor.scalar(value));
     }
 
     public void setValue(boolean[] values) {
-        super.setValue(BooleanTensor.create(values, getShape()));
+        super.setValue(BooleanTensor.create(values));
     }
 
     public void setAndCascade(boolean value) {
-        super.setAndCascade(BooleanTensor.create(value, getShape()));
+        super.setAndCascade(BooleanTensor.scalar(value));
     }
 
     public void setAndCascade(boolean[] values) {
-        super.setAndCascade(BooleanTensor.create(values, getShape()));
+        super.setAndCascade(BooleanTensor.create(values));
+    }
+
+    public void observe(boolean value) {
+        this.observe(BooleanTensor.scalar(value));
+    }
+
+    public void observe(boolean[] values) {
+        this.observe(BooleanTensor.create(values));
     }
 
     public boolean getValue(int... index) {

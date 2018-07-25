@@ -1,11 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
@@ -162,11 +158,15 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new DoubleUnaryOpVertex(Tensor.SCALAR_SHAPE, this, a -> DoubleTensor.scalar(a.sum()), a -> a.sum());
     }
 
+    public DoubleVertex reshape(int... proposedShape) {
+        return new DoubleUnaryOpVertex(this, a -> a.reshape(proposedShape), a -> a.reshape(proposedShape));
+    }
+
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
-
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+
     @Override
     public DoubleVertex times(DoubleVertex that) {
         return multiply(that);
@@ -191,6 +191,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
     }
+
 
     public <T extends Tensor> BooleanVertex equalTo(Vertex<T> rhs) {
         return new BooleanBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
@@ -217,19 +218,27 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public void setValue(double value) {
-        super.setValue(DoubleTensor.create(value, getShape()));
+        super.setValue(DoubleTensor.scalar(value));
     }
 
     public void setValue(double[] values) {
-        super.setValue(DoubleTensor.create(values, getShape()));
+        super.setValue(DoubleTensor.create(values));
     }
 
     public void setAndCascade(double value) {
-        super.setAndCascade(DoubleTensor.create(value, getShape()));
+        super.setAndCascade(DoubleTensor.scalar(value));
     }
 
     public void setAndCascade(double[] values) {
-        super.setAndCascade(DoubleTensor.create(values, getShape()));
+        super.setAndCascade(DoubleTensor.create(values));
+    }
+
+    public void observe(double value) {
+        this.observe(DoubleTensor.scalar(value));
+    }
+
+    public void observe(double[] values) {
+        this.observe(DoubleTensor.create(values));
     }
 
     public double getValue(int... index) {

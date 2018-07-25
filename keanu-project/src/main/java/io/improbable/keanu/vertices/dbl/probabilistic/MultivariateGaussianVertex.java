@@ -5,8 +5,13 @@ import java.util.Map;
 import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class MultivariateGaussian extends DistributionBackedDoubleVertex<DoubleTensor> {
+import java.util.Map;
+
+
+public class MultivariateGaussianVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
 
     /**
      * Multivariate gaussian distribution. The shape is driven from mu, which must be a vector.
@@ -17,7 +22,7 @@ public class MultivariateGaussian extends DistributionBackedDoubleVertex<DoubleT
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     // package private
-    MultivariateGaussian(int[] tensorShape, DoubleVertex mu, DoubleVertex covariance) {
+    MultivariateGaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex covariance) {
         super(false, tensorShape, DistributionOfType::multivariateGaussian, mu, covariance);
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
     }

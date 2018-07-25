@@ -1,9 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class DualNumber implements DoubleOperators<DualNumber>  {
@@ -278,11 +281,35 @@ public class DualNumber implements DoubleOperators<DualNumber>  {
 
     public DualNumber sum() {
         DoubleTensor sumOfAll = DoubleTensor.scalar(value.sum());
-        int[] resultDims = new int[value.getRank()];
-        for (int i = 0; i < value.getRank(); i++) {
-            resultDims[i] = i;
+        int[] resultDims = TensorShape.dimensionRange(0, value.getRank());
+        return new DualNumber(sumOfAll, this.partialDerivatives.sum(false, resultDims));
+    }
+
+    public DualNumber reshape(int[] proposedShape) {
+        PartialDerivatives reshapedPartialDerivatives = this.partialDerivatives.reshape(getValue().getRank(), proposedShape);
+        return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
+    }
+
+    public DualNumber concat(int dimension, Map<Long, List<DoubleTensor>> combinedPartialDerivatives, DoubleTensor... toConcat) {
+        Map<Long, DoubleTensor> concatenatedPartialDerivates = new HashMap<>();
+
+        for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivatives.entrySet()) {
+            concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
         }
-        return new DualNumber(sumOfAll, this.partialDerivatives.sum(resultDims));
+
+        DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
+        return new DualNumber(concatValue, concatenatedPartialDerivates);
+
+    }
+
+    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+        if (partialDerivates.size() == 1) {
+            return partialDerivates.get(0);
+        } else {
+            DoubleTensor primaryTensor = partialDerivates.remove(0);
+            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
+            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+        }
     }
 
     @Override

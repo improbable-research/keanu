@@ -14,7 +14,7 @@ public class SmoothUniformVertex extends DistributionBackedDoubleVertex<DoubleTe
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape   the desired shape of the vertex
@@ -35,10 +35,9 @@ public class SmoothUniformVertex extends DistributionBackedDoubleVertex<DoubleTe
 
         @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        final DoubleTensor dPdfdx = distribution().dLogProb(value).get(X).getValue();
+        final DoubleTensor dPdx = distribution().dLogProb(value).get(X).getValue();
         final DoubleTensor density = distribution().logProb(value);
-        final DoubleTensor dlogPdfdx = dPdfdx.divInPlace(density);
-
-        return singletonMap(getId(), dlogPdfdx);
+        final DoubleTensor dLogPdx = dPdx.divInPlace(density);
+        return singletonMap(getId(), dLogPdx);
     }
 }

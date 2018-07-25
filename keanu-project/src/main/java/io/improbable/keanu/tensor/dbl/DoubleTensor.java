@@ -83,12 +83,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor sqrt();
 
-    DoubleTensor log();
-
-    DoubleTensor sin();
-
-    DoubleTensor cos();
-
     DoubleTensor tan();
 
     DoubleTensor atan();
@@ -96,12 +90,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor atan2(double y);
 
     DoubleTensor atan2(DoubleTensor y);
-
-    DoubleTensor asin();
-
-    DoubleTensor acos();
-
-    DoubleTensor exp();
 
     DoubleTensor max(DoubleTensor max);
 
@@ -132,6 +120,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor choleskyDecomposition();
 
     double determinant();
+
+    DoubleTensor concat(int dimension, DoubleTensor... those);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

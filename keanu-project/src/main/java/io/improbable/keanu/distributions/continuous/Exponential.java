@@ -34,11 +34,11 @@ public class Exponential implements ContinuousDistribution {
 
     @Override
     public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
-        final DoubleTensor dPda = lambda.reciprocal();
-        final DoubleTensor dPdb = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
+        final DoubleTensor dLogPdlocation = lambda.reciprocal();
+        final DoubleTensor dLogPdlambda = x.minus(location).minusInPlace(lambda).divInPlace(lambda.pow(2));
         return new ParameterMap<DoubleTensor>()
-            .put(LOCATION, dPda)
-            .put(LAMBDA, dPdb)
-            .put(X, dPda.unaryMinus());
+            .put(LOCATION, dLogPdlocation)
+            .put(LAMBDA, dLogPdlambda)
+            .put(X, dLogPdlocation.unaryMinus());
     }
 }

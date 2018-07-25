@@ -116,7 +116,7 @@ public class DistributionVertexBuilder {
      * and the resulting tensor has the same shape as MU
      * @return new MultivariateGaussian object
      */
-    public MultivariateGaussian multivariateGaussian() {
+    public MultivariateGaussianVertex multivariateGaussian() {
         int[] requiredShape = this.parameters.get(ParameterName.MU).getValue().getShape();
         if (shape != null && !Arrays.equals(shape, requiredShape)) {
             throw new BuilderParameterException(
@@ -124,7 +124,7 @@ public class DistributionVertexBuilder {
                     Arrays.toString(shape), Arrays.toString(requiredShape)));
         }
         shape = requiredShape;
-        return build(MultivariateGaussian.class, ParameterName.MU, ParameterName.SIGMA);
+        return build(MultivariateGaussianVertex.class, ParameterName.MU, ParameterName.SIGMA);
     }
 
     public PoissonVertex poisson() {

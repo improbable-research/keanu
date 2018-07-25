@@ -3,11 +3,13 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.ParameterName.MU;
 import static io.improbable.keanu.distributions.dual.ParameterName.S;
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
 import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -34,20 +36,24 @@ public class LogisticVertex extends DistributionBackedDoubleVertex<DoubleTensor>
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdmu,
-                                                             DoubleTensor dPds,
-                                                             DoubleTensor dPdx) {
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
+                                                             DoubleTensor dLogPds,
+                                                             DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dPdInputsFromA = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dPdmu);
-        PartialDerivatives dPdInputsFromB = differentiator.calculateDual((Differentiable) getS()).getPartialDerivatives().multiplyBy(dPds);
-        PartialDerivatives dPdInputs = dPdInputsFromA.add(dPdInputsFromB);
+        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual((Differentiable) getS()).getPartialDerivatives().multiplyBy(dLogPds);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromB);
+
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 
     private DoubleVertex getMu() {

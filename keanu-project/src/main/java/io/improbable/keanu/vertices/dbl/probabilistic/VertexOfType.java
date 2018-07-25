@@ -5,6 +5,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
@@ -112,11 +113,11 @@ public class VertexOfType {
             .logNormal();
     }
 
-    public static MultivariateGaussian multivariateGaussian(Double mu, Double sigma) {
+    public static MultivariateGaussianVertex multivariateGaussian(Double mu, Double sigma) {
         return multivariateGaussian(ConstantVertex.of(mu), ConstantVertex.of(sigma));
     }
 
-    public static MultivariateGaussian multivariateGaussian(DoubleVertex mu, DoubleVertex sigma) {
+    public static MultivariateGaussianVertex multivariateGaussian(DoubleVertex mu, DoubleVertex sigma) {
         return new DistributionVertexBuilder()
             .shaped(mu.getShape())
             .withInput(ParameterName.MU, mu)
@@ -124,6 +125,17 @@ public class VertexOfType {
             .multivariateGaussian();
     }
 
+
+    public static BinomialVertex binomial(Double p, Integer n) {
+        return binomial(ConstantVertex.of(p), ConstantVertex.of(n));
+    }
+
+    public static BinomialVertex binomial(DoubleVertex p, IntegerVertex n) {
+        return new DistributionVertexBuilder()
+            .withInput(ParameterName.P, p)
+            .withInput(ParameterName.N, n)
+            .binomial();
+    }
 
     public static PoissonVertex poisson(Double mu) {
         return poisson(ConstantVertex.of(mu));

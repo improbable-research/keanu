@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType
 import io.improbable.keanu.vertices.intgr.IntegerVertex
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
+
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test

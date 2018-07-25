@@ -23,7 +23,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor create(int[] values, int[] shape) {
+    static IntegerTensor create(int[] values, int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarIntegerTensor(values[0]);
         } else {
@@ -32,7 +32,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     static IntegerTensor create(int[] values) {
-        return create(values, new int[]{1, values.length});
+        return create(values, 1, values.length);
     }
 
     static IntegerTensor ones(int[] shape) {

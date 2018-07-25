@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
+
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -8,6 +10,7 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.distributions.dual.ParameterName;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,7 +24,7 @@ public class BetaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
 
     /**
      * One alpha or beta or both that match a proposed tensor shape of Beta.
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor contained in the vertex
@@ -39,17 +42,22 @@ public class BetaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
         return convertDualNumbersToDiff(dlnP.get(ParameterName.A).getValue(), dlnP.get(ParameterName.B).getValue(), dlnP.get(ParameterName.X).getValue());
     }
 
-    private Map<Long,DoubleTensor> convertDualNumbersToDiff(DoubleTensor dPdalpha, DoubleTensor dPdbeta, DoubleTensor dPdx) {
+    private Map<Long,DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdalpha,
+                                                            DoubleTensor dLogPdbeta,
+                                                            DoubleTensor dLogPdx) {
             Differentiator differentiator = new Differentiator();
-            PartialDerivatives dPdInputsFromAlpha = differentiator.calculateDual((Differentiable) getAlpha()).getPartialDerivatives().multiplyBy(dPdalpha);
-            PartialDerivatives dPdInputsFromBeta = differentiator.calculateDual((Differentiable) getBeta()).getPartialDerivatives().multiplyBy(dPdbeta);
-        PartialDerivatives dPdInputs = dPdInputsFromAlpha.add(dPdInputsFromBeta);
+            PartialDerivatives dLogPdInputsFromAlpha = differentiator.calculateDual((Differentiable) getAlpha()).getPartialDerivatives().multiplyBy(dLogPdalpha);
+            PartialDerivatives dLogPdInputsFromBeta = differentiator.calculateDual((Differentiable) getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);
 
         if (!this.isObserved()) {
-            dPdInputs.putWithRespectTo(getId(), dPdx);
+            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
+                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
+            );
         }
 
-        return dPdInputs.asMap();
+        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
+        return summed.asMap();
     }
 
     private Vertex<?> getAlpha() {

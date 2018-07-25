@@ -10,11 +10,12 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex implements 
     /**
      * Matrix multiplies one vertex by another. C = AB
      *
-     * @param a vertex A
-     * @param b vertex B
+     * @param left vertex A
+     * @param right vertex B
      */
-    public MatrixMultiplicationVertex(DoubleVertex a, DoubleVertex b) {
-        super(getResultingShape(a.getShape(), b.getShape()), a, b, (a_,b_) -> a_.matrixMultiply(b_), (a_,b_) -> a_.matrixMultiplyBy(b_));
+    public MatrixMultiplicationVertex(DoubleVertex left, DoubleVertex right) {
+        super(getResultingShape(left.getShape(), right.getShape()), left, right, (l,r) -> l.matrixMultiply(r), (a_,b_) -> a_.matrixMultiplyBy(b_));
+
     }
 
     private static int[] getResultingShape(int[] left, int[] right) {

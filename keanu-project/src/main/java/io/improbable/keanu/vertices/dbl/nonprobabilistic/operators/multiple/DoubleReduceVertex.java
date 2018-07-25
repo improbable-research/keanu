@@ -33,7 +33,7 @@ public class DoubleReduceVertex extends DoubleVertex implements Differentiable {
             Observable.observableTypeFor(DoubleReduceVertex.class)
         );
         if (inputs.size() < 2) {
-            throw new IllegalArgumentException("DoubleReduceVertex should have at least two input vertices, called with " + inputs.size());
+            throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }
 
         this.inputs = new ArrayList<>(inputs);

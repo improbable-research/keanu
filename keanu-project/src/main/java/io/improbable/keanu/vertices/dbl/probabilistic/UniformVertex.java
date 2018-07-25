@@ -22,6 +22,7 @@ public class UniformVertex extends DistributionBackedDoubleVertex<DoubleTensor> 
      */
     public UniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
         super(tensorShape, DistributionOfType::uniform, xMin, xMax);
+
     }
 
     @Override
@@ -40,10 +41,10 @@ public class UniformVertex extends DistributionBackedDoubleVertex<DoubleTensor> 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
 
-        DoubleTensor dlogPdf = DoubleTensor.zeros(this.getXMax().getShape());
-        dlogPdf = dlogPdf.setWithMaskInPlace(value.getGreaterThanMask(getXMax().getValue()), Double.NEGATIVE_INFINITY);
-        dlogPdf = dlogPdf.setWithMaskInPlace(value.getLessThanOrEqualToMask(getXMin().getValue()), Double.POSITIVE_INFINITY);
+        DoubleTensor dLogPdf = DoubleTensor.zeros(this.getXMax().getShape());
+        dLogPdf = dLogPdf.setWithMaskInPlace(value.getGreaterThanMask(getXMax().getValue()), Double.NEGATIVE_INFINITY);
+        dLogPdf = dLogPdf.setWithMaskInPlace(value.getLessThanOrEqualToMask(getXMin().getValue()), Double.POSITIVE_INFINITY);
 
-        return singletonMap(getId(), dlogPdf);
+        return singletonMap(getId(), dLogPdf);
     }
 }

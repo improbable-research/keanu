@@ -117,21 +117,21 @@ public class Gamma implements ContinuousDistribution {
 
     @Override
     public ParameterMap<DoubleTensor> dLogProb(DoubleTensor x) {
-        final DoubleTensor xMinusA = x.minus(location);
-        final DoubleTensor aMinusX = location.minus(x);
+        final DoubleTensor xMinusLocation = x.minus(location);
+        final DoubleTensor locationMinusX = location.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
         final DoubleTensor oneOverTheta = theta.reciprocal();
 
-        final DoubleTensor dPdx = kMinus1.div(xMinusA).minusInPlace(oneOverTheta);
-        final DoubleTensor dPda = kMinus1.div(aMinusX).plusInPlace(oneOverTheta);
-        final DoubleTensor dPdtheta = theta.times(k).plus(aMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dPdk = xMinusA.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdx = kMinus1.div(xMinusLocation).minusInPlace(oneOverTheta);
+        final DoubleTensor dLogPdlocation = kMinus1.div(locationMinusX).plusInPlace(oneOverTheta);
+        final DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
         return new ParameterMap<DoubleTensor>()
-        .put(A, dPda)
-        .put(THETA, dPdtheta)
-        .put(K, dPdk)
-        .put(X, dPdx);
+        .put(A, dLogPdlocation)
+        .put(THETA, dLogPdtheta)
+        .put(K, dLogPdk)
+        .put(X, dLogPdx);
     }
 
 }
