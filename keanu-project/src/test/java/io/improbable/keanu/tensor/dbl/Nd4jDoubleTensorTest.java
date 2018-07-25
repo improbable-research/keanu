@@ -5,6 +5,7 @@ import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class Nd4jDoubleTensorTest {
 
@@ -177,6 +178,42 @@ public class Nd4jDoubleTensorTest {
 
         assertTimesOperationEquals(rank5, matrix, expected);
         assertTimesInPlaceOperationEquals(rank5, matrix, expected);
+    }
+
+    @Test
+    public void canSetAllValues(){
+        DoubleTensor rank5 = DoubleTensor.create(new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
+            6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
+        }, new int[]{2, 2, 2, 2, 2});
+        rank5.zero();
+        assertAllValuesAre(rank5,0.0);
+        rank5.setAll(0.8);
+        assertAllValuesAre(rank5,0.8);
+    }
+
+    @Test
+    public void canEqualsWithEspilon(){
+        double[] aData = new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
+            6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3};
+        double[] bData = new double[aData.length];
+        for ( int i =0;i<aData.length;i++){
+            if ( i%2 == 0 ) {
+                bData[i] = aData[i] + 0.4;
+            }else{
+                bData[i] = aData[i] - 0.4;
+            }
+        }
+        DoubleTensor a = DoubleTensor.create(aData, new int[]{2, 2, 2, 2, 2});
+        DoubleTensor b = DoubleTensor.create(bData, new int[]{2, 2, 2, 2, 2});
+        assertTrue("equals with epsilon should be true",a.equalsWithEps(b,0.5));
+    }
+
+    private void assertAllValuesAre(DoubleTensor tensor, double v) {
+        for( double element : tensor.asFlatList() ){
+            assertEquals( element , v , 0.01);
+        }
     }
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
