@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.shapeAlongDimension;
 
-public class GenericTADVertex<T> extends NonProbabilistic<Tensor<T>> {
+public class GenericAlongDimensionVertex<T> extends NonProbabilistic<Tensor<T>> {
 
     private final Vertex<? extends Tensor<T>> inputVertex;
     private final int dimension;
@@ -20,7 +20,7 @@ public class GenericTADVertex<T> extends NonProbabilistic<Tensor<T>> {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericTADVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
+    public GenericAlongDimensionVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
 
         this.inputVertex = inputVertex;
         this.dimension = dimension;
