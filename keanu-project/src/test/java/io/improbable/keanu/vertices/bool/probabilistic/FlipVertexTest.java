@@ -63,43 +63,66 @@ public class FlipVertexTest {
 
         int[] shape = new int[]{2, 2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
-        A.setValue(DoubleTensor.create(new double[]{
+        DoubleTensor AValue = DoubleTensor.create(new double[]{
             0.1, 0.2,
             0.3, 0.4,
-            0.5, 0.3,
+            5, 0.3,
             0.2, 0.8
-        }, shape));
+        }, shape);
+
+        A.setValue(AValue);
 
         DoubleVertex B = new GaussianVertex(shape, 0, 1);
-        B.setValue(DoubleTensor.create(new double[]{
+        DoubleTensor BValue = DoubleTensor.create(new double[]{
             0.55, 0.65,
             0.45, 0.25,
-            0.3, 0.4,
+            0.8, -0.4,
             0.5, 0.3,
-        }, shape));
+        }, shape);
+
+        B.setValue(BValue);
+
         DoubleVertex C = A.times(B);
         Flip D = new Flip(C);
 
-        Map<Long, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{
+        BooleanTensor atValue = BooleanTensor.create(new boolean[]{
             true, false,
             false, true,
             false, false,
             true, true
-        }, shape));
-
-        DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{
-            0.55, -0.65,
-            -0.45, 0.25,
-            -0.3, -0.4,
-            0.5, 0.3,
         }, shape);
 
-        DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{
-            0.1, -0.2,
-            -0.3, 0.4,
-            -0.5, -0.3,
-            0.2, 0.8
-        }, shape);
+        Map<Long, DoubleTensor> dLogPmf = D.dLogPmf(atValue);
+
+        DoubleTensor expectedWrtA = atValue.setDoubleIf(
+            AValue.reciprocal(),
+            BValue.div(AValue.times(BValue).minus(1.0))
+        );
+
+        expectedWrtA = expectedWrtA.setWithMaskInPlace(
+            AValue.times(BValue).getGreaterThanMask(DoubleTensor.ONE_SCALAR),
+            0.0
+        );
+
+        expectedWrtA = expectedWrtA.setWithMaskInPlace(
+            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR),
+            0.0
+        );
+
+        DoubleTensor expectedWrtB = atValue.setDoubleIf(
+            BValue.reciprocal(),
+            AValue.div(AValue.times(BValue).minus(1.0))
+        );
+
+        expectedWrtB = expectedWrtB.setWithMaskInPlace(
+            AValue.times(BValue).getGreaterThanMask(DoubleTensor.ONE_SCALAR),
+            0.0
+        );
+
+        expectedWrtB = expectedWrtB.setWithMaskInPlace(
+            AValue.times(BValue).getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR),
+            0.0
+        );
 
         assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
         assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
@@ -108,13 +131,16 @@ public class FlipVertexTest {
     @Test
     public void canUseWithGradientOptimizer() {
 
-        DoubleVertex A = new UniformVertex(new int[]{1, 2}, -4.0, 8.0);
+        double min = -4.0;
+        double max = 8.0;
+        DoubleVertex A = new UniformVertex(new int[]{1, 2}, min, max);
         A.setValue(DoubleTensor.create(new double[]{-0.5, 0.5}));
         DoubleVertex B = A.sigmoid();
         Flip flip = new Flip(B);
         flip.observe(new boolean[]{true, false});
 
-        GradientOptimizer optimizer = new GradientOptimizer(new BayesianNetwork(flip.getConnectedGraph()));
+        BayesianNetwork network = new BayesianNetwork(flip.getConnectedGraph());
+        GradientOptimizer optimizer = new GradientOptimizer(network);
         optimizer.onGradientCalculation((point, gradient) -> {
             System.out.println("Gradient: @" + Arrays.toString(point) + " -> " + Arrays.toString(gradient));
         });
@@ -123,10 +149,10 @@ public class FlipVertexTest {
             System.out.println("Fitness @" + Arrays.toString(point) + " -> " + fitness);
         });
 
-        optimizer.maxLikelihood();
+        optimizer.maxAPosteriori();
 
         double[] actual = A.getValue().asFlatDoubleArray();
-        assertArrayEquals(new double[]{8.0, -4.0}, actual, 0.1);
+        assertArrayEquals(new double[]{max, min}, actual, 0.1);
     }
 
 }

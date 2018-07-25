@@ -74,16 +74,29 @@ public class Flip extends ProbabilisticBool {
     public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
 
         DualNumber probTrueDual = probTrue.getDualNumber();
+        DoubleTensor probTrueValue = probTrueDual.getValue();
+        PartialDerivatives probTruePartialDerivatives = probTrueDual.getPartialDerivatives();
 
-        probTrueDual.getPartialDerivatives().asMap();
+        DoubleTensor greaterThanMask = probTrueValue
+            .getGreaterThanMask(DoubleTensor.ONE_SCALAR);
+
+        DoubleTensor lessThanOrEqualToMask = probTrueValue
+            .getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR);
+
+        DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
+
+        DoubleTensor dlogProbdxForTrue = probTrueValue.reciprocal();
+        dlogProbdxForTrue = dlogProbdxForTrue.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
+
+        DoubleTensor dlogProbdxForFalse = probTrueValue.minus(1.0).reciprocal();
+        dlogProbdxForFalse = dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
         DoubleTensor dLogPdp = value.setDoubleIf(
-            DoubleTensor.ONE_SCALAR,
-            DoubleTensor.MINUS_ONE_SCALAR
+            dlogProbdxForTrue,
+            dlogProbdxForFalse
         );
 
-        PartialDerivatives partials = probTrueDual
-            .getPartialDerivatives()
+        PartialDerivatives partials = probTruePartialDerivatives
             .multiplyBy(dLogPdp)
             .sum(true, TensorShape.dimensionRange(0, value.getRank()));
 
