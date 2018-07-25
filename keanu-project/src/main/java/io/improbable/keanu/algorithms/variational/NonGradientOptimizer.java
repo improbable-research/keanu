@@ -40,7 +40,19 @@ public class NonGradientOptimizer extends Optimizer {
         }
     }
 
-    public double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+    public double optimize(int maxEvaluations,
+                           double boundsRange,
+                           List<Vertex> outputVertices){
+        double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
+        double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+        return optimize(maxEvaluations, boundsRange, outputVertices, initialTrustRegionRadius, stoppingTrustRegionRadius);
+    }
+
+    public double optimize(int maxEvaluations,
+                           double boundsRange,
+                           List<Vertex> outputVertices,
+                           double initialTrustRegionRadius,
+                           double stoppingTrustRegionRadius) {
 
         bayesNet.cascadeObservations();
 
@@ -55,7 +67,11 @@ public class NonGradientOptimizer extends Optimizer {
             this::handleFitnessCalculation
         );
 
-        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(getNumInterpolationPoints(latentVertices));
+        BOBYQAOptimizer optimizer = new BOBYQAOptimizer(
+            getNumInterpolationPoints(latentVertices),
+            initialTrustRegionRadius,
+            stoppingTrustRegionRadius
+        );
 
         double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
@@ -94,6 +110,25 @@ public class NonGradientOptimizer extends Optimizer {
      */
     public double maxAPosteriori(int maxEvaluations, double boundsRange) {
         return optimize(maxEvaluations, boundsRange, bayesNet.getLatentAndObservedVertices());
+    }
+
+    /**
+     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
+     * @param boundsRange    bounding box around starting point
+     * @param initialTrustRegionRadius    radius around region to start testing points
+     * @param stoppingTrustRegionRadius    stopping trust region radius
+     * @param boundsRange    bounding box around starting point
+     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     */
+    public double maxAPosteriori(int maxEvaluations,
+                                 double boundsRange,
+                                 double initialTrustRegionRadius,
+                                 double stoppingTrustRegionRadius) {
+        return optimize(maxEvaluations,
+                        boundsRange,
+                        bayesNet.getLatentAndObservedVertices(),
+                        initialTrustRegionRadius,
+                        stoppingTrustRegionRadius);
     }
 
     /**

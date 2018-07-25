@@ -210,6 +210,14 @@ public class Nd4jDoubleTensorTest {
         assertTrue("equals with epsilon should be true",a.equalsWithEps(b,0.5));
     }
 
+    @Test
+    public void doesClampTensor() {
+        DoubleTensor A = DoubleTensor.create(new double[]{0.25, 3, -4, -5});
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
+        DoubleTensor expected = DoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5});
+        assertEquals(expected, clampedA);
+    }
+
     private void assertAllValuesAre(DoubleTensor tensor, double v) {
         for( double element : tensor.asFlatList() ){
             assertEquals( element , v , 0.01);

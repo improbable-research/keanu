@@ -52,12 +52,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return ChiSquared.sample(getShape(), k.getValue(), random);
+        return ChiSquared.withParameters(k.getValue()).sample(getShape(), random);
     }
 
     @Override
     public double logPdf(DoubleTensor value) {
-        return ChiSquared.logPdf(k.getValue(), value).sum();
+        return ChiSquared.withParameters(k.getValue()).logProb(value).sum();
     }
 
     @Override

@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.dbl;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -175,6 +176,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor choleskyDecomposition();
 
     double determinant();
+
+    DoubleTensor concat(int dimension, DoubleTensor... those);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

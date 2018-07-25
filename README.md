@@ -7,7 +7,10 @@
 ```
 
 
-[![Build Status](https://travis-ci.org/improbable-research/keanu.svg?branch=develop)](https://travis-ci.org/improbable-research/keanu) [![Quality Gate](https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status)](https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project)
+[![Build Status][travis-image]][travis-url]
+[![Quality Gate][sonar-image]][sonar-url]
+[![Maven Central][maven-image]][maven-url]
+[![Javadocs](https://www.javadoc.io/badge/io.improbable/keanu.svg)](https://www.javadoc.io/doc/io.improbable/keanu)
 
 ## Overview
 
@@ -27,6 +30,9 @@ Whilst we will always welcome contributions, we would value your time more if it
 were spent applying Keanu to challenging problems and locating its strengths and weaknesses.
 
 Please create a Github Issue if you encounter any bugs or have a feature request.
+
+* Slack: [#keanu](https://join.slack.com/t/improbable-eng/shared_invite/enQtMzQ1ODcyMzQ5MjM4LWY5ZWZmNGM2ODc5MmViNmQ3ZTA3ZTY3NzQwOTBlMTkzZmIxZTIxODk0OWU3YjZhNWVlNDU3MDlkZGViZjhkMjc)
+* Issue Tracker: [GitHub Issues](https://github.com/improbable-research/keanu/issues)
 
 ## Features
 
@@ -58,3 +64,10 @@ Interested in more technical examples? Explore [Examples](keanu-docs/examples.md
 ## Hiring
 
 Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)
+
+[travis-image]: https://travis-ci.org/improbable-research/keanu.svg?branch=develop
+[travis-url]: https://travis-ci.org/improbable-research/keanu
+[maven-image]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu/badge.svg
+[maven-url]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu
+[sonar-image]: https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status
+[sonar-url]: https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project
