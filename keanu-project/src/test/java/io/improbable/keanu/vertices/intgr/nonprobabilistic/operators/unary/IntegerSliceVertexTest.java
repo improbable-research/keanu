@@ -17,7 +17,7 @@ public class IntegerSliceVertexTest {
     }
 
     @Test
-    public void canTADFrom2D() {
+    public void canGetTensorAlongDimensionOfRank2() {
         IntegerSliceVertex rowOne = new IntegerSliceVertex(matrixA, 0, 0);
 
         Assert.assertArrayEquals(new int[]{1, 2, 3}, rowOne.getValue().asFlatIntegerArray());
@@ -45,7 +45,7 @@ public class IntegerSliceVertexTest {
     }
 
     @Test
-    public void canTadAlongACube() {
+    public void canGetTensorAlongDimensionOfRank3() {
         IntegerVertex cube = new ConstantIntegerVertex(0);
         cube.setValue(IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2));
 

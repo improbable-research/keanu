@@ -165,7 +165,7 @@ public class TensorShape {
         return paddedShape;
     }
 
-    public static int[] shapeAlongDimension(int dimension, int[] shape) {
+    public static int[] shapeSlice(int dimension, int[] shape) {
         int[] newShape = Arrays.copyOf(shape, shape.length);
         newShape[dimension] = 1;
         return newShape;

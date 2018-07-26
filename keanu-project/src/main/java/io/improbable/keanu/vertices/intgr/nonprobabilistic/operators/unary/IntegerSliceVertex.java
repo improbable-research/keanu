@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeAlongDimension;
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class IntegerSliceVertex extends IntegerUnaryOpVertex {
 
@@ -18,7 +18,7 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
      * @param index the index of extraction
      */
     public IntegerSliceVertex(IntegerVertex inputVertex, int dimension, int index) {
-        super(shapeAlongDimension(dimension, inputVertex.getShape()), inputVertex);
+        super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
     }

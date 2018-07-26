@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeAlongDimension;
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class SliceVertex extends DoubleUnaryOpVertex {
 
@@ -22,7 +22,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
      * @param index the index of extraction
      */
     public SliceVertex(DoubleVertex inputVertex, int dimension, int index) {
-        super(shapeAlongDimension(dimension, inputVertex.getShape()), inputVertex);
+        super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
     }

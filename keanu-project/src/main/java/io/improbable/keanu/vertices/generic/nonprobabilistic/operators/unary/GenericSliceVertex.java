@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeAlongDimension;
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
 public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
 
@@ -26,7 +26,7 @@ public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
         this.dimension = dimension;
         this.index = index;
         setParents(inputVertex);
-        setValue(Tensor.placeHolder(shapeAlongDimension(dimension, inputVertex.getShape())));
+        setValue(Tensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
     }
 
     @Override

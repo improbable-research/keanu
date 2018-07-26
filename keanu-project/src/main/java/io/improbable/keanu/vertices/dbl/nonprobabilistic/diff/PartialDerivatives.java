@@ -245,17 +245,17 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives slice(int dimension, int index) {
-        Map<Long, DoubleTensor> splitDerivatives = new HashMap<>();
+        Map<Long, DoubleTensor> slicedDerivatives = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
             int[] partialDerivativeShape = partialDerivative.getValue().getShape();
             partialDerivativeShape[dimension] = 1;
-            DoubleTensor splitPartialDerivative = partialDerivative.getValue().slice(dimension, index);
-            splitPartialDerivative = splitPartialDerivative.reshape(partialDerivativeShape);
-            splitDerivatives.put(partialDerivative.getKey(), splitPartialDerivative);
+            DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
+            slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
+            slicedDerivatives.put(partialDerivative.getKey(), slicedPartialDerivative);
         }
 
-        return new PartialDerivatives(splitDerivatives);
+        return new PartialDerivatives(slicedDerivatives);
     }
 
     private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {

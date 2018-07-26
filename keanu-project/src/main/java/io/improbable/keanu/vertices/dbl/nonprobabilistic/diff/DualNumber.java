@@ -290,8 +290,8 @@ public class DualNumber {
     }
 
     public DualNumber slice(int dimension, int index) {
-        PartialDerivatives splitPartialDerivatives = this.partialDerivatives.slice(dimension, index);
-        return new DualNumber(value.slice(dimension, index), splitPartialDerivatives);
+        PartialDerivatives slicedPartialDerivatives = this.partialDerivatives.slice(dimension, index);
+        return new DualNumber(value.slice(dimension, index), slicedPartialDerivatives);
     }
 
     public DualNumber concat(int dimension, Map<Long, List<DoubleTensor>> combinedPartialDerivatives, DoubleTensor... toConcat) {
