@@ -31,7 +31,8 @@ public class GaussianKDE {
 
     public KDEVertex approximate(DoubleVertex vertex, Integer nSamples){
         BayesianNetwork network = new BayesianNetwork(vertex.getConnectedGraph());
-        DoubleVertexSamples vertexSamples = MetropolisHastings.getPosteriorSamples(network, Arrays.asList(vertex), nSamples).getDoubleTensorSamples(vertex);
+        DoubleVertexSamples vertexSamples = MetropolisHastings.withDefaultConfig()
+            .getPosteriorSamples(network, Arrays.asList(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
     }
 }

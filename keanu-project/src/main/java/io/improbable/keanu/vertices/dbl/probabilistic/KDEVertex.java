@@ -100,12 +100,12 @@ public class KDEVertex extends ProbabilisticDouble {
     public DoubleTensor sample(int nSamples, KeanuRandom random) {
         // get a random sample as the mean of a gaussian
         // then draw a sample from the gaussian around that mean with the bandwidth as the standard deviation
-        DoubleTensor value = Uniform.sample(new int[]{nSamples}, DoubleTensor.create(0, new int[]{1}), DoubleTensor.create(samples.getLength(), new int[]{1}), random);
+        DoubleTensor value = Uniform.withParameters(DoubleTensor.create(0, new int[]{1}), DoubleTensor.create(samples.getLength(), new int[]{1})).sample(new int[]{nSamples}, random);
         DoubleTensor index = value.floor();
         double[] newSamples = new double[nSamples];
         int j = 0;
         for (Double i : index.asFlatList()) {
-            newSamples[j] = Gaussian.sample(new int[]{1}, DoubleTensor.create(samples.getValue(i.intValue()), new int[]{1}), DoubleTensor.create(bandwidth, new int[]{1}), random).scalar();
+            newSamples[j] = Gaussian.withParameters(DoubleTensor.create(samples.getValue(i.intValue()), new int[]{1}), DoubleTensor.create(bandwidth, new int[]{1})).sample(new int[]{nSamples}, random).scalar();
             j++;
         }
         return DoubleTensor.create(newSamples);

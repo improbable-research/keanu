@@ -2,6 +2,7 @@ package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,7 +25,7 @@ public class KDEApproximationTest {
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
         BayesianNetwork network = new BayesianNetwork(gaussian.getConnectedGraph());
-        DoubleVertexSamples samples = MetropolisHastings.getPosteriorSamples(network, Arrays.asList(gaussian), nSamples).getDoubleTensorSamples(gaussian);
+        DoubleVertexSamples samples =  MetropolisHastings.withDefaultConfig().getPosteriorSamples(network, Arrays.asList(gaussian), nSamples).getDoubleTensorSamples(gaussian);
         return samples;
     }
 
@@ -60,7 +61,7 @@ public class KDEApproximationTest {
         KDEVertex KDE = new GaussianKDE().approximate(samples);
 
         DoubleTensor x = DoubleTensor.create(linspace(-3., 3., 100));
-        DoubleTensor gaussianLogPdf = Gaussian.logPdf(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1}), x);
+        DoubleTensor gaussianLogPdf = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).logProb(x);
         DoubleTensor expectedPdf = DoubleTensor.create(Math.E, x.getShape()).pow(gaussianLogPdf);
         DoubleTensor approximatedPdf = KDE.pdf(x);
 
@@ -77,9 +78,9 @@ public class KDEApproximationTest {
         KDEVertex KDE = new GaussianKDE().approximate(samples);
 
         for (double x: linspace(-1.+mu, 1.+mu, 10)) {
-            Gaussian.DiffLogP diffLog = Gaussian.dlnPdf(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1}), DoubleTensor.create(x, new int[]{1}));
+            Diffs diffLog = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).dLogProb(DoubleTensor.create(x, new int[]{1}));
             DoubleTensor approximateDerivative = KDE.dLogPdf(DoubleTensor.create(x, new int[]{1})).get(KDE.getId());
-            DoubleTensor expectedDerivative = diffLog.dLogPdx;
+            DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
             assertEquals(String.format("Got approximation %f and for real pdf %f at x=%f", expectedDerivative.scalar(), approximateDerivative.scalar(), x),
                 expectedDerivative.scalar(), approximateDerivative.scalar(), DELTA);
         }
