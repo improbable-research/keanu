@@ -49,7 +49,7 @@ public class KDEVertex extends ProbabilisticDouble {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         Map<Long, DoubleTensor> partialDerivates = new HashMap<>();
-        // do a for loop here
+        
         List<Double> valueAsList = value.asFlatList();
         double[] dlnPdfs = new double[valueAsList.size()];
         for (int i = 0; i < valueAsList.size(); i++){
