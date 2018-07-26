@@ -287,10 +287,21 @@ public class DualNumber {
         return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
     }
 
-    public DualNumber concat(int dimension, Map<Long, List<DoubleTensor>> combinedPartialDerivatives, DoubleTensor... toConcat) {
+    public DualNumber concat(int dimension, List<DualNumber> dualToConcat, DoubleTensor... toConcat) {
         Map<Long, DoubleTensor> concatenatedPartialDerivates = new HashMap<>();
+        Map<Long, List<DoubleTensor>> combinedPartialDerivativesOfInputs = new HashMap<>();
 
-        for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivatives.entrySet()) {
+        for (Map.Entry<Long, DoubleTensor> partial : this.partialDerivatives.asMap().entrySet()) {
+            combinedPartialDerivativesOfInputs.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
+        }
+
+        for (int i = 0; i < dualToConcat.size(); i++) {
+            for (Map.Entry<Long, DoubleTensor> partial : dualToConcat.get(i).getPartialDerivatives().asMap().entrySet()) {
+                combinedPartialDerivativesOfInputs.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
+            }
+        }
+
+        for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivativesOfInputs.entrySet()) {
             concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
         }
 
@@ -307,6 +318,35 @@ public class DualNumber {
             DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
             return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
         }
+    }
+
+    public DualNumber pluck(int[] inputShape, int... index) {
+        Map<Long, DoubleTensor> pluckedDuals = new HashMap<>();
+
+        long inputLength = TensorShape.getLength(inputShape);
+        int flatIndex = TensorShape.getFlatIndex(inputShape, TensorShape.getRowFirstStride(inputShape), index);
+
+        for (Map.Entry<Long, DoubleTensor> entry : this.partialDerivatives.asMap().entrySet()) {
+            DoubleTensor partial = entry.getValue();
+            int[] partialShape = entry.getValue().getShape();
+            long partialLength = TensorShape.getLength(partialShape);
+            long howManyValuesToPluckFromPartial = partialLength / inputLength;
+            int flatIndexOfPartial = (int) howManyValuesToPluckFromPartial * flatIndex;
+            double[] flatPartial = partial.asFlatDoubleArray();
+            double[] pluckedValues = new double[(int) howManyValuesToPluckFromPartial];
+
+            for (int i = flatIndexOfPartial; i < flatIndexOfPartial + howManyValuesToPluckFromPartial; i++) {
+                pluckedValues[i - flatIndexOfPartial] = flatPartial[i];
+            }
+
+            int[] newShape = Arrays.copyOfRange(partialShape, partialShape.length - 2, partialShape.length);
+            newShape = TensorShape.shapeToDesiredRankByPrependingOnes(newShape, partial.getShape().length);
+            DoubleTensor plucked = DoubleTensor.create(pluckedValues, newShape);
+            pluckedDuals.put(entry.getKey(), plucked);
+
+        }
+
+        return new DualNumber(DoubleTensor.scalar(this.value.getValue(index)), pluckedDuals);
     }
 
 

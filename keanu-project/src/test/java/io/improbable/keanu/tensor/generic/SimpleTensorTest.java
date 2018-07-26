@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor.generic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericPluckVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -64,6 +66,25 @@ public class SimpleTensorTest {
 
         assertArrayEquals(new int[]{9, 1}, reshapedSomething.getShape());
         assertArrayEquals(somethingTensor.asFlatArray(), reshapedSomething.asFlatArray());
+    }
+
+    @Test
+    public void canPluck() {
+
+        Tensor<Something> somethingTensor = new GenericTensor<>(
+            new Something[]{
+                Something.A, Something.B, Something.B,
+                Something.C, Something.D, Something.B,
+                Something.D, Something.A, Something.C
+            },
+            new int[]{3, 3}
+        );
+
+        ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(somethingTensor);
+
+        GenericPluckVertex<Something> pluck = new GenericPluckVertex(somethingVertex, 0, 0);
+
+        assertEquals(Something.A, pluck.getValue().scalar());
     }
 
 }

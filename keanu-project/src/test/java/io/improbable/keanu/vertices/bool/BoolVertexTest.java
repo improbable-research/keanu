@@ -10,6 +10,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -185,6 +187,14 @@ public class BoolVertexTest {
         BoolVertex flip = new Flip(new int[]{2, 1}, 0.5);
         flip.setAndCascade(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canPluckValue() {
+        BoolVertex flip = new Flip(0.5);
+        boolean[] values = new boolean[]{true, false, true};
+        flip.setAndCascade(values);
+        assertEquals(true, flip.pluck(0, 0).getValue().scalar());
     }
 
     private double andProbability(double pA, double pB) {
