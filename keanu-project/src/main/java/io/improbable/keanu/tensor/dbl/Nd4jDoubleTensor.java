@@ -773,10 +773,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor alongDimension(int dimension, int index) {
+    public DoubleTensor slice(int dimension, int index) {
         INDArray dup = tensor.dup();
-        INDArray tad = dup.slice(index, dimension);
-        return new Nd4jDoubleTensor(tad);
+        INDArray alongDimension = dup.slice(index, dimension);
+        return new Nd4jDoubleTensor(alongDimension);
     }
 
     @Override

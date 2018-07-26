@@ -5,9 +5,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.shapeAlongDimension;
+import static io.improbable.keanu.tensor.TensorShape.shapeAlongDimension;
 
-public class GenericAlongDimensionVertex<T> extends NonProbabilistic<Tensor<T>> {
+public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
 
     private final Vertex<? extends Tensor<T>> inputVertex;
     private final int dimension;
@@ -20,7 +20,7 @@ public class GenericAlongDimensionVertex<T> extends NonProbabilistic<Tensor<T>> 
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericAlongDimensionVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
+    public GenericSliceVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
 
         this.inputVertex = inputVertex;
         this.dimension = dimension;
@@ -39,8 +39,8 @@ public class GenericAlongDimensionVertex<T> extends NonProbabilistic<Tensor<T>> 
         return op(inputVertex.sample(random));
     }
 
-    protected Tensor<T> op(Tensor<T> a) {
-        return a.alongDimension(dimension, index);
+    protected Tensor<T> op(Tensor<T> input) {
+        return input.slice(dimension, index);
     }
 
 }

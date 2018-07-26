@@ -289,9 +289,9 @@ public class DualNumber {
         return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
     }
 
-    public DualNumber alongDimension(int dimension, int index) {
-        PartialDerivatives splitPartialDerivatives = this.partialDerivatives.alongDimension(dimension, index);
-        return new DualNumber(value.alongDimension(dimension, index), splitPartialDerivatives);
+    public DualNumber slice(int dimension, int index) {
+        PartialDerivatives splitPartialDerivatives = this.partialDerivatives.slice(dimension, index);
+        return new DualNumber(value.slice(dimension, index), splitPartialDerivatives);
     }
 
     public DualNumber concat(int dimension, Map<Long, List<DoubleTensor>> combinedPartialDerivatives, DoubleTensor... toConcat) {

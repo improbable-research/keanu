@@ -244,13 +244,13 @@ public class PartialDerivatives {
         return new PartialDerivatives(reshapedDerivatives);
     }
 
-    public PartialDerivatives alongDimension(int dimension, int index) {
+    public PartialDerivatives slice(int dimension, int index) {
         Map<Long, DoubleTensor> splitDerivatives = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
             int[] partialDerivativeShape = partialDerivative.getValue().getShape();
             partialDerivativeShape[dimension] = 1;
-            DoubleTensor splitPartialDerivative = partialDerivative.getValue().alongDimension(dimension, index);
+            DoubleTensor splitPartialDerivative = partialDerivative.getValue().slice(dimension, index);
             splitPartialDerivative = splitPartialDerivative.reshape(partialDerivativeShape);
             splitDerivatives.put(partialDerivative.getKey(), splitPartialDerivative);
         }

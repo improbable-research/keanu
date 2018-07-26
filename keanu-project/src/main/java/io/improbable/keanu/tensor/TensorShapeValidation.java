@@ -90,12 +90,6 @@ public class TensorShapeValidation {
         return uniqueShapes.iterator().next().getShape();
     }
 
-    public static int[] shapeAlongDimension(int dimension, int[] shape) {
-        int[] newShape = Arrays.copyOf(shape, shape.length);
-        newShape[dimension] = 1;
-        return newShape;
-    }
-
     public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
         int[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
 

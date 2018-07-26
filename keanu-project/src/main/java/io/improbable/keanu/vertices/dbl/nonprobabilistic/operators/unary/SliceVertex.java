@@ -7,9 +7,9 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.shapeAlongDimension;
+import static io.improbable.keanu.tensor.TensorShape.shapeAlongDimension;
 
-public class AlongDimensionVertex extends DoubleUnaryOpVertex {
+public class SliceVertex extends DoubleUnaryOpVertex {
 
     private final int dimension;
     private final int index;
@@ -21,7 +21,7 @@ public class AlongDimensionVertex extends DoubleUnaryOpVertex {
      * @param dimension the dimension to extract along
      * @param index the index of extraction
      */
-    public AlongDimensionVertex(DoubleVertex inputVertex, int dimension, int index) {
+    public SliceVertex(DoubleVertex inputVertex, int dimension, int index) {
         super(shapeAlongDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
@@ -29,11 +29,11 @@ public class AlongDimensionVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).alongDimension(dimension, index);
+        return dualNumbers.get(inputVertex).slice(dimension, index);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.alongDimension(dimension, index);
+    protected DoubleTensor op(DoubleTensor input) {
+        return input.slice(dimension, index);
     }
 }

@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-public class BoolAlongDimensionVertexTest {
+public class BoolSliceVertexTest {
 
     private BoolVertex matrixA;
 
@@ -19,48 +19,48 @@ public class BoolAlongDimensionVertexTest {
     }
 
     @Test
-    public void canTADFrom2D() {
+    public void canGetTensorAlongDimensionOfRank2() {
         System.out.println(Arrays.toString(matrixA.getShape()));
-        BoolAlongDimensionVertex rowOne = new BoolAlongDimensionVertex(matrixA, 0, 0);
+        BoolSliceVertex rowOne = new BoolSliceVertex(matrixA, 0, 0);
 
         Assert.assertArrayEquals(new double[]{1, 1, 0}, rowOne.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{1, 3}, rowOne.getShape());
 
-        BoolAlongDimensionVertex rowTwo = new BoolAlongDimensionVertex(matrixA, 0, 1);
+        BoolSliceVertex rowTwo = new BoolSliceVertex(matrixA, 0, 1);
 
         Assert.assertArrayEquals(new double[]{0, 1, 1}, rowTwo.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{1, 3}, rowTwo.getShape());
 
-        BoolAlongDimensionVertex columnOne = new BoolAlongDimensionVertex(matrixA, 1, 0);
+        BoolSliceVertex columnOne = new BoolSliceVertex(matrixA, 1, 0);
 
         Assert.assertArrayEquals(new double[]{1, 0}, columnOne.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 1}, columnOne.getShape());
 
-        BoolAlongDimensionVertex columnTwo = new BoolAlongDimensionVertex(matrixA, 1, 1);
+        BoolSliceVertex columnTwo = new BoolSliceVertex(matrixA, 1, 1);
 
         Assert.assertArrayEquals(new double[]{1, 1}, columnTwo.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 1}, columnTwo.getShape());
 
-        BoolAlongDimensionVertex columnThree = new BoolAlongDimensionVertex(matrixA, 1, 2);
+        BoolSliceVertex columnThree = new BoolSliceVertex(matrixA, 1, 2);
 
         Assert.assertArrayEquals(new double[]{0, 1}, columnThree.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 1}, columnThree.getShape());
     }
 
     @Test
-    public void canTadAlongACube() {
+    public void canGetTensorAlongDimensionOfRank3() {
         BoolVertex cube = new ConstantBoolVertex(false);
         cube.setValue(BooleanTensor.create(new boolean[]{true, true, false, false, true, true, false, false}, 2, 2, 2));
 
-        BoolAlongDimensionVertex dimenZeroFace = new BoolAlongDimensionVertex(cube, 0, 0);
+        BoolSliceVertex dimenZeroFace = new BoolSliceVertex(cube, 0, 0);
         Assert.assertArrayEquals(new double[]{1, 1, 0, 0}, dimenZeroFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 2}, dimenZeroFace.getShape());
 
-        BoolAlongDimensionVertex dimenOneFace = new BoolAlongDimensionVertex(cube, 1, 0);
+        BoolSliceVertex dimenOneFace = new BoolSliceVertex(cube, 1, 0);
         Assert.assertArrayEquals(new double[]{1, 1, 1, 1}, dimenOneFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 2}, dimenOneFace.getShape());
 
-        BoolAlongDimensionVertex dimenTwoFace = new BoolAlongDimensionVertex(cube, 2, 0);
+        BoolSliceVertex dimenTwoFace = new BoolSliceVertex(cube, 2, 0);
         Assert.assertArrayEquals(new double[]{1, 0, 1, 0}, dimenTwoFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 2}, dimenTwoFace.getShape());
     }

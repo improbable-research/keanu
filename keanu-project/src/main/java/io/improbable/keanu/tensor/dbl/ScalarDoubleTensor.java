@@ -394,7 +394,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor alongDimension(int dimension, int index) {
+    public DoubleTensor slice(int dimension, int index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {

@@ -175,7 +175,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
     double determinant();
 
     @Override
-    DoubleTensor alongDimension(int dimension, int index);
+    DoubleTensor slice(int dimension, int index);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 

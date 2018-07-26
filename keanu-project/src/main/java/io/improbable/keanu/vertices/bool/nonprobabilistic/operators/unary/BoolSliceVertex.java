@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.shapeAlongDimension;
+import static io.improbable.keanu.tensor.TensorShape.shapeAlongDimension;
 
-public class BoolAlongDimensionVertex extends BoolUnaryOpVertex<BooleanTensor> {
+public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
 
     private final int dimension;
     private final int index;
@@ -17,15 +17,15 @@ public class BoolAlongDimensionVertex extends BoolUnaryOpVertex<BooleanTensor> {
      * @param dimension the dimension to extract along
      * @param index the index of extraction
      */
-    public BoolAlongDimensionVertex(BoolVertex inputVertex, int dimension, int index) {
+    public BoolSliceVertex(BoolVertex inputVertex, int dimension, int index) {
         super(shapeAlongDimension(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
     }
 
     @Override
-    protected BooleanTensor op(BooleanTensor a) {
-        return a.alongDimension(dimension, index);
+    protected BooleanTensor op(BooleanTensor input) {
+        return input.slice(dimension, index);
     }
 
 }

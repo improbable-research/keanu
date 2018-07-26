@@ -65,7 +65,7 @@ public class SimpleTensorTest {
     }
 
     @Test
-    public void canTAD() {
+    public void canSliceRankTwoTensor() {
 
         Tensor<Something> somethingTensor = new GenericTensor<>(
             new Something[]{
@@ -76,11 +76,11 @@ public class SimpleTensorTest {
             new int[]{3, 3}
         );
 
-        Tensor<Something> taddedSomethingRow = somethingTensor.alongDimension(0, 1);
+        Tensor<Something> taddedSomethingRow = somethingTensor.slice(0, 1);
         assertArrayEquals(new int[]{1, 3}, taddedSomethingRow.getShape());
         assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
 
-        Tensor<Something> taddedSomethingColumn = somethingTensor.alongDimension(1, 1);
+        Tensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
         assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
     }

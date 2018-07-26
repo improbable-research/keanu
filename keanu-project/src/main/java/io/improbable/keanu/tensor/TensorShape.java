@@ -93,16 +93,18 @@ public class TensorShape {
     /**
      * This method can be interpreted as the opposite to getFlatIndex.
 
-     *
-     * @param shape shape to find the index of
+     * @param shape the shape to find the index of
      * @param stride the stride to find the index of
      * @param flatIndex the index to f
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */
     public static int[] getShapeIndices(int[] shape, int[] stride, int flatIndex) {
-        int[] shapeIndices = new int[shape.length];
+        if (flatIndex > getLength(shape)) {
+            throw new IllegalArgumentException("The requested index is out of the bounds of this shape.");
+        }
+        int[] shapeIndices = new int[stride.length];
         int remainder = flatIndex;
-        for (int i = 0; i < shape.length; i++) {
+        for (int i = 0; i < stride.length; i++) {
             shapeIndices[i] = remainder / stride[i];
             remainder -= shapeIndices[i] * stride[i];
         }
@@ -161,6 +163,12 @@ public class TensorShape {
         }
 
         return paddedShape;
+    }
+
+    public static int[] shapeAlongDimension(int dimension, int[] shape) {
+        int[] newShape = Arrays.copyOf(shape, shape.length);
+        newShape[dimension] = 1;
+        return newShape;
     }
 }
 

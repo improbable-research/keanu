@@ -105,6 +105,6 @@ public interface Tensor<T> {
         return new GenericTensor<>(shape);
     }
 
-    Tensor<T> alongDimension(int dimension, int index);
+    Tensor<T> slice(int dimension, int index);
 
 }

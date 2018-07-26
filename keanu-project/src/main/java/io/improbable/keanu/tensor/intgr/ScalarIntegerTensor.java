@@ -245,7 +245,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor alongDimension(int dimension, int index) {
+    public IntegerTensor slice(int dimension, int index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
