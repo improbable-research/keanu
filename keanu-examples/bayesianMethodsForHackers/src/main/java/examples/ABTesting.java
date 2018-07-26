@@ -10,72 +10,58 @@ import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Arrays;
 
 /**
  * Is treatment A significantly more likely to drive purchases than treatment B?
- *
+ * <p>
  * http://nbviewer.jupyter.org/github/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/blob/master/Chapter2_MorePyMC/Ch2_MorePyMC_PyMC3.ipynb#Example:-Bayesian-A/B-testing
  */
 public class ABTesting {
     private static KeanuRandom RANDOM = KeanuRandom.getDefaultRandom();
 
-    public static ABTestingPosteriors run() {
-        DoubleVertex pA = new UniformVertex(0., 1.);
-        DoubleVertex pB = new UniformVertex(0., 1.);
+    public static ABTestingMaximumAPosteriori run() {
 
-        DoubleVertex delta = pA.minus(pB);
+        DoubleVertex probabilityA = new UniformVertex(0., 1.);
+        DoubleVertex probabilityB = new UniformVertex(0., 1.);
 
-        Flip obsA = new Flip(pA);
-        Flip obsB = new Flip(pB);
+        DoubleVertex delta = probabilityA.minus(probabilityB);
+
+        Flip observationA = new Flip(probabilityA);
+        Flip observationB = new Flip(probabilityB);
 
         // manufacture observations
         int nObsA = 1500;
-        BooleanTensor observationsA = RANDOM.nextDouble(new int[] {1, nObsA}).lessThan(0.05);
-        obsA.observe(observationsA);
-        double observedFrequencyA = (double)observationsA.asFlatList().stream().filter(b -> b).count() / nObsA;
+        BooleanTensor observationsA = RANDOM.nextDouble(new int[]{1, nObsA}).lessThan(0.05);
+        observationA.observe(observationsA);
 
         int nObsB = 750;
-        BooleanTensor observationsB = RANDOM.nextDouble(new int[] {1, nObsB}).lessThan(0.04);
-        obsB.observe(observationsB);
-        double observedFrequencyB = (double)observationsB.asFlatList().stream().filter(b -> b).count() / nObsB;
+        BooleanTensor observationsB = RANDOM.nextDouble(new int[]{1, nObsB}).lessThan(0.04);
+        observationB.observe(observationsB);
 
-        BayesianNetwork net = new BayesianNetwork(pA.getConnectedGraph());
+        //infer the most probable probabilities
+        BayesianNetwork net = new BayesianNetwork(probabilityA.getConnectedGraph());
+        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
+            .getPosteriorSamples(net, Arrays.asList(probabilityA, probabilityB, delta), 20000)
+            .drop(1000).downSample(net.getLatentVertices().size());
 
-        NetworkSamples networkSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), 20000)
-                .drop(1000).downSample(1);
+        DoubleVertexSamples pASamples = networkSamples.getDoubleTensorSamples(probabilityA);
+        DoubleVertexSamples pBSamples = networkSamples.getDoubleTensorSamples(probabilityB);
 
-        DoubleVertexSamples pASamples = networkSamples.getDoubleTensorSamples(pA);
-        DoubleVertexSamples pBSamples = networkSamples.getDoubleTensorSamples(pB);
-        ABTestingPosteriors out = new ABTestingPosteriors();
-        out.pASamples = pASamples.asList().stream().map(dT -> dT.scalar()).collect(Collectors.toList());
-        out.pBSamples = pBSamples.asList().stream().map(dT -> dT.scalar()).collect(Collectors.toList());
-        out.pAMode = pASamples.getMode().scalar();
-        out.pBMode = pBSamples.getMode().scalar();
-        return out;
+        //most probable probabilities are the averages of the MH walk in this case
+        double mapPA = pASamples.getAverages().scalar();
+        double mapPB = pBSamples.getAverages().scalar();
+
+        return new ABTestingMaximumAPosteriori(mapPA, mapPB);
     }
 
-    public static class ABTestingPosteriors {
-        private List<Double> pASamples;
-        private List<Double> pBSamples;
-        private Double pAMode;
-        private Double pBMode;
+    public static class ABTestingMaximumAPosteriori {
+        public double pA;
+        public double pB;
 
-        public List<Double> getpASamples() {
-            return pASamples;
-        }
-
-        public List<Double> getpBSamples() {
-            return pBSamples;
-        }
-
-        public Double getpAMode() {
-            return pAMode;
-        }
-
-        public Double getpBMode() {
-            return pBMode;
+        public ABTestingMaximumAPosteriori(double pA, double pB) {
+            this.pA = pA;
+            this.pB = pB;
         }
     }
 }

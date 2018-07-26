@@ -11,15 +11,7 @@ public class ChallengerDisasterTest {
         ChallengerDisaster.ChallengerPosteriors posteriors = ChallengerDisaster.run();
 
         // assert
-        assertThat(posteriors.getAlphaMode()).isBetween(0.1, 0.4);
-    }
-
-    @Test
-    public void testWhenChallengerDisasterIsRunThenAlphaIsLargeAndNegative() {
-        // act
-        ChallengerDisaster.ChallengerPosteriors posteriors = ChallengerDisaster.run();
-
-        // assert
-        assertThat(posteriors.getBetaMode()).isBetween(-25.0, -5.0);
+        assertThat(posteriors.mapBeta).isBetween(0.1, 0.4);
+        assertThat(posteriors.mapAlpha).isBetween(-25.0, -5.0);
     }
 }

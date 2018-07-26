@@ -1,55 +1,51 @@
 package examples;
 
-import com.google.common.primitives.Booleans;
-import data.ChallengerData;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 /**
  * Does temperature correlate with defects?
- *
+ * <p>
  * http://nbviewer.jupyter.org/github/CamDavidsonPilon/Probabilistic-Programming-and-Bayesian-Methods-for-Hackers/blob/master/Chapter2_MorePyMC/Ch2_MorePyMC_PyMC3.ipynb#Example:-Challenger-Space-Shuttle-Disaster-
  */
 public class ChallengerDisaster {
     public static ChallengerPosteriors run() {
-        GaussianVertex beta = new GaussianVertex(0, 0.001);
-        GaussianVertex alpha = new GaussianVertex(0, 0.001);
 
-        double[] temps = new double[ChallengerData.LAUNCH_EVENTS.length];
-        IntStream.range(0, temps.length).forEach(i -> temps[i] = ChallengerData.LAUNCH_EVENTS[i][0]);
-        boolean[] defects = new boolean[ChallengerData.LAUNCH_EVENTS.length];
-        IntStream.range(0, defects.length).forEach(i -> defects[i] = ChallengerData.LAUNCH_EVENTS[i][1] == 1);
+        ChallengerData data = ReadCsv.fromResources("challenger_data.csv")
+            .asVectorizedColumnsDefinedBy(ChallengerData.class)
+            .load();
 
-        DoubleVertex temp = new ConstantDoubleVertex(temps);
-        DoubleVertex logisticOutput = createLogisticFunction(beta, alpha, temp);
+        double tau = 0.001;
+        double sigma = Math.sqrt(1.0 / tau);
+        GaussianVertex beta = new GaussianVertex(0, sigma);
+        GaussianVertex alpha = new GaussianVertex(0, sigma);
+
+        DoubleVertex temps = new ConstantDoubleVertex(data.temps);
+        DoubleVertex logisticOutput = createLogisticFunction(beta, alpha, temps);
+
         Flip defect = new Flip(logisticOutput);
-        defect.observe(defects);
+        defect.observe(data.oRingFailure);
 
         BayesianNetwork net = new BayesianNetwork(defect.getConnectedGraph());
+        net.probeForNonZeroProbability(10000);
 
-        NetworkSamples networkSamples = MetropolisHastings.getPosteriorSamples(net, net.getLatentVertices(), 120000)
-                .drop(100000).downSample(2);
+        int sampleCount = 120000;
+        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
+            .getPosteriorSamples(net, net.getLatentVertices(), sampleCount)
+            .drop(sampleCount / 10).downSample(net.getLatentVertices().size());
 
         ChallengerPosteriors cp = new ChallengerPosteriors();
-        cp.networkSamples = networkSamples;
-        cp.vertices = net.getLatentVertices();
-        cp.alphaSamples = networkSamples.get(alpha).asList().stream().map(s -> s.scalar()).collect(Collectors.toList());
-        cp.betaSamples = networkSamples.get(beta).asList().stream().map(s -> s.scalar()).collect(Collectors.toList());
-        cp.alphaMode = networkSamples.get(alpha).getMode().scalar();
-        cp.betaMode = networkSamples.get(beta).getMode().scalar();
-        cp.temperature = Arrays.stream(temps).boxed().collect(Collectors.toList());
-        cp.defects = Booleans.asList(defects).stream().map(b -> b ? 1. : 0.).collect(Collectors.toList());
+        cp.mapAlpha = networkSamples.getDoubleTensorSamples(alpha).getAverages().scalar();
+        cp.mapBeta = networkSamples.getDoubleTensorSamples(beta).getAverages().scalar();
+
         return cp;
     }
 
@@ -60,45 +56,12 @@ public class ChallengerDisaster {
     }
 
     public static class ChallengerPosteriors {
-        private NetworkSamples networkSamples;
-        private List<Vertex> vertices;
-        private List<Double> alphaSamples;
-        private List<Double> betaSamples;
-        private List<Double> temperature;
-        private List<Double> defects;
-        private Double alphaMode;
-        private Double betaMode;
+        public Double mapAlpha;
+        public Double mapBeta;
+    }
 
-        public NetworkSamples getNetworkSamples() {
-            return networkSamples;
-        }
-
-        public List<Vertex> getVertices() {
-            return vertices;
-        }
-
-        public List<Double> getAlphaSamples() {
-            return alphaSamples;
-        }
-
-        public List<Double> getBetaSamples() {
-            return betaSamples;
-        }
-
-        public List<Double> getTemperature() {
-            return temperature;
-        }
-
-        public List<Double> getDefects() {
-            return defects;
-        }
-
-        public Double getAlphaMode() {
-            return alphaMode;
-        }
-
-        public Double getBetaMode() {
-            return betaMode;
-        }
+    public static class ChallengerData {
+        public DoubleTensor temps;
+        public BooleanTensor oRingFailure;
     }
 }

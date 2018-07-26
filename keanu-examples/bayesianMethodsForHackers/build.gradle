@@ -15,6 +15,6 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
     testCompile("org.assertj:assertj-core:3.10.0")
 
-    compile group: 'io.improbable', name: 'keanu', version: '0.0.8'
+    compile project(":keanu-project")
     compile 'net.sf.py4j:py4j:0.10.6'
 }

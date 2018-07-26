@@ -11,6 +11,6 @@ public class TextMessagingTest {
         TextMessaging.TextMessagingResults output = TextMessaging.run();
 
         // assert
-        assertThat(output.getSwitchPointMode()).isBetween(41, 46);
+        assertThat(output.switchPointMode).isBetween(41, 46);
     }
 }

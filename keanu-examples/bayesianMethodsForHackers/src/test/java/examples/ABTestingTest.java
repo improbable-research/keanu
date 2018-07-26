@@ -9,10 +9,10 @@ public class ABTestingTest {
     @Test
     public void testWhenABTestIsRunThenBothTreatmentsHaveAccuratePosteriors() {
         // act
-        ABTesting.ABTestingPosteriors posteriors = ABTesting.run();
+        ABTesting.ABTestingMaximumAPosteriori posteriors = ABTesting.run();
 
         // assert
-        assertThat(posteriors.getpAMode()).isBetween(0.02, 0.07);
-        assertThat(posteriors.getpBMode()).isBetween(0.02, 0.07);
+        assertThat(posteriors.pA).isBetween(0.02, 0.07);
+        assertThat(posteriors.pB).isBetween(0.02, 0.07);
     }
 }
