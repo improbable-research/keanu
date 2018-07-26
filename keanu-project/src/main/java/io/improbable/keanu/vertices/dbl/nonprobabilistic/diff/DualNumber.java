@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.*;
 
@@ -285,6 +284,11 @@ public class DualNumber {
     public DualNumber reshape(int[] proposedShape) {
         PartialDerivatives reshapedPartialDerivatives = this.partialDerivatives.reshape(getValue().getRank(), proposedShape);
         return new DualNumber(value.reshape(proposedShape), reshapedPartialDerivatives);
+    }
+
+    public DualNumber slice(int dimension, int index) {
+        PartialDerivatives slicedPartialDerivatives = this.partialDerivatives.slice(dimension, index);
+        return new DualNumber(value.slice(dimension, index), slicedPartialDerivatives);
     }
 
     public DualNumber concat(int dimension, List<DualNumber> dualToConcat, DoubleTensor... toConcat) {

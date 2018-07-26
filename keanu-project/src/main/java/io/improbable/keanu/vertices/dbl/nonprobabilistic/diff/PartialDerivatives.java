@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -243,6 +242,20 @@ public class PartialDerivatives {
         }
 
         return new PartialDerivatives(reshapedDerivatives);
+    }
+
+    public PartialDerivatives slice(int dimension, int index) {
+        Map<Long, DoubleTensor> slicedDerivatives = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+            int[] partialDerivativeShape = partialDerivative.getValue().getShape();
+            partialDerivativeShape[dimension] = 1;
+            DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
+            slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
+            slicedDerivatives.put(partialDerivative.getKey(), slicedPartialDerivative);
+        }
+
+        return new PartialDerivatives(slicedDerivatives);
     }
 
     private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {

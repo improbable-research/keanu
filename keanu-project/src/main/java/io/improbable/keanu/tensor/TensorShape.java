@@ -69,6 +69,12 @@ public class TensorShape {
         return stride;
     }
 
+    /**
+     * @param shape shape to find the index for
+     * @param stride stride to find the index for
+     * @param index the index in each dimension
+     * @return the flat index from a N dimensional index
+     */
     public static int getFlatIndex(int[] shape, int[] stride, int... index) {
         int flatIndex = 0;
         for (int i = 0; i < index.length; i++) {
@@ -82,6 +88,27 @@ public class TensorShape {
             flatIndex += stride[i] * index[i];
         }
         return flatIndex;
+    }
+
+    /**
+     * This method can be interpreted as the opposite to getFlatIndex.
+
+     * @param shape the shape to find the index of
+     * @param stride the stride to find the index of
+     * @param flatIndex the index to f
+     * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
+     */
+    public static int[] getShapeIndices(int[] shape, int[] stride, int flatIndex) {
+        if (flatIndex > getLength(shape)) {
+            throw new IllegalArgumentException("The requested index is out of the bounds of this shape.");
+        }
+        int[] shapeIndices = new int[stride.length];
+        int remainder = flatIndex;
+        for (int i = 0; i < stride.length; i++) {
+            shapeIndices[i] = remainder / stride[i];
+            remainder -= shapeIndices[i] * stride[i];
+        }
+        return shapeIndices;
     }
 
     public static boolean isScalar(int[] shape) {
@@ -137,4 +164,11 @@ public class TensorShape {
 
         return paddedShape;
     }
+
+    public static int[] shapeSlice(int dimension, int[] shape) {
+        int[] newShape = Arrays.copyOf(shape, shape.length);
+        newShape[dimension] = 1;
+        return newShape;
+    }
 }
+
