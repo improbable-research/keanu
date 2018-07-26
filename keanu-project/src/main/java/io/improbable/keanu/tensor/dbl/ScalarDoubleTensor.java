@@ -646,7 +646,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setAll(double value) {
+    public DoubleTensor setAllInPlace(double value) {
         this.value = value;
         return this;
     }

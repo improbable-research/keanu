@@ -247,11 +247,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor standardizeInPlace();
 
-    default public DoubleTensor zero() {
-        return setAll(0.0);
+    default public DoubleTensor zeroInPlace() {
+        return setAllInPlace(0.0);
     }
 
-    DoubleTensor setAll( double value );
+    DoubleTensor setAllInPlace( double value );
 
     // Comparisons
     BooleanTensor lessThan(double value);

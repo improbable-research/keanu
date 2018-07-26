@@ -754,7 +754,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setAll(double value) {
+    public DoubleTensor setAllInPlace(double value) {
         this.tensor.assign(value);
         return this;
     }
