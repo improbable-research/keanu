@@ -1,28 +1,40 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.S;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Logistic {
+public class Logistic implements ContinuousDistribution {
+
+    private final DoubleTensor mu;
+    private final DoubleTensor s;
 
     /**
-     * @param shape  shape of tensor returned
      * @param mu     location parameter (any real number)
      * @param s      scale parameter (b greater than 0)
-     * @param random source or randomness
-     * @return a sample from the distribution
+     * @return       a new ContinuousDistribution object
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor mu, DoubleTensor s, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
+        return new Logistic(mu, s);
+    }
+
+    private Logistic(DoubleTensor mu, DoubleTensor s) {
+        this.mu = mu;
+        this.s = s;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
         return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(mu.minus(s));
     }
 
-    /**
-     * @param mu location parameter (any real number)
-     * @param s  scale parameter (b greater than 0)
-     * @param x  at value
-     * @return the density at x
-     */
-    public static DoubleTensor logPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor xMinusAOverB = x.minus(mu).divInPlace(s);
         final DoubleTensor ln1OverB = s.reciprocal().logInPlace();
 
@@ -31,7 +43,8 @@ public class Logistic {
         );
     }
 
-    public static DiffLogP dlnPdf(DoubleTensor mu, DoubleTensor s, DoubleTensor x) {
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor expAOverB = mu.div(s).expInPlace();
         final DoubleTensor expXOverB = x.div(s).expInPlace();
         final DoubleTensor expPlus = expAOverB.plus(expXOverB);
@@ -49,19 +62,9 @@ public class Logistic {
 
         final DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
-        return new DiffLogP(dLogPdmu, dLogPds, dLogPdx);
+        return new Diffs()
+            .put(MU, dLogPdmu)
+            .put(S, dLogPds)
+            .put(X, dLogPdx);
     }
-
-    public static class DiffLogP {
-        public final DoubleTensor dLogPdmu;
-        public final DoubleTensor dLogPds;
-        public final DoubleTensor dLogPdx;
-
-        public DiffLogP(DoubleTensor dLogPdmu, DoubleTensor dLogPds, DoubleTensor dLogPdx) {
-            this.dLogPdmu = dLogPdmu;
-            this.dLogPds = dLogPds;
-            this.dLogPdx = dLogPdx;
-        }
-    }
-
 }

@@ -1,6 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.K;
+import static io.improbable.keanu.distributions.dual.Diffs.THETA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Gamma;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -86,15 +96,15 @@ public class GammaVertex extends ProbabilisticDouble {
         DoubleTensor thetaValues = theta.getValue();
         DoubleTensor kValues = k.getValue();
 
-        DoubleTensor logPdfs = Gamma.logPdf(locationValues, thetaValues, kValues, value);
+        DoubleTensor logPdfs = Gamma.withParameters(locationValues, thetaValues, kValues).logProb(value);
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Gamma.DiffLogP dlnP = Gamma.dlnPdf(location.getValue(), theta.getValue(), k.getValue(), value);
+        Diffs dlnP = Gamma.withParameters(location.getValue(), theta.getValue(), k.getValue()).dLogProb(value);
 
-        return convertDualNumbersToDiff(dlnP.dLogPdlocation, dlnP.dLogPdtheta, dlnP.dLogPdk, dlnP.dLogPdx);
+        return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
@@ -119,7 +129,7 @@ public class GammaVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Gamma.sample(getShape(), location.getValue(), theta.getValue(), k.getValue(), random);
+        return Gamma.withParameters(location.getValue(), theta.getValue(), k.getValue()).sample(getShape(), random);
     }
 
 }
