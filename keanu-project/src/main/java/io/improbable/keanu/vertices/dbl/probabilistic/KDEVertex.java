@@ -14,10 +14,9 @@ public class KDEVertex extends ProbabilisticDouble {
     public double bandwidth;
     private DoubleTensor samples;
 
-    public KDEVertex(List<Double> samples) {
-        this(DoubleTensor.create(samples.stream()
-            .mapToDouble(Double::doubleValue)
-            .toArray()));
+    public KDEVertex(DoubleTensor samples, double bandwidth){
+        this.samples = samples;
+        this.bandwidth = bandwidth;
     }
 
     public KDEVertex(DoubleTensor samples) {
@@ -25,9 +24,16 @@ public class KDEVertex extends ProbabilisticDouble {
         this.bandwidth = scottsBandwith();
     }
 
-    public DoubleTensor pdf(double x) {
-        DoubleTensor xTensor = DoubleTensor.create(x, samples.getShape());
-        return pdf(xTensor);
+    public KDEVertex(List<Double> samples) {
+        this(DoubleTensor.create(samples.stream()
+            .mapToDouble(Double::doubleValue)
+            .toArray()));
+    }
+
+    public KDEVertex(List<Double> samples, double bandwidth) {
+        this(DoubleTensor.create(samples.stream()
+            .mapToDouble(Double::doubleValue)
+            .toArray()), bandwidth);
     }
 
     public DoubleTensor pdf(DoubleTensor x) {
@@ -57,11 +63,6 @@ public class KDEVertex extends ProbabilisticDouble {
         }
         partialDerivates.put(getId(), DoubleTensor.create(dlnPdfs, new int[]{dlnPdfs.length}));
         return partialDerivates;
-    }
-
-    public DoubleTensor dPdx(double x) {
-        DoubleTensor diff = DoubleTensor.create(x, samples.getShape()).minus(samples);
-        return dPdx(diff.divInPlace(bandwidth)).sum(0, 1);
     }
 
     private DoubleTensor dPdx(DoubleTensor x) {
@@ -113,11 +114,6 @@ public class KDEVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        // get a random sample as the mean of a gaussian
-        // then draw a sample from the gaussian around that mean with the bandwidth as the standard deviation
-        //double value = Uniform.sample(new int[]{1}, DoubleTensor.create(0, new int[]{1}), DoubleTensor.create(samples.getLength(), new int[]{1}), random).scalar();
-        //int index = ((Double) Math.floor(value)).intValue();
-        //return Gaussian.sample(new int[]{1}, DoubleTensor.create(samples.getValue(index), new int[]{1}), DoubleTensor.create(bandwidth, new int[]{1}), random);
         return sample(1, random);
     }
 
