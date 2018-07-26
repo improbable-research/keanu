@@ -52,7 +52,7 @@ public class CheatingStudents {
 
         BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
 
-        NetworkSamples networkSamples = MetropolisHastings.getPosteriorSamples(
+        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             network,
             Collections.singletonList(probabilityOfCheating),
             numberOfSamples
@@ -77,7 +77,7 @@ public class CheatingStudents {
 
         BayesianNetwork network = new BayesianNetwork(answerTotal.getConnectedGraph());
 
-        NetworkSamples networkSamples = MetropolisHastings.getPosteriorSamples(
+        NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             network,
             Collections.singletonList(probabilityOfCheating),
             numberOfSamples

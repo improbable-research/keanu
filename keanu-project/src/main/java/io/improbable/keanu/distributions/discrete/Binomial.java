@@ -49,7 +49,7 @@ public class Binomial implements DiscreteDistribution {
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
 
-        int[] shape = n.getShape();
+        int[] shape = k.getShape();
         Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
         Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
         Tensor.FlattenedView<Integer> kWrapped = k.getFlattenedView();
