@@ -754,11 +754,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor zero() {
-        return setAll(0.0);
-    }
-
-    @Override
     public DoubleTensor setAll(double value) {
         this.tensor.assign(value);
         return this;
