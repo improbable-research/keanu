@@ -322,32 +322,32 @@ public class DualNumber {
 
     public DualNumber pluck(int[] inputShape, int... index) {
         Map<Long, DoubleTensor> pluckedDuals = new HashMap<>();
-
         long inputLength = TensorShape.getLength(inputShape);
         int flatIndex = TensorShape.getFlatIndex(inputShape, TensorShape.getRowFirstStride(inputShape), index);
 
         for (Map.Entry<Long, DoubleTensor> entry : this.partialDerivatives.asMap().entrySet()) {
-            DoubleTensor partial = entry.getValue();
-            int[] partialShape = entry.getValue().getShape();
-            long partialLength = TensorShape.getLength(partialShape);
-            long howManyValuesToPluckFromPartial = partialLength / inputLength;
-            int flatIndexOfPartial = (int) howManyValuesToPluckFromPartial * flatIndex;
-            double[] flatPartial = partial.asFlatDoubleArray();
-            double[] pluckedValues = new double[(int) howManyValuesToPluckFromPartial];
-
-            for (int i = flatIndexOfPartial; i < flatIndexOfPartial + howManyValuesToPluckFromPartial; i++) {
-                pluckedValues[i - flatIndexOfPartial] = flatPartial[i];
-            }
-
-            int[] newShape = Arrays.copyOfRange(partialShape, partialShape.length - 2, partialShape.length);
-            newShape = TensorShape.shapeToDesiredRankByPrependingOnes(newShape, partial.getShape().length);
-            DoubleTensor plucked = DoubleTensor.create(pluckedValues, newShape);
+            DoubleTensor plucked = pluckedFromPartial(entry.getValue(), inputLength, flatIndex);
             pluckedDuals.put(entry.getKey(), plucked);
-
         }
 
         return new DualNumber(DoubleTensor.scalar(this.value.getValue(index)), pluckedDuals);
     }
 
+    private DoubleTensor pluckedFromPartial(DoubleTensor partial, long inputLength, int inputFlatIndex) {
+        int[] partialShape = partial.getShape();
+        long partialLength = TensorShape.getLength(partialShape);
+        long howManyValuesToPluckFromPartial = partialLength / inputLength;
+        int flatIndexOfPartial = (int) howManyValuesToPluckFromPartial * inputFlatIndex;
+        double[] flatPartial = partial.asFlatDoubleArray();
+        double[] pluckedValues = new double[(int) howManyValuesToPluckFromPartial];
+
+        for (int i = flatIndexOfPartial; i < flatIndexOfPartial + howManyValuesToPluckFromPartial; i++) {
+            pluckedValues[i - flatIndexOfPartial] = flatPartial[i];
+        }
+
+        int[] newShape = Arrays.copyOfRange(partialShape, partialShape.length - 2, partialShape.length);
+        newShape = TensorShape.shapeToDesiredRankByPrependingOnes(newShape, partial.getShape().length);
+        return DoubleTensor.create(pluckedValues, newShape);
+    }
 
 }
