@@ -1,15 +1,12 @@
 package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
-import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.util.CombinatoricsUtils;
+import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.nd4j.linalg.util.ArrayUtil;
-
-import java.util.List;
 
 public class Binomial implements DiscreteDistribution {
 
@@ -24,6 +21,7 @@ public class Binomial implements DiscreteDistribution {
         this.p = p;
         this.n = n;
     }
+
     @Override
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
@@ -50,31 +48,23 @@ public class Binomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
-        DoubleTensor logBinomialCoefficient = getLogBinomialCoefficient(k, n);
 
-        DoubleTensor logBinomial = p.pow(k.toDouble())
-            .times(
-                p.unaryMinus().plusInPlace(1.0).powInPlace(n.minus(k).toDouble())
-            ).logInPlace();
-
-        return logBinomialCoefficient.plusInPlace(logBinomial);
-    }
-
-    private static DoubleTensor getLogBinomialCoefficient(IntegerTensor k, IntegerTensor n) {
+        int[] shape = k.getShape();
+        Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
         Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
         Tensor.FlattenedView<Integer> kWrapped = k.getFlattenedView();
 
-        int length = (int) k.getLength();
-        double[] logBinomialCoefficient = new double[length];
+        int length = ArrayUtil.prod(shape);
+        double[] logPmf = new double[length];
         for (int i = 0; i < length; i++) {
-            logBinomialCoefficient[i] = getLogBinomialCoefficient(kWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
+            logPmf[i] = logPmf(kWrapped.getOrScalar(i), pWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
         }
 
-        return DoubleTensor.create(logBinomialCoefficient, k.getShape());
+        return DoubleTensor.create(logPmf, shape);
     }
 
-    private static double getLogBinomialCoefficient(int k, int n) {
-        long binomialCoefficient = CombinatoricsUtils.binomialCoefficient(n, k);
-        return Math.log(binomialCoefficient);
+    private static double logPmf(int k, double p, int n) {
+        BinomialDistribution distribution = new BinomialDistribution(n, p);
+        return distribution.logProbability(k);
     }
 }
