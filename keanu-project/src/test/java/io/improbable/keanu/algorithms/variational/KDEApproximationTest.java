@@ -53,7 +53,7 @@ public class KDEApproximationTest {
     public void matchesKnownLogDensityOfScalar() {
         double mu = 1.;
         double sigma = 1.;
-        double correctPercentage = 0.9;
+        double correctPercentage = 0.8;
         double delta = 0.1;
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 100000);
@@ -91,7 +91,7 @@ public class KDEApproximationTest {
         double mu = 0.;
         double sigma = 1.;
         double DELTA = 0.1;
-        double correctPercentage = 0.85;
+        double correctPercentage = 0.8;
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 100000);
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
