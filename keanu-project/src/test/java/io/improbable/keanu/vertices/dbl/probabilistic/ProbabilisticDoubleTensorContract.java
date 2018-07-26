@@ -253,5 +253,5 @@ public class ProbabilisticDoubleTensorContract {
         double actual = actualDerivatives.get(tensorVertex.getId()).sum();
         assertEquals(expected, actual, 1e-5);
     }
-    
+
 }
