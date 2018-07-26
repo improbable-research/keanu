@@ -26,9 +26,9 @@ public abstract class Writer {
     private String[] header = null;
     private boolean headerEnabled = false;
 
-    abstract File toFile(File file);
+    public abstract File toFile(File file);
 
-    File toFile(String file) {
+    public File toFile(String file) {
         return toFile(new File(file));
     }
 
@@ -108,7 +108,7 @@ public abstract class Writer {
         return header;
     }
 
-    public Writer withHeader(String[] h) {
+    public Writer withHeader(String... h) {
         header = h;
         withHeaderEnabled(true);
         return this;

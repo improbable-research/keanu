@@ -25,7 +25,7 @@ public class ColumnWriter extends Writer {
     }
 
     @Override
-    File toFile(File file) {
+    public File toFile(File file) {
         List<String[]> data = new ArrayList<>();
         int maxSize = findLongestTensor(vertices);
 

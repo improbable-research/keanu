@@ -1,6 +1,5 @@
-package io.improbable.keanu.e2e.bm4h;
+package examples;
 
-import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -12,23 +11,13 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
-import org.junit.Rule;
-import org.junit.Test;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertEquals;
-
 public class CheatingStudents {
 
-    @Rule
-    public DeterministicRule rule = new DeterministicRule();
 
-    private final int numberOfStudents = 100;
-    private final int numberOfYesAnswers = 35;
-
-    @Test
-    public void doesWorkWithHigherDimensionDescription() {
+    public static double runWithFlips(int numberOfStudents, int numberOfYesAnswers) {
 
         int numberOfSamples = 10000;
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
@@ -63,11 +52,10 @@ public class CheatingStudents {
             .getAverages()
             .scalar();
 
-        assertEquals(0.2, approximateProbabilityOfCheating, 0.05);
+        return approximateProbabilityOfCheating;
     }
 
-    @Test
-    public void doesWorkWithBinomial() {
+    public static double runUsingBinomial(int numberOfStudents, int numberOfYesAnswers) {
         int numberOfSamples = 10000;
 
         UniformVertex probabilityOfCheating = new UniformVertex(0.0, 1.0);
@@ -88,7 +76,7 @@ public class CheatingStudents {
             .getAverages()
             .scalar();
 
-        assertEquals(0.2, approximateProbabilityOfCheating, 0.05);
+        return approximateProbabilityOfCheating;
     }
 
 }

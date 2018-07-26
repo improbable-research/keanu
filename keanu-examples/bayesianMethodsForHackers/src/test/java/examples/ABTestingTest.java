@@ -1,10 +1,17 @@
 package examples;
 
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class ABTestingTest {
+
+    @Before
+    public void setup() {
+        KeanuRandom.setDefaultRandomSeed(1);
+    }
 
     @Test
     public void testWhenABTestIsRunThenBothTreatmentsHaveAccuratePosteriors() {

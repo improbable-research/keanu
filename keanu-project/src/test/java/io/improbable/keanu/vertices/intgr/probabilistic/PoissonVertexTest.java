@@ -1,6 +1,9 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -53,5 +56,18 @@ public class PoissonVertexTest {
         double logProbAboveThreshold = poissonVertex.logPmf(21);
 
         assertTrue(logProbAboveThreshold > logProbThreshold && logProbThreshold > logProb);
+    }
+
+    @Test
+    public void logProbMatchesKnownLogProb() {
+        DoubleVertex mu = ConstantVertex.of(new double[]{5, 7});
+        PoissonVertex poissonVertex = new PoissonVertex(mu);
+        double actualLogProb = poissonVertex.logPmf(new int[]{39, 49});
+
+        PoissonDistribution distribution1 = new PoissonDistribution(5);
+        PoissonDistribution distribution2 = new PoissonDistribution(7);
+        double expectedLogProb = distribution1.logProbability(39) + distribution2.logProbability(49);
+
+        assertEquals(expectedLogProb, actualLogProb, 1e-5);
     }
 }

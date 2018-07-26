@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.Vertex;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Function;
 
 import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
 
@@ -26,7 +25,7 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    File toFile(File file) {
+    public File toFile(File file) {
         List<String[]> data = new ArrayList<>();
         int maxSize = findLongestTensor(vertices);
 
