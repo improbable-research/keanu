@@ -43,7 +43,7 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
         return inputs;
     }
 
-    public BoolVertex tad(int dimension, int index) {
+    public BoolVertex slice(int dimension, int index) {
         return new BoolSliceVertex(this, dimension, index);
     }
 

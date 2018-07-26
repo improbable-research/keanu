@@ -14,7 +14,7 @@ public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
     private final int index;
 
     /**
-     * Takes the tensor along a dimension of a vertex
+     * Takes the slice along a given dimension and index of a vertex
      *
      * @param inputVertex the input vertex
      * @param dimension   the dimension to extract along

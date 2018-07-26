@@ -106,7 +106,7 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return multiply(-1);
     }
 
-    public IntegerVertex tad(int dimension, int index) {
+    public IntegerVertex slice(int dimension, int index) {
         return new IntegerSliceVertex(this, dimension, index);
     }
 

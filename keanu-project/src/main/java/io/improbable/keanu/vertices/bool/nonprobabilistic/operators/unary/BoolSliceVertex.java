@@ -11,7 +11,7 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
     private final int index;
 
     /**
-     * Takes the tensor along a dimension for a vertex
+     * Takes the slice along a given dimension and index of a vertex
      *
      * @param inputVertex the input vertex
      * @param dimension the dimension to extract along

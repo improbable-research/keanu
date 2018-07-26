@@ -144,7 +144,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return multiply(-1.0);
     }
 
-    public DoubleVertex alongDimension(int dimension, int index) {
+    public DoubleVertex slice(int dimension, int index) {
         return new SliceVertex(this, dimension, index);
     }
 
