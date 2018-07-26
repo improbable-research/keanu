@@ -193,7 +193,7 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void canEqualsWithEspilon(){
+    public void canEqualsWithEpsilon(){
         double[] aData = new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3};
