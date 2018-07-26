@@ -71,16 +71,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor reciprocal();
 
-    DoubleTensor minus(double value);
-
-    DoubleTensor plus(double value);
-
-    DoubleTensor times(double value);
-
-    DoubleTensor div(double value);
-
-    DoubleTensor pow(double exponent);
-
     DoubleTensor sqrt();
 
     DoubleTensor tan();

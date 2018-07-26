@@ -67,19 +67,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(shape);
     }
 
-
-    //New tensor Ops and transforms
-
-    IntegerTensor minus(int value);
-
-    IntegerTensor plus(int value);
-
-    IntegerTensor times(int value);
-
-    IntegerTensor div(int value);
-
-    IntegerTensor pow(int exponent);
-
     // In Place
 
     IntegerTensor minusInPlace(int value);
