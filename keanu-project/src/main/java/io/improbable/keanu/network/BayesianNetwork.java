@@ -57,10 +57,8 @@ public class BayesianNetwork {
 
     public double getLogOfMasterP() {
         double sum = 0.0;
-        for (Vertex<?> vertex : latentAndObservedVertices) {
-            if (vertex instanceof Probabilistic) {
-                sum += ((Probabilistic<?>)vertex).logProbAtValue();
-            }
+        for (Probabilistic<?> vertex : Probabilistic.filter(latentAndObservedVertices)) {
+                sum += vertex.logProbAtValue();
         }
         return sum;
     }
