@@ -9,7 +9,7 @@ import org.junit.Test;
 public class DoubleIfVertexTest {
 
     @Test
-    public void canDoIf() {
+    public void caneDoIf() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true}, 1, 2));
 
         If.isTrue(bool)
