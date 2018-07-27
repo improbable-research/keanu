@@ -21,38 +21,6 @@ public class SimpleTensorTest {
     }
 
     @Test
-    public void whatDoesSliceDo() {
-        double[] data = new double[]{
-            1, 2, 3, 4, 5, 6, 7, 8,
-            5, 6, 7, 8, 9, 10, 11, 12,
-            8, 7, 6, 5, 4, 3, 2, 1,
-            4, 3, 2, 1, 0, -1, -2, -3
-        };
-
-        int[] shape = new int[]{2, 2, 2, 2, 2};
-        DataBuffer buffer = Nd4j.createBuffer(data);
-        INDArray rank4 = Nd4j.create(buffer, shape);
-
-        INDArray plucked = pluck(rank4, 0, 1);
-        assertArrayEquals(new int[]{2, 2, 2}, plucked.shape());
-        assertArrayEquals(new double[]{5, 6, 7, 8, 9, 10, 11, 12}, plucked.data().asDouble(), 0.0);
-    }
-
-
-    private INDArray pluck(INDArray from, int... indices) {
-
-        int[] fromShape = from.shape();
-        int[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-        int pluckIndex = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
-        int[] pluckShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
-        int subShapeLength = (int) TensorShape.getLength(subFromShape);
-
-        return from.reshape(subShapeLength, -1)
-            .slice(pluckIndex)
-            .reshape(pluckShape);
-    }
-
-    @Test
     public void canGetRandomAccessValue() {
 
         Tensor<Something> somethingTensor = new GenericTensor<>(
