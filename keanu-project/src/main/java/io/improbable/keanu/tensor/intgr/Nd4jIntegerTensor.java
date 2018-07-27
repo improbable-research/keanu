@@ -557,6 +557,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor slice(int dimension, int index) {
+        INDArray dup = tensor.dup();
+        INDArray slice = dup.slice(index, dimension);
+        return new Nd4jIntegerTensor(slice);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 

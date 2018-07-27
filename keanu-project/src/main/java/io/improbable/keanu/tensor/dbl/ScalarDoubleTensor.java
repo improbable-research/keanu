@@ -394,6 +394,15 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor slice(int dimension, int index) {
+        if (dimension == 0 && index == 0) {
+            return duplicate();
+        } else {
+            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+        }
+    }
+
+    @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
         return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
     }
