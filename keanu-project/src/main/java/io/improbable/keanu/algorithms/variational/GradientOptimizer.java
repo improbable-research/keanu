@@ -24,13 +24,21 @@ public class GradientOptimizer implements Optimizer {
 
     private static final double FLAT_GRADIENT = 1e-16;
 
-    public static final NonLinearConjugateGradientOptimizer DEFAULT_OPTIMIZER = new NonLinearConjugateGradientOptimizer(
-        NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE,
-        new SimpleValueChecker(1e-8, 1e-8)
-    );
+    public enum UpdateFormula {
+        POLAK_RIBIERE(NonLinearConjugateGradientOptimizer.Formula.POLAK_RIBIERE),
+        FLETCHER_REEVES(NonLinearConjugateGradientOptimizer.Formula.FLETCHER_REEVES);
+
+        NonLinearConjugateGradientOptimizer.Formula apacheMapping;
+
+        UpdateFormula(NonLinearConjugateGradientOptimizer.Formula apacheMapping) {
+            this.apacheMapping = apacheMapping;
+        }
+    }
 
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
-        return GradientOptimizer.builder().bayesianNetwork(bayesNet).build();
+        return GradientOptimizer.builder()
+            .bayesianNetwork(bayesNet)
+            .build();
     }
 
     @Getter
@@ -43,14 +51,14 @@ public class GradientOptimizer implements Optimizer {
     @Builder.Default
     private int maxEvaluations = Integer.MAX_VALUE;
 
-    /**
-     * apache math optimizer to use for optimization
-     */
     @Builder.Default
-    private NonLinearConjugateGradientOptimizer optimizer = DEFAULT_OPTIMIZER;
+    private double relativeThreshold = 1e-8;
 
-    private double relativeThreshold;
-    private double absoluteThreshold;
+    @Builder.Default
+    private double absoluteThreshold = 1e-8;
+
+    @Builder.Default
+    private UpdateFormula updateFormula = UpdateFormula.POLAK_RIBIERE;
 
     private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
@@ -115,6 +123,11 @@ public class GradientOptimizer implements Optimizer {
         }
 
         warnIfGradientIsFlat(initialGradient);
+
+        NonLinearConjugateGradientOptimizer optimizer = new NonLinearConjugateGradientOptimizer(
+            updateFormula.apacheMapping,
+            new SimpleValueChecker(relativeThreshold, absoluteThreshold)
+        );
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
