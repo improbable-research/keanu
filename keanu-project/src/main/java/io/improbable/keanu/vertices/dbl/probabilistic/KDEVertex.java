@@ -15,13 +15,15 @@ public class KDEVertex extends ProbabilisticDouble {
     private DoubleTensor samples;
 
     public KDEVertex(DoubleTensor samples, double bandwidth){
+        if (samples.getLength()==0){
+            throw new IllegalStateException("The provided tensor of samples is empty!");
+        }
         this.samples = samples;
         this.bandwidth = bandwidth;
     }
 
     public KDEVertex(DoubleTensor samples) {
-        this.samples = samples;
-        this.bandwidth = scottsBandwith();
+        this(samples, scottsBandwidth(samples));
     }
 
     public KDEVertex(List<Double> samples) {
@@ -81,21 +83,21 @@ public class KDEVertex extends ProbabilisticDouble {
         return power;
     }
 
-    private double getMean() {
+    private static double getMean(DoubleTensor samples) {
         return samples.sum() / samples.getLength();
     }
 
-    private double getVariance() {
-        double mean = getMean();
+    private static double getVariance(DoubleTensor samples) {
+        double mean = getMean(samples);
         return samples.minus(DoubleTensor.create(mean, samples.getShape())).powInPlace(2).sum() / samples.getLength();
     }
 
-    private double getStandardDeviation() {
-        return Math.sqrt(getVariance());
+    private static double getStandardDeviation(DoubleTensor samples) {
+        return Math.sqrt(getVariance(samples));
     }
 
-    private double scottsBandwith() {
-        return 1.06 * getStandardDeviation() * Math.pow(samples.getLength(), -1. / 5.);
+    private static double scottsBandwidth(DoubleTensor samples) {
+        return 1.06 * getStandardDeviation(samples) * Math.pow(samples.getLength(), -1. / 5.);
     }
 
     public DoubleTensor sample(int nSamples, KeanuRandom random) {
