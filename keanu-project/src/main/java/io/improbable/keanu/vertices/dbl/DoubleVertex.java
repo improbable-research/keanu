@@ -148,6 +148,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new PluckVertex(this, index);
     }
 
+    public DoubleVertex slice(int dimension, int index) {
+        return new SliceVertex(this, dimension, index);
+    }
+
     public final DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();

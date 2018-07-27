@@ -16,6 +16,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPluckVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 
 import java.util.Map;
@@ -110,6 +111,10 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
 
     public IntegerVertex pluck(int... index) {
         return new IntegerPluckVertex(this, index);
+    }
+
+    public IntegerVertex slice(int dimension, int index) {
+        return new IntegerSliceVertex(this, dimension, index);
     }
 
     public void setValue(int value) {

@@ -1,10 +1,7 @@
 package io.improbable.keanu.tensor;
 
-import org.apache.commons.lang3.ArrayUtils;
-
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
@@ -95,7 +92,7 @@ public class TensorShapeValidation {
 
     public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
         int[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
-        
+
         for (int i = 1; i < shapes.length; i++) {
             if (shapes[i].length != concatShape.length) {
                 throw new IllegalArgumentException("Cannot concat shapes of different ranks");
@@ -113,5 +110,18 @@ public class TensorShapeValidation {
         }
         return concatShape;
     }
+
+    public static void checkIndexIsValid(int[] shape, int... index) {
+        for (int i = 0; i < index.length; i++) {
+
+            if (index[i] >= shape[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape)
+                );
+            }
+
+        }
+    }
+
 
 }

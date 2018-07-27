@@ -1,31 +1,32 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpVertex;
 
-public class GenericPluckVertex<T> extends NonProbabilistic<Tensor<T>> {
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
+
+public class GenericSliceVertex<T> extends NonProbabilistic<Tensor<T>> {
 
     private final Vertex<? extends Tensor<T>> inputVertex;
-    private final int[] index;
+    private final int dimension;
+    private final int index;
 
     /**
-     * A vertex that extracts a scalar at a given index
+     * Takes the slice along a given dimension and index of a vertex
      *
      * @param inputVertex the input vertex
+     * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public GenericPluckVertex(Vertex<? extends Tensor<T>> inputVertex, int... index) {
-        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
+    public GenericSliceVertex(Vertex<? extends Tensor<T>> inputVertex, int dimension, int index) {
+
         this.inputVertex = inputVertex;
+        this.dimension = dimension;
         this.index = index;
         setParents(inputVertex);
-        setValue(Tensor.placeHolder(Tensor.SCALAR_SHAPE));
+        setValue(Tensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
     }
 
     @Override
@@ -39,7 +40,7 @@ public class GenericPluckVertex<T> extends NonProbabilistic<Tensor<T>> {
     }
 
     protected Tensor<T> op(Tensor<T> input) {
-        return Tensor.scalar(input.getValue(index));
+        return input.slice(dimension, index);
     }
 
 }
