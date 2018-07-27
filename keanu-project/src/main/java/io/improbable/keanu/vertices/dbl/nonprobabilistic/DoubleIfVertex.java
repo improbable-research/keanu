@@ -92,6 +92,7 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
         for (Map.Entry<Long, DoubleTensor> entry : b.entrySet()) {
             toBeConcatted.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
         }
+        return toBeConcatted;
     }
 
     private Map<Long, DoubleTensor> removePrimaryFromSecondary(DualNumber primary, DualNumber secondary) {
