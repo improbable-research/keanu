@@ -22,7 +22,9 @@ import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 public class NonGradientOptimizer implements Optimizer {
 
     public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
-        return NonGradientOptimizer.builder().bayesianNetwork(bayesNet).build();
+        return NonGradientOptimizer.builder()
+            .bayesianNetwork(bayesNet)
+            .build();
     }
 
     @Getter
@@ -66,7 +68,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
     }
 
-    private double optimize(int maxEvaluations, double boundsRange, List<Vertex> outputVertices) {
+    private double optimize(List<Vertex> outputVertices) {
 
         bayesianNetwork.cascadeObservations();
 
@@ -122,7 +124,7 @@ public class NonGradientOptimizer implements Optimizer {
      */
     @Override
     public double maxAPosteriori() {
-        return optimize(maxEvaluations, boundsRange, bayesianNetwork.getLatentAndObservedVertices());
+        return optimize(bayesianNetwork.getLatentAndObservedVertices());
     }
 
     /**
@@ -130,7 +132,7 @@ public class NonGradientOptimizer implements Optimizer {
      */
     @Override
     public double maxLikelihood() {
-        return optimize(maxEvaluations, boundsRange, bayesianNetwork.getObservedVertices());
+        return optimize(bayesianNetwork.getObservedVertices());
     }
 
 }

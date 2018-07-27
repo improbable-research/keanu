@@ -81,7 +81,7 @@ public class GradientOptimizer implements Optimizer {
         if (bayesianNetwork.getLatentAndObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
-        return optimize(maxEvaluations, bayesianNetwork.getLatentAndObservedVertices(), optimizer);
+        return optimize(bayesianNetwork.getLatentAndObservedVertices());
     }
 
     @Override
@@ -89,12 +89,10 @@ public class GradientOptimizer implements Optimizer {
         if (bayesianNetwork.getObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find max likelihood of network without any observations");
         }
-        return optimize(maxEvaluations, bayesianNetwork.getObservedVertices(), optimizer);
+        return optimize(bayesianNetwork.getObservedVertices());
     }
 
-    private double optimize(int maxEvaluations,
-                            List<Vertex> outputVertices,
-                            NonLinearConjugateGradientOptimizer optimizer) {
+    private double optimize(List<Vertex> outputVertices) {
 
         bayesianNetwork.cascadeObservations();
 
