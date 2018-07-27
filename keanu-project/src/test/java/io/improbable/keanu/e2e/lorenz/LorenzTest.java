@@ -71,9 +71,9 @@ public class LorenzTest {
 
             BayesianNetwork net = new BayesianNetwork(xt0.getConnectedGraph());
 
-            GradientOptimizer graphOptimizer = new GradientOptimizer(net);
+            GradientOptimizer optimizer = GradientOptimizer.of(net);
 
-            graphOptimizer.maxAPosteriori();
+            optimizer.maxAPosteriori();
 
             List<DoubleTensor> posterior = getTimeSliceValues(graphTimeSteps, windowSize - 1);
 

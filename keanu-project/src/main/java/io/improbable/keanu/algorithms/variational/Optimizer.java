@@ -1,14 +1,37 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.vertices.Vertex;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.function.BiConsumer;
 
-public abstract class Optimizer {
+public interface Optimizer {
 
-    protected double[] currentPoint(List<Vertex<DoubleTensor>> continuousLatentVertices) {
-        long totalLatentDimensions = totalNumLatentDimensions(continuousLatentVertices);
+    void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler);
+
+    double maxAPosteriori();
+
+    double maxLikelihood();
+
+    BayesianNetwork getBayesianNetwork();
+
+    static Optimizer of(BayesianNetwork network) {
+        if (network.getDiscreteLatentVertices().isEmpty()) {
+            return GradientOptimizer.of(network);
+        } else {
+            return NonGradientOptimizer.of(network);
+        }
+    }
+
+    static Optimizer of(Collection<? extends Vertex> vertices) {
+        return of(new BayesianNetwork(vertices));
+    }
+
+    static double[] currentPoint(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
+        long totalLatentDimensions = totalNumberOfLatentDimensions(continuousLatentVertices);
 
         if (totalLatentDimensions > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
@@ -17,7 +40,7 @@ public abstract class Optimizer {
         int position = 0;
         double[] point = new double[(int) totalLatentDimensions];
 
-        for (Vertex<DoubleTensor> vertex : continuousLatentVertices) {
+        for (Vertex<? extends NumberTensor> vertex : continuousLatentVertices) {
             double[] values = vertex.getValue().asFlatDoubleArray();
             System.arraycopy(values, 0, point, position, values.length);
             position += values.length;
@@ -26,7 +49,7 @@ public abstract class Optimizer {
         return point;
     }
 
-    protected long totalNumLatentDimensions(List<? extends Vertex<DoubleTensor>> continuousLatentVertices) {
+    static long totalNumberOfLatentDimensions(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
         return continuousLatentVertices.stream().mapToLong(FitnessFunction::numDimensions).sum();
     }
 }
