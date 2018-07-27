@@ -90,4 +90,43 @@ public class TensorShapeValidation {
         return uniqueShapes.iterator().next().getShape();
     }
 
+    public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
+        int[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
+
+        for (int i = 1; i < shapes.length; i++) {
+            if (shapes[i].length != concatShape.length) {
+                throw new IllegalArgumentException("Cannot concat shapes of different ranks");
+            }
+
+            for (int dim = 0; dim < shapes[i].length; dim++) {
+                if (dim == dimension) {
+                    concatShape[dim] += shapes[i][dim];
+                } else {
+                    if (shapes[i][dim] != concatShape[dim]) {
+                        throw new IllegalArgumentException("Cannot concat mismatched shapes");
+                    }
+                }
+            }
+        }
+        return concatShape;
+    }
+
+    public static void checkIndexIsValid(int[] shape, int... index) {
+        if (shape.length != index.length) {
+            throw new IllegalArgumentException(
+                "Length of desired index " + Arrays.toString(index) + " must match the length of the shape " + Arrays.toString(shape));
+        }
+
+        for (int i = 0; i < index.length; i++) {
+
+            if (index[i] >= shape[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape)
+                );
+            }
+
+        }
+    }
+
+
 }

@@ -737,7 +737,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minInPlace(min).maxInPlace(max);
+        return minInPlace(max).maxInPlace(min);
     }
 
     @Override
@@ -770,6 +770,25 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         double[][] asMatrix = dup.toDoubleMatrix();
         RealMatrix matrix = new Array2DRowRealMatrix(asMatrix);
         return new LUDecomposition(matrix).getDeterminant();
+    }
+
+    @Override
+    public DoubleTensor slice(int dimension, int index) {
+        INDArray dup = tensor.dup();
+        INDArray slice = dup.slice(index, dimension);
+        return new Nd4jDoubleTensor(slice);
+    }
+
+    @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        INDArray dup = tensor.dup();
+        INDArray[] toConcat = new INDArray[those.length + 1];
+        toConcat[0] = dup;
+        for (int i = 1; i <= those.length; i++) {
+            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+        }
+        INDArray concat = Nd4j.concat(dimension, toConcat);
+        return new Nd4jDoubleTensor(concat);
     }
 
     // Comparisons

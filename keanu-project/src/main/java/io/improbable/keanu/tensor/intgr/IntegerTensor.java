@@ -121,6 +121,11 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
 
     IntegerTensor apply(Function<Integer, Integer> function);
 
+    @Override
+    IntegerTensor slice(int dimension, int index);
+
+    IntegerTensor concat(int dimension, IntegerTensor... those);
+
     // In Place
 
     IntegerTensor minusInPlace(int value);

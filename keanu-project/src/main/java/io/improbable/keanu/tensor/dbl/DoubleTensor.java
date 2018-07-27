@@ -174,6 +174,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double determinant();
 
+    @Override
+    DoubleTensor slice(int dimension, int index);
+
+    DoubleTensor concat(int dimension, DoubleTensor... those);
+
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();

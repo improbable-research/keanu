@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.bool;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -70,7 +71,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public BooleanTensor reshape(int... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
-            + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
+                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
         return new SimpleBooleanTensor(data, newShape);
     }
@@ -198,6 +199,37 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public IntegerTensor toIntegerMask() {
         int[] doubles = asFlatIntegerArray();
         return IntegerTensor.create(doubles, copyOf(shape, shape.length));
+    }
+
+    @Override
+    public BooleanTensor slice(int dimension, int index) {
+        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
+        double[] tadFlat = tadDoubles.asFlatDoubleArray();
+        boolean[] tadToBooleans = new boolean[tadFlat.length];
+        for (int i = 0; i < tadFlat.length; i++) {
+            tadToBooleans[i] = tadFlat[i] == 1;
+        }
+        return new SimpleBooleanTensor(tadToBooleans, tadDoubles.getShape());
+    }
+
+    @Override
+    public BooleanTensor concat(int dimension, BooleanTensor... those) {
+        DoubleTensor[] toDoubles = new DoubleTensor[those.length];
+        DoubleTensor primary = this.toDoubleMask();
+
+        for (int i = 0; i < those.length; i++) {
+            toDoubles[i] = those[i].toDoubleMask();
+        }
+
+        DoubleTensor concat = primary.concat(dimension, toDoubles);
+        double[] concatFlat = concat.asFlatDoubleArray();
+        boolean[] data = new boolean[concat.asFlatDoubleArray().length];
+
+        for (int i = 0; i < data.length; i++) {
+            data[i] = concatFlat[i] == 1.0;
+        }
+
+        return new SimpleBooleanTensor(data, concat.getShape());
     }
 
     @Override

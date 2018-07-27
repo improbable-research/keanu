@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -177,6 +178,14 @@ public class Nd4jDoubleTensorTest {
 
         assertTimesOperationEquals(rank5, matrix, expected);
         assertTimesInPlaceOperationEquals(rank5, matrix, expected);
+    }
+
+    @Test
+    public void doesClampTensor() {
+        DoubleTensor A = DoubleTensor.create(new double[]{0.25, 3, -4, -5});
+        DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
+        DoubleTensor expected = DoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5});
+        assertEquals(expected, clampedA);
     }
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {

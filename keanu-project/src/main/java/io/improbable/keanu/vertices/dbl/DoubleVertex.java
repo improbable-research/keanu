@@ -144,6 +144,14 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return multiply(-1.0);
     }
 
+    public DoubleVertex pluck(int... index) {
+        return new PluckVertex(this, index);
+    }
+
+    public DoubleVertex slice(int dimension, int index) {
+        return new SliceVertex(this, dimension, index);
+    }
+
     public final DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();
@@ -166,7 +174,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
                     if (vertex instanceof DoubleVertex) {
                         stack.push((DoubleVertex) vertex);
                     } else {
-                        throw new IllegalArgumentException("Can only calculate Dual Numbers on a graph made of Doubles");
+                        throw new IllegalArgumentException("Can only calculate Diff Numbers on a graph made of Doubles");
                     }
                 }
 

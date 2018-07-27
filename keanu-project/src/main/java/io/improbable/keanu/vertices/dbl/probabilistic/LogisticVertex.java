@@ -1,6 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Diffs.MU;
+import static io.improbable.keanu.distributions.dual.Diffs.S;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Logistic;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -8,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -59,15 +67,15 @@ public class LogisticVertex extends ProbabilisticDouble {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor sValues = s.getValue();
 
-        DoubleTensor logPdfs = Logistic.logPdf(muValues, sValues, value);
+        DoubleTensor logPdfs = Logistic.withParameters(muValues, sValues).logProb(value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Logistic.DiffLogP dlnP = Logistic.dlnPdf(mu.getValue(), s.getValue(), value);
-        return convertDualNumbersToDiff(dlnP.dLogPdmu, dlnP.dLogPds, dlnP.dLogPdx);
+        Diffs dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
@@ -90,6 +98,6 @@ public class LogisticVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Logistic.sample(getShape(), mu.getValue(), s.getValue(), random);
+        return Logistic.withParameters(mu.getValue(), s.getValue()).sample(getShape(), random);
     }
 }

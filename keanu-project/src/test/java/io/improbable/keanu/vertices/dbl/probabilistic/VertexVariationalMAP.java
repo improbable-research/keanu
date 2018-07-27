@@ -41,7 +41,7 @@ public class VertexVariationalMAP {
 
         inferNet.probeForNonZeroProbability(100, random);
 
-        GradientOptimizer gradientOptimizer = new GradientOptimizer(inferNet);
+        GradientOptimizer gradientOptimizer = GradientOptimizer.of(inferNet);
 
         gradientOptimizer.maxAPosteriori();
     }

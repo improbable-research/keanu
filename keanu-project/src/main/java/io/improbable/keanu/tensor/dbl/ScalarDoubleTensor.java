@@ -394,6 +394,20 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor slice(int dimension, int index) {
+        if (dimension == 0 && index == 0) {
+            return duplicate();
+        } else {
+            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+        }
+    }
+
+    @Override
+    public DoubleTensor concat(int dimension, DoubleTensor... those) {
+        return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
+    }
+
+    @Override
     public DoubleTensor reciprocalInPlace() {
         value = 1.0 / value;
         return this;
@@ -587,7 +601,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max) {
-        return minusInPlace(min).maxInPlace(max);
+        return minInPlace(max).maxInPlace(min);
     }
 
     @Override
@@ -608,6 +622,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      * e.g.
      * Java: round(-2.5) == -2.0
      * Python: round(-2.5) == -3.0
+     *
      * @return Nearest integer value as a DoubleTensor
      */
     @Override

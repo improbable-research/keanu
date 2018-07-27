@@ -245,6 +245,20 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor slice(int dimension, int index) {
+        if (dimension == 0 && index == 0) {
+            return duplicate();
+        } else {
+            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+        }
+    }
+
+    @Override
+    public IntegerTensor concat(int dimension, IntegerTensor... those) {
+        return Nd4jIntegerTensor.scalar(value).concat(dimension, those);
+    }
+
+    @Override
     public IntegerTensor minusInPlace(int that) {
         value = value - that;
         return this;

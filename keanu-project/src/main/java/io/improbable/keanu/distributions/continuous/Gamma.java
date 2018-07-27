@@ -1,30 +1,49 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static java.lang.Math.exp;
+import static java.lang.Math.log;
+import static java.lang.Math.pow;
+import static java.lang.Math.sqrt;
+
+import static io.improbable.keanu.distributions.dual.Diffs.A;
+import static io.improbable.keanu.distributions.dual.Diffs.K;
+import static io.improbable.keanu.distributions.dual.Diffs.THETA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
+import org.nd4j.linalg.util.ArrayUtil;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.nd4j.linalg.util.ArrayUtil;
 
-import static java.lang.Math.*;
-
-public class Gamma {
+public class Gamma implements ContinuousDistribution {
 
     private static final double M_E = 0.577215664901532860606512090082;
-
-    private Gamma() {
-    }
+    private final DoubleTensor location;
+    private final DoubleTensor theta;
+    private final DoubleTensor k;
 
     /**
-     * @param shape  shape of tensor returned
      * @param a      location
      * @param theta  scale
      * @param k      shape
-     * @param random source of randomness
-     * @return a random number from the Gamma distribution
+     * @return       a new ContinuousDistribution object
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+        return new Gamma(a, theta, k);
+    }
 
-        Tensor.FlattenedView<Double> aWrapped = a.getFlattenedView();
+    private Gamma(DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
+        this.location = a;
+        this.theta = theta;
+        this.k = k;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+        Tensor.FlattenedView<Double> aWrapped = location.getFlattenedView();
         Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
         Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
 
@@ -90,7 +109,8 @@ public class Gamma {
         return location - lambda * Math.log(random.nextDouble());
     }
 
-    public static DoubleTensor logPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor aMinusXOverTheta = location.minus(x).divInPlace(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
         final DoubleTensor xMinusAPowKMinus1 = x.minus(location).powInPlace(k.minus(1));
@@ -98,7 +118,8 @@ public class Gamma {
         return aMinusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXMinusAToKMinus1);
     }
 
-    public static DiffLogP dlnPdf(DoubleTensor location, DoubleTensor theta, DoubleTensor k, DoubleTensor x) {
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor xMinusLocation = x.minus(location);
         final DoubleTensor locationMinusX = location.minus(x);
         final DoubleTensor kMinus1 = k.minus(1.);
@@ -109,21 +130,11 @@ public class Gamma {
         final DoubleTensor dLogPdtheta = theta.times(k).plus(locationMinusX).divInPlace(theta.pow(2.)).unaryMinusInPlace();
         final DoubleTensor dLogPdk = xMinusLocation.logInPlace().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
-        return new DiffLogP(dLogPdlocation, dLogPdtheta, dLogPdk, dLogPdx);
-    }
-
-    public static class DiffLogP {
-        public final DoubleTensor dLogPdlocation;
-        public final DoubleTensor dLogPdtheta;
-        public final DoubleTensor dLogPdk;
-        public final DoubleTensor dLogPdx;
-
-        public DiffLogP(DoubleTensor dLogPdlocation, DoubleTensor dLogPdtheta, DoubleTensor dLogPdk, DoubleTensor dLogPdx) {
-            this.dLogPdlocation = dLogPdlocation;
-            this.dLogPdtheta = dLogPdtheta;
-            this.dLogPdk = dLogPdk;
-            this.dLogPdx = dLogPdx;
-        }
+        return new Diffs()
+        .put(A, dLogPdlocation)
+        .put(THETA, dLogPdtheta)
+        .put(K, dLogPdk)
+        .put(X, dLogPdx);
     }
 
 }

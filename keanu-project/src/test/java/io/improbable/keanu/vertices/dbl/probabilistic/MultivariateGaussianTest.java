@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -113,6 +115,15 @@ public class MultivariateGaussianTest {
         double bucketSize = 0.05;
 
         sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void whenYouSampleYouMustMatchMusShape() {
+        DoubleTensor mu = new Nd4jDoubleTensor(new double[]{0, 0}, new int[]{2, 1});
+        DoubleTensor sigma = new Nd4jDoubleTensor(new double[]{1}, new int[]{1});
+
+        ContinuousDistribution mvg = MultivariateGaussian.withParameters(mu, sigma);
+        mvg.sample(new int[]{2,2}, KeanuRandom.getDefaultRandom());
     }
 
     private static void sampleMethodMatchesLogProbMethodMultiVariate(MultivariateGaussianVertex vertexUnderTest,

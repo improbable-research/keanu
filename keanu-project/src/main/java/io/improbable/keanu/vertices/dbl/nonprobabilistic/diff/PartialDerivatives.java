@@ -244,6 +244,20 @@ public class PartialDerivatives {
         return new PartialDerivatives(reshapedDerivatives);
     }
 
+    public PartialDerivatives slice(int dimension, int index) {
+        Map<Long, DoubleTensor> slicedDerivatives = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+            int[] partialDerivativeShape = partialDerivative.getValue().getShape();
+            partialDerivativeShape[dimension] = 1;
+            DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
+            slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
+            slicedDerivatives.put(partialDerivative.getKey(), slicedPartialDerivative);
+        }
+
+        return new PartialDerivatives(slicedDerivatives);
+    }
+
     private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {
         Map<Long, DoubleTensor> clone = new HashMap<>();
         for (Map.Entry<Long, DoubleTensor> entry : infinitesimals.entrySet()) {
@@ -268,4 +282,5 @@ public class PartialDerivatives {
             TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
         );
     }
+
 }

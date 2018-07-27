@@ -104,4 +104,12 @@ public class IntegerVertexTest {
         assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
     }
 
+    @Test
+    public void canPluckValue() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        int[] values = new int[]{1, 2, 3};
+        binomialVertex.setValue(values);
+        assertEquals(1, (long) binomialVertex.pluck(0, 0).getValue().scalar());
+    }
+
 }

@@ -1,5 +1,9 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
+import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -32,24 +36,33 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
  * A = -2 / (Sw^3 * (Sw + Bw))
  * B = 3 / (Sw^3 * Sw^2*Bw)
  */
-public class SmoothUniform {
+public class SmoothUniform implements ContinuousDistribution {
 
-    private SmoothUniform() {
-    }
+    private final DoubleTensor xMin;
+    private final DoubleTensor xMax;
+    private final double edgeSharpness;
 
     /**
      * Will return samples between xMin and xMax as well as samples from the left and right shoulder.
      * The width of the shoulder is determined by the edgeSharpness as a percentage of the body width,
      * which is (xMax - xMin).
      *
-     * @param shape         result tensor shape
      * @param xMin          min value from body
      * @param xMax          max value from body
      * @param edgeSharpness sharpness as a percentage of the body width
-     * @param random        source of randomness
-     * @return a uniform random number between xMin and xMax
+     * @return       a new ContinuousDistribution object
      */
-    public static DoubleTensor sample(int[] shape, DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness, KeanuRandom random) {
+    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
+        return new SmoothUniform(xMin, xMax, edgeSharpness);
+    }
+    private SmoothUniform(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
+        this.xMin = xMin;
+        this.xMax = xMax;
+        this.edgeSharpness = edgeSharpness;
+    }
+
+    @Override
+    public DoubleTensor sample(int[] shape, KeanuRandom random) {
 
         DoubleTensor r1 = random.nextDouble(shape);
         DoubleTensor r2 = random.nextDouble(shape);
@@ -90,9 +103,10 @@ public class SmoothUniform {
             .plusInPlace(inverseFirstConditional.timesInPlace(secondConditionalFalseNestedFalse).timesInPlace(secondConditionalFalseNestedFalseResult));
     }
 
-    public static DoubleTensor pdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
-
+    @Override
+    public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
+        final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
 
@@ -114,8 +128,10 @@ public class SmoothUniform {
             .plusInPlace(thirdConditional.timesInPlace(thirdConditionalResult));
     }
 
-    public static DoubleTensor dPdf(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor shoulderWidth, DoubleTensor x) {
+    @Override
+    public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor bodyWidth = xMax.minus(xMin);
+        final DoubleTensor shoulderWidth = bodyWidth.times(edgeSharpness);
         final DoubleTensor leftCutoff = xMin.minus(shoulderWidth);
         final DoubleTensor rightCutoff = xMax.plus(shoulderWidth);
 
@@ -130,8 +146,9 @@ public class SmoothUniform {
             shoulderWidth.minus(x).plusInPlace(rightCutoff)
         ).unaryMinusInPlace();
 
-        return firstConditional.timesInPlace(firstConditionalResult)
-            .plusInPlace(secondConditional.timesInPlace(secondConditionalResult));
+        return new Diffs()
+            .put(X, firstConditional.timesInPlace(firstConditionalResult)
+                .plusInPlace(secondConditional.timesInPlace(secondConditionalResult)));
     }
 
     private static DoubleTensor shoulder(DoubleTensor Sw, DoubleTensor Bw, DoubleTensor x) {
@@ -157,5 +174,4 @@ public class SmoothUniform {
     private static DoubleTensor bodyHeight(DoubleTensor shoulderWidth, DoubleTensor bodyWidth) {
         return shoulderWidth.plus(bodyWidth).reciprocalInPlace();
     }
-
 }
