@@ -365,6 +365,7 @@ public class DualNumber {
         int[] thenShape = thn.value.getShape();
         double[] flatPredicate = predicate.asFlatDoubleArray();
         Map<Long, List<DoubleTensor>> ifAndElseDualNumbers = new HashMap<>();
+
         for (int i = 0; i < flatPredicate.length; i++) {
             boolean condition = flatPredicate[i] == 1.0;
             if (condition) {
@@ -373,6 +374,7 @@ public class DualNumber {
                 pluckFromThenAndElse(els, thn, ifAndElseDualNumbers, thenShape, i);
             }
         }
+
         Map<Long, DoubleTensor> newPartials = concatenatePluckedPartials(ifAndElseDualNumbers, thn, els);
         return new DualNumber(predicate.setDoubleIf(thn.value, els.value), newPartials);
     }
@@ -383,11 +385,13 @@ public class DualNumber {
         DualNumber secondaryDualNumber = secondary.pluck(currentIndex);
         Map<Long, DoubleTensor> primaryDualsMap = primaryDualNumber.getPartialDerivatives().asMap();
         Map<Long, DoubleTensor> secondaryWithPrimaryRemoved = removePrimaryFromSecondaryAndZero(primaryDualNumber, secondaryDualNumber);
+
         addToMap(partials, primaryDualsMap, secondaryWithPrimaryRemoved);
     }
 
     private Map<Long, DoubleTensor> concatenatePluckedPartials(Map<Long, List<DoubleTensor>> ifAndElseDualNumbers, DualNumber thn, DualNumber els) {
         Map<Long, DoubleTensor> newPartials = new HashMap<>();
+
         for (Map.Entry<Long, List<DoubleTensor>> entry : ifAndElseDualNumbers.entrySet()) {
             List<DoubleTensor> value = entry.getValue();
             DoubleTensor primaryTensor = value.remove(0);
@@ -398,6 +402,7 @@ public class DualNumber {
                 els.getPartialDerivatives().withRespectTo(entry.getKey()).getShape();
             newPartials.put(entry.getKey(), concatenatedPartials.reshape(originalPartialShape));
         }
+
         return newPartials;
     }
 
@@ -414,6 +419,7 @@ public class DualNumber {
     private Map<Long, DoubleTensor> removePrimaryFromSecondaryAndZero(DualNumber primary, DualNumber secondary) {
         Map<Long, DoubleTensor> primaryMap = primary.getPartialDerivatives().asMap();
         Map<Long, DoubleTensor> secondaryWithPrimaryRemoved = new HashMap<>();
+
         for (Map.Entry<Long, DoubleTensor> entry : secondary.getPartialDerivatives().asMap().entrySet()) {
             if (!primaryMap.containsKey(entry.getKey())) {
                 DoubleTensor toZero = secondary.getPartialDerivatives().asMap().get(entry.getKey());
@@ -421,6 +427,7 @@ public class DualNumber {
                 secondaryWithPrimaryRemoved.put(entry.getKey(), zeroes);
             }
         }
+
         return secondaryWithPrimaryRemoved;
     }
 
