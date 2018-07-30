@@ -160,7 +160,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         while (!stack.isEmpty()) {
 
             DoubleVertex head = stack.peek();
-            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+            Set<DoubleVertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
 
@@ -171,11 +171,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
             } else {
 
                 for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
-                    if (vertex instanceof DoubleVertex) {
-                        stack.push((DoubleVertex) vertex);
-                    } else {
-                        //do nothing - todo: optimiser should check this
-                    }
+                    stack.push((DoubleVertex) vertex);
                 }
 
             }
@@ -185,11 +181,11 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return dualNumbers.get(this);
     }
 
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
-        Set<Vertex> notCalculatedParents = new HashSet<>();
+    private Set<DoubleVertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
+        Set<DoubleVertex> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!dualNumbers.containsKey(next) && next instanceof DoubleVertex) {
-                notCalculatedParents.add(next);
+                notCalculatedParents.add((DoubleVertex) next);
             }
         }
         return notCalculatedParents;
