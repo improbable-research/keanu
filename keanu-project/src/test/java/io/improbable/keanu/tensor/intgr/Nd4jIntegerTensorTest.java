@@ -5,8 +5,7 @@ import org.junit.Test;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.*;
 
 public class Nd4jIntegerTensorTest {
 
@@ -322,6 +321,66 @@ public class Nd4jIntegerTensorTest {
         BooleanTensor result = matrix.greaterThanOrEqual(3);
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
+    }
+
+    @Test
+    public void canBroadcastAdd() {
+        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3}, new int[]{3, 1});
+        IntegerTensor s = IntegerTensor.create(new int[]{
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8
+        }, new int[]{3, 5});
+
+        IntegerTensor diff = s.plus(x);
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            -4, -1, -2, -6, -7,
+            -3, 0, -1, -5, -6,
+            -2, 1, 0, -4, -5
+        }, new int[]{3, 5});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canBroadcastSubtract() {
+        IntegerTensor x = IntegerTensor.create(new int[]{-1, -2, -3}, new int[]{3, 1});
+        IntegerTensor s = IntegerTensor.create(new int[]{
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8
+        }, new int[]{3, 5});
+
+        IntegerTensor diff = s.minus(x);
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            -4, -1, -2, -6, -7,
+            -3, 0, -1, -5, -6,
+            -2, 1, 0, -4, -5
+        }, new int[]{3, 5});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canBroadcastDivide() {
+        IntegerTensor x = IntegerTensor.create(new int[]{1, 2, 3}, new int[]{3, 1});
+        IntegerTensor s = IntegerTensor.create(new int[]{
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8
+        }, new int[]{3, 5});
+
+        IntegerTensor diff = s.div(x);
+
+        IntegerTensor expected = IntegerTensor.create(new int[]{
+            5 / 1, 2 / 1, 3 / 1, 7 / 1, 8 / 1,
+            5 / 2, 2 / 2, 3 / 2, 7 / 2, 8 / 2,
+            5 / 3, 2 / 3, 3 / 3, 7 / 3, 8 / 3
+        }, new int[]{3, 5});
+
+        assertEquals(expected, diff);
     }
 
 }

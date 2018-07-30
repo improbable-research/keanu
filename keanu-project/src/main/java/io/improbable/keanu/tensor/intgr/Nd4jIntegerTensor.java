@@ -371,6 +371,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         } else {
             INDArrayShim.divi(tensor, unsafeGetNd4J(that));
         }
+        Transforms.floor(tensor, false);
         return this;
     }
 
