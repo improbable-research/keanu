@@ -42,7 +42,7 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(thn).ifThnElse(predicate.getValue(), dualNumbers.get(els));
+        return dualNumbers.get(thn).ifThenElse(predicate.getValue(), dualNumbers.get(els));
     }
 
 }

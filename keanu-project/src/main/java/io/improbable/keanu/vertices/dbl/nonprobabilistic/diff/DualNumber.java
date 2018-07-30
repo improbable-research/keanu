@@ -355,7 +355,7 @@ public class DualNumber {
         return DoubleTensor.create(pluckedValues, newShape);
     }
 
-    public DualNumber ifThnElse(BooleanTensor predicate, DualNumber els) {
+    public DualNumber ifThenElse(BooleanTensor predicate, DualNumber els) {
         if (predicate.allTrue()) {
             return new DualNumber(this.value, this.getPartialDerivatives());
         } else if (predicate.allFalse()) {

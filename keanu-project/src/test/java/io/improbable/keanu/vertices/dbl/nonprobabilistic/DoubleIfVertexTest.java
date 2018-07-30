@@ -1,19 +1,33 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 
 public class DoubleIfVertexTest {
+
+
+    private KeanuRandom random;
+
+    @Before
+    public void setup() {
+        random = new KeanuRandom(1);
+    }
 
     @Test
     public void canExtractDualNumberFromTruePredicate() {
@@ -154,6 +168,88 @@ public class DoubleIfVertexTest {
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
         Assert.assertArrayEquals(dFdd.getShape(), dIfdD.getShape());
+    }
+
+    @Test
+    public void canExtractValueFromMixedPredicate() {
+        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
+
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        DoubleVertex c = a.matrixMultiply(b);
+        DoubleVertex d = b.matrixMultiply(a);
+
+        DoubleVertex ifVertex = If.isTrue(bool)
+            .then(c)
+            .orElse(d);
+
+        Assert.assertArrayEquals(new double[]{
+            19, 34,
+            43, 46
+        }, ifVertex.getValue().asFlatDoubleArray(), 1e-6);
+    }
+    @Test
+    public void canRunGradientOptimiserThroughIfWhenTrue() {
+        UniformVertex a = new UniformVertex(2, 2.5);
+        a.setValue(2.1);
+        UniformVertex b = new UniformVertex(1, 1.5);
+        b.setValue(1.1);
+
+        BoolVertex leftFlip = new Flip(0.5);
+        BoolVertex rightFlip = new Flip(0.5);
+        leftFlip.setValue(false);
+        rightFlip.setValue(true);
+
+        DoubleVertex ifVertex = If.isTrue(leftFlip.or(rightFlip))
+            .then(a)
+            .orElse(b);
+
+        double sigma = 2.0;
+
+        GaussianVertex observedIf = new GaussianVertex(ifVertex, sigma);
+
+        observedIf.observe(2.25);
+
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
+        GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesianNetwork);
+
+        gradientOptimizer.maxLikelihood(5000);
+
+        Assert.assertEquals(2.25, a.getValue().scalar(), 1e-6);
+    }
+
+    @Test
+    public void canRunGradientOptimiserThroughIfWhenFalse() {
+        UniformVertex a = new UniformVertex(2, 2.5);
+        a.setValue(2.1);
+        UniformVertex b = new UniformVertex(1, 1.5);
+        b.setValue(1.1);
+
+        BoolVertex leftFlip = new Flip(0.5);
+        BoolVertex rightFlip = new Flip(0.5);
+        leftFlip.setValue(false);
+        rightFlip.setValue(false);
+
+        DoubleVertex ifVertex = If.isTrue(leftFlip.or(rightFlip))
+            .then(a)
+            .orElse(b);
+
+        double sigma = 2.0;
+
+        GaussianVertex observedIf = new GaussianVertex(ifVertex, sigma);
+
+        observedIf.observe(1.25);
+
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
+        GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesianNetwork);
+
+        gradientOptimizer.maxLikelihood(5000);
+
+        Assert.assertEquals(1.25, b.getValue().scalar(), 1e-6);
     }
 
 }
