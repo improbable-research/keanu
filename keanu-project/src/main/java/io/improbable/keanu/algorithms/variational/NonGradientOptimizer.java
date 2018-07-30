@@ -40,7 +40,7 @@ public class NonGradientOptimizer implements Optimizer {
      * bounding box around starting point
      */
     @Builder.Default
-    private final double scalarBoundsRange = Double.POSITIVE_INFINITY;
+    private final double boundsRange = Double.POSITIVE_INFINITY;
 
     /**
      * bounds for each specific continuous latent vertex
@@ -128,8 +128,8 @@ public class NonGradientOptimizer implements Optimizer {
         double[] maxBounds = new double[startPoint.length];
 
         for (int i = 0; i < startPoint.length; i++) {
-            minBounds[i] = startPoint[i] - scalarBoundsRange;
-            maxBounds[i] = startPoint[i] + scalarBoundsRange;
+            minBounds[i] = startPoint[i] - boundsRange;
+            maxBounds[i] = startPoint[i] + boundsRange;
         }
         return new SimpleBounds(minBounds, maxBounds);
     }
