@@ -138,7 +138,7 @@ public class NonGradientOptimizer implements Optimizer {
         List<Double> minBounds = new ArrayList<>();
         List<Double> maxBounds = new ArrayList<>();
 
-        vertexSpecificBounds.forEach((vertex, bounds) -> {
+        vertexSpecificBounds.values().forEach(bounds -> {
             minBounds.addAll(DoubleTensor.create(bounds.getLower()).asFlatList());
             maxBounds.addAll(DoubleTensor.create(bounds.getUpper()).asFlatList());
         });
