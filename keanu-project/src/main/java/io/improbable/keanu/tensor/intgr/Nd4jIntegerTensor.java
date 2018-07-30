@@ -577,6 +577,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return tensor.toString();
+    }
+
     private INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isScalar()) {
             return Nd4j.scalar(that.scalar().doubleValue()).reshape(that.getShape());
