@@ -21,7 +21,6 @@ import org.junit.Test;
 
 public class DoubleIfVertexTest {
 
-
     private KeanuRandom random;
 
     @Before
