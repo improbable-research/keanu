@@ -1,19 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.*;
 
 public class DualNumber {
-
-    public static DualNumber createConstant(DoubleTensor value) {
-        return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
-    }
-
-    public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
-        return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
-    }
 
     private DoubleTensor value;
     private PartialDerivatives partialDerivatives;
@@ -29,6 +22,14 @@ public class DualNumber {
 
     public DualNumber(DoubleTensor value, long infinitesimalLabel) {
         this(value, new PartialDerivatives(Collections.singletonMap(infinitesimalLabel, DoubleTensor.ones(value.getShape()))));
+    }
+
+    public static DualNumber createConstant(DoubleTensor value) {
+        return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
+    }
+
+    public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
+        return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
     public DoubleTensor getValue() {
@@ -352,6 +353,87 @@ public class DualNumber {
         int[] newShape = Arrays.copyOfRange(partialShape, partialShape.length - 2, partialShape.length);
         newShape = TensorShape.shapeToDesiredRankByPrependingOnes(newShape, partial.getShape().length);
         return DoubleTensor.create(pluckedValues, newShape);
+    }
+
+    public DualNumber ifThnElse(BooleanTensor predicate, DualNumber els) {
+        if (predicate.allTrue()) {
+            return new DualNumber(this.value, this.getPartialDerivatives());
+        } else if (predicate.allFalse()) {
+            return new DualNumber(els.value, els.getPartialDerivatives());
+        } else {
+            return pluckFromMixedPredicate(predicate, this, els);
+        }
+    }
+
+    private DualNumber pluckFromMixedPredicate(BooleanTensor predicate, DualNumber thn, DualNumber els) {
+        int[] thenShape = thn.value.getShape();
+        double[] flatPredicate = predicate.asFlatDoubleArray();
+        Map<Long, List<DoubleTensor>> ifAndElseDualNumbers = new HashMap<>();
+
+        for (int i = 0; i < flatPredicate.length; i++) {
+            boolean condition = flatPredicate[i] == 1.0;
+            if (condition) {
+                pluckFromThenAndElse(thn, els, ifAndElseDualNumbers, thenShape, i);
+            } else {
+                pluckFromThenAndElse(els, thn, ifAndElseDualNumbers, thenShape, i);
+            }
+        }
+
+        Map<Long, DoubleTensor> newPartials = concatenatePluckedPartials(ifAndElseDualNumbers, thn, els);
+        return new DualNumber(predicate.setDoubleIf(thn.value, els.value), newPartials);
+    }
+
+    private void pluckFromThenAndElse(DualNumber primary, DualNumber secondary, Map<Long, List<DoubleTensor>> partials, int[] shape, int index) {
+        int[] currentIndex = TensorShape.getShapeIndices(shape, TensorShape.getRowFirstStride(shape), index);
+        DualNumber primaryDualNumber = primary.pluck(shape, currentIndex);
+        DualNumber secondaryDualNumber = secondary.pluck(shape, currentIndex);
+        Map<Long, DoubleTensor> primaryDualsMap = primaryDualNumber.getPartialDerivatives().asMap();
+        Map<Long, DoubleTensor> secondaryWithPrimaryRemoved = removePrimaryFromSecondaryAndZero(primaryDualNumber, secondaryDualNumber);
+        addToMap(partials, primaryDualsMap, secondaryWithPrimaryRemoved);
+    }
+
+    private Map<Long, DoubleTensor> concatenatePluckedPartials(Map<Long, List<DoubleTensor>> ifAndElseDualNumbers, DualNumber thn, DualNumber els) {
+        Map<Long, DoubleTensor> newPartials = new HashMap<>();
+
+        for (Map.Entry<Long, List<DoubleTensor>> entry : ifAndElseDualNumbers.entrySet()) {
+            List<DoubleTensor> value = entry.getValue();
+            DoubleTensor primaryTensor = value.remove(0);
+            DoubleTensor[] partialsToConcat = new DoubleTensor[value.size()];
+            DoubleTensor concatenatedPartials = primaryTensor.concat(0, value.toArray(partialsToConcat));
+
+            int[] originalPartialShape = thn.getPartialDerivatives().asMap().containsKey(entry.getKey()) ?
+                thn.getPartialDerivatives().withRespectTo(entry.getKey()).getShape() :
+                els.getPartialDerivatives().withRespectTo(entry.getKey()).getShape();
+
+            newPartials.put(entry.getKey(), concatenatedPartials.reshape(originalPartialShape));
+        }
+
+        return newPartials;
+    }
+
+    private Map<Long, List<DoubleTensor>> addToMap(Map<Long, List<DoubleTensor>> toBeConcatted, Map<Long, DoubleTensor> a, Map<Long, DoubleTensor> b) {
+        for (Map.Entry<Long, DoubleTensor> entry : a.entrySet()) {
+            toBeConcatted.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+        }
+        for (Map.Entry<Long, DoubleTensor> entry : b.entrySet()) {
+            toBeConcatted.computeIfAbsent(entry.getKey(), k -> new ArrayList<>()).add(entry.getValue());
+        }
+        return toBeConcatted;
+    }
+
+    private Map<Long, DoubleTensor> removePrimaryFromSecondaryAndZero(DualNumber primary, DualNumber secondary) {
+        Map<Long, DoubleTensor> primaryMap = primary.getPartialDerivatives().asMap();
+        Map<Long, DoubleTensor> secondaryWithPrimaryRemoved = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> entry : secondary.getPartialDerivatives().asMap().entrySet()) {
+            if (!primaryMap.containsKey(entry.getKey())) {
+                DoubleTensor toZero = secondary.getPartialDerivatives().asMap().get(entry.getKey());
+                DoubleTensor zeroes = DoubleTensor.zeros(toZero.getShape());
+                secondaryWithPrimaryRemoved.put(entry.getKey(), zeroes);
+            }
+        }
+
+        return secondaryWithPrimaryRemoved;
     }
 
 }
