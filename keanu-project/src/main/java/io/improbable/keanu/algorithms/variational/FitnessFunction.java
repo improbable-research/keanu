@@ -1,6 +1,7 @@
 package io.improbable.keanu.algorithms.variational;
 
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.analysis.MultivariateFunction;
@@ -59,7 +60,7 @@ public class FitnessFunction {
         VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
-    static long numDimensions(Vertex<DoubleTensor> vertex) {
+    static long numDimensions(Vertex<? extends Tensor> vertex) {
         return vertex.getValue().getLength();
     }
 

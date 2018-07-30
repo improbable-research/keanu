@@ -3,6 +3,8 @@ package io.improbable.keanu.algorithms.variational;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import lombok.Builder;
+import lombok.Getter;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -16,20 +18,46 @@ import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
-public class NonGradientOptimizer extends Optimizer {
+@Builder
+public class NonGradientOptimizer implements Optimizer {
 
-    private final BayesianNetwork bayesNet;
-    private final List<BiConsumer<double[], Double>> onFitnessCalculations;
-
-    public NonGradientOptimizer(BayesianNetwork bayesNet) {
-        this.bayesNet = bayesNet;
-        this.onFitnessCalculations = new ArrayList<>();
+    public static NonGradientOptimizer of(BayesianNetwork bayesNet) {
+        return NonGradientOptimizer.builder()
+            .bayesianNetwork(bayesNet)
+            .build();
     }
 
-    public NonGradientOptimizer(List<Vertex<Double>> graph) {
-        this(new BayesianNetwork(graph));
-    }
+    @Getter
+    private final BayesianNetwork bayesianNetwork;
 
+    /**
+     * maxEvaluations the maximum number of objective function evaluations before throwing an exception
+     * indicating convergence failure.
+     */
+    @Builder.Default
+    private int maxEvaluations = Integer.MAX_VALUE;
+
+    /**
+     * bounding box around starting point
+     */
+    @Builder.Default
+    private final double boundsRange = Double.POSITIVE_INFINITY;
+
+    /**
+     * radius around region to start testing points
+     */
+    @Builder.Default
+    double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
+
+    /**
+     * stopping trust region radius
+     */
+    @Builder.Default
+    double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
+
+    private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
+
+    @Override
     public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.add(fitnessCalculationHandler);
     }
@@ -40,27 +68,15 @@ public class NonGradientOptimizer extends Optimizer {
         }
     }
 
-    public double optimize(int maxEvaluations,
-                           double boundsRange,
-                           List<Vertex> outputVertices){
-        double initialTrustRegionRadius = BOBYQAOptimizer.DEFAULT_INITIAL_RADIUS;
-        double stoppingTrustRegionRadius = BOBYQAOptimizer.DEFAULT_STOPPING_RADIUS;
-        return optimize(maxEvaluations, boundsRange, outputVertices, initialTrustRegionRadius, stoppingTrustRegionRadius);
-    }
+    private double optimize(List<Vertex> outputVertices) {
 
-    public double optimize(int maxEvaluations,
-                           double boundsRange,
-                           List<Vertex> outputVertices,
-                           double initialTrustRegionRadius,
-                           double stoppingTrustRegionRadius) {
+        bayesianNetwork.cascadeObservations();
 
-        bayesNet.cascadeObservations();
-
-        if (bayesNet.isInImpossibleState()) {
+        if (bayesianNetwork.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<? extends Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
+        List<? extends Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
         FitnessFunction fitnessFunction = new FitnessFunction(
             outputVertices,
             latentVertices,
@@ -73,7 +89,7 @@ public class NonGradientOptimizer extends Optimizer {
             stoppingTrustRegionRadius
         );
 
-        double[] startPoint = currentPoint(bayesNet.getContinuousLatentVertices());
+        double[] startPoint = Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices());
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
@@ -93,51 +109,30 @@ public class NonGradientOptimizer extends Optimizer {
             new ObjectiveFunction(fitnessFunction.fitness()),
             new SimpleBounds(minBounds, maxBounds),
             MAXIMIZE,
-            new InitialGuess(currentPoint(bayesNet.getContinuousLatentVertices()))
+            new InitialGuess(Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices()))
         );
 
         return pointValuePair.getValue();
     }
 
-    private int getNumInterpolationPoints(List<? extends Vertex<DoubleTensor>> latentVertices){
-        return (int)(2 * totalNumLatentDimensions(latentVertices) + 1);
+    private int getNumInterpolationPoints(List<? extends Vertex<DoubleTensor>> latentVertices) {
+        return (int) (2 * Optimizer.totalNumberOfLatentDimensions(latentVertices) + 1);
     }
 
     /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
-     * @param boundsRange    bounding box around starting point
      * @return the natural logarithm of the Maximum a posteriori (MAP)
      */
-    public double maxAPosteriori(int maxEvaluations, double boundsRange) {
-        return optimize(maxEvaluations, boundsRange, bayesNet.getLatentAndObservedVertices());
+    @Override
+    public double maxAPosteriori() {
+        return optimize(bayesianNetwork.getLatentAndObservedVertices());
     }
 
     /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
-     * @param boundsRange    bounding box around starting point
-     * @param initialTrustRegionRadius    radius around region to start testing points
-     * @param stoppingTrustRegionRadius    stopping trust region radius
-     * @param boundsRange    bounding box around starting point
-     * @return the natural logarithm of the Maximum a posteriori (MAP)
+     * @return the natural logarithm of the maximum likelihood (MLE)
      */
-    public double maxAPosteriori(int maxEvaluations,
-                                 double boundsRange,
-                                 double initialTrustRegionRadius,
-                                 double stoppingTrustRegionRadius) {
-        return optimize(maxEvaluations,
-                        boundsRange,
-                        bayesNet.getLatentAndObservedVertices(),
-                        initialTrustRegionRadius,
-                        stoppingTrustRegionRadius);
-    }
-
-    /**
-     * @param maxEvaluations throws an exception if the optimizer doesn't converge within this many evaluations
-     * @param boundsRange    bounding box around starting point
-     * @return the natural logarithm of the maximum likelihood
-     */
-    public double maxLikelihood(int maxEvaluations, double boundsRange) {
-        return optimize(maxEvaluations, boundsRange, bayesNet.getObservedVertices());
+    @Override
+    public double maxLikelihood() {
+        return optimize(bayesianNetwork.getObservedVertices());
     }
 
 }

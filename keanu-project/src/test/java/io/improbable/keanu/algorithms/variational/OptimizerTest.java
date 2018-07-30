@@ -6,13 +6,45 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
 import static org.junit.Assert.assertEquals;
 
-public class GraphOptimizerTest {
+public class OptimizerTest {
 
     @Test
-    public void calculatesMaxLikelihood() {
+    public void gradientOptimizerCanMLE() {
+        assertCanCalculateMaxLikelihood(getGradientOptimizer());
+    }
+
+    @Test
+    public void nonGradientOptimizerCanMLE() {
+        assertCanCalculateMaxLikelihood(getNonGradientOptimizer());
+    }
+
+    @Test
+    public void gradientOptimizerCanMAP() {
+        assertCanCalculateMaxAPosteriori(getGradientOptimizer());
+    }
+
+    @Test
+    public void nonGradientOptimizerCanMAP() {
+        assertCanCalculateMaxAPosteriori(getNonGradientOptimizer());
+    }
+
+    private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
+        return (bayesNet) -> GradientOptimizer.builder()
+            .bayesianNetwork(bayesNet)
+            .build();
+    }
+
+    private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
+        return (bayesNet) -> NonGradientOptimizer.builder()
+            .bayesianNetwork(bayesNet)
+            .build();
+    }
+
+    private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);
@@ -26,7 +58,7 @@ public class GraphOptimizerTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        Optimizer optimizer = optimizerMapper.apply(bayesNet);
 
         optimizer.maxLikelihood();
         double maxA = A.getValue().scalar();
@@ -35,8 +67,7 @@ public class GraphOptimizerTest {
         assertEquals(44, maxA + maxB, 0.1);
     }
 
-    @Test
-    public void calculatesMaxAPosteriori() {
+    public void assertCanCalculateMaxAPosteriori(Function<BayesianNetwork, Optimizer> optimizerMapper) {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);
@@ -50,7 +81,7 @@ public class GraphOptimizerTest {
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
 
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        Optimizer optimizer = optimizerMapper.apply(bayesNet);
 
         optimizer.maxAPosteriori();
         double maxA = A.getValue().scalar();
