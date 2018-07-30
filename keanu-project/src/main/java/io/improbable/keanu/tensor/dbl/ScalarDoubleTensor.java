@@ -357,7 +357,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public boolean equalsWithEps(DoubleTensor o, double epsilon) {
         if (this == o) return true;
         if (!this.hasSameShapeAs(o)) return false;
-        double difference = value - o.asFlatList().get(0);
+        double difference = value - o.scalar();
         return (Math.abs(difference) <= epsilon);
     }
 

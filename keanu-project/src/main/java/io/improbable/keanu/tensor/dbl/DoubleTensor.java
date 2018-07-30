@@ -247,10 +247,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor standardizeInPlace();
 
-    default public DoubleTensor zeroInPlace() {
-        return setAllInPlace(0.0);
-    }
-
     DoubleTensor setAllInPlace( double value );
 
     // Comparisons

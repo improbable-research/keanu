@@ -180,10 +180,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else {
             if (this.hasSameShapeAs(o)) {
                 DoubleTensor difference = o.minus(this);
-                for (double v : difference.asFlatList()) {
-                    if (Math.abs(v) > epsilon) return false;
-                }
-                return true;
+                return difference.lessThan(epsilon).allTrue();
             }
         }
         return false;
