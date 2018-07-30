@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class BoolPluckVertex extends BoolUnaryOpVertex<BooleanTensor> {

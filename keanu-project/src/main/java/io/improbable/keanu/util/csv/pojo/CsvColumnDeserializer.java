@@ -1,8 +1,8 @@
 package io.improbable.keanu.util.csv.pojo;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 

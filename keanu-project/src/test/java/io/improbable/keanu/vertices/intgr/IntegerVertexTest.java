@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr;
 
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;

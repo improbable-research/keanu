@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 
 
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;

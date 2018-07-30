@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.junit.Test;
 

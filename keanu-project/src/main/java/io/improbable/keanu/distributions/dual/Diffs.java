@@ -5,7 +5,7 @@ import java.util.TreeSet;
 
 import com.google.common.collect.Sets;
 
-import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class Diffs {
     public static final ParameterName A = new ParameterName("A");

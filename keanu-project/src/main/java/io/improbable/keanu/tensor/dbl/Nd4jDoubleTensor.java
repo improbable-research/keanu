@@ -1,31 +1,24 @@
-package io.improbable.keanu.tensor.number.dbl;
+package io.improbable.keanu.tensor.dbl;
 
-import com.google.common.primitives.Ints;
+import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.number.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastAddOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastDivOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastSubOp;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
-import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 import static java.util.Arrays.copyOf;
@@ -500,12 +493,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             tensor.subi(that.scalar());
         } else {
-            INDArray thatArray = unsafeGetNd4J(that);
-            if (Arrays.equals(tensor.shape(), thatArray.shape())) {
-                tensor.subi(thatArray);
-            } else {
-                broadcastMinus(tensor, thatArray, tensor);
-            }
+            INDArrayShim.subi(tensor, unsafeGetNd4J(that));
         }
         return this;
     }
@@ -515,12 +503,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             tensor.addi(that.scalar());
         } else {
-            INDArray thatArray = unsafeGetNd4J(that);
-            if (Arrays.equals(tensor.shape(), thatArray.shape())) {
-                tensor.addi(thatArray);
-            } else {
-                broadcastPlus(tensor, thatArray, tensor);
-            }
+            INDArrayShim.addi(tensor, unsafeGetNd4J(that));
         }
         return this;
     }
@@ -530,12 +513,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             tensor.muli(that.scalar());
         } else {
-            INDArray thatArray = unsafeGetNd4J(that);
-            if (Arrays.equals(tensor.shape(), thatArray.shape())) {
-                tensor.muli(thatArray);
-            } else {
-                broadcastMultiply(tensor, thatArray, tensor);
-            }
+            INDArrayShim.muli(tensor, unsafeGetNd4J(that));
         }
         return this;
     }
@@ -545,61 +523,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (that.isScalar()) {
             tensor.divi(that.scalar());
         } else {
-            INDArray thatArray = unsafeGetNd4J(that);
-            if (Arrays.equals(tensor.shape(), thatArray.shape())) {
-                tensor.divi(thatArray);
-            } else {
-                broadcastDivide(tensor, thatArray, tensor);
-            }
+            INDArrayShim.divi(tensor, unsafeGetNd4J(that));
         }
         return this;
-    }
-
-    private static void broadcastMultiply(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        Nd4j.getExecutioner().exec(
-            new BroadcastMulOp(a, b, result, broadcastDimensions),
-            executeAlong
-        );
-    }
-
-    private static void broadcastDivide(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        Nd4j.getExecutioner().exec(
-            new BroadcastDivOp(a, b, result, broadcastDimensions),
-            executeAlong
-        );
-    }
-
-    private static void broadcastPlus(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        Nd4j.getExecutioner().exec(
-            new BroadcastAddOp(a, b, result, broadcastDimensions),
-            executeAlong
-        );
-    }
-
-    private static void broadcastMinus(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        Nd4j.getExecutioner().exec(
-            new BroadcastSubOp(a, b, result, broadcastDimensions),
-            executeAlong
-        );
-    }
-
-    private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
-        int minRank = Math.min(shapeA.length, shapeB.length);
-        List<Integer> along = new ArrayList<>();
-        for (int i = 0; i < minRank; i++) {
-            if (shapeA[i] == shapeB[i]) {
-                along.add(i);
-            }
-        }
-        return Ints.toArray(along);
     }
 
     @Override
@@ -613,7 +539,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         Transforms.abs(tensor, false);
         return this;
     }
-
 
     @Override
     public DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis) {

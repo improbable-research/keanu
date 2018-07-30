@@ -1,6 +1,6 @@
 package io.improbable.keanu.kotlin
 
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor
+import io.improbable.keanu.tensor.intgr.IntegerTensor
 import io.improbable.keanu.vertices.intgr.IntegerVertex
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 

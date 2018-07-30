@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
-import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilisticObservationException;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 

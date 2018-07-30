@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.number.dbl;
+package io.improbable.keanu.tensor.dbl;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;

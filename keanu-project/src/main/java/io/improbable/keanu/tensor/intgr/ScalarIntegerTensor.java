@@ -1,9 +1,9 @@
-package io.improbable.keanu.tensor.number.intgr;
+package io.improbable.keanu.tensor.intgr;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
