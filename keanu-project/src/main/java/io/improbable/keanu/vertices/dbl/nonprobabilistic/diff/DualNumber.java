@@ -8,6 +8,14 @@ import java.util.*;
 
 public class DualNumber {
 
+    public static DualNumber createConstant(DoubleTensor value) {
+        return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
+    }
+
+    public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
+        return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
+    }
+
     private DoubleTensor value;
     private PartialDerivatives partialDerivatives;
 
@@ -22,14 +30,6 @@ public class DualNumber {
 
     public DualNumber(DoubleTensor value, long infinitesimalLabel) {
         this(value, new PartialDerivatives(Collections.singletonMap(infinitesimalLabel, DoubleTensor.ones(value.getShape()))));
-    }
-
-    public static DualNumber createConstant(DoubleTensor value) {
-        return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
-    }
-
-    public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
-        return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
     public DoubleTensor getValue() {
@@ -293,7 +293,7 @@ public class DualNumber {
     }
 
     public DualNumber concat(int dimension, List<DualNumber> dualToConcat, DoubleTensor... toConcat) {
-        Map<Long, DoubleTensor> concatenatedPartialDerivates = new HashMap<>();
+        Map<Long, DoubleTensor> concatenatedPartialDerivatives = new HashMap<>();
         Map<Long, List<DoubleTensor>> combinedPartialDerivativesOfInputs = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partial : this.partialDerivatives.asMap().entrySet()) {
@@ -307,11 +307,11 @@ public class DualNumber {
         }
 
         for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivativesOfInputs.entrySet()) {
-            concatenatedPartialDerivates.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
         }
 
         DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
-        return new DualNumber(concatValue, concatenatedPartialDerivates);
+        return new DualNumber(concatValue, concatenatedPartialDerivatives);
 
     }
 
