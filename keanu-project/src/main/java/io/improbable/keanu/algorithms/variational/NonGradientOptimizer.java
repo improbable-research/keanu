@@ -46,7 +46,7 @@ public class NonGradientOptimizer implements Optimizer {
      * bounds for each specific continuous latent vertex
      */
     @Builder.Default
-    private final Map<Vertex<DoubleTensor>, SimpleBounds> vertexSpecificBounds = new HashMap<>();
+    private final Map<? extends Vertex<DoubleTensor>, SimpleBounds> vertexSpecificBounds = new HashMap<>();
 
     /**
      * radius around region to start testing points
