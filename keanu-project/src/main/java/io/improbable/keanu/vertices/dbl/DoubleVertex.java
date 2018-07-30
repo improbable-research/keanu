@@ -174,7 +174,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
                     if (vertex instanceof DoubleVertex) {
                         stack.push((DoubleVertex) vertex);
                     } else {
-                        throw new IllegalArgumentException("Can only calculate Diff Numbers on a graph made of Doubles");
+                        //do nothing - todo: optimiser should check this
                     }
                 }
 
@@ -188,7 +188,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)) {
+            if (!dualNumbers.containsKey(next) && next instanceof DoubleVertex) {
                 notCalculatedParents.add(next);
             }
         }

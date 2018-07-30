@@ -49,40 +49,48 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
         BooleanTensor predicateValue = predicate.getValue();
         DualNumber thnDual = dualNumbers.get(thn);
         DualNumber elsDual = dualNumbers.get(els);
-        Map<Long, List<DoubleTensor>> toBeConcatted = new HashMap<>();
+        int[] thenShape = thn.getShape();
 
-        int[] thnShape = thn.getShape();
-
-        if (predicateValue.isScalar()) {
-            //or all are true
-            if (predicateValue.scalar()) {
-                return new DualNumber(dualNumbers.get(thn).getValue(), dualNumbers.get(thn).getPartialDerivatives());
-            //or all are false
-            } else {
-                return new DualNumber(dualNumbers.get(els).getValue(), dualNumbers.get(els).getPartialDerivatives());
-            }
+        if (predicateValue.allTrue()) {
+            return new DualNumber(dualNumbers.get(thn).getValue(), dualNumbers.get(thn).getPartialDerivatives());
+        } else if (predicateValue.allFalse()) {
+            return new DualNumber(dualNumbers.get(els).getValue(), dualNumbers.get(els).getPartialDerivatives());
         } else {
-
-            double[] flatBools = predicateValue.asFlatDoubleArray();
+            Map<Long, List<DoubleTensor>> toBeConcatted = new HashMap<>();
+            double[] flatPredicate = predicateValue.asFlatDoubleArray();
 
             for (int i = 0; i < predicateValue.getLength(); i++) {
-                boolean bool = flatBools[i] == 1.0;
-                if (bool) {
-                    DualNumber thnDuals = thnDual.pluck(thnShape, TensorShape.getFlatIndex(thnShape, TensorShape.getRowFirstStride(thnShape), i));
-                    DualNumber elsDuals = elsDual.pluck(thnShape, TensorShape.getFlatIndex(thnShape, TensorShape.getRowFirstStride(thnShape), i));
-                    Map<Long, DoubleTensor> thnDualsMap = thnDuals.getPartialDerivatives().asMap();
-                    Map<Long, DoubleTensor> elsWithThnRemoved = removePrimaryFromSecondary(thnDuals, elsDuals);
-                    addToMap(toBeConcatted, thnDualsMap, elsWithThnRemoved);
+                boolean currentPredicate = flatPredicate[i] == 1.0;
+                if (currentPredicate) {
+                    pluckFromThenAndElse(thnDual, elsDual, toBeConcatted, thenShape, i);
                 } else {
-                    DualNumber thnDuals = thnDual.pluck(thnShape, TensorShape.getFlatIndex(thnShape, TensorShape.getRowFirstStride(thnShape), i));
-                    DualNumber elsDuals = elsDual.pluck(thnShape, TensorShape.getFlatIndex(thnShape, TensorShape.getRowFirstStride(thnShape), i));
-                    Map<Long, DoubleTensor> elsDualsMap = elsDuals.getPartialDerivatives().asMap();
-                    Map<Long, DoubleTensor> thnWithElsRemoved = removePrimaryFromSecondary(elsDuals, thnDuals);
-                    addToMap(toBeConcatted, elsDualsMap, thnWithElsRemoved);
+                    pluckFromThenAndElse(elsDual, thnDual, toBeConcatted, thenShape, i);
                 }
             }
+
+            Map<Long, DoubleTensor> newPartials = new HashMap<>();
+
+            for (Map.Entry<Long, List<DoubleTensor>> entry : toBeConcatted.entrySet()) {
+                List<DoubleTensor> toConcat = entry.getValue();
+                DoubleTensor conc = toConcat.remove(0);
+                DoubleTensor[] arrayConc = new DoubleTensor[toConcat.size()];
+                DoubleTensor concatted = conc.concat(0, toConcat.toArray(arrayConc));
+                int[] shape = thnDual.getPartialDerivatives().asMap().containsKey(entry.getKey()) ? thnDual.getPartialDerivatives().withRespectTo(entry.getKey()).getShape() : elsDual.getPartialDerivatives().withRespectTo(entry.getKey()).getShape();
+
+                newPartials.put(entry.getKey(), concatted.reshape(shape));
+            }
+
+            return new DualNumber(DoubleTensor.scalar(0), newPartials);
         }
-        return null;
+    }
+
+    private void pluckFromThenAndElse(DualNumber primary, DualNumber secondary, Map<Long, List<DoubleTensor>> toBeConcatted, int[] shape, int index) {
+        int[] currentIndex = TensorShape.getShapeIndices(shape, TensorShape.getRowFirstStride(shape), index);
+        DualNumber primaryDualNumber = primary.pluck(shape, currentIndex);
+        DualNumber secondaryDualNumber = secondary.pluck(shape, currentIndex);
+        Map<Long, DoubleTensor> primaryDualsMap = primaryDualNumber.getPartialDerivatives().asMap();
+        Map<Long, DoubleTensor> secondaryWithPrimaryRemoved = removePrimaryFromSecondary(primaryDualNumber, secondaryDualNumber);
+        addToMap(toBeConcatted, primaryDualsMap, secondaryWithPrimaryRemoved);
     }
 
     private Map<Long, List<DoubleTensor>> addToMap(Map<Long, List<DoubleTensor>> toBeConcatted, Map<Long, DoubleTensor> a, Map<Long, DoubleTensor> b) {
