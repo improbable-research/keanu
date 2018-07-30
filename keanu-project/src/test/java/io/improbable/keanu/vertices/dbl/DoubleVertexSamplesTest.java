@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
 import org.junit.Test;
 
 import java.util.Arrays;

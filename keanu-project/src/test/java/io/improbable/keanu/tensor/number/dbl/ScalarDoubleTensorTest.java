@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.dbl;
+package io.improbable.keanu.tensor.number.dbl;
 
 import org.junit.Test;
 

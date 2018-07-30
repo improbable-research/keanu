@@ -1,15 +1,12 @@
 package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
-import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.nd4j.linalg.util.ArrayUtil;
-
-import java.util.List;
 
 public class Binomial implements DiscreteDistribution {
 

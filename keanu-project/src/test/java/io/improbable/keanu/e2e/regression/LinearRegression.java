@@ -4,7 +4,7 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;

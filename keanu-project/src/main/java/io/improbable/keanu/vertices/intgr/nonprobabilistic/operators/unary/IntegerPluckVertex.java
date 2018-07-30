@@ -2,15 +2,8 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
+import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-
-import java.util.Map;
 
 public class IntegerPluckVertex extends IntegerUnaryOpVertex {
 

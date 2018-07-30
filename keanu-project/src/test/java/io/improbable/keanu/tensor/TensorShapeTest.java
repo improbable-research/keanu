@@ -1,6 +1,6 @@
 package io.improbable.keanu.tensor;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
 import org.junit.Assert;
 import org.junit.Test;
 

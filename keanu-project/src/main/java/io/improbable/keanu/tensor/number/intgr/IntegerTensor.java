@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.intgr;
+package io.improbable.keanu.tensor.number.intgr;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;

@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.dbl;
+package io.improbable.keanu.tensor.number.dbl;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -86,11 +86,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor times(double value);
 
+    DoubleTensor div(double value);
+
     DoubleTensor matrixMultiply(DoubleTensor value);
 
     DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
-
-    DoubleTensor div(double value);
 
     DoubleTensor pow(DoubleTensor exponent);
 

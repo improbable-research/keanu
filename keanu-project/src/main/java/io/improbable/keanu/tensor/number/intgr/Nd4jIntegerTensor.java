@@ -1,12 +1,11 @@
-package io.improbable.keanu.tensor.intgr;
+package io.improbable.keanu.tensor.number.intgr;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.Nd4jDoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;

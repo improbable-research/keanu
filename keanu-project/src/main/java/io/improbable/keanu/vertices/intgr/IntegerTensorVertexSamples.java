@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.intgr;
 
 import io.improbable.keanu.algorithms.VertexSamples;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
 
 import java.util.List;
 import java.util.Map;

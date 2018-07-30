@@ -1,8 +1,7 @@
-package io.improbable.keanu.tensor.dbl;
+package io.improbable.keanu.tensor.number.dbl;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.nd4j.linalg.api.ndarray.INDArray;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -186,6 +185,66 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
         DoubleTensor expected = DoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5});
         assertEquals(expected, clampedA);
+    }
+
+    @Test
+    public void canBroadcastAdd() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8
+        }, new int[]{3, 5});
+
+        DoubleTensor diff = s.plus(x);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            -4, -1, -2, -6, -7,
+            -3, 0, -1, -5, -6,
+            -2, 1, 0, -4, -5
+        }, new int[]{3, 5});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canBroadcastSubtract() {
+        DoubleTensor x = DoubleTensor.create(new double[]{-1, -2, -3}, new int[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8,
+            -5, -2, -3, -7, -8
+        }, new int[]{3, 5});
+
+        DoubleTensor diff = s.minus(x);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            -4, -1, -2, -6, -7,
+            -3, 0, -1, -5, -6,
+            -2, 1, 0, -4, -5
+        }, new int[]{3, 5});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canBroadcastDivide() {
+        DoubleTensor x = DoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
+        DoubleTensor s = DoubleTensor.create(new double[]{
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8
+        }, new int[]{3, 5});
+
+        DoubleTensor diff = s.div(x);
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            5 / 1.0, 2 / 1.0, 3 / 1.0, 7 / 1.0, 8 / 1.0,
+            5 / 2.0, 2 / 2.0, 3 / 2.0, 7 / 2.0, 8 / 2.0,
+            5 / 3.0, 2 / 3.0, 3 / 3.0, 7 / 3.0, 8 / 3.0
+        }, new int[]{3, 5});
+
+        assertEquals(expected, diff);
     }
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {

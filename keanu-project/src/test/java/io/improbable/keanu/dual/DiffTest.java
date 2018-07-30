@@ -11,7 +11,7 @@ import org.junit.Test;
 
 import io.improbable.keanu.distributions.dual.Diff;
 import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
 
 public class DiffTest {
     Diffs diffs;

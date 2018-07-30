@@ -5,7 +5,7 @@ import java.util.Objects;
 
 import org.jetbrains.annotations.NotNull;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
 
 /**
  * A Diff is identified only by its name

@@ -1,8 +1,8 @@
 package io.improbable.keanu.util.csv.pojo.bycolumn;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.number.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.number.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
 import org.junit.Test;
