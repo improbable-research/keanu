@@ -109,12 +109,12 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return multiply(-1);
     }
 
-    public IntegerVertex slice(int dimension, int index) {
-        return new IntegerSliceVertex(this, dimension, index);
-    }
-
     public IntegerVertex pluck(int... index) {
         return new IntegerPluckVertex(this, index);
+    }
+
+    public IntegerVertex slice(int dimension, int index) {
+        return new IntegerSliceVertex(this, dimension, index);
     }
 
     public void setValue(int value) {

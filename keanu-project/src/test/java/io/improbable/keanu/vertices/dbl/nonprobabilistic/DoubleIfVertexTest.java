@@ -215,9 +215,9 @@ public class DoubleIfVertexTest {
         observedIf.observe(2.25);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesianNetwork);
+        GradientOptimizer gradientOptimizer = GradientOptimizer.of(bayesianNetwork);
 
-        gradientOptimizer.maxLikelihood(5000);
+        gradientOptimizer.maxLikelihood();
 
         Assert.assertEquals(2.25, a.getValue().scalar(), 1e-6);
     }
@@ -245,9 +245,9 @@ public class DoubleIfVertexTest {
         observedIf.observe(1.25);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(observedIf.getConnectedGraph());
-        GradientOptimizer gradientOptimizer = new GradientOptimizer(bayesianNetwork);
+        GradientOptimizer gradientOptimizer = GradientOptimizer.of(bayesianNetwork);
 
-        gradientOptimizer.maxLikelihood(5000);
+        gradientOptimizer.maxLikelihood();
 
         Assert.assertEquals(1.25, b.getValue().scalar(), 1e-6);
     }

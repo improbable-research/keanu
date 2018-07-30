@@ -5,8 +5,6 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVert
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericPluckVertex;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -69,6 +67,25 @@ public class SimpleTensorTest {
     }
 
     @Test
+    public void canPluck() {
+
+        Tensor<Something> somethingTensor = new GenericTensor<>(
+            new Something[]{
+                Something.A, Something.B, Something.B,
+                Something.C, Something.D, Something.B,
+                Something.D, Something.A, Something.C
+            },
+            new int[]{3, 3}
+        );
+
+        ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(somethingTensor);
+
+        GenericPluckVertex<Something> pluck = new GenericPluckVertex(somethingVertex, 0, 0);
+
+        assertEquals(Something.A, pluck.getValue().scalar());
+    }
+
+    @Test
     public void canSliceRankTwoTensor() {
 
         Tensor<Something> somethingTensor = new GenericTensor<>(
@@ -87,25 +104,6 @@ public class SimpleTensorTest {
         Tensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
         assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
-    }
-
-    @Test
-    public void canPluck() {
-
-        Tensor<Something> somethingTensor = new GenericTensor<>(
-            new Something[]{
-                Something.A, Something.B, Something.B,
-                Something.C, Something.D, Something.B,
-                Something.D, Something.A, Something.C
-            },
-            new int[]{3, 3}
-        );
-
-        ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(somethingTensor);
-
-        GenericPluckVertex<Something> pluck = new GenericPluckVertex(somethingVertex, 0, 0);
-
-        assertEquals(Something.A, pluck.getValue().scalar());
     }
 
 }

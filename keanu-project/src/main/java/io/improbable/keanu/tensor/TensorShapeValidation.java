@@ -111,4 +111,22 @@ public class TensorShapeValidation {
         return concatShape;
     }
 
+    public static void checkIndexIsValid(int[] shape, int... index) {
+        if (shape.length != index.length) {
+            throw new IllegalArgumentException(
+                "Length of desired index " + Arrays.toString(index) + " must match the length of the shape " + Arrays.toString(shape));
+        }
+
+        for (int i = 0; i < index.length; i++) {
+
+            if (index[i] >= shape[i]) {
+                throw new IllegalArgumentException(
+                    "Invalid index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape)
+                );
+            }
+
+        }
+    }
+
+
 }

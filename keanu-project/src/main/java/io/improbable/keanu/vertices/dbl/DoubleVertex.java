@@ -144,12 +144,12 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return multiply(-1.0);
     }
 
-    public DoubleVertex slice(int dimension, int index) {
-        return new SliceVertex(this, dimension, index);
-    }
-
     public DoubleVertex pluck(int... index) {
         return new PluckVertex(this, index);
+    }
+
+    public DoubleVertex slice(int dimension, int index) {
+        return new SliceVertex(this, dimension, index);
     }
 
     public final DualNumber getDualNumber() {

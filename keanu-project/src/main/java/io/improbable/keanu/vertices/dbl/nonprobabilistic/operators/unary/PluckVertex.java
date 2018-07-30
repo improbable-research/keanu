@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -20,6 +21,7 @@ public class PluckVertex extends DoubleUnaryOpVertex {
      */
     public PluckVertex(DoubleVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
+        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
     }
 
@@ -30,6 +32,6 @@ public class PluckVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).pluck(inputVertex.getShape(), index);
+        return dualNumbers.get(inputVertex).pluck(index);
     }
 }

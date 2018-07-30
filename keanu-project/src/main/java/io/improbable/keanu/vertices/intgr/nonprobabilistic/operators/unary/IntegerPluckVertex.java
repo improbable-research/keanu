@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -23,6 +24,7 @@ public class IntegerPluckVertex extends IntegerUnaryOpVertex {
      */
     public IntegerPluckVertex(IntegerVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
+        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
     }
 

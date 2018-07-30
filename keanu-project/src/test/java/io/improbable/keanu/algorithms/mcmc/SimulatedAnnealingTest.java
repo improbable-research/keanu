@@ -52,7 +52,7 @@ public class SimulatedAnnealingTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
 
-        GradientOptimizer graphOptimizer = new GradientOptimizer(network);
+        GradientOptimizer graphOptimizer = GradientOptimizer.of(network);
         graphOptimizer.maxAPosteriori();
 
         return new SimpleNetworkState(network.getLatentVertices().stream()
