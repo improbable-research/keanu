@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorC
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -135,5 +136,14 @@ public class KDEApproximationTest {
         resampledKDE.resample(nSamples,  new KeanuRandom());
         assertEquals(1, resampledKDE.getSampleShape()[0]);
         assertEquals(nSamples, resampledKDE.getSampleShape()[1]);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void handlingNonScalarSamplesTest(){
+        List<DoubleTensor> badSamplesList = Arrays.asList(DoubleTensor.create(new double[]{1,2,3}));
+
+        DoubleVertexSamples badSamples = new DoubleVertexSamples(badSamplesList);
+        KDEVertex KDE = new GaussianKDE().approximate(badSamples);
+        throw new AssertionError("approximate did not throw a IllegalArgumentException!");
     }
 }

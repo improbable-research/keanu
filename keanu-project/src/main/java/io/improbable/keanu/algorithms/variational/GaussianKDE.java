@@ -17,6 +17,7 @@ public class GaussianKDE {
     public KDEVertex approximate(VertexSamples<DoubleTensor> vertexSamples){
 
         List<Double> samples = vertexSamples.asList().stream()
+            .map(tensor -> checkIfScalar(tensor))
             .map(tensor -> tensor.scalar())
             .collect(Collectors.toList());
 
@@ -28,5 +29,12 @@ public class GaussianKDE {
         DoubleVertexSamples vertexSamples = MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(network, Arrays.asList(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
+    }
+
+    private DoubleTensor checkIfScalar(DoubleTensor tensor) throws IllegalArgumentException {
+        if (tensor.asFlatList().size()>1){
+            throw new IllegalArgumentException();
+        }
+        return tensor;
     }
 }
