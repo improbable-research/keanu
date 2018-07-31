@@ -12,7 +12,8 @@ import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.BiConsumer;
 
 import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
@@ -46,7 +47,7 @@ public class NonGradientOptimizer implements Optimizer {
      * bounds for each specific continuous latent vertex
      */
     @Builder.Default
-    private final Map<? extends Vertex<DoubleTensor>, SimpleBounds> vertexSpecificBounds = new HashMap<>();
+    private final OptimizerBounds optimizerBounds = new OptimizerBounds();
 
     /**
      * radius around region to start testing points
@@ -80,9 +81,7 @@ public class NonGradientOptimizer implements Optimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        List<? extends Vertex<DoubleTensor>> latentVertices = vertexSpecificBounds.isEmpty() ?
-            bayesianNetwork.getContinuousLatentVertices() :
-            new ArrayList<>(vertexSpecificBounds.keySet());
+        List<? extends Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
 
         FitnessFunction fitnessFunction = new FitnessFunction(
             outputVertices,
@@ -103,7 +102,8 @@ public class NonGradientOptimizer implements Optimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        SimpleBounds bounds = getBounds(startPoint);
+        BoundsCalculator boundsCalculator = new BoundsCalculator(boundsRange, optimizerBounds);
+        SimpleBounds bounds = boundsCalculator.getBounds(latentVertices, startPoint);
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
@@ -114,39 +114,6 @@ public class NonGradientOptimizer implements Optimizer {
         );
 
         return pointValuePair.getValue();
-    }
-
-    private SimpleBounds getBounds(double[] startPoint) {
-        if (vertexSpecificBounds.isEmpty()) {
-            return getScalarBounds(startPoint);
-        }
-        return getVertexSpecificBounds();
-    }
-
-    private SimpleBounds getScalarBounds(double[] startPoint) {
-        double[] minBounds = new double[startPoint.length];
-        double[] maxBounds = new double[startPoint.length];
-
-        for (int i = 0; i < startPoint.length; i++) {
-            minBounds[i] = startPoint[i] - boundsRange;
-            maxBounds[i] = startPoint[i] + boundsRange;
-        }
-        return new SimpleBounds(minBounds, maxBounds);
-    }
-
-    private SimpleBounds getVertexSpecificBounds() {
-        List<Double> minBounds = new ArrayList<>();
-        List<Double> maxBounds = new ArrayList<>();
-
-        vertexSpecificBounds.values().forEach(bounds -> {
-            minBounds.addAll(DoubleTensor.create(bounds.getLower()).asFlatList());
-            maxBounds.addAll(DoubleTensor.create(bounds.getUpper()).asFlatList());
-        });
-
-        return new SimpleBounds(
-            minBounds.stream().mapToDouble(d -> d).toArray(),
-            maxBounds.stream().mapToDouble(d -> d).toArray()
-        );
     }
 
     private int getNumInterpolationPoints(List<? extends Vertex<DoubleTensor>> latentVertices) {

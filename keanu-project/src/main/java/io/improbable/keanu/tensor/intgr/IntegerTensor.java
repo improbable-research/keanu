@@ -71,6 +71,9 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     @Override
     IntegerTensor reshape(int... newShape);
 
+    @Override
+    IntegerTensor duplicate();
+
     IntegerTensor diag();
 
     IntegerTensor transpose();
