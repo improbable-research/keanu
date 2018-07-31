@@ -23,9 +23,9 @@ public class Dirichlet implements ContinuousDistribution {
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
        final ContinuousDistribution gamma = Gamma.withParameters(
-            concentration,
-            DoubleTensor.ones(shape),
-            DoubleTensor.zeros(shape)
+           DoubleTensor.zeros(shape),
+           DoubleTensor.ones(shape),
+           concentration
         );
         final DoubleTensor gammaSamples = gamma.sample(concentration.getShape(), random);
         return normalise(gammaSamples);
