@@ -7,7 +7,7 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -21,13 +21,13 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
     protected final Vertex<A> left;
     protected final Vertex<B> right;
     protected final BiFunction<A, B, DoubleTensor> op;
-    protected final Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation;
 
     public DoubleBinaryOpLambda(int[] shape,
                                 Vertex<A> left,
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
+                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(left.getValue(), right.getValue())),
             Observable.observableTypeFor(DoubleBinaryOpLambda.class)
@@ -47,7 +47,7 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
     public DoubleBinaryOpLambda(Vertex<A> left,
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
+                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, dualNumberCalculation);
     }
 
@@ -61,7 +61,7 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differen
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberCalculation != null) {
             return dualNumberCalculation.apply(dualNumbers);
         }

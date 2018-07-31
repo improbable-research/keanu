@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
@@ -69,7 +68,7 @@ public class DualNumbersTest {
         vB.setValue(B);
         vC.eval();
 
-        DualNumber cDual = new Differentiator().calculateDual((Differentiable)vC);
+        DualNumber cDual = new Differentiator().calculateDual(vC);
 
         DoubleTensor C = cDual.getValue();
         Map<Long, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();

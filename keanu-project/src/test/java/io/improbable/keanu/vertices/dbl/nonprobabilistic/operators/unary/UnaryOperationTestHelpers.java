@@ -13,7 +13,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -37,7 +36,7 @@ public class UnaryOperationTestHelpers {
         UniformVertex A = VertexOfType.uniform(0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
 
-        DualNumber resultDualNumber = new Differentiator().calculateDual((Differentiable)op.apply(A));
+        DualNumber resultDualNumber = new Differentiator().calculateDual(op.apply(A));
         assertEquals(expectedGradientWrtA, resultDualNumber.getPartialDerivatives().withRespectTo(A).scalar(), 1e-5);
     }
 
@@ -69,7 +68,7 @@ public class UnaryOperationTestHelpers {
             .uniform();
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
 
-        DualNumber result = new Differentiator().calculateDual((Differentiable)op.apply(A));
+        DualNumber result = new Differentiator().calculateDual(op.apply(A));
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA, wrtA.asFlatDoubleArray(), 1e-10);

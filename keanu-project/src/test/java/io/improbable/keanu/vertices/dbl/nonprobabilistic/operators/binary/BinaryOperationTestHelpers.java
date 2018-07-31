@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -42,7 +41,7 @@ public class BinaryOperationTestHelpers {
         UniformVertex B = VertexOfType.uniform(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
 
-        DualNumber resultDualNumber = new Differentiator().calculateDual((Differentiable)(op.apply(A, B)));
+        DualNumber resultDualNumber = new Differentiator().calculateDual((op.apply(A, B)));
         assertEquals(expectedGradientWrtA, resultDualNumber.getPartialDerivatives().withRespectTo(A).scalar(), 1e-5);
         assertEquals(expectedGradientWrtB, resultDualNumber.getPartialDerivatives().withRespectTo(B).scalar(), 1e-5);
     }
@@ -94,7 +93,7 @@ public class BinaryOperationTestHelpers {
             .uniform();
         B.setAndCascade(bValues);
 
-        DualNumber result = new Differentiator().calculateDual((Differentiable)op.apply(A, B));
+        DualNumber result = new Differentiator().calculateDual(op.apply(A, B));
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);
@@ -119,7 +118,7 @@ public class BinaryOperationTestHelpers {
         UniformVertex B = VertexOfType.uniform(0.0, 1.0);
         B.setAndCascade(DoubleTensor.scalar(bValue));
 
-        DualNumber result = new Differentiator().calculateDual((Differentiable)op.apply(A, B));
+        DualNumber result = new Differentiator().calculateDual(op.apply(A, B));
 
         DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);

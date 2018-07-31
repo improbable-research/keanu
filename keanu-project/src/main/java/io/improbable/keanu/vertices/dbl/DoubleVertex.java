@@ -8,7 +8,6 @@ import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BooleanVertex;
@@ -162,7 +161,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new DoubleUnaryOpVertex(this, a -> a.reshape(proposedShape), a -> a.reshape(proposedShape));
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
@@ -246,7 +245,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());
         } else {

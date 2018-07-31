@@ -12,7 +12,6 @@ import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -46,8 +45,8 @@ public class BetaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
                                                             DoubleTensor dLogPdbeta,
                                                             DoubleTensor dLogPdx) {
             Differentiator differentiator = new Differentiator();
-            PartialDerivatives dLogPdInputsFromAlpha = differentiator.calculateDual((Differentiable) getAlpha()).getPartialDerivatives().multiplyBy(dLogPdalpha);
-            PartialDerivatives dLogPdInputsFromBeta = differentiator.calculateDual((Differentiable) getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
+            PartialDerivatives dLogPdInputsFromAlpha = differentiator.calculateDual(getAlpha()).getPartialDerivatives().multiplyBy(dLogPdalpha);
+            PartialDerivatives dLogPdInputsFromBeta = differentiator.calculateDual(getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);
 
         if (!this.isObserved()) {
@@ -60,11 +59,11 @@ public class BetaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
         return summed.asMap();
     }
 
-    private Vertex<?> getAlpha() {
-        return getParents().get(0);
+    private DoubleVertex getAlpha() {
+        return (DoubleVertex) getParents().get(0);
     }
 
-    private Vertex<?> getBeta() {
-        return getParents().get(1);
+    private DoubleVertex getBeta() {
+        return (DoubleVertex) getParents().get(1);
     }
 }

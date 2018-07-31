@@ -8,7 +8,6 @@ import org.junit.Test;
 import io.improbable.keanu.distributions.dual.ParameterName;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.DistributionVertexBuilder;
 
@@ -26,7 +25,7 @@ public class SumVertexTest {
 
         DoubleVertex summed = in.sum();
 
-        DoubleTensor wrtIn = new Differentiator().calculateDual((Differentiable)summed).getPartialDerivatives().withRespectTo(in);
+        DoubleTensor wrtIn = new Differentiator().calculateDual(summed).getPartialDerivatives().withRespectTo(in);
         DoubleTensor expectedWrtIn = DoubleTensor.ones(1, 1, 1, 5);
 
         assertEquals(1 + 2 + 3 + 4 + 5, summed.lazyEval().scalar(), 1e-5);

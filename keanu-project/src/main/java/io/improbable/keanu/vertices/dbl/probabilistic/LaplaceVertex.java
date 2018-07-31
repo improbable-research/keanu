@@ -49,8 +49,8 @@ public class LaplaceVertex extends DistributionBackedDoubleVertex<DoubleTensor> 
                                                              DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual((Differentiable)getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
-        PartialDerivatives dLogPdInputsFromBeta = differentiator.calculateDual((Differentiable)getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
+        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual(getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromBeta = differentiator.calculateDual(getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromMu.add(dLogPdInputsFromBeta);
 
 

@@ -46,9 +46,9 @@ public class GammaVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
                                                              DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual((Differentiable) getParents().get(0)).getPartialDerivatives().multiplyBy(dLogPdlocation);
-        PartialDerivatives dLogPdInputsFromTheta = differentiator.calculateDual((Differentiable) getParents().get(1)).getPartialDerivatives().multiplyBy(dLogPdtheta);
-        PartialDerivatives dLogPdInputsFromK = differentiator.calculateDual((Differentiable) getParents().get(2)).getPartialDerivatives().multiplyBy(dLogPdk);
+        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual(Differentiable.filter(getParents()).get(0)).getPartialDerivatives().multiplyBy(dLogPdlocation);
+        PartialDerivatives dLogPdInputsFromTheta = differentiator.calculateDual(Differentiable.filter(getParents()).get(1)).getPartialDerivatives().multiplyBy(dLogPdtheta);
+        PartialDerivatives dLogPdInputsFromK = differentiator.calculateDual(Differentiable.filter(getParents()).get(2)).getPartialDerivatives().multiplyBy(dLogPdk);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromTheta).add(dLogPdInputsFromK);
 
         if (!this.isObserved()) {

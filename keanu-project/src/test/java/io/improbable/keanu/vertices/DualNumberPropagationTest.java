@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 
 public class DualNumberPropagationTest {
@@ -25,7 +24,7 @@ public class DualNumberPropagationTest {
         int links = 20;
         DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
 
-        new Differentiator().calculateDual((Differentiable)end);
+        new Differentiator().calculateDual(end);
 
         //Does the right amount of work
         assertEquals(3 * links, m.get());

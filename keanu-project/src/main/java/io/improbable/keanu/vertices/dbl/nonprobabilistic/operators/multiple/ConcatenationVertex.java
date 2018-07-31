@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -50,7 +50,7 @@ public class ConcatenationVertex extends DoubleVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         Map<Long, List<DoubleTensor>> combinedPartialDerivativesOfInputs = new HashMap<>();
 
         for (DoubleVertex vertex : input) {

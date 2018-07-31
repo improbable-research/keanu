@@ -4,7 +4,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.IVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -17,9 +17,9 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, DoubleTensor> op;
-    protected final Function<Map<IVertex, DualNumber>, DualNumber> dualNumberSupplier;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue())),
             Observable.observableTypeFor(DoubleUnaryOpLambda.class)
@@ -35,7 +35,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
         this(shape, inputVertex, op, null);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<IVertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation);
     }
 
@@ -49,7 +49,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<IVertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.apply(dualNumbers);
         }

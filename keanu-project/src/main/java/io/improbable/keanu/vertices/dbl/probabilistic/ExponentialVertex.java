@@ -11,7 +11,6 @@ import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -47,8 +46,8 @@ public class ExponentialVertex extends DistributionBackedDoubleVertex<DoubleTens
                                                              DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual((Differentiable) getLocation()).getPartialDerivatives().multiplyBy(dLogPdlocation);
-        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual((Differentiable) getLambda()).getPartialDerivatives().multiplyBy(dLogPdlambda);
+        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual(getLocation()).getPartialDerivatives().multiplyBy(dLogPdlocation);
+        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual(getLambda()).getPartialDerivatives().multiplyBy(dLogPdlambda);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromB);
 
         if (!this.isObserved()) {
@@ -61,12 +60,12 @@ public class ExponentialVertex extends DistributionBackedDoubleVertex<DoubleTens
         return summed.asMap();
     }
 
-    private Vertex<?> getLocation() {
-        return getParents().get(0);
+    private DoubleVertex getLocation() {
+        return (DoubleVertex) getParents().get(0);
     }
 
-    private Vertex<?> getLambda() {
-        return getParents().get(1);
+    private DoubleVertex getLambda() {
+        return (DoubleVertex) getParents().get(1);
     }
 }
 

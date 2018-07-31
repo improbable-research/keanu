@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.dbl.probabilistic.Differentiator;
 import io.improbable.keanu.vertices.dbl.probabilistic.VertexOfType;
 
@@ -37,7 +36,7 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex alpha = VertexOfType.uniform(0., 10.);
         alpha.setValue(DoubleTensor.create(new double[]{1, 3, 5, 2, 4, 6}, 2, 3));
 
-        Differentiable N = (Differentiable) m.matrixMultiply(alpha);
+        DoubleVertex N = m.matrixMultiply(alpha);
         DualNumber NDual = new Differentiator().calculateDual(N);
 
         DoubleTensor dNdm = NDual.getPartialDerivatives().withRespectTo(m);
@@ -80,7 +79,7 @@ public class MatrixMultiplicationVertexTest {
 
         DoubleVertex N = m.matrixMultiply(alpha);
         DoubleVertex y = N.matrixMultiply(beta);
-        DualNumber yDual = new Differentiator().calculateDual((Differentiable) y);
+        DualNumber yDual = new Differentiator().calculateDual(y);
 
         DoubleTensor dydm = yDual.getPartialDerivatives().withRespectTo(m);
         DoubleTensor expectedDydm = DoubleTensor.create(new double[]{
@@ -136,7 +135,7 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex L = beta.matrixMultiply(alpha);
         //y = L x N = (beta x alpha) x (alpha x m)
         DoubleVertex y = L.matrixMultiply(N);
-        DualNumber yDual = new Differentiator().calculateDual((Differentiable)y);
+        DualNumber yDual = new Differentiator().calculateDual(y);
 
         DoubleTensor dydalpha = yDual.getPartialDerivatives().withRespectTo(alpha);
         DoubleTensor expectedDydalpha = DoubleTensor.create(new double[]{

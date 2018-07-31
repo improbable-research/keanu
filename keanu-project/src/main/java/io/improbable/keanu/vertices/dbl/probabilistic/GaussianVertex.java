@@ -11,7 +11,6 @@ import io.improbable.keanu.distributions.continuous.DistributionOfType;
 import io.improbable.keanu.distributions.dual.ParameterMap;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -32,12 +31,12 @@ public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleTensor>
         super(tensorShape, DistributionOfType::gaussian, mu, sigma);
     }
 
-    public Vertex<?> getMu() {
-        return getParents().get(0);
+    public DoubleVertex getMu() {
+        return (DoubleVertex) getParents().get(0);
     }
 
-    public Vertex<?> getSigma() {
-        return getParents().get(1);
+    public DoubleVertex getSigma() {
+        return (DoubleVertex) getParents().get(1);
     }
 
     @Override
@@ -51,8 +50,8 @@ public class GaussianVertex extends DistributionBackedDoubleVertex<DoubleTensor>
                                                              DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
-        PartialDerivatives dLogPdInputsFromSigma = differentiator.calculateDual((Differentiable) getSigma()).getPartialDerivatives().multiplyBy(dLogPdsigma);
+        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual(getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromSigma = differentiator.calculateDual(getSigma()).getPartialDerivatives().multiplyBy(dLogPdsigma);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromMu.add(dLogPdInputsFromSigma);
 
         if (!this.isObserved()) {

@@ -205,7 +205,7 @@ public class ProbabilisticDoubleTensorContract {
 
     public static void isTreatedAsConstantWhenObserved(DoubleVertex vertexUnderTest) {
         vertexUnderTest.observe(DoubleTensor.ones(vertexUnderTest.getValue().getShape()));
-        assertTrue(new Differentiator().calculateDual((Differentiable)vertexUnderTest).isOfConstant());
+        assertTrue(new Differentiator().calculateDual(vertexUnderTest).isOfConstant());
     }
 
     public static void hasNoGradientWithRespectToItsValueWhenObserved(DoubleVertex vertexUnderTest) {

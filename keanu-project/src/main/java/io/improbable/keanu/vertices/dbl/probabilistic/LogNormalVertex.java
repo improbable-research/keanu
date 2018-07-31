@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.ParameterName.MU;
 import static io.improbable.keanu.distributions.dual.ParameterName.SIGMA;
 import static io.improbable.keanu.distributions.dual.ParameterName.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
 import java.util.Map;
 
@@ -12,8 +13,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
 public class LogNormalVertex extends DistributionBackedDoubleVertex<DoubleTensor> {
 
@@ -42,8 +41,8 @@ public class LogNormalVertex extends DistributionBackedDoubleVertex<DoubleTensor
                                                              DoubleTensor dLogPdsigma,
                                                              DoubleTensor dLogPdx) {
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
-        PartialDerivatives dLogPdInputsFromSigma = differentiator.calculateDual((Differentiable) getSigma()).getPartialDerivatives().multiplyBy(dLogPdsigma);
+        PartialDerivatives dLogPdInputsFromMu = differentiator.calculateDual(getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromSigma = differentiator.calculateDual(getSigma()).getPartialDerivatives().multiplyBy(dLogPdsigma);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromMu.add(dLogPdInputsFromSigma);
 
         if (!this.isObserved()) {

@@ -42,8 +42,8 @@ public class InverseGammaVertex extends DistributionBackedDoubleVertex<DoubleTen
                                                              DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual((Differentiable) getAlpha()).getPartialDerivatives().multiplyBy(dLogPdalpha);
-        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual((Differentiable) getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
+        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual(getAlpha()).getPartialDerivatives().multiplyBy(dLogPdalpha);
+        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual(getBeta()).getPartialDerivatives().multiplyBy(dLogPdbeta);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromB);
 
         if (!this.isObserved()) {

@@ -41,8 +41,8 @@ public class LogisticVertex extends DistributionBackedDoubleVertex<DoubleTensor>
                                                              DoubleTensor dLogPdx) {
 
         Differentiator differentiator = new Differentiator();
-        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual((Differentiable) getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
-        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual((Differentiable) getS()).getPartialDerivatives().multiplyBy(dLogPds);
+        PartialDerivatives dLogPdInputsFromA = differentiator.calculateDual(getMu()).getPartialDerivatives().multiplyBy(dLogPdmu);
+        PartialDerivatives dLogPdInputsFromB = differentiator.calculateDual(getS()).getPartialDerivatives().multiplyBy(dLogPds);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromB);
 
 
