@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -47,7 +46,7 @@ public class PlatesExample {
                 DoubleVertex y = m.multiply(x).plus(b);
 
                 DoubleVertex yObserved = VertexOfType.gaussian(y, ConstantVertex.of(1.));
-                yObserved.observe(DoubleTensor.scalar(csvMyData.y));
+                yObserved.observe(csvMyData.y);
 
                 // this labels the x and y vertex for later use
                 plate.add("x", x);
