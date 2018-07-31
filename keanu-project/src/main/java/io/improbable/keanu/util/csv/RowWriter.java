@@ -26,7 +26,7 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    File toFile(File file) {
+    public File toFile(File file) {
         List<String[]> data = new ArrayList<>();
         int maxSize = findLongestTensor(vertices);
 
@@ -43,7 +43,7 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    Writer withDefaultHeader() {
+    public Writer withDefaultHeader() {
         int sizeOfHeader = findLongestTensor(vertices);
         String[] header = createHeader(sizeOfHeader, HEADER_STYLE, i -> i);
         withHeader(header);
