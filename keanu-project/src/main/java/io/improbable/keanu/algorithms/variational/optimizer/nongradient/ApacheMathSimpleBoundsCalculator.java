@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,21 +10,26 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * This class creates an Apache math commons simple bounds object for a given collection of
+ * vertices and their staring point. This can be used for some of the Apache math commons
+ * optimizer, namely the BOBYQAOptimizer.
+ */
 @RequiredArgsConstructor
-public class BoundsCalculator {
+class ApacheMathSimpleBoundsCalculator {
 
     private final double boundsRange;
     private final OptimizerBounds optimizerBounds;
 
-    public SimpleBounds getBounds(List<? extends Vertex<DoubleTensor>> latentVertices, double[] startPoint) {
+    SimpleBounds getBounds(List<? extends Vertex<DoubleTensor>> latentVertices, double[] startPoint) {
         List<Double> minBounds = new ArrayList<>();
         List<Double> maxBounds = new ArrayList<>();
 
         for (Vertex<DoubleTensor> vertex : latentVertices) {
 
             if (optimizerBounds.hasBound(vertex)) {
-                validateBoundsForVertex(vertex, optimizerBounds);
-                addBoundsForVertex(vertex, optimizerBounds, minBounds, maxBounds);
+                validateBoundsForVertex(vertex);
+                addBoundsForVertex(vertex, minBounds, maxBounds);
             } else {
                 int length = (int) TensorShape.getLength(vertex.getShape());
                 int startIndex = minBounds.size();
@@ -42,12 +47,11 @@ public class BoundsCalculator {
     }
 
     private void addBoundsForVertex(Vertex<DoubleTensor> vertex,
-                                    OptimizerBounds bounds,
                                     List<Double> minBounds,
                                     List<Double> maxBounds) {
 
-        DoubleTensor lowerBound = bounds.getLower(vertex);
-        DoubleTensor upperBound = bounds.getUpper(vertex);
+        DoubleTensor lowerBound = optimizerBounds.getLower(vertex);
+        DoubleTensor upperBound = optimizerBounds.getUpper(vertex);
 
         if (lowerBound.isScalar()) {
             minBounds.addAll(DoubleTensor.create(lowerBound.scalar(), vertex.getShape()).asFlatList());
@@ -62,12 +66,12 @@ public class BoundsCalculator {
         }
     }
 
-    private void validateBoundsForVertex(Vertex<DoubleTensor> vertex, OptimizerBounds bounds) {
+    private void validateBoundsForVertex(Vertex<DoubleTensor> vertex) {
         int[] vertexShape = vertex.getShape();
-        if (!bounds.getLower(vertex).isScalar() && !Arrays.equals(vertexShape, bounds.getLower(vertex).getShape())) {
+        if (!optimizerBounds.getLower(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getLower(vertex).getShape())) {
             throw new IllegalArgumentException("Lower bounds shape does not match vertex shape");
         }
-        if (!bounds.getUpper(vertex).isScalar() && !Arrays.equals(vertexShape, bounds.getUpper(vertex).getShape())) {
+        if (!optimizerBounds.getUpper(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getUpper(vertex).getShape())) {
             throw new IllegalArgumentException("Upper bounds shape does not match vertex shape");
         }
     }

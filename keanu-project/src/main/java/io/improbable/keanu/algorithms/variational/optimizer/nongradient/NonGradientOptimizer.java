@@ -1,5 +1,6 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -13,6 +14,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -25,6 +27,14 @@ public class NonGradientOptimizer implements Optimizer {
         return NonGradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
+    }
+
+    public static NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
+        return of(new BayesianNetwork(vertices));
+    }
+
+    public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        return of(vertexFromNetwork.getConnectedGraph());
     }
 
     @Getter
@@ -102,7 +112,7 @@ public class NonGradientOptimizer implements Optimizer {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        BoundsCalculator boundsCalculator = new BoundsCalculator(boundsRange, optimizerBounds);
+        ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(boundsRange, optimizerBounds);
         SimpleBounds bounds = boundsCalculator.getBounds(latentVertices, startPoint);
 
         PointValuePair pointValuePair = optimizer.optimize(

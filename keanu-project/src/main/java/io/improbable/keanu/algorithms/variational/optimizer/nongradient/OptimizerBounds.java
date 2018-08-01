@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -22,7 +22,6 @@ public class OptimizerBounds {
         DoubleTensor maxDup = max.duplicate();
 
         vertexBounds.put(vertex, new VertexBounds(minDup, maxDup));
-
     }
 
     public void addBound(Vertex<? extends DoubleTensor> vertex, double min, DoubleTensor max) {
