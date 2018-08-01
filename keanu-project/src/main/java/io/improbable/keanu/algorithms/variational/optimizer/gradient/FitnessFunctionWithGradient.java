@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,7 +11,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.FitnessFunction.logOfTotalProbability;
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
+import static io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction.logOfTotalProbability;
 
 
 public class FitnessFunctionWithGradient {
@@ -39,7 +40,7 @@ public class FitnessFunctionWithGradient {
     public MultivariateVectorFunction gradient() {
         return point -> {
 
-            FitnessFunction.setAndCascadePoint(point, latentVertices);
+            setAndCascadePoint(point, latentVertices);
 
             Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
@@ -55,7 +56,7 @@ public class FitnessFunctionWithGradient {
 
     public MultivariateFunction fitness() {
         return point -> {
-            FitnessFunction.setAndCascadePoint(point, latentVertices);
+            setAndCascadePoint(point, latentVertices);
             double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
 
             if (onFitnessCalculation != null) {

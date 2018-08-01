@@ -1,5 +1,7 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
@@ -14,6 +16,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjuga
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -39,6 +42,14 @@ public class GradientOptimizer implements Optimizer {
         return GradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
+    }
+
+    public static GradientOptimizer of(Collection<? extends Vertex> vertices) {
+        return of(new BayesianNetwork(vertices));
+    }
+
+    public static GradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        return of(vertexFromNetwork.getConnectedGraph());
     }
 
     @Getter
