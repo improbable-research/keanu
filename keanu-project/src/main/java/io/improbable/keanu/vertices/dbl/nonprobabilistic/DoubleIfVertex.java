@@ -41,7 +41,7 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         throw new UnsupportedOperationException("if is non-differentiable");
     }
 }

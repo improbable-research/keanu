@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import java.util.Map;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.Map;
 
 public abstract class ProbabilisticDouble extends DoubleVertex {
 
@@ -23,7 +23,7 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());
         } else {
