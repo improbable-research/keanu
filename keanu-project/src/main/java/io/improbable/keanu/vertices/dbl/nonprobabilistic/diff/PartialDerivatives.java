@@ -22,6 +22,44 @@ public class PartialDerivatives {
         );
     }
 
+    public static PartialDerivatives ifThenElse(BooleanTensor predicate, PartialDerivatives thn, PartialDerivatives els) {
+        DoubleTensor trueMask = predicate.toDoubleMask();
+        DoubleTensor falseMask = predicate.not().toDoubleMask();
+
+        Map<Long, DoubleTensor> thenPartials = thn.derivativeWithRespectTo;
+        Map<Long, DoubleTensor> elsePartials = els.derivativeWithRespectTo;
+        Set<Long> wrtUnion = new HashSet<>();
+        wrtUnion.addAll(thenPartials.keySet());
+        wrtUnion.addAll(elsePartials.keySet());
+
+        Map<Long, DoubleTensor> mixedPartials = new HashMap<>();
+        for (Long wrt : wrtUnion) {
+            DoubleTensor thnPartial = thenPartials.get(wrt);
+            DoubleTensor elsPartial = elsePartials.get(wrt);
+            DoubleTensor broadcastedTrueMask;
+            DoubleTensor broadcastedFalseMask;
+
+            DoubleTensor newPartial;
+            if (thnPartial == null) {
+                broadcastedFalseMask = DoubleTensor.zeros(elsPartial.getShape()).plusInPlace(falseMask);
+                newPartial = broadcastedFalseMask.timesInPlace(elsPartial);
+            } else if (elsPartial == null) {
+                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
+                newPartial = broadcastedTrueMask.timesInPlace(thnPartial);
+            } else {
+                broadcastedFalseMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(falseMask);
+                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
+
+                newPartial = broadcastedTrueMask.timesInPlace(thnPartial)
+                    .plusInPlace(broadcastedFalseMask.timesInPlace(elsPartial));
+            }
+
+            mixedPartials.put(wrt, newPartial);
+        }
+
+        return new PartialDerivatives(mixedPartials);
+    }
+
     private Map<Long, DoubleTensor> derivativeWithRespectTo;
 
     public PartialDerivatives(long id, DoubleTensor derivativeWithRespectTo) {
@@ -279,44 +317,6 @@ public class PartialDerivatives {
         return lowRankTensor.reshape(
             TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
         );
-    }
-
-    public static PartialDerivatives ifThenElse(BooleanTensor predicate, PartialDerivatives thn, PartialDerivatives els) {
-        DoubleTensor trueMask = predicate.toDoubleMask();
-        DoubleTensor falseMask = predicate.not().toDoubleMask();
-
-        Map<Long, DoubleTensor> thenPartials = thn.derivativeWithRespectTo;
-        Map<Long, DoubleTensor> elsePartials = els.derivativeWithRespectTo;
-        Set<Long> wrtUnion = new HashSet<>();
-        wrtUnion.addAll(thenPartials.keySet());
-        wrtUnion.addAll(elsePartials.keySet());
-
-        Map<Long, DoubleTensor> mixedPartials = new HashMap<>();
-        for (Long wrt : wrtUnion) {
-            DoubleTensor thnPartial = thenPartials.get(wrt);
-            DoubleTensor elsPartial = elsePartials.get(wrt);
-            DoubleTensor broadcastedTrueMask;
-            DoubleTensor broadcastedFalseMask;
-
-            DoubleTensor newPartial;
-            if (thnPartial == null) {
-                broadcastedFalseMask = DoubleTensor.zeros(elsPartial.getShape()).plusInPlace(falseMask);
-                newPartial = broadcastedFalseMask.timesInPlace(elsPartial);
-            } else if (elsPartial == null) {
-                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
-                newPartial = broadcastedTrueMask.timesInPlace(thnPartial);
-            } else {
-                broadcastedFalseMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(falseMask);
-                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
-
-                newPartial = broadcastedTrueMask.timesInPlace(thnPartial)
-                    .plusInPlace(broadcastedFalseMask.timesInPlace(elsPartial));
-            }
-
-            mixedPartials.put(wrt, newPartial);
-        }
-
-        return new PartialDerivatives(mixedPartials);
     }
 
 }
