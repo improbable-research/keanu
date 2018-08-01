@@ -33,7 +33,9 @@ public class DirichletVertexTest {
         DirichletVertex dirichlet = new DirichletVertex(2.0);
 
         Assert.assertEquals(1.0, dirichlet.sample(random).scalar(), 1e-6);
+        Assert.assertEquals(1.0, dirichlet.logPdf(0.1), 1e-6);
         Assert.assertEquals(1.0, dirichlet.logPdf(0.5), 1e-6);
+        Assert.assertEquals(1.0, dirichlet.logPdf(0.9), 1e-6);
     }
 
     @Test
@@ -49,6 +51,8 @@ public class DirichletVertexTest {
     public void matchesScip() {
         DirichletVertex dirichlet = new DirichletVertex(new ConstantDoubleVertex(new double[]{2, 2}));
         double scipyAnswer = 0.8662499999999997;
+        Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
+        Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
         Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
     }
 
@@ -81,7 +85,7 @@ public class DirichletVertexTest {
 
     @Test
     public void dirichletSampleMethodMatchesLogProbMethod() {
-        DirichletVertex mvg = new DirichletVertex(new ConstantDoubleVertex(new double[]{2, 2}));
+        DirichletVertex mvg = new DirichletVertex(new ConstantDoubleVertex(new double[]{5, 5}));
 
         double from = 0.1;
         double to = 0.9;
@@ -139,13 +143,11 @@ public class DirichletVertexTest {
             double percentage = (double) entry.getValue() / sampleCount;
             if (percentage != 0) {
                 double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
-                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, new int[]{2, 1});
+                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, new int[]{1, 2});
                 double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketSize;
-                double actual = (percentage / bucketSize);
+                double actual = (percentage);
                 assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
             }
         }
-
     }
-
 }
