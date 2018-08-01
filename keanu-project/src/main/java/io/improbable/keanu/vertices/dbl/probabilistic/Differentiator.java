@@ -12,7 +12,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class Differentiator {
-    public <V extends Vertex & Differentiable> DualNumber calculateDual(V vertex) {
+    private Differentiator() {}
+
+    public static <V extends Vertex & Differentiable> DualNumber calculateDual(V vertex) {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<V> stack = new ArrayDeque<>();
         stack.push(vertex);
@@ -40,7 +42,7 @@ public class Differentiator {
         return dualNumbers.get(vertex);
     }
 
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, List<? extends Vertex> parents) {
+    private static Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, List<? extends Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex next : parents) {
             if (!dualNumbers.containsKey(next)) {

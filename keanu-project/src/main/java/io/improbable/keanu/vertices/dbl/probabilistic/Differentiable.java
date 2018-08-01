@@ -13,7 +13,7 @@ public interface Differentiable {
     DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     default DualNumber getDualNumber() {
-        return new Differentiator().calculateDual((Vertex & Differentiable) this);
+        return Differentiator.calculateDual((Vertex & Differentiable) this);
     }
 
     static <V extends Vertex & Differentiable> List<V> filter(List<? extends Vertex<?>> vertices) {
