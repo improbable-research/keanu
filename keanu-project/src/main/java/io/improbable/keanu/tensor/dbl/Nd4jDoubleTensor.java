@@ -176,7 +176,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else {
             if (this.hasSameShapeAs(o)) {
                 DoubleTensor difference = o.minus(this);
-                return abs(difference) < epsilon;
+                return difference.abs() < epsilon;
             }
         }
         return false;
