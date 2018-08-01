@@ -27,7 +27,11 @@ public interface Tensor<T> {
     }
 
     default boolean isVector() {
-        return getRank() == 1;
+        if (getRank() == 2) {
+            return getShape()[0] == 1 || getShape()[1] == 1;
+        } else {
+            return false;
+        }
     }
 
     default boolean isMatrix() {

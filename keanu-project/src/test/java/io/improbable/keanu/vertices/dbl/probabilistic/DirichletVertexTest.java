@@ -2,14 +2,22 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import org.apache.commons.math3.util.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 
 public class DirichletVertexTest {
 
@@ -38,6 +46,13 @@ public class DirichletVertexTest {
     }
 
     @Test
+    public void matchesScip() {
+        DirichletVertex dirichlet = new DirichletVertex(new ConstantDoubleVertex(new double[]{2, 2}));
+        double scipyAnswer = 0.8662499999999997;
+        Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
+    }
+
+    @Test
     public void splitStrings() {
         DirichletVertex dirichlet = new DirichletVertex(new ConstantDoubleVertex(new double[]{10, 5, 3}));
         int numSamples = 50000;
@@ -62,14 +77,75 @@ public class DirichletVertexTest {
         Assert.assertEquals(10. / 18., stringOneLength, 1e-3);
         Assert.assertEquals(5. / 18., stringTwoLength, 1e-3);
         Assert.assertEquals(3. / 18., stringThreeLength, 1e-3);
-
     }
 
     @Test
-    public void dog() {
-        DirichletVertex d = new DirichletVertex(new ConstantDoubleVertex(new double[]{2, 2, 2}));
-        System.out.println(d.sample(random));
-        System.out.println(d.logPdf(new double[]{0.5, 0.5}));
+    public void dirichletSampleMethodMatchesLogProbMethod() {
+        DirichletVertex mvg = new DirichletVertex(new ConstantDoubleVertex(new double[]{2, 2}));
+
+        double from = 0.1;
+        double to = 0.9;
+        double bucketSize = 0.05;
+
+        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random);
+    }
+
+    private static void sampleMethodMatchesLogProbMethodMultiVariate(DirichletVertex vertexUnderTest,
+                                                                     double from,
+                                                                     double to,
+                                                                     double bucketSize,
+                                                                     double maxError,
+                                                                     int sampleCount,
+                                                                     KeanuRandom random) {
+        double bucketCount = ((to - from) / bucketSize);
+        double halfBucket = bucketSize / 2;
+
+        if (bucketCount != (int) bucketCount) {
+            throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
+        }
+
+        double[][] samples = new double[sampleCount][2];
+
+        for (int i = 0; i < sampleCount; i++) {
+            DoubleTensor sample = vertexUnderTest.sample(random);
+            samples[i] = sample.asFlatDoubleArray();
+        }
+
+        Map<Pair<Double, Double>, Long> sampleBucket = new HashMap<>();
+
+        for (double firstDimension = from; firstDimension < to; firstDimension = firstDimension + bucketSize) {
+            for (double secondDimension = from; secondDimension < to; secondDimension = secondDimension + bucketSize) {
+                sampleBucket.put(new Pair<>(firstDimension + halfBucket, secondDimension + halfBucket), 0L);
+            }
+        }
+
+        for (int i = 0; i < sampleCount; i++) {
+            double sampleX = samples[i][0];
+            double sampleY = samples[i][1];
+            for (Pair<Double, Double> bucketCenter : sampleBucket.keySet()) {
+
+                if (sampleX > bucketCenter.getFirst() - halfBucket
+                    && sampleX < bucketCenter.getFirst() + halfBucket
+                    && sampleY > bucketCenter.getSecond() - halfBucket
+                    && sampleY < bucketCenter.getSecond() + halfBucket) {
+                    sampleBucket.put(bucketCenter, sampleBucket.get(bucketCenter) + 1);
+                    break;
+                }
+
+            }
+        }
+
+        for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
+            double percentage = (double) entry.getValue() / sampleCount;
+            if (percentage != 0) {
+                double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
+                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, new int[]{2, 1});
+                double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketSize;
+                double actual = (percentage / bucketSize);
+                assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
+            }
+        }
+
     }
 
 }

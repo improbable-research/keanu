@@ -33,10 +33,10 @@ public class Dirichlet implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor sumConcentrationLogged = x.log().times(concentration.minus(1.).sum());
+        final double sumConcentrationLogged = concentration.minus(1.).times(x.log()).sum();
         final double sumLogGammaConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::gamma).log().sum();
         final double logGammaSumConcentration = Math.log(org.apache.commons.math3.special.Gamma.gamma(concentration.sum()));
-        return sumConcentrationLogged.minus(sumLogGammaConcentration).plus(logGammaSumConcentration);
+        return DoubleTensor.scalar(sumConcentrationLogged - sumLogGammaConcentration + logGammaSumConcentration);
     }
 
     @Override
