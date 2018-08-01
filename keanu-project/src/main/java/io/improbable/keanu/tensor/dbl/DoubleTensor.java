@@ -70,6 +70,9 @@ public interface DoubleTensor extends NumberTensor<Double> {
     @Override
     DoubleTensor reshape(int... newShape);
 
+    @Override
+    DoubleTensor duplicate();
+
     DoubleTensor diag();
 
     DoubleTensor transpose();
@@ -86,11 +89,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor times(double value);
 
+    DoubleTensor div(double value);
+
     DoubleTensor matrixMultiply(DoubleTensor value);
 
     DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
-
-    DoubleTensor div(double value);
 
     DoubleTensor pow(DoubleTensor exponent);
 

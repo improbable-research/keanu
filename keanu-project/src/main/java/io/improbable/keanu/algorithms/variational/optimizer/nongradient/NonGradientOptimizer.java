@@ -1,5 +1,6 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -13,6 +14,7 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
@@ -25,6 +27,14 @@ public class NonGradientOptimizer implements Optimizer {
         return NonGradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
+    }
+
+    public static NonGradientOptimizer of(Collection<? extends Vertex> vertices) {
+        return of(new BayesianNetwork(vertices));
+    }
+
+    public static NonGradientOptimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        return of(vertexFromNetwork.getConnectedGraph());
     }
 
     @Getter
@@ -42,6 +52,12 @@ public class NonGradientOptimizer implements Optimizer {
      */
     @Builder.Default
     private final double boundsRange = Double.POSITIVE_INFINITY;
+
+    /**
+     * bounds for each specific continuous latent vertex
+     */
+    @Builder.Default
+    private final OptimizerBounds optimizerBounds = new OptimizerBounds();
 
     /**
      * radius around region to start testing points
@@ -69,7 +85,6 @@ public class NonGradientOptimizer implements Optimizer {
     }
 
     private double optimize(List<Vertex> outputVertices) {
-
         bayesianNetwork.cascadeObservations();
 
         if (bayesianNetwork.isInImpossibleState()) {
@@ -77,6 +92,7 @@ public class NonGradientOptimizer implements Optimizer {
         }
 
         List<? extends Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
+
         FitnessFunction fitnessFunction = new FitnessFunction(
             outputVertices,
             latentVertices,
@@ -89,27 +105,22 @@ public class NonGradientOptimizer implements Optimizer {
             stoppingTrustRegionRadius
         );
 
-        double[] startPoint = Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices());
+        double[] startPoint = Optimizer.currentPoint(latentVertices);
         double initialFitness = fitnessFunction.fitness().value(startPoint);
 
         if (FitnessFunction.isValidInitialFitness(initialFitness)) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        double[] minBounds = new double[startPoint.length];
-        double[] maxBounds = new double[startPoint.length];
-
-        for (int i = 0; i < startPoint.length; i++) {
-            minBounds[i] = startPoint[i] - boundsRange;
-            maxBounds[i] = startPoint[i] + boundsRange;
-        }
+        ApacheMathSimpleBoundsCalculator boundsCalculator = new ApacheMathSimpleBoundsCalculator(boundsRange, optimizerBounds);
+        SimpleBounds bounds = boundsCalculator.getBounds(latentVertices, startPoint);
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
             new ObjectiveFunction(fitnessFunction.fitness()),
-            new SimpleBounds(minBounds, maxBounds),
+            bounds,
             MAXIMIZE,
-            new InitialGuess(Optimizer.currentPoint(bayesianNetwork.getContinuousLatentVertices()))
+            new InitialGuess(Optimizer.currentPoint(latentVertices))
         );
 
         return pointValuePair.getValue();

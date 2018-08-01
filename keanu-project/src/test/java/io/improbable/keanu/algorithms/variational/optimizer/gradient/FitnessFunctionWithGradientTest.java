@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
