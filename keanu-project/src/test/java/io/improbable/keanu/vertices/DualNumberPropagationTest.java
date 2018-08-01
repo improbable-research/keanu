@@ -12,8 +12,6 @@ import static org.junit.Assert.assertEquals;
 
 public class DualNumberPropagationTest {
 
-    private final Logger log = LoggerFactory.getLogger(DualNumberPropagationTest.class);
-
     @Test
     public void doesNotPerformUnneccesaryDualNumberCalculations() {
         AtomicInteger n = new AtomicInteger(0);
