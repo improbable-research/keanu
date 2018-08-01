@@ -21,13 +21,6 @@ import org.junit.Test;
 
 public class DoubleIfVertexTest {
 
-    private KeanuRandom random;
-
-    @Before
-    public void setup() {
-        random = new KeanuRandom(1);
-    }
-
     @Test
     public void canExtractDualNumberFromTruePredicate() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, true}, 2, 2));

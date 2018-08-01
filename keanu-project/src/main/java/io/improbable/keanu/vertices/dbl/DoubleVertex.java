@@ -170,8 +170,8 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
             } else {
 
-                for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
-                    stack.push((DoubleVertex) vertex);
+                for (DoubleVertex vertex : parentsThatDualNumberIsNotCalculated) {
+                    stack.push(vertex);
                 }
 
             }
