@@ -59,6 +59,14 @@ public interface DoubleTensor extends NumberTensor<Double> {
         }
     }
 
+    static DoubleTensor linspace(double start, double end, int numberOfPoints) {
+        return Nd4jDoubleTensor.linspace(start, end, numberOfPoints);
+    }
+
+    static DoubleTensor arange(double start, double end) {
+        return Nd4jDoubleTensor.arange(start, end);
+    }
+
     static DoubleTensor scalar(double scalarValue) {
         return new ScalarDoubleTensor(scalarValue);
     }
