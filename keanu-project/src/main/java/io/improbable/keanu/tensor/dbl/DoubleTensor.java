@@ -158,7 +158,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double standardDeviation();
 
-    boolean equalsWithEps( DoubleTensor other , double epsilon );
+    boolean equalsWithEps(DoubleTensor other, double epsilon);
 
     DoubleTensor standardize();
 
@@ -249,7 +249,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor standardizeInPlace();
 
-    DoubleTensor setAllInPlace( double value );
+    DoubleTensor setAllInPlace(double value);
 
     // Comparisons
     BooleanTensor lessThan(double value);

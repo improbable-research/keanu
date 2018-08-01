@@ -176,11 +176,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         if (this == o) return true;
 
         if (o instanceof Nd4jDoubleTensor) {
-            return tensor.equalsWithEps(((Nd4jDoubleTensor) o).tensor,epsilon);
+            return tensor.equalsWithEps(((Nd4jDoubleTensor) o).tensor, epsilon);
         } else {
             if (this.hasSameShapeAs(o)) {
                 DoubleTensor difference = o.minus(this);
-                return difference.lessThan(epsilon).allTrue();
+                return abs(difference) < epsilon;
             }
         }
         return false;
