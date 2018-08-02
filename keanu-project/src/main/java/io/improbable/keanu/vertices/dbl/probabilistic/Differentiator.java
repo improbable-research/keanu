@@ -32,8 +32,6 @@ public class Differentiator {
                 for (Vertex parent : parentsThatDualNumberIsNotCalculated) {
                     if (parent instanceof Differentiable) {
                         stack.push((V) parent);
-                    } else {
-                        throw new IllegalArgumentException("Can only calculate Dual Numbers on a graph made of Differentiable vertices");
                     }
                 }
             }
@@ -45,7 +43,7 @@ public class Differentiator {
     private static Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Collection<? extends Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex next : parents) {
-            if (!dualNumbers.containsKey(next)) {
+            if (!dualNumbers.containsKey(next) && next instanceof Differentiable) {
                 notCalculatedParents.add(next);
             }
         }
