@@ -22,6 +22,7 @@ import static org.junit.Assert.assertTrue;
 public class KDEApproximationTest {
 
     private static final double DELTA = 0.1;
+    private static final long randomSeed = 420;
 
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
@@ -80,7 +81,7 @@ public class KDEApproximationTest {
 
         for (double x: linspace(-1.+mu, 1.+mu, 10)) {
             Diffs diffLog = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).dLogProb(DoubleTensor.create(x, new int[]{1}));
-            DoubleTensor approximateDerivative = KDE.dLogPdf(DoubleTensor.create(x, new int[]{1})).get(KDE.getId());
+            DoubleTensor approximateDerivative = KDE.dLogPdf(DoubleTensor.create(x, new int[]{1,1})).get(KDE.getId());
             DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
             assertEquals(String.format("Got approximation %f and for real pdf %f at x=%f", expectedDerivative.scalar(), approximateDerivative.scalar(), x),
                 expectedDerivative.scalar(), approximateDerivative.scalar(), DELTA);
@@ -119,7 +120,7 @@ public class KDEApproximationTest {
         double to = 3;
         double bucketSize = 0.1;
 
-        ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod(KDE, from, to, bucketSize, 1e-2, new KeanuRandom(), 1000);
+        ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod(KDE, from, to, bucketSize, 1e-2, new KeanuRandom(randomSeed), 1000);
     }
 
     @Test
@@ -133,7 +134,7 @@ public class KDEApproximationTest {
         KDEVertex resampledKDE = new GaussianKDE().approximate(samples);
 
         int nSamples = 1000;
-        resampledKDE.resample(nSamples,  new KeanuRandom());
+        resampledKDE.resample(nSamples,  new KeanuRandom(randomSeed));
         assertEquals(1, resampledKDE.getSampleShape()[0]);
         assertEquals(nSamples, resampledKDE.getSampleShape()[1]);
     }

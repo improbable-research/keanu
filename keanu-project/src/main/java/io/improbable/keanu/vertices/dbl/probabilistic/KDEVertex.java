@@ -29,7 +29,7 @@ public class KDEVertex extends ProbabilisticDouble {
     public KDEVertex(List<Double> samples) {
         this(DoubleTensor.create(samples.stream()
             .mapToDouble(Double::doubleValue)
-            .toArray()));
+            .toArray(), new int[]{samples.size(), 1}));
     }
 
     public KDEVertex(List<Double> samples, double bandwidth) {
@@ -38,15 +38,28 @@ public class KDEVertex extends ProbabilisticDouble {
             .toArray()), bandwidth);
     }
 
+    private DoubleTensor getDiffs(DoubleTensor x){
+        DoubleTensor diffs = DoubleTensor.zeros(new int[]{(int) samples.getShape()[0], (int) x.getShape()[1]});
+        return diffs.plusInPlace(x).minusInPlace(samples).divInPlace(bandwidth);
+    }
+
     public DoubleTensor pdf(DoubleTensor x) {
+
+        DoubleTensor diffs = getDiffs(x);
+        /*
+        DoubleTensor pdfs = gaussianKernel(diffs).sum(0).divInPlace(samples.getLength() * bandwidth);
+        return pdfs;
+        */
+
         List<Double> xAsList = x.asFlatList();
         double[] pdfs = new double[xAsList.size()];
         for (int i = 0; i < xAsList.size(); i++){
-            DoubleTensor diff = DoubleTensor.create(xAsList.get(i), new int[]{1}).minus(samples);
-            DoubleTensor gaussian = gaussianKernel(diff.divInPlace(bandwidth)).sum(0, 1);
+            DoubleTensor diff = DoubleTensor.create(xAsList.get(i), new int[]{1}).minus(samples).divInPlace(bandwidth);
+            DoubleTensor gaussian = gaussianKernel(diff).sum(0, 1);
             pdfs[i] = gaussian.divInPlace(DoubleTensor.create(samples.getLength() * bandwidth, gaussian.getShape())).scalar();
         }
         return DoubleTensor.create(pdfs);
+
     }
 
     @Override
@@ -61,14 +74,14 @@ public class KDEVertex extends ProbabilisticDouble {
         List<Double> valueAsList = value.asFlatList();
         double[] dlnPdfs = new double[valueAsList.size()];
         for (int i = 0; i < valueAsList.size(); i++){
-            dlnPdfs[i] = dlnPdf(DoubleTensor.create(valueAsList.get(i), new int[]{1})).dLogPdx.scalar();
+            dlnPdfs[i] = dlnPdf(DoubleTensor.create(valueAsList.get(i), new int[]{1, 1})).dLogPdx.scalar();
         }
         partialDerivates.put(getId(), DoubleTensor.create(dlnPdfs, new int[]{dlnPdfs.length}));
         return partialDerivates;
     }
 
     private DoubleTensor dPdx(DoubleTensor x) {
-        DoubleTensor diff = x.minus(samples).divInPlace(bandwidth);
+        DoubleTensor diff = getDiffs(x);
         return gaussianKernel(diff).times(diff).unaryMinusInPlace().sum(0, 1) .divInPlace(bandwidth).divInPlace(bandwidth * samples.getLength());
     }
 
@@ -78,9 +91,8 @@ public class KDEVertex extends ProbabilisticDouble {
 
     private DoubleTensor gaussianKernel(DoubleTensor x) {
         DoubleTensor exponent = x.pow(2.).times(-1. / 2.);
-        DoubleTensor power = DoubleTensor.create(Math.E, exponent.getShape()).powInPlace(exponent);
-        power.timesInPlace(1. / Math.sqrt(2. * Math.PI));
-        return power;
+        DoubleTensor power = DoubleTensor.create(Math.E, x.getShape()).powInPlace(exponent);
+        return power.timesInPlace(1. / Math.sqrt(2. * Math.PI));
     }
 
     private static double getMean(DoubleTensor samples) {
