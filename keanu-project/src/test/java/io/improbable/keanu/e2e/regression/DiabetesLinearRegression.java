@@ -1,6 +1,6 @@
 package io.improbable.keanu.e2e.regression;
 
-import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
@@ -40,7 +40,7 @@ public class DiabetesLinearRegression {
         y.observe(data.y);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
         optimizer.maxLikelihood();
 
         assertEquals(938.2378, weight.getValue().scalar(), 0.01);

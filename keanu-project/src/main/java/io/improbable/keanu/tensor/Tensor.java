@@ -11,74 +11,6 @@ import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 public interface Tensor<T> {
 
-    int[] SCALAR_SHAPE = new int[]{1, 1};
-    int[] SCALAR_STRIDE = new int[]{1};
-
-    int getRank();
-
-    int[] getShape();
-
-    long getLength();
-
-    boolean isShapePlaceholder();
-
-    default boolean isScalar() {
-        return getLength() == 1;
-    }
-
-    default boolean isVector() {
-        return getRank() == 1;
-    }
-
-    default boolean isMatrix() {
-        return getRank() == 2;
-    }
-
-    default boolean hasSameShapeAs(Tensor that) {
-        return hasSameShapeAs(that.getShape());
-    }
-
-    default boolean hasSameShapeAs(int[] shape) {
-        return Arrays.equals(this.getShape(), shape);
-    }
-
-    T getValue(int... index);
-
-    void setValue(T value, int... index);
-
-    T scalar();
-
-    Tensor<T> duplicate();
-
-    FlattenedView<T> getFlattenedView();
-
-    interface FlattenedView<T> {
-
-        long size();
-
-        T get(long index);
-
-        T getOrScalar(long index);
-
-        void set(long index, T value);
-    }
-
-    double[] asFlatDoubleArray();
-
-    int[] asFlatIntegerArray();
-
-    T[] asFlatArray();
-
-    default List<T> asFlatList() {
-        return Arrays.asList(asFlatArray());
-    }
-
-    Tensor<T> reshape(int... newShape);
-
-    default BooleanTensor elementwiseEquals(Tensor that) {
-        return elementwiseEquals(this, that);
-    }
-
     static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
         if (!a.hasSameShapeAs(b)) {
             throw new IllegalArgumentException("Cannot compare tensors of different shapes");
@@ -103,6 +35,76 @@ public interface Tensor<T> {
 
     static <T> Tensor<T> placeHolder(int[] shape) {
         return new GenericTensor<>(shape);
+    }
+
+    int[] SCALAR_SHAPE = new int[]{1, 1};
+    int[] SCALAR_STRIDE = new int[]{1};
+
+    int getRank();
+
+    int[] getShape();
+
+    long getLength();
+
+    boolean isShapePlaceholder();
+
+    T getValue(int... index);
+
+    void setValue(T value, int... index);
+
+    T scalar();
+
+    Tensor<T> duplicate();
+
+    Tensor<T> slice(int dimension, int index);
+
+    double[] asFlatDoubleArray();
+
+    int[] asFlatIntegerArray();
+
+    T[] asFlatArray();
+
+    Tensor<T> reshape(int... newShape);
+
+    FlattenedView<T> getFlattenedView();
+
+    interface FlattenedView<T> {
+
+        long size();
+
+        T get(long index);
+
+        T getOrScalar(long index);
+
+        void set(long index, T value);
+    }
+
+    default List<T> asFlatList() {
+        return Arrays.asList(asFlatArray());
+    }
+
+    default boolean isScalar() {
+        return getLength() == 1;
+    }
+
+    default boolean isVector() {
+        return getRank() == 1;
+    }
+
+    default boolean isMatrix() {
+        return getRank() == 2;
+    }
+
+    default boolean hasSameShapeAs(Tensor that) {
+        return hasSameShapeAs(that.getShape());
+    }
+
+    default boolean hasSameShapeAs(int[] shape) {
+        return Arrays.equals(this.getShape(), shape);
+    }
+
+    default BooleanTensor elementwiseEquals(Tensor that) {
+        return elementwiseEquals(this, that);
     }
 
 }

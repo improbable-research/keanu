@@ -144,6 +144,14 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return multiply(-1.0);
     }
 
+    public DoubleVertex pluck(int... index) {
+        return new PluckVertex(this, index);
+    }
+
+    public DoubleVertex slice(int dimension, int index) {
+        return new SliceVertex(this, dimension, index);
+    }
+
     public final DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();
@@ -152,7 +160,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         while (!stack.isEmpty()) {
 
             DoubleVertex head = stack.peek();
-            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+            Set<DoubleVertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
 
@@ -162,12 +170,8 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
             } else {
 
-                for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
-                    if (vertex instanceof DoubleVertex) {
-                        stack.push((DoubleVertex) vertex);
-                    } else {
-                        throw new IllegalArgumentException("Can only calculate Diff Numbers on a graph made of Doubles");
-                    }
+                for (DoubleVertex vertex : parentsThatDualNumberIsNotCalculated) {
+                    stack.push(vertex);
                 }
 
             }
@@ -177,11 +181,11 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return dualNumbers.get(this);
     }
 
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
-        Set<Vertex> notCalculatedParents = new HashSet<>();
+    private Set<DoubleVertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
+        Set<DoubleVertex> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)) {
-                notCalculatedParents.add(next);
+            if (!dualNumbers.containsKey(next) && next instanceof DoubleVertex) {
+                notCalculatedParents.add((DoubleVertex) next);
             }
         }
         return notCalculatedParents;

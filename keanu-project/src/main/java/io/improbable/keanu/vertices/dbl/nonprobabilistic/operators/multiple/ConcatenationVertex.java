@@ -39,18 +39,16 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        Map<Long, List<DoubleTensor>> combinedPartialDerivativesOfInputs = new HashMap<>();
+        List<DualNumber> duals = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {
-            for (Map.Entry<Long, DoubleTensor> partial : dualNumbers.get(vertex).getPartialDerivatives().asMap().entrySet()) {
-                combinedPartialDerivativesOfInputs.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
-            }
+            duals.add(dualNumbers.get(vertex));
         }
 
-        DualNumber dualOfPrimary = dualNumbers.get(input[0]);
+        DualNumber dualOfPrimary = duals.remove(0);
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
         DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
-        return dualOfPrimary.concat(dimension, combinedPartialDerivativesOfInputs, dualToConcat);
+        return dualOfPrimary.concat(dimension, duals, dualToConcat);
     }
 
     @Override
