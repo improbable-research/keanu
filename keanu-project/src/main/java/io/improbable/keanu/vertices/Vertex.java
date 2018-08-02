@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
@@ -20,8 +19,8 @@ public abstract class Vertex<T> implements Observable<T> {
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private List<Vertex<?>> children = new ArrayList<>();
-    private List<Vertex<?>> parents = new ArrayList<>();
+    private Set<Vertex<?>> children = new HashSet<>();
+    private Set<Vertex<?>> parents = new HashSet<>();
     private T value;
     private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
@@ -179,8 +178,8 @@ public abstract class Vertex<T> implements Observable<T> {
         return uuid;
     }
 
-    public List<Vertex<?>> getChildren() {
-        return ImmutableList.copyOf(children);
+    public Set<Vertex<?>> getChildren() {
+        return ImmutableSet.copyOf(children);
     }
 
     public void addChild(Vertex<?> v) {
@@ -188,7 +187,7 @@ public abstract class Vertex<T> implements Observable<T> {
     }
 
     public void setParents(Collection<? extends Vertex> parents) {
-        this.parents = new ArrayList<>();
+        this.parents = new HashSet<>();
         addParents(parents);
     }
 
@@ -205,8 +204,8 @@ public abstract class Vertex<T> implements Observable<T> {
         parent.addChild(this);
     }
 
-    public List<Vertex<?>> getParents() {
-        return ImmutableList.copyOf(this.parents);
+    public Set<Vertex<?>> getParents() {
+        return ImmutableSet.copyOf(this.parents);
     }
 
     @Override
