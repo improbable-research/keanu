@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -44,22 +43,9 @@ public class KDEVertex extends ProbabilisticDouble {
     }
 
     public DoubleTensor pdf(DoubleTensor x) {
-
         DoubleTensor diffs = getDiffs(x);
-        /*
         DoubleTensor pdfs = gaussianKernel(diffs).sum(0).divInPlace(samples.getLength() * bandwidth);
         return pdfs;
-        */
-
-        List<Double> xAsList = x.asFlatList();
-        double[] pdfs = new double[xAsList.size()];
-        for (int i = 0; i < xAsList.size(); i++){
-            DoubleTensor diff = DoubleTensor.create(xAsList.get(i), new int[]{1}).minus(samples).divInPlace(bandwidth);
-            DoubleTensor gaussian = gaussianKernel(diff).sum(0, 1);
-            pdfs[i] = gaussian.divInPlace(DoubleTensor.create(samples.getLength() * bandwidth, gaussian.getShape())).scalar();
-        }
-        return DoubleTensor.create(pdfs);
-
     }
 
     @Override
@@ -70,19 +56,16 @@ public class KDEVertex extends ProbabilisticDouble {
     @Override
     public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
         Map<Long, DoubleTensor> partialDerivates = new HashMap<>();
-        
-        List<Double> valueAsList = value.asFlatList();
-        double[] dlnPdfs = new double[valueAsList.size()];
-        for (int i = 0; i < valueAsList.size(); i++){
-            dlnPdfs[i] = dlnPdf(DoubleTensor.create(valueAsList.get(i), new int[]{1, 1})).dLogPdx.scalar();
-        }
-        partialDerivates.put(getId(), DoubleTensor.create(dlnPdfs, new int[]{dlnPdfs.length}));
+
+        DoubleTensor dlnPdfs = dlnPdf(value).dLogPdx;
+
+        partialDerivates.put(getId(), dlnPdfs);
         return partialDerivates;
     }
 
     private DoubleTensor dPdx(DoubleTensor x) {
         DoubleTensor diff = getDiffs(x);
-        return gaussianKernel(diff).times(diff).unaryMinusInPlace().sum(0, 1) .divInPlace(bandwidth).divInPlace(bandwidth * samples.getLength());
+        return gaussianKernel(diff).timesInPlace(diff).unaryMinusInPlace().sum(0).divInPlace(bandwidth).divInPlace(bandwidth * samples.getLength());
     }
 
     public DiffLogP dlnPdf(DoubleTensor value) {

@@ -74,18 +74,17 @@ public class KDEApproximationTest {
     public void matchesKnownDerivativeLogDensityOfScalar() {
         double mu = 1.;
         double sigma = 1.;
+        double correctPercentage = 0.9;
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 1000000);
 
         KDEVertex KDE = new GaussianKDE().approximate(samples);
 
-        for (double x: linspace(-1.+mu, 1.+mu, 10)) {
-            Diffs diffLog = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).dLogProb(DoubleTensor.create(x, new int[]{1}));
-            DoubleTensor approximateDerivative = KDE.dLogPdf(DoubleTensor.create(x, new int[]{1,1})).get(KDE.getId());
-            DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
-            assertEquals(String.format("Got approximation %f and for real pdf %f at x=%f", expectedDerivative.scalar(), approximateDerivative.scalar(), x),
-                expectedDerivative.scalar(), approximateDerivative.scalar(), DELTA);
-        }
+        DoubleTensor xTensor = DoubleTensor.create(linspace(-1.+mu, 1.+mu, 10));
+        Diffs diffLog = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).dLogProb(xTensor);
+        DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor).get(KDE.getId());
+        DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
+        isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
 
     @Test
