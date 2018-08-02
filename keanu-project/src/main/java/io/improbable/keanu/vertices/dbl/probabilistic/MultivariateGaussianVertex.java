@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class MultivariateGaussianVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;

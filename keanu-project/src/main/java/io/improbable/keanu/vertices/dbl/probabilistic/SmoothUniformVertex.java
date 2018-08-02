@@ -24,7 +24,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class SmoothUniformVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 

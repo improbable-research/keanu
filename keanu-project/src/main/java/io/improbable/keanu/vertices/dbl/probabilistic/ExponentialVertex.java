@@ -21,7 +21,7 @@ import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
-public class ExponentialVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex location;
     private final DoubleVertex lambda;

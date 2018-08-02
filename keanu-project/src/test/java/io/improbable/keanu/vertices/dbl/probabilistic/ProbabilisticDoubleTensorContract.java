@@ -19,6 +19,8 @@ import java.util.function.Supplier;
 
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -226,18 +228,19 @@ public class ProbabilisticDoubleTensorContract {
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static <T extends DoubleVertex & Probabilistic> void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<T> vertexUnderTestSupplier) {
+    public static <T extends DoubleVertex & ProbabilisticDouble> void matchesKnownDerivativeLogDensityOfVector(double[] vector, Supplier<T> vertexUnderTestSupplier) {
 
-        DoubleVertex[] scalarVertices = new DoubleVertex[vector.length];
+        ImmutableList.Builder<T> scalarVertices = ImmutableList.builder();
         PartialDerivatives expectedPartialDerivatives = new PartialDerivatives(new HashMap<>());
 
         for (int i = 0; i < vector.length; i++) {
 
-            scalarVertices[i] = vertexUnderTestSupplier.get();
+            T scalarVertex = vertexUnderTestSupplier.get();
+            scalarVertices.add(scalarVertex);
 
             expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
-                    scalarVertices[i].dLogProb(vector[i])
+                    scalarVertex.dLogProb(vector[i])
                 )
             );
         }
@@ -256,8 +259,8 @@ public class ProbabilisticDoubleTensorContract {
         }
 
         double expected = 0;
-        for (int i = 0; i < vector.length; i++) {
-            expected += expectedPartialDerivatives.withRespectTo(scalarVertices[i]).scalar();
+        for (T scalarVertex : scalarVertices.build()) {
+            expected += expectedPartialDerivatives.withRespectTo(scalarVertex).scalar();
         }
 
         double actual = actualDerivatives.get(tensorVertex.getId()).sum();

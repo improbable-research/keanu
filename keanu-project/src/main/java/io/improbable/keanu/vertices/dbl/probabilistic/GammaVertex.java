@@ -21,7 +21,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class GammaVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex location;
     private final DoubleVertex theta;

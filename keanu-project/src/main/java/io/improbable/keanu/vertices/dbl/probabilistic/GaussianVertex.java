@@ -22,7 +22,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class GaussianVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;

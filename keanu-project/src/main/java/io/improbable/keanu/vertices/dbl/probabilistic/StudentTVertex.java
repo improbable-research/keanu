@@ -23,7 +23,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class StudentTVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final IntegerVertex v;
 

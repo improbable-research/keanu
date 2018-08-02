@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class TriangularVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class TriangularVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;

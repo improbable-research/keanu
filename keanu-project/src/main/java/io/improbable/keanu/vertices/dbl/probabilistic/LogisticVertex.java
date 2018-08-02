@@ -22,7 +22,7 @@ import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
-public class LogisticVertex extends DoubleVertex implements Probabilistic<DoubleTensor> {
+public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
