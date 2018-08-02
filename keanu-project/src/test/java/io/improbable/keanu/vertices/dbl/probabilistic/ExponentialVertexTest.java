@@ -70,7 +70,7 @@ public class ExponentialVertexTest {
         bTensor.setValue(2.5);
 
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(aTensor, bTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogProb(1.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

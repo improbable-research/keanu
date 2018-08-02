@@ -61,7 +61,7 @@ public class LogNormalVertexTest {
         sigmaTensor.setValue(1.0);
 
         LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(muTensor, sigmaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogProb(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

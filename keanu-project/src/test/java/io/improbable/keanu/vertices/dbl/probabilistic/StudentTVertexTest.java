@@ -78,7 +78,7 @@ public class StudentTVertexTest {
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected = apache.logDensity(t);
-            double actual = studentT.logPdf(t);
+            double actual = studentT.logProb(t);
             assertEquals(expected, actual, DELTA);
         }
     }
@@ -88,7 +88,7 @@ public class StudentTVertexTest {
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected;
-            double actual = studentT.dLogPdf(t).get(studentT.getId()).scalar();
+            double actual = studentT.dLogProb(t).get(studentT.getId()).scalar();
             switch (v) {
                 case 1:
                     expected = (-2 * t) / (pow(t, 2) + 1.);

@@ -62,7 +62,7 @@ public class LaplaceVertexTest {
         betaTensor.setValue(1.0);
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogProb(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

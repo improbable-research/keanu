@@ -1,12 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
@@ -39,9 +34,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
+public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
     public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater) {
         super(valueUpdater);
@@ -183,51 +179,6 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     public DoubleVertex slice(int dimension, int index) {
         return new SliceVertex(this, dimension, index);
     }
-
-    public final DualNumber getDualNumber() {
-        Map<Vertex<?>, DualNumber> dualNumbers = new HashMap<>();
-        Deque<DoubleVertex> stack = new ArrayDeque<>();
-        stack.push(this);
-
-        while (!stack.isEmpty()) {
-
-            DoubleVertex head = stack.peek();
-            Set<Vertex<?>> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
-
-            if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
-
-                DoubleVertex top = stack.pop();
-                DualNumber dual = top.calculateDualNumber(dualNumbers);
-                dualNumbers.put(top, dual);
-
-            } else {
-
-                for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
-                    if (vertex instanceof DoubleVertex) {
-                        stack.push((DoubleVertex) vertex);
-                    } else {
-                        throw new IllegalArgumentException("Can only calculate Diff Numbers on a graph made of Doubles");
-                    }
-                }
-
-            }
-
-        }
-
-        return dualNumbers.get(this);
-    }
-
-    private Set<Vertex<?>> parentsThatDualNumberIsNotCalculated(Map<Vertex<?>, DualNumber> dualNumbers, Set<Vertex<?>> parents) {
-        Set<Vertex<?>> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)) {
-                notCalculatedParents.add(next);
-            }
-        }
-        return notCalculatedParents;
-    }
-
-    protected abstract DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers);
 
     public void setValue(double value) {
         super.setValue(DoubleTensor.scalar(value));

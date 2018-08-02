@@ -24,7 +24,7 @@ public class TanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).tan();
     }
 }

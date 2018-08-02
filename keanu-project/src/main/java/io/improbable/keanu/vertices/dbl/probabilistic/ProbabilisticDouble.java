@@ -15,24 +15,23 @@ public abstract class ProbabilisticDouble extends DoubleVertex implements Probab
         super(new ProbabilisticValueUpdater<>());
     }
 
-    public double logPdf(double value) {
+    public double logProb(double value) {
         return this.logProb(DoubleTensor.scalar(value));
     }
-
-    public double logPdf(double[] values) {
+    public double logProb(double[] values) {
         return this.logProb(DoubleTensor.create(values));
     }
 
-    public Map<Long, DoubleTensor> dLogPdf(double value) {
+    public Map<Long, DoubleTensor> dLogProb(double value) {
         return this.dLogProb(DoubleTensor.scalar(value));
     }
 
-    public Map<Long, DoubleTensor> dLogPdf(double[] values) {
+    public Map<Long, DoubleTensor> dLogProb(double[] values) {
         return this.dLogProb(DoubleTensor.create(values));
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());
         } else {

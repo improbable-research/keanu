@@ -86,7 +86,7 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Set<Vertex<?>> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Collection<Vertex<?>> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {
@@ -124,7 +124,7 @@ public class VertexValuePropagation {
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(Collection<Vertex<?>> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!next.hasValue()) {

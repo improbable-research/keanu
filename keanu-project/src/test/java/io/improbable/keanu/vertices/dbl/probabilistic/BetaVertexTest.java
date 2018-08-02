@@ -61,7 +61,7 @@ public class BetaVertexTest {
         betaTensor.setValue(3.0);
 
         BetaVertex tensorBetaVertex = new BetaVertex(alphaTensor, betaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogPdf(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogProb(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

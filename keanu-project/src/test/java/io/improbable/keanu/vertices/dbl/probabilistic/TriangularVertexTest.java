@@ -1,8 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
+
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class TriangularVertexTest {
 
@@ -25,7 +26,7 @@ public class TriangularVertexTest {
     public void matchesKnownLogDensityOfVector() {
         TriangularVertex triangularVertex = new TriangularVertex(0.0, 10, 5);
 
-        double expectedLogDensity = triangularVertex.logPdf(2.5) + triangularVertex.logPdf(7.5);
+        double expectedLogDensity = triangularVertex.logProb(2.5) + triangularVertex.logProb(7.5);
         TriangularVertex tensorTriangularVertex = new TriangularVertex(0.0, 10, 5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorTriangularVertex, new double[]{2.5, 7.5}, expectedLogDensity);
     }

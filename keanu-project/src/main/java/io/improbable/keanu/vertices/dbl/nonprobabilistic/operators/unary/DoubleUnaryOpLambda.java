@@ -42,7 +42,7 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.apply(dualNumbers);
         }

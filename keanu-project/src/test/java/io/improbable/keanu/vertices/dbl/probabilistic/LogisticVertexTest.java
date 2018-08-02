@@ -58,7 +58,7 @@ public class LogisticVertexTest {
         bTensor.setValue(0.5);
 
         LogisticVertex tensorLogisticVertex = new LogisticVertex(aTensor, bTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogPdf(1.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogProb(1.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

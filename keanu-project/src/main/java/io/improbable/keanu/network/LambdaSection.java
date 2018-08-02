@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
@@ -90,7 +91,7 @@ public class LambdaSection {
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */
     private static Set<Vertex<?>> getVerticesDepthFirst(Vertex vertex,
-                                                        Function<Vertex<?>, Set<Vertex<?>>> nextVertices,
+                                                        Function<Vertex<?>, Collection<Vertex<?>>> nextVertices,
                                                         Predicate<Vertex> shouldAdd) {
 
         Set<Vertex<?>> visited = new HashSet<>();

@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class SmoothUniformVertex extends ProbabilisticDouble {
+public class SmoothUniformVertex extends ProbabilisticDouble implements Differentiable {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
