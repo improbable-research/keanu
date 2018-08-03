@@ -46,6 +46,7 @@ public class DirichletVertex extends ProbabilisticDouble {
     /**
      * Matches a scalar concentration value to a desired shape of a Dirichlet distribution
      *
+     * @param tensorShape the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, double concentration) {
