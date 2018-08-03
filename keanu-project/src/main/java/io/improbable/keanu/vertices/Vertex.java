@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
@@ -20,8 +20,8 @@ public abstract class Vertex<T> {
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private Set<Vertex> children = new HashSet<>();
-    private Set<Vertex> parents = new HashSet<>();
+    private Set<Vertex> children = Collections.emptySet();
+    private Set<Vertex> parents = Collections.emptySet();
     private T value;
     private boolean observed;
 
@@ -186,15 +186,15 @@ public abstract class Vertex<T> {
     }
 
     public Set<Vertex> getChildren() {
-        return ImmutableSet.copyOf(children);
+        return children;
     }
 
     public void addChild(Vertex<?> v) {
-        children.add(v);
+        children = ImmutableSet.<Vertex>builder().addAll(children).add(v).build();
     }
 
     public void setParents(Collection<? extends Vertex> parents) {
-        this.parents = new HashSet<>();
+        this.parents = Collections.emptySet();
         addParents(parents);
     }
 
@@ -203,16 +203,16 @@ public abstract class Vertex<T> {
     }
 
     public void addParents(Collection<? extends Vertex> parents) {
-        parents.forEach(this::addParent);
+        this.parents = ImmutableSet.<Vertex>builder().addAll(this.getParents()).addAll(parents).build();
+        parents.forEach(p -> p.addChild(this));
     }
 
     public void addParent(Vertex<?> parent) {
-        this.parents.add(parent);
-        parent.addChild(this);
+        addParents(ImmutableSet.of(parent));
     }
 
     public Set<Vertex> getParents() {
-        return ImmutableSet.copyOf(this.parents);
+        return parents;
     }
 
     @Override
