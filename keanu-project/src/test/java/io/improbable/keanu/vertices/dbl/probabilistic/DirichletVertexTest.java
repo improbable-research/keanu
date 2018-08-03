@@ -47,7 +47,7 @@ public class DirichletVertexTest {
 
         Assert.assertTrue(twoDimDirichletPdf1 == twoDimDirichletPdf2 && twoDimDirichletPdf2 == twoDimDirichletPdf3);
 
-        dirichlet = new DirichletVertex(1, 1, 1, 1);
+        dirichlet = new DirichletVertex(new int[]{1, 4}, 1);
 
         double fourDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.1, 0.2, 0.3, 0.4}));
         double fourDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.7, 0.1, 0.1, 0.1}));

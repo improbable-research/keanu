@@ -19,6 +19,12 @@ public class DirichletVertex extends ProbabilisticDouble {
 
     private final DoubleVertex concentration;
 
+    /**
+     * Dirichlet distribution. The shape is driven from concentration, which must be a vector.
+     *
+     * @param tensorShape the desired shape of the vertex
+     * @param concentration the concentration values of the dirichlet
+     */
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
@@ -28,14 +34,29 @@ public class DirichletVertex extends ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    /**
+     * Matches a vector of concentration values to a Dirichlet distribution
+     *
+     * @param concentration the concentration values of the dirichlet
+     */
     public DirichletVertex(DoubleVertex concentration) {
         this(concentration.getShape(), concentration);
     }
 
+    /**
+     * Matches a scalar concentration value to a desired shape of a Dirichlet distribution
+     *
+     * @param concentration the concentration values of the dirichlet
+     */
     public DirichletVertex(int[] tensorShape, double concentration) {
-        this(tensorShape, new ConstantDoubleVertex(concentration));
+        this(tensorShape, new ConstantDoubleVertex(DoubleTensor.create(concentration, tensorShape)));
     }
 
+    /**
+     * Matches a vector of concentration values to a Dirichlet distribution
+     *
+     * @param concentration the concentration values of the dirichlet
+     */
     public DirichletVertex(double... concentration) {
         this(new ConstantDoubleVertex(concentration));
     }

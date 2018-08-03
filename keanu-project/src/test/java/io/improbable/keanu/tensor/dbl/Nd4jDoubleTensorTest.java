@@ -6,18 +6,23 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class Nd4jDoubleTensorTest {
 
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor scalarA;
+    Nd4jDoubleTensor vectorA;
+    Nd4jDoubleTensor vectorB;
 
     @Before
     public void setup() {
         matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
+        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
+        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
     }
 
     @Test
@@ -196,6 +201,17 @@ public class Nd4jDoubleTensorTest {
     private void assertTimesInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left.timesInPlace(right);
         assertEquals(left, expected);
+    }
+
+    @Test
+    public void canCalculateProductOfVector() {
+        double productVectorA = vectorA.product();
+        double productVectorB = vectorB.product();
+
+        assertEquals(6., productVectorA, 1e-6);
+        assertEquals(6., productVectorB, 1e-6);
+
+        assertTrue(vectorA.isVector());
     }
 
 }
