@@ -211,7 +211,7 @@ public class Nd4jDoubleTensorTest {
         assertEquals(6., productVectorA, 1e-6);
         assertEquals(6., productVectorB, 1e-6);
 
-        assertTrue(vectorA.isVector());
+        assertTrue(vectorA.isVector() && vectorB.isVector());
     }
 
 }

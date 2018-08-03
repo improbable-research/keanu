@@ -176,11 +176,10 @@ public class ProbabilisticDoubleTensorContract {
                                                          Vertex<DoubleTensor> vertexUnderTest,
                                                          double gradientDelta) {
 
-        double[] values = hyperParameterValue.asFlatDoubleArray();
-        hyperParameterVertex.setAndCascade(DoubleTensor.create(new double[]{values[0] + gradientDelta, values[1] + gradientDelta}));
+        hyperParameterVertex.setAndCascade(hyperParameterValue.minus(gradientDelta));
         double lnDensityA1 = vertexUnderTest.logProb(vertexValue);
 
-        hyperParameterVertex.setAndCascade(DoubleTensor.create(new double[]{values[0] - gradientDelta, values[1] - gradientDelta}));
+        hyperParameterVertex.setAndCascade(hyperParameterValue.plus(gradientDelta));
         double lnDensityA2 = vertexUnderTest.logProb(vertexValue);
 
         double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
@@ -191,10 +190,8 @@ public class ProbabilisticDoubleTensorContract {
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
-        double actualDiff = Math.abs(diffln.get(hyperParameterVertex.getId()).getValue(0, 0)) - Math.abs(diffln.get(hyperParameterVertex.getId()).getValue(0, 1));
-        System.out.println(actualDiff);
         assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
-            diffLnDensityApproxExpected, actualDiff, 0.1);
+            diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
     public static void isTreatedAsConstantWhenObserved(DoubleVertex vertexUnderTest) {
