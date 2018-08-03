@@ -88,11 +88,7 @@ public interface Tensor<T> {
     }
 
     default boolean isVector() {
-        if (getRank() == 2) {
-            return getShape()[0] == 1 || getShape()[1] == 1;
-        } else {
-            return false;
-        }
+        return getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1);
     }
 
     default boolean isMatrix() {
