@@ -33,7 +33,7 @@ public class GaussianKDE {
 
     private DoubleTensor checkIfScalar(DoubleTensor tensor) throws IllegalArgumentException {
         if (tensor.asFlatList().size()>1){
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("The provided samples are not scalars, but have shape "+Arrays.toString(tensor.getShape()));
         }
         return tensor;
     }
