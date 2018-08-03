@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.probabilistic;
+package io.improbable.keanu.vertices.dbl;
 
 import java.util.List;
 import java.util.Map;
@@ -16,7 +16,7 @@ public interface Differentiable {
         return Differentiator.calculateDual((Vertex & Differentiable) this);
     }
 
-    static <V extends Vertex & Differentiable> List<V> filter(List<? extends Vertex<?>> vertices) {
+    static <V extends Vertex & Differentiable> List<V> keepOnlyDifferentiableVertices(List<? extends Vertex<?>> vertices) {
         ImmutableList.Builder<V> differentiableVertices = ImmutableList.builder();
         for (Vertex v : vertices) {
             if (v instanceof Differentiable) {
