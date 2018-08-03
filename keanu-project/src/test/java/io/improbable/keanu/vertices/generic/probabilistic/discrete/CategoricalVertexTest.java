@@ -14,8 +14,8 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 
-public class SelectVertexTest {
-    private final Logger log = LoggerFactory.getLogger(SelectVertexTest.class);
+public class CategoricalVertexTest {
+    private final Logger log = LoggerFactory.getLogger(CategoricalVertexTest.class);
 
     private static double epsilon = 0.01;
     private static int N = 100000;
@@ -84,7 +84,7 @@ public class SelectVertexTest {
     private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
                                                        KeanuRandom random) {
 
-        SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues);
+        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
 
         LinkedHashMap<TestEnum, Integer> sampleFrequencies = new LinkedHashMap<>();
         sampleFrequencies.put(TestEnum.A, 0);

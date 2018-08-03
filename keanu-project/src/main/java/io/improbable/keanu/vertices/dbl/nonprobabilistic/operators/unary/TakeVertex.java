@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 import java.util.Map;
 
-public class PluckVertex extends DoubleUnaryOpVertex {
+public class TakeVertex extends DoubleUnaryOpVertex {
 
     private final int[] index;
 
@@ -19,7 +19,7 @@ public class PluckVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the input vertex to extract from
      * @param index the index to extract at
      */
-    public PluckVertex(DoubleVertex inputVertex, int... index) {
+    public TakeVertex(DoubleVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
@@ -32,6 +32,6 @@ public class PluckVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).pluck(index);
+        return dualNumbers.get(inputVertex).take(index);
     }
 }

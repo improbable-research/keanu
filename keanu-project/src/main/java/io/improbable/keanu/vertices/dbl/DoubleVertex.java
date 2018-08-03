@@ -144,8 +144,8 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return multiply(-1.0);
     }
 
-    public DoubleVertex pluck(int... index) {
-        return new PluckVertex(this, index);
+    public DoubleVertex take(int... index) {
+        return new TakeVertex(this, index);
     }
 
     public DoubleVertex slice(int dimension, int index) {

@@ -9,12 +9,12 @@ import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class SelectVertex<T> extends Probabilistic<T> {
+public class CategoricalVertex<T> extends Probabilistic<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
-    public static <T> SelectVertex<T> of(Map<T, Double> selectableValues) {
-        return new SelectVertex<>(defensiveCopy(selectableValues));
+    public static <T> CategoricalVertex<T> of(Map<T, Double> selectableValues) {
+        return new CategoricalVertex<>(defensiveCopy(selectableValues));
     }
 
     private static <T> Map<T, DoubleVertex> defensiveCopy(Map<T, Double> selectableValues) {
@@ -25,7 +25,7 @@ public class SelectVertex<T> extends Probabilistic<T> {
         return copy;
     }
 
-    public SelectVertex(Map<T, DoubleVertex> selectableValues) {
+    public CategoricalVertex(Map<T, DoubleVertex> selectableValues) {
         this.selectableValues = selectableValues;
         setParents(this.selectableValues.values());
     }
