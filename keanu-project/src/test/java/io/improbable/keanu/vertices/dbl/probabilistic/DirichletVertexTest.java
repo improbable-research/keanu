@@ -106,7 +106,8 @@ public class DirichletVertexTest {
             0.01,
             10000,
             random,
-            bucketSize
+            bucketSize,
+            true
         );
     }
 

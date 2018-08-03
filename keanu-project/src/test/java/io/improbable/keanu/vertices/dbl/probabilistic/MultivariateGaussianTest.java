@@ -115,7 +115,7 @@ public class MultivariateGaussianTest {
         double to = 1.;
         double bucketSize = 0.05;
 
-        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random, bucketSize * bucketSize);
+        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random, bucketSize * bucketSize, false);
     }
 
     @Test(expected = IllegalArgumentException.class)

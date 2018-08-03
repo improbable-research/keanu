@@ -256,13 +256,14 @@ public class ProbabilisticDoubleTensorContract {
     }
 
     public static void sampleMethodMatchesLogProbMethodMultiVariate(Vertex<DoubleTensor> vertexUnderTest,
-                                                                     double from,
-                                                                     double to,
-                                                                     double bucketSize,
-                                                                     double maxError,
-                                                                     int sampleCount,
-                                                                     KeanuRandom random,
-                                                                     double bucketVolume) {
+                                                                    double from,
+                                                                    double to,
+                                                                    double bucketSize,
+                                                                    double maxError,
+                                                                    int sampleCount,
+                                                                    KeanuRandom random,
+                                                                    double bucketVolume,
+                                                                    boolean isVector) {
         double bucketCount = ((to - from) / bucketSize);
         double halfBucket = bucketSize / 2;
 
@@ -301,11 +302,13 @@ public class ProbabilisticDoubleTensorContract {
             }
         }
 
+        int[] shape = isVector ? new int[]{1, 2} : new int[]{2, 1};
+
         for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
             double percentage = (double) entry.getValue() / sampleCount;
             if (percentage != 0) {
                 double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
-                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, new int[]{1, 2});
+                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, shape);
                 double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketVolume;
                 double actual = percentage;
                 assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
