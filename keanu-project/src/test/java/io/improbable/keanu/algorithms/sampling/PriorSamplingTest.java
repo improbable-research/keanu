@@ -1,16 +1,14 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import static junit.framework.TestCase.assertEquals;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Before;
+import org.junit.Test;
+
+import static junit.framework.TestCase.assertEquals;
 
 public class PriorSamplingTest {
 
@@ -44,7 +42,7 @@ public class PriorSamplingTest {
     @Test(expected = IllegalStateException.class)
     public void doesNotSamplePriorFromNetWithObservations() {
 
-        B.observe(DoubleTensor.scalar(95.0));
+        B.observe(95.0);
         BayesianNetwork net = new BayesianNetwork(C.getConnectedGraph());
 
         final int sampleCount = 10000;

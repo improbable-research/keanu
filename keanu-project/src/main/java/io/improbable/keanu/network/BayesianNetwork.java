@@ -15,29 +15,29 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class BayesianNetwork {
 
-    private final List<Vertex<?>> latentAndObservedVertices;
+    private final List<Vertex> latentAndObservedVertices;
 
-    public BayesianNetwork(Set<? extends Vertex<?>> vertices) {
+    public BayesianNetwork(Set<? extends Vertex> vertices) {
         latentAndObservedVertices = vertices.stream()
             .filter(v -> v.isObserved() || v.isProbabilistic())
             .collect(Collectors.toList());
     }
 
-    public BayesianNetwork(Collection<? extends Vertex<?>> vertices) {
+    public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public List<Vertex<?>> getLatentAndObservedVertices() {
+    public List<Vertex> getLatentAndObservedVertices() {
         return latentAndObservedVertices;
     }
 
-    public List<Vertex<?>> getLatentVertices() {
+    public List<Vertex> getLatentVertices() {
         return latentAndObservedVertices.stream()
             .filter(v -> !v.isObserved())
             .collect(Collectors.toList());
     }
 
-    public List<Vertex<?>> getObservedVertices() {
+    public List<Vertex> getObservedVertices() {
         return latentAndObservedVertices.stream()
             .filter(Vertex::isObserved)
             .collect(Collectors.toList());

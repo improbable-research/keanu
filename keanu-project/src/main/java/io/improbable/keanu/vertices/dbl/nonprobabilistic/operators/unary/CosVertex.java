@@ -24,7 +24,7 @@ public class CosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).cos();
     }
 }

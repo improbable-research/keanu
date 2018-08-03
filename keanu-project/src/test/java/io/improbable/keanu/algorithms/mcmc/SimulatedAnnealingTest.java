@@ -11,7 +11,6 @@ import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -34,7 +33,7 @@ public class SimulatedAnnealingTest {
         B.setValue(2.0);
         C = A.plus(B);
         D = new GaussianVertex(C, 1);
-        D.observe(DoubleTensor.scalar(7.5));
+        D.observe(7.5);
     }
 
     @Test

@@ -91,7 +91,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.get();
         }

@@ -1,15 +1,15 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
+import io.improbable.keanu.vertices.Vertex;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-import io.improbable.keanu.vertices.Vertex;
-
 public class Proposal {
 
-    private final Map<Vertex<?>, Object> perVertexProposalTo;
-    private final Map<Vertex<?>, Object> perVertexProposalFrom;
+    private final Map<Vertex, Object> perVertexProposalTo;
+    private final Map<Vertex, Object> perVertexProposalFrom;
 
     public Proposal() {
         this.perVertexProposalTo = new HashMap<>();
@@ -29,19 +29,19 @@ public class Proposal {
         return (T) perVertexProposalFrom.get(vertex);
     }
 
-    public Set<Vertex<?>> getVerticesWithProposal() {
+    public Set<Vertex> getVerticesWithProposal() {
         return perVertexProposalTo.keySet();
     }
 
     public void apply() {
-        Set<Vertex<?>> vertices = perVertexProposalTo.keySet();
+        Set<Vertex> vertices = perVertexProposalTo.keySet();
         for (Vertex v : vertices) {
             v.setValue(getProposalTo(v));
         }
     }
 
     public void reject() {
-        Set<Vertex<?>> vertices = perVertexProposalTo.keySet();
+        Set<Vertex> vertices = perVertexProposalTo.keySet();
         for (Vertex v : vertices) {
             v.setValue(getProposalFrom(v));
         }

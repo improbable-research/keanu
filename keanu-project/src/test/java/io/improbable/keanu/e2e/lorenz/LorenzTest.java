@@ -67,7 +67,7 @@ public class LorenzTest {
                 DoubleVertex xt = timeSlice.get(0);
 
                 GaussianVertex observedXt = new GaussianVertex(xt, 1.0);
-                observedXt.observe(DoubleTensor.scalar(observed.get(t).x));
+                observedXt.observe(observed.get(t).x);
             }
 
             BayesianNetwork net = new BayesianNetwork(xt0.getConnectedGraph());

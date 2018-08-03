@@ -16,9 +16,9 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, DoubleTensor> op;
-    protected final Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberSupplier;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         super(
             new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue())),
             Observable.observableTypeFor(DoubleUnaryOpLambda.class)
@@ -34,7 +34,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
         this(shape, inputVertex, op, null);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation);
     }
 
@@ -48,7 +48,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberSupplier != null) {
             return dualNumberSupplier.apply(dualNumbers);
         }

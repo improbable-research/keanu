@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public interface Differentiable {
 
-    DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers);
+    DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     default DualNumber getDualNumber() {
         return Differentiator.calculateDual((Vertex & Differentiable) this);

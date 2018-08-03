@@ -125,7 +125,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());
         } else {

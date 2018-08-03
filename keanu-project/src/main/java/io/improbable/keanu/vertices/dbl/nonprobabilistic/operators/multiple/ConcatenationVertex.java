@@ -44,7 +44,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         List<DualNumber> duals = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {

@@ -19,8 +19,8 @@ public abstract class Vertex<T> implements Observable<T> {
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private Set<Vertex<?>> children = new HashSet<>();
-    private Set<Vertex<?>> parents = new HashSet<>();
+    private Set<Vertex> children = new HashSet<>();
+    private Set<Vertex> parents = new HashSet<>();
     private T value;
     private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
@@ -178,7 +178,7 @@ public abstract class Vertex<T> implements Observable<T> {
         return uuid;
     }
 
-    public Set<Vertex<?>> getChildren() {
+    public Set<Vertex> getChildren() {
         return ImmutableSet.copyOf(children);
     }
 
@@ -204,7 +204,7 @@ public abstract class Vertex<T> implements Observable<T> {
         parent.addChild(this);
     }
 
-    public Set<Vertex<?>> getParents() {
+    public Set<Vertex> getParents() {
         return ImmutableSet.copyOf(this.parents);
     }
 
@@ -223,7 +223,7 @@ public abstract class Vertex<T> implements Observable<T> {
         return (int) (uuid ^ (uuid >>> 32));
     }
 
-    public Set<Vertex<?>> getConnectedGraph() {
+    public Set<Vertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 

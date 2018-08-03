@@ -70,7 +70,7 @@ public class SimulatedAnnealing {
         }
 
         Map<Long, ?> maxSamplesByVertex = new HashMap<>();
-        List<Vertex<?>> latentVertices = bayesNet.getLatentVertices();
+        List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
         double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
         double maxLogP = logProbabilityBeforeStep;

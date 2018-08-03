@@ -1,13 +1,5 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
@@ -16,6 +8,10 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
+
+import java.util.*;
+
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
@@ -58,7 +54,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         checkBayesNetInHealthyState(bayesianNetwork);
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
-        List<Vertex<?>> latentVertices = bayesianNetwork.getLatentVertices();
+        List<Vertex> latentVertices = bayesianNetwork.getLatentVertices();
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             latentVertices,
@@ -70,7 +66,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-            Set<Vertex<?>> chosenVertices = variableSelector.select(latentVertices, sampleNum);
+            Set<Vertex> chosenVertices = variableSelector.select(latentVertices, sampleNum);
 
             logProbabilityBeforeStep = mhStep.step(
                 chosenVertices,

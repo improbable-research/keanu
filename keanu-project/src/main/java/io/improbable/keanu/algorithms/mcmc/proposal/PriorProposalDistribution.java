@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class PriorProposalDistribution implements ProposalDistribution {
 
     @Override
-    public Proposal getProposal(Collection<Vertex<?>> vertices, KeanuRandom random) {
+    public Proposal getProposal(Collection<Vertex> vertices, KeanuRandom random) {
         Proposal proposal = new Proposal();
         for (Vertex<?> vertex : vertices) {
             setFor(vertex, random, proposal);
@@ -22,7 +22,7 @@ public class PriorProposalDistribution implements ProposalDistribution {
         return vertex.logProb(ofValue);
     }
 
-    private <T, V extends Vertex<T>> void setFor(V vertex, KeanuRandom random, Proposal proposal) {
+    private <T> void setFor(Vertex<T> vertex, KeanuRandom random, Proposal proposal) {
         proposal.setProposal(vertex, vertex.sample(random));
     }
 

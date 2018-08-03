@@ -147,7 +147,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SumVertex(this);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex<?>, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
 
@@ -209,7 +209,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex<?>, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (isObserved()) {
             return DualNumber.createConstant(getValue());
         } else {

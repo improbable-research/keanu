@@ -1,15 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+import java.util.function.Function;
+
 import io.improbable.keanu.algorithms.variational.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.List;
-import java.util.function.Function;
-
-import static org.junit.Assert.assertEquals;
 
 public class VertexVariationalMAP {
 

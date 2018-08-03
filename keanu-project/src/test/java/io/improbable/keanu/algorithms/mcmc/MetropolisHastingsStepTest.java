@@ -147,9 +147,9 @@ public class MetropolisHastingsStepTest {
         private final double constant;
 
         @Override
-        public Proposal getProposal(Collection<Vertex<?>> vertices, KeanuRandom random) {
+        public Proposal getProposal(Collection<Vertex> vertices, KeanuRandom random) {
             Proposal proposal = new Proposal();
-            vertices.forEach(vertex -> proposal.setProposal((Vertex<Object>) vertex, DoubleTensor.scalar(constant)));
+            vertices.forEach(vertex -> proposal.setProposal(vertex, DoubleTensor.scalar(constant)));
             return proposal;
         }
     }

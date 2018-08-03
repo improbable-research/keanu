@@ -102,7 +102,7 @@ public class GradientOptimizer implements Optimizer {
         return optimize(bayesianNetwork.getObservedVertices());
     }
 
-    private double optimize(List<Vertex<?>> outputVertices) {
+    private double optimize(List<Vertex> outputVertices) {
 
         bayesianNetwork.cascadeObservations();
 

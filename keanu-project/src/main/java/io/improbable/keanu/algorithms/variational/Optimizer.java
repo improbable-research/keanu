@@ -26,7 +26,7 @@ public interface Optimizer {
         }
     }
 
-    static Optimizer of(Collection<? extends Vertex<?>> vertices) {
+    static Optimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
     }
 
