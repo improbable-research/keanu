@@ -21,6 +21,9 @@ public class DirichletVertex extends ProbabilisticDouble {
 
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
         this.concentration = concentration;
+        if (concentration.getValue().getLength() < 2) {
+            throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
+        }
         setParents(concentration);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
@@ -29,7 +32,11 @@ public class DirichletVertex extends ProbabilisticDouble {
         this(concentration.getShape(), concentration);
     }
 
-    public DirichletVertex(double concentration) {
+    public DirichletVertex(int[] tensorShape, double concentration) {
+        this(tensorShape, new ConstantDoubleVertex(concentration));
+    }
+
+    public DirichletVertex(double... concentration) {
         this(new ConstantDoubleVertex(concentration));
     }
 

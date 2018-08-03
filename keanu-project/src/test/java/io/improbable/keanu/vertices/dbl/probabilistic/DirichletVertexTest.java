@@ -5,19 +5,18 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import org.apache.commons.math3.util.Pair;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariateDirichlet;
+import static org.junit.Assert.assertEquals;
 
 public class DirichletVertexTest {
 
@@ -29,36 +28,45 @@ public class DirichletVertexTest {
     }
 
     @Test
-    public void sampleFromUnivariateReturnsFlatDistribution() {
-        DirichletVertex dirichlet = new DirichletVertex(2.0);
+    public void twoDimensionalDirichletEqualsABeta() {
+        double alpha = 0.4;
+        double beta = 1.;
+        BetaVertex betaVertex = new BetaVertex(alpha, beta);
+        DirichletVertex dirichletVertex = new DirichletVertex(alpha, beta);
 
-        Assert.assertEquals(1.0, dirichlet.sample(random).scalar(), 1e-6);
-        Assert.assertEquals(1.0, dirichlet.logPdf(0.1), 1e-6);
-        Assert.assertEquals(1.0, dirichlet.logPdf(0.5), 1e-6);
-        Assert.assertEquals(1.0, dirichlet.logPdf(0.9), 1e-6);
+        Assert.assertEquals(betaVertex.logPdf(0.5), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.5, 0.5})), 1e-6);
+        Assert.assertEquals(betaVertex.logPdf(0.75), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.75, 0.25})), 1e-6);
     }
 
     @Test
-    public void flatDirichletIfAllConcentrationAreOnes() {
-        DirichletVertex dirichlet = new DirichletVertex(new ConstantDoubleVertex(new double[]{1, 1}));
+    public void flatUniformIfAllConcentrationValuesAreOne() {
+        DirichletVertex dirichlet = new DirichletVertex(1, 1);
 
-        Assert.assertEquals(0.0, dirichlet.logPdf(DoubleTensor.create(new double[]{1.3, 1.6})), 1e-6);
-        Assert.assertEquals(0.0, dirichlet.logPdf(DoubleTensor.create(new double[]{0.3, 0.6})), 1e-6);
-        Assert.assertEquals(0.0, dirichlet.logPdf(DoubleTensor.create(new double[]{30, 50})), 1e-6);
+        double twoDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.7, 0.3}));
+        double twoDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.3, 0.7}));
+        double twoDimDirichletPdf3 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.5, 0.5}));
+
+        Assert.assertTrue(twoDimDirichletPdf1 == twoDimDirichletPdf2 && twoDimDirichletPdf2 == twoDimDirichletPdf3);
+
+        dirichlet = new DirichletVertex(1, 1, 1, 1);
+
+        double fourDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.1, 0.2, 0.3, 0.4}));
+        double fourDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.7, 0.1, 0.1, 0.1}));
+        double fourDimDirichletPdf3 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.25, 0.25, 0.25, 0.25}));
+
+        Assert.assertTrue(fourDimDirichletPdf1 == fourDimDirichletPdf2 && fourDimDirichletPdf2 == fourDimDirichletPdf3);
     }
 
     @Test
-    public void matchesScip() {
-        DirichletVertex dirichlet = new DirichletVertex(new ConstantDoubleVertex(new double[]{2, 2}));
-        double scipyAnswer = 0.8662499999999997;
-        Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
-        Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
-        Assert.assertEquals(scipyAnswer, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
+    public void matchesScipyDirichletLogPdf() {
+        DirichletVertex dirichlet = new DirichletVertex(2, 2);
+        double scipyPdf = 0.8662499999999997;
+        Assert.assertEquals(scipyPdf, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
     }
 
     @Test
-    public void splitStrings() {
-        DirichletVertex dirichlet = new DirichletVertex(new ConstantDoubleVertex(new double[]{10, 5, 3}));
+    public void canSplitManyStringsOfVaryingSizeWithKnownMean() {
+        DirichletVertex dirichlet = new DirichletVertex(10, 5, 3);
         int numSamples = 50000;
         DoubleTensor samples = Nd4jDoubleTensor.zeros(new int[]{numSamples, 3});
 
@@ -84,70 +92,81 @@ public class DirichletVertexTest {
     }
 
     @Test
-    public void dirichletSampleMethodMatchesLogProbMethod() {
-        DirichletVertex mvg = new DirichletVertex(new ConstantDoubleVertex(new double[]{5, 5}));
+    public void twoDimensionalDirichletSampleMethodMatchesLogProbMethod() {
+        DirichletVertex dirichlet = new DirichletVertex(5, 5);
 
         double from = 0.1;
         double to = 0.9;
         double bucketSize = 0.05;
 
-        sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random);
+        sampleMethodMatchesLogProbMethodMultiVariate(
+            dirichlet,
+            from,
+            to,
+            bucketSize,
+            0.01,
+            10000,
+            random,
+            bucketSize
+        );
     }
 
-    private static void sampleMethodMatchesLogProbMethodMultiVariate(DirichletVertex vertexUnderTest,
-                                                                     double from,
-                                                                     double to,
-                                                                     double bucketSize,
-                                                                     double maxError,
-                                                                     int sampleCount,
-                                                                     KeanuRandom random) {
-        double bucketCount = ((to - from) / bucketSize);
-        double halfBucket = bucketSize / 2;
+    @Test
+    public void threeDimensionalDirichletSampleMethodMatchesLogProbMethod() {
+        DirichletVertex dirichlet = new DirichletVertex(2, 2, 2);
 
-        if (bucketCount != (int) bucketCount) {
-            throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
-        }
+        double from = 0.1;
+        double to = 0.9;
+        double bucketSize = 0.05;
 
-        double[][] samples = new double[sampleCount][2];
+        sampleMethodMatchesLogProbMethodMultiVariateDirichlet(
+            dirichlet,
+            from,
+            to,
+            bucketSize,
+            0.01,
+            10000,
+            random,
+            bucketSize * bucketSize
+        );
+    }
 
-        for (int i = 0; i < sampleCount; i++) {
-            DoubleTensor sample = vertexUnderTest.sample(random);
-            samples[i] = sample.asFlatDoubleArray();
-        }
+    @Test
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdconcentration() {
+        UniformVertex concentrationHyperParam = new UniformVertex(1.5, 3.0);
+        DoubleTensor hyperParamValue = DoubleTensor.create(new double[]{7, 7}, 1, 2);
+        concentrationHyperParam.setValue(hyperParamValue);
 
-        Map<Pair<Double, Double>, Long> sampleBucket = new HashMap<>();
+        DirichletVertex dirichlet = new DirichletVertex(concentrationHyperParam);
+        DoubleTensor startingValue = Nd4jDoubleTensor.create(new double[]{0.1, 0.9}, new int[]{1, 2});
 
-        for (double firstDimension = from; firstDimension < to; firstDimension = firstDimension + bucketSize) {
-            for (double secondDimension = from; secondDimension < to; secondDimension = secondDimension + bucketSize) {
-                sampleBucket.put(new Pair<>(firstDimension + halfBucket, secondDimension + halfBucket), 0L);
-            }
-        }
+        double start = 0.1;
+        double end = 0.9;
+        double step = 0.05;
+        double gradientDelta = 0.01;
 
-        for (int i = 0; i < sampleCount; i++) {
-            double sampleX = samples[i][0];
-            double sampleY = samples[i][1];
-            for (Pair<Double, Double> bucketCenter : sampleBucket.keySet()) {
+        for (double i = start; i < end; i = i + step) {
 
-                if (sampleX > bucketCenter.getFirst() - halfBucket
-                    && sampleX < bucketCenter.getFirst() + halfBucket
-                    && sampleY > bucketCenter.getSecond() - halfBucket
-                    && sampleY < bucketCenter.getSecond() + halfBucket) {
-                    sampleBucket.put(bucketCenter, sampleBucket.get(bucketCenter) + 1);
-                    break;
-                }
+            dirichlet.setAndCascade(startingValue);
+            double[] dirchletValue = startingValue.asFlatDoubleArray();
 
-            }
-        }
+            double[] values = hyperParamValue.asFlatDoubleArray();
+            concentrationHyperParam.setAndCascade(DoubleTensor.create(new double[]{values[0] - gradientDelta, values[1] - gradientDelta}));
+            double lnDensityA1 = dirichlet.logProb(startingValue);
 
-        for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
-            double percentage = (double) entry.getValue() / sampleCount;
-            if (percentage != 0) {
-                double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
-                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, new int[]{1, 2});
-                double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketSize;
-                double actual = (percentage);
-                assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
-            }
+            concentrationHyperParam.setAndCascade(DoubleTensor.create(new double[]{values[0] + gradientDelta, values[1] + gradientDelta}));
+            double lnDensityA2 = dirichlet.logProb(startingValue);
+
+            double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
+
+            Map<Long, DoubleTensor> diffln = dirichlet.dLogProbAtValue();
+
+            double actualDiff = diffln.get(concentrationHyperParam.getId()).getValue(0, 0) + diffln.get(concentrationHyperParam.getId()).getValue(0, 1);
+
+            assertEquals(diffLnDensityApproxExpected, actualDiff, 0.001);
+
+            startingValue = Nd4jDoubleTensor.create(new double[]{dirchletValue[0] + step, dirchletValue[1] - step}, new int[]{1, 2});
         }
     }
+
 }
