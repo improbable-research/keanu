@@ -70,6 +70,9 @@ public interface DoubleTensor extends NumberTensor<Double> {
     @Override
     DoubleTensor reshape(int... newShape);
 
+    @Override
+    DoubleTensor duplicate();
+
     DoubleTensor diag();
 
     DoubleTensor transpose();

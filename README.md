@@ -61,6 +61,14 @@ What does the future entail for Keanu? Find out at [Future](keanu-docs/future.md
 
 Interested in more technical examples? Explore [Examples](keanu-docs/examples.md).
 
+## Development
+
+We use [Lombok](https://projectlombok.org/) annotations, which you will need to enable in your IDE.
+
+For IntelliJ:
+ - Install the [Lombok plugin](https://plugins.jetbrains.com/plugin/6317-lombok-plugin)
+ - Settings > Build, Execution, Deployment > Compiler > Annotation Processors - Enable annotation processing
+
 ## Hiring
 
 Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)

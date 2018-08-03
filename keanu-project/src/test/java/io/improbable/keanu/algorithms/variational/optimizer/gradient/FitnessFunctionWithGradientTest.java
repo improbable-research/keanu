@@ -1,4 +1,4 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import static org.junit.Assert.assertEquals;
 

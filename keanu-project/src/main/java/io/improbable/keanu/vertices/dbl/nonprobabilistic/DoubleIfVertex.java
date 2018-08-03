@@ -44,6 +44,7 @@ public class DoubleIfVertex extends DoubleVertex {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        throw new UnsupportedOperationException("if is non-differentiable");
+        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
     }
+
 }
