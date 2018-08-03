@@ -15,7 +15,6 @@ import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import lombok.Builder;
 import lombok.Getter;
@@ -80,7 +79,7 @@ public class NonGradientOptimizer implements Optimizer {
 
         List<? extends Vertex<DoubleTensor>> latentVertices = bayesianNetwork.getContinuousLatentVertices();
         FitnessFunction fitnessFunction = new FitnessFunction(
-            Probabilistic.filter(outputVertices),
+            outputVertices,
             latentVertices,
             this::handleFitnessCalculation
         );

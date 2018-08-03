@@ -56,7 +56,7 @@ public class Hamiltonian {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<Probabilistic<?>> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
+        final List<? extends Probabilistic> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
@@ -65,9 +65,7 @@ public class Hamiltonian {
         cachePosition(latentVertices, position);
         Map<Long, DoubleTensor> positionBeforeLeapfrog = new HashMap<>();
 
-        Map<Long, DoubleTensor> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-            Probabilistic.filter(bayesNet.getLatentAndObservedVertices())
-        );
+        Map<Long, DoubleTensor> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
         Map<Long, DoubleTensor> gradientBeforeLeapfrog = new HashMap<>();
 
         final Map<Long, DoubleTensor> momentum = new HashMap<>();
@@ -168,7 +166,7 @@ public class Hamiltonian {
                                                     final Map<Long, DoubleTensor> gradient,
                                                     final Map<Long, DoubleTensor> momentums,
                                                     final double stepSize,
-                                                    final List<Probabilistic<?>> probabilisticVertices) {
+                                                    final List<? extends Probabilistic> probabilisticVertices) {
 
         final double halfTimeStep = stepSize / 2.0;
 

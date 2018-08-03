@@ -136,14 +136,14 @@ class MetropolisHastingsStep {
      * @return the log probability of the set of vertices
      */
     private static double sumLogProbability(Set<Vertex> vertices) {
-        double sumLogProb = 0.0;
-        for (Probabilistic<?> v : Probabilistic.filter(vertices)) {
-            sumLogProb += v.logProbAtValue();
-        }
         for (Vertex<?> v : vertices) {
             if (!v.isProbabilistic() && v.isObserved() && !v.matchesObservation()) {
                 return LOG_ZERO_PROBABILITY;
             }
+        }
+        double sumLogProb = 0.0;
+        for (Probabilistic v : Probabilistic.filter(vertices)) {
+            sumLogProb += v.logProbAtValue();
         }
         return sumLogProb;
     }

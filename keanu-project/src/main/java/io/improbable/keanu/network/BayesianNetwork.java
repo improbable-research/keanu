@@ -47,7 +47,9 @@ public class BayesianNetwork {
         double sum = 0.0;
         for (Vertex<?> vertex : latentAndObservedVertices) {
             if (vertex instanceof Probabilistic) {
-                sum += ((Probabilistic<?>)vertex).logProbAtValue();
+                sum += ((Probabilistic)vertex).logProbAtValue();
+            } else if (vertex.isObserved() && !vertex.matchesObservation()) {
+                return Double.NEGATIVE_INFINITY;
             }
         }
         return sum;

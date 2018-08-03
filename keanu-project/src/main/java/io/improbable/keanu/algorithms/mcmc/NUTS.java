@@ -75,7 +75,7 @@ public class NUTS {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<Probabilistic<?>> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
+        List<? extends Probabilistic> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));
@@ -187,7 +187,7 @@ public class NUTS {
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
                                                   List<Vertex<DoubleTensor>> latentVertices,
-                                                  List<Probabilistic<?>> probabilisticVertices,
+                                                  List<? extends Probabilistic> probabilisticVertices,
                                                   final List<? extends Vertex> sampleFromVertices,
                                                   double u,
                                                   int buildDirection,
@@ -247,7 +247,7 @@ public class NUTS {
     }
 
     private static BuiltTree buildTree(List<Vertex<DoubleTensor>> latentVertices,
-                                       List<Probabilistic<?>> probabilisticVertices,
+                                       List<? extends Probabilistic> probabilisticVertices,
                                        final List<? extends Vertex> sampleFromVertices,
                                        Map<Long, DoubleTensor> position,
                                        Map<Long, DoubleTensor> gradient,
@@ -333,7 +333,7 @@ public class NUTS {
     }
 
     private static BuiltTree builtTreeBaseCase(List<Vertex<DoubleTensor>> latentVertices,
-                                               List<Probabilistic<?>> probabilisticVertices,
+                                               List<? extends Probabilistic> probabilisticVertices,
                                                final List<? extends Vertex> sampleFromVertices,
                                                Map<Long, DoubleTensor> position,
                                                Map<Long, DoubleTensor> gradient,
@@ -381,9 +381,9 @@ public class NUTS {
         );
     }
 
-    private static double getLogProb(List<Probabilistic<?>> probabilisticVertices) {
+    private static double getLogProb(List<? extends Probabilistic> probabilisticVertices) {
         double sum = 0.0;
-        for (Probabilistic<?> vertex : probabilisticVertices) {
+        for (Probabilistic vertex : probabilisticVertices) {
             sum += vertex.logProbAtValue();
         }
         return sum;
@@ -447,7 +447,7 @@ public class NUTS {
     }
 
     private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                        final List<Probabilistic<?>> probabilisticVertices,
+                                        final List<? extends Probabilistic> probabilisticVertices,
                                         final Map<Long, DoubleTensor> position,
                                         final Map<Long, DoubleTensor> gradient,
                                         final Map<Long, DoubleTensor> momentum,
@@ -618,7 +618,7 @@ public class NUTS {
     private static double findStartingStepSize(Map<Long, DoubleTensor> position,
                                                Map<Long, DoubleTensor> gradient,
                                                List<Vertex<DoubleTensor>> vertices,
-                                               List<Probabilistic<?>> probabilisticVertices,
+                                               List<? extends Probabilistic> probabilisticVertices,
                                                KeanuRandom random) {
         double stepsize = 1;
         double probBeforeLeapfrog = getLogProb(probabilisticVertices);

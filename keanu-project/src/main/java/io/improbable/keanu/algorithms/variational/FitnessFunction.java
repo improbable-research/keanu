@@ -13,27 +13,27 @@ import io.improbable.keanu.vertices.Vertex;
 
 public class FitnessFunction {
 
-    private final List<Probabilistic<?>> probabilisticVertices;
+    private final List<Vertex> outputVertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunction(List<Probabilistic<?>> probabilisticVertices,
+    public FitnessFunction(List<Vertex> outputVertices,
                            List<? extends Vertex<DoubleTensor>> latentVertices,
                            BiConsumer<double[], Double> onFitnessCalculation) {
-        this.probabilisticVertices = probabilisticVertices;
+        this.outputVertices = outputVertices;
         this.latentVertices = latentVertices;
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunction(List<Probabilistic<?>> probabilisticVertices,
+    public FitnessFunction(List<Vertex> outputVertices,
                            List<? extends Vertex<DoubleTensor>> latentVertices) {
-        this(probabilisticVertices, latentVertices, null);
+        this(outputVertices, latentVertices, null);
     }
 
     public MultivariateFunction fitness() {
         return point -> {
             setAndCascadePoint(point, latentVertices);
-            double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
+            double logOfTotalProbability = logOfTotalProbability(outputVertices);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);
@@ -66,9 +66,14 @@ public class FitnessFunction {
         return vertex.getValue().getLength();
     }
 
-    public static double logOfTotalProbability(List<? extends Probabilistic<?>> probabilisticVertices) {
+    public static double logOfTotalProbability(List<? extends Vertex> vertices) {
+        for (Vertex<?> v : vertices) {
+            if (!v.isProbabilistic() && v.isObserved() && !v.matchesObservation()) {
+                return Double.NEGATIVE_INFINITY;
+            }
+        }
         double sum = 0.0;
-        for (Probabilistic<?> vertex : probabilisticVertices) {
+        for (Probabilistic vertex : Probabilistic.filter(vertices)) {
             sum += vertex.logProbAtValue();
         }
 

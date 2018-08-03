@@ -19,14 +19,14 @@ public class LogProbGradient {
     public static Map<Long, DoubleTensor> getJointLogProbGradientWrtLatents(List<? extends Probabilistic> probabilisticVertices) {
         final Map<Long, DoubleTensor> diffOfLogWrt = new HashMap<>();
 
-        for (final Probabilistic<?> probabilisticVertex : probabilisticVertices) {
+        for (final Probabilistic probabilisticVertex : probabilisticVertices) {
             getLogProbGradientWrtLatents(probabilisticVertex, diffOfLogWrt);
         }
 
         return diffOfLogWrt;
     }
 
-    public static Map<Long, DoubleTensor> getLogProbGradientWrtLatents(final Probabilistic<?> probabilisticVertex,
+    public static Map<Long, DoubleTensor> getLogProbGradientWrtLatents(final Probabilistic probabilisticVertex,
                                                                        final Map<Long, DoubleTensor> diffOfLogProbWrt) {
         //dlogProbForProbabilisticVertex is the partial differentials of the natural
         //log of the fitness vertex's probability w.r.t latent vertices. The key of the
@@ -51,7 +51,7 @@ public class LogProbGradient {
         return diffOfLogProbWrt;
     }
 
-    public static Map<Long, DoubleTensor> getLogProbGradientWrtLatents(final Probabilistic<?> probabilisticVertex) {
+    public static Map<Long, DoubleTensor> getLogProbGradientWrtLatents(final Probabilistic probabilisticVertex) {
         return getLogProbGradientWrtLatents(probabilisticVertex, new HashMap<>());
     }
 

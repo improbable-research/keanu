@@ -1,11 +1,12 @@
 package io.improbable.keanu.algorithms.variational;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
+import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.function.BiConsumer;
+
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -14,12 +15,11 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 public class GradientOptimizer implements Optimizer {
@@ -109,8 +109,8 @@ public class GradientOptimizer implements Optimizer {
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
             Probabilistic.filter(outputVertices),
             bayesianNetwork.getContinuousLatentVertices(),
-            this::handleGradientCalculation,
-            this::handleFitnessCalculation
+            (BiConsumer<double[], double[]>) this::handleGradientCalculation,
+            (BiConsumer<double[], Double>) this::handleFitnessCalculation
         );
 
         ObjectiveFunction fitness = new ObjectiveFunction(fitnessFunction.fitness());
