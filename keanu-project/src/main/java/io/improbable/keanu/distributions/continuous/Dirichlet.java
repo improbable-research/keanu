@@ -10,6 +10,7 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 
 public class Dirichlet implements ContinuousDistribution {
 
+    private static final double EPSILON =  0.00001;
     private final DoubleTensor concentration;
 
     public static ContinuousDistribution withParameters(DoubleTensor concentration) {
@@ -33,11 +34,11 @@ public class Dirichlet implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        if (Math.abs(x.sum() - 1.0) > 0.001) {
-            throw new IllegalArgumentException("Cannot calculate log prob on Dirichlet on values that do not sum to one.");
+        if (Math.abs(x.sum() - 1.0) > EPSILON) {
+            throw new IllegalArgumentException("Sum of dirichlet values to calculate likelihood for must equal 1.");
         }
-        final double sumConcentrationLogged = concentration.minus(1.).times(x.log()).sum();
-        final double sumLogGammaConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::gamma).log().sum();
+        final double sumConcentrationLogged = concentration.minus(1.).timesInPlace(x.log()).sum();
+        final double sumLogGammaConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::gamma).logInPlace().sum();
         final double logGammaSumConcentration = Math.log(org.apache.commons.math3.special.Gamma.gamma(concentration.sum()));
         return DoubleTensor.scalar(sumConcentrationLogged - sumLogGammaConcentration + logGammaSumConcentration);
     }
@@ -45,9 +46,9 @@ public class Dirichlet implements ContinuousDistribution {
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdc = x.log().
-            minus(concentration.apply(org.apache.commons.math3.special.Gamma::digamma)).
-            plus(org.apache.commons.math3.special.Gamma.digamma(concentration.sum()));
-        final DoubleTensor dLogPdx = concentration.minus(1).div(x);
+            minusInPlace(concentration.apply(org.apache.commons.math3.special.Gamma::digamma)).
+            plusInPlace(org.apache.commons.math3.special.Gamma.digamma(concentration.sum()));
+        final DoubleTensor dLogPdx = concentration.minus(1).divInPlace(x);
 
         return new Diffs()
             .put(C, dLogPdc)
