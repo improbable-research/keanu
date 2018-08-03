@@ -34,7 +34,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.Differentiable;
 
 public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 

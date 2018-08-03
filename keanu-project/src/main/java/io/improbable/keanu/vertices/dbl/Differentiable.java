@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.probabilistic;
+package io.improbable.keanu.vertices.dbl;
 
 import java.util.List;
 import java.util.Map;
