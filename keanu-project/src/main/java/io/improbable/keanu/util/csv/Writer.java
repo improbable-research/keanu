@@ -26,13 +26,13 @@ public abstract class Writer {
     private String[] header = null;
     private boolean headerEnabled = false;
 
-    abstract File toFile(File file);
+    public abstract File toFile(File file);
 
-    File toFile(String file) {
+    public File toFile(String file) {
         return toFile(new File(file));
     }
 
-    abstract Writer withDefaultHeader();
+    public abstract Writer withDefaultHeader();
 
     public Writer withSeparator(char s) {
         separator = s;

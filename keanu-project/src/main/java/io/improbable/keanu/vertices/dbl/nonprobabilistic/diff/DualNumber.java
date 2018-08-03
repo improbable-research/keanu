@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.*;
@@ -13,6 +14,17 @@ public class DualNumber {
 
     public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
+    }
+
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els){
+        if (predicate.allTrue()) {
+            return new DualNumber(thn.value, thn.getPartialDerivatives());
+        } else if (predicate.allFalse()) {
+            return new DualNumber(els.value, els.getPartialDerivatives());
+        } else {
+            PartialDerivatives mixedPartials = PartialDerivatives.ifThenElse(predicate, thn.getPartialDerivatives(), els.getPartialDerivatives());
+            return new DualNumber(predicate.setDoubleIf(thn.value, els.value), mixedPartials);
+        }
     }
 
     private DoubleTensor value;

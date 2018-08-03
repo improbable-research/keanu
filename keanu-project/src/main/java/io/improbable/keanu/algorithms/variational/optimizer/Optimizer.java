@@ -1,7 +1,12 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer;
 
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.Collection;
@@ -18,7 +23,7 @@ public interface Optimizer {
 
     BayesianNetwork getBayesianNetwork();
 
-    static Optimizer of(BayesianNetwork network) {
+    public static Optimizer of(BayesianNetwork network) {
         if (network.getDiscreteLatentVertices().isEmpty()) {
             return GradientOptimizer.of(network);
         } else {
@@ -26,8 +31,12 @@ public interface Optimizer {
         }
     }
 
-    static Optimizer of(Collection<? extends Vertex> vertices) {
+    public static Optimizer of(Collection<? extends Vertex> vertices) {
         return of(new BayesianNetwork(vertices));
+    }
+
+    public static Optimizer ofConnectedGraph(Vertex<?> vertexFromNetwork) {
+        return of(vertexFromNetwork.getConnectedGraph());
     }
 
     static double[] currentPoint(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
@@ -49,7 +58,30 @@ public interface Optimizer {
         return point;
     }
 
+    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {
+
+        int position = 0;
+        for (Vertex<DoubleTensor> vertex : latentVertices) {
+
+            int dimensions = (int) Optimizer.numDimensions(vertex);
+
+            double[] values = new double[dimensions];
+            System.arraycopy(point, position, values, 0, dimensions);
+
+            DoubleTensor newTensor = DoubleTensor.create(values, vertex.getValue().getShape());
+            vertex.setValue(newTensor);
+
+            position += dimensions;
+        }
+
+        VertexValuePropagation.cascadeUpdate(latentVertices);
+    }
+
     static long totalNumberOfLatentDimensions(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
-        return continuousLatentVertices.stream().mapToLong(FitnessFunction::numDimensions).sum();
+        return continuousLatentVertices.stream().mapToLong(Optimizer::numDimensions).sum();
+    }
+
+    static long numDimensions(Vertex<? extends Tensor> vertex) {
+        return vertex.getValue().getLength();
     }
 }
