@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.lang.reflect.Array;
 import java.util.*;
@@ -49,6 +50,11 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
         DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
         return dualOfPrimary.concat(dimension, duals, dualToConcat);
+    }
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        return null;
     }
 
     @Override

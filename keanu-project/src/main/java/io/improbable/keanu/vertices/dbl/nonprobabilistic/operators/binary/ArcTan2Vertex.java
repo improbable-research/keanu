@@ -39,4 +39,9 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         PartialDerivatives newInf = thisInfLeft.add(thisInfRight);
         return new DualNumber(op(left.getValue(), right.getValue()), newInf);
     }
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        return null;
+    }
 }

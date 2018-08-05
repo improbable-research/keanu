@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Collections;
 import java.util.Map;
@@ -24,7 +25,12 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble {
 
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return new DualNumber(getValue(), Collections.emptyMap());
+        return new DualNumber(getValue(), PartialDerivatives.OF_CONSTANT);
+    }
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        return Collections.emptyMap();
     }
 
     @Override

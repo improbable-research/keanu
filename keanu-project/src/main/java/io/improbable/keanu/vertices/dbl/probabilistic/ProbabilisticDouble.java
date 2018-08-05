@@ -4,6 +4,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.Map;
 
@@ -29,6 +30,12 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
         } else {
             return DualNumber.createWithRespectToSelf(getId(), getValue());
         }
+    }
+
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        return null;
     }
 
 }

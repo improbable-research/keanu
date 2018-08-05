@@ -4,7 +4,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class CosVertex extends DoubleUnaryOpVertex {
@@ -26,5 +28,12 @@ public class CosVertex extends DoubleUnaryOpVertex {
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).cos();
+    }
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        partials.put(inputVertex, dAlldSelf.multiplyBy(inputVertex.getValue().sin().unaryMinusInPlace()));
+        return partials;
     }
 }

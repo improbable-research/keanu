@@ -35,4 +35,9 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
         return new DualNumber(x.sigmoid(), infinitesimal);
     }
 
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        return null;
+    }
+
 }

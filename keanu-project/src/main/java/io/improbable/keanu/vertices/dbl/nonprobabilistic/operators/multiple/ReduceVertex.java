@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -90,5 +91,10 @@ public class ReduceVertex extends NonProbabilisticDouble {
         }
 
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        return null;
     }
 }

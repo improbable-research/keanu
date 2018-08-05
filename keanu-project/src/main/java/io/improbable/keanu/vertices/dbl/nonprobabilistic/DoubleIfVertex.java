@@ -5,7 +5,9 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class DoubleIfVertex extends NonProbabilisticDouble {
@@ -43,6 +45,15 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
     @Override
     protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
+    }
+
+    @Override
+    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        BooleanTensor predicateValue = predicate.getValue();
+        partials.put(thn, dAlldSelf.multiplyBy(predicateValue.toDoubleMask()));
+        partials.put(els, dAlldSelf.multiplyBy(predicateValue.not().toDoubleMask()));
+        return partials;
     }
 
 }

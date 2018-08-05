@@ -1,23 +1,22 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.Map;
-
 import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.Collection;
+import java.util.Map;
+
+import static io.improbable.keanu.distributions.dual.Diffs.*;
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class LogNormalVertex extends ProbabilisticDouble {
 

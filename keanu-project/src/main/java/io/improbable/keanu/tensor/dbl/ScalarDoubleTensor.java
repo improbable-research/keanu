@@ -774,4 +774,9 @@ public class ScalarDoubleTensor implements DoubleTensor {
         result = 31 * result + Arrays.hashCode(shape);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Value: " + value + " Shape: " + Arrays.toString(shape);
+    }
 }

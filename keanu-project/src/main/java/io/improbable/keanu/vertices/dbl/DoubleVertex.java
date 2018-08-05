@@ -7,6 +7,7 @@ import io.improbable.keanu.vertices.ContinuousVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
 
@@ -192,6 +193,8 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     }
 
     protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+
+    protected abstract Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf);
 
     public void setValue(double value) {
         super.setValue(DoubleTensor.scalar(value));
