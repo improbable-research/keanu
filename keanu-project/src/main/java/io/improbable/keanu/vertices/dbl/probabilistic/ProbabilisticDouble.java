@@ -34,7 +34,7 @@ public abstract class ProbabilisticDouble extends DoubleVertex {
 
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         return null;
     }
 

@@ -31,9 +31,9 @@ public class CosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, dAlldSelf.multiplyBy(inputVertex.getValue().sin().unaryMinusInPlace()));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(inputVertex.getValue().sin().unaryMinusInPlace()));
         return partials;
     }
 }

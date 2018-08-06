@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -14,18 +15,18 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     /**
      * Divides one vertex by another
      *
-     * @param left the vertex to be divided
+     * @param left  the vertex to be divided
      * @param right the vertex to divide
      */
     public DivisionVertex(DoubleVertex left, DoubleVertex right) {
         super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
     }
 
-    public DoubleVertex getDividend(){
+    public DoubleVertex getDividend() {
         return super.getLeft();
     }
 
-    public DoubleVertex getDivsor(){
+    public DoubleVertex getDivsor() {
         return super.getRight();
     }
 
@@ -37,8 +38,15 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
-        return null;
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        DoubleTensor leftValue = left.getValue();
+        DoubleTensor rightValue = right.getValue();
+        DoubleTensor dOutWrtLeft = left.getValue().reciprocal();
+        DoubleTensor dOutWrtRight = leftValue.unaryMinus().timesInPlace(rightValue.powInPlace(2.0).unaryMinusInPlace());
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));
+        return partials;
     }
 
     @Override

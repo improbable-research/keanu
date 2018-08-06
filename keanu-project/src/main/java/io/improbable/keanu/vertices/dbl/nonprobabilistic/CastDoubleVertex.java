@@ -34,7 +34,7 @@ public class CastDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
     }
 }

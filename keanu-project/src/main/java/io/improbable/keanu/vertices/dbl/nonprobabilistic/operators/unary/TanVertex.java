@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class TanVertex extends DoubleUnaryOpVertex {
@@ -30,7 +31,12 @@ public class TanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
-        return null;
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        //dTandInput = sec^2(x)
+        DoubleTensor dTandInput = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
+
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dTandInput));
+        return partials;
     }
 }

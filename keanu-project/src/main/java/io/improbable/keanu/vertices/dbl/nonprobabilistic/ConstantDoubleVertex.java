@@ -29,7 +29,7 @@ public class ConstantDoubleVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         return Collections.emptyMap();
     }
 

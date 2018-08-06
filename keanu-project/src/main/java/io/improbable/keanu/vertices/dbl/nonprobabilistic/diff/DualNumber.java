@@ -135,7 +135,7 @@ public class DualNumber {
         if (thisInfMultiplied.isEmpty() && thatInfMultiplied.isEmpty()) {
             newInf = PartialDerivatives.OF_CONSTANT;
         } else {
-            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
+            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.pow(2));
         }
 
         return new DualNumber(newValue, newInf);

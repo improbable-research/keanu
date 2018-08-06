@@ -66,7 +66,7 @@ public class Differentiator {
                 continue;
             }
 
-            Map<Vertex, PartialDerivatives> partialDerivatives = visiting.derivativeWithRespectTo(dwrtOf.get(visiting));
+            Map<Vertex, PartialDerivatives> partialDerivatives = visiting.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
 
             for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
                 if (dwrtOf.containsKey(v.getKey())) {

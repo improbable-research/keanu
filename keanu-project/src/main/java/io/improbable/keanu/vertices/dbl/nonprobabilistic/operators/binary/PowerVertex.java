@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -35,8 +36,16 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
-        return null;
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        DoubleTensor leftValue = left.getValue();
+        DoubleTensor rightValue = right.getValue();
+        DoubleTensor leftPowRight = getValue();
+        DoubleTensor dOutWrtLeft = rightValue.div(leftValue).timesInPlace(leftPowRight);
+        DoubleTensor dOutWrtRight = leftPowRight.times(leftValue.log());
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));
+        return partials;
     }
 
     public DoubleVertex getBase(){

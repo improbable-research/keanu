@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -48,23 +48,23 @@ public class ReduceVertexTest {
 
     @Test
     public void varargsConstrution() {
-        DoubleVertex max = new ReduceVertex(DoubleTensor::max, null, verts.get(0), verts.get(1));
+        DoubleVertex max = new ReduceVertex(DoubleTensor::max, null, null, verts.get(0), verts.get(1));
         assertEquals(max.eval().scalar(), Math.max(verts.get(0).eval().scalar(), verts.get(1).eval().scalar()), 0.0001);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void zeroArgThrowsException() {
-        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null);
+        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void singleArgThrowsException() {
-        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, verts.get(0));
+        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, null, verts.get(0));
     }
 
     @Test
     public void doubleArgExecutesAsExpected() {
-        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, verts.get(0), verts.get(1));
+        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, null, verts.get(0), verts.get(1));
         assertEquals(min.eval().scalar(), Math.max(verts.get(0).eval().scalar(), verts.get(1).eval().scalar()), 0.0);
     }
 }

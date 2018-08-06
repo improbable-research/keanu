@@ -48,11 +48,11 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
-        partials.put(thn, dAlldSelf.multiplyBy(predicateValue.toDoubleMask()));
-        partials.put(els, dAlldSelf.multiplyBy(predicateValue.not().toDoubleMask()));
+        partials.put(thn, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.toDoubleMask()));
+        partials.put(els, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.not().toDoubleMask()));
         return partials;
     }
 

@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class ExpVertex extends DoubleUnaryOpVertex {
@@ -30,7 +31,9 @@ public class ExpVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
-        return null;
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(getValue()));
+        return partials;
     }
 }

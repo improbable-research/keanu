@@ -94,9 +94,6 @@ public class DifferentiatorTest {
         DoubleTensor expecteddHdA = AValue.reciprocal().plus(AValue.cos().div(AValue.sin())).plus(BValue).reshape(1, 4).diag().reshape(2, 2, 2, 2);
         DoubleTensor expecteddHdB = BValue.reciprocal().plus(1).plus(AValue).reshape(1, 4).diag().reshape(2, 2, 2, 2);
 
-        System.out.println("dhda shape " + Arrays.toString(dHdA.getShape()));
-        System.out.println("dhdb shape " + Arrays.toString(dHdB.getShape()));
-
         assertEquals(expecteddHdA, dHdA);
         assertEquals(expecteddHdB, dHdB);
     }
@@ -132,8 +129,6 @@ public class DifferentiatorTest {
 
         DoubleTensor expecteddHdB = BValue.reciprocal().times(predicateTrueMask).plus(AValue.plus(1).times(predicateFalseMask)).reshape(1, 4).diag().reshape(2, 2, 2, 2);
 
-        System.out.println("dhda shape " + Arrays.toString(dHdA.getShape()));
-        System.out.println("dhdb shape " + Arrays.toString(dHdB.getShape()));
         assertEquals(expecteddHdA, dHdA);
         assertEquals(expecteddHdB, dHdB);
     }

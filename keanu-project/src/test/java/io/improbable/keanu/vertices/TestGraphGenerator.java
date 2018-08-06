@@ -33,7 +33,7 @@ public class TestGraphGenerator {
         }, (a) -> {
             dualNumberCount.incrementAndGet();
             return a.get(from);
-        });
+        }, null);
     }
 
     static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
@@ -45,7 +45,7 @@ public class TestGraphGenerator {
         }, (a) -> {
             dualNumberCount.incrementAndGet();
             return a.get(left).add(a.get(right));
-        });
+        }, null);
     }
 
 }

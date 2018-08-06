@@ -22,8 +22,8 @@ public class ArcTan2VertexTest {
     public void calculatesDualNumberOfTwoScalarsTan2() {
         double a = 0.5;
         double b = Math.sqrt(3) / 2.0;
-        double wrtA = b / (Math.pow(b, 2) * Math.pow(0.5, 2));
-        double wrtB = -0.5 / (Math.pow(b, 2) * Math.pow(0.5, 2));
+        double wrtA = b / (Math.pow(b, 2) + Math.pow(0.5, 2));
+        double wrtB = -0.5 / (Math.pow(b, 2) + Math.pow(0.5, 2));
 
         calculatesDualNumberOfTwoScalars(
             a,
@@ -49,8 +49,8 @@ public class ArcTan2VertexTest {
         calculatesDualNumberOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
-            DoubleTensor.create(new double[]{2. / 4., 3. / 36., 4. / (9. * 16), 5. / (16 * 25)}).diag().reshape(1, 4, 1, 4),
-            DoubleTensor.create(new double[]{-1. / 4., -2. / 36., -3. / (9 * 16), -4. / (16 * 25)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{2. / (1 + 4), 3. / (4 + 9), 4. / (9. + 16), 5. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{-1. / (1 + 4), -2. / (4 + 9), -3. / (9 + 16), -4. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
             DoubleVertex::atan2
         );
     }

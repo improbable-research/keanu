@@ -31,10 +31,10 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(left, dAlldSelf);
-        partials.put(right, dAlldSelf);
+        partials.put(left, derivativeOfOutputsWithRespectToSelf);
+        partials.put(right, derivativeOfOutputsWithRespectToSelf);
         return partials;
     }
 

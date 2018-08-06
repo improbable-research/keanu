@@ -120,8 +120,10 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new SumVertex(this);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
+                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+        return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation, reverseModeAutoDiffLambda);
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
@@ -194,7 +196,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
 
     protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
-    protected abstract Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf);
+    protected abstract Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf);
 
     public void setValue(double value) {
         super.setValue(DoubleTensor.scalar(value));

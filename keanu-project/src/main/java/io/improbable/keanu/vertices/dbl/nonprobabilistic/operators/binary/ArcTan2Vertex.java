@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -32,16 +33,28 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DualNumber leftDual = dualNumbers.get(left);
         DualNumber rightDual = dualNumbers.get(right);
 
-        DoubleTensor denominator = ((right.getValue().pow(2)).timesInPlace((left.getValue().pow(2))));
+        DoubleTensor leftValue = left.getValue();
+        DoubleTensor rightValue = right.getValue();
+        DoubleTensor denominator = ((rightValue.pow(2)).plusInPlace((leftValue.pow(2))));
 
-        PartialDerivatives thisInfLeft = leftDual.getPartialDerivatives().multiplyBy(right.getValue().div(denominator));
-        PartialDerivatives thisInfRight = rightDual.getPartialDerivatives().multiplyBy((left.getValue().div(denominator)).unaryMinusInPlace());
+        PartialDerivatives thisInfLeft = leftDual.getPartialDerivatives().multiplyBy(rightValue.div(denominator));
+        PartialDerivatives thisInfRight = rightDual.getPartialDerivatives().multiplyBy((leftValue.div(denominator)).unaryMinusInPlace());
         PartialDerivatives newInf = thisInfLeft.add(thisInfRight);
-        return new DualNumber(op(left.getValue(), right.getValue()), newInf);
+        return new DualNumber(op(leftValue, rightValue), newInf);
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
-        return null;
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        DoubleTensor leftValue = left.getValue();
+        DoubleTensor rightValue = right.getValue();
+
+        DoubleTensor denominator = rightValue.pow(2).plusInPlace(leftValue.pow(2));
+        DoubleTensor dOutWrtLeft = rightValue.divInPlace(denominator);
+        DoubleTensor dOutWrtRight =leftValue.unaryMinus().divInPlace(denominator);
+
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));
+        return partials;
     }
 }

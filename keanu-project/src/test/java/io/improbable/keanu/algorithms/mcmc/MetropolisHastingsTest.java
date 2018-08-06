@@ -48,7 +48,7 @@ public class MetropolisHastingsTest {
             bayesNet,
             Arrays.asList(A, B),
             100000
-        );
+        ).drop(10000).downSample(20);
 
         double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
         double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();

@@ -15,25 +15,33 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, DoubleTensor> op;
     protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
+    protected final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex,
+                               Function<IN, DoubleTensor> op,
+                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualNumberSupplier = dualNumberCalculation;
+        this.reverseModeAutoDiffLambda = reverseModeAutoDiffLambda;
         setParents(inputVertex);
         setValue(DoubleTensor.placeHolder(shape));
     }
 
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
-        this(shape, inputVertex, op, null);
+        this(shape, inputVertex, op, null, null);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation);
+    public DoubleUnaryOpLambda(Vertex<IN> inputVertex,
+                               Function<IN, DoubleTensor> op,
+                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+        this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation, reverseModeAutoDiffLambda);
     }
 
     public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
-        this(inputVertex.getShape(), inputVertex, op, null);
+        this(inputVertex.getShape(), inputVertex, op, null, null);
     }
 
     @Override
@@ -56,8 +64,12 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> derivativeWithRespectTo(PartialDerivatives dAlldSelf) {
-        return null;
+    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        if (reverseModeAutoDiffLambda != null) {
+            return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
+        }
+
+        throw new UnsupportedOperationException();
     }
 }
 
