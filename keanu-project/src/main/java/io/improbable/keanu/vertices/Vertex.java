@@ -1,21 +1,27 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
+import com.google.common.collect.ImmutableSet;
+
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-
 public abstract class Vertex<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private Set<Vertex> children = new HashSet<>();
-    private Set<Vertex> parents = new HashSet<>();
+    private Set<Vertex> children = Collections.emptySet();
+    private Set<Vertex> parents = Collections.emptySet();
     private T value;
     private boolean observed;
 
@@ -184,11 +190,11 @@ public abstract class Vertex<T> {
     }
 
     public void addChild(Vertex<?> v) {
-        children.add(v);
+        children = ImmutableSet.<Vertex>builder().addAll(children).add(v).build();
     }
 
     public void setParents(Collection<? extends Vertex> parents) {
-        this.parents = new HashSet<>();
+        this.parents = Collections.emptySet();
         addParents(parents);
     }
 
@@ -197,16 +203,16 @@ public abstract class Vertex<T> {
     }
 
     public void addParents(Collection<? extends Vertex> parents) {
-        parents.forEach(this::addParent);
+        this.parents = ImmutableSet.<Vertex>builder().addAll(this.getParents()).addAll(parents).build();
+        parents.forEach(p -> p.addChild(this));
     }
 
     public void addParent(Vertex<?> parent) {
-        this.parents.add(parent);
-        parent.addChild(this);
+        addParents(ImmutableSet.of(parent));
     }
 
     public Set<Vertex> getParents() {
-        return this.parents;
+        return parents;
     }
 
     @Override
