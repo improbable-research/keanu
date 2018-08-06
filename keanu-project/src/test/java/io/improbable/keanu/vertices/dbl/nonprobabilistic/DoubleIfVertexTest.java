@@ -9,7 +9,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -188,8 +188,8 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(1, 1.5);
         b.setValue(1.1);
 
-        BoolVertex leftFlip = new Flip(0.5);
-        BoolVertex rightFlip = new Flip(0.5);
+        BoolVertex leftFlip = new BernoulliVertex(0.5);
+        BoolVertex rightFlip = new BernoulliVertex(0.5);
         leftFlip.setValue(false);
         rightFlip.setValue(true);
 
@@ -218,8 +218,8 @@ public class DoubleIfVertexTest {
         UniformVertex b = new UniformVertex(1, 1.5);
         b.setValue(1.1);
 
-        BoolVertex leftFlip = new Flip(0.5);
-        BoolVertex rightFlip = new Flip(0.5);
+        BoolVertex leftFlip = new BernoulliVertex(0.5);
+        BoolVertex rightFlip = new BernoulliVertex(0.5);
         leftFlip.setValue(false);
         rightFlip.setValue(false);
 
