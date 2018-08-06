@@ -61,7 +61,7 @@ public class Differentiator {
         while (!priorityQueue.isEmpty()) {
             DoubleVertex visiting = priorityQueue.poll();
 
-            if(wrt.contains(visiting)){
+            if (wrt.contains(visiting)) {
                 wrtOf.put(visiting.getId(), dwrtOf.get(visiting));
                 continue;
             }
@@ -76,7 +76,7 @@ public class Differentiator {
                 }
             }
 
-            if(!visiting.isProbabilistic()) {
+            if (!visiting.isProbabilistic()) {
                 for (Vertex parent : visiting.getParents()) {
                     if (!alreadyQueued.contains(parent) && parent instanceof DoubleVertex) {
                         priorityQueue.offer((DoubleVertex) parent);
@@ -93,17 +93,21 @@ public class Differentiator {
         return reverseModeAutoDiff(singleton(of), wrt).get(of.getId());
     }
 
-    private static Map<Long, PartialDerivatives> wrtOfToOfWrt(Map<Long, PartialDerivatives> wrtOf){
+    public static PartialDerivatives reverseModeAutoDiff(DoubleVertex of, DoubleVertex... wrt) {
+        return reverseModeAutoDiff(singleton(of), new HashSet<>(Arrays.asList(wrt))).get(of.getId());
+    }
+
+    private static Map<Long, PartialDerivatives> wrtOfToOfWrt(Map<Long, PartialDerivatives> wrtOf) {
         Map<Long, PartialDerivatives> ofWrt = new HashMap<>();
 
-        for(Map.Entry<Long, PartialDerivatives> wrtOfEntry: wrtOf.entrySet()){
+        for (Map.Entry<Long, PartialDerivatives> wrtOfEntry : wrtOf.entrySet()) {
             Map<Long, DoubleTensor> ofs = wrtOfEntry.getValue().asMap();
 
-            for(Map.Entry<Long, DoubleTensor> ofsEntry: ofs.entrySet()){
+            for (Map.Entry<Long, DoubleTensor> ofsEntry : ofs.entrySet()) {
 
-                if(ofWrt.containsKey(ofsEntry.getKey())){
+                if (ofWrt.containsKey(ofsEntry.getKey())) {
                     ofWrt.get(ofsEntry.getKey()).putWithRespectTo(wrtOfEntry.getKey(), ofsEntry.getValue());
-                }else {
+                } else {
                     ofWrt.put(ofsEntry.getKey(), new PartialDerivatives(wrtOfEntry.getKey(), ofsEntry.getValue()));
                 }
             }
