@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
@@ -16,7 +14,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
      * @param right y coordinate
      */
     public ArcTan2Vertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right,
+        super(left, right,
             (l, r) -> l.atan2(r),
             (l, r) -> dualOp(l, r)
         );

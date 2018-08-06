@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
@@ -13,7 +11,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      * @param right the exponent vertex
      */
     public PowerVertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right,
+        super(left, right,
             (l, r) -> l.pow(r),
             (l, r) -> l.pow(r));
     }

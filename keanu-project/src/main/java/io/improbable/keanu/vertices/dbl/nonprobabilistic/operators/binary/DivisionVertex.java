@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class DivisionVertex extends DoubleBinaryOpVertex {
@@ -12,7 +10,7 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
      * @param right the vertex to divide
      */
     public DivisionVertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right,
+        super(left, right,
             (l, r) -> l.div(r),
             (l, r) -> l.div(r));
     }
