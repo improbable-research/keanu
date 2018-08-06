@@ -10,7 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 
 public class BayesianNetworkTest {
 
@@ -21,8 +21,8 @@ public class BayesianNetworkTest {
 
     @Before
     public void setUpNetwork() {
-        input1 = new Flip(0.25);
-        input2 = new Flip(0.75);
+        input1 = new BernoulliVertex(0.25);
+        input2 = new BernoulliVertex(0.75);
         output = input1.or(input2);
         network = new BayesianNetwork(output.getConnectedGraph());
 
