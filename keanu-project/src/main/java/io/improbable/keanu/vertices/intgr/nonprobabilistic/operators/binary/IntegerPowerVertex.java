@@ -13,11 +13,6 @@ public class IntegerPowerVertex extends IntegerBinaryOpVertex {
      * @param b the exponent vertex
      */
     public IntegerPowerVertex(IntegerVertex a, IntegerVertex b) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
-    }
-
-    @Override
-    protected IntegerTensor op(IntegerTensor a, IntegerTensor b) {
-        return a.pow(b);
+        super(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b, IntegerTensor::pow);
     }
 }

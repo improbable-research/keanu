@@ -11,11 +11,6 @@ public class IntegerAbsVertex extends IntegerUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public IntegerAbsVertex(IntegerVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
-    }
-
-    @Override
-    protected IntegerTensor op(IntegerTensor a) {
-        return a.abs();
+        super(inputVertex.getShape(), inputVertex, IntegerTensor::abs);
     }
 }
