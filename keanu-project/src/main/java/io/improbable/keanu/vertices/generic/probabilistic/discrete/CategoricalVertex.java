@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
+import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -8,6 +9,8 @@ import io.improbable.keanu.vertices.generic.probabilistic.Probabilistic;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+
+import static io.improbable.keanu.distributions.discrete.Categorical.withParameters;
 
 public class CategoricalVertex<T> extends Probabilistic<T> {
 
@@ -36,38 +39,14 @@ public class CategoricalVertex<T> extends Probabilistic<T> {
 
     @Override
     public T sample(KeanuRandom random) {
-        double sumOfProbabilities = getSumOfProbabilities();
-        double p = random.nextDouble();
-        double sum = 0;
-
-        if (sumOfProbabilities == 0.0) {
-            throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
-        }
-
-        T value = null;
-        for (Map.Entry<T, DoubleVertex> entry : selectableValues.entrySet()) {
-            sum += entry.getValue().getValue().scalar() / sumOfProbabilities;
-            if (p < sum) {
-                value = entry.getKey();
-                break;
-            }
-        }
-        if (value == null) {
-            T[] values = (T[]) selectableValues.keySet().toArray();
-            value = values[values.length - 1];
-        }
-
-        return value;
+        Categorical<T> categorical = Categorical.withParameters(selectableValues);
+        return categorical.sample(getShape(), random);
     }
 
     @Override
     public double logProb(T value) {
-        double sumOfProbabilities = getSumOfProbabilities();
-        if (sumOfProbabilities == 0.0) {
-            throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
-        }
-        final double probability = selectableValues.get(value).getValue().scalar() / sumOfProbabilities;
-        return Math.log(probability);
+        Categorical<T> categorical = Categorical.withParameters(selectableValues);
+        return categorical.logProb(value);
     }
 
     @Override
@@ -75,11 +54,4 @@ public class CategoricalVertex<T> extends Probabilistic<T> {
         throw new UnsupportedOperationException();
     }
 
-    private double getSumOfProbabilities() {
-        double sumP = 0.0;
-        for (DoubleVertex p : selectableValues.values()) {
-            sumP += p.getValue().scalar();
-        }
-        return sumP;
-    }
 }

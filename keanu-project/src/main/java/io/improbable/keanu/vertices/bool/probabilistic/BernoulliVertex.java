@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -54,16 +55,7 @@ public class BernoulliVertex extends ProbabilisticBool {
 
     @Override
     public double logPmf(BooleanTensor value) {
-
-        DoubleTensor probTrueClamped = probTrue.getValue()
-            .clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
-
-        DoubleTensor probability = value.setDoubleIf(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plusInPlace(1.0)
-        );
-
-        return probability.logInPlace().sum();
+        return Bernoulli.withParameters(probTrue.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -73,9 +65,6 @@ public class BernoulliVertex extends ProbabilisticBool {
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-
-        DoubleTensor uniforms = random.nextDouble(this.getShape());
-
-        return uniforms.lessThan(probTrue.getValue());
+        return Bernoulli.withParameters(probTrue.getValue()).sample(this.getShape(), random);
     }
 }
