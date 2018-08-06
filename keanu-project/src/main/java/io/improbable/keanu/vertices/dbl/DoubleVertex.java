@@ -11,7 +11,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
@@ -188,28 +193,28 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return multiply(-1.0);
     }
 
-    public <T extends Tensor> BoolVertex equalTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    public BoolVertex equalTo(DoubleVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
     }
 
     public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+        return new NotEqualsVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThan(b.toDouble()));
+        return new GreaterThanVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThanOrEqual(b.toDouble()));
+        return new GreaterThanOrEqualVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+        return new LessThanVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThanOrEqual(b.toDouble()));
+        return new LessThanOrEqualVertex<>(this, rhs);
     }
 
     public DoubleVertex pluck(int... index) {

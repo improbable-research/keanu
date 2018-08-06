@@ -10,8 +10,9 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolPluckVertex;
@@ -43,12 +44,12 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         return new NotVertex(vertex);
     }
 
-    public <T extends Tensor> BoolVertex equalTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    public BoolVertex equalTo(BoolVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
     }
 
     public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+        return new NotEqualsVertex<>(this, rhs);
     }
 
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {

@@ -9,7 +9,12 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
@@ -19,8 +24,8 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPluckVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
@@ -133,28 +138,28 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     }
 
 
-    public <T extends Tensor> BoolVertex equalTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b));
+    public BoolVertex equalTo(IntegerVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
     }
 
     public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.elementwiseEquals(b).not());
+        return new NotEqualsVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThan(b.toDouble()));
+        return new GreaterThanVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().greaterThanOrEqual(b.toDouble()));
+        return new GreaterThanOrEqualVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThan(b.toDouble()));
+        return new LessThanVertex<>(this, rhs);
     }
 
     public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
-        return new BoolBinaryOpVertex<>(this, rhs, (a, b) -> a.toDouble().lessThanOrEqual(b.toDouble()));
+        return new LessThanOrEqualVertex<>(this, rhs);
     }
 
     public void setValue(int value) {
