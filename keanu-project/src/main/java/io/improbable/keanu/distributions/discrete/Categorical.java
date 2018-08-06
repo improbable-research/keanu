@@ -13,11 +13,11 @@ public class Categorical<T> {
         return new Categorical<>(selectableValues);
     }
 
-    private <L> Categorical(Map<T, DoubleVertex> selectableValues) {
+    private Categorical(Map<T, DoubleVertex> selectableValues) {
         this.selectableValues = selectableValues;
     }
 
-    public T sample(int[] shape, KeanuRandom random) {
+    public T sample(KeanuRandom random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;

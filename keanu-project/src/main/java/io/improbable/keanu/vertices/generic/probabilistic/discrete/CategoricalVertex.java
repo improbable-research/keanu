@@ -40,7 +40,7 @@ public class CategoricalVertex<T> extends Probabilistic<T> {
     @Override
     public T sample(KeanuRandom random) {
         Categorical<T> categorical = Categorical.withParameters(selectableValues);
-        return categorical.sample(getShape(), random);
+        return categorical.sample(random);
     }
 
     @Override
