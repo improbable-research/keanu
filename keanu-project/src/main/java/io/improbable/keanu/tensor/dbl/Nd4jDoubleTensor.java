@@ -736,7 +736,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
                 return tensor.prod(1).getDouble(0);
             }
         } else {
-            throw new IllegalArgumentException("Can only calculate product on vector or scalar tensorsa");
+            throw new UnsupportedOperationException("Currently only vector or scalar tensors can calculate their product.");
         }
     }
 
