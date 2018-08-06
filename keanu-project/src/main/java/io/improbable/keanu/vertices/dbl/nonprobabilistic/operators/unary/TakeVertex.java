@@ -31,7 +31,7 @@ public class TakeVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).take(index);
     }
 }
