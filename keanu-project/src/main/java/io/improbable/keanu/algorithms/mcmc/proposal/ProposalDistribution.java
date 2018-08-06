@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import java.util.Collection;
+import java.util.Set;
 
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -12,7 +12,7 @@ public interface ProposalDistribution {
         return new PriorProposalDistribution();
     }
 
-    Proposal getProposal(Collection<Vertex> vertices, KeanuRandom random);
+    Proposal getProposal(Set<Vertex> vertices, KeanuRandom random);
 
     <T> double logProb(Probabilistic<T> vertex, T ofValue, T givenValue);
 

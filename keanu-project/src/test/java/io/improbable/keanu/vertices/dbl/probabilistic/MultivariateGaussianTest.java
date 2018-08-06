@@ -2,25 +2,23 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.util.Pair;
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.apache.commons.math3.util.Pair;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.HashMap;
+import java.util.Map;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
 
 public class MultivariateGaussianTest {
 
@@ -47,7 +45,7 @@ public class MultivariateGaussianTest {
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(5, 1);
 
         double expectedDensity = new NormalDistribution(5.0, 1).logDensity(0.5);
-        double density = mvg.logProb(Nd4jDoubleTensor.scalar(0.5));
+        double density = mvg.logPdf(Nd4jDoubleTensor.scalar(0.5));
 
         assertEquals(expectedDensity, density, 1e-2);
     }
@@ -63,7 +61,7 @@ public class MultivariateGaussianTest {
         double expectedDensity2 = new NormalDistribution(3, 1).logDensity(10);
         double expectedDensity = expectedDensity1 + expectedDensity2;
 
-        double density = mvg.logProb(new Nd4jDoubleTensor(new double[]{8, 10}, new int[]{2, 1}));
+        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{8, 10}, new int[]{2, 1}));
 
         assertEquals(expectedDensity, density, 0.0001);
     }
@@ -76,7 +74,7 @@ public class MultivariateGaussianTest {
             new Nd4jDoubleTensor(new double[]{1, 0.3, 0.3, 0.6}, new int[]{2, 2}));
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
-        double density = mvg.logProb(new Nd4jDoubleTensor(new double[]{0.5, 0.4}, new int[]{2, 1}));
+        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.5, 0.4}, new int[]{2, 1}));
         double expected = -3.6874792995813834;
 
         assertEquals(expected, density, 0.001);
@@ -99,7 +97,7 @@ public class MultivariateGaussianTest {
         );
 
         MultivariateGaussianVertex mvg = new MultivariateGaussianVertex(mu, covarianceMatrix);
-        double density = mvg.logProb(new Nd4jDoubleTensor(new double[]{0.2, 0.3, 0.4}, new int[]{3, 1}));
+        double density = mvg.logPdf(new Nd4jDoubleTensor(new double[]{0.2, 0.3, 0.4}, new int[]{3, 1}));
         double expected = -8.155504532016181;
 
         assertEquals(expected, density, 0.001);

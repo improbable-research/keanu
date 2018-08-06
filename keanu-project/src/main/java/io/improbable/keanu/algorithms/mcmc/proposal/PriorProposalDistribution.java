@@ -1,6 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import java.util.Collection;
+import java.util.Set;
 
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class PriorProposalDistribution implements ProposalDistribution {
 
     @Override
-    public Proposal getProposal(Collection<Vertex> vertices, KeanuRandom random) {
+    public Proposal getProposal(Set<Vertex> vertices, KeanuRandom random) {
         Proposal proposal = new Proposal();
         for (Vertex<?> vertex : vertices) {
             setFor(vertex, random, proposal);

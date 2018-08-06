@@ -8,11 +8,11 @@ public class InverseGamma {
     private InverseGamma() {
     }
 
-    public static double logProb(double a, double b, double x) {
+    public static double logPdf(double a, double b, double x) {
         return a * Math.log(b) + (-a - 1) * Math.log(x) - Math.log(gamma(a)) - (b / x);
     }
 
-    public static Diff dLogProb(double a, double b, double x) {
+    public static Diff dlnPdf(double a, double b, double x) {
         double dPda = -digamma(a) + Math.log(b) - Math.log(x);
         double dPdb = (a / b) - (1 / x);
         double dPdx = (b - (a + 1) * x) / Math.pow(x, 2);

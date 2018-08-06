@@ -1,9 +1,5 @@
 package io.improbable.keanu.e2e.regression;
 
-import static org.junit.Assert.assertEquals;
-
-import org.junit.Test;
-
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -11,6 +7,9 @@ import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html

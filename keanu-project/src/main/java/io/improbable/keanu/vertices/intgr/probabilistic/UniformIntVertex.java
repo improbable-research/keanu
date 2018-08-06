@@ -9,14 +9,13 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-public class UniformIntVertex extends IntegerVertex implements Probabilistic<IntegerTensor> {
+public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger {
 
     private IntegerVertex min;
     private IntegerVertex max;

@@ -188,7 +188,9 @@ public class Hamiltonian {
         VertexValuePropagation.cascadeUpdate(latentVertices);
 
         //Set `r = `r + (eps/2)dTL(`T)
-        Map<Long, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
+        Map<Long, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
+            probabilisticVertices
+        );
 
         for (Map.Entry<Long, DoubleTensor> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
             final DoubleTensor updatedMomentum = newGradient.get(halfTimeStepMomentum.getKey()).times(halfTimeStep).plusInPlace(halfTimeStepMomentum.getValue());
