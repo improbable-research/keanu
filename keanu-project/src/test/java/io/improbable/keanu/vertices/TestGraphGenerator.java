@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 
 public class TestGraphGenerator {
 
@@ -27,25 +27,25 @@ public class TestGraphGenerator {
 
     static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
         final long id = Vertex.ID_GENERATOR.get();
-        return new DoubleUnaryOpLambda<>(from, (a) -> {
+        return new DoubleUnaryOpVertex(from, (a) -> {
             opCount.incrementAndGet();
             onOp.accept(id);
             return a;
         }, (a) -> {
             dualNumberCount.incrementAndGet();
-            return a.get(from);
+            return a;
         });
     }
 
     static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
         final long id = Vertex.ID_GENERATOR.get();
-        return new DoubleBinaryOpLambda<>(left, right, (a, b) -> {
+        return new DoubleBinaryOpVertex(left, right, (a, b) -> {
             opCount.incrementAndGet();
             onOp.accept(id);
             return a.plus(b);
-        }, (a) -> {
+        }, (a, b) -> {
             dualNumberCount.incrementAndGet();
-            return a.get(left).add(a.get(right));
+            return a.add(b);
         });
     }
 

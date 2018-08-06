@@ -13,7 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class EvalPropagationTest {
@@ -113,22 +113,22 @@ public class EvalPropagationTest {
 
         DoubleVertex start = new GaussianVertex(0, 1);
 
-        DoubleVertex blackBox = new DoubleUnaryOpLambda<>(start,
+        DoubleVertex blackBox = new DoubleUnaryOpVertex(start,
             (startValue) -> {
                 n.incrementAndGet();
                 return DoubleTensor.create(new double[]{0, 1, 2});
             }
         );
 
-        DoubleVertex pluck0 = new DoubleUnaryOpLambda<>(blackBox,
+        DoubleVertex pluck0 = new DoubleUnaryOpVertex(blackBox,
             bb -> DoubleTensor.scalar(bb.getValue(0))
         );
 
-        DoubleVertex pluck1 = new DoubleUnaryOpLambda<>(blackBox,
+        DoubleVertex pluck1 = new DoubleUnaryOpVertex(blackBox,
             bb -> DoubleTensor.scalar(bb.getValue(1))
         );
 
-        DoubleVertex pluck2 = new DoubleUnaryOpLambda<>(blackBox,
+        DoubleVertex pluck2 = new DoubleUnaryOpVertex(blackBox,
             bb -> DoubleTensor.scalar(bb.getValue(2))
         );
 

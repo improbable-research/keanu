@@ -1,11 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
 
 public class DoubleBinaryOpLambdaTest {
 
@@ -17,9 +18,10 @@ public class DoubleBinaryOpLambdaTest {
         UniformVertex matrixB = new UniformVertex(new int[]{2, 2}, 0, 5);
         matrixB.setAndCascade(DoubleTensor.create(3.5, new int[]{2, 2}));
 
-        DoubleVertex matrixLambda = new DoubleBinaryOpLambda<>(
+        DoubleVertex matrixLambda = new DoubleBinaryOpVertex(
             matrix.getShape(), matrix, matrixB,
-            (val, valB) -> val.plus(valB)
+            (val, valB) -> val.plus(valB),
+            null
         );
 
         assertArrayEquals(new double[]{6, 6, 6, 6}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);

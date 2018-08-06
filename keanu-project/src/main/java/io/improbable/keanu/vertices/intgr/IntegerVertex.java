@@ -26,7 +26,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPluckVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
@@ -101,11 +101,11 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     }
 
     public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpLambda<>(shape, this, op);
+        return new IntegerUnaryOpVertex(shape, this, op);
     }
 
     public IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpLambda<>(this.getShape(), this, op);
+        return new IntegerUnaryOpVertex(this.getShape(), this, op);
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)

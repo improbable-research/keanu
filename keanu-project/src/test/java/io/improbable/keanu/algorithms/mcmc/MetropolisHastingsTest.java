@@ -1,5 +1,14 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -7,17 +16,9 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.Flip;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertEquals;
 
 public class MetropolisHastingsTest {
 
@@ -174,22 +175,22 @@ public class MetropolisHastingsTest {
 
         DoubleVertex start = new GaussianVertex(new int[]{1, 3}, 0, 1);
 
-        DoubleVertex blackBox = new DoubleUnaryOpLambda<>(start,
+        DoubleVertex blackBox = new DoubleUnaryOpVertex(start,
             (startValue) -> {
                 n.incrementAndGet();
                 return startValue.plus(1);
             }
         );
 
-        DoubleVertex pluck0 = new DoubleUnaryOpLambda<>(blackBox,
+        DoubleVertex pluck0 = new DoubleUnaryOpVertex(blackBox,
             bb -> DoubleTensor.scalar(bb.getValue(0))
         );
 
-        DoubleVertex pluck1 = new DoubleUnaryOpLambda<>(blackBox,
+        DoubleVertex pluck1 = new DoubleUnaryOpVertex(blackBox,
             bb -> DoubleTensor.scalar(bb.getValue(1))
         );
 
-        DoubleVertex pluck2 = new DoubleUnaryOpLambda<>(blackBox,
+        DoubleVertex pluck2 = new DoubleUnaryOpVertex(blackBox,
             bb -> DoubleTensor.scalar(bb.getValue(2))
         );
 
