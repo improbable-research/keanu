@@ -7,6 +7,7 @@ import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,14 +35,14 @@ public class InverseGammaVertexTest {
     public void matchesKnownLogDensityOfScalar() {
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(2.0, 1.0);
-        double expectedDensity = InverseGamma.logProb(2.0, 1.0, 0.5);
+        double expectedDensity = InverseGamma.logPdf(2.0, 1.0, 0.5);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorInverseGammaVertex, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
 
-        double expectedLogDensity = InverseGamma.logProb(2.0, 1.0, 0.25) + InverseGamma.logProb(2.0, 1.0, 0.75);
+        double expectedLogDensity = InverseGamma.logPdf(2.0, 1.0, 0.25) + InverseGamma.logPdf(2.0, 1.0, 0.75);
         InverseGammaVertex ndInverseGammaVertex = new InverseGammaVertex(2.0, 1.0);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(ndInverseGammaVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
@@ -49,7 +50,7 @@ public class InverseGammaVertexTest {
     @Test
     public void matchesKnownDerivativeLogDensityOfScalar() {
 
-        InverseGamma.Diff inverseGammaLogDiff = InverseGamma.dLogProb(2.0, 1.0, 0.5);
+        InverseGamma.Diff inverseGammaLogDiff = InverseGamma.dlnPdf(2.0, 1.0, 0.5);
 
         UniformVertex aTensor = new UniformVertex(0.0, 5.0);
         aTensor.setValue(2.0);
@@ -58,7 +59,7 @@ public class InverseGammaVertexTest {
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogProb(0.5);
+        Map<Long, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
@@ -78,7 +79,9 @@ public class InverseGammaVertexTest {
         UniformVertex bTensor = new UniformVertex(0.0, 1.0);
         bTensor.setValue(1.0);
 
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, () -> new InverseGammaVertex(aTensor, bTensor));
+        Supplier<InverseGammaVertex> vertexSupplier = () -> new InverseGammaVertex(aTensor, bTensor);
+
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test

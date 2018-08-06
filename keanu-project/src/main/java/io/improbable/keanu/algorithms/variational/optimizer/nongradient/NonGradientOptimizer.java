@@ -1,11 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.function.BiConsumer;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Builder;
+import lombok.Getter;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -13,11 +13,6 @@ import org.apache.commons.math3.optim.SimpleBounds;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.noderiv.BOBYQAOptimizer;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;

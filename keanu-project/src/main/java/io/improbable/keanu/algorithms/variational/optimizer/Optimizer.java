@@ -13,10 +13,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.NumberTensor;
-import io.improbable.keanu.vertices.Vertex;
-
 public interface Optimizer {
 
     void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler);
