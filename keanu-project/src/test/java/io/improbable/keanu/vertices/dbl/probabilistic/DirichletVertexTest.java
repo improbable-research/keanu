@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.util.Pair;
+import umontreal.ssj.probdistmulti.DirichletDist;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -58,10 +59,14 @@ public class DirichletVertexTest {
     }
 
     @Test
-    public void matchesScipyDirichletLogPdf() {
-        DirichletVertex dirichlet = new DirichletVertex(2, 2);
-        double scipyPdf = 0.8662499999999997;
-        Assert.assertEquals(scipyPdf, Math.exp(dirichlet.logPdf(new double[]{0.175, 0.825})), 1e-6);
+    public void matchesMontrealDirichletLogPdf() {
+        DirichletDist baseline = new DirichletDist(new double[]{2, 2});
+        DirichletVertex keanu = new DirichletVertex(2, 2);
+
+        Assert.assertEquals(Math.log(baseline.density(new double[]{0.175, 0.825})),
+            keanu.logPdf(new double[]{0.175, 0.825}), 1e-6);
+        Assert.assertEquals(Math.log(baseline.density(new double[]{0.35, 0.65})),
+            keanu.logPdf(new double[]{0.35, 0.65}), 1e-6);
     }
 
     @Test
