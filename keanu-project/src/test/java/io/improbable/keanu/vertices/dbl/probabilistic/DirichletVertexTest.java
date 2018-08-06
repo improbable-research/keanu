@@ -35,6 +35,7 @@ public class DirichletVertexTest {
 
         Assert.assertEquals(betaVertex.logPdf(0.5), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.5, 0.5})), 1e-6);
         Assert.assertEquals(betaVertex.logPdf(0.75), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.75, 0.25})), 1e-6);
+        Assert.assertEquals(betaVertex.logPdf(0.0), dirichletVertex.logPdf(DoubleTensor.create(new double[]{0.0, 1})), 1e-6);
     }
 
     @Test
