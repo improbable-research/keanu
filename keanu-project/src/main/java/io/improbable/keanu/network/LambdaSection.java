@@ -1,15 +1,16 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Value;
-
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Value;
 
 /**
  * A Lambda Section is defined as a given vertex and all the vertices that it affects (downstream) OR
@@ -90,7 +91,7 @@ public class LambdaSection {
      * @return A Set of vertices that are in the direction implied by nextVertices and filtered by shouldAdd
      */
     private static Set<Vertex> getVerticesDepthFirst(Vertex vertex,
-                                                     Function<Vertex, Set<Vertex>> nextVertices,
+                                                     Function<Vertex, Collection<Vertex>> nextVertices,
                                                      Predicate<Vertex> shouldAdd) {
 
         Set<Vertex> visited = new HashSet<>();

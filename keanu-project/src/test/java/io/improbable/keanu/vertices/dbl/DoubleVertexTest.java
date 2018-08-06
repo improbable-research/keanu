@@ -47,10 +47,10 @@ public class DoubleVertexTest {
     }
 
     @Test
-    public void canPluckValue() {
+    public void canTakeValue() {
         DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
         double[] values = new double[]{1, 2, 3};
         gaussianVertex.setAndCascade(values);
-        assertEquals(1, gaussianVertex.pluck(0, 0).getValue().scalar(), 0.0);
+        assertEquals(1, gaussianVertex.take(0, 0).getValue().scalar(), 0.0);
     }
 }

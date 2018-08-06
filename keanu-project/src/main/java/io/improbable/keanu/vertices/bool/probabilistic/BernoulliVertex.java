@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -11,19 +12,19 @@ import java.util.Map;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-public class Flip extends ProbabilisticBool {
+public class BernoulliVertex extends ProbabilisticBool {
 
     private final Vertex<DoubleTensor> probTrue;
 
     /**
-     * One probTrue that must match a proposed tensor shape of Poisson.
+     * One probTrue that must match a proposed tensor shape of Bernoulli.
      * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape    the desired shape of the vertex
-     * @param probTrue the probability the flip returns true
+     * @param probTrue the probability the bernoulli returns true
      */
-    public Flip(int[] shape, Vertex<DoubleTensor> probTrue) {
+    public BernoulliVertex(int[] shape, Vertex<DoubleTensor> probTrue) {
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
@@ -32,19 +33,19 @@ public class Flip extends ProbabilisticBool {
 
     /**
      * One to one constructor for mapping some shape of probTrue to
-     * a matching shaped Flip.
+     * a matching shaped Bernoulli.
      *
-     * @param probTrue probTrue with same shape as desired Poisson tensor or scalar
+     * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
-    public Flip(Vertex<DoubleTensor> probTrue) {
+    public BernoulliVertex(Vertex<DoubleTensor> probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
-    public Flip(double probTrue) {
+    public BernoulliVertex(double probTrue) {
         this(Tensor.SCALAR_SHAPE, new ConstantDoubleVertex(probTrue));
     }
 
-    public Flip(int[] shape, double probTrue) {
+    public BernoulliVertex(int[] shape, double probTrue) {
         this(shape, new ConstantDoubleVertex(probTrue));
     }
 
@@ -54,16 +55,7 @@ public class Flip extends ProbabilisticBool {
 
     @Override
     public double logPmf(BooleanTensor value) {
-
-        DoubleTensor probTrueClamped = probTrue.getValue()
-            .clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
-
-        DoubleTensor probability = value.setDoubleIf(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plusInPlace(1.0)
-        );
-
-        return probability.logInPlace().sum();
+        return Bernoulli.withParameters(probTrue.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -73,9 +65,6 @@ public class Flip extends ProbabilisticBool {
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-
-        DoubleTensor uniforms = random.nextDouble(this.getShape());
-
-        return uniforms.lessThan(probTrue.getValue());
+        return Bernoulli.withParameters(probTrue.getValue()).sample(this.getShape(), random);
     }
 }

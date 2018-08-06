@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
-public class GenericPluckVertex<T> extends NonProbabilistic<Tensor<T>> {
+public class GenericTakeVertex<T> extends NonProbabilistic<Tensor<T>> {
 
     private final Vertex<? extends Tensor<T>> inputVertex;
     private final int[] index;
@@ -18,7 +18,7 @@ public class GenericPluckVertex<T> extends NonProbabilistic<Tensor<T>> {
      * @param inputVertex the input vertex
      * @param index       the index of extraction
      */
-    public GenericPluckVertex(Vertex<? extends Tensor<T>> inputVertex, int... index) {
+    public GenericTakeVertex(Vertex<? extends Tensor<T>> inputVertex, int... index) {
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.inputVertex = inputVertex;
         this.index = index;
