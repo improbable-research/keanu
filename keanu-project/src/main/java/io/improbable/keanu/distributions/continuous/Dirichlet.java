@@ -34,8 +34,10 @@ public class Dirichlet implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        if (Math.abs(x.sum() - 1.0) > EPSILON) {
-            throw new IllegalArgumentException("Sum of dirichlet values to calculate likelihood for must equal 1.");
+        if (Math.abs(x.sum() - 1.0) > EPSILON || x.min() <= 0.) {
+            throw new IllegalArgumentException(
+                "Can only find dirichlet likelihood for values greater than zero that sum to one"
+            );
         }
         final double sumConcentrationLogged = concentration.minus(1.).timesInPlace(x.log()).sum();
         final double sumLogGammaConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::gamma).logInPlace().sum();
@@ -45,9 +47,9 @@ public class Dirichlet implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dLogPdc = x.log().
-            minusInPlace(concentration.apply(org.apache.commons.math3.special.Gamma::digamma)).
-            plusInPlace(org.apache.commons.math3.special.Gamma.digamma(concentration.sum()));
+        final DoubleTensor dLogPdc = x.log()
+            .minusInPlace(concentration.apply(org.apache.commons.math3.special.Gamma::digamma))
+            .plusInPlace(org.apache.commons.math3.special.Gamma.digamma(concentration.sum()));
         final DoubleTensor dLogPdx = concentration.minus(1).divInPlace(x);
 
         return new Diffs()
