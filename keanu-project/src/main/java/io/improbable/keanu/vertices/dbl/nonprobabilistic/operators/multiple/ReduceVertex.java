@@ -13,12 +13,11 @@ import java.util.stream.Collectors;
 
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
 public class ReduceVertex extends DoubleVertex implements Differentiable {
@@ -27,10 +26,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable {
     private final Supplier<DualNumber> dualNumberSupplier;
 
     public ReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> ((ReduceVertex) v).applyReduce(Vertex::getValue)),
-            Observable.observableTypeFor(ReduceVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> ((ReduceVertex) v).applyReduce(Vertex::getValue)));
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }

@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -15,10 +14,7 @@ public class IntegerUnaryOpLambda<IN> extends IntegerVertex {
     protected final Function<IN, IntegerTensor> op;
 
     public IntegerUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> ((IntegerUnaryOpLambda<IN>)v).op.apply(inputVertex.getValue())),
-            Observable.observableTypeFor(IntegerUnaryOpLambda.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> ((IntegerUnaryOpLambda<IN>) v).op.apply(inputVertex.getValue())));
         this.inputVertex = inputVertex;
         this.op = op;
         setParents(inputVertex);

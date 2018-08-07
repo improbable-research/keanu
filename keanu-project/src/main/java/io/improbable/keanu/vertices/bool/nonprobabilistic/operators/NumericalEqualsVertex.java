@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -21,10 +20,7 @@ public class NumericalEqualsVertex extends BoolVertex {
     public NumericalEqualsVertex(Vertex<? extends NumberTensor> a,
                                  Vertex<? extends NumberTensor> b,
                                  Vertex<? extends NumberTensor> epsilon) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> ((NumericalEqualsVertex) v).op(a.getValue(), b.getValue(), epsilon.getValue())),
-            Observable.observableTypeFor(NumericalEqualsVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> ((NumericalEqualsVertex) v).op(a.getValue(), b.getValue(), epsilon.getValue())));
         this.a = a;
         this.b = b;
         this.epsilon = epsilon;

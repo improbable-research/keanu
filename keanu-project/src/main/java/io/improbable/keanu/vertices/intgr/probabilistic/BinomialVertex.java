@@ -21,7 +21,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     private final IntegerVertex n;
 
     public BinomialVertex(int[] tensorShape, DoubleVertex p, IntegerVertex n) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(BinomialVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
         this.p = p;

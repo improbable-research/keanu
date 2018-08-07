@@ -28,7 +28,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(DirichletVertex.class));
+        super(new ProbabilisticValueUpdater<>());
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
             throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");

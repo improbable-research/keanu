@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
@@ -16,14 +15,11 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
      * A vertex that performs a user defined operation on two vertices
      *
      * @param shape the shape of the resulting vertex
-     * @param left a vertex
+     * @param left  a vertex
      * @param right a vertex
      */
     public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpVertex) v).op(left.getValue(), right.getValue())),
-            Observable.observableTypeFor(DoubleBinaryOpVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpVertex) v).op(left.getValue(), right.getValue())));
         this.left = left;
         this.right = right;
         setParents(left, right);
@@ -37,11 +33,11 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
 
     protected abstract DoubleTensor op(DoubleTensor left, DoubleTensor right);
 
-    public DoubleVertex getLeft(){
+    public DoubleVertex getLeft() {
         return left;
     }
 
-    public DoubleVertex getRight(){
+    public DoubleVertex getRight() {
         return right;
     }
 

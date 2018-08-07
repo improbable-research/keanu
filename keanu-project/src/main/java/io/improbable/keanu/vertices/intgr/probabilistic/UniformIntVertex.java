@@ -26,7 +26,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
      * @param max   The exclusive upper bound.
      */
     public UniformIntVertex(int[] shape, IntegerVertex min, IntegerVertex max) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(UniformIntVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
 

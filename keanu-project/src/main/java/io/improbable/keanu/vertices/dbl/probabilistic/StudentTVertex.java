@@ -37,7 +37,7 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param v           Degrees of Freedom
      */
     public StudentTVertex(int[] tensorShape, IntegerVertex v) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(StudentTVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;

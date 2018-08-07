@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -13,16 +12,16 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
-    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater, Observable<IntegerTensor> observation) {
-        super(valueUpdater, observation);
+    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater) {
+        super(valueUpdater);
     }
 
     public IntegerVertex minus(IntegerVertex that) {

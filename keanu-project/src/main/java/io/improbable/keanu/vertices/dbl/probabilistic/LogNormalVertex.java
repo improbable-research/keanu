@@ -37,7 +37,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
      * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(LogNormalVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 

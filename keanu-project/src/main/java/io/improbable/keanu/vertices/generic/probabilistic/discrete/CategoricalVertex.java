@@ -30,7 +30,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     public CategoricalVertex(Map<T, DoubleVertex> selectableValues) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(CategoricalVertex.class));
+        super(new ProbabilisticValueUpdater<>());
         this.selectableValues = selectableValues;
         setParents(this.selectableValues.values());
     }

@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -27,15 +26,12 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input the input vertices to concatenate
+     * @param input     the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
-        super(
-            new NonProbabilisticValueUpdater<>(
-                v -> ((ConcatenationVertex) v).op(((ConcatenationVertex)v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
-            ),
-            Observable.observableTypeFor(ConcatenationVertex.class)
-            );
+        super(new NonProbabilisticValueUpdater<>(
+            v -> ((ConcatenationVertex) v).op(((ConcatenationVertex) v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
+        ));
         this.dimension = dimension;
         this.input = input;
         setParents(input);

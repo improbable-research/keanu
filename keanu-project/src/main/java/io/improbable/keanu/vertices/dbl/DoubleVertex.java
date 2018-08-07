@@ -6,7 +6,6 @@ import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
@@ -17,13 +16,29 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Divisi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
-    public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater, Observable<DoubleTensor> observation) {
-        super(valueUpdater, observation);
+    public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater) {
+        super(valueUpdater);
     }
 
     public DoubleVertex minus(DoubleVertex that) {

@@ -31,7 +31,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
     public PoissonVertex(int[] shape, DoubleVertex mu) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(PoissonVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 

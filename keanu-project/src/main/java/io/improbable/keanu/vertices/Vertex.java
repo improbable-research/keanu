@@ -25,9 +25,9 @@ public abstract class Vertex<T> implements Observable<T> {
     private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
 
-    public Vertex(ValueUpdater<T> valueUpdater, Observable<T> observation) {
+    public Vertex(ValueUpdater<T> valueUpdater) {
         this.valueUpdater = valueUpdater;
-        this.observation = observation;
+        this.observation = Observable.observableTypeFor(this.getClass());
     }
 
     /**
