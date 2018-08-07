@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices;
 
 public class NotObservable<T> implements Observable<T> {
-    // package private
+    // package private - because it's created by the factory method Observable.observableTypeFor
     NotObservable() {}
 
     @Override
