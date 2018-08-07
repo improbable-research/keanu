@@ -21,7 +21,7 @@ public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> {
                      Map<Condition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> ((CPTVertex<OUT>)v).getDerivedValue()),
+            new NonProbabilisticValueUpdater<>(v -> ((CPTVertex<OUT>) v).getDerivedValue()),
             Observable.observableTypeFor(CPTVertex.class)
         );
         this.conditions = conditions;

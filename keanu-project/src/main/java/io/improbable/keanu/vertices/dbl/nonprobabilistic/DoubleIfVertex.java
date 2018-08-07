@@ -22,7 +22,7 @@ public class DoubleIfVertex extends DoubleVertex {
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> ((DoubleIfVertex)v).op(predicate.getValue(), thn.getValue(), els.getValue())),
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleIfVertex) v).op(predicate.getValue(), thn.getValue(), els.getValue())),
             Observable.observableTypeFor(DoubleIfVertex.class)
         );
 

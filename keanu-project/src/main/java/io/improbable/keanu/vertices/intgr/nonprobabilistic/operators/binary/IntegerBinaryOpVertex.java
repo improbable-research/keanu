@@ -14,7 +14,7 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex {
 
     public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> ((IntegerBinaryOpVertex)v).op(a.getValue(), b.getValue())),
+            new NonProbabilisticValueUpdater<>(v -> ((IntegerBinaryOpVertex) v).op(a.getValue(), b.getValue())),
             Observable.observableTypeFor(IntegerBinaryOpVertex.class)
         );
         this.a = a;

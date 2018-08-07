@@ -211,7 +211,7 @@ public class ParticleFilter {
         private double sumLogP(Collection<Vertex> vertices) {
             return vertices.stream()
                 .filter(v -> v instanceof Probabilistic)
-                .mapToDouble(v -> ((Probabilistic)v).logProbAtValue()).sum();
+                .mapToDouble(v -> ((Probabilistic) v).logProbAtValue()).sum();
         }
     }
 }

@@ -25,14 +25,15 @@ public interface Probabilistic<T> extends Observable<T> {
      * @param value at a given value
      * @return the partial derivatives of the log density
      */
-     Map<Long, DoubleTensor> dLogProb(T value);
+    Map<Long, DoubleTensor> dLogProb(T value);
 
     T getValue();
+
     void setValue(T value);
 
     default double logProbAtValue() {
         return logProb(getValue());
-    };
+    }
 
     default Map<Long, DoubleTensor> dLogProbAtValue() {
         return dLogProb(getValue());

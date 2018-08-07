@@ -11,7 +11,7 @@ public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> {
     protected final Vertex<IN> inputVertex;
 
     public UnaryOpVertex(Vertex<IN> inputVertex) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((UnaryOpVertex<IN,OUT>)v).op(inputVertex.getValue())), Observable.observableTypeFor(UnaryOpVertex.class));
+        super(new NonProbabilisticValueUpdater<>(v -> ((UnaryOpVertex<IN, OUT>) v).op(inputVertex.getValue())), Observable.observableTypeFor(UnaryOpVertex.class));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
