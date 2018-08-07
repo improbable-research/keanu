@@ -27,7 +27,7 @@ public interface ProposalDistribution {
     default double logProbAtFromGivenTo(Proposal proposal) {
         double sumLogProb = 0.0;
         for (Vertex v : proposal.getVerticesWithProposal()) {
-            sumLogProb += logProb((Probabilistic<Object>) v, proposal.getProposalFrom(v), proposal.getProposalTo(v));
+            sumLogProb += logProb((Probabilistic) v, proposal.getProposalFrom(v), proposal.getProposalTo(v));
         }
         return sumLogProb;
     }
