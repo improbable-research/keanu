@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
 
-    private final Vertex<? extends Tensor<T>> inputVertex;
     private final int dimension;
     private final int index;
 
@@ -21,10 +20,8 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
      */
     public GenericSliceVertex(Vertex<Tensor<T>> inputVertex, int dimension, int index) {
         super(inputVertex);
-        this.inputVertex = inputVertex;
         this.dimension = dimension;
         this.index = index;
-        setParents(inputVertex);
         setValue(Tensor.placeHolder(shapeSlice(dimension, inputVertex.getShape())));
     }
 
