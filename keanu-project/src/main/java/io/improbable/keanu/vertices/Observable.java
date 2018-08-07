@@ -9,11 +9,16 @@ public interface Observable<T> {
     boolean isObserved();
 
     static <T> Observable<T> observableTypeFor(Class<? extends Vertex> v) {
-        if (!Probabilistic.class.isAssignableFrom(v)) {
-            if (IntegerVertex.class.isAssignableFrom(v) || DoubleVertex.class.isAssignableFrom(v)) {
-                return new NotObservable<>();
-            }
+
+        boolean isProbabilistic = Probabilistic.class.isAssignableFrom(v);
+        boolean isNotDoubleOrIntegerVertex = !IntegerVertex.class.isAssignableFrom(v) && !DoubleVertex.class.isAssignableFrom(v);
+
+        boolean isObservable = isProbabilistic || isNotDoubleOrIntegerVertex;
+
+        if (isObservable) {
+            return new Observation<>();
+        } else {
+            return new NotObservable<>();
         }
-        return new Observation<>();
     }
 }
