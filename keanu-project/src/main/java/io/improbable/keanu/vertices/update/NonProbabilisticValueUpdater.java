@@ -12,13 +12,10 @@ public class NonProbabilisticValueUpdater<T> implements ValueUpdater<T> {
         this.calculation = calculation;
     }
 
-    @Override
-    public boolean hasValue(Vertex<T> v) {
-        return v.isObserved();
-    }
-
-    @Override
-    public T calculateValue(Vertex<T> v) {
-        return calculation.apply(v);
+    public T updateValue(Vertex<T> vertex) {
+        if (!vertex.isObserved()) {
+            vertex.setValue(calculation.apply(vertex));
+        }
+        return vertex.getValue();
     }
 }

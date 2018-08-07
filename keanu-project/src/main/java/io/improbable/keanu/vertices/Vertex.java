@@ -48,10 +48,7 @@ public abstract class Vertex<T> implements Observable<T> {
      * @return The updated value
      */
     public final T updateValue() {
-        if (!valueUpdater.hasValue(this)) {
-            setValue(valueUpdater.calculateValue(this));
-        }
-        return getValue();
+        return valueUpdater.updateValue(this);
     }
 
     /**
