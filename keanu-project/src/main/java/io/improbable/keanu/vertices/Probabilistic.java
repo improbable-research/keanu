@@ -15,7 +15,9 @@ public interface Probabilistic<T> extends Observable<T> {
      * will differ from the probability by a constant.
      *
      * @param value The supplied value.
-     * @return The natural log of the probability density at the supplied value
+     * @return The natural log of the probability function at the supplied value.
+     * For continuous variables this is called the PDF (probability density function).
+     * For discrete variables this is called the PMF (probability mass function).
      */
     double logProb(T value);
 
@@ -23,7 +25,9 @@ public interface Probabilistic<T> extends Observable<T> {
      * The partial derivatives of the natural log prob.
      *
      * @param value at a given value
-     * @return the partial derivatives of the log density
+     * @return the partial derivatives of the log of the probability function at the supplied value.
+     * For continuous variables this is called the PDF (probability density function).
+     * For discrete variables this is called the PMF (probability mass function).
      */
     Map<Long, DoubleTensor> dLogProb(T value);
 
