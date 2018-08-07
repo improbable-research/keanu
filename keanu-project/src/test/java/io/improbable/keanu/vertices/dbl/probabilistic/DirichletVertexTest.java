@@ -60,13 +60,13 @@ public class DirichletVertexTest {
 
     @Test
     public void matchesMontrealDirichletLogPdf() {
-        DirichletDist baseline = new DirichletDist(new double[]{2, 2});
-        DirichletVertex keanu = new DirichletVertex(2, 2);
+        DirichletDist baseline = new DirichletDist(new double[]{3, 4, 5});
+        DirichletVertex keanu = new DirichletVertex(3, 4, 5);
 
-        Assert.assertEquals(Math.log(baseline.density(new double[]{0.175, 0.825})),
-            keanu.logPdf(new double[]{0.175, 0.825}), 1e-6);
-        Assert.assertEquals(Math.log(baseline.density(new double[]{0.35, 0.65})),
-            keanu.logPdf(new double[]{0.35, 0.65}), 1e-6);
+        Assert.assertEquals(Math.log(baseline.density(new double[]{0.1, 0.6, 0.3})),
+            keanu.logPdf(new double[]{0.1, 0.6, 0.3}), 1e-6);
+        Assert.assertEquals(Math.log(baseline.density(new double[]{0.3, 0.4, 0.3})),
+            keanu.logPdf(new double[]{0.3, 0.4, 0.3}), 1e-6);
     }
 
     @Test

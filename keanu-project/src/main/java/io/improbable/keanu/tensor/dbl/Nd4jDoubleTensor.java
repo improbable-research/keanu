@@ -727,17 +727,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public double product() {
-        if (this.isScalar()) {
-            return this.scalar();
-        } else if (this.isVector()) {
-            if (this.getShape()[0] > 1) {
-                return tensor.prod(0).getDouble(0);
-            } else {
-                return tensor.prod(1).getDouble(0);
-            }
-        } else {
-            throw new UnsupportedOperationException("Currently only vector or scalar tensors can calculate their product.");
-        }
+        return tensor.prod().getDouble(0);
     }
 
     @Override

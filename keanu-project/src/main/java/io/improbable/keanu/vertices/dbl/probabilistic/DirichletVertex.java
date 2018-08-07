@@ -56,7 +56,7 @@ public class DirichletVertex extends ProbabilisticDouble {
     /**
      * Matches a vector of concentration values to a Dirichlet distribution
      *
-     * @param concentration the concentration valPues of the dirichlet
+     * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(double... concentration) {
         this(new ConstantDoubleVertex(concentration));

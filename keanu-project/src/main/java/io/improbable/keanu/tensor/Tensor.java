@@ -100,7 +100,7 @@ public interface Tensor<T> {
      * @return true if the tensor is a vector
      */
     default boolean isVector() {
-        return getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1);
+        return getRank() == 1 || (getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1));
     }
 
     default boolean isMatrix() {
