@@ -21,6 +21,7 @@ public class Binomial implements DiscreteDistribution {
         this.p = p;
         this.n = n;
     }
+
     @Override
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();

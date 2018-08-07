@@ -8,7 +8,7 @@ import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
@@ -23,16 +23,16 @@ import static org.junit.Assert.assertNotEquals;
 public class FoodPoisoningTest {
 
     private KeanuRandom random;
-    private Flip infectedOysters;
-    private Flip infectedLamb;
-    private Flip infectedToilet;
+    private BernoulliVertex infectedOysters;
+    private BernoulliVertex infectedLamb;
+    private BernoulliVertex infectedToilet;
 
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        infectedOysters = new Flip(0.4);
-        infectedLamb = new Flip(0.4);
-        infectedToilet = new Flip(0.1);
+        infectedOysters = new BernoulliVertex(0.4);
+        infectedLamb = new BernoulliVertex(0.4);
+        infectedToilet = new BernoulliVertex(0.1);
     }
 
     @Test
@@ -79,9 +79,9 @@ public class FoodPoisoningTest {
     public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {
 
         Consumer<Plate> personMaker = (plate) -> {
-            Flip didEatOysters = plate.add("didEatOysters", new Flip(0.4));
-            Flip didEatLamb = plate.add("didEatLamb", new Flip(0.4));
-            Flip didEatPoo = plate.add("didEatPoo", new Flip(0.4));
+            BernoulliVertex didEatOysters = plate.add("didEatOysters", new BernoulliVertex(0.4));
+            BernoulliVertex didEatLamb = plate.add("didEatLamb", new BernoulliVertex(0.4));
+            BernoulliVertex didEatPoo = plate.add("didEatPoo", new BernoulliVertex(0.4));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -95,7 +95,7 @@ public class FoodPoisoningTest {
                 .orElse(0.1);
 
             plate.add("pIll", pIll);
-            plate.add("isIll", new Flip(pIll));
+            plate.add("isIll", new BernoulliVertex(pIll));
         };
 
         Plates personPlates = new PlateBuilder()

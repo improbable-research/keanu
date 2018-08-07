@@ -726,6 +726,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public double product() {
+        return tensor.prod().getDouble(0);
+    }
+
+    @Override
     public DoubleTensor slice(int dimension, int index) {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);
