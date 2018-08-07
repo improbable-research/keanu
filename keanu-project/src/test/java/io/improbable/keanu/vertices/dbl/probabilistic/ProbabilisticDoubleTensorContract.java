@@ -1,30 +1,22 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.util.Pair;
+
+import java.util.*;
+import java.util.function.Supplier;
+
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.*;
 
 public class ProbabilisticDoubleTensorContract {
 
@@ -261,6 +253,68 @@ public class ProbabilisticDoubleTensorContract {
 
         double actual = actualDerivatives.get(tensorVertex.getId()).sum();
         assertEquals(expected, actual, 1e-5);
+    }
+
+    public static void sampleMethodMatchesLogProbMethodMultiVariate(Vertex<DoubleTensor> vertexUnderTest,
+                                                                    double from,
+                                                                    double to,
+                                                                    double bucketSize,
+                                                                    double maxError,
+                                                                    int sampleCount,
+                                                                    KeanuRandom random,
+                                                                    double bucketVolume,
+                                                                    boolean isVector) {
+        double bucketCount = ((to - from) / bucketSize);
+        double halfBucket = bucketSize / 2;
+
+        if (bucketCount != (int) bucketCount) {
+            throw new IllegalArgumentException("Range must be evenly divisible by bucketSize");
+        }
+
+        double[][] samples = new double[sampleCount][2];
+
+        for (int i = 0; i < sampleCount; i++) {
+            DoubleTensor sample = vertexUnderTest.sample(random);
+            samples[i] = sample.asFlatDoubleArray();
+        }
+
+        Map<Pair<Double, Double>, Long> sampleBucket = new HashMap<>();
+
+        for (double firstDimension = from; firstDimension < to; firstDimension = firstDimension + bucketSize) {
+            for (double secondDimension = from; secondDimension < to; secondDimension = secondDimension + bucketSize) {
+                sampleBucket.put(new Pair<>(firstDimension + halfBucket, secondDimension + halfBucket), 0L);
+            }
+        }
+
+        for (int i = 0; i < sampleCount; i++) {
+            double sampleX = samples[i][0];
+            double sampleY = samples[i][1];
+            for (Pair<Double, Double> bucketCenter : sampleBucket.keySet()) {
+
+                if (sampleX > bucketCenter.getFirst() - halfBucket
+                    && sampleX < bucketCenter.getFirst() + halfBucket
+                    && sampleY > bucketCenter.getSecond() - halfBucket
+                    && sampleY < bucketCenter.getSecond() + halfBucket) {
+                    sampleBucket.put(bucketCenter, sampleBucket.get(bucketCenter) + 1);
+                    break;
+                }
+
+            }
+        }
+
+        int[] shape = isVector ? new int[]{1, 2} : new int[]{2, 1};
+
+        for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
+            double percentage = (double) entry.getValue() / sampleCount;
+            if (percentage != 0) {
+                double[] bucketCenter = new double[]{entry.getKey().getFirst(), entry.getKey().getSecond()};
+                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(bucketCenter, shape);
+                double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketVolume;
+                double actual = percentage;
+                assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));
+            }
+        }
+
     }
 
 }

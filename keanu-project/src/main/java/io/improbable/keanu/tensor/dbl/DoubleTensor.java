@@ -177,6 +177,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double determinant();
 
+    double product();
+
     @Override
     DoubleTensor slice(int dimension, int index);
 
