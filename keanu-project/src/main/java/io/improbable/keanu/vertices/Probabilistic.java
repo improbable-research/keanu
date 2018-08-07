@@ -43,7 +43,7 @@ public interface Probabilistic<T> extends Observable<T> {
         return dLogProb(getValue());
     }
 
-    static <V extends Vertex & Probabilistic> List<V> filter(Iterable<? extends Vertex> vertices) {
+    static <V extends Vertex & Probabilistic> List<V> keepOnlyProbabilisticVertices(Iterable<? extends Vertex> vertices) {
         ImmutableList.Builder<V> probabilisticVertices = ImmutableList.builder();
         for (Vertex v : vertices) {
             if (v instanceof Probabilistic) {

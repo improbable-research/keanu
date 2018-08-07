@@ -16,13 +16,8 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
 
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -123,7 +118,7 @@ public class GradientOptimizer implements Optimizer {
         bayesianNetwork.cascadeObservations();
 
         FitnessFunctionWithGradient fitnessFunction = new FitnessFunctionWithGradient(
-            Probabilistic.filter(outputVertices),
+            Probabilistic.keepOnlyProbabilisticVertices(outputVertices),
             bayesianNetwork.getContinuousLatentVertices(),
             (BiConsumer<double[], double[]>) this::handleGradientCalculation,
             (BiConsumer<double[], Double>) this::handleFitnessCalculation

@@ -142,7 +142,7 @@ class MetropolisHastingsStep {
             }
         }
         double sumLogProb = 0.0;
-        for (Probabilistic v : Probabilistic.filter(vertices)) {
+        for (Probabilistic v : Probabilistic.keepOnlyProbabilisticVertices(vertices)) {
             sumLogProb += v.logProbAtValue();
         }
         return sumLogProb;
