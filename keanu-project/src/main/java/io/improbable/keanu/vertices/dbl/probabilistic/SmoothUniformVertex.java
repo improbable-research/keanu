@@ -18,8 +18,6 @@ import java.util.Map;
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
