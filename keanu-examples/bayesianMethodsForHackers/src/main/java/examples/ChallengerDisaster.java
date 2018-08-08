@@ -6,7 +6,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -31,7 +31,7 @@ public class ChallengerDisaster {
         DoubleVertex temps = new ConstantDoubleVertex(data.temps);
         DoubleVertex logisticOutput = createLogisticFunction(beta, alpha, temps);
 
-        Flip defect = new Flip(logisticOutput);
+        BernoulliVertex defect = new BernoulliVertex(logisticOutput);
         defect.observe(data.oRingFailure);
 
         BayesianNetwork net = new BayesianNetwork(defect.getConnectedGraph());

@@ -4,7 +4,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -27,8 +27,8 @@ public class ABTesting {
 
         DoubleVertex delta = probabilityA.minus(probabilityB);
 
-        Flip observationA = new Flip(probabilityA);
-        Flip observationB = new Flip(probabilityB);
+        BernoulliVertex observationA = new BernoulliVertex(probabilityA);
+        BernoulliVertex observationB = new BernoulliVertex(probabilityB);
 
         // manufacture observations
         int nObsA = 1500;
