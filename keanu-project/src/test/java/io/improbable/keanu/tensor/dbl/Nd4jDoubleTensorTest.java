@@ -248,16 +248,37 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void canLinSpace(){
+    public void canLinSpace() {
         DoubleTensor actual = DoubleTensor.linspace(0, 10, 5);
         DoubleTensor expected = DoubleTensor.create(new double[]{0, 2.5, 5.0, 7.5, 10.0});
         assertEquals(expected, actual);
     }
 
     @Test
-    public void canARange(){
+    public void canARange() {
         DoubleTensor actual = DoubleTensor.arange(0, 5);
         DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARangeWithStep() {
+        DoubleTensor actual = DoubleTensor.arange(3, 7, 2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 5});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARangeWithFractionStep() {
+        DoubleTensor actual = DoubleTensor.arange(3, 7, 0.5);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARangeWithFractionStepThatIsNotEvenlyDivisible() {
+        DoubleTensor actual = DoubleTensor.arange(3, 7, 1.5);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3.0, 4.5, 6.0});
         assertEquals(expected, actual);
     }
 
