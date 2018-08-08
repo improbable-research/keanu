@@ -41,7 +41,7 @@ public class SampleWriter extends Writer {
     }
 
     @Override
-    Writer withDefaultHeader() {
+    public Writer withDefaultHeader() {
         List<String> header = new ArrayList<>();
         for (Vertex<? extends Tensor> vertex : vertices) {
             for (int j = 0; j < vertex.getValue().getLength(); j++) {

@@ -1,12 +1,13 @@
-package io.improbable.keanu.algorithms.variational;
+package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import java.util.List;
 import java.util.function.BiConsumer;
+
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
 
 public class FitnessFunction {
 
@@ -38,29 +39,6 @@ public class FitnessFunction {
 
             return logOfTotalProbability;
         };
-    }
-
-    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {
-
-        int position = 0;
-        for (Vertex<DoubleTensor> vertex : latentVertices) {
-
-            int dimensions = (int) numDimensions(vertex);
-
-            double[] values = new double[dimensions];
-            System.arraycopy(point, position, values, 0, dimensions);
-
-            DoubleTensor newTensor = DoubleTensor.create(values, vertex.getValue().getShape());
-            vertex.setValue(newTensor);
-
-            position += dimensions;
-        }
-
-        VertexValuePropagation.cascadeUpdate(latentVertices);
-    }
-
-    static long numDimensions(Vertex<DoubleTensor> vertex) {
-        return vertex.getValue().getLength();
     }
 
     public static double logOfTotalProbability(List<? extends Vertex> probabilisticVertices) {

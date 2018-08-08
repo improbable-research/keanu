@@ -42,7 +42,7 @@ public class ColumnWriter extends Writer {
     }
 
     @Override
-    Writer withDefaultHeader() {
+    public Writer withDefaultHeader() {
         int headerSize = vertices.size();
         String[] header = createHeader(headerSize, HEADER_STYLE, i -> (int) vertices.get(i).getId());
         withHeader(header);

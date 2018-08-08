@@ -1,12 +1,12 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
@@ -336,53 +336,42 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor minusInPlace(IntegerTensor that) {
-
         if (that.isScalar()) {
-            minusInPlace(that.scalar());
+            tensor.subi(that.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(that);
-            tensor.subi(indArray);
+            INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
         }
-
         return this;
     }
 
     @Override
     public IntegerTensor plusInPlace(IntegerTensor that) {
-
         if (that.isScalar()) {
-            plusInPlace(that.scalar());
+            tensor.addi(that.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(that);
-            tensor.addi(indArray);
+            INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
         }
-
         return this;
     }
 
     @Override
     public IntegerTensor timesInPlace(IntegerTensor that) {
-
         if (that.isScalar()) {
-            timesInPlace(that.scalar());
+            tensor.muli(that.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(that);
-            tensor.muli(indArray);
+            INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
         }
-
         return this;
     }
 
     @Override
     public IntegerTensor divInPlace(IntegerTensor that) {
-
         if (that.isScalar()) {
-            divInPlace(that.scalar());
+            tensor.divi(that.scalar());
         } else {
-            INDArray indArray = unsafeGetNd4J(that);
-            Transforms.floor(tensor.divi(indArray), false);
+            INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
         }
-
+        Transforms.floor(tensor, false);
         return this;
     }
 
@@ -557,6 +546,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor slice(int dimension, int index) {
+        INDArray dup = tensor.dup();
+        INDArray slice = dup.slice(index, dimension);
+        return new Nd4jIntegerTensor(slice);
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
 
@@ -579,6 +575,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         int result = tensor != null ? tensor.hashCode() : 0;
         result = 31 * result + Arrays.hashCode(getShape());
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return tensor.toString();
     }
 
     private INDArray unsafeGetNd4J(IntegerTensor that) {

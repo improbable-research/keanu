@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor.dbl;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -71,6 +70,9 @@ public interface DoubleTensor extends NumberTensor<Double> {
     @Override
     DoubleTensor reshape(int... newShape);
 
+    @Override
+    DoubleTensor duplicate();
+
     DoubleTensor diag();
 
     DoubleTensor transpose();
@@ -87,11 +89,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor times(double value);
 
+    DoubleTensor div(double value);
+
     DoubleTensor matrixMultiply(DoubleTensor value);
 
     DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
-
-    DoubleTensor div(double value);
 
     DoubleTensor pow(DoubleTensor exponent);
 
@@ -174,6 +176,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor choleskyDecomposition();
 
     double determinant();
+
+    double product();
+
+    @Override
+    DoubleTensor slice(int dimension, int index);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 

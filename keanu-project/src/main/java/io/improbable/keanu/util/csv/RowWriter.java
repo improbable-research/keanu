@@ -42,7 +42,7 @@ public class RowWriter extends Writer {
     }
 
     @Override
-    Writer withDefaultHeader() {
+    public Writer withDefaultHeader() {
         int sizeOfHeader = findLongestTensor(vertices);
         String[] header = createHeader(sizeOfHeader, HEADER_STYLE, i -> i);
         withHeader(header);

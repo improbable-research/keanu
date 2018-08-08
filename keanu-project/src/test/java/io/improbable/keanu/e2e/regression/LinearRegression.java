@@ -1,7 +1,8 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.variational.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -52,9 +53,7 @@ public class LinearRegression {
         DoubleVertex y = new GaussianVertex(x.multiply(m).plus(b), 5.0);
         y.observe(yData);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(m.getConnectedGraph());
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
-
+        Optimizer optimizer = Optimizer.of(m.getConnectedGraph());
         optimizer.maxLikelihood();
 
         log.info("M = " + m.getValue().scalar() + ", B = " + b.getValue().scalar());
@@ -93,7 +92,7 @@ public class LinearRegression {
         y.observe(yData);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
 
         optimizer.maxLikelihood();
 
@@ -143,7 +142,7 @@ public class LinearRegression {
         y.observe(yData);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
         optimizer.maxLikelihood();
 
         for (int i = 0; i < featureCount; i++) {
@@ -179,7 +178,7 @@ public class LinearRegression {
         y.observe(yData);
 
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = new GradientOptimizer(bayesNet);
+        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
 
         optimizer.maxLikelihood();
 

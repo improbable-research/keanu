@@ -8,6 +8,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBi
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 
 import java.util.Arrays;
@@ -40,6 +42,10 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
         inputs.addAll(Arrays.asList(those));
         inputs.add(this);
         return inputs;
+    }
+
+    public BoolVertex slice(int dimension, int index) {
+        return new BoolSliceVertex(this, dimension, index);
     }
 
     public void setValue(boolean value) {
@@ -85,5 +91,10 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
     public boolean getValue(int... index) {
         return getValue().getValue(index);
     }
+
+    public BoolVertex take(int... index) {
+        return new BoolTakeVertex(this, index);
+    }
+
 
 }

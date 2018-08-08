@@ -29,6 +29,9 @@ public interface BooleanTensor extends Tensor<Boolean> {
     @Override
     BooleanTensor reshape(int... newShape);
 
+    @Override
+    BooleanTensor duplicate();
+
     BooleanTensor and(BooleanTensor that);
 
     BooleanTensor or(BooleanTensor that);
@@ -56,6 +59,9 @@ public interface BooleanTensor extends Tensor<Boolean> {
     DoubleTensor toDoubleMask();
 
     IntegerTensor toIntegerMask();
+
+    @Override
+    BooleanTensor slice(int dimension, int index);
 
     BooleanTensor concat(int dimension, BooleanTensor... those);
 

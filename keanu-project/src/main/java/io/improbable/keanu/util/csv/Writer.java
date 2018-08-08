@@ -32,7 +32,7 @@ public abstract class Writer {
         return toFile(new File(file));
     }
 
-    abstract Writer withDefaultHeader();
+    public abstract Writer withDefaultHeader();
 
     public Writer withSeparator(char s) {
         separator = s;

@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 public class Diffs {
     public static final ParameterName A = new ParameterName("A");
     public static final ParameterName B = new ParameterName("B");
+    public static final ParameterName C = new ParameterName("C");
     public static final ParameterName K = new ParameterName("K");
     public static final ParameterName S = new ParameterName("S");
     public static final ParameterName T = new ParameterName("T");
