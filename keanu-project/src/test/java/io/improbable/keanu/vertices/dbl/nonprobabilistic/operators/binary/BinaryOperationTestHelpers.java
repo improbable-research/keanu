@@ -1,11 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
+import java.util.Arrays;
 import java.util.function.BiFunction;
 
 import static org.junit.Assert.assertArrayEquals;
@@ -36,10 +40,15 @@ public class BinaryOperationTestHelpers {
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
         UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
+        DoubleVertex output = op.apply(A, B);
 
-        DualNumber resultDualNumber = op.apply(A, B).getDualNumber();
-        assertEquals(expectedGradientWrtA, resultDualNumber.getPartialDerivatives().withRespectTo(A).scalar(), 1e-5);
-        assertEquals(expectedGradientWrtB, resultDualNumber.getPartialDerivatives().withRespectTo(B).scalar(), 1e-5);
+        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
+        assertEquals(expectedGradientWrtA, wrtForward.withRespectTo(A).scalar(), 1e-5);
+        assertEquals(expectedGradientWrtB, wrtForward.withRespectTo(B).scalar(), 1e-5);
+
+        PartialDerivatives wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
+        assertEquals(expectedGradientWrtA, wrtReverse.withRespectTo(A).scalar(), 1e-5);
+        assertEquals(expectedGradientWrtB, wrtReverse.withRespectTo(B).scalar(), 1e-5);
     }
 
     public static void operatesOnTwo2x2MatrixVertexValues(double[] aValues,
@@ -73,15 +82,26 @@ public class BinaryOperationTestHelpers {
         UniformVertex B = new UniformVertex(bValues.getShape(), 0.0, 1.0);
         B.setAndCascade(bValues);
 
-        DualNumber result = op.apply(A, B).getDualNumber();
+        DoubleVertex output = op.apply(A, B);
+        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
 
-        DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);
-        assertArrayEquals(expectedGradientWrtA.getShape(), wrtA.getShape());
+        DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtAForward.getShape());
 
-        DoubleTensor wrtB = result.getPartialDerivatives().withRespectTo(B);
-        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtB.asFlatDoubleArray(), 1e-10);
-        assertArrayEquals(expectedGradientWrtB.getShape(), wrtB.getShape());
+        DoubleTensor wrtBForward = wrtForward.withRespectTo(B);
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
+
+        PartialDerivatives wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
+
+        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtAReverse.getShape());
+
+        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B);
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBReverse.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
 
     public static void calculatesDualNumberOfAVectorsAndScalar(DoubleTensor aValues,
@@ -94,15 +114,60 @@ public class BinaryOperationTestHelpers {
         UniformVertex B = new UniformVertex(0.0, 1.0);
         B.setAndCascade(DoubleTensor.scalar(bValue));
 
-        DualNumber result = op.apply(A, B).getDualNumber();
+        DoubleVertex output = op.apply(A, B);
+        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
 
-        DoubleTensor wrtA = result.getPartialDerivatives().withRespectTo(A);
-        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 1e-10);
-        assertArrayEquals(expectedGradientWrtA.getShape(), wrtA.getShape());
+        DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtAForward.getShape());
 
-        DoubleTensor wrtB = result.getPartialDerivatives().withRespectTo(B);
-        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtB.asFlatDoubleArray(), 1e-10);
-        assertArrayEquals(expectedGradientWrtB.getShape(), wrtB.getShape());
+        DoubleTensor wrtBForward = wrtForward.withRespectTo(B);
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
+
+        PartialDerivatives x = Differentiator.forwardModeAutoDiff(output, Arrays.asList(A, B));
+
+        PartialDerivatives wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
+        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtAReverse.getShape());
+
+        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B);
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBReverse.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
+    }
+
+    public static void calculatesDualNumberOfAScalarAndVector(double aValue,
+                                                               DoubleTensor bValues,
+                                                               DoubleTensor expectedGradientWrtA,
+                                                               DoubleTensor expectedGradientWrtB,
+                                                               BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+        UniformVertex A = new UniformVertex(0.0, 1.0);
+        A.setAndCascade(DoubleTensor.scalar(aValue));
+        UniformVertex B = new UniformVertex(0.0, 1.0);
+        B.setAndCascade(bValues);
+
+        DoubleVertex output = op.apply(A, B);
+        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
+
+        DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtAForward.getShape());
+
+        DoubleTensor wrtBForward = wrtForward.withRespectTo(B);
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
+
+        PartialDerivatives x = Differentiator.forwardModeAutoDiff(output, Arrays.asList(A, B));
+
+        PartialDerivatives wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
+        DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
+        assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtA.getShape(), wrtAReverse.getShape());
+
+        DoubleTensor wrtBReverse = wrtReverse.withRespectTo(B);
+        assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBReverse.asFlatDoubleArray(), 1e-10);
+        assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
 
     public static double[] toDiagonalArray(double[] diagonal) {

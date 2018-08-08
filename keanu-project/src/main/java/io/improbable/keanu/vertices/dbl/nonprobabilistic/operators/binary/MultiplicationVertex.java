@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -33,8 +34,24 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     @Override
     protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        Map<Long, DoubleTensor> toScalar = new HashMap<>();
+
         partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(right.getValue()));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(left.getValue()));
+
+        if (right.getValue().isScalar()) {
+            for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+                //replace ones with diag of matrix?
+                toScalar.put(
+                    partialDerivative.getKey(),
+                    DoubleTensor.ones(
+                        left.getShape()
+                    ).reshape(TensorShape.shapeDesiredToRankByAppendingOnes(left.getShape(), partialDerivative.getValue().getRank()))
+                );
+            }
+            partials.put(right, new PartialDerivatives(toScalar).multiplyBy(left.getValue()));
+        } else {
+            partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(left.getValue()));
+        }
         return partials;
     }
 

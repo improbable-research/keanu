@@ -35,10 +35,10 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
         DoubleTensor leftValue = left.getValue();
         DoubleTensor rightValue = right.getValue();
-        DoubleTensor denominator = ((rightValue.pow(2)).plusInPlace((leftValue.pow(2))));
+        DoubleTensor denominator = rightValue.pow(2).plusInPlace(leftValue.pow(2));
 
         PartialDerivatives thisInfLeft = leftDual.getPartialDerivatives().multiplyBy(rightValue.div(denominator));
-        PartialDerivatives thisInfRight = rightDual.getPartialDerivatives().multiplyBy((leftValue.div(denominator)).unaryMinusInPlace());
+        PartialDerivatives thisInfRight = rightDual.getPartialDerivatives().multiplyBy(leftValue.div(denominator).unaryMinusInPlace());
         PartialDerivatives newInf = thisInfLeft.add(thisInfRight);
         return new DualNumber(op(leftValue, rightValue), newInf);
     }
@@ -51,7 +51,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
         DoubleTensor denominator = rightValue.pow(2).plusInPlace(leftValue.pow(2));
         DoubleTensor dOutWrtLeft = rightValue.divInPlace(denominator);
-        DoubleTensor dOutWrtRight =leftValue.unaryMinus().divInPlace(denominator);
+        DoubleTensor dOutWrtRight = leftValue.div(denominator).unaryMinusInPlace();
 
         partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
         partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));

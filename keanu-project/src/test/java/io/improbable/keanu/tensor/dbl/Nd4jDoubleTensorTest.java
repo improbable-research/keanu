@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.dbl;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -10,17 +12,20 @@ public class Nd4jDoubleTensorTest {
 
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
+    Nd4jDoubleTensor matrixC;
     Nd4jDoubleTensor scalarA;
 
     @Before
     public void setup() {
         matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+        matrixC = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, new int[]{4, 4});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
     }
 
     @Test
     public void canElementWiseMultiplyMatrix() {
+        INDArray x = Nd4j.diag(Nd4j.arange(0, 16).reshape(4, 4));
         DoubleTensor result = matrixA.times(matrixB);
         assertArrayEquals(new double[]{1, 4, 9, 16}, result.asFlatDoubleArray(), 0.0);
     }

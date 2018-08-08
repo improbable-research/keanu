@@ -158,7 +158,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
     public final DualNumber getDualNumber() {
         Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
         Deque<DoubleVertex> stack = new ArrayDeque<>();
-        stack.push(this);
+        stack.push(this)    ;
 
         while (!stack.isEmpty()) {
 

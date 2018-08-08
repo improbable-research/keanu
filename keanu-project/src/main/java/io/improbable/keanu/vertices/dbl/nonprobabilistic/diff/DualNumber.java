@@ -273,7 +273,7 @@ public class DualNumber {
         if (this.partialDerivatives.isEmpty()) {
             return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
-            DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
+            DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dArcTan));
         }
     }
