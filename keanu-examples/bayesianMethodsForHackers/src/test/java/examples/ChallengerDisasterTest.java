@@ -18,6 +18,9 @@ public class ChallengerDisasterTest {
         // act
         ChallengerDisaster.ChallengerPosteriors posteriors = ChallengerDisaster.run();
 
+        System.out.println("mapAlpha " + posteriors.mapAlpha);
+        System.out.println("mapBeta " + posteriors.mapBeta);
+
         // assert
         assertThat(posteriors.mapBeta).isBetween(0.1, 0.4);
         assertThat(posteriors.mapAlpha).isBetween(-25.0, -5.0);

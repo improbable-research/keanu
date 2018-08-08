@@ -83,6 +83,8 @@ public class SimulatedAnnealing {
             random
         );
 
+        System.out.println("Start probability " + maxLogP);
+
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
             Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
@@ -99,6 +101,8 @@ public class SimulatedAnnealing {
                 setSamplesAsMax(maxSamplesByVertex, latentVertices);
             }
         }
+
+        System.out.println("End probability " + maxLogP);
 
         return new SimpleNetworkState(maxSamplesByVertex);
     }

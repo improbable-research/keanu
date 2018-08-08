@@ -26,7 +26,9 @@ public class ChallengerDisaster {
         double tau = 0.001;
         double sigma = Math.sqrt(1.0 / tau);
         GaussianVertex beta = new GaussianVertex(0, sigma);
+        beta.setValue(0);
         GaussianVertex alpha = new GaussianVertex(0, sigma);
+        alpha.setValue(0);
 
         DoubleVertex temps = new ConstantDoubleVertex(data.temps);
         DoubleVertex logisticOutput = createLogisticFunction(beta, alpha, temps);
@@ -36,6 +38,11 @@ public class ChallengerDisaster {
 
         BayesianNetwork net = new BayesianNetwork(defect.getConnectedGraph());
         net.probeForNonZeroProbability(10000);
+
+//        SimulatedAnnealing.withDefaultConfig().getMaxAPosteriori(net, 10000);
+
+        System.out.println("Start Alpha " + alpha.getValue(0));
+        System.out.println("Start Beta " + beta.getValue(0));
 
         int sampleCount = 120000;
         NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
@@ -50,9 +57,7 @@ public class ChallengerDisaster {
     }
 
     private static DoubleVertex createLogisticFunction(GaussianVertex beta, GaussianVertex alpha, DoubleVertex temp) {
-        ConstantDoubleVertex one = new ConstantDoubleVertex(1.0);
-        ConstantDoubleVertex e = new ConstantDoubleVertex(Math.E);
-        return one.divideBy(one.plus(e.pow(beta.times(temp).plus(alpha))));
+        return beta.times(temp).plus(alpha).unaryMinus().sigmoid();
     }
 
     public static class ChallengerPosteriors {
