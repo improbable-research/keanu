@@ -21,6 +21,10 @@ import static java.util.Arrays.copyOf;
 
 public class Nd4jIntegerTensor implements IntegerTensor {
 
+    static {
+        System.setProperty("dtype", "double");
+    }
+
     public static Nd4jIntegerTensor scalar(int scalarValue) {
         return new Nd4jIntegerTensor(Nd4j.scalar(scalarValue));
     }
@@ -48,22 +52,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, int[] shape) {
-        DataBuffer buffer = Nd4j.createBuffer(toFloat(data));
+        DataBuffer buffer = Nd4j.getDataBufferFactory().createDouble(data);
         this.tensor = Nd4j.create(buffer, shape);
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {
         this.tensor = tensor;
-    }
-
-    private float[] toFloat(int[] data) {
-        float[] floatData = new float[data.length];
-
-        for (int i = 0; i < floatData.length; i++) {
-            floatData[i] = data[i];
-        }
-
-        return floatData;
     }
 
     @Override
@@ -313,8 +307,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor divInPlace(int value) {
-        Transforms.floor(tensor.divi(value), false);
+        tensor.divi(value);
+        dropBufferFraction();
         return this;
+    }
+
+    private void dropBufferFraction() {
+        tensor.data().setData(tensor.data().asInt());
     }
 
     @Override
@@ -371,7 +370,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         } else {
             INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
         }
-        Transforms.floor(tensor, false);
+        dropBufferFraction();
         return this;
     }
 

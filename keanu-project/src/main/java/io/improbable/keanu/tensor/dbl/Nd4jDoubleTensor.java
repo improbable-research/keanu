@@ -56,8 +56,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, int[] shape) {
-        DataBuffer buffer = Nd4j.createBuffer(data);
-        tensor = Nd4j.create(buffer, shape);
+        DataBuffer buffer = Nd4j.getDataBufferFactory().createDouble(data);
+        this.tensor = Nd4j.create(buffer, shape);
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
