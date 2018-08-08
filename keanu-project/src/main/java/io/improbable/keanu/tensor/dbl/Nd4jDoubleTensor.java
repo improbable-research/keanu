@@ -53,6 +53,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(Nd4j.zeros(shape));
     }
 
+    public static Nd4jDoubleTensor linspace(double start, double end, int numberOfPoints) {
+        return new Nd4jDoubleTensor(Nd4j.linspace(start, end, numberOfPoints));
+    }
+
+    public static Nd4jDoubleTensor arange(double start, double end) {
+        return new Nd4jDoubleTensor(Nd4j.arange(start, end));
+    }
+
+    public static Nd4jDoubleTensor arange(double start, double end, double stepSize) {
+        double stepCount = Math.ceil((end - start) / stepSize);
+        INDArray arangeWithStep = Nd4j.arange(0, stepCount).muli(stepSize).addi(start);
+        return new Nd4jDoubleTensor(arangeWithStep);
+    }
+
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, int[] shape) {
