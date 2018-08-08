@@ -13,8 +13,6 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Observable;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -37,7 +35,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
      * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(LogNormalVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 

@@ -1,6 +1,6 @@
 package io.improbable.keanu.plating;
 
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import org.junit.Test;
 
 import java.util.Arrays;
@@ -42,7 +42,7 @@ public class PlateBuilderTest {
         String vertexName = "vertexName";
         Plates plates = new PlateBuilder<>()
             .count(n)
-            .withFactory((plate) -> plate.add(vertexName, new Flip(0.5)))
+            .withFactory((plate) -> plate.add(vertexName, new BernoulliVertex(0.5)))
             .build();
         plates.asList().forEach(plate -> {
             assertNotNull(plate.get(vertexName));

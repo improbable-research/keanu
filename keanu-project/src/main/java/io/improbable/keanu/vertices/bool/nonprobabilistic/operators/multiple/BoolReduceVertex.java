@@ -9,7 +9,6 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,9 +21,7 @@ public class BoolReduceVertex extends BoolVertex {
     public BoolReduceVertex(int[] shape, Collection<Vertex<BooleanTensor>> input,
                             BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> ((BoolReduceVertex) v).applyReduce(Vertex::getValue)),
-            Observable.observableTypeFor(BoolReduceVertex.class)
-        );
+            new NonProbabilisticValueUpdater<>(v -> ((BoolReduceVertex) v).applyReduce(Vertex::getValue)));
         if (input.size() < 2) {
             throw new IllegalArgumentException("BoolReduceVertex should have at least two input vertices, called with " + input.size());
         }

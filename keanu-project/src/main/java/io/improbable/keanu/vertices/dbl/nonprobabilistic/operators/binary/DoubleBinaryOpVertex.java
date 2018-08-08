@@ -22,7 +22,7 @@ public class DoubleBinaryOpVertex extends DoubleVertex {
 
     /**
      * A vertex that performs a user defined operation on two vertices
-     * @param left a vertex
+     * @param left  a vertex
      * @param right a vertex
      * @param op operation used to sample
      * @param dualOp operation used to calculate Dual
@@ -46,10 +46,7 @@ public class DoubleBinaryOpVertex extends DoubleVertex {
         int[] shape,
         DoubleVertex left, DoubleVertex right,
         BinaryOperator<DoubleTensor> op, BinaryOperator<DualNumber> dualOp) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> op.apply(left.getValue(), right.getValue())),
-            Observable.observableTypeFor(DoubleBinaryOpVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> op.apply(left.getValue(), right.getValue())));
         this.left = left;
         this.right = right;
         this.op = op;
@@ -63,11 +60,11 @@ public class DoubleBinaryOpVertex extends DoubleVertex {
         return op.apply(left.sample(random), right.sample(random));
     }
 
-    public DoubleVertex getLeft(){
+    public DoubleVertex getLeft() {
         return left;
     }
 
-    public DoubleVertex getRight(){
+    public DoubleVertex getRight() {
         return right;
     }
     @Override

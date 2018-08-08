@@ -5,9 +5,8 @@ import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class GenericPluckVertex<T> extends UnaryOpVertex<Tensor<T>,Tensor<T>> {
+public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>,Tensor<T>> {
 
-    private final Vertex<? extends Tensor<T>> inputVertex;
     private final int[] index;
 
     /**
@@ -16,12 +15,10 @@ public class GenericPluckVertex<T> extends UnaryOpVertex<Tensor<T>,Tensor<T>> {
      * @param inputVertex the input vertex
      * @param index       the index of extraction
      */
-    public GenericPluckVertex(Vertex<Tensor<T>> inputVertex, int... index) {
+    public GenericTakeVertex(Vertex<Tensor<T>> inputVertex, int... index) {
         super(inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
-        this.inputVertex = inputVertex;
         this.index = index;
-        setParents(inputVertex);
         setValue(Tensor.placeHolder(Tensor.SCALAR_SHAPE));
     }
 

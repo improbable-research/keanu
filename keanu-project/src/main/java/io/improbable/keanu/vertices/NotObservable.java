@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices;
 
 public class NotObservable<T> implements Observable<T> {
-    // package private
+    // package private - because it's created by the factory method Observable.observableTypeFor
     NotObservable() {}
 
     @Override
@@ -11,6 +11,9 @@ public class NotObservable<T> implements Observable<T> {
 
     @Override
     public void unobserve() {
+        // Do nothing:
+        // This is allowed, since it's common for algorithms to unobserve all vertices
+        // e.g. in io.improbable.keanu.network.NetworkSnapshot.apply
     }
 
     @Override

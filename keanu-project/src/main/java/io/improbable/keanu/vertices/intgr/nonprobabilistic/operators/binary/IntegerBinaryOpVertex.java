@@ -6,7 +6,6 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import java.util.function.BinaryOperator;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
@@ -33,11 +32,9 @@ public class IntegerBinaryOpVertex extends IntegerVertex {
      * @param a first input vertex
      * @param b second input vertex
      * @param op operation used to sample
-     */
-    public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b, BinaryOperator<IntegerTensor> op) {
+     */public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b, BinaryOperator<IntegerTensor> op) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue(), b.getValue())),
-            Observable.observableTypeFor(IntegerBinaryOpVertex.class)
+            new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue(), b.getValue()))
         );
         this.a = a;
         this.b = b;

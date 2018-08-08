@@ -2,6 +2,7 @@ package io.improbable.keanu.tensor.dbl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -11,12 +12,18 @@ public class Nd4jDoubleTensorTest {
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor scalarA;
+    Nd4jDoubleTensor vectorA;
+    Nd4jDoubleTensor vectorB;
+    Nd4jDoubleTensor rankThreeTensor;
 
     @Before
     public void setup() {
         matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
+        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
+        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
+        rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
     }
 
     @Test
@@ -255,6 +262,19 @@ public class Nd4jDoubleTensorTest {
     private void assertTimesInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left.timesInPlace(right);
         assertEquals(left, expected);
+    }
+
+    @Test
+    public void canCalculateProductOfVector() {
+        double productVectorA = vectorA.product();
+        double productVectorB = vectorB.product();
+        double productRankThreeTensor = rankThreeTensor.product();
+
+        assertEquals(6., productVectorA, 1e-6);
+        assertEquals(6., productVectorB, 1e-6);
+        assertEquals(40320, productRankThreeTensor, 1e-6);
+
+        assertTrue(vectorA.isVector() && vectorB.isVector());
     }
 
 }

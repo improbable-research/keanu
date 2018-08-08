@@ -95,7 +95,7 @@ public class RejectionSampler {
 
     private static boolean matchesObservation(List<? extends Vertex> observedVertices) {
         return observedVertices.stream()
-            .allMatch(v -> v.matchesObservation());
+            .allMatch(Vertex::matchesObservation);
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {

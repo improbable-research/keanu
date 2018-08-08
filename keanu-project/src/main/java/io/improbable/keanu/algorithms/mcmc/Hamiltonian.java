@@ -56,7 +56,7 @@ public class Hamiltonian {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<? extends Probabilistic> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
+        final List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentAndObservedVertices());
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);

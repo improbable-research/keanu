@@ -6,7 +6,6 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
@@ -23,16 +22,16 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPluckVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
-    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater, Observable<IntegerTensor> observation) {
-        super(valueUpdater, observation);
+    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater) {
+        super(valueUpdater);
     }
 
     public IntegerVertex minus(IntegerVertex that) {
@@ -129,8 +128,8 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(-1);
     }
 
-    public IntegerVertex pluck(int... index) {
-        return new IntegerPluckVertex(this, index);
+    public IntegerVertex take(int... index) {
+        return new IntegerTakeVertex(this, index);
     }
 
     public IntegerVertex slice(int dimension, int index) {

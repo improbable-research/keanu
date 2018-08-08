@@ -28,6 +28,7 @@ public class DoubleUnaryOpVertex extends DoubleVertex {
 
     /**
      * A vertex that performs a user defined operation on a single input vertex
+
      * @param inputVertex the input vertex
      * @param op operation used to sample
      * @param dualOp operation used to calculate Dual
@@ -51,10 +52,7 @@ public class DoubleUnaryOpVertex extends DoubleVertex {
         DoubleVertex inputVertex,
         Function<DoubleTensor,DoubleTensor> op,
         Function<DualNumber,DualNumber> dualOp) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> op.apply(inputVertex.getValue())),
-            Observable.observableTypeFor(DoubleUnaryOpVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> op.apply(inputVertex.getValue())));
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualOp = dualOp;

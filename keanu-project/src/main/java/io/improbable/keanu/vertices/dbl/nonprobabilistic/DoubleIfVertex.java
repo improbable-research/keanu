@@ -4,7 +4,6 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,9 +21,7 @@ public class DoubleIfVertex extends DoubleVertex {
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> ((DoubleIfVertex)v).op(predicate.getValue(), thn.getValue(), els.getValue())),
-            Observable.observableTypeFor(DoubleIfVertex.class)
-        );
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleIfVertex) v).op(predicate.getValue(), thn.getValue(), els.getValue())));
 
         this.predicate = predicate;
         this.thn = thn;

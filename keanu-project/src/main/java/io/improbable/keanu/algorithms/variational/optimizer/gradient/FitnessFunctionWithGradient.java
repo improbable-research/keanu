@@ -17,26 +17,26 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 
-public class FitnessFunctionWithGradient<V extends Vertex & Probabilistic> {
+public class FitnessFunctionWithGradient {
 
-    private final List<V> probabilisticVertices;
+    private final List<? extends Vertex> vertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(List<V> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<? extends Vertex> vertices,
                                        List<? extends Vertex<DoubleTensor>> latentVertices,
                                        BiConsumer<double[], double[]> onGradientCalculation,
                                        BiConsumer<double[], Double> onFitnessCalculation) {
-        this.probabilisticVertices = probabilisticVertices;
+        this.vertices = vertices;
         this.latentVertices = latentVertices;
         this.onGradientCalculation = onGradientCalculation;
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(List<V> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<? extends Vertex> vertices,
                                        List<? extends Vertex<DoubleTensor>> latentVertices) {
-        this(probabilisticVertices, latentVertices, null, null);
+        this(vertices, latentVertices, null, null);
     }
 
     public MultivariateVectorFunction gradient() {
@@ -44,6 +44,7 @@ public class FitnessFunctionWithGradient<V extends Vertex & Probabilistic> {
 
             setAndCascadePoint(point, latentVertices);
 
+            List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(this.vertices);
             Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, latentVertices);
@@ -59,7 +60,7 @@ public class FitnessFunctionWithGradient<V extends Vertex & Probabilistic> {
     public MultivariateFunction fitness() {
         return point -> {
             setAndCascadePoint(point, latentVertices);
-            double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
+            double logOfTotalProbability = logOfTotalProbability(vertices);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);

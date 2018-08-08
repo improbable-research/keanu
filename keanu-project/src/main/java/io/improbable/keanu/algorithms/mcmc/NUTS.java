@@ -75,7 +75,7 @@ public class NUTS {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        List<? extends Probabilistic> probabilisticVertices = Probabilistic.filter(bayesNet.getLatentAndObservedVertices());
+        List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentAndObservedVertices());
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));

@@ -27,7 +27,7 @@ public interface ProbabilisticBoolean extends Probabilistic<BooleanTensor> {
         return dLogPmf(BooleanTensor.create(values));
     }
 
-    default Map<Long,DoubleTensor> dLogPmf(BooleanTensor value) {
+    default Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
         return dLogProb(value);
     }
 }

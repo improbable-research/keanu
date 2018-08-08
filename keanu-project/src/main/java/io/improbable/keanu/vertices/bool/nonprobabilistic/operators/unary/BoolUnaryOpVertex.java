@@ -4,7 +4,6 @@ import java.util.function.Function;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -20,10 +19,7 @@ public class BoolUnaryOpVertex<T extends Tensor> extends BoolVertex {
     }
 
     public BoolUnaryOpVertex(int[] shape, Vertex<T> a, Function<T, BooleanTensor> op) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue())),
-            Observable.observableTypeFor(BoolUnaryOpVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue())));
         this.a = a;
         this.op = op;
         setParents(a);

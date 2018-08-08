@@ -7,7 +7,6 @@ import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
@@ -15,15 +14,15 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolPluckVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
-    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater, Observable<BooleanTensor> observation) {
-        super(valueUpdater, observation);
+    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater) {
+        super(valueUpdater);
     }
 
     @SafeVarargs
@@ -91,8 +90,8 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         return getValue().getValue(index);
     }
 
-    public BoolVertex pluck(int... index) {
-        return new BoolPluckVertex(this, index);
+    public BoolVertex take(int... index) {
+        return new BoolTakeVertex(this, index);
     }
 
 

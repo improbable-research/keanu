@@ -2,9 +2,7 @@ package io.improbable.keanu.vertices;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -27,9 +25,9 @@ public abstract class Vertex<T> implements Observable<T> {
     private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
 
-    public Vertex(ValueUpdater<T> valueUpdater, Observable<T> observation) {
+    public Vertex(ValueUpdater<T> valueUpdater) {
         this.valueUpdater = valueUpdater;
-        this.observation = observation;
+        this.observation = Observable.observableTypeFor(this.getClass());
     }
 
     /**
@@ -50,12 +48,8 @@ public abstract class Vertex<T> implements Observable<T> {
      * @return The updated value
      */
     public final T updateValue() {
-        if (!valueUpdater.hasValue(this)) {
-            setValue(valueUpdater.calculateValue(this));
-        }
-        return getValue();
-    };
-
+        return valueUpdater.updateValue(this);
+    }
 
     /**
      * This is similar to eval() except it only propagates as far up the graph as required until
@@ -91,7 +85,7 @@ public abstract class Vertex<T> implements Observable<T> {
      */
     public final boolean isProbabilistic() {
         return this instanceof Probabilistic;
-    };
+    }
 
     /**
      * Sets the value if the vertex isn't already observed.

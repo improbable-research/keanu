@@ -6,7 +6,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
@@ -20,10 +19,7 @@ public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> {
     public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
                      Map<Condition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> ((CPTVertex<OUT>)v).getDerivedValue()),
-            Observable.observableTypeFor(CPTVertex.class)
-        );
+        super(new NonProbabilisticValueUpdater<>(v -> ((CPTVertex<OUT>) v).getDerivedValue()));
         this.conditions = conditions;
         this.inputs = inputs;
         this.defaultResult = defaultResult;

@@ -9,7 +9,6 @@ import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -111,10 +110,10 @@ public class FitnessFunctionWithGradientTest {
     private void assert2DGradientEqualsApproxGradient(double[] topRight,
                                                       double[] bottomLeft,
                                                       double stepSize,
-                                                      List<Probabilistic<?>> probabilisticVertices,
+                                                      List<Vertex> vertices,
                                                       List<? extends Vertex<DoubleTensor>> latentVertices) {
 
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(probabilisticVertices, latentVertices);
+        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(vertices, latentVertices);
 
         double[] point = Arrays.copyOf(bottomLeft, bottomLeft.length);
 

@@ -9,7 +9,6 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -21,7 +20,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     private final IntegerVertex n;
 
     public BinomialVertex(int[] tensorShape, DoubleVertex p, IntegerVertex n) {
-        super(new ProbabilisticValueUpdater<>(), Observable.observableTypeFor(BinomialVertex.class));
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
         this.p = p;

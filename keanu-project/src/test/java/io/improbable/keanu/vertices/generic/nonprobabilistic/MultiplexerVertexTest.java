@@ -3,7 +3,7 @@ package io.improbable.keanu.vertices.generic.nonprobabilistic;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
+import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Test;
@@ -38,12 +38,12 @@ public class MultiplexerVertexTest {
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup1 = new LinkedHashMap<>();
         optionGroup1.put(TestEnum.A, ConstantVertex.of(0.5));
         optionGroup1.put(TestEnum.B, ConstantVertex.of(0.5));
-        SelectVertex<TestEnum> select1 = new SelectVertex<>(optionGroup1);
+        CategoricalVertex<TestEnum> select1 = new CategoricalVertex<>(optionGroup1);
 
         LinkedHashMap<TestEnum, DoubleVertex> optionGroup2 = new LinkedHashMap<>();
         optionGroup2.put(TestEnum.C, ConstantVertex.of(0.5));
         optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
-        SelectVertex<TestEnum> select2 = new SelectVertex<>(optionGroup2);
+        CategoricalVertex<TestEnum> select2 = new CategoricalVertex<>(optionGroup2);
 
         MultiplexerVertex<TestEnum> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 

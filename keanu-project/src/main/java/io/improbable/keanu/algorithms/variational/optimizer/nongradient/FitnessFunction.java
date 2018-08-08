@@ -50,7 +50,7 @@ public class FitnessFunction {
             }
         }
         double sum = 0.0;
-        for (Probabilistic vertex : Probabilistic.filter(vertices)) {
+        for (Probabilistic vertex : Probabilistic.keepOnlyProbabilisticVertices(vertices)) {
             sum += vertex.logProbAtValue();
         }
 
