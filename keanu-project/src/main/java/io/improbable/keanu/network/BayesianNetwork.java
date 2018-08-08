@@ -11,7 +11,7 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -52,15 +52,7 @@ public class BayesianNetwork {
     }
 
     public double getLogOfMasterP() {
-        double sum = 0.0;
-        for (Vertex<?> vertex : getLatentAndObservedVertices()) {
-            if (vertex instanceof Probabilistic) {
-                sum += ((Probabilistic) vertex).logProbAtValue();
-            } else if (vertex.isObserved() && !vertex.matchesObservation()) {
-                return Double.NEGATIVE_INFINITY;
-            }
-        }
-        return sum;
+        return ProbabilityCalculator.calculateLogProbFor(getLatentAndObservedVertices());
     }
 
     public void cascadeObservations() {

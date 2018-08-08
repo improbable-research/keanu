@@ -8,6 +8,7 @@ import java.util.function.Supplier;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -95,7 +96,8 @@ public class RejectionSampler {
 
     private static boolean matchesObservation(List<? extends Vertex> observedVertices) {
         return observedVertices.stream()
-            .allMatch(Vertex::matchesObservation);
+            .filter(v -> v instanceof NonProbabilistic)
+            .noneMatch(v -> ((NonProbabilistic) v).contradictsObservation());
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {

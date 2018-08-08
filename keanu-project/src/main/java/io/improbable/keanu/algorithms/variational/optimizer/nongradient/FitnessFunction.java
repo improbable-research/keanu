@@ -8,7 +8,7 @@ import java.util.function.BiConsumer;
 import org.apache.commons.math3.analysis.MultivariateFunction;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 
 public class FitnessFunction {
@@ -33,7 +33,7 @@ public class FitnessFunction {
     public MultivariateFunction fitness() {
         return point -> {
             setAndCascadePoint(point, latentVertices);
-            double logOfTotalProbability = logOfTotalProbability(outputVertices);
+            double logOfTotalProbability = ProbabilityCalculator.calculateLogProbFor(outputVertices);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);
@@ -41,20 +41,6 @@ public class FitnessFunction {
 
             return logOfTotalProbability;
         };
-    }
-
-    public static double logOfTotalProbability(List<? extends Vertex> vertices) {
-        for (Vertex<?> v : vertices) {
-            if (!v.isProbabilistic() && v.isObserved() && !v.matchesObservation()) {
-                return Double.NEGATIVE_INFINITY;
-            }
-        }
-        double sum = 0.0;
-        for (Probabilistic vertex : Probabilistic.keepOnlyProbabilisticVertices(vertices)) {
-            sum += vertex.logProbAtValue();
-        }
-
-        return sum;
     }
 
     public static boolean isValidInitialFitness(double fitnessValue) {

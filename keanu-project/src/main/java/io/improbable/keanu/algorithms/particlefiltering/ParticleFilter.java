@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -180,8 +180,8 @@ public class ParticleFilter {
 
         public double updateSumLogPOfSubgraph() {
             applyLatentVertexValues();
-            double sumLogPOfLatents = sumLogP(latentVertices.keySet());
-            double sumLogPOfObservables = sumLogP(observedVertices);
+            double sumLogPOfLatents = ProbabilityCalculator.calculateLogProbFor(latentVertices.keySet());
+            double sumLogPOfObservables = ProbabilityCalculator.calculateLogProbFor(observedVertices);
             sumLogPOfSubgraph = sumLogPOfLatents + sumLogPOfObservables;
             return sumLogPOfSubgraph;
         }
@@ -206,12 +206,6 @@ public class ParticleFilter {
                 T value = (T) latentVertices.get(vertex);
                 vertex.setAndCascade(value);
             }
-        }
-
-        private double sumLogP(Collection<Vertex> vertices) {
-            return vertices.stream()
-                .filter(v -> v instanceof Probabilistic)
-                .mapToDouble(v -> ((Probabilistic) v).logProbAtValue()).sum();
         }
     }
 }

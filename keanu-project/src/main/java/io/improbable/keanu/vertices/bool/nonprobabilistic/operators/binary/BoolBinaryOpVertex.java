@@ -2,12 +2,13 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex {
+public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
@@ -29,7 +30,7 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     protected abstract BooleanTensor op(A a, B b);
 
     @Override
-    public boolean matchesObservation() {
-        return op(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
+    public boolean contradictsObservation() {
+        return isObserved() && !op(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
     }
 }
