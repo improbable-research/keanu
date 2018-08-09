@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class TensorShape {
 
@@ -169,6 +171,26 @@ public class TensorShape {
         int[] newShape = Arrays.copyOf(shape, shape.length);
         newShape[dimension] = 1;
         return newShape;
+    }
+
+    public static int[] scalarDimensions(int[] shape) {
+        List<Integer> scalarDimensions = new ArrayList<>();
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[i] == 1) {
+                scalarDimensions.add(i);
+            }
+        }
+        return scalarDimensions.stream().mapToInt(i -> i).toArray();
+    }
+
+    public static int[] nonScalarDimensions(int[] shape) {
+        List<Integer> nonScalarDimensions = new ArrayList<>();
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[i] > 1) {
+                nonScalarDimensions.add(i);
+            }
+        }
+        return nonScalarDimensions.stream().mapToInt(i -> i).toArray();
     }
 }
 

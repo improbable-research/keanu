@@ -125,8 +125,6 @@ public class BinaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
 
-        PartialDerivatives x = Differentiator.forwardModeAutoDiff(output, Arrays.asList(A, B));
-
         PartialDerivatives wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
         DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAReverse.asFlatDoubleArray(), 1e-10);
@@ -144,7 +142,7 @@ public class BinaryOperationTestHelpers {
                                                                BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
         UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(DoubleTensor.scalar(aValue));
-        UniformVertex B = new UniformVertex(0.0, 1.0);
+        UniformVertex B = new UniformVertex(bValues.getShape(),0.0, 1.0);
         B.setAndCascade(bValues);
 
         DoubleVertex output = op.apply(A, B);
@@ -157,8 +155,6 @@ public class BinaryOperationTestHelpers {
         DoubleTensor wrtBForward = wrtForward.withRespectTo(B);
         assertArrayEquals(expectedGradientWrtB.asFlatDoubleArray(), wrtBForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBForward.getShape());
-
-        PartialDerivatives x = Differentiator.forwardModeAutoDiff(output, Arrays.asList(A, B));
 
         PartialDerivatives wrtReverse = Differentiator.reverseModeAutoDiff(output, ImmutableSet.of(A, B));
         DoubleTensor wrtAReverse = wrtReverse.withRespectTo(A);
