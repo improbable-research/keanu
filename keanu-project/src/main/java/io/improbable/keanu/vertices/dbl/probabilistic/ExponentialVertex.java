@@ -23,15 +23,15 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     private final DoubleVertex lambda;
 
     /**
-     * One location or lambda or both driving an arbitrarily shaped tensor of Exponential
+     * Lambda driving an arbitrarily shaped tensor of Exponential
      * <p>
      * pdf = lambda * exp(-lambda*x)
      * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
-     * @param lambda      the lambda of the Exponential with either the same shape as specified for this
-     *                    vertex or location scalar.
+     * @param lambda      the lambda of the Exponential with either be the same shape as specified for this
+     *                    vertex or scalar.
      */
     public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
         super(new ProbabilisticValueUpdater<>());
@@ -44,10 +44,9 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     }
 
     /**
-     * One to one constructor for mapping some shape of location and lambda to
-     * location matching shaped exponential.
+     * One to one constructor for mapping some shape of lambda to matching shaped exponential.
      *
-     * @param lambda the lambda of the Exponential with either the same shape as specified for this vertex or location scalar
+     * @param lambda the lambda of the Exponential with either the same shape as specified for this vertex or scalar
      */
     public ExponentialVertex(DoubleVertex lambda) {
         this(checkHasSingleNonScalarShapeOrAllScalar(lambda.getShape()), lambda);

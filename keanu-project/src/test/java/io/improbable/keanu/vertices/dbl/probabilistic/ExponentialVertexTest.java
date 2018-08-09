@@ -69,7 +69,7 @@ public class ExponentialVertexTest {
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
-        assertEquals(exponentialLogDiff.dPdb, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
+        assertEquals(exponentialLogDiff.dPdlambda, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
         assertEquals(exponentialLogDiff.dPdx, actual.withRespectTo(tensorExponentialVertex.getId()).scalar(), 1e-5);
     }
 

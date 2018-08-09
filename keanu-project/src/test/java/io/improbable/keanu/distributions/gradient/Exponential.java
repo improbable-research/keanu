@@ -12,18 +12,18 @@ public class Exponential {
     private Exponential() {
     }
 
-    public static Diff dlnPdf(double b, double x) {
-        double dPdb = -(b - x) / Math.pow(b, 2);
-        double dPdx = -(1 / b);
-        return new Diff(dPdb, dPdx);
+    public static Diff dlnPdf(double lambda, double x) {
+        double dPdlambda = -(lambda - x) / Math.pow(lambda, 2);
+        double dPdx = -(1 / lambda);
+        return new Diff(dPdlambda, dPdx);
     }
 
     public static class Diff {
-        public final double dPdb;
+        public final double dPdlambda;
         public final double dPdx;
 
-        public Diff(double dPdb, double dPdx) {
-            this.dPdb = dPdb;
+        public Diff(double dPdlambda, double dPdx) {
+            this.dPdlambda = dPdlambda;
             this.dPdx = dPdx;
         }
     }
