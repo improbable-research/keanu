@@ -1,9 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
+import java.util.Set;
+
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.Set;
 
 public class PriorProposalDistribution implements ProposalDistribution {
 
@@ -17,7 +18,7 @@ public class PriorProposalDistribution implements ProposalDistribution {
     }
 
     @Override
-    public <T> double logProb(Vertex<T> vertex, T ofValue, T givenValue) {
+    public <T> double logProb(Probabilistic<T> vertex, T ofValue, T givenValue) {
         return vertex.logProb(ofValue);
     }
 

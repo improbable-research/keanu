@@ -1,22 +1,25 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.util.Pair;
-import umontreal.ssj.probdistmulti.DirichletDist;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
+import org.apache.commons.math3.util.Pair;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import umontreal.ssj.probdistmulti.DirichletDist;
 
 public class DirichletVertexTest {
 
@@ -175,14 +178,14 @@ public class DirichletVertexTest {
         }
     }
 
-    private static void sampleMethodMatchesLogProbMethodMultiVariateDirichlet(Vertex<DoubleTensor> vertexUnderTest,
-                                                                             double from,
-                                                                             double to,
-                                                                             double bucketSize,
-                                                                             double maxError,
-                                                                             int sampleCount,
-                                                                             KeanuRandom random,
-                                                                             double bucketVolume) {
+    private static <V extends Vertex<DoubleTensor> & Probabilistic<DoubleTensor>> void sampleMethodMatchesLogProbMethodMultiVariateDirichlet(V vertexUnderTest,
+                                                                                                                                             double from,
+                                                                                                                                             double to,
+                                                                                                                                             double bucketSize,
+                                                                                                                                             double maxError,
+                                                                                                                                             int sampleCount,
+                                                                                                                                             KeanuRandom random,
+                                                                                                                                             double bucketVolume) {
         double bucketCount = ((to - from) / bucketSize);
         double halfBucket = bucketSize / 2;
 

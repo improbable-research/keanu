@@ -1,9 +1,9 @@
 package io.improbable.keanu.distributions.discrete;
 
+import java.util.Map;
+
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.Map;
 
 public class Categorical<T> {
 

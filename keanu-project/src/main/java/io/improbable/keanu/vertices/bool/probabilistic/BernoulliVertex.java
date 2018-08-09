@@ -1,18 +1,20 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class BernoulliVertex extends ProbabilisticBool {
+public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
     private final Vertex<DoubleTensor> probTrue;
 
@@ -25,6 +27,7 @@ public class BernoulliVertex extends ProbabilisticBool {
      * @param probTrue the probability the bernoulli returns true
      */
     public BernoulliVertex(int[] shape, Vertex<DoubleTensor> probTrue) {
+        super(new ProbabilisticValueUpdater<>());
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);
@@ -54,12 +57,12 @@ public class BernoulliVertex extends ProbabilisticBool {
     }
 
     @Override
-    public double logPmf(BooleanTensor value) {
+    public double logProb(BooleanTensor value) {
         return Bernoulli.withParameters(probTrue.getValue()).logProb(value).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPmf(BooleanTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
         throw new UnsupportedOperationException();
     }
 
