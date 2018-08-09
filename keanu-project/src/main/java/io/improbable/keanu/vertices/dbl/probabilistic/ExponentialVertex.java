@@ -16,10 +16,11 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
-public class ExponentialVertex extends ProbabilisticDouble {
+public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex location;
     private final DoubleVertex lambda;
@@ -38,6 +39,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
      *                    vertex or location scalar.
      */
     public ExponentialVertex(int[] tensorShape, DoubleVertex location, DoubleVertex lambda) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), lambda.getShape());
 
@@ -71,7 +73,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
 
         DoubleTensor locationValues = location.getValue();
         DoubleTensor lambdaValues = lambda.getValue();
@@ -82,7 +84,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
     }

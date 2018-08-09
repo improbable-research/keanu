@@ -1,5 +1,11 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.distributions.dual.Diffs.C;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
@@ -8,14 +14,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.distributions.dual.Diffs.C;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
-
-public class DirichletVertex extends ProbabilisticDouble {
+public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex concentration;
 
@@ -26,6 +27,7 @@ public class DirichletVertex extends ProbabilisticDouble {
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
+        super(new ProbabilisticValueUpdater<>());
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
             throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
@@ -63,14 +65,14 @@ public class DirichletVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor concentrationValues = concentration.getValue();
         DoubleTensor logPdfs = Dirichlet.withParameters(concentrationValues).logProb(value);
         return logPdfs.sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Dirichlet.withParameters(concentration.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(C).getValue(), dlnP.get(X).getValue());
     }

@@ -1,14 +1,15 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-public class MultivariateGaussianVertex extends ProbabilisticDouble {
+public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
@@ -22,6 +23,7 @@ public class MultivariateGaussianVertex extends ProbabilisticDouble {
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
@@ -59,7 +61,7 @@ public class MultivariateGaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor covarianceValues = covariance.getValue();
 
@@ -67,7 +69,7 @@ public class MultivariateGaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         throw new UnsupportedOperationException();
     }
 

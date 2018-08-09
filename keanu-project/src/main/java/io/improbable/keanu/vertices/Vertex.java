@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,10 +11,10 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
-public abstract class Vertex<T> {
+public abstract class Vertex<T> implements Observable<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
@@ -23,32 +22,12 @@ public abstract class Vertex<T> {
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
-    private boolean observed;
+    private final ValueUpdater<T> valueUpdater;
+    private final Observable<T> observation;
 
-    /**
-     * This is the natural log of the probability at the supplied value. In the
-     * case of continuous vertices, this is actually the log of the density, which
-     * will differ from the probability by a constant.
-     *
-     * @param value The supplied value.
-     * @return The natural log of the probability density at the supplied value
-     */
-    public abstract double logProb(T value);
-
-    public double logProbAtValue() {
-        return logProb(getValue());
-    }
-
-    /**
-     * The partial derivatives of the natural log prob.
-     *
-     * @param value at a given value
-     * @return the partial derivatives of the log density
-     */
-    public abstract Map<Long, DoubleTensor> dLogProb(T value);
-
-    public final Map<Long, DoubleTensor> dLogProbAtValue() {
-        return dLogProb(getValue());
+    public Vertex(ValueUpdater<T> valueUpdater) {
+        this.valueUpdater = valueUpdater;
+        this.observation = Observable.observableTypeFor(this.getClass());
     }
 
     /**
@@ -68,8 +47,9 @@ public abstract class Vertex<T> {
      *
      * @return The updated value
      */
-    public abstract T updateValue();
-
+    public final T updateValue() {
+        return valueUpdater.updateValue(this);
+    }
 
     /**
      * This is similar to eval() except it only propagates as far up the graph as required until
@@ -103,7 +83,9 @@ public abstract class Vertex<T> {
      * not derived from it's parents. However, the probability of the
      * vertex's value may be dependent on it's parents values.
      */
-    public abstract boolean isProbabilistic();
+    public final boolean isProbabilistic() {
+        return this instanceof Probabilistic;
+    }
 
     /**
      * Sets the value if the vertex isn't already observed.
@@ -111,7 +93,7 @@ public abstract class Vertex<T> {
      * @param value the observed value
      */
     public void setValue(T value) {
-        if (!this.observed) {
+        if (!observation.isObserved()) {
             this.value = value;
         }
     }
@@ -161,24 +143,27 @@ public abstract class Vertex<T> {
      *
      * @param value the value to be observed
      */
+    @Override
     public void observe(T value) {
         this.value = value;
-        this.observed = true;
+        observation.observe(value);
     }
 
     /**
      * Cause this vertex to observe its own value, for example when generating test data
      */
     public void observeOwnValue() {
-        this.observed = true;
+        observation.observe(getValue());
     }
 
+    @Override
     public void unobserve() {
-        observed = false;
+        observation.unobserve();
     }
 
+    @Override
     public boolean isObserved() {
-        return observed;
+        return observation.isObserved();
     }
 
     public long getId() {

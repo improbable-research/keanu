@@ -11,12 +11,13 @@ import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConcatenationVertex extends NonProbabilisticDouble {
+public class ConcatenationVertex extends DoubleVertex implements Differentiable {
 
     private final int dimension;
     private final DoubleVertex[] input;
@@ -25,19 +26,17 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input the input vertices to concatenate
+     * @param input     the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
+        super(new NonProbabilisticValueUpdater<>(
+            v -> ((ConcatenationVertex) v).op(((ConcatenationVertex) v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
+        ));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
         int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
         setValue(DoubleTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
-    }
-
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
     }
 
     @Override
