@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.intgr;
 
+import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -9,7 +10,11 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -308,12 +313,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     @Override
     public IntegerTensor divInPlace(int value) {
         tensor.divi(value);
-        dropBufferFraction();
+        INDArrayExtensions.castToInteger(tensor, false);
         return this;
-    }
-
-    private void dropBufferFraction() {
-        tensor.data().setData(tensor.data().asInt());
     }
 
     @Override
@@ -370,7 +371,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         } else {
             INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
         }
-        dropBufferFraction();
+        INDArrayExtensions.castToInteger(tensor, false);
         return this;
     }
 

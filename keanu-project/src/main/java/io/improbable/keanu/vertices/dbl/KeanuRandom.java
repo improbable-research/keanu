@@ -9,8 +9,10 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.rng.DefaultRandom;
 import org.nd4j.linalg.api.rng.Random;
+import org.nd4j.linalg.factory.Nd4j;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicReference;
@@ -20,8 +22,6 @@ public class KeanuRandom {
     private static final AtomicReference<KeanuRandom> DEFAULT_RANDOM = new AtomicReference<>();
 
     static {
-        System.setProperty("dtype", "double");
-
         String randomSeed = System.getProperty("io.improbable.keanu.defaultRandom.seed");
 
         if (randomSeed != null) {
@@ -70,6 +70,7 @@ public class KeanuRandom {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(nextGaussian());
         } else {
+            Nd4j.setDataType(DataBuffer.Type.DOUBLE);
             return new Nd4jDoubleTensor(nd4jRandom.nextGaussian(shape));
         }
     }
@@ -95,6 +96,7 @@ public class KeanuRandom {
     }
 
     public IntegerTensor nextInt(int[] shape) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         return new Nd4jIntegerTensor(nd4jRandom.nextInt(shape));
     }
 

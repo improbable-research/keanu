@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -12,7 +13,11 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
@@ -25,11 +30,8 @@ import static java.util.Arrays.copyOf;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
-    static {
-        System.setProperty("dtype", "double");
-    }
-
     public static Nd4jDoubleTensor scalar(double scalarValue) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         return new Nd4jDoubleTensor(Nd4j.scalar(scalarValue));
     }
 
@@ -38,24 +40,29 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor create(double value, int[] shape) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         return new Nd4jDoubleTensor(Nd4j.valueArrayOf(shape, value));
     }
 
     public static Nd4jDoubleTensor ones(int[] shape) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         return new Nd4jDoubleTensor(Nd4j.ones(shape));
     }
 
     public static Nd4jDoubleTensor eye(int n) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         return new Nd4jDoubleTensor(Nd4j.eye(n));
     }
 
     public static Nd4jDoubleTensor zeros(int[] shape) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         return new Nd4jDoubleTensor(Nd4j.zeros(shape));
     }
 
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, int[] shape) {
+        Nd4j.setDataType(DataBuffer.Type.DOUBLE);
         DataBuffer buffer = Nd4j.getDataBufferFactory().createDouble(data);
         this.tensor = Nd4j.create(buffer, shape);
     }
@@ -463,6 +470,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor atan2InPlace(DoubleTensor y) {
         if (y.isScalar()) {
+            Nd4j.setDataType(DataBuffer.Type.DOUBLE);
             tensor = Transforms.atan2(tensor, Nd4j.valueArrayOf(this.tensor.shape(), y.scalar()));
         } else {
             tensor = Transforms.atan2(tensor, unsafeGetNd4J(y));
@@ -638,7 +646,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
         if (value == 0.0) {
-            INDArray swapOnesForZeros = Nd4j.ones(tensor.shape()).subi(maskDup);
+            INDArray swapOnesForZeros = maskDup.rsub(1.0);
+            ;
             tensor.muli(swapOnesForZeros);
         } else {
             Nd4j.getExecutioner().exec(
@@ -888,8 +897,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public IntegerTensor toInteger() {
-        Transforms.floor(tensor, false);
-        return new Nd4jIntegerTensor(tensor);
+        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, false));
     }
 
     private BooleanTensor fromMask(INDArray mask, int[] shape) {
