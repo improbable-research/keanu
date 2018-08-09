@@ -166,10 +166,6 @@ public abstract class Vertex<T> implements Observable<T> {
         return observation.isObserved();
     }
 
-    public boolean matchesObservation() {
-        throw new UnsupportedOperationException();
-    }
-
     public long getId() {
         return uuid;
     }

@@ -6,12 +6,13 @@ import java.util.function.BiFunction;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex {
+public class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     protected final Vertex<A> a;
     protected final Vertex<B> b;
@@ -37,7 +38,7 @@ public class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends Bool
     }
 
     @Override
-    public boolean matchesObservation() {
-        return op.apply(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
+    public boolean contradictsObservation() {
+        return isObserved() && !op.apply(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
     }
 }
