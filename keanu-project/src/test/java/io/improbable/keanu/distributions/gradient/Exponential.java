@@ -1,7 +1,5 @@
 package io.improbable.keanu.distributions.gradient;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 /**
  * Computer Generation of Statistical Distributions
  * by Richard Saucier
@@ -14,20 +12,17 @@ public class Exponential {
     private Exponential() {
     }
 
-    public static Diff dlnPdf(double a, double b, double x) {
-        double dPda = 1 / b;
-        double dPdb = -(a + b - x) / Math.pow(b, 2);
-        double dPdx = -dPda;
-        return new Diff(dPda, dPdb, dPdx);
+    public static Diff dlnPdf(double b, double x) {
+        double dPdb = -(b - x) / Math.pow(b, 2);
+        double dPdx = -(1 / b);
+        return new Diff(dPdb, dPdx);
     }
 
     public static class Diff {
-        public final double dPda;
         public final double dPdb;
         public final double dPdx;
 
-        public Diff(double dPda, double dPdb, double dPdx) {
-            this.dPda = dPda;
+        public Diff(double dPdb, double dPdx) {
             this.dPdb = dPdb;
             this.dPdx = dPdx;
         }
