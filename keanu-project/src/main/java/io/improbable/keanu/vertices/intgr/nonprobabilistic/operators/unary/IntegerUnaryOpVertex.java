@@ -14,20 +14,23 @@ public class IntegerUnaryOpVertex extends IntegerVertex {
 
     /**
      * A vertex that performs a user defined operation on a singe input vertex
+     *
      * @param inputVertex the input vertex
-     * @param op operation used to sample
-     */   public IntegerUnaryOpVertex(IntegerVertex inputVertex, Function<IntegerTensor,IntegerTensor> op) {
-         this(inputVertex.getShape(), inputVertex, op);
+     * @param op          operation used to sample
+     */
+    public IntegerUnaryOpVertex(IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
+        this(inputVertex.getShape(), inputVertex, op);
 
     }
 
     /**
-    * A vertex that performs a user defined operation on a singe input vertex
-    * @param shape the shape of the tensor
-    * @param inputVertex the input vertex
-    * @param op operation used to sample
-    */
-    public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex, Function<IntegerTensor,IntegerTensor> op) {
+     * A vertex that performs a user defined operation on a singe input vertex
+     *
+     * @param shape       the shape of the tensor
+     * @param inputVertex the input vertex
+     * @param op          operation used to sample
+     */
+    public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
         super(
             new NonProbabilisticValueUpdater<>(v -> op.apply(inputVertex.getValue())));
         this.inputVertex = inputVertex;

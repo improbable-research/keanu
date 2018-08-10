@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Observable;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -14,44 +13,46 @@ import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 public class DoubleUnaryOpVertex extends DoubleVertex {
 
     protected final DoubleVertex inputVertex;
-    private final Function<DoubleTensor,DoubleTensor> op;
-    private final Function<DualNumber,DualNumber> dualOp;
+    private final Function<DoubleTensor, DoubleTensor> op;
+    private final Function<DualNumber, DualNumber> dualOp;
 
     /**
      * A vertex that performs a user defined operation on a single input vertex
+     *
      * @param inputVertex the input vertex
-     * @param op operation used to sample
+     * @param op          operation used to sample
      */
-    public DoubleUnaryOpVertex(DoubleVertex inputVertex, Function<DoubleTensor,DoubleTensor> op) {
+    public DoubleUnaryOpVertex(DoubleVertex inputVertex, Function<DoubleTensor, DoubleTensor> op) {
         this(inputVertex, op, null);
     }
 
     /**
      * A vertex that performs a user defined operation on a single input vertex
-
+     *
      * @param inputVertex the input vertex
-     * @param op operation used to sample
-     * @param dualOp operation used to calculate Dual
+     * @param op          operation used to sample
+     * @param dualOp      operation used to calculate Dual
      */
     public DoubleUnaryOpVertex(
         DoubleVertex inputVertex,
-        Function<DoubleTensor,DoubleTensor> op,
-        Function<DualNumber,DualNumber> dualOp) {
+        Function<DoubleTensor, DoubleTensor> op,
+        Function<DualNumber, DualNumber> dualOp) {
         this(inputVertex.getShape(), inputVertex, op, dualOp);
     }
 
     /**
      * A vertex that performs a user defined operation on a single input vertex
-     * @param shape the shape of the tensor
+     *
+     * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
-     * @param op operation used to sample
-     * @param dualOp operation used to calculate Dual
+     * @param op          operation used to sample
+     * @param dualOp      operation used to calculate Dual
      */
     public DoubleUnaryOpVertex(
         int[] shape,
         DoubleVertex inputVertex,
-        Function<DoubleTensor,DoubleTensor> op,
-        Function<DualNumber,DualNumber> dualOp) {
+        Function<DoubleTensor, DoubleTensor> op,
+        Function<DualNumber, DualNumber> dualOp) {
         super(new NonProbabilisticValueUpdater<>(v -> op.apply(inputVertex.getValue())));
         this.inputVertex = inputVertex;
         this.op = op;

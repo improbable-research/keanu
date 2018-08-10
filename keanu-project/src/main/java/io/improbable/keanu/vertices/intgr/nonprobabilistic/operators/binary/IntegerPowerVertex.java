@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerPowerVertex extends IntegerBinaryOpVertex {
     /**
-     * Multiplies one vertex by another
+     * Raises one vertex to the power of another
      *
      * @param a the base vertex
      * @param b the exponent vertex

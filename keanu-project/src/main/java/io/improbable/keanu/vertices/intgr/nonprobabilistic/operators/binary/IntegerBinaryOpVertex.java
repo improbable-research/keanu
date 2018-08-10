@@ -18,8 +18,9 @@ public class IntegerBinaryOpVertex extends IntegerVertex {
 
     /**
      * A vertex that performs a user defined operation on two input vertices
-     * @param a first input vertex
-     * @param b second input vertex
+     *
+     * @param a  first input vertex
+     * @param b  second input vertex
      * @param op operation used to sample
      */
     public IntegerBinaryOpVertex(IntegerVertex a, IntegerVertex b, BinaryOperator<IntegerTensor> op) {
@@ -28,11 +29,13 @@ public class IntegerBinaryOpVertex extends IntegerVertex {
 
     /**
      * A vertex that performs a user defined operation on two input vertices
+     *
      * @param shape the shape of the tensor
-     * @param a first input vertex
-     * @param b second input vertex
-     * @param op operation used to sample
-     */public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b, BinaryOperator<IntegerTensor> op) {
+     * @param a     first input vertex
+     * @param b     second input vertex
+     * @param op    operation used to sample
+     */
+    public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b, BinaryOperator<IntegerTensor> op) {
         super(
             new NonProbabilisticValueUpdater<>(v -> op.apply(a.getValue(), b.getValue()))
         );
