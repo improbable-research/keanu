@@ -47,7 +47,7 @@ public class GradientOptimizer implements Optimizer {
 
         if (numIntegerVertices != 0) {
             throw new UnsupportedOperationException("Gradient Optimization unsupported on Networks containing " +
-                "Discrete Latents");
+                "Discrete Latents (" + numIntegerVertices + " found)");
         }
 
         return GradientOptimizer.builder()
