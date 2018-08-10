@@ -1,14 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Builder;
+import lombok.Getter;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -17,12 +14,13 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
+
+import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
 
 @Builder
 public class GradientOptimizer implements Optimizer {
@@ -41,13 +39,12 @@ public class GradientOptimizer implements Optimizer {
     }
 
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
-        long numIntegerVertices = bayesNet.getDiscreteLatentVertices().stream()
-            .filter(v -> v instanceof IntegerVertex)
-            .count();
+        List<Vertex> discreteLatentVertices = bayesNet.getDiscreteLatentVertices();
+        boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
 
-        if (numIntegerVertices != 0) {
+        if (containsDiscreteLatents) {
             throw new UnsupportedOperationException("Gradient Optimization unsupported on Networks containing " +
-                "Discrete Latents (" + numIntegerVertices + " found)");
+                "Discrete Latents (" + discreteLatentVertices.size() + " found)");
         }
 
         return GradientOptimizer.builder()
