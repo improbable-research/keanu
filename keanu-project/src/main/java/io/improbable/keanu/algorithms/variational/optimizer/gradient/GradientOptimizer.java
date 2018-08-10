@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -40,6 +41,15 @@ public class GradientOptimizer implements Optimizer {
     }
 
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
+        long numIntegerVertices = bayesNet.getDiscreteLatentVertices().stream()
+            .filter(v -> v instanceof IntegerVertex)
+            .count();
+
+        if (numIntegerVertices != 0) {
+            throw new UnsupportedOperationException("Gradient Optimisation unsupported on Networks containing " +
+                "Discrete latents");
+        }
+
         return GradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();
