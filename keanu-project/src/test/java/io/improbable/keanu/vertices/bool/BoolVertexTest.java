@@ -68,7 +68,7 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void doesEquals() {
+    public void doesEqualTo() {
         v1.setValue(true);
         v2.setValue(false);
         BoolVertex v3 = ConstantVertex.of(true);
