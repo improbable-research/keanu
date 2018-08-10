@@ -46,8 +46,8 @@ public class GradientOptimizer implements Optimizer {
             .count();
 
         if (numIntegerVertices != 0) {
-            throw new UnsupportedOperationException("Gradient Optimisation unsupported on Networks containing " +
-                "Discrete latents");
+            throw new UnsupportedOperationException("Gradient Optimization unsupported on Networks containing " +
+                "Discrete Latents");
         }
 
         return GradientOptimizer.builder()
