@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
@@ -114,6 +115,23 @@ public class Differentiator {
         }
 
         return ofWrt;
+    }
+
+    public static PartialDerivatives reshapeReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary, DoubleTensor secondary) {
+        Map<Long, DoubleTensor> reshapedPartials = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : partialDerivatives.asMap().entrySet()) {
+            DoubleTensor partial;
+            if (primary.isScalar()) {
+                int[] nonScalarDimensions = TensorShape.nonScalarDimensions(secondary.getShape());
+                partial = partialDerivative.getValue().sum(nonScalarDimensions).reshape(TensorShape.concat(secondary.getShape(), primary.getShape()));
+            } else {
+                partial = partialDerivative.getValue();
+            }
+            reshapedPartials.put(partialDerivative.getKey(), partial);
+        }
+
+        return new PartialDerivatives(reshapedPartials);
     }
 
 }

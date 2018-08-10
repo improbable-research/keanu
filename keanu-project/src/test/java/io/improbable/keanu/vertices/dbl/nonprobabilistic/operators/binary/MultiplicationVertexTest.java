@@ -64,17 +64,6 @@ public class MultiplicationVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVerticalVectorsAndScalarMultiplied() {
-        calculatesDualNumberOfAVectorsAndScalar(
-            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 4, 1),
-            2,
-            DoubleTensor.eye(4).times(2).reshape(4, 1, 4, 1),
-            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 4, 1, 1, 1),
-            DoubleVertex::multiply
-        );
-    }
-
-    @Test
     public void calculatesDualNumberofAScalarAndVectorsMultiplied() {
         calculatesDualNumberOfAScalarAndVector(
             2,

@@ -49,4 +49,26 @@ public class AdditionVertexTest {
             DoubleVertex::plus
         );
     }
+
+    @Test
+    public void calculatesDualNumberOfAVectorsAndScalarAdded() {
+        calculatesDualNumberOfAVectorsAndScalar(
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            2,
+            DoubleTensor.eye(4).reshape(1, 4, 1, 4),
+            DoubleTensor.scalar(1).reshape(1, 1, 1, 1),
+            DoubleVertex::plus
+        );
+    }
+
+    @Test
+    public void calculatesDualNumberofAScalarAndVectorsAdded() {
+        calculatesDualNumberOfAScalarAndVector(
+            2,
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.scalar(1).reshape(1, 1, 1, 1),
+            DoubleTensor.eye(4).reshape(1, 4, 1, 4),
+            DoubleVertex::plus
+        );
+    }
 }
