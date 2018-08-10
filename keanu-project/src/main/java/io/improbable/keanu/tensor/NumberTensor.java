@@ -14,9 +14,6 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
 
     IntegerTensor toInteger();
 
-
-    T reshape(int... newShape);
-
     T diag();
 
     T transpose();
