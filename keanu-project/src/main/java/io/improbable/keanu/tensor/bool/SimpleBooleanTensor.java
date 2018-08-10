@@ -93,15 +93,23 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue) {
-        FlattenedView<Double> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Double> falseValuesFlattened = falseValue.getFlattenedView();
+        double[] trueValues = trueValue.asFlatDoubleArray();
+        double[] falseValues = falseValue.asFlatDoubleArray();
 
         double[] result = new double[data.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] = data[i] ? getOrScalar(trueValues, i) : getOrScalar(falseValues, i);
         }
 
         return DoubleTensor.create(result, copyOf(shape, shape.length));
+    }
+
+    private double getOrScalar(double[] values, int index) {
+        if (values.length == 1) {
+            return values[0];
+        } else {
+            return values[index];
+        }
     }
 
     @Override
@@ -365,4 +373,5 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public Boolean[] asFlatArray() {
         return ArrayUtils.toObject(data);
     }
+
 }

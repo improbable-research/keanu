@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.B;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -17,14 +18,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class BetaVertex extends ProbabilisticDouble {
+public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -39,6 +35,8 @@ public class BetaVertex extends ProbabilisticDouble {
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+        super(new ProbabilisticValueUpdater<>());
+
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
@@ -86,13 +84,13 @@ public class BetaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor logPdfs = distribution().logProb(value);
         return logPdfs.sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = distribution().dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
     }

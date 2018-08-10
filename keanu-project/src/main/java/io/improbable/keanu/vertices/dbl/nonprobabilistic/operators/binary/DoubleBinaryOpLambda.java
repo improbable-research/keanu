@@ -1,18 +1,20 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 import java.util.Map;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
+public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements Differentiable {
 
     protected final Vertex<A> left;
     protected final Vertex<B> right;
@@ -24,6 +26,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpLambda<A, B>) v).op.apply(left.getValue(), right.getValue())));
         this.left = left;
         this.right = right;
         this.op = op;
@@ -53,12 +56,7 @@ public class DoubleBinaryOpLambda<A, B> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor getDerivedValue() {
-        return op.apply(left.getValue(), right.getValue());
-    }
-
-    @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (dualNumberCalculation != null) {
             return dualNumberCalculation.apply(dualNumbers);
         }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.*;
@@ -13,6 +14,17 @@ public class DualNumber {
 
     public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
+    }
+
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els){
+        if (predicate.allTrue()) {
+            return new DualNumber(thn.value, thn.getPartialDerivatives());
+        } else if (predicate.allFalse()) {
+            return new DualNumber(els.value, els.getPartialDerivatives());
+        } else {
+            PartialDerivatives mixedPartials = PartialDerivatives.ifThenElse(predicate, thn.getPartialDerivatives(), els.getPartialDerivatives());
+            return new DualNumber(predicate.setDoubleIf(thn.value, els.value), mixedPartials);
+        }
     }
 
     private DoubleTensor value;
@@ -324,30 +336,30 @@ public class DualNumber {
         }
     }
 
-    public DualNumber pluck(int... index) {
-        Map<Long, DoubleTensor> pluckedDuals = new HashMap<>();
+    public DualNumber take(int... index) {
+        Map<Long, DoubleTensor> dualsAtIndex = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> entry : this.partialDerivatives.asMap().entrySet()) {
-            DoubleTensor pluckedTensor = pluckFromPartial(entry.getValue(), index);
+            DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
             int desiredRank = entry.getValue().getShape().length;
-            int[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(pluckedTensor.getShape(), desiredRank);
-            pluckedTensor = pluckedTensor.reshape(paddedShape);
-            pluckedDuals.put(entry.getKey(), pluckedTensor);
+            int[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
+            atIndexTensor = atIndexTensor.reshape(paddedShape);
+            dualsAtIndex.put(entry.getKey(), atIndexTensor);
         }
 
-        return new DualNumber(DoubleTensor.scalar(this.value.getValue(index)), pluckedDuals);
+        return new DualNumber(DoubleTensor.scalar(this.value.getValue(index)), dualsAtIndex);
     }
 
-    private DoubleTensor pluckFromPartial(DoubleTensor from, int... indices) {
+    private DoubleTensor takeFromPartial(DoubleTensor from, int... indices) {
         int[] fromShape = from.getShape();
         int[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-        int pluckIndex = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
-        int[] pluckShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
+        int indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
+        int[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
         int subShapeLength = (int) TensorShape.getLength(subFromShape);
 
         return from.reshape(subShapeLength, -1)
-            .slice(0, pluckIndex)
-            .reshape(pluckShape);
+            .slice(0, indexToTakeFrom)
+            .reshape(takeShape);
     }
 
 }

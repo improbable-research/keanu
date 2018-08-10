@@ -1,25 +1,26 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
+
+import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
 public class BayesianNetwork {
 
-    private final List<Vertex> latentAndObservedVertices;
+    private final List<? extends Vertex> vertices;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
-        latentAndObservedVertices = vertices.stream()
-            .filter(v -> v.isObserved() || v.isProbabilistic())
-            .collect(Collectors.toList());
+        this.vertices = ImmutableList.copyOf(vertices);
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
@@ -27,27 +28,31 @@ public class BayesianNetwork {
     }
 
     public List<Vertex> getLatentAndObservedVertices() {
-        return latentAndObservedVertices;
-    }
-
-    public List<Vertex> getLatentVertices() {
-        return latentAndObservedVertices.stream()
-            .filter(v -> !v.isObserved())
+        return vertices.stream()
+            .filter(v -> v.isProbabilistic() || v.isObserved())
             .collect(Collectors.toList());
     }
 
+    /**
+     * @return All vertices that are latent (i.e. probabilistic non-observed)
+     */
+    public List<Vertex> getLatentVertices() {
+        return vertices.stream()
+            .filter(v -> v.isProbabilistic() && !v.isObserved())
+            .collect(Collectors.toList());
+    }
+
+    /**
+     * @return All vertices that are observed - which may be probabilistic or non-probabilistic
+     */
     public List<Vertex> getObservedVertices() {
-        return latentAndObservedVertices.stream()
+        return vertices.stream()
             .filter(Vertex::isObserved)
             .collect(Collectors.toList());
     }
 
     public double getLogOfMasterP() {
-        double sum = 0.0;
-        for (Vertex<?> vertex : latentAndObservedVertices) {
-            sum += vertex.logProbAtValue();
-        }
-        return sum;
+        return ProbabilityCalculator.calculateLogProbFor(getLatentAndObservedVertices());
     }
 
     public void cascadeObservations() {

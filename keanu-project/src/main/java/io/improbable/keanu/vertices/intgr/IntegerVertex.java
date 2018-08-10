@@ -1,12 +1,10 @@
 package io.improbable.keanu.vertices.intgr;
 
+import java.util.function.Function;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.DiscreteVertex;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.PluckVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
@@ -14,15 +12,17 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerPluckVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
+import io.improbable.keanu.vertices.update.ValueUpdater;
 
-import java.util.Map;
-import java.util.function.Function;
+public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
-public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
+    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater) {
+        super(valueUpdater);
+    }
 
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);
@@ -109,8 +109,8 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return multiply(-1);
     }
 
-    public IntegerVertex pluck(int... index) {
-        return new IntegerPluckVertex(this, index);
+    public IntegerVertex take(int... index) {
+        return new IntegerTakeVertex(this, index);
     }
 
     public IntegerVertex slice(int dimension, int index) {
@@ -139,22 +139,6 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
 
     public void observe(int[] values) {
         super.observe(IntegerTensor.create(values));
-    }
-
-    public double logPmf(int value) {
-        return this.logPmf(IntegerTensor.scalar(value));
-    }
-
-    public double logPmf(int[] values) {
-        return this.logPmf(IntegerTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(int value) {
-        return this.dLogPmf(IntegerTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(int[] values) {
-        return this.dLogPmf(IntegerTensor.create(values));
     }
 
     public int getValue(int... index) {

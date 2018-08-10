@@ -1,15 +1,15 @@
 package io.improbable.keanu.distributions.dual;
 
+import com.google.common.collect.Sets;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
-
-import com.google.common.collect.Sets;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 public class Diffs {
     public static final ParameterName A = new ParameterName("A");
     public static final ParameterName B = new ParameterName("B");
+    public static final ParameterName C = new ParameterName("C");
     public static final ParameterName K = new ParameterName("K");
     public static final ParameterName S = new ParameterName("S");
     public static final ParameterName T = new ParameterName("T");
@@ -18,6 +18,7 @@ public class Diffs {
     public static final ParameterName MU = new ParameterName("MU");
     public static final ParameterName SIGMA = new ParameterName("SIGMA");
     public static final ParameterName THETA = new ParameterName("THETA");
+    public static final ParameterName LAMBDA = new ParameterName("LAMBDA");
 
     private final TreeSet<Diff> diffs = Sets.newTreeSet();
 

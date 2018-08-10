@@ -1,15 +1,16 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
+
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class RejectionSampler {
 
@@ -95,7 +96,8 @@ public class RejectionSampler {
 
     private static boolean matchesObservation(List<? extends Vertex> observedVertices) {
         return observedVertices.stream()
-            .allMatch(v -> v.logProbAtValue() != Double.NEGATIVE_INFINITY);
+            .filter(v -> v instanceof NonProbabilistic)
+            .noneMatch(v -> ((NonProbabilistic) v).contradictsObservation());
     }
 
     private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {

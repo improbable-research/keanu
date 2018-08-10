@@ -10,8 +10,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 public class ConcatenationVertexTest {
 
     @Test

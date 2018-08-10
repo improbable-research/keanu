@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.MU;
 import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -12,18 +13,15 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class GaussianVertex extends ProbabilisticDouble {
+public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -38,6 +36,7 @@ public class GaussianVertex extends ProbabilisticDouble {
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -84,7 +83,7 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
 
         DoubleTensor muValues = mu.getValue();
         DoubleTensor sigmaValues = sigma.getValue();
@@ -95,7 +94,7 @@ public class GaussianVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(SIGMA).getValue(), dlnP.get(X).getValue());
     }
@@ -124,4 +123,12 @@ public class GaussianVertex extends ProbabilisticDouble {
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
     }
 
+    @Override
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        if (isObserved()) {
+            return DualNumber.createConstant(getValue());
+        } else {
+            return DualNumber.createWithRespectToSelf(getId(), getValue());
+        }
+    }
 }
