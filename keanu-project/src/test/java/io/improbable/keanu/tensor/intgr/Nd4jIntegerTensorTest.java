@@ -435,4 +435,18 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
     }
 
+    @Test
+    public void canRepresentAllValues() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0,0,0,0},
+            new int[]{2, 2}
+        );
+
+        final int biggestBitRange = (0x3 << Integer.SIZE - 2) + 1;
+
+        tensor.plusInPlace(biggestBitRange);
+        assertArrayEquals(new int[]{biggestBitRange, biggestBitRange, biggestBitRange, biggestBitRange},
+            tensor.asFlatIntegerArray());
+    }
+
 }
