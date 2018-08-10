@@ -1,5 +1,17 @@
 package io.improbable.keanu.vertices.bool;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+
+import java.util.Collections;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.Prior;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -10,16 +22,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Collections;
-
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
 
 public class BoolVertexTest {
 
@@ -63,6 +65,18 @@ public class BoolVertexTest {
         v1.setValue(true);
 
         assertFalse(v3.eval().scalar());
+    }
+
+    @Test
+    public void doesEquals() {
+        v1.setValue(true);
+        v2.setValue(false);
+        BoolVertex v3 = ConstantVertex.of(true);
+
+        assertFalse(v1.equalTo(v2).eval().scalar());
+        assertTrue(v1.notEqualTo(v2).eval().scalar());
+        assertFalse(v2.equalTo(v3).eval().scalar());
+        assertTrue(v2.notEqualTo(v3).eval().scalar());
     }
 
     @Test
