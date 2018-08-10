@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
@@ -12,7 +14,7 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
      */
     public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right,
-            (l, r) -> l.minus(r),
-            (l, r) -> l.minus(r));
+            DoubleTensor::minus,
+            DualNumber::minus);
     }
 }

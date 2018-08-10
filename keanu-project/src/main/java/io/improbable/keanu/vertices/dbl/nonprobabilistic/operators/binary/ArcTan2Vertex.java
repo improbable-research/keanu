@@ -15,8 +15,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
      */
     public ArcTan2Vertex(DoubleVertex left, DoubleVertex right) {
         super(left, right,
-            (l, r) -> l.atan2(r),
-            (l, r) -> dualOp(l, r)
+            DoubleTensor::atan2,
+            ArcTan2Vertex::dualOp
         );
     }
 

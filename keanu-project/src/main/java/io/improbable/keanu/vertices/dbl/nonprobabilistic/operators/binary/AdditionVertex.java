@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class AdditionVertex extends DoubleBinaryOpVertex {
 
@@ -12,8 +14,8 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
      */
     public AdditionVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right,
-            (l,r) -> l.plus(r),
-            (l,r) -> l.plus(r)
+            DoubleTensor::plus,
+            DualNumber::plus
         );
     }
 }

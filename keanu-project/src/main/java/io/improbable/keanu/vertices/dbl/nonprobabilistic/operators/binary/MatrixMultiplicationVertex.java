@@ -2,7 +2,9 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import java.util.Arrays;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     /**
@@ -15,8 +17,8 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     public MatrixMultiplicationVertex(DoubleVertex left, DoubleVertex right) {
         super(getResultingShape(left.getShape(), right.getShape()),
             left, right,
-            (l,r) -> l.matrixMultiply(r),
-            (l,r) -> l.matrixMultiplyBy(r)
+            DoubleTensor::matrixMultiply,
+            DualNumber::matrixMultiplyBy
         );
     }
 

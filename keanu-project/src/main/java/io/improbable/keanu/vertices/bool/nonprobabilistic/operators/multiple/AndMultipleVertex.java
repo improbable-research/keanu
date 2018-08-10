@@ -12,6 +12,6 @@ public class AndMultipleVertex extends BoolReduceVertex {
     public AndMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
         super(checkAllShapesMatch(
             input.stream().map(Vertex::getShape).collect(Collectors.toList())
-        ), input, (a, b) -> a.and(b));
+        ), input, BooleanTensor::and);
     }
 }

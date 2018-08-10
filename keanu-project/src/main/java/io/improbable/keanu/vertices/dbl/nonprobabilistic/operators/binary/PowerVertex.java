@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
 
@@ -12,8 +14,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      */
     public PowerVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right,
-            (l, r) -> l.pow(r),
-            (l, r) -> l.pow(r));
+            DoubleTensor::pow,
+            DualNumber::pow);
     }
 
     public DoubleVertex getBase(){

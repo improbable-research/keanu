@@ -14,6 +14,6 @@ public class OrMultipleVertex extends BoolReduceVertex {
         super(checkAllShapesMatch(
             input.stream().map(Vertex::getShape).collect(Collectors.toList())
             ),
-            input, (a,b) -> a.or(b));
+            input, BooleanTensor::or);
     }
 }

@@ -1,6 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
 
@@ -12,7 +14,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
      */
     public MultiplicationVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right,
-            (l, r) -> l.times(r),
-            (l, r) -> l.multiplyBy(r));
+            DoubleTensor::times,
+            DualNumber::multiplyBy);
     }
 }
