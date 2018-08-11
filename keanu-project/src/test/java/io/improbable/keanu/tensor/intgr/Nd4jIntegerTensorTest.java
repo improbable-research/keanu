@@ -383,4 +383,56 @@ public class Nd4jIntegerTensorTest {
         assertEquals(expected, diff);
     }
 
+    @Test
+    public void doesPositiveDivisionCorrectly() {
+        assertDropsFractionCorrectlyOnDivision(5, 3);
+    }
+
+    @Test
+    public void doesNegativeDivisionCorrectly() {
+        assertDropsFractionCorrectlyOnDivision(-5, 3);
+    }
+
+    @Test
+    public void canStartAsMaxInteger() {
+        assertDropsFractionCorrectlyOnDivision(Integer.MAX_VALUE, 3);
+    }
+
+    @Test
+    public void canStartAsMinInteger() {
+        assertDropsFractionCorrectlyOnDivision(Integer.MIN_VALUE, 3);
+    }
+
+    private void assertDropsFractionCorrectlyOnDivision(int numerator, int denominator) {
+        int expected = numerator / denominator;
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{numerator, numerator, numerator, numerator},
+            new int[]{2, 2}
+        );
+        IntegerTensor result = tensor.div(denominator);
+        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canResultInMaxInteger() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0, 0, 0, 0},
+            new int[]{2, 2}
+        );
+        IntegerTensor result = tensor.plus(Integer.MAX_VALUE);
+        int expected = Integer.MAX_VALUE;
+        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canResultInMinInteger() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0, 0, 0, 0},
+            new int[]{2, 2}
+        );
+        IntegerTensor result = tensor.plus(Integer.MIN_VALUE);
+        int expected = Integer.MIN_VALUE;
+        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
+    }
+
 }
