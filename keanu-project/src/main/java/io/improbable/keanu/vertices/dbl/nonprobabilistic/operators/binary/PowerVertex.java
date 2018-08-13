@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -43,8 +44,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         DoubleTensor leftPowRight = getValue();
         DoubleTensor dOutWrtLeft = rightValue.div(leftValue).timesInPlace(leftPowRight);
         DoubleTensor dOutWrtRight = leftPowRight.times(leftValue.log());
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));
+        partials.put(left, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft), left.getValue(), right.getValue()));
+        partials.put(right, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight), right.getValue(), left.getValue()));
         return partials;
     }
 
