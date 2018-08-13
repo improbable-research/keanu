@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -27,14 +28,14 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         DualNumber leftDual = dualNumbers.get(left);
         DualNumber rightDual = dualNumbers.get(right);
-        return leftDual.minus(rightDual);
+        return leftDual.subtract(rightDual);
     }
 
     @Override
     protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(left, derivativeOfOutputsWithRespectToSelf);
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0));
+        partials.put(left, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf, left.getValue(), right.getValue()));
+        partials.put(right, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0), right.getValue(), left.getValue()));
         return partials;
     }
 

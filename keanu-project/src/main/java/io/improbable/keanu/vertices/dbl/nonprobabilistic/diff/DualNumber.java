@@ -80,9 +80,7 @@ public class DualNumber {
 
     public DualNumber subtract(DualNumber that) {
         // dc = da - db;
-        DoubleTensor newValue = this.value.minus(that.value);
-        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives);
-        return new DualNumber(newValue, newInf);
+        return plus(that.unaryMinus());
     }
 
     public DualNumber matrixMultiplyBy(DualNumber that) {
