@@ -92,7 +92,7 @@ public class PartialDerivatives {
     }
 
     /**
-     * This will sum partial derivatives that are represented as tenors over given dimensions.
+     * This will sum partial derivatives that are represented as tensors over given dimensions.
      * There is the option to reshape to a lower rank tensor where the summation has caused a
      * dimension to go to length 1.
      *
