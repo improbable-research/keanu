@@ -71,6 +71,9 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     @Override
     IntegerTensor reshape(int... newShape);
 
+    @Override
+    IntegerTensor duplicate();
+
     IntegerTensor diag();
 
     IntegerTensor transpose();
@@ -120,6 +123,9 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
     IntegerTensor setWithMask(IntegerTensor mask, int value);
 
     IntegerTensor apply(Function<Integer, Integer> function);
+
+    @Override
+    IntegerTensor slice(int dimension, int index);
 
     IntegerTensor concat(int dimension, IntegerTensor... those);
 

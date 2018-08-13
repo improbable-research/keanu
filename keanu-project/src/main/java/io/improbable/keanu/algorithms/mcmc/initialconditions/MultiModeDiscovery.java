@@ -26,7 +26,7 @@ public class MultiModeDiscovery {
 
         for (int i = 0; i < attempts; i++) {
             BayesianNetwork.setFromSampleAndCascade(sortedByDependency, random);
-            NetworkState maxAPosteriori = SimulatedAnnealing.getMaxAPosteriori(network, samplesPerAttempt);
+            NetworkState maxAPosteriori = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(network, samplesPerAttempt);
             maxSamples.add(maxAPosteriori);
         }
 

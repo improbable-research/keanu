@@ -3,6 +3,7 @@ package io.improbable.keanu.tensor.bool;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.lang3.ArrayUtils;
@@ -70,7 +71,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public BooleanTensor reshape(int... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
-            + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
+                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
         }
         return new SimpleBooleanTensor(data, newShape);
     }
@@ -92,15 +93,23 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue) {
-        FlattenedView<Double> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Double> falseValuesFlattened = falseValue.getFlattenedView();
+        double[] trueValues = trueValue.asFlatDoubleArray();
+        double[] falseValues = falseValue.asFlatDoubleArray();
 
         double[] result = new double[data.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] = data[i] ? getOrScalar(trueValues, i) : getOrScalar(falseValues, i);
         }
 
         return DoubleTensor.create(result, copyOf(shape, shape.length));
+    }
+
+    private double getOrScalar(double[] values, int index) {
+        if (values.length == 1) {
+            return values[0];
+        } else {
+            return values[index];
+        }
     }
 
     @Override
@@ -201,6 +210,17 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor slice(int dimension, int index) {
+        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
+        double[] tadFlat = tadDoubles.asFlatDoubleArray();
+        boolean[] tadToBooleans = new boolean[tadFlat.length];
+        for (int i = 0; i < tadFlat.length; i++) {
+            tadToBooleans[i] = tadFlat[i] == 1;
+        }
+        return new SimpleBooleanTensor(tadToBooleans, tadDoubles.getShape());
+    }
+
+    @Override
     public BooleanTensor concat(int dimension, BooleanTensor... those) {
         DoubleTensor[] toDoubles = new DoubleTensor[those.length];
         DoubleTensor primary = this.toDoubleMask();
@@ -285,6 +305,14 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public String toString() {
+        return "SimpleBooleanTensor{" +
+            "data=" + Arrays.toString(data) +
+            ", shape=" + Arrays.toString(shape) +
+            '}';
+    }
+
+    @Override
     public FlattenedView<Boolean> getFlattenedView() {
         return new SimpleBooleanFlattenedView(data);
     }
@@ -353,4 +381,5 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public Boolean[] asFlatArray() {
         return ArrayUtils.toObject(data);
     }
+
 }

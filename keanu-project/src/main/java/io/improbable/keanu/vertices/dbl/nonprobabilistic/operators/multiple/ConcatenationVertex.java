@@ -1,19 +1,23 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.lang.reflect.Array;
-import java.util.*;
-import java.util.function.Function;
-
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-public class ConcatenationVertex extends NonProbabilisticDouble {
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+
+public class ConcatenationVertex extends DoubleVertex implements Differentiable {
 
     private final int dimension;
     private final DoubleVertex[] input;
@@ -22,9 +26,12 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input the input vertices to concatenate
+     * @param input     the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
+        super(new NonProbabilisticValueUpdater<>(
+            v -> ((ConcatenationVertex) v).op(((ConcatenationVertex) v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
+        ));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
@@ -33,24 +40,17 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor getDerivedValue() {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
-    }
-
-    @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        Map<Long, List<DoubleTensor>> combinedPartialDerivativesOfInputs = new HashMap<>();
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        List<DualNumber> duals = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {
-            for (Map.Entry<Long, DoubleTensor> partial : dualNumbers.get(vertex).getPartialDerivatives().asMap().entrySet()) {
-                combinedPartialDerivativesOfInputs.computeIfAbsent(partial.getKey(), k -> new ArrayList<>()).add(partial.getValue());
-            }
+            duals.add(dualNumbers.get(vertex));
         }
 
-        DualNumber dualOfPrimary = dualNumbers.get(input[0]);
+        DualNumber dualOfPrimary = duals.remove(0);
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
         DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
-        return dualOfPrimary.concat(dimension, combinedPartialDerivativesOfInputs, dualToConcat);
+        return dualOfPrimary.concat(dimension, duals, dualToConcat);
     }
 
     @Override

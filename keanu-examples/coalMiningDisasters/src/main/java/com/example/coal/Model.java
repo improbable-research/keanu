@@ -54,11 +54,10 @@ public class Model {
         BayesianNetwork net = buildBayesianNetwork();
         Integer numSamples = 50000;
 
-        NetworkSamples posteriorDistSamples = MetropolisHastings.getPosteriorSamples(
+        NetworkSamples posteriorDistSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             net,
             net.getLatentVertices(),
-            numSamples,
-            KeanuRandom.getDefaultRandom()
+            numSamples
         );
 
         results = posteriorDistSamples.drop(10000).downSample(3);
@@ -67,8 +66,8 @@ public class Model {
     private BayesianNetwork buildBayesianNetwork() {
 
         switchpoint = new UniformIntVertex(data.startYear, data.endYear + 1);
-        earlyRate = new ExponentialVertex(1.0, 1.0);
-        lateRate = new ExponentialVertex(1.0, 1.0);
+        earlyRate = new ExponentialVertex(1.0);
+        lateRate = new ExponentialVertex(1.0);
 
         ConstantIntegerVertex years = ConstantVertex.of(data.years);
 

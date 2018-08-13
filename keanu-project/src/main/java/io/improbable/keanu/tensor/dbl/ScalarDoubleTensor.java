@@ -394,6 +394,20 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public double product() {
+        return value;
+    }
+
+    @Override
+    public DoubleTensor slice(int dimension, int index) {
+        if (dimension == 0 && index == 0) {
+            return duplicate();
+        } else {
+            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+        }
+    }
+
+    @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
         return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
     }
@@ -764,5 +778,13 @@ public class ScalarDoubleTensor implements DoubleTensor {
         int result = value != null ? value.hashCode() : 0;
         result = 31 * result + Arrays.hashCode(shape);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "ScalarDoubleTensor{" +
+            "value=" + value +
+            ", shape=" + Arrays.toString(shape) +
+            '}';
     }
 }

@@ -9,6 +9,7 @@ buildscript {
 }
 
 plugins {
+    id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'java'
     id 'maven'
 }
@@ -27,22 +28,24 @@ repositories {
 dependencies {
 
     compile 'org.apache.commons:commons-math3:3.6.1'
-    compile 'org.nd4j:nd4j-native-platform:1.0.0-alpha'
+    compile 'org.nd4j:nd4j-native-platform:1.0.0-beta'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
     compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.10'
 
     //testing
     testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.19.1'
     testCompile 'org.jfree:jfreechart:1.0.19'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
     testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'ca.umontreal.iro.simul:ssj:3.2.1'
 
 }
 
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
-    systemProperty "dtype" , 'double'
+    systemProperty "dtype", 'double'
 }
 
 // Add default user/pass so it's not needed if only building and not publishing to Nexus
@@ -135,4 +138,9 @@ tasks.withType(Javadoc) {
 
 artifacts {
     archives javadocJar, sourcesJar
+}
+
+lombok { // optional: values below are the defaults
+    version = "1.16.20"
+    sha256 = ""
 }
