@@ -94,7 +94,7 @@ public class PartialDerivatives {
     /**
      * This will sum partial derivatives that are represented as tenors over given dimensions.
      * There is the option to reshape to a lower rank tensor where the summation has caused a
-     * dimension to go to length 1. If the reshape is
+     * dimension to go to length 1.
      *
      * @param reshape        Returns the sum and drops the summed over dimensions (now length one)
      *                       in the shape if true. Returns a same ranked tensor but with a shape
