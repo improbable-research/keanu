@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
@@ -20,7 +20,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
-    private final DoubleVertex probTrue;
+    private final Vertex<DoubleTensor> probTrue;
 
     /**
      * One probTrue that must match a proposed tensor shape of Bernoulli.
@@ -30,7 +30,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
      * @param shape    the desired shape of the vertex
      * @param probTrue the probability the bernoulli returns true
      */
-    public BernoulliVertex(int[] shape, DoubleVertex probTrue) {
+    public BernoulliVertex(int[] shape, Vertex<DoubleTensor> probTrue) {
         super(new ProbabilisticValueUpdater<>());
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
@@ -44,7 +44,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
      *
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
-    public BernoulliVertex(DoubleVertex probTrue) {
+    public BernoulliVertex(Vertex<DoubleTensor> probTrue) {
         this(probTrue.getShape(), probTrue);
     }
 
@@ -68,7 +68,11 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     @Override
     public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
 
-        DualNumber probTrueDual = probTrue.getDualNumber();
+        if (!(probTrue instanceof Differentiable)) {
+            throw new UnsupportedOperationException("Probability is non-differentiable");
+        }
+
+        DualNumber probTrueDual = ((Differentiable) probTrue).getDualNumber();
         DoubleTensor probTrueValue = probTrueDual.getValue();
         PartialDerivatives probTruePartialDerivatives = probTrueDual.getPartialDerivatives();
 

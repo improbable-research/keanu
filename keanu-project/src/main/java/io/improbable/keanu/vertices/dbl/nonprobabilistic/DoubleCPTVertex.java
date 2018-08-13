@@ -26,6 +26,9 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
         this.inputs = inputs;
         this.conditions = conditions;
         this.defaultResult = defaultResult;
+        addParents(inputs);
+        addParents(conditions.values());
+        addParent(defaultResult);
     }
 
     @Override
@@ -43,7 +46,9 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        throw new UnsupportedOperationException("if is non-differentiable");
+        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
+        DoubleVertex vertex = conditions.get(condition);
+        return dualNumbers.get(vertex);
     }
 
 }
