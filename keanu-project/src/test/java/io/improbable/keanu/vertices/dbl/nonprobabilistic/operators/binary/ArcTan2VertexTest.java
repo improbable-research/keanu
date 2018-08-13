@@ -55,4 +55,26 @@ public class ArcTan2VertexTest {
         );
     }
 
+    @Test
+    public void calculatesDualNumberOfAVectorsAndScalarTan2() {
+        calculatesDualNumberOfAVectorsAndScalar(
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            2,
+            DoubleTensor.create(new double[]{2. / (1. + 4.), 2. / (4. + 4.), 2. / (9. + 4.), 2. / (16. + 4.)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{-1. / (1. + 4.), -2. / (4. + 4.), -3. / (9. + 4.), -4. / (16. + 4.)}).reshape(1, 4, 1, 1),
+            DoubleVertex::atan2
+        );
+    }
+
+    @Test
+    public void calculatesDualNumberofAScalarAndVectorsTan2() {
+        calculatesDualNumberOfAScalarAndVector(
+            2,
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.create(new double[]{1. / (4. + 1.), 2. / (4. + 4.), 3. / (4. + 9.), 4. / (4. + 16.)}).reshape(1, 4, 1, 1),
+            DoubleTensor.create(new double[]{-2. / (4. + 1.), -2. / (4. + 4.), -2. / (4. + 9.), -2. / (4. + 16.)}).diag().reshape(1, 4, 1, 4),
+            DoubleVertex::atan2
+        );
+    }
+
 }
