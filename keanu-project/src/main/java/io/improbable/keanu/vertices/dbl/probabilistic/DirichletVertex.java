@@ -14,7 +14,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -23,11 +22,11 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     /**
      * Dirichlet distribution. The shape is driven from concentration, which must be a vector.
      *
-     * @param tensorShape the desired shape of the vertex
+     * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
-        super(new ProbabilisticValueUpdater<>());
+        super();
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
             throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
@@ -48,7 +47,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     /**
      * Matches a scalar concentration value to a desired shape of a Dirichlet distribution
      *
-     * @param tensorShape the desired shape of the vertex
+     * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, double concentration) {

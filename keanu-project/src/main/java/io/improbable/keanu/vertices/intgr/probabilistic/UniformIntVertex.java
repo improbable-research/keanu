@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger {
 
@@ -25,7 +24,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
      * @param max   The exclusive upper bound.
      */
     public UniformIntVertex(int[] shape, IntegerVertex min, IntegerVertex max) {
-        super(new ProbabilisticValueUpdater<>());
+        super();
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
 

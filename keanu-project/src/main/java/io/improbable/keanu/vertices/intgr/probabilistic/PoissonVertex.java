@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger {
 
@@ -23,14 +22,14 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
 
     /**
      * One mu that must match a proposed tensor shape of Poisson.
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
     public PoissonVertex(int[] shape, DoubleVertex mu) {
-        super(new ProbabilisticValueUpdater<>());
+        super();
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 
@@ -47,7 +46,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * One to one constructor for mapping some shape of mu to
      * a matching shaped Poisson.
      *
-     * @param mu    mu with same shape as desired Poisson tensor or scalar
+     * @param mu mu with same shape as desired Poisson tensor or scalar
      */
     public PoissonVertex(DoubleVertex mu) {
         this(mu.getShape(), mu);

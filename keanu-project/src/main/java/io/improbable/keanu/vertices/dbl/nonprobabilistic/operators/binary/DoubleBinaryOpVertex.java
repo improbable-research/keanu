@@ -2,11 +2,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;
@@ -19,7 +19,7 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
      * @param right a vertex
      */
     public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpVertex) v).op(left.getValue(), right.getValue())));
+        super();
         this.left = left;
         this.right = right;
         setParents(left, right);
@@ -29,6 +29,11 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(left.sample(random), right.sample(random));
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return op(left.getValue(), right.getValue());
     }
 
     protected abstract DoubleTensor op(DoubleTensor left, DoubleTensor right);

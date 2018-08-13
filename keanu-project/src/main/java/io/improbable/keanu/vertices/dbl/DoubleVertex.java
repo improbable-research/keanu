@@ -33,12 +33,11 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
-import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
-    public DoubleVertex(ValueUpdater<DoubleTensor> valueUpdater) {
-        super(valueUpdater);
+    public DoubleVertex() {
+        super();
     }
 
     public DoubleVertex minus(DoubleVertex that) {

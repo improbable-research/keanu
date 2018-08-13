@@ -1,17 +1,17 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class CastIntegerVertex extends IntegerVertex {
+public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private final Vertex<IntegerTensor> inputVertex;
 
     public CastIntegerVertex(Vertex<IntegerTensor> inputVertex) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((CastIntegerVertex) v).inputVertex.getValue()));
+        super();
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
@@ -21,4 +21,8 @@ public class CastIntegerVertex extends IntegerVertex {
         return inputVertex.sample(random);
     }
 
+    @Override
+    public IntegerTensor calculate() {
+        return inputVertex.getValue();
+    }
 }

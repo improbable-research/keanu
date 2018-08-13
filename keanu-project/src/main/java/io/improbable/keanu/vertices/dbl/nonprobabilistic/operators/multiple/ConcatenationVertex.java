@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConcatenationVertex extends DoubleVertex implements Differentiable {
+public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final int dimension;
     private final DoubleVertex[] input;
@@ -29,9 +29,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
      * @param input     the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
-        super(new NonProbabilisticValueUpdater<>(
-            v -> ((ConcatenationVertex) v).op(((ConcatenationVertex) v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
-        ));
+        super();
         this.dimension = dimension;
         this.input = input;
         setParents(input);
@@ -58,6 +56,11 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
         return op(extractFromInputs(DoubleTensor.class, Vertex::sample));
     }
 
+    @Override
+    public DoubleTensor calculate() {
+        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
+    }
+
     protected DoubleTensor op(DoubleTensor... inputs) {
         DoubleTensor primary = inputs[0];
         DoubleTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
@@ -71,6 +74,5 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
         }
         return extract;
     }
-
 
 }

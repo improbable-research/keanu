@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -12,7 +13,6 @@ import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class Vertex<T> implements Observable<T> {
 
@@ -22,11 +22,9 @@ public abstract class Vertex<T> implements Observable<T> {
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
-    private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
 
-    public Vertex(ValueUpdater<T> valueUpdater) {
-        this.valueUpdater = valueUpdater;
+    public Vertex() {
         this.observation = Observable.observableTypeFor(this.getClass());
     }
 
@@ -39,16 +37,6 @@ public abstract class Vertex<T> implements Observable<T> {
 
     public T sample() {
         return sample(KeanuRandom.getDefaultRandom());
-    }
-
-    /**
-     * This causes a non-probabilistic vertex to recalculate it's value based off it's
-     * parent's current values.
-     *
-     * @return The updated value
-     */
-    public final T updateValue() {
-        return valueUpdater.updateValue(this);
     }
 
     /**
@@ -164,6 +152,11 @@ public abstract class Vertex<T> implements Observable<T> {
     @Override
     public boolean isObserved() {
         return observation.isObserved();
+    }
+
+    @Override
+    public Optional<T> getObservedValue() {
+        return observation.getObservedValue();
     }
 
     public long getId() {
