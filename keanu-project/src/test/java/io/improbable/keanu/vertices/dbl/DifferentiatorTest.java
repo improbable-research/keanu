@@ -44,8 +44,8 @@ public class DifferentiatorTest {
         DoubleTensor dCdA = dC.withRespectTo(A);
         DoubleTensor dCdB = dC.withRespectTo(B);
 
-        assertEquals(A.getValue(), dCdB);
-        assertEquals(B.getValue(), dCdA);
+        assertEquals(A.getValue().scalar(), dCdB.scalar(), 1e-5);
+        assertEquals(B.getValue().scalar(), dCdA.scalar(), 1e-5);
     }
 
     @Test

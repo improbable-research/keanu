@@ -5,6 +5,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class DualNumber {
 
@@ -58,8 +59,23 @@ public class DualNumber {
     public DualNumber add(DualNumber that) {
         // dc = da + db;
         DoubleTensor newValue = this.value.plus(that.value);
-        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives);
+        Map<Long, List<Integer>> reshapes = new HashMap<>();
+        reshapes = reshapeScalarOperations(this.value, this.getPartialDerivatives(), newValue, reshapes);
+        reshapes = reshapeScalarOperations(that.value, that.getPartialDerivatives(), newValue, reshapes);
+        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives, reshapes);
         return new DualNumber(newValue, newInf);
+    }
+
+    private Map<Long, List<Integer>> reshapeScalarOperations(DoubleTensor primary, PartialDerivatives partials, DoubleTensor newValue, Map<Long, List<Integer>> reshapedScalars) {
+        if (primary.isScalar()) {
+            for (Map.Entry<Long, DoubleTensor> partial : partials.asMap().entrySet()) {
+                if (partial.getValue().isScalar()) {
+                    int[] desiredShape = TensorShape.concat(newValue.getShape(), primary.getShape());
+                    reshapedScalars.put(partial.getKey(), Arrays.stream(desiredShape).boxed().collect(Collectors.toList()));
+                }
+            }
+        }
+        return reshapedScalars;
     }
 
     public DualNumber subtract(DualNumber that) {

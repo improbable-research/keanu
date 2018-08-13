@@ -134,4 +134,20 @@ public class Differentiator {
         return new PartialDerivatives(reshapedPartials);
     }
 
+    public static PartialDerivatives reshapeAdditionReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary) {
+        Map<Long, DoubleTensor> reshapedPartials = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : partialDerivatives.asMap().entrySet()) {
+            DoubleTensor partial;
+            if (primary.isScalar()) {
+                partial = DoubleTensor.ones(TensorShape.concat(primary.getShape(), primary.getShape()));
+            } else {
+                partial = partialDerivative.getValue();
+            }
+            reshapedPartials.put(partialDerivative.getKey(), partial);
+        }
+
+        return new PartialDerivatives(reshapedPartials);
+    }
+
 }

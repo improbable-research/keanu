@@ -25,7 +25,6 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canElementWiseMultiplyMatrix() {
-        INDArray x = Nd4j.diag(Nd4j.arange(0, 16).reshape(4, 4));
         DoubleTensor result = matrixA.times(matrixB);
         assertArrayEquals(new double[]{1, 4, 9, 16}, result.asFlatDoubleArray(), 0.0);
     }

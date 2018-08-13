@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 
 import java.util.*;
@@ -109,7 +110,22 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives add(PartialDerivatives toAdd) {
-        Map<Long, DoubleTensor> added = cloneInfinitesimals(derivativeWithRespectTo);
+        return add(toAdd, new HashMap<>());
+    }
+
+    public PartialDerivatives add(PartialDerivatives toAdd, Map<Long, List<Integer>> reshapes) {
+        Map<Long, DoubleTensor> added = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            long k = entry.getKey();
+            DoubleTensor v = entry.getValue();
+            if (reshapes.containsKey(k)) {
+                int[] desiredShape = reshapes.get(k).stream().mapToInt(i -> i).toArray();
+                added.put(k, Nd4jDoubleTensor.ones(desiredShape).times(v));
+            } else {
+                added.put(k, v);
+            }
+        }
 
         for (Map.Entry<Long, DoubleTensor> entry : toAdd.derivativeWithRespectTo.entrySet()) {
             long k = entry.getKey();
@@ -118,7 +134,12 @@ public class PartialDerivatives {
             if (added.containsKey(k)) {
                 added.put(k, added.get(k).plus(v));
             } else {
-                added.put(k, v);
+                if (reshapes.containsKey(k)) {
+                    int[] desiredShape = reshapes.get(k).stream().mapToInt(i -> i).toArray();
+                    added.put(k, Nd4jDoubleTensor.ones(desiredShape).times(v));
+                } else {
+                    added.put(k, v);
+                }
             }
         }
 
