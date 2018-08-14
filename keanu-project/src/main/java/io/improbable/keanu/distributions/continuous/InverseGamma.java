@@ -14,41 +14,51 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class InverseGamma implements ContinuousDistribution {
 
     private final DoubleTensor alpha;
-    private final DoubleTensor beta;
+    private final DoubleTensor scale;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta) {
-        return new InverseGamma(alpha, beta);
+    /**
+     * <h3>Inverted Gamma (Person's Type 6) Distribution</h3>
+     *
+     * @param alpha    shape parameter (not to be confused with tensor shape)
+     * @param scale    stretches/shrinks the distribution
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier,
+     * ARL-TR-2168 March 2000,
+     * 5.1.4 page 16"
+     */
+    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor scale) {
+        return new InverseGamma(alpha, scale);
     }
 
-    private InverseGamma(DoubleTensor alpha, DoubleTensor beta) {
+    private InverseGamma(DoubleTensor alpha, DoubleTensor scale) {
         this.alpha = alpha;
-        this.beta = beta;
+        this.scale = scale;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        final DoubleTensor gammaSample = random.nextGamma(shape, beta.reciprocal(), alpha);
+        final DoubleTensor gammaSample = random.nextGamma(shape, scale.reciprocal(), alpha);
         return gammaSample.reciprocal();
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor aTimesLnB = alpha.times(beta.log());
+        final DoubleTensor aTimesLnB = alpha.times(scale.log());
         final DoubleTensor negAMinus1TimesLnX = x.log().timesInPlace(alpha.unaryMinus().minusInPlace(1));
         final DoubleTensor lnGammaA = alpha.apply(Gamma::gamma).logInPlace();
 
-        return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(beta.div(x));
+        return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(scale.div(x));
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dPdalpha = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(beta.log());
-        final DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
-        final DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
+        final DoubleTensor dLogPdalpha = x.log().unaryMinusInPlace().minusInPlace(alpha.apply(Gamma::digamma)).plusInPlace(scale.log());
+        final DoubleTensor dLogPdscale = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(scale));
+        final DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(scale));
 
         return new Diffs()
-            .put(A, dPdalpha)
-            .put(B, dLogPdbeta)
+            .put(A, dLogPdalpha)
+            .put(B, dLogPdscale)
             .put(X, dLogPdx);
     }
 

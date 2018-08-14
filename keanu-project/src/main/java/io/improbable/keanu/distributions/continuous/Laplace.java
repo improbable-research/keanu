@@ -14,69 +14,78 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class Laplace implements ContinuousDistribution {
 
-    private final DoubleTensor mu;
-    private final DoubleTensor beta;
+    private final DoubleTensor location;
+    private final DoubleTensor scale;
 
     /**
-     * @param mu     location
-     * @param beta   shape
-     * @return       a new ContinuousDistribution object
+     * <h3>Laplace (Double Exponential) Distribution</h3>
+     *
+     * @param location shifts the distribution
+     * @param scale    stretches/shrinks the distribution, must be greater than 0
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier,
+     * ARL-TR-2168 March 2000,
+     * 5.1.12 page 25"
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
-        return new Laplace(mu, beta);
+    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+        return new Laplace(location, scale);
     }
 
-    private Laplace(DoubleTensor mu, DoubleTensor beta) {
-        this.mu = mu;
-        this.beta = beta;
+    private Laplace(DoubleTensor location, DoubleTensor scale) {
+        this.location = location;
+        this.scale = scale;
     }
 
+    /**
+     * @throws IllegalArgumentException if scale passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
+     *                                  is less than or equal to 0
+     */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
-        Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
+        Tensor.FlattenedView<Double> locationWrapped = location.getFlattenedView();
+        Tensor.FlattenedView<Double> scaleWrapped = scale.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
         for (int i = 0; i < length; i++) {
-            samples[i] = sample(muWrapped.getOrScalar(i), betaWrapped.getOrScalar(i), random);
+            samples[i] = sample(locationWrapped.getOrScalar(i), scaleWrapped.getOrScalar(i), random);
         }
 
         return DoubleTensor.create(samples, shape);
     }
 
-    private static double sample(double mu, double beta, KeanuRandom random) {
-        if (beta <= 0.0) {
-            throw new IllegalArgumentException("Invalid value for beta: " + beta);
+    private static double sample(double location, double scale, KeanuRandom random) {
+        if (scale <= 0.0) {
+            throw new IllegalArgumentException("Invalid value for scale: " + scale);
         }
         if (random.nextDouble() > 0.5) {
-            return mu + beta * Math.log(random.nextDouble());
+            return location + scale * Math.log(random.nextDouble());
         } else {
-            return mu - beta * Math.log(random.nextDouble());
+            return location - scale * Math.log(random.nextDouble());
         }
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor muMinusXAbsNegDivBeta = mu.minus(x).abs().divInPlace(beta);
-        final DoubleTensor logTwoBeta = beta.times(2).logInPlace();
-        return muMinusXAbsNegDivBeta.plusInPlace(logTwoBeta).unaryMinus();
+        final DoubleTensor locationMinusXAbsNegDivScale = location.minus(x).abs().divInPlace(scale);
+        final DoubleTensor logTwoScale = scale.times(2).logInPlace();
+        return  locationMinusXAbsNegDivScale.plusInPlace(logTwoScale).unaryMinus();
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor muMinusX = mu.minus(x);
-        final DoubleTensor muMinusXAbs = muMinusX.abs();
+        final DoubleTensor locationMinusX = location.minus(x);
+        final DoubleTensor locationMinusXAbs = locationMinusX.abs();
 
-        final DoubleTensor denominator = muMinusXAbs.times(beta);
+        final DoubleTensor denominator =  locationMinusXAbs.times(scale);
 
-        final DoubleTensor dLogPdx = muMinusX.divInPlace(denominator);
-        final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
-        final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
+        final DoubleTensor dLogPdx = locationMinusX.divInPlace(denominator);
+        final DoubleTensor dLogPdlocation = x.minus(location).divInPlace(denominator);
+        final DoubleTensor dLogPdscale =  locationMinusXAbs.minusInPlace(scale).divInPlace(scale.pow(2));
 
         return new Diffs()
-            .put(MU, dLogPdMu)
-            .put(BETA, dLogPdBeta)
+            .put(MU, dLogPdlocation)
+            .put(BETA, dLogPdscale)
             .put(X, dLogPdx);
     }
 

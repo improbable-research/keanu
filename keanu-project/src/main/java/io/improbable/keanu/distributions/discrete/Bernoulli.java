@@ -7,47 +7,56 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class Bernoulli implements Distribution<BooleanTensor> {
 
-    private final DoubleTensor probTrue;
+    private final DoubleTensor probOfEvent;
 
-    public static Bernoulli withParameters(DoubleTensor probTrue) {
-        return new Bernoulli(probTrue);
+    /**
+     * <h3>Bernoulli Distribution</h3>
+     *
+     * @param probOfEvent probability of an event
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier
+     * ARL-TR-2168 March 2000
+     * 5.2.1 page 42"
+     */
+    public static Distribution<BooleanTensor> withParameters(DoubleTensor probOfEvent) {
+        return new Bernoulli(probOfEvent);
     }
 
-    private Bernoulli(DoubleTensor probTrue) {
-        this.probTrue = probTrue;
+    private Bernoulli(DoubleTensor probOfEvent) {
+        this.probOfEvent = probOfEvent;
     }
 
     @Override
     public BooleanTensor sample(int[] shape, KeanuRandom random) {
         DoubleTensor uniforms = random.nextDouble(shape);
-        return uniforms.lessThan(probTrue);
+        return uniforms.lessThan(probOfEvent);
     }
 
     @Override
     public DoubleTensor logProb(BooleanTensor x) {
-        DoubleTensor probTrueClamped = probTrue.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+        DoubleTensor probOfEventClamped = probOfEvent.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
 
         DoubleTensor probability = x.setDoubleIf(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plusInPlace(1.0)
+            probOfEventClamped,
+            probOfEventClamped.unaryMinus().plusInPlace(1.0)
         );
 
         return probability.logInPlace();
     }
 
     public DoubleTensor dLogProb(BooleanTensor x) {
-        DoubleTensor greaterThanMask = probTrue
+        DoubleTensor greaterThanMask = probOfEvent
             .getGreaterThanMask(DoubleTensor.ONE_SCALAR);
 
-        DoubleTensor lessThanOrEqualToMask = probTrue
+        DoubleTensor lessThanOrEqualToMask = probOfEvent
             .getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR);
 
         DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
 
-        DoubleTensor dlogProbdxForTrue = probTrue.reciprocal();
+        DoubleTensor dlogProbdxForTrue = probOfEvent.reciprocal();
         dlogProbdxForTrue = dlogProbdxForTrue.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
-        DoubleTensor dlogProbdxForFalse = probTrue.minus(1.0).reciprocalInPlace();
+        DoubleTensor dlogProbdxForFalse = probOfEvent.minus(1.0).reciprocalInPlace();
         dlogProbdxForFalse = dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
         DoubleTensor dLogPdp = x.setDoubleIf(

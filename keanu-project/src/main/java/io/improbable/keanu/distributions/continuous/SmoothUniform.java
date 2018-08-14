@@ -7,35 +7,6 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-/**
- * The Smooth Uniform distribution is the usual Uniform distribution with the edges
- * at max and min smoothed by attaching a sigmoid as shoulders.
- * <p>
- * Math:
- * <p>
- * let sigmoid shoulder function be f(x), Sw be shoulder width, Bw be base (max-min) width,
- * and h be the bodyHeight of the base.
- * <p>
- * f(x) = Ax^3 + Bx^2
- * f'(x) = 3Ax^2 + 2Bx
- * integral f = Ax^4/4 + Bx^3/3
- * <p>
- * f(Sw) = h
- * integral of f from 0 to Sw = 1 (area under the curve must be 1)
- * f'(Sw) = 0
- * <p>
- * yields:
- * <p>
- * |  0    3Sw^2    2Sw   |   | h |   | 0 |
- * | -1    Sw^3     Sw^2  | * | A | = | 0 |
- * | Bw    Sw/4     2Sw/3 |   | B |   | 1 |
- * <p>
- * therefore:
- * <p>
- * h = 1 / (Sw + Bw)
- * A = -2 / (Sw^3 * (Sw + Bw))
- * B = 3 / (Sw^3 * Sw^2*Bw)
- */
 public class SmoothUniform implements ContinuousDistribution {
 
     private final DoubleTensor xMin;
@@ -43,14 +14,31 @@ public class SmoothUniform implements ContinuousDistribution {
     private final double edgeSharpness;
 
     /**
-     * Will return samples between xMin and xMax as well as samples from the left and right shoulder.
-     * The width of the shoulder is determined by the edgeSharpness as a percentage of the body width,
-     * which is (xMax - xMin).
+     * <h3>Smooth Uniform Distribution</h3>
+     * <p>This is the usual {@link Uniform} Distribution with the edges at <code>xMax</code> and <code>xMin</code> smoothed
+     * by attaching a sigmoid as shoulders.</p>
      *
-     * @param xMin          min value from body
-     * @param xMax          max value from body
-     * @param edgeSharpness sharpness as a percentage of the body width
-     * @return       a new ContinuousDistribution object
+     * <h4>Math:</h4>
+     * <p>Let <code>f(x)</code> be the sigmoid shoulder function, <code>Sw</code> be shoulder width, <code>Bw</code>
+     * be base width (<code>xMax - xMin</code>), and <code>h</code> be the body height of the base. Then, we have:</p>
+     * <p><code>f(x) = Ax^3 + Bx^2</code></p>
+     * <p><code>f'(x) = 3Ax^2 + 2Bx</code></p>
+     * <p><code>integral f = Ax^4/4 + Bx^3/3</code></p>
+     * <p><code>f(Sw) = h</code></p>
+     * <p><code>integral of f from 0 to Sw = 1</code> (area under the curve must be 1)</p>
+     * <p><code>f'(Sw) = 0</code></p>
+     * <p>which yields:</p>
+     * <p><code>| &nbsp;0 3Sw^2 &nbsp;2Sw   | &nbsp; | h | &nbsp; | 0 |</code></p>
+     * <p><code>|      -1 Sw^3  &nbsp;Sw^2  |    *   | A |    =   | 0 |</code></p>
+     * <p><code>|      Bw Sw/4       2Sw/3  | &nbsp; | B | &nbsp; | 1 |</code></p>
+     * <p>therefore:</p>
+     * <p><code>h = 1 / (Sw + Bw)</code></p>
+     * <p><code>A = -2 / (Sw^3 * (Sw + Bw))</code></p>
+     * <p><code>B = 3 / (Sw^3 * Sw^2*Bw)</code></p>
+     *
+     * @param xMin          minimum value of random variable x
+     * @param xMax          maximum value of random variable x
+     * @param edgeSharpness sharpness as a percentage of (xMax - xMin), which determines the width of the shoulder
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);
@@ -61,6 +49,9 @@ public class SmoothUniform implements ContinuousDistribution {
         this.edgeSharpness = edgeSharpness;
     }
 
+    /**
+     * Samples between <code>xMin</code> and <code>xMax</code> as well as left and right shoulder
+     */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
 
@@ -174,4 +165,5 @@ public class SmoothUniform implements ContinuousDistribution {
     private static DoubleTensor bodyHeight(DoubleTensor shoulderWidth, DoubleTensor bodyWidth) {
         return shoulderWidth.plus(bodyWidth).reciprocalInPlace();
     }
+
 }

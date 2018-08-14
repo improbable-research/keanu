@@ -9,16 +9,27 @@ public class Triangular implements ContinuousDistribution {
 
     private final DoubleTensor xMin;
     private final DoubleTensor xMax;
-    private final DoubleTensor c;
+    private final DoubleTensor mode;
 
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
-        return new Triangular(xMin, xMax, c);
+    /**
+     * <h3>Triangular Distribution</h3>
+     *
+     * @param xMin minimum value of random variable x
+     * @param xMax maximum value of random variable x
+     * @param mode location of mode
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier
+     * ARL-TR-2168 March 2000
+     * 5.1.24 page 37"
+     */
+    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor mode) {
+        return new Triangular(xMin, xMax, mode);
     }
 
-    private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor c) {
+    private Triangular(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor mode) {
         this.xMin = xMin;
         this.xMax = xMax;
-        this.c = c;
+        this.mode = mode;
     }
 
     @Override
@@ -27,10 +38,10 @@ public class Triangular implements ContinuousDistribution {
         final DoubleTensor q = p.unaryMinus().plusInPlace(1);
         final DoubleTensor range = xMax.minus(xMin);
 
-        final DoubleTensor conditional = (c.minus(xMin)).divInPlace(xMax.minus(xMin));
+        final DoubleTensor conditional = (mode.minus(xMin)).divInPlace(xMax.minus(xMin));
 
-        final DoubleTensor lessThan = xMin.plus((range.times(c.minus(xMin).timesInPlace(p))).sqrtInPlace());
-        final DoubleTensor greaterThan = xMax.minus((range.timesInPlace(xMax.minus(c).timesInPlace(q))).sqrtInPlace());
+        final DoubleTensor lessThan = xMin.plus((range.times(mode.minus(xMin).timesInPlace(p))).sqrtInPlace());
+        final DoubleTensor greaterThan = xMax.minus((range.timesInPlace(xMax.minus(mode).timesInPlace(q))).sqrtInPlace());
 
         final DoubleTensor lessThanMask = p.getLessThanOrEqualToMask(conditional);
         final DoubleTensor greaterThanMask = p.getGreaterThanMask(conditional);
@@ -43,14 +54,14 @@ public class Triangular implements ContinuousDistribution {
         final DoubleTensor range = xMax.minus(xMin);
 
         final DoubleTensor conditionalFirstHalf = x.getGreaterThanMask(xMin);
-        final DoubleTensor conditionalSecondHalf = x.getLessThanMask(c);
+        final DoubleTensor conditionalSecondHalf = x.getLessThanMask(mode);
         final DoubleTensor conditionalAnd = conditionalFirstHalf.timesInPlace(conditionalSecondHalf);
-        final DoubleTensor conditionalResult = range.reciprocal().timesInPlace(2).timesInPlace(x.minus(xMin)).divInPlace(c.minus(xMin));
+        final DoubleTensor conditionalResult = range.reciprocal().timesInPlace(2).timesInPlace(x.minus(xMin)).divInPlace(mode.minus(xMin));
 
-        final DoubleTensor elseIfConditionalFirstHalf = x.getGreaterThanMask(c);
+        final DoubleTensor elseIfConditionalFirstHalf = x.getGreaterThanMask(mode);
         final DoubleTensor elseIfConditionalSecondHalf = x.getLessThanOrEqualToMask(xMax);
         final DoubleTensor elseIfConditionalAnd = elseIfConditionalFirstHalf.timesInPlace(elseIfConditionalSecondHalf);
-        final DoubleTensor elseIfConditionalResult = range.reciprocalInPlace().timesInPlace(2).timesInPlace(xMax.minus(x)).divInPlace(xMax.minus(c));
+        final DoubleTensor elseIfConditionalResult = range.reciprocalInPlace().timesInPlace(2).timesInPlace(xMax.minus(x)).divInPlace(xMax.minus(mode));
 
         return (conditionalResult.timesInPlace(conditionalAnd).plusInPlace(elseIfConditionalResult.timesInPlace(elseIfConditionalAnd))).logInPlace();
     }

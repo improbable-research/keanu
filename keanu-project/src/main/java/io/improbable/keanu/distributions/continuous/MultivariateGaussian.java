@@ -8,39 +8,46 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class MultivariateGaussian implements ContinuousDistribution {
 
-    private final DoubleTensor mu;
-    private final DoubleTensor covariance;
+    private final DoubleTensor location;
+    private final DoubleTensor scale;
 
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor covariance) {
-        return new MultivariateGaussian(mu, covariance);
+    /**
+     * <h3>Multivariate Gaussian (Normal) Distribution</h3>
+     *
+     * @param location shifts the distribution; mean
+     * @param scale    stretches/shrinks the distribution; covariance
+     * @see <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">Wikipedia</a>
+     */
+    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+        return new MultivariateGaussian(location, scale);
     }
-    private MultivariateGaussian(DoubleTensor mu, DoubleTensor covariance) {
-        this.mu = mu;
-        this.covariance = covariance;
+    private MultivariateGaussian(DoubleTensor location, DoubleTensor scale) {
+        this.location = location;
+        this.scale = scale;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
-        final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
-        final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());
-        final DoubleTensor covTimesVariates = mu.isScalar() ?
+        TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, location.getShape());
+        final DoubleTensor choleskyCov = scale.choleskyDecomposition();
+        final DoubleTensor variateSamples = random.nextGaussian(location.getShape());
+        final DoubleTensor covTimesVariates = location.isScalar() ?
             choleskyCov.times(variateSamples) : choleskyCov.matrixMultiply(variateSamples);
-        return covTimesVariates.plus(mu);
+        return covTimesVariates.plus(location);
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final double dimensions = mu.getShape()[0];
+        final double dimensions = location.getShape()[0];
         final double kLog2Pi = dimensions * Math.log(2 * Math.PI);
-        final double logCovDet = Math.log(covariance.determinant());
-        DoubleTensor xMinusMu = x.minus(mu);
-        DoubleTensor xMinusMuT = xMinusMu.transpose();
-        DoubleTensor covInv = covariance.inverse();
+        final double logCovDet = Math.log(scale.determinant());
+        DoubleTensor xMinusMean = x.minus(location);
+        DoubleTensor xMinusMeanT = xMinusMean.transpose();
+        DoubleTensor covInv = scale.inverse();
 
-        double scalar = mu.isScalar() ?
-            covInv.times(xMinusMu).times(xMinusMuT).scalar() :
-            xMinusMuT.matrixMultiply(covInv.matrixMultiply(xMinusMu)).scalar();
+        double scalar = location.isScalar() ?
+            covInv.times(xMinusMean).times(xMinusMeanT).scalar() :
+            xMinusMeanT.matrixMultiply(covInv.matrixMultiply(xMinusMean)).scalar();
 
         return DoubleTensor.scalar(-0.5 * (scalar + kLog2Pi + logCovDet));
     }
@@ -49,4 +56,5 @@ public class MultivariateGaussian implements ContinuousDistribution {
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
+
 }

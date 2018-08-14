@@ -11,26 +11,35 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class ChiSquared implements ContinuousDistribution {
 
     private static final double LOG_TWO = Math.log(2);
-    private final IntegerTensor k;
+    private final IntegerTensor alpha;
 
-    public static ContinuousDistribution withParameters(IntegerTensor k) {
-        return new ChiSquared(k);
+    /**
+     * <h3>Chi-Square Distribution</h3>
+     *
+     * @param alpha shape parameter (not to be confused with tensor shape); number of degrees of freedom
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier,
+     * ARL-TR-2168 March 2000,
+     * 5.1.4 page 16"
+     */
+    public static ContinuousDistribution withParameters(IntegerTensor alpha) {
+        return new ChiSquared(alpha);
     }
 
-    private ChiSquared(IntegerTensor k) {
-        this.k = k;
+    private ChiSquared(IntegerTensor alpha) {
+        this.alpha = alpha;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, k.toDouble().div(2));
+        return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, alpha.toDouble().div(2));
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        DoubleTensor halfK = k.toDouble().div(2);
-        DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
-        DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.apply(Gamma::gamma).logInPlace());
+        DoubleTensor halfDof = alpha.toDouble().div(2);
+        DoubleTensor numerator = halfDof.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
+        DoubleTensor denominator = halfDof.times(LOG_TWO).plusInPlace(halfDof.apply(Gamma::gamma).logInPlace());
         return numerator.minusInPlace(denominator);
     }
 
@@ -38,4 +47,5 @@ public class ChiSquared implements ContinuousDistribution {
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
+
 }

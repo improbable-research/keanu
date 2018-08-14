@@ -16,6 +16,16 @@ public class Cauchy implements ContinuousDistribution {
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
+    /**
+     * <h3>Cauchy (Lorentz) Distribution</h3>
+     *
+     * @param location shifts the distribution
+     * @param scale    stretches/shrinks the distribution, must be greater than 0
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier,
+     * ARL-TR-2168 March 2000,
+     * 5.1.3 page 15"
+     */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Cauchy(location, scale);
     }
@@ -25,6 +35,9 @@ public class Cauchy implements ContinuousDistribution {
         this.scale = scale;
     }
 
+    /**
+     * @throws IllegalArgumentException if non-positive scale was passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
+     */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
         if (!scale.greaterThan(0.0).allTrue()) {
@@ -61,4 +74,5 @@ public class Cauchy implements ContinuousDistribution {
             .put(S, dLogPdscale)
             .put(X, dLogPdx);
     }
+
 }

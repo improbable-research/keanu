@@ -9,7 +9,13 @@ public class Categorical<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
-    public static <T> Categorical<T> withParameters(Map<T, DoubleVertex> selectableValues) {
+    /**
+     * <h3>Categorical (Generalised Bernoulli Distribution) Distribution</h3>
+     *
+     * @param selectableValues a mapping of category T to event probability
+     * @see <a href="https://en.wikipedia.org/wiki/Categorical_distribution">Wikipedia</a>
+     */
+    public static <T> Categorical withParameters(Map<T, DoubleVertex> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
@@ -58,4 +64,5 @@ public class Categorical<T> {
         }
         return sumP;
     }
+
 }

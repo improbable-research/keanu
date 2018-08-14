@@ -10,22 +10,32 @@ import org.nd4j.linalg.util.ArrayUtil;
 
 public class Binomial implements DiscreteDistribution {
 
-    private final DoubleTensor p;
-    private final IntegerTensor n;
+    private final DoubleTensor successProbability;
+    private final IntegerTensor numberOfTrials;
 
-    public static DiscreteDistribution withParameters(DoubleTensor p, IntegerTensor n) {
-        return new Binomial(p, n);
+    /**
+     * <h3>Binomial Distribution</h3>
+     *
+     * @param successProbability probability of success
+     * @param numberOfTrials     number of trials
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier
+     * ARL-TR-2168 March 2000
+     * 5.2.2 page 43"
+     */
+    public static DiscreteDistribution withParameters(DoubleTensor successProbability, IntegerTensor numberOfTrials) {
+        return new Binomial(successProbability, numberOfTrials);
     }
 
-    private Binomial(DoubleTensor p, IntegerTensor n) {
-        this.p = p;
-        this.n = n;
+    private Binomial(DoubleTensor successProbability, IntegerTensor numberOfTrials) {
+        this.successProbability = successProbability;
+        this.numberOfTrials = numberOfTrials;
     }
 
     @Override
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
-        Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
+        Tensor.FlattenedView<Double> pWrapped = successProbability.getFlattenedView();
+        Tensor.FlattenedView<Integer> nWrapped = numberOfTrials.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         int[] samples = new int[length];
@@ -36,10 +46,10 @@ public class Binomial implements DiscreteDistribution {
         return IntegerTensor.create(samples, shape);
     }
 
-    private static int sample(double p, int n, KeanuRandom random) {
+    private static int sample(double successProbability, int numberOfTrials, KeanuRandom random) {
         int sum = 0;
-        for (int i = 0; i < n; i++) {
-            if (random.nextDouble() < p) {
+        for (int i = 0; i < numberOfTrials; i++) {
+            if (random.nextDouble() < successProbability) {
                 sum++;
             }
         }
@@ -47,32 +57,33 @@ public class Binomial implements DiscreteDistribution {
     }
 
     @Override
-    public DoubleTensor logProb(IntegerTensor k) {
-        DoubleTensor logBinomialCoefficient = getLogBinomialCoefficient(k, n);
+    public DoubleTensor logProb(IntegerTensor x) {
+        DoubleTensor logBinomialCoefficient = getLogBinomialCoefficient(x, numberOfTrials);
 
-        DoubleTensor logBinomial = p.pow(k.toDouble())
+        DoubleTensor logBinomial = successProbability.pow(x.toDouble())
             .times(
-                p.unaryMinus().plusInPlace(1.0).powInPlace(n.minus(k).toDouble())
+                successProbability.unaryMinus().plusInPlace(1.0).powInPlace(numberOfTrials.minus(x).toDouble())
             ).logInPlace();
 
         return logBinomialCoefficient.plusInPlace(logBinomial);
     }
 
-    private static DoubleTensor getLogBinomialCoefficient(IntegerTensor k, IntegerTensor n) {
-        Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
-        Tensor.FlattenedView<Integer> kWrapped = k.getFlattenedView();
+    private static DoubleTensor getLogBinomialCoefficient(IntegerTensor x, IntegerTensor numberOfTrials) {
+        Tensor.FlattenedView<Integer> nWrapped = numberOfTrials.getFlattenedView();
+        Tensor.FlattenedView<Integer> xWrapped = x.getFlattenedView();
 
-        int length = (int) k.getLength();
+        int length = (int) x.getLength();
         double[] logBinomialCoefficient = new double[length];
         for (int i = 0; i < length; i++) {
-            logBinomialCoefficient[i] = getLogBinomialCoefficient(kWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
+            logBinomialCoefficient[i] = getLogBinomialCoefficient(xWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
         }
 
-        return DoubleTensor.create(logBinomialCoefficient, k.getShape());
+        return DoubleTensor.create(logBinomialCoefficient, x.getShape());
     }
 
-    private static double getLogBinomialCoefficient(int k, int n) {
-        long binomialCoefficient = CombinatoricsUtils.binomialCoefficient(n, k);
+    private static double getLogBinomialCoefficient(int x, int numberOfTrials) {
+        long binomialCoefficient = CombinatoricsUtils.binomialCoefficient(numberOfTrials, x);
         return Math.log(binomialCoefficient);
     }
+
 }

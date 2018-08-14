@@ -13,6 +13,13 @@ public class Dirichlet implements ContinuousDistribution {
     private static final double EPSILON =  0.00001;
     private final DoubleTensor concentration;
 
+    /**
+     * <h3>Dirichlet Distribution</h3>
+     *
+     * @param concentration a type of numerical parameter of parametric family of probability distributions,
+     *                      sum of values must equal to 1
+     * @see <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution">Wikipedia</a>
+     */
     public static ContinuousDistribution withParameters(DoubleTensor concentration) {
         return new Dirichlet(concentration);
     }
@@ -31,6 +38,10 @@ public class Dirichlet implements ContinuousDistribution {
         return normalise(gammaSamples);
     }
 
+    /**
+     * @throws IllegalArgumentException if sum of values in concentration passed to
+     *                                  {@link #withParameters(DoubleTensor concentration)} does not equal to 1
+     */
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         if (Math.abs(x.sum() - 1.0) > EPSILON) {
@@ -58,4 +69,5 @@ public class Dirichlet implements ContinuousDistribution {
         double sum = gammaSamples.sum();
         return gammaSamples.div(sum);
     }
+
 }

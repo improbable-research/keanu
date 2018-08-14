@@ -18,6 +18,18 @@ public class Beta implements ContinuousDistribution {
     private final DoubleTensor xMin;
     private final DoubleTensor xMax;
 
+    /**
+     * <h3>Beta Distribution</h3>
+     *
+     * @param alpha shape parameter (not to be confused with tensor shape)
+     * @param beta  shape parameter (not to be confused with tensor shape)
+     * @param xMin  minimum value of random variable x
+     * @param xMax  maximum value of random variable x
+     * @see "Computer Generation of Statistical Distributions
+     * by Richard Saucier
+     * ARL-TR-2168 March 2000
+     * 5.1.2 page 14"
+     */
     public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
         return new Beta(alpha, beta, xMin, xMax);
     }
