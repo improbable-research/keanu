@@ -50,16 +50,6 @@ public class Multinomial implements DiscreteDistribution {
         this.p = p;
     }
 
-//    private DoubleTensor calculateCumulative(DoubleTensor probabilities) {
-//        ImmutableList.Builder<DoubleTensor> cumulativeProbabilities = ImmutableList.builder();
-//        DoubleTensor runningTotal = DoubleTensor.create(0., probabilities.getShape());
-//        for (DoubleTensor p : probabilities) {
-//            p.
-//            cumulativeProbabilities.add(runningTotal.plusInPlace(p));
-//        }
-//        return cumulativeProbabilities.build();
-//    }
-
     @Override
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
         p.sum(0);

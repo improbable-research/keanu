@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -9,19 +10,22 @@ import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 
-import java.util.List;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
+import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class MultinomialVertexTest {
@@ -56,25 +60,6 @@ public class MultinomialVertexTest {
             },
             4, 2, 2);
         //
-    }
-
-    @Test
-    public void testSlicing() {
-        DoubleTensor t = DoubleTensor.arange(0., 120.).reshape(2, 3, 4, 5);
-        assertEquals(0., t.getValue(0, 0, 0, 0), 1e-8);
-        assertEquals(60., t.getValue(1, 0, 0, 0), 1e-8);
-        assertEquals(20., t.getValue(0, 1, 0, 0), 1e-8);
-        assertEquals(5., t.getValue(0, 0, 1, 0), 1e-8);
-        assertEquals(1., t.getValue(0, 0, 0, 1), 1e-8);
-
-        assertEquals(DoubleTensor.arange(0., 60.).reshape(3, 4, 5),
-            t.slice(0, 0));
-        assertEquals(DoubleTensor.arange(60., 120.).reshape(3, 4, 5),
-            t.slice(0, 1));
-
-        List<Double> tFlattened = t.asFlatList();
-        assertEquals(0., tFlattened.get(0), 1e-8);
-        assertEquals(71., tFlattened.get(71), 1e-8);
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -140,17 +125,40 @@ public class MultinomialVertexTest {
     }
 
     @Test
-    public void whenKEquals2ItsBinomial() {
+    public void whenKEqualsTwoItsBinomial() {
         IntegerTensor n = IntegerTensor.scalar(10);
-        DoubleTensor p = DoubleTensor.create(0.2, 0.8);
-        DiscreteDistribution multinomial = Multinomial.withParameters(n, p.transpose());
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8).transpose();
+        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
         DiscreteDistribution binomial = Binomial.withParameters(DoubleTensor.scalar(0.2), n);
         for (int value : ImmutableList.of(1, 2, 9, 10)) {
             DoubleTensor binomialLogProbs = binomial.logProb(IntegerTensor.scalar(value));
             DoubleTensor multinomialLogProbs = multinomial.logProb(IntegerTensor.create(value, 10-value).transpose()).transpose();
             assertThat(multinomialLogProbs, allCloseTo(new Double(1e-6), binomialLogProbs));
         }
+    }
 
+    enum Colours {
+        RED, GREEN, BLUE
+    }
+
+    @Test
+    public void whenKNEqualsOneItsCategorical() {
+        IntegerTensor n = IntegerTensor.scalar(1);
+        DoubleTensor p = DoubleTensor.create(0.2, .3, 0.5).transpose();
+        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
+
+        Map<Colours, DoubleVertex> selectableValues = ImmutableMap.of(
+            Colours.RED, ConstantVertex.of(p.getValue(0)),
+            Colours.GREEN, ConstantVertex.of(p.getValue(1)),
+            Colours.BLUE, ConstantVertex.of(p.getValue(2)));
+        Categorical categorical = Categorical.withParameters(selectableValues);
+
+        double pRed = categorical.logProb(Colours.RED);
+        assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).transpose()).scalar(), closeTo(pRed, 1e-7));
+        double pGreen = categorical.logProb(Colours.GREEN);
+        assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0).transpose()).scalar(), closeTo(pGreen, 1e-7));
+        double pBlue = categorical.logProb(Colours.BLUE);
+        assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).transpose()).scalar(), closeTo(pBlue, 1e-7));
     }
 
     @Test
