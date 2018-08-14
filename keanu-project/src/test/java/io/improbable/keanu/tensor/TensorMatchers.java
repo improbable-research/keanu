@@ -90,6 +90,33 @@ public class TensorMatchers {
         };
     }
 
+    public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
+        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+            @Override
+            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+                mismatchDescription.appendText("Tensor");
+                Tensor.FlattenedView<T> itemFlattened = item.getFlattenedView();
+
+                for (int i = 0; i < itemFlattened.size(); i++) {
+                    if (!valueMatcher.matches(itemFlattened.getOrScalar(i))) {
+                        mismatchDescription
+                            .appendText(" with different value ")
+                            .appendValue(itemFlattened.getOrScalar(i))
+                            .appendText(" at entry ")
+                            .appendValue(i);
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Tensor with all values ").appendValue(valueMatcher);
+            }
+        };
+    }
+
     public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
         return hasValue(other.asFlatArray());
     }

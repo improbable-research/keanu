@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -107,9 +108,12 @@ public class Multinomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
+        int[] expectedShape = p.getShape();
         TensorShapeValidation.checkAllShapesMatch(
-            String.format("k: %s, p: %s", k, p.sum(0)),
-            k.getShape(), new int[] {p.getShape()[0], 1}
+            String.format("Shape mismatch. k: %s, p: %s",
+                Arrays.toString(k.getShape()),
+                Arrays.toString(expectedShape)),
+            k.getShape(), expectedShape
         );
         Preconditions.checkArgument(
             k.sum(0).elementwiseEquals(this.n).allTrue(),
@@ -120,9 +124,9 @@ public class Multinomial implements DiscreteDistribution {
             String.format("Inputs %s cannot be negative", k)
         );
 
-        DoubleTensor gammaN = n.plus(1).toDouble().apply(Gamma::gamma).log();
-        DoubleTensor gammaKs = k.plus(1).toDouble().apply(Gamma::gamma).log().sum(0);
-        DoubleTensor kLogP = p.log().times(k.toDouble()).sum(0);
-        return kLogP.plus(gammaN).minus(gammaKs);
+        DoubleTensor gammaN = n.plus(1).toDouble().applyInPlace(Gamma::logGamma);
+        DoubleTensor gammaKs = k.plus(1).toDouble().applyInPlace(Gamma::logGamma).sum(0);
+        DoubleTensor kLogP = p.log().timesInPlace(k.toDouble()).sum(0);
+        return kLogP.plusInPlace(gammaN).minusInPlace(gammaKs);
     }
 }
