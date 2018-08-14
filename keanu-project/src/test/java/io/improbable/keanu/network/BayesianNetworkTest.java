@@ -19,6 +19,9 @@ public class BayesianNetworkTest {
     BoolVertex input1;
     BoolVertex input2;
     BoolVertex output;
+    final String LABEL_A = "Label A";
+    final String LABEL_B = "Label B";
+    final String LABEL_ORED = "Output";
 
     @Before
     public void setUpNetwork() {
@@ -56,9 +59,6 @@ public class BayesianNetworkTest {
         BoolVertex ored = a.or(b);
         BayesianNetwork net;
         Vertex retrieved;
-        final String LABEL_A = "Label A";
-        final String LABEL_B = "Label B";
-        final String LABEL_ORED = "Output";
 
         a.setLabel(LABEL_A);
         b.setLabel(LABEL_B);
@@ -71,5 +71,18 @@ public class BayesianNetworkTest {
         assertThat(retrieved, is(b));
         retrieved = net.getVertexByLabel(LABEL_ORED);
         assertThat(retrieved, is(ored));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void labelErrorsDetected() {
+        BoolVertex a = new BernoulliVertex(0.5);
+        BoolVertex b = new BernoulliVertex(0.5);
+        BoolVertex ored = a.or(b);
+        BayesianNetwork net;
+
+        a.setLabel(LABEL_A);
+        b.setLabel(LABEL_A);
+
+        net = new BayesianNetwork(a.getConnectedGraph());
     }
 }

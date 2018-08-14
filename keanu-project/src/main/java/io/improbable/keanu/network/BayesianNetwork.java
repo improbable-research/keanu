@@ -17,13 +17,22 @@ public class BayesianNetwork {
     private final List<? extends Vertex> vertices;
     private final HashMap<String, Vertex> labelSet;
 
+    private void addLabels(Set<? extends Vertex>vertices) {
+        for (Vertex v : vertices) {
+            String label = v.getLabel();
+            if (label != null && labelSet.containsKey(label)) {
+                throw new IllegalArgumentException("Vertex Label Repeated: " + label);
+            } else {
+                labelSet.put(label, v);
+            }
+        }
+    }
+
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
         this.labelSet = new HashMap<>();
 
-        vertices.stream()
-            .filter(v -> v.getLabel() != null)
-            .forEach(v -> this.labelSet.put(v.getLabel(), v));
+        addLabels(vertices);
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
