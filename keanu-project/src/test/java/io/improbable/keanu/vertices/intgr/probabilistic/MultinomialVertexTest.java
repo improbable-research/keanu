@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
@@ -112,6 +114,28 @@ public class MultinomialVertexTest {
         DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
         IntegerTensor samples = multinomial.sample(new int[]{1, 1}, KeanuRandom.getDefaultRandom());
+        assertThat(samples, hasValue(0, 0, 100, 0));
+    }
+
+    @Test
+    public void ifYourRandomReturnsZeroItSamplesFromTheFirstNonZeroCategory() {
+        KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
+        when(mockRandomAlwaysZero.nextDouble()).thenReturn(0.);
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0., 0.5, .5, 0.).transpose();
+        Multinomial multinomial = Multinomial.withParameters(n, p);
+        IntegerTensor samples = multinomial.sample(new int[]{1, 1}, mockRandomAlwaysZero);
+        assertThat(samples, hasValue(0, 100, 0, 0));
+    }
+
+    @Test
+    public void ifYourRandomReturnsOneItSamplesFromTheLastNonZeroCategory() {
+        KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
+        when(mockRandomAlwaysZero.nextDouble()).thenReturn(1.);
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0., 0.5, .5, 0.).transpose();
+        Multinomial multinomial = Multinomial.withParameters(n, p);
+        IntegerTensor samples = multinomial.sample(new int[]{1, 1}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(0, 0, 100, 0));
     }
 

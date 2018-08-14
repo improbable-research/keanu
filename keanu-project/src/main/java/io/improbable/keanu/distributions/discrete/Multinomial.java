@@ -103,13 +103,16 @@ public class Multinomial implements DiscreteDistribution {
         int index = 0;
         Double pCumulative = 0.;
         while (index < p.length) {
-            pCumulative += p[index];
-            if (pCumulative > value) {
+            Double currentP = p[index++];
+            if (currentP == 0.) {
+                continue;
+            }
+            pCumulative += currentP;
+            if (pCumulative >= value) {
                 break;
             }
-            index++;
         }
-        return index;
+        return index-1;
     }
 
     @Override
