@@ -15,24 +15,11 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
-    private final HashMap<String, Vertex> labelSet;
-
-    private void addLabels(Set<? extends Vertex>vertices) {
-        for (Vertex v : vertices) {
-            String label = v.getLabel();
-            if (label != null && labelSet.containsKey(label)) {
-                throw new IllegalArgumentException("Vertex Label Repeated: " + label);
-            } else {
-                labelSet.put(label, v);
-            }
-        }
-    }
+    private final Map<String, Vertex> vertexLabels;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
-        this.labelSet = new HashMap<>();
-
-        addLabels(vertices);
+        this.vertexLabels = getLabels(vertices);
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
@@ -40,7 +27,21 @@ public class BayesianNetwork {
     }
 
     public Vertex getVertexByLabel(String label) {
-        return labelSet.get(label);
+        return vertexLabels.get(label);
+    }
+
+    private Map<String, Vertex> getLabels(Set<? extends Vertex>vertices) {
+        Map<String, Vertex> labelMap = new HashMap<>();
+        for (Vertex v : vertices) {
+            String label = v.getLabel();
+            if (label != null && labelMap.containsKey(label)) {
+                throw new IllegalArgumentException("Vertex Label Repeated: " + label);
+            } else {
+                labelMap.put(label, v);
+            }
+        }
+
+        return labelMap;
     }
 
     public List<Vertex> getLatentAndObservedVertices() {

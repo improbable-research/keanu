@@ -57,14 +57,13 @@ public class BayesianNetworkTest {
         BoolVertex a = new BernoulliVertex(0.5);
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
-        BayesianNetwork net;
         Vertex retrieved;
 
         a.setLabel(LABEL_A);
         b.setLabel(LABEL_B);
         ored.setLabel(LABEL_ORED);
 
-        net = new BayesianNetwork(a.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
         retrieved = net.getVertexByLabel(LABEL_A);
         assertThat(retrieved, is(a));
         retrieved = net.getVertexByLabel(LABEL_B);
@@ -78,11 +77,10 @@ public class BayesianNetworkTest {
         BoolVertex a = new BernoulliVertex(0.5);
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
-        BayesianNetwork net;
 
         a.setLabel(LABEL_A);
         b.setLabel(LABEL_A);
 
-        net = new BayesianNetwork(a.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }
 }
