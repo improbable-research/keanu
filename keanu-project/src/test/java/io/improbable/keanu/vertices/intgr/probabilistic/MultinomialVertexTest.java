@@ -52,14 +52,20 @@ public class MultinomialVertexTest {
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
         IntegerTensor n = IntegerTensor.create(100, 200);
-        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
+        DoubleTensor p = DoubleTensor.create(new double[]{
+            0.1, 0.25,
+            0.2, 0.25,
+            0.3, 0.25,
+            0.4, 0.25
+        },
+            4, 2);
         Multinomial multinomial = Multinomial.withParameters(n, p);
         multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
-        IntegerTensor n = IntegerTensor.create(100, 200);
+        IntegerTensor n = IntegerTensor.create(100);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
         multinomial.logProb(IntegerTensor.scalar(1));
