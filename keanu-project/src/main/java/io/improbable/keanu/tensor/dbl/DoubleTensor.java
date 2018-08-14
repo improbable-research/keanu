@@ -1,11 +1,11 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
 
@@ -31,7 +31,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
         }
     }
 
-    static DoubleTensor create(double[] values) {
+    static DoubleTensor create(double... values) {
         return create(values, 1, values.length);
     }
 

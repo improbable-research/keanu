@@ -1,12 +1,12 @@
 package io.improbable.keanu.tensor.intgr;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<IntegerTensor> {
 
@@ -32,7 +32,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         }
     }
 
-    static IntegerTensor create(int[] values) {
+    static IntegerTensor create(int... values) {
         return create(values, 1, values.length);
     }
 

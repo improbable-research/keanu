@@ -1,19 +1,22 @@
 package io.improbable.keanu.tensor;
 
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
+import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.math3.util.MathArrays.copyOf;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 
 public interface Tensor<T> {
 
     static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
         if (!a.hasSameShapeAs(b)) {
-            throw new IllegalArgumentException("Cannot compare tensors of different shapes");
+            throw new IllegalArgumentException(
+                String.format("Cannot compare tensors of different shapes %s and %s",
+                    Arrays.toString(a.getShape()), Arrays.toString(b.getShape()))
+            );
         }
 
         Object[] aArray = a.asFlatArray();
