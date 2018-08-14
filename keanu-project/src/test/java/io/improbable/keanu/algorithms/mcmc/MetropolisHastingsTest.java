@@ -1,5 +1,17 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,14 +22,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertEquals;
 
 public class MetropolisHastingsTest {
 
@@ -211,6 +215,33 @@ public class MetropolisHastingsTest {
         );
 
         assertEquals(sampleCount + 1, n.get());
+    }
+
+    @Test
+    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
+
+        GaussianVertex A = new GaussianVertex(0.0, 1.0);
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+        net.probeForNonZeroProbability(100, random);
+
+        MetropolisHastings algo = MetropolisHastings.builder()
+            .useCacheOnRejection(false)
+            .build();
+
+        assertNotNull(algo.getProposalDistribution());
+        assertNotNull(algo.getRandom());
+        assertNotNull(algo.getVariableSelector());
+
+        NetworkSamples posteriorSamples = algo.getPosteriorSamples(
+            net,
+            net.getLatentVertices(),
+            2
+        );
+
+        algo.setVariableSelector(null);
+        assertNull(algo.getVariableSelector());
+
+        assertFalse(posteriorSamples.get(A).asList().isEmpty());
     }
 
 }

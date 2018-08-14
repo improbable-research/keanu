@@ -1,5 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
+
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
 import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -8,13 +15,8 @@ import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
-
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
@@ -36,14 +38,25 @@ public class SimulatedAnnealing {
             .build();
     }
 
-    private final KeanuRandom random;
-    private final ProposalDistribution proposalDistribution;
-
+    @Getter
+    @Setter
     @Builder.Default
-    private final MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+    private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
+    @Getter
+    @Setter
     @Builder.Default
-    private final boolean useCacheOnRejection = true;
+    private ProposalDistribution proposalDistribution = ProposalDistribution.usePrior();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private boolean useCacheOnRejection = true;
 
     public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                           int sampleCount) {

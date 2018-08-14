@@ -1,12 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
-import org.junit.Test;
 
 public class NUTSTest {
 
@@ -23,13 +24,15 @@ public class NUTSTest {
         double sigma = 1.0;
         BayesianNetwork simpleGaussian = MCMCTestDistributions.createSimpleGaussian(mu, sigma, random);
 
-        NetworkSamples posteriorSamples = NUTS.getPosteriorSamples(
+        NUTS nuts = NUTS.builder()
+            .adaptCount(50)
+            .random(random)
+            .build();
+
+        NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             simpleGaussian,
             simpleGaussian.getLatentVertices(),
-            1000,
-            50,
-            0.65,
-            random
+            1000
         );
 
         Vertex<DoubleTensor> vertex = simpleGaussian.getContinuousLatentVertices().get(0);
@@ -42,13 +45,15 @@ public class NUTSTest {
 
         BayesianNetwork bayesNet = MCMCTestDistributions.createSumOfGaussianDistribution(20.0, 1.0, 46.);
 
-        NetworkSamples posteriorSamples = NUTS.getPosteriorSamples(
+        NUTS nuts = NUTS.builder()
+            .adaptCount(100)
+            .random(random)
+            .build();
+
+        NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
             bayesNet,
             bayesNet.getLatentVertices(),
-            2000,
-            100,
-            0.65,
-            random
+            2000
         );
 
         Vertex<DoubleTensor> A = bayesNet.getContinuousLatentVertices().get(0);
@@ -61,13 +66,15 @@ public class NUTSTest {
     public void samplesFromDonut() {
         BayesianNetwork donutBayesNet = MCMCTestDistributions.create2DDonutDistribution();
 
-        NetworkSamples samples = NUTS.getPosteriorSamples(
+        NUTS nuts = NUTS.builder()
+            .adaptCount(100)
+            .random(random)
+            .build();
+
+        NetworkSamples samples = nuts.getPosteriorSamples(
             donutBayesNet,
             donutBayesNet.getLatentVertices(),
-            1000,
-            100,
-            0.65,
-            random
+            1000
         );
 
         Vertex<DoubleTensor> A = donutBayesNet.getContinuousLatentVertices().get(0);

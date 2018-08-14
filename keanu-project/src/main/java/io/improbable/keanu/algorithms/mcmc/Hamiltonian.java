@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -13,6 +14,9 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Hamiltonian Monte Carlo is a method for obtaining samples from a probability
@@ -22,36 +26,50 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-public class Hamiltonian {
+@Builder
+public class Hamiltonian implements PosteriorSamplingAlgorithm {
 
-    private Hamiltonian() {
+    public static Hamiltonian withDefaultConfig() {
+        return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
+
+    public static Hamiltonian withDefaultConfig(KeanuRandom random) {
+        return Hamiltonian.builder()
+            .random(random)
+            .leapFrogCount(20)
+            .stepSize(0.1)
+            .build();
+    }
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private KeanuRandom random = KeanuRandom.getDefaultRandom();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    //the number of times to leapfrog in each sample
+    private int leapFrogCount;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    //the amount of distance to move each leapfrog
+    private double stepSize;
 
     /**
      * Sample from the posterior of a Bayesian Network using the Hamiltonian Monte Carlo algorithm
      *
-     * @param bayesNet The bayesian network to sample from
+     * @param bayesNet     The bayesian network to sample from
      * @param fromVertices the vertices to sample from
-     * @param sampleCount the number of samples to take
-     * @param leapFrogCount the number of times to leapfrog in each sample
-     * @param stepSize the amount of distance to move each leapfrog
+     * @param sampleCount  the number of samples to take
      * @return Samples taken with Hamiltonian Monte Carlo
      */
-    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<? extends Vertex> fromVertices,
-                                                     final int sampleCount,
-                                                     final int leapFrogCount,
-                                                     final double stepSize) {
-
-        return getPosteriorSamples(bayesNet, fromVertices, sampleCount, leapFrogCount, stepSize, new KeanuRandom());
-    }
-
-    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<? extends Vertex> fromVertices,
-                                                     final int sampleCount,
-                                                     final int leapFrogCount,
-                                                     final double stepSize,
-                                                     final KeanuRandom random) {
+    @Override
+    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
+                                              final List<? extends Vertex> fromVertices,
+                                              final int sampleCount) {
 
         bayesNet.cascadeObservations();
 
@@ -155,10 +173,10 @@ public class Hamiltonian {
      *
      * @param latentVertices
      * @param position
-     * @param gradient                 gradient at current position
-     * @param momentums                current vertex momentums
+     * @param gradient              gradient at current position
+     * @param momentums             current vertex momentums
      * @param stepSize
-     * @param probabilisticVertices    all vertices that impact the joint posterior (masterP)
+     * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
      * @return the gradient at the updated position
      */
     private static Map<Long, DoubleTensor> leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
@@ -276,5 +294,4 @@ public class Hamiltonian {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(id, v -> new ArrayList<T>());
         samplesForVertex.add(value);
     }
-
 }

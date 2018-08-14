@@ -1,5 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
@@ -8,10 +16,8 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
-
-import java.util.*;
-
-import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Metropolis Hastings is a Markov Chain Monte Carlo method for obtaining samples from a probability distribution
@@ -32,14 +38,25 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             .build();
     }
 
-    private final KeanuRandom random;
-    private final ProposalDistribution proposalDistribution;
-
+    @Getter
+    @Setter
     @Builder.Default
-    private final MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+    private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
+    @Getter
+    @Setter
     @Builder.Default
-    private final boolean useCacheOnRejection = true;
+    private ProposalDistribution proposalDistribution = ProposalDistribution.usePrior();
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private boolean useCacheOnRejection = true;
 
     /**
      * @param bayesianNetwork      a bayesian network containing latent vertices
@@ -62,6 +79,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
             useCacheOnRejection,
             random
         );
+
 
         double logProbabilityBeforeStep = bayesianNetwork.getLogOfMasterP();
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
