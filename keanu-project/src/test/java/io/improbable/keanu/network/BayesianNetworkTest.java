@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
+import io.improbable.keanu.vertices.Vertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -46,5 +47,29 @@ public class BayesianNetworkTest {
         assertThat(network.getObservedVertices(), contains(output));
         output.unobserve();
         assertThat(network.getObservedVertices(), is(empty()));
+    }
+
+    @Test
+    public void youCanLabelVertices() {
+        BoolVertex a = new BernoulliVertex(0.5);
+        BoolVertex b = new BernoulliVertex(0.5);
+        BoolVertex ored = a.or(b);
+        BayesianNetwork net;
+        Vertex retrieved;
+        final String LABEL_A = "Label A";
+        final String LABEL_B = "Label B";
+        final String LABEL_ORED = "Output";
+
+        a.setLabel(LABEL_A);
+        b.setLabel(LABEL_B);
+        ored.setLabel(LABEL_ORED);
+
+        net = new BayesianNetwork(a.getConnectedGraph());
+        retrieved = net.getVertexByLabel(LABEL_A);
+        assertThat(retrieved, is(a));
+        retrieved = net.getVertexByLabel(LABEL_B);
+        assertThat(retrieved, is(b));
+        retrieved = net.getVertexByLabel(LABEL_ORED);
+        assertThat(retrieved, is(ored));
     }
 }

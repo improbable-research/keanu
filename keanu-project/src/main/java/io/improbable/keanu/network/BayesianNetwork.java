@@ -1,9 +1,6 @@
 package io.improbable.keanu.network;
 
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -18,13 +15,23 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
+    private final HashMap<String, Vertex> labelSet;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
+        this.labelSet = new HashMap<>();
+
+        vertices.stream()
+            .filter(v -> v.getLabel() != null)
+            .forEach(v -> this.labelSet.put(v.getLabel(), v));
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
+    }
+
+    public Vertex getVertexByLabel(String label) {
+        return labelSet.get(label);
     }
 
     public List<Vertex> getLatentAndObservedVertices() {
