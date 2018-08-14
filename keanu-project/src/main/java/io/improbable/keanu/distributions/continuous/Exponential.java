@@ -8,18 +8,18 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.8 page 20"
+ */
 public class Exponential implements ContinuousDistribution {
 
     private final DoubleTensor rate;
 
     /**
-     * <h3>Exponential Distribution</h3>
-     *
      * @param rate inverse scale
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.8 page 20"
      */
     public static ContinuousDistribution withParameters(DoubleTensor rate) {
         return new Exponential(rate);

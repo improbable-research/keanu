@@ -10,6 +10,12 @@ import static io.improbable.keanu.distributions.dual.Diffs.L;
 import static io.improbable.keanu.distributions.dual.Diffs.S;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.3 page 15"
+ */
 public class Cauchy implements ContinuousDistribution {
 
     private static final double NEG_LOG_PI = -Math.log(Math.PI);
@@ -17,14 +23,8 @@ public class Cauchy implements ContinuousDistribution {
     private final DoubleTensor scale;
 
     /**
-     * <h3>Cauchy (Lorentz) Distribution</h3>
-     *
      * @param location shifts the distribution
      * @param scale    stretches/shrinks the distribution, must be greater than 0
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.3 page 15"
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Cauchy(location, scale);

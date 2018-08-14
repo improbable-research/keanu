@@ -14,28 +14,6 @@ public class SmoothUniform implements ContinuousDistribution {
     private final double edgeSharpness;
 
     /**
-     * <h3>Smooth Uniform Distribution</h3>
-     * <p>This is the usual {@link Uniform} Distribution with the edges at <code>xMax</code> and <code>xMin</code> smoothed
-     * by attaching a sigmoid as shoulders.</p>
-     *
-     * <h4>Math:</h4>
-     * <p>Let <code>f(x)</code> be the sigmoid shoulder function, <code>Sw</code> be shoulder width, <code>Bw</code>
-     * be base width (<code>xMax - xMin</code>), and <code>h</code> be the body height of the base. Then, we have:</p>
-     * <p><code>f(x) = Ax^3 + Bx^2</code></p>
-     * <p><code>f'(x) = 3Ax^2 + 2Bx</code></p>
-     * <p><code>integral f = Ax^4/4 + Bx^3/3</code></p>
-     * <p><code>f(Sw) = h</code></p>
-     * <p><code>integral of f from 0 to Sw = 1</code> (area under the curve must be 1)</p>
-     * <p><code>f'(Sw) = 0</code></p>
-     * <p>which yields:</p>
-     * <p><code>| &nbsp;0 3Sw^2 &nbsp;2Sw   | &nbsp; | h | &nbsp; | 0 |</code></p>
-     * <p><code>|      -1 Sw^3  &nbsp;Sw^2  |    *   | A |    =   | 0 |</code></p>
-     * <p><code>|      Bw Sw/4       2Sw/3  | &nbsp; | B | &nbsp; | 1 |</code></p>
-     * <p>therefore:</p>
-     * <p><code>h = 1 / (Sw + Bw)</code></p>
-     * <p><code>A = -2 / (Sw^3 * (Sw + Bw))</code></p>
-     * <p><code>B = 3 / (Sw^3 * Sw^2*Bw)</code></p>
-     *
      * @param xMin          minimum value of random variable x
      * @param xMax          maximum value of random variable x
      * @param edgeSharpness sharpness as a percentage of (xMax - xMin), which determines the width of the shoulder

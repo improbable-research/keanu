@@ -11,20 +11,20 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.4 page 16"
+ */
 public class InverseGamma implements ContinuousDistribution {
 
     private final DoubleTensor alpha;
     private final DoubleTensor scale;
 
     /**
-     * <h3>Inverted Gamma (Person's Type 6) Distribution</h3>
-     *
      * @param alpha    shape parameter (not to be confused with tensor shape)
      * @param scale    stretches/shrinks the distribution
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.4 page 16"
      */
     public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor scale) {
         return new InverseGamma(alpha, scale);

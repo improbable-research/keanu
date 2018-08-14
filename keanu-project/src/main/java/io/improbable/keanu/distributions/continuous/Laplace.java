@@ -12,20 +12,20 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.12 page 25"
+ */
 public class Laplace implements ContinuousDistribution {
 
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
     /**
-     * <h3>Laplace (Double Exponential) Distribution</h3>
-     *
      * @param location shifts the distribution
      * @param scale    stretches/shrinks the distribution, must be greater than 0
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.12 page 25"
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Laplace(location, scale);

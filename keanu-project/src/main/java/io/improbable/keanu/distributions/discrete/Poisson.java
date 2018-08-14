@@ -10,18 +10,18 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.2.8 page 49"
+ */
 public class Poisson implements DiscreteDistribution {
 
     private final DoubleTensor rate;
 
     /**
-     * <h3>Poisson Distribution</h3>
-     *
      * @param rate rate of occurrence
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.2.8 page 49"
      */
     public static DiscreteDistribution withParameters(DoubleTensor rate) {
         return new Poisson(rate);

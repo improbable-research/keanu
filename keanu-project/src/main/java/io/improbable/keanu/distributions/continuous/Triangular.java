@@ -5,6 +5,12 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.24 page 37"
+ */
 public class Triangular implements ContinuousDistribution {
 
     private final DoubleTensor xMin;
@@ -12,15 +18,9 @@ public class Triangular implements ContinuousDistribution {
     private final DoubleTensor mode;
 
     /**
-     * <h3>Triangular Distribution</h3>
-     *
      * @param xMin minimum value of random variable x
      * @param xMax maximum value of random variable x
      * @param mode location of mode
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.24 page 37"
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor mode) {
         return new Triangular(xMin, xMax, mode);

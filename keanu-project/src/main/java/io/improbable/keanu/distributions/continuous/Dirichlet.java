@@ -8,17 +8,17 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import static io.improbable.keanu.distributions.dual.Diffs.C;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
+/**
+ * @see <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution">Wikipedia</a>
+ */
 public class Dirichlet implements ContinuousDistribution {
 
     private static final double EPSILON =  0.00001;
     private final DoubleTensor concentration;
 
     /**
-     * <h3>Dirichlet Distribution</h3>
-     *
      * @param concentration a type of numerical parameter of parametric family of probability distributions,
      *                      sum of values must equal to 1
-     * @see <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution">Wikipedia</a>
      */
     public static ContinuousDistribution withParameters(DoubleTensor concentration) {
         return new Dirichlet(concentration);

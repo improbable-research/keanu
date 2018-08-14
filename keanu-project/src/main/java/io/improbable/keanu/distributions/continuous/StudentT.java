@@ -13,19 +13,19 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.23 page 36"
+ */
 public class StudentT implements ContinuousDistribution {
 
     private static final double HALF_LOG_PI = log(PI) / 2;
     private final IntegerTensor alpha;
 
     /**
-     * <h3>Student's T Distribution</h3>
-     *
      * @param alpha shape parameter; number of degrees of freedom
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.23 page 36"
      */
     public static ContinuousDistribution withParameters(IntegerTensor alpha) {
         return new StudentT(alpha);

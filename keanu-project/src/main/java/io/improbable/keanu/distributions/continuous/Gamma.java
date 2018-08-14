@@ -17,6 +17,12 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.11 page 23"
+ */
 public class Gamma implements ContinuousDistribution {
 
     private static final double M_E = 0.577215664901532860606512090082;
@@ -29,10 +35,6 @@ public class Gamma implements ContinuousDistribution {
      *
      * @param scale    stretches/shrinks the distribution, must be greater than 0
      * @param alpha    shape parameter (not to be confused with tensor shape)
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.11 page 23"
      */
     public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor alpha) {
         return new Gamma(scale, alpha);

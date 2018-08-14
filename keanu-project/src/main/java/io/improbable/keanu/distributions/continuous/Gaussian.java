@@ -9,6 +9,12 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.16 page 29"
+ */
 public class Gaussian implements ContinuousDistribution {
 
     private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
@@ -17,13 +23,8 @@ public class Gaussian implements ContinuousDistribution {
     private final DoubleTensor scale;
 
     /**
-     * <h3>Gaussian (Normal) Distribution</h3>
      * @param location shifts the distribution; mean
      * @param scale    stretches/shrinks the distribution; variance
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.16 page 29"
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Gaussian(location, scale);

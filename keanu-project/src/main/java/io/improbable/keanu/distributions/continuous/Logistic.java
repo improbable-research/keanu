@@ -9,19 +9,20 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.14 page 27"
+ */
 public class Logistic implements ContinuousDistribution {
 
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
     /**
-     * <h3>Logistic Distribution</h3>
      * @param location shifts the distribution
      * @param scale    stretches/shrinks the distribution
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier,
-     * ARL-TR-2168 March 2000,
-     * 5.1.14 page 27"
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Logistic(location, scale);

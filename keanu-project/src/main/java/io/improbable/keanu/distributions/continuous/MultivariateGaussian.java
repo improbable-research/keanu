@@ -6,17 +6,17 @@ import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">Wikipedia</a>
+ */
 public class MultivariateGaussian implements ContinuousDistribution {
 
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
     /**
-     * <h3>Multivariate Gaussian (Normal) Distribution</h3>
-     *
      * @param location shifts the distribution; mean
      * @param scale    stretches/shrinks the distribution; covariance
-     * @see <a href="https://en.wikipedia.org/wiki/Multivariate_normal_distribution">Wikipedia</a>
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new MultivariateGaussian(location, scale);

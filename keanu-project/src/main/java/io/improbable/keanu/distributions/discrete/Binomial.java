@@ -8,20 +8,20 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.nd4j.linalg.util.ArrayUtil;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.2.2 page 43"
+ */
 public class Binomial implements DiscreteDistribution {
 
     private final DoubleTensor successProbability;
     private final IntegerTensor numberOfTrials;
 
     /**
-     * <h3>Binomial Distribution</h3>
-     *
      * @param successProbability probability of success
      * @param numberOfTrials     number of trials
-     * @see "Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.2.2 page 43"
      */
     public static DiscreteDistribution withParameters(DoubleTensor successProbability, IntegerTensor numberOfTrials) {
         return new Binomial(successProbability, numberOfTrials);
