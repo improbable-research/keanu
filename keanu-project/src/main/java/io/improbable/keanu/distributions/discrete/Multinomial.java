@@ -115,6 +115,10 @@ public class Multinomial implements DiscreteDistribution {
             k.sum(0).elementwiseEquals(this.n).allTrue(),
             String.format("Inputs %s must sum to n = %s", k, this.n)
         );
+        Preconditions.checkArgument(
+            k.greaterThanOrEqual(0).allTrue(),
+            String.format("Inputs %s cannot be negative", k)
+        );
 
         DoubleTensor gammaN = n.plus(1).toDouble().apply(Gamma::gamma).log();
         DoubleTensor gammaKs = k.plus(1).toDouble().apply(Gamma::gamma).log().sum(0);

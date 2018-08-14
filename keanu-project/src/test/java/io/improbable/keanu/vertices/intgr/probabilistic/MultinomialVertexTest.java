@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -62,26 +63,60 @@ public class MultinomialVertexTest {
         //
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
         IntegerTensor n = IntegerTensor.scalar(100);
         DoubleTensor p = DoubleTensor.create(0., 0., 0.99, 0.).transpose();
         Multinomial.withParameters(n, p);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheParametersAreDifferentShapes() {
         IntegerTensor n = IntegerTensor.create(100, 200);
         DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
         Multinomial.withParameters(n, p);
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
         IntegerTensor n = IntegerTensor.create(100, 200);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
         multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbShapeDoesntMatchTheNumberOfCategories() {
+        IntegerTensor n = IntegerTensor.create(100, 200);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
+        Multinomial multinomial = Multinomial.withParameters(n, p);
+        multinomial.logProb(IntegerTensor.scalar(1));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbStateDoesntSumToN() {
+        IntegerTensor n = IntegerTensor.scalar(10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8).transpose();
+        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
+        multinomial.logProb(IntegerTensor.create(5, 6).transpose());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbStateContainsNegativeNumbers() {
+        IntegerTensor n = IntegerTensor.scalar(10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.8).transpose();
+        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
+        multinomial.logProb(IntegerTensor.create(-1, 11).transpose());
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void itThrowsIfTheLogProbStateContainsNumbersGreaterThanN() {
+        IntegerTensor n = IntegerTensor.scalar(10);
+        DoubleTensor p = DoubleTensor.create(0.2, 0.3, 0.5).transpose();
+        DiscreteDistribution multinomial = Multinomial.withParameters(n, p);
+        int[] state = new int[] {Integer.MAX_VALUE, Integer.MAX_VALUE, 12};
+        assertThat(state[0] + state[1] + state[2], equalTo(10));
+        multinomial.logProb(IntegerTensor.create(state).transpose());
     }
 
     @Test
@@ -132,7 +167,7 @@ public class MultinomialVertexTest {
         DiscreteDistribution binomial = Binomial.withParameters(DoubleTensor.scalar(0.2), n);
         for (int value : ImmutableList.of(1, 2, 9, 10)) {
             DoubleTensor binomialLogProbs = binomial.logProb(IntegerTensor.scalar(value));
-            DoubleTensor multinomialLogProbs = multinomial.logProb(IntegerTensor.create(value, 10-value).transpose()).transpose();
+            DoubleTensor multinomialLogProbs = multinomial.logProb(IntegerTensor.create(value, 10 - value).transpose()).transpose();
             assertThat(multinomialLogProbs, allCloseTo(new Double(1e-6), binomialLogProbs));
         }
     }
@@ -168,7 +203,7 @@ public class MultinomialVertexTest {
         n = IntegerTensor.scalar(500);
 
         MultinomialVertex vertex = new MultinomialVertex(
-            new int[] {1, N},
+            new int[]{1, N},
             ConstantVertex.of(n),
             ConstantVertex.of(p)
         );
@@ -186,7 +221,7 @@ public class MultinomialVertexTest {
             double epsilonForMean = 0.5;
             double epsilonForVariance = 5.;
             assertEquals(n.scalar() * probability, mean, epsilonForMean);
-            assertEquals(n.scalar() * probability * (1 - probability), std*std, epsilonForVariance);
+            assertEquals(n.scalar() * probability * (1 - probability), std * std, epsilonForVariance);
         }
     }
 }

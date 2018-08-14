@@ -36,7 +36,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         return create(values, 1, values.length);
     }
 
-    static IntegerTensor ones(int[] shape) {
+    static IntegerTensor ones(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(1);
         } else {
@@ -52,7 +52,7 @@ public interface IntegerTensor extends NumberTensor<Integer>, IntegerOperators<I
         }
     }
 
-    static IntegerTensor zeros(int[] shape) {
+    static IntegerTensor zeros(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(0);
         } else {

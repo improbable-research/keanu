@@ -51,7 +51,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
         }
     }
 
-    static DoubleTensor zeros(int[] shape) {
+    static DoubleTensor zeros(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
