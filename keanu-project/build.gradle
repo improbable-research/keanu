@@ -14,6 +14,9 @@ plugins {
     id 'maven'
 }
 
+apply plugin: 'java'
+apply plugin: 'jacoco'
+
 group = 'io.improbable'
 archivesBaseName = "keanu"
 
