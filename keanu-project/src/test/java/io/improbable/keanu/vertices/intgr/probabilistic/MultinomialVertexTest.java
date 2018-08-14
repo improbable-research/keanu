@@ -12,7 +12,6 @@ import static org.mockito.Mockito.when;
 
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static io.improbable.keanu.tensor.TensorMatchers.allValues;
-import static io.improbable.keanu.tensor.TensorMatchers.elementwiseEqualTo;
 import static io.improbable.keanu.tensor.TensorMatchers.hasShape;
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 
@@ -32,6 +31,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class MultinomialVertexTest {
 
@@ -101,10 +101,47 @@ public class MultinomialVertexTest {
     public void itWorksWithScalars() {
         int n = 100;
         DoubleTensor p = DoubleTensor.create(0.01, 0.09, 0.9).transpose();
-        Multinomial multinomial = Multinomial.withParameters(IntegerTensor.scalar(n), p);
-        IntegerTensor samples = multinomial.sample(new int[]{1, 1}, KeanuRandom.getDefaultRandom());
+        MultinomialVertex multinomial = new MultinomialVertex(
+            ConstantVertex.of(n), ConstantVertex.of(p));
+        IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(3, 1));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
+    }
+
+    @Test
+    public void itWorksWithTensors() {
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
+            1, 10,
+            100, 1000},
+            2, 2));
+
+        DoubleVertex p = ConstantVertex.of(DoubleTensor.create(new double[]{
+                .1, .8,
+                .25, .2,
+
+                .1, .1,
+                .50, .3,
+
+                .8, .1,
+                .25, .5
+            },
+            3, 2, 2));
+        //
+        MultinomialVertex multinomial = new MultinomialVertex(n, p);
+        IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
+        assertThat(sample, hasShape(3, 2, 2));
+        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
+                0, 10,
+                25, 200,
+
+                0, 0,
+                50, 300,
+
+                1, 0,
+                25, 500,
+            },
+            3, 2, 2));
+        assertThat(logProb, closeTo(-14.165389164658901, 1e-8));
     }
 
     @Test
@@ -116,47 +153,7 @@ public class MultinomialVertexTest {
         assertThat(samples, hasShape(4, 2, 2));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
     }
-
-    @Test
-    public void itWorksWithTensors() {
-        IntegerTensor n = IntegerTensor.create(new int[]{
-            1, 10,
-            100, 1000},
-            2, 2);
-
-        DoubleTensor p = DoubleTensor.create(new double[]{
-                .1, .8,
-                .25, .2,
-
-                .1, .1,
-                .50, .3,
-
-                .8, .1,
-                .25, .5
-            },
-            3, 2, 2);
-        //
-        Multinomial multinomial = Multinomial.withParameters(n, p);
-        IntegerTensor sample = multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(3, 2, 2));
-        DoubleTensor logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-                0, 10,
-                25, 200,
-
-                0, 0,
-                50, 300,
-
-                1, 0,
-                25, 500,
-            },
-            3, 2, 2));
-        assertThat(logProb, hasShape(2, 2));
-        assertThat(logProb, elementwiseEqualTo(DoubleTensor.create(
-            -0.2231435513142097, -2.231435513142097,
-            -4.717678926162421, -6.9931311740401725
-        ).reshape(2, 2)));
-    }
-
+    
     @Test
     public void ifTheresOnlyOneValidChoiceItAlwaysReturnsIt() {
         IntegerTensor n = IntegerTensor.scalar(100);
