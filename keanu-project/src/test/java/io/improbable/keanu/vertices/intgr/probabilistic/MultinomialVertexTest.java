@@ -31,6 +31,8 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class MultinomialVertexTest {
@@ -143,6 +145,53 @@ public class MultinomialVertexTest {
             3, 2, 2));
         assertThat(logProb, closeTo(-14.165389164658901, 1e-8));
     }
+
+    @Test
+    public void youCanUseAConcatAndReshapeVertexToPipeInTheProbabilities() {
+        IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
+                1, 10,
+                100, 1000},
+            2, 2));
+
+        DoubleVertex p1 = ConstantVertex.of(DoubleTensor.create(new double[]{
+                .1, .8,
+                .25, .2,
+            },
+            2, 2));
+
+        DoubleVertex p2 = ConstantVertex.of(DoubleTensor.create(new double[]{
+                .1, .1,
+                .50, .3,
+            },
+            2, 2));
+
+        DoubleVertex p3 = ConstantVertex.of(DoubleTensor.create(new double[]{
+
+                .8, .1,
+                .25, .5
+            },
+            2, 2));
+
+        ConcatenationVertex pConcatenated = new ConcatenationVertex(0, p1, p2, p3);
+        ReshapeVertex pReshaped = new ReshapeVertex(pConcatenated, 3, 2, 2);
+        MultinomialVertex multinomial = new MultinomialVertex(n, pReshaped);
+        IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
+        assertThat(sample, hasShape(3, 2, 2));
+        double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
+                0, 10,
+                25, 200,
+
+                0, 0,
+                50, 300,
+
+                1, 0,
+                25, 500,
+            },
+            3, 2, 2));
+
+        assertThat(logProb, equalTo(-14.165389164658901));
+    }
+
 
     @Test
     public void youCanSampleWithATensorIfNIsScalarAndPIsAColumnVector() {
