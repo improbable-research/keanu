@@ -73,7 +73,37 @@ public class MultinomialVertexTest {
         List<Double> tFlattened = t.asFlatList();
         assertEquals(0., tFlattened.get(0), 1e-8);
         assertEquals(71., tFlattened.get(71), 1e-8);
+    }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void itThrowsIfTheProbabilitiesDontSumToOne() {
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0., 0., 0.99, 0.).transpose();
+        Multinomial.withParameters(n, p);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void itThrowsIfTheParametersAreDifferentShapes() {
+        IntegerTensor n = IntegerTensor.create(100, 200);
+        DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
+        Multinomial.withParameters(n, p);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void itThrowsIfTheSampleShapeDoesntMatchTheShapeOfN() {
+        IntegerTensor n = IntegerTensor.create(100, 200);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
+        Multinomial multinomial = Multinomial.withParameters(n, p);
+        multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
+    }
+
+    @Test
+    public void youCanSampleWithATensorIfNIsScalarAndPIsAColumnVector() {
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
+        Multinomial multinomial = Multinomial.withParameters(n, p);
+        IntegerTensor samples = multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
+        assertThat(samples, hasShape(4, 2, 2));
     }
 
     @Test
