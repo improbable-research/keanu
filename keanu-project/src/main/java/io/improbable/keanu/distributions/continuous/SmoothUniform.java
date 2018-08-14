@@ -10,31 +10,29 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 /**
  * The Smooth Uniform distribution is the usual Uniform distribution with the edges
  * at max and min smoothed by attaching a sigmoid as shoulders.
- * <p>
- * Math:
- * <p>
- * let sigmoid shoulder function be f(x), Sw be shoulder width, Bw be base (max-min) width,
+ * <h4>Math:</h4>
+ * Let sigmoid shoulder function be f(x), Sw be shoulder width, Bw be base (max-min) width,
  * and h be the bodyHeight of the base.
  * <p>
- * f(x) = Ax^3 + Bx^2
- * f'(x) = 3Ax^2 + 2Bx
- * integral f = Ax^4/4 + Bx^3/3
+ * <a href="https://www.codecogs.com/eqnedit.php?latex=f(x)&space;=&space;Ax^3&space;&plus;&space;Bx^2&space;\\&space;f'(x)&space;=&space;3Ax^2&space;&plus;&space;2Bx&space;\\&space;\int&space;f(x)&space;=&space;\frac{Ax^{4}}{4}&space;&plus;&space;\frac{Bx^3}{3}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?f(x)&space;=&space;Ax^3&space;&plus;&space;Bx^2&space;\\&space;f'(x)&space;=&space;3Ax^2&space;&plus;&space;2Bx&space;\\&space;\int&space;f(x)&space;=&space;\frac{Ax^{4}}{4}&space;&plus;&space;\frac{Bx^3}{3}" title="f(x) = Ax^3 + Bx^2 \\ f'(x) = 3Ax^2 + 2Bx \\ \int f(x) = \frac{Ax^{4}}{4} + \frac{Bx^3}{3}" /></a>
+ * </p>
  * <p>
- * f(Sw) = h
- * integral of f from 0 to Sw = 1 (area under the curve must be 1)
- * f'(Sw) = 0
+ * <a href="https://www.codecogs.com/eqnedit.php?latex=f(Sw)&space;=&space;h&space;\\&space;\int_{0}^{1}&space;f(Sw)&space;=&space;1&space;\\&space;f'(Sw)&space;=&space;0" target="_blank"><img src="https://latex.codecogs.com/gif.latex?f(Sw)&space;=&space;h&space;\\&space;\int_{0}^{1}&space;f(Sw)&space;=&space;1&space;\\&space;f'(Sw)&space;=&space;0" title="f(Sw) = h \\ \int_{0}^{1} f(Sw) = 1 \\ f'(Sw) = 0" /></a>
+ * </p>
  * <p>
- * yields:
+ * (area under the curve must be 1)
+ * </p>
  * <p>
- * |  0    3Sw^2    2Sw   |   | h |   | 0 |
- * | -1    Sw^3     Sw^2  | * | A | = | 0 |
- * | Bw    Sw/4     2Sw/3 |   | B |   | 1 |
+ * This yields:
  * <p>
- * therefore:
+ * <a href="https://www.codecogs.com/eqnedit.php?latex=\begin{bmatrix}&space;0&space;&&space;3Sw^2&space;&&space;2Sw&space;\\&space;-1&space;&&space;Sw^3&space;&&space;Sw^2&space;\\&space;Bw&space;&&space;\frac{Sw}{4}&space;&&space;\frac{2Sw}{3}&space;\end{bmatrix}&space;\cdot&space;\begin{bmatrix}&space;h&space;\\&space;A&space;\\&space;B&space;\end{bmatrix}&space;=&space;\begin{bmatrix}&space;0&space;\\&space;0&space;\\&space;1&space;\end{bmatrix}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?\begin{bmatrix}&space;0&space;&&space;3Sw^2&space;&&space;2Sw&space;\\&space;-1&space;&&space;Sw^3&space;&&space;Sw^2&space;\\&space;Bw&space;&&space;\frac{Sw}{4}&space;&&space;\frac{2Sw}{3}&space;\end{bmatrix}&space;\cdot&space;\begin{bmatrix}&space;h&space;\\&space;A&space;\\&space;B&space;\end{bmatrix}&space;=&space;\begin{bmatrix}&space;0&space;\\&space;0&space;\\&space;1&space;\end{bmatrix}" title="\begin{bmatrix} 0 & 3Sw^2 & 2Sw \\ -1 & Sw^3 & Sw^2 \\ Bw & \frac{Sw}{4} & \frac{2Sw}{3} \end{bmatrix} \cdot \begin{bmatrix} h \\ A \\ B \end{bmatrix} = \begin{bmatrix} 0 \\ 0 \\ 1 \end{bmatrix}" /></a>
+ * </p>
  * <p>
- * h = 1 / (Sw + Bw)
- * A = -2 / (Sw^3 * (Sw + Bw))
- * B = 3 / (Sw^3 * Sw^2*Bw)
+ * Therefore:
+ * </p>
+ * <p>
+ * <a href="https://www.codecogs.com/eqnedit.php?latex=h&space;=&space;\frac{1}{Sw&space;&plus;&space;Bw}&space;\\&space;A&space;=&space;\frac{-2}{Sw^3&space;(Sw&space;&plus;&space;Bw)}&space;\\&space;B&space;=&space;\frac{3}{Sw^3&space;(Sw^2)(Bw)}" target="_blank"><img src="https://latex.codecogs.com/gif.latex?h&space;=&space;\frac{1}{Sw&space;&plus;&space;Bw}&space;\\&space;A&space;=&space;\frac{-2}{Sw^3&space;(Sw&space;&plus;&space;Bw)}&space;\\&space;B&space;=&space;\frac{3}{Sw^3&space;(Sw^2)(Bw)}" title="h = \frac{1}{Sw + Bw} \\ A = \frac{-2}{Sw^3 (Sw + Bw)} \\ B = \frac{3}{Sw^3 (Sw^2)(Bw)}" /></a>
+ * </p>
  */
 public class SmoothUniform implements ContinuousDistribution {
 
