@@ -22,12 +22,9 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     public MultinomialVertex(int[] tensorShape, IntegerVertex n, DoubleVertex p) {
         super(new ProbabilisticValueUpdater<>());
 
-        int[] tensorShapePrefixedByOne = tensorShape;
-        if (tensorShape.length > 2) {
-            tensorShapePrefixedByOne = ArrayUtils.insert(0, tensorShape, 1);
-        }
+        int[] tensorShapePrefixedByOne = ArrayUtils.insert(0, tensorShape, 1);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, n.getShape());
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.slice(0, 0).getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShapePrefixedByOne, p.slice(0, 0).getShape());
 
         this.p = p;
         this.n = n;
