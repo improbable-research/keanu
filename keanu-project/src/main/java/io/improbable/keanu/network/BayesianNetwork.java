@@ -40,10 +40,12 @@ public class BayesianNetwork {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
             VertexLabel label = v.getLabel();
-            if (label != null && labelMap.containsKey(label)) {
-                throw new IllegalArgumentException("Vertex Label Repeated: " + label);
-            } else {
-                labelMap.put(label, v);
+            if (label != null) {
+                if (labelMap.containsKey(label)) {
+                    throw new IllegalArgumentException("Vertex Label Repeated: " + label);
+                } else {
+                    labelMap.put(label, v);
+                }
             }
         }
 

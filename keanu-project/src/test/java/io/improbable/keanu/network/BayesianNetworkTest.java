@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.nullValue;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -58,6 +59,7 @@ public class BayesianNetworkTest {
         BoolVertex a = new BernoulliVertex(0.5);
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
+        BoolVertex or2 = ored.or(a);
         Vertex retrieved;
         VertexLabel labelA = new VertexLabel(LABEL_A);
         VertexLabel labelB = new VertexLabel(LABEL_B);
@@ -74,6 +76,8 @@ public class BayesianNetworkTest {
         assertThat(retrieved, is(b));
         retrieved = net.getVertexByLabel(labelOr);
         assertThat(retrieved, is(ored));
+        retrieved = net.getVertexByLabel(null);
+        assertThat(retrieved, nullValue());
     }
 
     @Test(expected = IllegalArgumentException.class)
