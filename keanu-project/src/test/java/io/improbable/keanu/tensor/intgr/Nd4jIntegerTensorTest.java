@@ -435,4 +435,24 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
     }
 
+    @Test
+    public void canRepresentAllValues() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0,0,0,0},
+            new int[]{2, 2}
+        );
+
+        /*
+         * Construct a value that has the most significant two bits and the least significant bit set to 1 with all
+         * others set to 0.  This value will stretch any floating point backing representation by requiring at least a
+         * <Num bits> - 1 length Mantissa.  Simply using INT MAX often doesn't work for this test as the closest
+         * floating point value is usually > INT MAX and when converting back, the value will be clamped back to max
+         */
+        final int biggestBitRange = (0x3 << Integer.SIZE - 2) + 1;
+
+        tensor.plusInPlace(biggestBitRange);
+        assertArrayEquals(new int[]{biggestBitRange, biggestBitRange, biggestBitRange, biggestBitRange},
+            tensor.asFlatIntegerArray());
+    }
+
 }
