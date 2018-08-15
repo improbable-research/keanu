@@ -55,7 +55,6 @@ public class Multinomial implements DiscreteDistribution {
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, n.getShape());
 
-        p.sum(0);
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
         List<Tensor.FlattenedView<Double>> pFlattened = Lists.newArrayList();
 
