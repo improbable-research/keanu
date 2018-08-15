@@ -26,12 +26,12 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).acos();
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcCosdx = -1 / sqrt(1 - x^2)

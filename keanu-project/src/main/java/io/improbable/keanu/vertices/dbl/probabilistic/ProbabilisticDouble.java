@@ -1,41 +1,33 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
 import java.util.Map;
 
-public abstract class ProbabilisticDouble extends DoubleVertex {
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 
-    @Override
-    public DoubleTensor updateValue() {
-        if (!hasValue()) {
-            setValue(sample());
-        }
-        return getValue();
+public interface ProbabilisticDouble extends Probabilistic<DoubleTensor> {
+    default double logPdf(double value) {
+        return logPdf(DoubleTensor.scalar(value));
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return true;
+    default double logPdf(double[] values) {
+        return logPdf(DoubleTensor.create(values));
     }
 
-    @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        if (isObserved()) {
-            return DualNumber.createConstant(getValue());
-        } else {
-            return DualNumber.createWithRespectToSelf(getId(), getValue());
-        }
+    default double logPdf(DoubleTensor value) {
+        return logProb(value);
     }
 
+    default Map<Long, DoubleTensor> dLogPdf(double value) {
+        return dLogPdf(DoubleTensor.scalar(value));
+    }
 
-    @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        return null;
+    default Map<Long, DoubleTensor> dLogPdf(double[] values) {
+        return dLogPdf(DoubleTensor.create(values));
+    }
+
+    default Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+        return dLogProb(value);
     }
 
 }

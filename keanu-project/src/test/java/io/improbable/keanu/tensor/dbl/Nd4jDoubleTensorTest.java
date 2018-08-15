@@ -7,6 +7,7 @@ import org.nd4j.linalg.factory.Nd4j;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class Nd4jDoubleTensorTest {
 
@@ -14,6 +15,9 @@ public class Nd4jDoubleTensorTest {
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor matrixC;
     Nd4jDoubleTensor scalarA;
+    Nd4jDoubleTensor vectorA;
+    Nd4jDoubleTensor vectorB;
+    Nd4jDoubleTensor rankThreeTensor;
 
     @Before
     public void setup() {
@@ -21,6 +25,9 @@ public class Nd4jDoubleTensorTest {
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixC = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, new int[]{4, 4});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
+        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
+        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
+        rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
     }
 
     @Test
@@ -251,6 +258,41 @@ public class Nd4jDoubleTensorTest {
         assertEquals(expected, diff);
     }
 
+    @Test
+    public void canLinSpace() {
+        DoubleTensor actual = DoubleTensor.linspace(0, 10, 5);
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, 2.5, 5.0, 7.5, 10.0});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARange() {
+        DoubleTensor actual = DoubleTensor.arange(0, 5);
+        DoubleTensor expected = DoubleTensor.create(new double[]{0, 1, 2, 3, 4});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARangeWithStep() {
+        DoubleTensor actual = DoubleTensor.arange(3, 7, 2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 5});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARangeWithFractionStep() {
+        DoubleTensor actual = DoubleTensor.arange(3, 7, 0.5);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3, 3.5, 4.0, 4.5, 5.0, 5.5, 6.0, 6.5});
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canARangeWithFractionStepThatIsNotEvenlyDivisible() {
+        DoubleTensor actual = DoubleTensor.arange(3, 7, 1.5);
+        DoubleTensor expected = DoubleTensor.create(new double[]{3.0, 4.5, 6.0});
+        assertEquals(expected, actual);
+    }
+
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.times(right);
         assertEquals(actual, expected);
@@ -259,6 +301,19 @@ public class Nd4jDoubleTensorTest {
     private void assertTimesInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left.timesInPlace(right);
         assertEquals(left, expected);
+    }
+
+    @Test
+    public void canCalculateProductOfVector() {
+        double productVectorA = vectorA.product();
+        double productVectorB = vectorB.product();
+        double productRankThreeTensor = rankThreeTensor.product();
+
+        assertEquals(6., productVectorA, 1e-6);
+        assertEquals(6., productVectorB, 1e-6);
+        assertEquals(40320, productRankThreeTensor, 1e-6);
+
+        assertTrue(vectorA.isVector() && vectorB.isVector());
     }
 
 }

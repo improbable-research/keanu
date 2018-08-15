@@ -1,16 +1,18 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
 import java.util.HashMap;
 import java.util.Map;
 
-public class DoubleIfVertex extends NonProbabilisticDouble {
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+
+public class DoubleIfVertex extends DoubleVertex {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends DoubleTensor> thn;
@@ -20,6 +22,8 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((DoubleIfVertex) v).op(predicate.getValue(), thn.getValue(), els.getValue())));
 
         this.predicate = predicate;
         this.thn = thn;
@@ -33,22 +37,17 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
         return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
-    @Override
-    public DoubleTensor getDerivedValue() {
-        return op(predicate.getValue(), thn.getValue(), els.getValue());
-    }
-
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
         return predicate.setDoubleIf(thn, els);
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
         partials.put(thn, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.toDoubleMask()));

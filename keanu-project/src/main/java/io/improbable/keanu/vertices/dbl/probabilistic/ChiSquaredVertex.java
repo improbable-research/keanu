@@ -1,18 +1,20 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class ChiSquaredVertex extends ProbabilisticDouble {
+public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private IntegerVertex k;
 
@@ -25,6 +27,8 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
      * @param k           the number of degrees of freedom
      */
     public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
+        super(new ProbabilisticValueUpdater<>());
+
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 
         this.k = k;
@@ -56,12 +60,12 @@ public class ChiSquaredVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         return ChiSquared.withParameters(k.getValue()).logProb(value).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         throw new UnsupportedOperationException();
     }
 

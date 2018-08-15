@@ -1,17 +1,18 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.continuous.Triangular;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class TriangularVertex extends ProbabilisticDouble {
+public class TriangularVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -28,6 +29,7 @@ public class TriangularVertex extends ProbabilisticDouble {
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 
@@ -98,7 +100,7 @@ public class TriangularVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor xMinValues = xMin.getValue();
         DoubleTensor xMaxValues = xMax.getValue();
         DoubleTensor cValues = c.getValue();
@@ -108,7 +110,7 @@ public class TriangularVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         throw new UnsupportedOperationException();
     }
 

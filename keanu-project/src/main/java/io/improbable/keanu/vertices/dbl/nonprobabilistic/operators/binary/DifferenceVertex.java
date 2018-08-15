@@ -32,7 +32,7 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         partials.put(left, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf, left.getValue(), right.getValue()));
         partials.put(right, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0), right.getValue(), left.getValue()));

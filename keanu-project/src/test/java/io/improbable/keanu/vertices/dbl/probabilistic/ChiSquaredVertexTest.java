@@ -1,17 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class ChiSquaredVertexTest {
 
@@ -47,7 +46,7 @@ public class ChiSquaredVertexTest {
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
         int sampleCount = 1000000;
-        Vertex<DoubleTensor> vertex = new ChiSquaredVertex(new int[]{sampleCount, 1}, 2);
+        ChiSquaredVertex vertex = new ChiSquaredVertex(new int[]{sampleCount, 1}, 2);
 
         double from = 2;
         double to = 4;

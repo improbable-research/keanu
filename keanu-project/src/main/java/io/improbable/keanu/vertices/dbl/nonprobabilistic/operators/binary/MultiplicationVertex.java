@@ -32,7 +32,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
 
         PartialDerivatives rightPartial = derivativeOfOutputsWithRespectToSelf.multiplyBy(right.getValue());
