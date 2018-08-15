@@ -30,8 +30,8 @@ public class Multinomial implements DiscreteDistribution {
     }
 
     /**
-     * https://en.wikipedia.org/wiki/Multinomial_distribution
-     * Generalisation of the Binomial distribution to variables with >2 possible values
+     * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
+     * Generalisation of the Binomial distribution to variables with more than 2 possible values
      *
      * @param n The number of draws from the variable
      * @param p The probability of observing each of the k values (which sum to 1)
