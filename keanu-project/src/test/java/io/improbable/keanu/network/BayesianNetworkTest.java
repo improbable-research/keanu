@@ -59,7 +59,7 @@ public class BayesianNetworkTest {
         BoolVertex a = new BernoulliVertex(0.5);
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
-        BoolVertex or2 = ored.or(a);
+        BoolVertex unlabelled = ored.or(a);
         Vertex retrieved;
         VertexLabel labelA = new VertexLabel(LABEL_A);
         VertexLabel labelB = new VertexLabel(LABEL_B);
