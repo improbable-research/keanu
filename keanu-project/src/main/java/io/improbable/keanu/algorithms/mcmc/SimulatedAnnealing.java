@@ -25,6 +25,10 @@ import lombok.Setter;
 @Builder
 public class SimulatedAnnealing {
 
+    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
+    private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
+    private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
+
     public static SimulatedAnnealing withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
@@ -46,17 +50,17 @@ public class SimulatedAnnealing {
     @Getter
     @Setter
     @Builder.Default
-    private ProposalDistribution proposalDistribution = ProposalDistribution.usePrior();
+    private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
 
     @Getter
     @Setter
     @Builder.Default
-    private MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+    private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
 
     @Getter
     @Setter
     @Builder.Default
-    private boolean useCacheOnRejection = true;
+    private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
     public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                           int sampleCount) {

@@ -29,6 +29,9 @@ import lombok.Setter;
 @Builder
 public class Hamiltonian implements PosteriorSamplingAlgorithm {
 
+    private static final double DEFAULT_STEP_SIZE = 0.1;
+    private static final int DEFAULT_LEAP_FROG_COUNT = 20;
+
     public static Hamiltonian withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
@@ -36,8 +39,8 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     public static Hamiltonian withDefaultConfig(KeanuRandom random) {
         return Hamiltonian.builder()
             .random(random)
-            .leapFrogCount(20)
-            .stepSize(0.1)
+            .leapFrogCount(DEFAULT_LEAP_FROG_COUNT)
+            .stepSize(DEFAULT_STEP_SIZE)
             .build();
     }
 
@@ -50,13 +53,13 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     @Setter
     @Builder.Default
     //the number of times to leapfrog in each sample
-    private int leapFrogCount = 20;
+    private int leapFrogCount = DEFAULT_LEAP_FROG_COUNT;
 
     @Getter
     @Setter
     @Builder.Default
     //the amount of distance to move each leapfrog
-    private double stepSize = 0.1;
+    private double stepSize = DEFAULT_STEP_SIZE;
 
     /**
      * Sample from the posterior of a Bayesian Network using the Hamiltonian Monte Carlo algorithm

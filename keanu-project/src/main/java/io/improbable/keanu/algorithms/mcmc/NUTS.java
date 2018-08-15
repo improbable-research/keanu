@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
@@ -27,6 +26,9 @@ import lombok.Setter;
 @Builder
 public class NUTS implements PosteriorSamplingAlgorithm {
 
+    private static final int DEFAULT_ADAPT_COUNT = 1000;
+    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
+
     private static final double DELTA_MAX = 1000.0;
     private static final double STABILISER = 10;
     private static final double SHRINKAGE_FACTOR = 0.05;
@@ -39,6 +41,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public static NUTS withDefaultConfig(KeanuRandom random) {
         return NUTS.builder()
             .random(random)
+            .adaptCount(DEFAULT_ADAPT_COUNT)
+            .targetAcceptanceProb(DEFAULT_TARGET_ACCEPTANCE_PROB)
             .build();
     }
 
@@ -52,14 +56,14 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     @Getter
     @Setter
     @Builder.Default
-    private int adaptCount = 1000;
+    private int adaptCount = DEFAULT_ADAPT_COUNT;
 
     //The target acceptance probability, a suggested value of this is 0.65,
     //Beskos et al., 2010; Neal, 2011
     @Getter
     @Setter
     @Builder.Default
-    private double targetAcceptanceProb = 0.65;
+    private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
 
     /**
      * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm

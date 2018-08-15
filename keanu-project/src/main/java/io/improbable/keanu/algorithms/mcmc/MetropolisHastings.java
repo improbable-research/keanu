@@ -27,15 +27,19 @@ import lombok.Setter;
 @Builder
 public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
+    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
+    private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
+    private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
+
     public static MetropolisHastings withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
 
     public static MetropolisHastings withDefaultConfig(KeanuRandom random) {
         return MetropolisHastings.builder()
-            .proposalDistribution(ProposalDistribution.usePrior())
-            .variableSelector(SINGLE_VARIABLE_SELECTOR)
-            .useCacheOnRejection(true)
+            .proposalDistribution(DEFAULT_PROPOSAL_DISTRIBUTION)
+            .variableSelector(DEFAULT_VARIABLE_SELECTOR)
+            .useCacheOnRejection(DEFAULT_USE_CACHE_ON_REJECTION)
             .random(random)
             .build();
     }
@@ -48,17 +52,17 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     @Getter
     @Setter
     @Builder.Default
-    private ProposalDistribution proposalDistribution = ProposalDistribution.usePrior();
+    private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
 
     @Getter
     @Setter
     @Builder.Default
-    private MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+    private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
 
     @Getter
     @Setter
     @Builder.Default
-    private boolean useCacheOnRejection = true;
+    private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
     /**
      * @param bayesianNetwork      a bayesian network containing latent vertices
@@ -88,7 +92,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             latentVertices,
-            proposalDistribution,
+            DEFAULT_PROPOSAL_DISTRIBUTION,
             useCacheOnRejection,
             random
         );
