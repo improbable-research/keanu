@@ -254,10 +254,10 @@ public class MetropolisHastingsTest {
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        NetworkSamples samples = algo.generatePosteriorSamples(network, network.getLatentVertices(), sampleCount)
+        NetworkSamples samples = algo.generatePosteriorSamples(network, network.getLatentVertices())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
-            .generate();
+            .generate(sampleCount);
 
         assertEquals((sampleCount - dropCount) / downSampleInterval, samples.size());
         assertEquals(0.0, samples.getDoubleTensorSamples(A).getAverages().scalar(), 0.1);
@@ -274,11 +274,11 @@ public class MetropolisHastingsTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
-        double averageA = algo.generatePosteriorSamples(network, network.getLatentVertices(), sampleCount)
+        double averageA = algo.generatePosteriorSamples(network, network.getLatentVertices())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .stream()
-            .limit(100)
+            .limit(200)
             .mapToDouble(networkState -> networkState.get(A).scalar())
             .average().getAsDouble();
 

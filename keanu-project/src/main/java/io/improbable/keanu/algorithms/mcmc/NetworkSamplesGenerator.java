@@ -14,31 +14,29 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class NetworkSamplesGenerator {
 
-    private final int totalCount;
     private final SamplingAlgorithm algorithm;
 
     @Getter
     @Setter
-    private int dropCount;
+    private int dropCount = 0;
 
     @Getter
     @Setter
-    private int downSampleInterval;
+    private int downSampleInterval = 1;
 
 
-    public NetworkSamplesGenerator(int totalCount, SamplingAlgorithm algorithm) {
-        this.totalCount = totalCount;
+    public NetworkSamplesGenerator(SamplingAlgorithm algorithm) {
         this.algorithm = algorithm;
     }
 
-    public NetworkSamples generate() {
+    public NetworkSamples generate(final int totalSampleCount) {
 
         Map<Long, List<?>> samplesByVertex = new HashMap<>();
 
         dropSamples(dropCount);
 
         int sampleCount = 0;
-        int samplesLeft = totalCount - dropCount;
+        int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
             if (i % downSampleInterval == 0) {
                 algorithm.sample(samplesByVertex);
@@ -57,7 +55,7 @@ public class NetworkSamplesGenerator {
 
         return Stream.generate(() -> {
 
-            for (int i = 0; i < downSampleInterval; i++) {
+            for (int i = 0; i < downSampleInterval - 1; i++) {
                 algorithm.step();
             }
 
@@ -71,12 +69,4 @@ public class NetworkSamplesGenerator {
         }
     }
 
-    public interface SamplingAlgorithm {
-
-        void step();
-
-        void sample(Map<Long, List<?>> samples);
-
-        NetworkState sample();
-    }
 }

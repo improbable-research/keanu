@@ -50,13 +50,13 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     @Setter
     @Builder.Default
     //the number of times to leapfrog in each sample
-    private int leapFrogCount;
+    private int leapFrogCount = 20;
 
     @Getter
     @Setter
     @Builder.Default
     //the amount of distance to move each leapfrog
-    private double stepSize;
+    private double stepSize = 0.1;
 
     /**
      * Sample from the posterior of a Bayesian Network using the Hamiltonian Monte Carlo algorithm

@@ -70,19 +70,18 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
                                               List<? extends Vertex> verticesToSampleFrom,
                                               int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, verticesToSampleFrom, sampleCount)
-            .generate();
+        return generatePosteriorSamples(bayesianNetwork, verticesToSampleFrom)
+            .generate(sampleCount);
     }
 
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
-                                                            final List<? extends Vertex> verticesToSampleFrom,
-                                                            final int sampleCount) {
+                                                            final List<? extends Vertex> verticesToSampleFrom) {
 
-        return new NetworkSamplesGenerator(sampleCount, setupSampler(bayesianNetwork, verticesToSampleFrom));
+        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom));
     }
 
-    private NetworkSamplesGenerator.SamplingAlgorithm setupSampler(final BayesianNetwork bayesianNetwork,
-                                                                   final List<? extends Vertex> verticesToSampleFrom) {
+    private SamplingAlgorithm setupSampler(final BayesianNetwork bayesianNetwork,
+                                           final List<? extends Vertex> verticesToSampleFrom) {
         checkBayesNetInHealthyState(bayesianNetwork);
 
         List<Vertex> latentVertices = bayesianNetwork.getLatentVertices();
@@ -99,7 +98,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         return new Sampler(latentVertices, verticesToSampleFrom, mhStep, variableSelector, logProbabilityBeforeStep);
     }
 
-    public static class Sampler implements NetworkSamplesGenerator.SamplingAlgorithm {
+    public static class Sampler implements SamplingAlgorithm {
 
         private final List<Vertex> latentVertices;
         private final List<? extends Vertex> verticesToSampleFrom;
