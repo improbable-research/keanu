@@ -1,5 +1,9 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -10,13 +14,8 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
-
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
@@ -69,31 +68,12 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
 
         if (!(probTrue instanceof Differentiable)) {
-            throw new UnsupportedOperationException("Probability is non-differentiable");
+            throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
         }
 
-        DualNumber probTrueDual = ((Differentiable) probTrue).getDualNumber();
-        DoubleTensor probTrueValue = probTrueDual.getValue();
-        PartialDerivatives probTruePartialDerivatives = probTrueDual.getPartialDerivatives();
+        PartialDerivatives probTruePartialDerivatives = ((Differentiable) probTrue).getDualNumber().getPartialDerivatives();
 
-        DoubleTensor greaterThanMask = probTrueValue
-            .getGreaterThanMask(DoubleTensor.ONE_SCALAR);
-
-        DoubleTensor lessThanOrEqualToMask = probTrueValue
-            .getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR);
-
-        DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
-
-        DoubleTensor dlogProbdxForTrue = probTrueValue.reciprocal();
-        dlogProbdxForTrue = dlogProbdxForTrue.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
-
-        DoubleTensor dlogProbdxForFalse = probTrueValue.minus(1.0).reciprocalInPlace();
-        dlogProbdxForFalse = dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
-
-        DoubleTensor dLogPdp = value.setDoubleIf(
-            dlogProbdxForTrue,
-            dlogProbdxForFalse
-        );
+        DoubleTensor dLogPdp = Bernoulli.withParameters(probTrue.getValue()).dLogProb(value);
 
         PartialDerivatives partials = probTruePartialDerivatives
             .multiplyBy(dLogPdp)

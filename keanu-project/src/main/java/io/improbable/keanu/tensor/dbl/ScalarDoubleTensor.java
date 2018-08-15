@@ -1,14 +1,15 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.util.FastMath;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.FastMath;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -782,9 +783,9 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public String toString() {
-        return "ScalarDoubleTensor{" +
-            "value=" + value +
-            ", shape=" + Arrays.toString(shape) +
-            '}';
+        return "{\n" +
+            "data = [" + value + "]" +
+            "\nshape = " + Arrays.toString(shape) +
+            "\n}";
     }
 }

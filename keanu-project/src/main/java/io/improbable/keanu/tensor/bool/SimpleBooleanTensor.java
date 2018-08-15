@@ -1,17 +1,19 @@
 package io.improbable.keanu.tensor.bool;
 
+import static java.util.Arrays.copyOf;
+
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+
+import java.util.Arrays;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.Arrays;
-
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static java.util.Arrays.copyOf;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 
@@ -306,10 +308,20 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public String toString() {
-        return "SimpleBooleanTensor{" +
-            "data=" + Arrays.toString(data) +
-            ", shape=" + Arrays.toString(shape) +
-            '}';
+
+        StringBuilder dataString = new StringBuilder();
+        if (data.length > 20) {
+            dataString.append(Arrays.toString(Arrays.copyOfRange(data, 0, 10)));
+            dataString.append("...");
+            dataString.append(Arrays.toString(Arrays.copyOfRange(data, data.length - 10, data.length)));
+        } else {
+            dataString.append(Arrays.toString(data));
+        }
+
+        return "{\n" +
+            "shape = " + Arrays.toString(shape) +
+            "\ndata = " + dataString.toString() +
+            "\n}";
     }
 
     @Override

@@ -1,5 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -9,9 +12,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
-
-import java.util.List;
-import java.util.Map;
 
 public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
 
@@ -48,7 +48,7 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
-        return dualNumbers.get(vertex);
+        return vertex == null ? dualNumbers.get(defaultResult) : dualNumbers.get(vertex);
     }
 
 }
