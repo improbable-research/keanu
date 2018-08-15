@@ -1,5 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import static junit.framework.TestCase.assertTrue;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -8,6 +14,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class NUTSTest {
 
@@ -81,6 +88,32 @@ public class NUTSTest {
         Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
+    }
+
+    @Test
+    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
+
+        GaussianVertex A = new GaussianVertex(0.0, 1.0);
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+        net.probeForNonZeroProbability(100, random);
+
+        NUTS nuts = NUTS.builder()
+            .build();
+
+        assertTrue(nuts.getAdaptCount() > 0);
+        assertTrue(nuts.getTargetAcceptanceProb() > 0);
+        assertNotNull(nuts.getRandom());
+
+        NetworkSamples posteriorSamples = nuts.getPosteriorSamples(
+            net,
+            net.getLatentVertices(),
+            2
+        );
+
+        nuts.setRandom(null);
+        assertNull(nuts.getRandom());
+
+        assertFalse(posteriorSamples.get(A).asList().isEmpty());
     }
 }
 

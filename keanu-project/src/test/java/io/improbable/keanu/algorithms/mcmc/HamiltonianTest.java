@@ -1,5 +1,11 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
+import static junit.framework.TestCase.assertTrue;
+
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -9,6 +15,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class HamiltonianTest {
 
@@ -79,5 +86,32 @@ public class HamiltonianTest {
         Vertex<DoubleTensor> B = donutBayesNet.getContinuousLatentVertices().get(1);
 
         MCMCTestDistributions.samplesMatch2DDonut(samples.get(A).asList(), samples.get(B).asList());
+    }
+
+
+    @Test
+    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
+
+        GaussianVertex A = new GaussianVertex(0.0, 1.0);
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+        net.probeForNonZeroProbability(100, KeanuRandom.getDefaultRandom());
+
+        Hamiltonian hmc = Hamiltonian.builder()
+            .build();
+
+        assertTrue(hmc.getLeapFrogCount() > 0);
+        assertTrue(hmc.getStepSize() > 0);
+        assertNotNull(hmc.getRandom());
+
+        NetworkSamples posteriorSamples = hmc.getPosteriorSamples(
+            net,
+            net.getLatentVertices(),
+            2
+        );
+
+        hmc.setRandom(null);
+        assertNull(hmc.getRandom());
+
+        assertFalse(posteriorSamples.get(A).asList().isEmpty());
     }
 }
