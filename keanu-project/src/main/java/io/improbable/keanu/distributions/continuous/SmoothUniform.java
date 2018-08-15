@@ -7,6 +7,35 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * The Smooth Uniform distribution is the usual Uniform distribution with the edges
+ * at max and min smoothed by attaching a sigmoid as shoulders.
+ * <p>
+ * Math:
+ * <p>
+ * let sigmoid shoulder function be f(x), Sw be shoulder width, Bw be base (max-min) width,
+ * and h be the bodyHeight of the base.
+ * <p>
+ * f(x) = Ax^3 + Bx^2
+ * f'(x) = 3Ax^2 + 2Bx
+ * integral f = Ax^4/4 + Bx^3/3
+ * <p>
+ * f(Sw) = h
+ * integral of f from 0 to Sw = 1 (area under the curve must be 1)
+ * f'(Sw) = 0
+ * <p>
+ * yields:
+ * <p>
+ * |  0    3Sw^2    2Sw   |   | h |   | 0 |
+ * | -1    Sw^3     Sw^2  | * | A | = | 0 |
+ * | Bw    Sw/4     2Sw/3 |   | B |   | 1 |
+ * <p>
+ * therefore:
+ * <p>
+ * h = 1 / (Sw + Bw)
+ * A = -2 / (Sw^3 * (Sw + Bw))
+ * B = 3 / (Sw^3 * Sw^2*Bw)
+ */
 public class SmoothUniform implements ContinuousDistribution {
 
     private final DoubleTensor xMin;
