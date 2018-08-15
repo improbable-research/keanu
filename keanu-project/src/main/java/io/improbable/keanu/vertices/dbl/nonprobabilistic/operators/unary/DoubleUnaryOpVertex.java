@@ -16,7 +16,6 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
      * @param inputVertex a vertex
      */
     public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
-        super();
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(DoubleTensor.placeHolder(shape));

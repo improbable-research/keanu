@@ -36,10 +36,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVert
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
-    public DoubleVertex() {
-        super();
-    }
-
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
     }

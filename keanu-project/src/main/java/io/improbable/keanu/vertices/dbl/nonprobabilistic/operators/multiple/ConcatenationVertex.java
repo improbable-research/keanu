@@ -29,7 +29,6 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
      * @param input     the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
-        super();
         this.dimension = dimension;
         this.input = input;
         setParents(input);

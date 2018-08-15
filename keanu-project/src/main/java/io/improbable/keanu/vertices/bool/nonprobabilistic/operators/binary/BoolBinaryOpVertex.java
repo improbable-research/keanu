@@ -13,8 +13,6 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     protected final Vertex<B> b;
 
     public BoolBinaryOpVertex(int[] shape, Vertex<A> a, Vertex<B> b) {
-        super();
-
         this.a = a;
         this.b = b;
         setParents(a, b);

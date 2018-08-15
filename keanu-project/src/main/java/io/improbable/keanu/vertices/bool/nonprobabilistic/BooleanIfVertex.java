@@ -16,7 +16,6 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
                            Vertex<? extends BooleanTensor> predicate,
                            Vertex<? extends BooleanTensor> thn,
                            Vertex<? extends BooleanTensor> els) {
-        super();
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

@@ -16,7 +16,6 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
                     Vertex<? extends BooleanTensor> predicate,
                     Vertex<? extends Tensor<T>> thn,
                     Vertex<? extends Tensor<T>> els) {
-        super();
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

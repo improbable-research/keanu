@@ -26,8 +26,6 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param k           the number of degrees of freedom
      */
     public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
-        super();
-
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 
         this.k = k;

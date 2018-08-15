@@ -20,7 +20,6 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
-        super();
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

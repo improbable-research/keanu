@@ -12,7 +12,6 @@ public class MultiplexerVertex<T> extends Vertex<T> implements NonProbabilistic<
     private final Vertex<T>[] selectVertices;
 
     public MultiplexerVertex(IntegerVertex selectorControlVertex, Vertex<T>... select) {
-        super();
 
         if (!TensorShape.isScalar(selectorControlVertex.getShape())) {
             throw new IllegalArgumentException("Select control must be scalar integer");

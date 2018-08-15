@@ -19,7 +19,6 @@ public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> implements NonPro
     public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
                      Map<Condition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
-        super();
         this.conditions = conditions;
         this.inputs = inputs;
         this.defaultResult = defaultResult;
@@ -35,6 +34,7 @@ public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> implements NonPro
         return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
+    @Override
     public OUT calculate() {
         final Condition condition = getCondition(v -> v.getValue().scalar());
         Vertex<OUT> vertex = conditions.get(condition);

@@ -24,7 +24,6 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
      * @param input     the input vertices to concatenate
      */
     public BoolConcatenationVertex(int dimension, BoolVertex... input) {
-        super();
         this.dimension = dimension;
         this.input = input;
         setParents(input);

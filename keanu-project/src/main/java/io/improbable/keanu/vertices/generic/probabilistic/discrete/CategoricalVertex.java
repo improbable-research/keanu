@@ -28,7 +28,6 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     public CategoricalVertex(Map<T, DoubleVertex> selectableValues) {
-        super();
         this.selectableValues = selectableValues;
         setParents(this.selectableValues.values());
     }

@@ -25,7 +25,6 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
                                 Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        super();
         this.left = left;
         this.right = right;
         this.op = op;

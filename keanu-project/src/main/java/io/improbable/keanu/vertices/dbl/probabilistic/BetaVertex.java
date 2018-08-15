@@ -34,7 +34,6 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
      */
     public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
-        super();
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 

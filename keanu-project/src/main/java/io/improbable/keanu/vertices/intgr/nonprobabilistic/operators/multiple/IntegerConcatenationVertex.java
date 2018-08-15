@@ -24,7 +24,6 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
      * @param input     the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
-        super();
         this.dimension = dimension;
         this.input = input;
         setParents(input);

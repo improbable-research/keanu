@@ -14,7 +14,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     public ConstantDoubleVertex(DoubleTensor constant) {
-        super();
         setValue(constant);
     }
 

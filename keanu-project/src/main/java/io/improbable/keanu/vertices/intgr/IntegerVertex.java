@@ -19,10 +19,6 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
-    public IntegerVertex() {
-        super();
-    }
-
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);
     }

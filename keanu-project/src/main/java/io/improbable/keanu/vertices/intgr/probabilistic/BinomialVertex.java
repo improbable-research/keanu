@@ -19,7 +19,6 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     private final IntegerVertex n;
 
     public BinomialVertex(int[] tensorShape, DoubleVertex p, IntegerVertex n) {
-        super();
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
         this.p = p;

@@ -18,7 +18,6 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     private final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
-        super();
         this.inputVertex = inputVertex;
         this.op = op;
         this.dualNumberSupplier = dualNumberCalculation;

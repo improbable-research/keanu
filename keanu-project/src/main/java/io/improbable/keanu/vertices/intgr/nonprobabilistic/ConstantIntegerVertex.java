@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 public class ConstantIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     public ConstantIntegerVertex(IntegerTensor constant) {
-        super();
         setValue(constant);
     }
 

@@ -26,7 +26,6 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     private final Supplier<DualNumber> dualNumberSupplier;
 
     public ReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> f, Supplier<DualNumber> dualNumberSupplier) {
-        super();
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }

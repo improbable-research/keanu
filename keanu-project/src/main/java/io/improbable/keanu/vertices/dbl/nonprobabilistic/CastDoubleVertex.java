@@ -15,7 +15,6 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
     private final Vertex<? extends NumberTensor> inputVertex;
 
     public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
-        super();
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }

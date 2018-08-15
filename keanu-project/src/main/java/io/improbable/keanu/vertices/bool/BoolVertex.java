@@ -16,10 +16,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVer
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
-    public BoolVertex() {
-        super();
-    }
-
     @SafeVarargs
     public final BoolVertex or(Vertex<BooleanTensor>... those) {
         if (those.length == 0) return this;

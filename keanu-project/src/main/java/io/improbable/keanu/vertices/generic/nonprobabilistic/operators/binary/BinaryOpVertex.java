@@ -10,7 +10,6 @@ public abstract class BinaryOpVertex<A, B, C> extends Vertex<C> implements NonPr
     protected final Vertex<B> b;
 
     public BinaryOpVertex(Vertex<A> a, Vertex<B> b) {
-        super();
         this.a = a;
         this.b = b;
         setParents(a, b);

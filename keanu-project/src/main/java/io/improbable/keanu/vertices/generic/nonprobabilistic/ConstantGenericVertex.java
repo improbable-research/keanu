@@ -7,7 +7,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class ConstantGenericVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
 
     public ConstantGenericVertex(T value) {
-        super();
         setValue(value);
     }
 

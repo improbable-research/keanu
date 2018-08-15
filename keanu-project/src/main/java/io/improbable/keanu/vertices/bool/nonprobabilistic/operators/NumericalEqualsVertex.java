@@ -20,7 +20,6 @@ public class NumericalEqualsVertex extends BoolVertex implements NonProbabilisti
     public NumericalEqualsVertex(Vertex<? extends NumberTensor> a,
                                  Vertex<? extends NumberTensor> b,
                                  Vertex<? extends NumberTensor> epsilon) {
-        super();
         this.a = a;
         this.b = b;
         this.epsilon = epsilon;

@@ -12,7 +12,6 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
     protected final IntegerVertex b;
 
     public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b) {
-        super();
         this.a = a;
         this.b = b;
         setParents(a, b);

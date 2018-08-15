@@ -11,7 +11,6 @@ public class ConstantBoolVertex extends BoolVertex implements NonProbabilistic<B
     public static final BoolVertex FALSE = new ConstantBoolVertex(false);
 
     public ConstantBoolVertex(BooleanTensor constant) {
-        super();
         setValue(constant);
     }
 
