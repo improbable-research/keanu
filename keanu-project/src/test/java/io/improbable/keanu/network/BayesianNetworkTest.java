@@ -6,10 +6,11 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 
-import io.improbable.keanu.vertices.Vertex;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 
@@ -58,17 +59,20 @@ public class BayesianNetworkTest {
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
         Vertex retrieved;
+        VertexLabel labelA = new VertexLabel(LABEL_A);
+        VertexLabel labelB = new VertexLabel(LABEL_B);
+        VertexLabel labelOr = new VertexLabel(LABEL_ORED);
 
-        a.setLabel(LABEL_A);
-        b.setLabel(LABEL_B);
-        ored.setLabel(LABEL_ORED);
+        a.setLabel(labelA);
+        b.setLabel(labelB);
+        ored.setLabel(labelOr);
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
-        retrieved = net.getVertexByLabel(LABEL_A);
+        retrieved = net.getVertexByLabel(labelA);
         assertThat(retrieved, is(a));
-        retrieved = net.getVertexByLabel(LABEL_B);
+        retrieved = net.getVertexByLabel(labelB);
         assertThat(retrieved, is(b));
-        retrieved = net.getVertexByLabel(LABEL_ORED);
+        retrieved = net.getVertexByLabel(labelOr);
         assertThat(retrieved, is(ored));
     }
 
@@ -78,8 +82,8 @@ public class BayesianNetworkTest {
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
 
-        a.setLabel(LABEL_A);
-        b.setLabel(LABEL_A);
+        a.setLabel(new VertexLabel(LABEL_A));
+        b.setLabel(new VertexLabel(LABEL_A));
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }

@@ -1,6 +1,11 @@
 package io.improbable.keanu.network;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
@@ -10,30 +15,31 @@ import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
-    private final Map<String, Vertex> vertexLabels;
+    private final Map<VertexLabel, Vertex> vertexLabels;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
-        this.vertexLabels = getLabels(vertices);
+        this.vertexLabels = buildLabelMap(vertices);
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
-    public Vertex getVertexByLabel(String label) {
+    public Vertex getVertexByLabel(VertexLabel label) {
         return vertexLabels.get(label);
     }
 
-    private Map<String, Vertex> getLabels(Set<? extends Vertex>vertices) {
-        Map<String, Vertex> labelMap = new HashMap<>();
+    private static Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
+        Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
-            String label = v.getLabel();
+            VertexLabel label = v.getLabel();
             if (label != null && labelMap.containsKey(label)) {
                 throw new IllegalArgumentException("Vertex Label Repeated: " + label);
             } else {

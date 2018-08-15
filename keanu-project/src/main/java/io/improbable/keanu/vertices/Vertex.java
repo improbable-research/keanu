@@ -24,7 +24,7 @@ public abstract class Vertex<T> implements Observable<T> {
     private T value;
     private final ValueUpdater<T> valueUpdater;
     private final Observable<T> observation;
-    private String label = null;
+    private VertexLabel label = null;
 
     public Vertex(ValueUpdater<T> valueUpdater) {
         this.valueUpdater = valueUpdater;
@@ -35,11 +35,11 @@ public abstract class Vertex<T> implements Observable<T> {
      * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
      * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
      */
-    public void setLabel(String label) {
+    public void setLabel(VertexLabel label) {
         this.label = label;
     }
 
-    public String getLabel() {
+    public VertexLabel getLabel() {
         return this.label;
     }
 
