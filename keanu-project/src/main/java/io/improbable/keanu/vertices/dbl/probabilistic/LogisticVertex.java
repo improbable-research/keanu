@@ -16,11 +16,12 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
-public class LogisticVertex extends ProbabilisticDouble {
+public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
@@ -35,6 +36,7 @@ public class LogisticVertex extends ProbabilisticDouble {
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
 
@@ -61,7 +63,7 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor muValues = mu.getValue();
         DoubleTensor sValues = s.getValue();
 
@@ -71,7 +73,7 @@ public class LogisticVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }

@@ -1,5 +1,9 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -10,12 +14,10 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class PoissonVertex extends ProbabilisticInteger {
+public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger {
 
     private final DoubleVertex mu;
 
@@ -28,6 +30,7 @@ public class PoissonVertex extends ProbabilisticInteger {
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
     public PoissonVertex(int[] shape, DoubleVertex mu) {
+        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 
@@ -63,12 +66,12 @@ public class PoissonVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double logPmf(IntegerTensor value) {
+    public double logProb(IntegerTensor value) {
         return Poisson.withParameters(mu.getValue()).logProb(value).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPmf(IntegerTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
         throw new UnsupportedOperationException();
     }
 

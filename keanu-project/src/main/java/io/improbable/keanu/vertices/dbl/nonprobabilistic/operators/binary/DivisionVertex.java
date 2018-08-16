@@ -39,7 +39,7 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         DoubleTensor leftValue = left.getValue();
         DoubleTensor rightValue = right.getValue();

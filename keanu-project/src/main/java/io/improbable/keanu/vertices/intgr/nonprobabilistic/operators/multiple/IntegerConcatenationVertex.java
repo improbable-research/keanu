@@ -1,18 +1,18 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class IntegerConcatenationVertex extends NonProbabilisticInteger {
+public class IntegerConcatenationVertex extends IntegerVertex {
 
     private final int dimension;
     private final IntegerVertex[] input;
@@ -21,9 +21,10 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input the input vertices to concatenate
+     * @param input     the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
+        super(new NonProbabilisticValueUpdater<>(v -> ((IntegerConcatenationVertex) v).apply()));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
@@ -31,8 +32,7 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
         setValue(IntegerTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
-    @Override
-    public IntegerTensor getDerivedValue() {
+    public IntegerTensor apply() {
         return op(extractFromInputs(IntegerTensor.class, Vertex::getValue));
     }
 

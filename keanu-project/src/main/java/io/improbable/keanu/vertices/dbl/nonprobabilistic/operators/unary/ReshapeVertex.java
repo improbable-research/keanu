@@ -26,12 +26,12 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).reshape(proposedShape);
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         //TODO
         return null;
     }

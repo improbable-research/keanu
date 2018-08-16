@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.sampling;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +28,8 @@ public class RejectionSamplerTest {
         double v1ProbTrue = 0.4;
         double v2ProbTrue = 0.8;
 
-        v1 = new Flip(v1ProbTrue);
-        v2 = new Flip(v2ProbTrue);
+        v1 = new BernoulliVertex(v1ProbTrue);
+        v2 = new BernoulliVertex(v2ProbTrue);
         v3 = v1.or(v2);
 
         double v3ProbTrue = v1ProbTrue + v2ProbTrue - (v1ProbTrue * v2ProbTrue);

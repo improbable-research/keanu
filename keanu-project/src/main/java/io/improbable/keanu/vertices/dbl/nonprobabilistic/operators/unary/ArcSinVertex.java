@@ -26,12 +26,12 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(inputVertex).asin();
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
         //dArcSindx = 1 / sqrt(1 - x^2)

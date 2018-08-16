@@ -27,7 +27,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         DualNumber dualNumber = dualNumbers.get(inputVertex);
         DoubleTensor x = dualNumber.getValue();
         DoubleTensor xExp = x.exp();
@@ -37,7 +37,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         DoubleTensor sigmoidOfInput = getValue();
         //dSigmoid = sigmoid(x)*(1-sigmoid(x))
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));

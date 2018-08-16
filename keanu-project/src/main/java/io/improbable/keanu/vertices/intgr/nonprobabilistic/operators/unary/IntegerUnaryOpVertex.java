@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
+public abstract class IntegerUnaryOpVertex extends IntegerVertex {
 
     protected final IntegerVertex inputVertex;
 
@@ -16,6 +16,8 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
      * @param inputVertex a vertex
      */
     public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((IntegerUnaryOpVertex) v).op(inputVertex.getValue())));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(IntegerTensor.placeHolder(shape));
@@ -24,10 +26,6 @@ public abstract class IntegerUnaryOpVertex extends NonProbabilisticInteger {
     @Override
     public IntegerTensor sample(KeanuRandom random) {
         return op(inputVertex.sample(random));
-    }
-
-    public IntegerTensor getDerivedValue() {
-        return op(inputVertex.getValue());
     }
 
     protected abstract IntegerTensor op(IntegerTensor a);

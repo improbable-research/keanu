@@ -66,8 +66,8 @@ public class Model {
     private BayesianNetwork buildBayesianNetwork() {
 
         switchpoint = new UniformIntVertex(data.startYear, data.endYear + 1);
-        earlyRate = new ExponentialVertex(1.0, 1.0);
-        lateRate = new ExponentialVertex(1.0, 1.0);
+        earlyRate = new ExponentialVertex(1.0);
+        lateRate = new ExponentialVertex(1.0);
 
         ConstantIntegerVertex years = ConstantVertex.of(data.years);
 

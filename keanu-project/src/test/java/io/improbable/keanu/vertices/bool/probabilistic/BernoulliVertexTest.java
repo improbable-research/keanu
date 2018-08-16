@@ -7,21 +7,21 @@ import org.junit.Test;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-public class FlipVertexTest {
+public class BernoulliVertexTest {
 
     @Test
     public void doesTensorSample() {
         int[] expectedShape = new int[]{1, 100};
-        Flip flip = new Flip(expectedShape, 0.25);
-        BooleanTensor samples = flip.sample(new KeanuRandom(1));
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(expectedShape, 0.25);
+        BooleanTensor samples = bernoulliVertex.sample(new KeanuRandom(1));
         assertArrayEquals(expectedShape, samples.getShape());
     }
 
     @Test
     public void doesExpectedLogProbOnTensor() {
         double probTrue = 0.25;
-        Flip flip = new Flip(new int[]{1, 2}, probTrue);
-        double actualLogPmf = flip.logPmf(BooleanTensor.create(new boolean[]{true, false}));
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(new int[]{1, 2}, probTrue);
+        double actualLogPmf = bernoulliVertex.logPmf(BooleanTensor.create(new boolean[]{true, false}));
         double expectedLogPmf = Math.log(probTrue) + Math.log(1 - probTrue);
         assertEquals(expectedLogPmf, actualLogPmf, 1e-10);
     }

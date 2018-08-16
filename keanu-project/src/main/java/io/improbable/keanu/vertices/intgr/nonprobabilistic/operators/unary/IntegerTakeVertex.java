@@ -1,12 +1,11 @@
-package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
+package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class BoolPluckVertex extends BoolUnaryOpVertex<BooleanTensor> {
+public class IntegerTakeVertex extends IntegerUnaryOpVertex {
 
     private final int[] index;
 
@@ -16,15 +15,15 @@ public class BoolPluckVertex extends BoolUnaryOpVertex<BooleanTensor> {
      * @param inputVertex the input vertex to extract from
      * @param index the index to extract at
      */
-    public BoolPluckVertex(BoolVertex inputVertex, int... index) {
+    public IntegerTakeVertex(IntegerVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
     }
 
     @Override
-    protected BooleanTensor op(BooleanTensor a) {
-        return BooleanTensor.scalar(a.getValue(index));
+    protected IntegerTensor op(IntegerTensor a) {
+        return IntegerTensor.scalar(a.getValue(index));
     }
 
 }
