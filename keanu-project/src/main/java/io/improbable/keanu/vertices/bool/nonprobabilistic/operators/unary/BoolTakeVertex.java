@@ -6,6 +6,8 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
+    private final int[] index;
+
     /**
      * A vertex that extracts a scalar at a given index
      *
@@ -13,7 +15,13 @@ public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
      * @param index the index to extract at
      */
     public BoolTakeVertex(BoolVertex inputVertex, int... index) {
-        super(Tensor.SCALAR_SHAPE, inputVertex, a -> BooleanTensor.scalar(a.getValue(index)));
+        super(Tensor.SCALAR_SHAPE, inputVertex);
+        this.index = index;
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
+    }
+
+    @Override
+    protected BooleanTensor op(BooleanTensor value) {
+        return BooleanTensor.scalar(value.getValue(index));
     }
 }
