@@ -7,6 +7,8 @@ import java.util.Map;
 
 public class HalfCauchyVertex extends CauchyVertex {
 
+    private static final double LOG_TWO = Math.log(2);
+
     /**
      * One scale that matches a proposed tensor shape of Cauchy
      * <p>
@@ -34,7 +36,7 @@ public class HalfCauchyVertex extends CauchyVertex {
     @Override
     public double logProb(DoubleTensor value) {
         if (value.greaterThanOrEqual(0.0).allTrue()) {
-            return super.logProb(value);
+            return super.logProb(value) + LOG_TWO;
         }
         return Double.NEGATIVE_INFINITY;
     }
