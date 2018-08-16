@@ -99,12 +99,17 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSumVertex(this);
     }
 
-    public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpVertex(shape, this, op);
+    public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> operation) {
+        return new IntegerUnaryOpVertex(shape, this) {
+            @Override
+            protected IntegerTensor op(IntegerTensor value) {
+                return operation.apply(value);
+            }
+        };
     }
 
     public IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpVertex(this.getShape(), this, op);
+        return lambda(this.getShape(), op);
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)

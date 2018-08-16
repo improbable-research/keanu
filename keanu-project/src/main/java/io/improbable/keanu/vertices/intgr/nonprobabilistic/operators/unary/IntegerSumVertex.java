@@ -11,6 +11,11 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
      * @param inputVertex the vertex to have its values summed
      */
     public IntegerSumVertex(IntegerVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex, a -> IntegerTensor.scalar(a.sum()));
+        super(inputVertex.getShape(), inputVertex);
+    }
+
+    @Override
+    protected IntegerTensor op(IntegerTensor value) {
+        return IntegerTensor.scalar(value.sum());
     }
 }

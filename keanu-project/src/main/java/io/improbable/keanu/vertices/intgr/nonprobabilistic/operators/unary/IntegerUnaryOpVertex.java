@@ -1,25 +1,21 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class IntegerUnaryOpVertex extends IntegerVertex {
+public abstract class IntegerUnaryOpVertex extends IntegerVertex {
 
     protected final IntegerVertex inputVertex;
-    private final Function<IntegerTensor, IntegerTensor> op;
 
     /**
      * A vertex that performs a user defined operation on a singe input vertex
      *
      * @param inputVertex the input vertex
-     * @param op          operation used to sample
      */
-    public IntegerUnaryOpVertex(IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
-        this(inputVertex.getShape(), inputVertex, op);
+    public IntegerUnaryOpVertex(IntegerVertex inputVertex) {
+        this(inputVertex.getShape(), inputVertex);
 
     }
 
@@ -28,19 +24,19 @@ public class IntegerUnaryOpVertex extends IntegerVertex {
      *
      * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
-     * @param op          operation used to sample
      */
-    public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex, Function<IntegerTensor, IntegerTensor> op) {
+    public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {
         super(
-            new NonProbabilisticValueUpdater<>(v -> op.apply(inputVertex.getValue())));
+            new NonProbabilisticValueUpdater<>(v -> ((IntegerUnaryOpVertex) v).op(inputVertex.getValue())));
         this.inputVertex = inputVertex;
-        this.op = op;
         setParents(inputVertex);
         setValue(IntegerTensor.placeHolder(shape));
     }
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return op.apply(inputVertex.sample(random));
+        return op(inputVertex.sample(random));
     }
+
+    protected abstract IntegerTensor op(IntegerTensor value);
 }
