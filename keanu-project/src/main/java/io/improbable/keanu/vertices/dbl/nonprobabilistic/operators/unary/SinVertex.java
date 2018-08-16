@@ -12,6 +12,16 @@ public class SinVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public SinVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::sin, DualNumber::sin);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.sin();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.sin();
     }
 }

@@ -14,12 +14,16 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public SigmoidVertex(DoubleVertex inputVertex) {
-        super(inputVertex,
-            a -> a.unaryMinus().expInPlace().plusInPlace(1).reciprocalInPlace(),
-            a -> op(a));
+        super(inputVertex);
     }
 
-    public static DualNumber op(DualNumber a) {
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.unaryMinus().expInPlace().plusInPlace(1).reciprocalInPlace();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber a) {
         DoubleTensor x = a.getValue();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));

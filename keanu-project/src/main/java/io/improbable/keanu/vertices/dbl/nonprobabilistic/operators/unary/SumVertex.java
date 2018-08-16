@@ -13,8 +13,16 @@ public class SumVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex to have its values summed
      */
     public SumVertex(DoubleVertex inputVertex) {
-        super(Tensor.SCALAR_SHAPE, inputVertex,
-            a -> DoubleTensor.scalar(a.sum()),
-            DualNumber::sum);
+        super(Tensor.SCALAR_SHAPE, inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return DoubleTensor.scalar(value.sum());
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.sum();
     }
 }

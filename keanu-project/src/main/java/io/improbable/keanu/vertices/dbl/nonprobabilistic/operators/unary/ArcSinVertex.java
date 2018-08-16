@@ -12,6 +12,16 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ArcSinVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::asin, DualNumber::asin);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.asin();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.asin();
     }
 }

@@ -12,6 +12,16 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ArcTanVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::atan, DualNumber::atan);;
+        super(inputVertex);;
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.atan();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.atan();
     }
 }

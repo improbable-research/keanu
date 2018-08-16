@@ -12,6 +12,16 @@ public class TanVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public TanVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::tan, DualNumber::tan);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.tan();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.tan();
     }
 }

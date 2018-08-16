@@ -60,7 +60,11 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualOp(dualNumbers.get(left), dualNumbers.get(right));
+        try {
+            return dualOp(dualNumbers.get(left), dualNumbers.get(right));
+        } catch (UnsupportedOperationException e) {
+            return super.calculateDualNumber(dualNumbers);
+        }
     }
 
     protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);

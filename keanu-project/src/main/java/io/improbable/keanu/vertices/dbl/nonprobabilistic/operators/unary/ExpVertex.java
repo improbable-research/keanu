@@ -12,6 +12,16 @@ public class ExpVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ExpVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::exp, DualNumber::exp);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.exp();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.exp();
     }
 }

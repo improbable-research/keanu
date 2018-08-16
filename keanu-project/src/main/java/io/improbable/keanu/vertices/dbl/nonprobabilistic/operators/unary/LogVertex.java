@@ -12,6 +12,16 @@ public class LogVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public LogVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::log, DualNumber::log);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.log();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.log();
     }
 }

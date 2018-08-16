@@ -12,6 +12,16 @@ public class CosVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public CosVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::cos, DualNumber::cos);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.cos();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.cos();
     }
 }

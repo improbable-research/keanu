@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -107,30 +108,37 @@ public class EvalPropagationTest {
         assertEquals(3, n.get());
     }
 
+    static class BlackBoxVertex extends DoubleUnaryOpVertex {
+
+        private final AtomicInteger n;
+
+        public BlackBoxVertex(DoubleVertex inputVertex, AtomicInteger n) {
+            super(inputVertex);
+            this.n = n;
+        }
+
+        @Override
+        protected DoubleTensor op(DoubleTensor value) {
+            n.incrementAndGet();
+            return DoubleTensor.create(new double[]{0, 1, 2});
+        }
+
+        @Override
+        protected DualNumber dualOp(DualNumber dualNumber) {
+            return null;
+        }
+    }
     @Test
     public void doesNotRedoWorkAlreadyDoneOnLazyEval() {
         AtomicInteger n = new AtomicInteger(0);
 
         DoubleVertex start = new GaussianVertex(0, 1);
 
-        DoubleVertex blackBox = new DoubleUnaryOpVertex(start,
-            (startValue) -> {
-                n.incrementAndGet();
-                return DoubleTensor.create(new double[]{0, 1, 2});
-            }
-        );
+        DoubleVertex blackBox = new BlackBoxVertex(start, n);
 
-        DoubleVertex pluck0 = new DoubleUnaryOpVertex(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(0))
-        );
-
-        DoubleVertex pluck1 = new DoubleUnaryOpVertex(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(1))
-        );
-
-        DoubleVertex pluck2 = new DoubleUnaryOpVertex(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(2))
-        );
+        DoubleVertex pluck0 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(0)), null);
+        DoubleVertex pluck1 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(1)), null);
+        DoubleVertex pluck2 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(2)), null);
 
         pluck0.lazyEval();
         pluck1.lazyEval();

@@ -27,16 +27,37 @@ public class TestGraphGenerator {
         return end;
     }
 
-    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
-        final long id = Vertex.ID_GENERATOR.get();
-        return new DoubleUnaryOpVertex(from, (a) -> {
+    static class PassThroughVertex extends DoubleUnaryOpVertex {
+
+        private final long id;
+        private final AtomicInteger opCount;
+        private final AtomicInteger dualNumberCount;
+        private final Consumer<Long> onOp;
+
+        public PassThroughVertex(DoubleVertex inputVertex, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
+            super(inputVertex);
+            this.opCount = opCount;
+            this.dualNumberCount = dualNumberCount;
+            this.onOp = onOp;
+            id = Vertex.ID_GENERATOR.get();
+        }
+
+        @Override
+        protected DoubleTensor op(DoubleTensor a) {
             opCount.incrementAndGet();
             onOp.accept(id);
             return a;
-        }, (a) -> {
+        }
+
+        @Override
+        protected DualNumber dualOp(DualNumber a) {
             dualNumberCount.incrementAndGet();
             return a;
-        });
+        }
+    }
+
+    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
+        return new PassThroughVertex(from, opCount, dualNumberCount, onOp);
     }
 
     static class SumVertex extends DoubleBinaryOpVertex {

@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class FloorVertex extends DoubleUnaryOpVertex {
 
@@ -12,6 +13,16 @@ public class FloorVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex to be floor'd
      */
     public FloorVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::floor);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.floor();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        throw new UnsupportedOperationException();
     }
 }

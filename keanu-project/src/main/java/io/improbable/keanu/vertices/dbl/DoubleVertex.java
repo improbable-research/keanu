@@ -162,8 +162,22 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SumVertex(this);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<DualNumber, DualNumber> dualNumberCalculation) {
-        return new DoubleUnaryOpVertex(outputShape, this, op, dualNumberCalculation);
+    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> calculation, Function<DualNumber, DualNumber> dualNumberCalculation) {
+        return lambda(this.getShape(), calculation, dualNumberCalculation);
+    }
+
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> calculation, Function<DualNumber, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpVertex(outputShape, this) {
+            @Override
+            protected DoubleTensor op(DoubleTensor value) {
+                return calculation.apply(value);
+            }
+
+            @Override
+            protected DualNumber dualOp(DualNumber dualNumber) {
+                return dualNumberCalculation.apply(dualNumber);
+            }
+        };
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)

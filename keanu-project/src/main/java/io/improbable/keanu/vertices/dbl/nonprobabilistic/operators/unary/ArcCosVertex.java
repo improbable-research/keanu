@@ -12,6 +12,16 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ArcCosVertex(DoubleVertex inputVertex) {
-        super(inputVertex, DoubleTensor::acos, DualNumber::acos);
+        super(inputVertex);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.acos();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.acos();
     }
 }
