@@ -12,8 +12,16 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
      * @param right the vertex to divide
      */
     public DivisionVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right,
-            DoubleTensor::div,
-            DualNumber::div);
+        super(left, right);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.div(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.div(r);
     }
 }

@@ -13,9 +13,16 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
      * @param right a vertex to add
      */
     public AdditionVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right,
-            DoubleTensor::plus,
-            DualNumber::plus
-        );
+        super(left, right);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.plus(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.plus(r);
     }
 }

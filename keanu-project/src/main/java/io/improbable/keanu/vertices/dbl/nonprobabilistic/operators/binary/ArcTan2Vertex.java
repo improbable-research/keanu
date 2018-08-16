@@ -14,13 +14,16 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
      * @param right y coordinate
      */
     public ArcTan2Vertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right,
-            DoubleTensor::atan2,
-            ArcTan2Vertex::dualOp
-        );
+        super(left, right);
     }
 
-    private static DualNumber dualOp(DualNumber a, DualNumber b) {
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.atan2(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber a, DualNumber b) {
         DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
 
         PartialDerivatives thisInfA = a.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));

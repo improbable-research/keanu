@@ -13,8 +13,16 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
      * @param right the vertex to subtract
      */
     public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right,
-            DoubleTensor::minus,
-            DualNumber::minus);
+        super(left, right);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.minus(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.minus(r);
     }
 }

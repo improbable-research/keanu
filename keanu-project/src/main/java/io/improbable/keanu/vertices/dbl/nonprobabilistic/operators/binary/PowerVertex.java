@@ -13,9 +13,17 @@ public class PowerVertex extends DoubleBinaryOpVertex {
      * @param right the exponent vertex
      */
     public PowerVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right,
-            DoubleTensor::pow,
-            DualNumber::pow);
+        super(left, right);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.pow(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.pow(r);
     }
 
     public DoubleVertex getBase(){

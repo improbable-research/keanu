@@ -16,10 +16,17 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
 
     public MatrixMultiplicationVertex(DoubleVertex left, DoubleVertex right) {
         super(getResultingShape(left.getShape(), right.getShape()),
-            left, right,
-            DoubleTensor::matrixMultiply,
-            DualNumber::matrixMultiplyBy
-        );
+            left, right);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.matrixMultiply(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.matrixMultiplyBy(r);
     }
 
     private static int[] getResultingShape(int[] left, int[] right) {

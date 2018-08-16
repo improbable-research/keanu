@@ -6,7 +6,9 @@ import java.util.function.Consumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 
@@ -37,16 +39,39 @@ public class TestGraphGenerator {
         });
     }
 
-    static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
-        final long id = Vertex.ID_GENERATOR.get();
-        return new DoubleBinaryOpVertex(left, right, (a, b) -> {
+    static class SumVertex extends DoubleBinaryOpVertex {
+
+        private final AtomicInteger opCount;
+        private final AtomicInteger dualNumberCount;
+        private final Consumer<Long> onOp;
+        private final long id;
+
+        public SumVertex(DoubleVertex left, DoubleVertex right,
+                         AtomicInteger opCount, AtomicInteger dualNumberCount,
+                         Consumer<Long> onOp) {
+            super(left, right);
+            this.opCount = opCount;
+            this.dualNumberCount = dualNumberCount;
+            this.onOp = onOp;
+            id = Vertex.ID_GENERATOR.get();
+        }
+
+        @Override
+        protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
             opCount.incrementAndGet();
             onOp.accept(id);
-            return a.plus(b);
-        }, (a, b) -> {
+            return l.plus(r);
+        }
+
+        @Override
+        protected DualNumber dualOp(DualNumber l, DualNumber r) {
             dualNumberCount.incrementAndGet();
-            return a.add(b);
-        });
+            return l.add(r);
+        }
+    }
+
+    static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
+        return new SumVertex(left, right, opCount, dualNumberCount, onOp);
     }
 
 }

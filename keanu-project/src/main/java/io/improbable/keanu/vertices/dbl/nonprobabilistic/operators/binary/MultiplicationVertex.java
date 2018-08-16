@@ -13,8 +13,16 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
      * @param right vertex to be multiplied
      */
     public MultiplicationVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right,
-            DoubleTensor::times,
-            DualNumber::multiplyBy);
+        super(left, right);
+    }
+
+    @Override
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.times(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.multiplyBy(r);
     }
 }
