@@ -12,6 +12,11 @@ public class IntegerMultiplicationVertex extends IntegerBinaryOpVertex {
      * @param b a vertex to be multiplied
      */
     public IntegerMultiplicationVertex(IntegerVertex a, IntegerVertex b) {
-        super(a, b, IntegerTensor::times);
+        super(a, b);
+    }
+
+    @Override
+    protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
+        return l.times(r);
     }
 }

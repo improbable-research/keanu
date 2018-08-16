@@ -12,6 +12,11 @@ public class IntegerAdditionVertex extends IntegerBinaryOpVertex {
      * @param b a vertex to add
      */
     public IntegerAdditionVertex(IntegerVertex a, IntegerVertex b) {
-        super(a, b, IntegerTensor::plus);
+        super(a, b);
+    }
+
+    @Override
+    protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
+        return l.plus(r);
     }
 }

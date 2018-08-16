@@ -13,6 +13,11 @@ public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
      * @param b a vertex to divide by
      */
     public IntegerDivisionVertex(IntegerVertex a, IntegerVertex b) {
-        super(a, b, IntegerTensor::div);
+        super(a, b);
+    }
+
+    @Override
+    protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
+        return l.div(r);
     }
 }

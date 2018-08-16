@@ -11,6 +11,11 @@ public class IntegerPowerVertex extends IntegerBinaryOpVertex {
      * @param b the exponent vertex
      */
     public IntegerPowerVertex(IntegerVertex a, IntegerVertex b) {
-        super(a, b, IntegerTensor::pow);
+        super(a, b);
+    }
+
+    @Override
+    protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
+        return l.pow(r);
     }
 }

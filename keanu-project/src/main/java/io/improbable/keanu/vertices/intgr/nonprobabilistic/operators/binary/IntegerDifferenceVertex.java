@@ -12,6 +12,11 @@ public class IntegerDifferenceVertex extends IntegerBinaryOpVertex {
      * @param b the vertex to subtract
      */
     public IntegerDifferenceVertex(IntegerVertex a, IntegerVertex b) {
-        super(a, b, IntegerTensor::minus);
+        super(a, b);
+    }
+
+    @Override
+    protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
+        return l.minus(r);
     }
 }
