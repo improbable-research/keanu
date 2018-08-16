@@ -6,6 +6,11 @@ import io.improbable.keanu.vertices.Vertex;
 public class OrBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
 
     public OrBinaryVertex(Vertex<BooleanTensor> a, Vertex<BooleanTensor> b) {
-        super(a, b, BooleanTensor::or);
+        super(a, b);
+    }
+
+    @Override
+    protected BooleanTensor op(BooleanTensor l, BooleanTensor r) {
+        return l.or(r);
     }
 }
