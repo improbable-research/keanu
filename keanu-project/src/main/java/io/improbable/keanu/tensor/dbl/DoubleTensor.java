@@ -205,6 +205,10 @@ public interface DoubleTensor extends NumberTensor<Double> {
     @Override
     DoubleTensor slice(int dimension, int index);
 
+    DoubleTensor tensorAlongDimension(int index, int... dimension);
+
+    DoubleTensor permute(int... rearrange);
+
     DoubleTensor concat(int dimension, DoubleTensor... those);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).

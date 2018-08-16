@@ -756,6 +756,20 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor tensorAlongDimension(int index, int... dimension) {
+        INDArray dup = tensor.dup();
+        INDArray tad = dup.tensorAlongDimension(index, dimension);
+        return new Nd4jDoubleTensor(tad);
+    }
+
+    @Override
+    public DoubleTensor permute(int... rearrange) {
+        INDArray dup = tensor.dup();
+        INDArray permute = dup.permute(rearrange);
+        return new Nd4jDoubleTensor(permute);
+    }
+
+    @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
         INDArray dup = tensor.dup();
         INDArray[] toConcat = new INDArray[those.length + 1];
