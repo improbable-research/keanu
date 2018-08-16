@@ -1,20 +1,23 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.continuous.Uniform;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class KDEVertex extends ProbabilisticDouble {
+import io.improbable.keanu.distributions.continuous.Gaussian;
+import io.improbable.keanu.distributions.continuous.Uniform;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
+
+public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     public double bandwidth;
     private DoubleTensor samples;
 
-    public KDEVertex(DoubleTensor samples, double bandwidth){
-        if (samples.getLength()==0){
+    public KDEVertex(DoubleTensor samples, double bandwidth) {
+        super(new ProbabilisticValueUpdater<>());
+        if (samples.getLength() == 0) {
             throw new IllegalStateException("The provided tensor of samples is empty!");
         }
         this.samples = samples;
@@ -37,7 +40,7 @@ public class KDEVertex extends ProbabilisticDouble {
             .toArray()), bandwidth);
     }
 
-    private DoubleTensor getDiffs(DoubleTensor x){
+    private DoubleTensor getDiffs(DoubleTensor x) {
         DoubleTensor diffs = DoubleTensor.zeros(new int[]{(int) samples.getShape()[0], (int) x.getShape()[1]});
         return diffs.plusInPlace(x).minusInPlace(samples).divInPlace(bandwidth);
     }
@@ -49,12 +52,12 @@ public class KDEVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor x) {
+    public double logProb(DoubleTensor x) {
         return pdf(x).log().sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Map<Long, DoubleTensor> partialDerivates = new HashMap<>();
 
         DoubleTensor dlnPdfs = dlnPdf(value).dLogPdx;
