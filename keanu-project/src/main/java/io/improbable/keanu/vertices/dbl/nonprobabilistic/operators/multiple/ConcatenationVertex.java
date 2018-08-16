@@ -48,11 +48,8 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
         for (DoubleVertex vertex : input) {
             duals.add(dualNumbers.get(vertex));
         }
-
-        DualNumber dualOfPrimary = duals.remove(0);
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
-        DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
-        return dualOfPrimary.concat(dimension, duals, dualToConcat);
+        return DualNumber.concat(dualNumbers, duals, input, dimension, inputValues);
     }
 
     @Override

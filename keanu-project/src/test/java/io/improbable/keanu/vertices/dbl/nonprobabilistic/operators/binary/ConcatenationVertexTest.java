@@ -1,17 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import com.google.common.collect.ImmutableSet;
-import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -166,53 +161,53 @@ public class ConcatenationVertexTest {
     }
 
     @Test
-    public void canConcatenateSimpleAutoDiffForwardBackward() {
+    public void canConcatenateSimpleAutoDiffForwardNoSharedParents() {
         DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+        a.setValue(DoubleTensor.create(new double[]{5}, 1, 1));
 
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex e = new UniformVertex(0, 10);
-        e.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+        DoubleVertex c = new UniformVertex(0, 10);
+        c.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
-        DoubleVertex f = new UniformVertex(0, 10);
-        f.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+        DoubleVertex d = new UniformVertex(0, 10);
+        d.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        DoubleVertex c = a.times(b);
-        DoubleVertex d = e.plus(f);
+        DoubleVertex e = a.times(b);
+        DoubleVertex f = c.plus(d);
 
-        ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
+        ConcatenationVertex concat = new ConcatenationVertex(0, e, f);
 
-        PartialDerivatives concatPartial = concat.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, Arrays.asList(a, b, c, d));
 
-        PartialDerivatives cPartial = c.getDualNumber().getPartialDerivatives();
-        PartialDerivatives dPartial = d.getDualNumber().getPartialDerivatives();
+        Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(c).getShape());
+        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(d).getShape());
+    }
 
-        Assert.assertArrayEquals(
-            cPartial.withRespectTo(a).asFlatDoubleArray(),
-            concatPartial.withRespectTo(a).asFlatDoubleArray(),
-            0.0001
-        );
-        Assert.assertArrayEquals(
-            cPartial.withRespectTo(b).asFlatDoubleArray(),
-            concatPartial.withRespectTo(b).asFlatDoubleArray(),
-            0.0001
-        );
+    @Test
+    public void canConcatenateSimpleAutoDiffForwardSharedParents() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{5}, 1, 1));
 
-        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, ImmutableSet.of(a, b, e, f));
-        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(concat, ImmutableSet.of(a, b, e, f));
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
-        Assert.assertArrayEquals(
-            cPartial.withRespectTo(a).asFlatDoubleArray(),
-            backward.withRespectTo(a).asFlatDoubleArray(),
-            0.0001
-        );
-        Assert.assertArrayEquals(
-            cPartial.withRespectTo(b).asFlatDoubleArray(),
-            backward.withRespectTo(b).asFlatDoubleArray(),
-            0.0001
-        );
+        DoubleVertex d = new UniformVertex(0, 10);
+        d.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+
+        DoubleVertex e = a.times(b);
+        DoubleVertex f = b.plus(d);
+
+        ConcatenationVertex concat = new ConcatenationVertex(0, e, f);
+
+        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, Arrays.asList(a, b, d));
+
+        Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(d).getShape());
     }
 
     @Test
@@ -262,13 +257,17 @@ public class ConcatenationVertexTest {
             concatPartial.withRespectTo(sharedMatrix).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor cwrtA = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
         Assert.assertArrayEquals(
-            c.getDualNumber().getPartialDerivatives().withRespectTo(a).asFlatDoubleArray(),
+            cwrtA.concat(0, DoubleTensor.zeros(cwrtA.getShape())).asFlatDoubleArray(),
             concatPartial.withRespectTo(a).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor dwrtB = d.getDualNumber().getPartialDerivatives().withRespectTo(b);
         Assert.assertArrayEquals(
-            d.getDualNumber().getPartialDerivatives().withRespectTo(b).asFlatDoubleArray(),
+            DoubleTensor.zeros(dwrtB.getShape()).concat(0, dwrtB).asFlatDoubleArray(),
             concatPartial.withRespectTo(b).asFlatDoubleArray(),
             0.0001
         );
@@ -299,13 +298,17 @@ public class ConcatenationVertexTest {
             concatPartial.withRespectTo(sharedMatrix).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor cwrtA = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
         Assert.assertArrayEquals(
-            c.getDualNumber().getPartialDerivatives().withRespectTo(a).asFlatDoubleArray(),
+            cwrtA.concat(1, DoubleTensor.zeros(cwrtA.getShape())).asFlatDoubleArray(),
             concatPartial.withRespectTo(a).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor dwrtB = d.getDualNumber().getPartialDerivatives().withRespectTo(b);
         Assert.assertArrayEquals(
-            d.getDualNumber().getPartialDerivatives().withRespectTo(b).asFlatDoubleArray(),
+            DoubleTensor.zeros(dwrtB.getShape()).concat(1, dwrtB).asFlatDoubleArray(),
             concatPartial.withRespectTo(b).asFlatDoubleArray(),
             0.0001
         );
@@ -341,18 +344,24 @@ public class ConcatenationVertexTest {
             concatPartial.withRespectTo(sharedMatrix).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor cwrtA = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
         Assert.assertArrayEquals(
-            c.getDualNumber().getPartialDerivatives().withRespectTo(a).asFlatDoubleArray(),
+            cwrtA.concat(0, DoubleTensor.zeros(cwrtA.getShape()), DoubleTensor.zeros(cwrtA.getShape())).asFlatDoubleArray(),
             concatPartial.withRespectTo(a).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor dwrtB = d.getDualNumber().getPartialDerivatives().withRespectTo(b);
         Assert.assertArrayEquals(
-            d.getDualNumber().getPartialDerivatives().withRespectTo(b).asFlatDoubleArray(),
+            DoubleTensor.zeros(dwrtB.getShape()).concat(0, dwrtB, DoubleTensor.zeros(dwrtB.getShape())).asFlatDoubleArray(),
             concatPartial.withRespectTo(b).asFlatDoubleArray(),
             0.0001
         );
+
+        DoubleTensor ewrtC = e.getDualNumber().getPartialDerivatives().withRespectTo(f);
         Assert.assertArrayEquals(
-            e.getDualNumber().getPartialDerivatives().withRespectTo(f).asFlatDoubleArray(),
+            DoubleTensor.zeros(ewrtC.getShape()).concat(0, DoubleTensor.zeros(ewrtC.getShape()), ewrtC).asFlatDoubleArray(),
             concatPartial.withRespectTo(f).asFlatDoubleArray(),
             0.0001
         );
