@@ -510,6 +510,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor minusInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.subi(that.scalar());
+        } else if (this.isScalar()) {
+            // Temporary fix: Scalar can't be subtracted by tensor inplace
+            return this.minus(that);
         } else {
             INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
         }
@@ -520,6 +523,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor plusInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.addi(that.scalar());
+        } else if (this.isScalar()) {
+             // Temporary fix: Scalar can't be added by tensor inplace
+            return this.plus(that);
         } else {
             INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
         }
@@ -530,6 +536,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor timesInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.muli(that.scalar());
+        } else if (this.isScalar()) {
+             // Temporary fix: Scalar can't be multiplied by tensor inplace
+            return this.times(that);
         } else {
             INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
         }
@@ -540,6 +549,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor divInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.divi(that.scalar());
+        } else if (this.isScalar()) {
+             // Temporary fix: Scalar can't be divided by tensor inplace
+            return this.div(that);
         } else {
             INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
         }

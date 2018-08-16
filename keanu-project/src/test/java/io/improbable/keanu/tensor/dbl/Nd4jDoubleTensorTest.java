@@ -312,4 +312,35 @@ public class Nd4jDoubleTensorTest {
         assertTrue(vectorA.isVector() && vectorB.isVector());
     }
 
+    @Test
+    public void scalarMinusInPlaceTensorBehavesSameAsMinus() {
+        DoubleTensor scalar = DoubleTensor.scalar(1);
+        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+
+        assertArrayEquals(scalar.minus(tensor).asFlatDoubleArray(), scalar.minusInPlace(tensor).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void scalarPlusInPlaceTensorBehavesSameAsPlus() {
+        DoubleTensor scalar = DoubleTensor.scalar(1);
+        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+
+        assertArrayEquals(scalar.plus(tensor).asFlatDoubleArray(), scalar.plusInPlace(tensor).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void scalarTimesInPlaceTensorBehavesSameAsTimes() {
+        DoubleTensor scalar = DoubleTensor.scalar(1);
+        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+
+        assertArrayEquals(scalar.times(tensor).asFlatDoubleArray(), scalar.timesInPlace(tensor).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void scalarDivInPlaceTensorBehavesSameAsDiv() {
+        DoubleTensor scalar = DoubleTensor.scalar(1);
+        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+
+        assertArrayEquals(scalar.div(tensor).asFlatDoubleArray(), scalar.divInPlace(tensor).asFlatDoubleArray(), 1e-6);
+    }
 }
