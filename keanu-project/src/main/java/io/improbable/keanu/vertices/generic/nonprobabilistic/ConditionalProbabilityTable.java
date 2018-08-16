@@ -41,22 +41,22 @@ public class ConditionalProbabilityTable {
 
     public static class CPTWhenRawBuilder {
 
-        private final CPTVertex.Condition condition;
+        private final CPTCondition condition;
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
 
         public CPTWhenRawBuilder(Boolean[] condition, List<Vertex<? extends Tensor<Boolean>>> inputs) {
-            this.condition = new CPTVertex.Condition(condition);
+            this.condition = new CPTCondition(condition);
             this.inputs = inputs;
         }
 
         public <T, OUT extends Tensor<T>> CPTBuilder<T, OUT> then(Vertex<OUT> thn) {
-            Map<CPTVertex.Condition, Vertex<OUT>> conditions = new HashMap<>();
+            Map<CPTCondition, Vertex<OUT>> conditions = new HashMap<>();
             conditions.put(condition, thn);
             return new CPTBuilder<>(inputs, conditions);
         }
 
         public DoubleCPTBuilder then(DoubleVertex thn) {
-            Map<CPTVertex.Condition, DoubleVertex> conditions = new HashMap<>();
+            Map<CPTCondition, DoubleVertex> conditions = new HashMap<>();
             conditions.put(condition, thn);
             return new DoubleCPTBuilder(inputs, conditions);
         }
@@ -68,9 +68,9 @@ public class ConditionalProbabilityTable {
 
     public static class DoubleCPTBuilder {
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-        private final Map<CPTVertex.Condition, DoubleVertex> conditions;
+        private final Map<CPTCondition, DoubleVertex> conditions;
 
-        public DoubleCPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTVertex.Condition, DoubleVertex> conditions) {
+        public DoubleCPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, DoubleVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -79,7 +79,7 @@ public class ConditionalProbabilityTable {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
-            return new DoubleCPTWhenBuilder(new CPTVertex.Condition(condition), this);
+            return new DoubleCPTWhenBuilder(new CPTCondition(condition), this);
         }
 
         public DoubleCPTVertex orDefault(DoubleVertex defaultResult) {
@@ -92,10 +92,10 @@ public class ConditionalProbabilityTable {
 
         public static class DoubleCPTWhenBuilder {
 
-            private final CPTVertex.Condition condition;
+            private final CPTCondition condition;
             private final DoubleCPTBuilder builder;
 
-            private DoubleCPTWhenBuilder(CPTVertex.Condition condition, DoubleCPTBuilder builder) {
+            private DoubleCPTWhenBuilder(CPTCondition condition, DoubleCPTBuilder builder) {
                 this.condition = condition;
                 this.builder = builder;
             }
@@ -113,9 +113,9 @@ public class ConditionalProbabilityTable {
 
     public static class CPTBuilder<T, OUT extends Tensor<T>> {
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-        private final Map<CPTVertex.Condition, Vertex<OUT>> conditions;
+        private final Map<CPTCondition, Vertex<OUT>> conditions;
 
-        public CPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTVertex.Condition, Vertex<OUT>> conditions) {
+        public CPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, Vertex<OUT>> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -124,7 +124,7 @@ public class ConditionalProbabilityTable {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
-            return new CPTWhenBuilder<>(new CPTVertex.Condition(condition), this);
+            return new CPTWhenBuilder<>(new CPTCondition(condition), this);
         }
 
         public CPTVertex<OUT> orDefault(Vertex<OUT> defaultResult) {
@@ -133,10 +133,10 @@ public class ConditionalProbabilityTable {
 
         public static class CPTWhenBuilder<T, OUT extends Tensor<T>> {
 
-            private final CPTVertex.Condition condition;
+            private final CPTCondition condition;
             private final CPTBuilder<T, OUT> builder;
 
-            private CPTWhenBuilder(CPTVertex.Condition condition, CPTBuilder<T, OUT> builder) {
+            private CPTWhenBuilder(CPTCondition condition, CPTBuilder<T, OUT> builder) {
                 this.condition = condition;
                 this.builder = builder;
             }

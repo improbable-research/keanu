@@ -91,6 +91,17 @@ public class PartialDerivatives {
         derivativeWithRespectTo.put(id, value);
     }
 
+    /**
+     * This will sum partial derivatives that are represented as tensors over given dimensions.
+     * There is the option to reshape to a lower rank tensor where the summation has caused a
+     * dimension to go to length 1.
+     *
+     * @param reshape        Returns the sum and drops the summed over dimensions (now length one)
+     *                       in the shape if true. Returns a same ranked tensor but with a shape
+     *                       that has ones for the dimensions summed over.
+     * @param overDimensions The dimensions to sum over. Dimensions are counted from zero
+     * @return The summed partial derivatives over given dimensions
+     */
     public PartialDerivatives sum(boolean reshape, int... overDimensions) {
         Map<Long, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
