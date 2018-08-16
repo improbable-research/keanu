@@ -1,13 +1,19 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+import java.util.HashSet;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 public class MatrixMultiplicationVertexTest {
 
@@ -37,12 +43,17 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex N = m.matrixMultiply(alpha);
         DualNumber NDual = N.getDualNumber();
 
-        DoubleTensor dNdm = NDual.getPartialDerivatives().withRespectTo(m);
+        PartialDerivatives reverseModePartialDiff = Differentiator.reverseModeAutoDiff(N, new HashSet<>(Arrays.asList(m, alpha)));
+
+        DoubleTensor dNdmForward = NDual.getPartialDerivatives().withRespectTo(m);
+        DoubleTensor dNdmReverse = reverseModePartialDiff.withRespectTo(m);
         DoubleTensor expectedDNdm = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 1, 3, 1, 2);
 
-        assertEquals(expectedDNdm, dNdm);
+        assertEquals(expectedDNdm, dNdmForward);
+//        assertEquals(expectedDNdm, dNdmReverse);
 
-        DoubleTensor dNdAlpha = NDual.getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor dNdAlphaForward = NDual.getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor dNdAlphaReverse = reverseModePartialDiff.withRespectTo(alpha);
         DoubleTensor expectedDNdAlpha = DoubleTensor.create(new double[]{
             1, 0, 0,
             2, 0, 0,
@@ -52,7 +63,8 @@ public class MatrixMultiplicationVertexTest {
             0, 0, 2
         }, 1, 3, 2, 3);
 
-        assertEquals(expectedDNdAlpha, dNdAlpha);
+        assertEquals(expectedDNdAlpha, dNdAlphaForward);
+//        assertEquals(expectedDNdAlpha, dNdAlphaReverse);
     }
 
     @Test

@@ -1,20 +1,21 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import java.util.Arrays;
-import java.util.Map;
-
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
 
     /**
      * Matrix multiplies one vertex by another. C = AB
      *
-     * @param left vertex A
+     * @param left  vertex A
      * @param right vertex B
      */
     public MatrixMultiplicationVertex(DoubleVertex left, DoubleVertex right) {
@@ -31,8 +32,25 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        //TODO:
-        return null;
+        PartialDerivatives partialsLeft = PartialDerivatives
+            .matrixMultiply(
+                derivativeOfOutputsWithRespectToSelf,
+                right.getValue().transpose(),
+                true
+            );
+
+        PartialDerivatives partialsRight = PartialDerivatives
+            .matrixMultiply(
+                derivativeOfOutputsWithRespectToSelf,
+                left.getValue().transpose(),
+                false
+            );
+
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        partials.put(left, partialsLeft);
+        partials.put(right, partialsRight);
+
+        return partials;
     }
 
     @Override

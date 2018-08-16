@@ -1,15 +1,20 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import static java.util.Collections.singletonMap;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.Differentiator;
-
-import java.util.*;
-
-import static java.util.Collections.singletonMap;
 
 public class PartialDerivatives {
 
@@ -214,13 +219,22 @@ public class PartialDerivatives {
 
             DoubleTensor v;
             if (partialIsLeft) {
-                resultShape[0] = partialShape[0];
-                resultShape[1] = multiplier.getShape()[1];
+//                resultShape[0] = partialShape[0];
+//                resultShape[1] = multiplier.getShape()[1];
+//                v = partial.getValue()
+//                    .tensorMultiply(reshapedMultiplier, new int[]{1}, new int[]{0})
+//                    .reshape(-1, resultShape[1])
+//                    .transpose()
+//                    .reshape(resultShape);
+
+                int partialRank = partial.getValue().getRank();
+                int[] per = TensorShape.dimensionRange(-1, partialRank - 1);
+                per[0] = 0;
+                per[1] = partialRank - 1;
+
                 v = partial.getValue()
-                    .tensorMultiply(reshapedMultiplier, new int[]{1}, new int[]{0})
-                    .reshape(-1, resultShape[1])
-                    .transpose()
-                    .reshape(resultShape);
+                    .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
+                    .permute(per);
             } else {
                 resultShape[0] = multiplier.getShape()[0];
                 resultShape[1] = partialShape[1];

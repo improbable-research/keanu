@@ -1,14 +1,15 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.util.FastMath;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.FastMath;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -97,6 +98,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
         ScalarDoubleTensor reshapedScalar = new ScalarDoubleTensor(value);
         reshapedScalar.shape = newShape;
         return reshapedScalar;
+    }
+
+    @Override
+    public DoubleTensor permute(int... rearrange) {
+        return new ScalarDoubleTensor(value);
     }
 
     @Override
@@ -410,12 +416,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor tensorAlongDimension(int index, int... dimension) {
         return null;
-    }
-
-    @Override
-    public DoubleTensor permute(int... rearrange) {
-        //TODO: scalar permute? Error?
-        return DoubleTensor.scalar(value);
     }
 
     @Override

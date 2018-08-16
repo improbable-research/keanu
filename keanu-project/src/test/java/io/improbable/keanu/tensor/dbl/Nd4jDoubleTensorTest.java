@@ -8,6 +8,9 @@ import static junit.framework.TestCase.assertTrue;
 import org.junit.Before;
 import org.junit.Test;
 
+import org.junit.Before;
+import org.junit.Test;
+
 public class Nd4jDoubleTensorTest {
 
     Nd4jDoubleTensor matrixA;
@@ -325,6 +328,64 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor expected = DoubleTensor.create(new double[]{3.0, 4.5, 6.0});
         assertEquals(expected, actual);
     }
+
+    @Test
+    public void canTensorMultiplyWithVectorAndRank4() {
+        DoubleTensor a = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 1, 3, 1});
+        DoubleTensor b = Nd4jDoubleTensor.create(new double[]{
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8
+        }, new int[]{1, 3, 1, 5});
+
+        DoubleTensor c = a.tensorMultiply(b, new int[]{2, 3}, new int[]{1, 0});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            30, 12, 18, 42, 48
+        }, new int[]{1, 1, 1, 5});
+
+        assertEquals(expected, c);
+    }
+
+    @Test
+    public void canTensorMultiplyWithNumpyExample() {
+        DoubleTensor a = DoubleTensor.arange(0, 60).reshape(3, 4, 5);
+        DoubleTensor b = DoubleTensor.arange(0, 24.).reshape(4, 3, 2);
+        DoubleTensor c = a.tensorMultiply(b, new int[]{1, 0}, new int[]{0, 1});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            4400., 4730.,
+            4532., 4874.,
+            4664., 5018.,
+            4796., 5162.,
+            4928., 5306.
+        }, new int[]{5, 2});
+
+        assertEquals(expected, c);
+    }
+
+//    @Test
+//    public void canTensorMultiplyWithMatrixAndRank4() {
+//        DoubleTensor a = Nd4jDoubleTensor.create(new double[]{
+//            5, 5, 2, 7,
+//            3, 2, 8, 4,
+//            9, 7, 6, 9,
+//            2, 3, 5, 6
+//        }, new int[]{2, 2, 2, 2});
+//
+//        DoubleTensor b = Nd4jDoubleTensor.create(new double[]{3, 2, 6, 4, 7, 5}, new int[]{2, 3});
+//
+//        DoubleTensor c = a.tensorMultiply(b, new int[]{3}, new int[]{0});
+//
+//        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+//            35, 45, 55, 34, 53, 47,
+//            0, 0, 0, 0, 0, 0,
+//            0, 0, 0, 0, 0, 0,
+//            0, 0, 0, 0, 0, 0
+//        }, new int[]{2, 2, 2, 3});
+//
+//        assertEquals(expected, c);
+//    }
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.times(right);

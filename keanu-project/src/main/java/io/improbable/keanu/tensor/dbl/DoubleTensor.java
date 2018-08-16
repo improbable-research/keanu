@@ -1,11 +1,11 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public interface DoubleTensor extends NumberTensor<Double> {
 
@@ -92,6 +92,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     @Override
     DoubleTensor reshape(int... newShape);
+
+    DoubleTensor permute(int... rearrange);
 
     @Override
     DoubleTensor duplicate();
@@ -206,8 +208,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor slice(int dimension, int index);
 
     DoubleTensor tensorAlongDimension(int index, int... dimension);
-
-    DoubleTensor permute(int... rearrange);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 

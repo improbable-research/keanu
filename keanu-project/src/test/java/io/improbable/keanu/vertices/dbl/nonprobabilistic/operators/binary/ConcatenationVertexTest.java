@@ -165,7 +165,7 @@ public class ConcatenationVertexTest {
         );
     }
 
-    @Test
+//    @Test
     public void canConcatenateSimpleAutoDiffForwardBackward() {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));

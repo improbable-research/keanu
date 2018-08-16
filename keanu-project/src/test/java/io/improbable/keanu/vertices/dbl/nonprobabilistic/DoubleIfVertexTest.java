@@ -100,10 +100,14 @@ public class DoubleIfVertexTest {
         DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
         Assert.assertArrayEquals(new double[]{
-            5, 7, 0, 0,
-            0, 5, 0, 6,
-            6, 8, 0, 0,
-            0, 7, 0, 8
+            5, 7,
+            0, 0,
+            0, 5,
+            0, 6,
+            6, 8,
+            0, 0,
+            0, 7,
+            0, 8
         }, dIfdA.asFlatDoubleArray(), 1e-6);
 
         Assert.assertArrayEquals(dDda.getShape(), dIfdA.getShape());
