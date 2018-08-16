@@ -9,6 +9,8 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
+    DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
+
     DoubleTensor ZERO_SCALAR = scalar(0.0);
 
     DoubleTensor ONE_SCALAR = scalar(1.0);

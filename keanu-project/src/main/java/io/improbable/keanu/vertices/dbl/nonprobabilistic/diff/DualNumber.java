@@ -22,7 +22,7 @@ public class DualNumber implements DoubleOperators<DualNumber>  {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
-    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els){
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els) {
         if (predicate.allTrue()) {
             return new DualNumber(thn.value, thn.getPartialDerivatives());
         } else if (predicate.allFalse()) {
@@ -324,7 +324,7 @@ public class DualNumber implements DoubleOperators<DualNumber>  {
         }
 
         for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivativesOfInputs.entrySet()) {
-            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivatives(dimension, partials.getValue()));
         }
 
         DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
@@ -332,7 +332,7 @@ public class DualNumber implements DoubleOperators<DualNumber>  {
 
     }
 
-    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+    private DoubleTensor concatPartialDerivatives(int dimension, List<DoubleTensor> partialDerivates) {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {

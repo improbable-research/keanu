@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.discrete.Poisson;
@@ -72,7 +73,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
-        throw new UnsupportedOperationException();
+        return Collections.emptyMap();
     }
 
     @Override
