@@ -1,11 +1,17 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
+import static java.lang.Math.exp;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.*;
-
-import static java.lang.Math.exp;
 
 public class ParticleFilter {
 
@@ -174,8 +180,8 @@ public class ParticleFilter {
 
         public double updateSumLogPOfSubgraph() {
             applyLatentVertexValues();
-            double sumLogPOfLatents = sumLogP(latentVertices.keySet());
-            double sumLogPOfObservables = sumLogP(observedVertices);
+            double sumLogPOfLatents = ProbabilityCalculator.calculateLogProbFor(latentVertices.keySet());
+            double sumLogPOfObservables = ProbabilityCalculator.calculateLogProbFor(observedVertices);
             sumLogPOfSubgraph = sumLogPOfLatents + sumLogPOfObservables;
             return sumLogPOfSubgraph;
         }
@@ -200,10 +206,6 @@ public class ParticleFilter {
                 T value = (T) latentVertices.get(vertex);
                 vertex.setAndCascade(value);
             }
-        }
-
-        private double sumLogP(Collection<Vertex> vertices) {
-            return vertices.stream().mapToDouble(Vertex::logProbAtValue).sum();
         }
     }
 }

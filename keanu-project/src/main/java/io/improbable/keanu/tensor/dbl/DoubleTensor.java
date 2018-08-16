@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor.dbl;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 import java.util.Arrays;
 import java.util.function.Function;
@@ -60,6 +59,29 @@ public interface DoubleTensor extends NumberTensor<Double> {
         }
     }
 
+    static DoubleTensor linspace(double start, double end, int numberOfPoints) {
+        return Nd4jDoubleTensor.linspace(start, end, numberOfPoints);
+    }
+
+    /**
+     * @param start start of range
+     * @param end   end of range (exclusive)
+     * @return a vector of numbers from start incrementing by one to end (exclusively)
+     */
+    static DoubleTensor arange(double start, double end) {
+        return Nd4jDoubleTensor.arange(start, end);
+    }
+
+    /**
+     * @param start    start of range
+     * @param end      end of range (exclusive)
+     * @param stepSize size of step from start to end
+     * @return a vector of numbers starting at start and stepping to end (exclusively)
+     */
+    static DoubleTensor arange(double start, double end, double stepSize) {
+        return Nd4jDoubleTensor.arange(start, end, stepSize);
+    }
+
     static DoubleTensor scalar(double scalarValue) {
         return new ScalarDoubleTensor(scalarValue);
     }
@@ -70,6 +92,9 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     @Override
     DoubleTensor reshape(int... newShape);
+
+    @Override
+    DoubleTensor duplicate();
 
     DoubleTensor diag();
 
@@ -87,11 +112,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor times(double value);
 
+    DoubleTensor div(double value);
+
     DoubleTensor matrixMultiply(DoubleTensor value);
 
     DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight);
-
-    DoubleTensor div(double value);
 
     DoubleTensor pow(DoubleTensor exponent);
 
@@ -174,6 +199,11 @@ public interface DoubleTensor extends NumberTensor<Double> {
     DoubleTensor choleskyDecomposition();
 
     double determinant();
+
+    double product();
+
+    @Override
+    DoubleTensor slice(int dimension, int index);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 

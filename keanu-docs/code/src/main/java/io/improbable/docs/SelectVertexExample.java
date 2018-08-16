@@ -2,7 +2,7 @@ package io.improbable.docs;
 
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.generic.probabilistic.discrete.SelectVertex;
+import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 
 import java.util.LinkedHashMap;
 
@@ -14,7 +14,7 @@ public class SelectVertexExample {
         A, B, C, D
     }
 
-    public SelectVertex<MyType> getSelectorForMyType() {
+    public CategoricalVertex<MyType> getSelectorForMyType() {
 
         LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
         frequency.put(A, ConstantVertex.of(0.25));
@@ -22,7 +22,7 @@ public class SelectVertexExample {
         frequency.put(C, ConstantVertex.of(0.25));
         frequency.put(D, ConstantVertex.of(0.25));
 
-        return new SelectVertex<MyType>(frequency);
+        return new CategoricalVertex<MyType>(frequency);
     }
 
 }

@@ -32,4 +32,5 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
         return left.plus(right);
     }
+
 }

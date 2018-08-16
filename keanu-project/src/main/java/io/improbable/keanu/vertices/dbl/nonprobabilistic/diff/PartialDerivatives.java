@@ -1,14 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Collections.singletonMap;
 
@@ -23,6 +20,44 @@ public class PartialDerivatives {
                 DoubleTensor.eye((int) TensorShape.getLength(shape)).reshape(TensorShape.concat(shape, shape))
             )
         );
+    }
+
+    public static PartialDerivatives ifThenElse(BooleanTensor predicate, PartialDerivatives thn, PartialDerivatives els) {
+        DoubleTensor trueMask = predicate.toDoubleMask();
+        DoubleTensor falseMask = predicate.not().toDoubleMask();
+
+        Map<Long, DoubleTensor> thenPartials = thn.derivativeWithRespectTo;
+        Map<Long, DoubleTensor> elsePartials = els.derivativeWithRespectTo;
+        Set<Long> wrtUnion = new HashSet<>();
+        wrtUnion.addAll(thenPartials.keySet());
+        wrtUnion.addAll(elsePartials.keySet());
+
+        Map<Long, DoubleTensor> mixedPartials = new HashMap<>();
+        for (Long wrt : wrtUnion) {
+            DoubleTensor thnPartial = thenPartials.get(wrt);
+            DoubleTensor elsPartial = elsePartials.get(wrt);
+            DoubleTensor broadcastedTrueMask;
+            DoubleTensor broadcastedFalseMask;
+
+            DoubleTensor newPartial;
+            if (thnPartial == null) {
+                broadcastedFalseMask = DoubleTensor.zeros(elsPartial.getShape()).plusInPlace(falseMask);
+                newPartial = broadcastedFalseMask.timesInPlace(elsPartial);
+            } else if (elsPartial == null) {
+                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
+                newPartial = broadcastedTrueMask.timesInPlace(thnPartial);
+            } else {
+                broadcastedFalseMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(falseMask);
+                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
+
+                newPartial = broadcastedTrueMask.timesInPlace(thnPartial)
+                    .plusInPlace(broadcastedFalseMask.timesInPlace(elsPartial));
+            }
+
+            mixedPartials.put(wrt, newPartial);
+        }
+
+        return new PartialDerivatives(mixedPartials);
     }
 
     private Map<Long, DoubleTensor> derivativeWithRespectTo;
@@ -243,6 +278,20 @@ public class PartialDerivatives {
         }
 
         return new PartialDerivatives(reshapedDerivatives);
+    }
+
+    public PartialDerivatives slice(int dimension, int index) {
+        Map<Long, DoubleTensor> slicedDerivatives = new HashMap<>();
+
+        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+            int[] partialDerivativeShape = partialDerivative.getValue().getShape();
+            partialDerivativeShape[dimension] = 1;
+            DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
+            slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
+            slicedDerivatives.put(partialDerivative.getKey(), slicedPartialDerivative);
+        }
+
+        return new PartialDerivatives(slicedDerivatives);
     }
 
     private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {

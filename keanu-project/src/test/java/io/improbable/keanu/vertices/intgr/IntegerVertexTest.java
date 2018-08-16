@@ -1,18 +1,15 @@
 package io.improbable.keanu.vertices.intgr;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.util.function.Function;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.function.Function;
+
+import static org.junit.Assert.*;
 
 public class IntegerVertexTest {
 
@@ -105,6 +102,14 @@ public class IntegerVertexTest {
         IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
         binomialVertex.setAndCascade(2);
         assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canPluckValue() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        int[] values = new int[]{1, 2, 3};
+        binomialVertex.setValue(values);
+        assertEquals(1, (long) binomialVertex.take(0, 0).getValue().scalar());
     }
 
 }

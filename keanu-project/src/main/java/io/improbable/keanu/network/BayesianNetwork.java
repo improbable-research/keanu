@@ -1,65 +1,87 @@
 package io.improbable.keanu.network;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class BayesianNetwork {
 
-    private final List<Vertex> latentAndObservedVertices;
-    private final List<Vertex> latentVertices;
-    private final List<Vertex> observedVertices;
-
-    //Lazy evaluated
-    private List<Vertex<DoubleTensor>> continuousLatentVertices;
-    private List<Vertex> discreteLatentVertices;
+    private final List<? extends Vertex> vertices;
+    private final Map<VertexLabel, Vertex> vertexLabels;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
-
-        latentAndObservedVertices = vertices.stream()
-            .filter(v -> v.isObserved() || v.isProbabilistic())
-            .collect(Collectors.toList());
-
-        observedVertices = latentAndObservedVertices.stream()
-            .filter(Vertex::isObserved)
-            .collect(Collectors.toList());
-
-        latentVertices = latentAndObservedVertices.stream()
-            .filter(v -> !v.isObserved())
-            .collect(Collectors.toList());
+        this.vertices = ImmutableList.copyOf(vertices);
+        this.vertexLabels = buildLabelMap(vertices);
     }
 
     public BayesianNetwork(Collection<? extends Vertex> vertices) {
         this(new HashSet<>(vertices));
     }
 
+    public Vertex getVertexByLabel(VertexLabel label) {
+        return vertexLabels.get(label);
+    }
+
+    private static Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
+        Map<VertexLabel, Vertex> labelMap = new HashMap<>();
+        for (Vertex v : vertices) {
+            VertexLabel label = v.getLabel();
+            if (label != null) {
+                if (labelMap.containsKey(label)) {
+                    throw new IllegalArgumentException("Vertex Label Repeated: " + label);
+                } else {
+                    labelMap.put(label, v);
+                }
+            }
+        }
+
+        return labelMap;
+    }
+
     public List<Vertex> getLatentAndObservedVertices() {
-        return latentAndObservedVertices;
+        return vertices.stream()
+            .filter(v -> v.isProbabilistic() || v.isObserved())
+            .collect(Collectors.toList());
     }
 
+    /**
+     * @return All vertices that are latent (i.e. probabilistic non-observed)
+     */
     public List<Vertex> getLatentVertices() {
-        return latentVertices;
+        return vertices.stream()
+            .filter(v -> v.isProbabilistic() && !v.isObserved())
+            .collect(Collectors.toList());
     }
 
+    /**
+     * @return All vertices that are observed - which may be probabilistic or non-probabilistic
+     */
     public List<Vertex> getObservedVertices() {
-        return observedVertices;
+        return vertices.stream()
+            .filter(Vertex::isObserved)
+            .collect(Collectors.toList());
     }
 
     public double getLogOfMasterP() {
-        double sum = 0.0;
-        for (Vertex<?> vertex : latentAndObservedVertices) {
-            sum += vertex.logProbAtValue();
-        }
-        return sum;
+        return ProbabilityCalculator.calculateLogProbFor(getLatentAndObservedVertices());
     }
 
     public void cascadeObservations() {
-        VertexValuePropagation.cascadeUpdate(observedVertices);
+        VertexValuePropagation.cascadeUpdate(getObservedVertices());
     }
 
 
@@ -78,7 +100,7 @@ public class BayesianNetwork {
 
         if (isInImpossibleState()) {
 
-            List<Vertex> sortedByDependency = TopologicalSort.sort(latentVertices);
+            List<Vertex> sortedByDependency = TopologicalSort.sort(getLatentVertices());
             setFromSampleAndCascade(sortedByDependency, random);
 
             probeForNonZeroProbability(sortedByDependency, attempts, random);
@@ -123,33 +145,16 @@ public class BayesianNetwork {
     }
 
     public List<Vertex<DoubleTensor>> getContinuousLatentVertices() {
-        if (continuousLatentVertices == null) {
-            splitContinuousAndDiscrete();
-        }
-
-        return continuousLatentVertices;
+        return getLatentVertices().stream()
+            .filter(v -> v.getValue() instanceof DoubleTensor)
+            .map(v -> (Vertex<DoubleTensor>) v)
+            .collect(Collectors.toList());
     }
 
     public List<Vertex> getDiscreteLatentVertices() {
-        if (discreteLatentVertices == null) {
-            splitContinuousAndDiscrete();
-        }
-
-        return discreteLatentVertices;
-    }
-
-    private void splitContinuousAndDiscrete() {
-
-        continuousLatentVertices = new ArrayList<>();
-        discreteLatentVertices = new ArrayList<>();
-
-        for (Vertex<?> vertex : getLatentVertices()) {
-            if (vertex.getValue() instanceof DoubleTensor) {
-                continuousLatentVertices.add((Vertex<DoubleTensor>) vertex);
-            } else {
-                discreteLatentVertices.add(vertex);
-            }
-        }
+        return getLatentVertices().stream()
+            .filter(v -> !(v.getValue() instanceof DoubleTensor))
+            .collect(Collectors.toList());
     }
 
 }
