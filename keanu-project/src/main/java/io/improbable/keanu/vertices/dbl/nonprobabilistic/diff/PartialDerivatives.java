@@ -220,38 +220,32 @@ public class PartialDerivatives {
 
                 if (reverseMode) {
                     v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{0});
+                        .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{1});
                 } else {
 
-                    int[] per = TensorShape.dimensionRange(-1, partialRank - 1);
-                    per[0] = 0;
-                    per[1] = partialRank - 1;
+                    int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
+                    rearrange[0] = 0;
+                    rearrange[1] = partialRank - 1;
                     v = partial.getValue()
                         .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                        .permute(per);
+                        .permute(rearrange);
                 }
 
             } else {
 
                 if (reverseMode) {
-                    int[] per = TensorShape.dimensionRange(0, partialRank);
-                    per[partialRank - 1] = partialRank - 2;
-                    per[partialRank - 2] = partialRank - 1;
+                    int[] rearrange = TensorShape.dimensionRange(0, partialRank);
+                    rearrange[partialRank - 1] = partialRank - 2;
+                    rearrange[partialRank - 2] = partialRank - 1;
 
                     v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{1})
-                        .permute(per);
+                        .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{0})
+                        .permute(rearrange);
 
                 } else {
-                    DoubleTensor reshapedMultiplier = increaseRankByAppendingOnesToShape(multiplier, partial.getValue().getRank());
-                    int[] partialShape = partial.getValue().getShape();
-                    int[] resultShape = Arrays.copyOf(partialShape, partialShape.length);
-                    resultShape[0] = multiplier.getShape()[0];
-                    resultShape[1] = partialShape[1];
-                    v = reshapedMultiplier
-                        .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0})
-                        .reshape(resultShape);
 
+                    v = multiplier
+                        .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
                 }
             }
             multiplied.put(partial.getKey(), v);

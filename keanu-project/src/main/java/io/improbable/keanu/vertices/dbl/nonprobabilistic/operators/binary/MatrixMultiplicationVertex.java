@@ -35,7 +35,7 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
         PartialDerivatives partialsLeft = PartialDerivatives
             .matrixMultiply(
                 derivativeOfOutputsWithRespectToSelf,
-                right.getValue().transpose(),
+                right.getValue(),
                 true,
                 true
             );
@@ -43,7 +43,7 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
         PartialDerivatives partialsRight = PartialDerivatives
             .matrixMultiply(
                 derivativeOfOutputsWithRespectToSelf,
-                left.getValue().transpose(),
+                left.getValue(),
                 false,
                 true
             );
