@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.discrete.Bernoulli;
@@ -63,7 +64,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
-        throw new UnsupportedOperationException();
+        return Collections.emptyMap();
     }
 
     @Override
