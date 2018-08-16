@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -7,10 +8,12 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import org.apache.commons.lang3.ArrayUtils;
 
 import java.lang.reflect.Array;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
@@ -54,8 +57,29 @@ public class ConcatenationVertex extends NonProbabilisticDouble {
 
     @Override
     protected Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        //TODO:
-        return null;
+        DoubleTensor value = derivativeOfOutputsWithRespectToSelf.asMap().get(this.getId());
+        int[] partialShape = value.getShape();
+        int[] rearrange = TensorShape.dimensionRange(0, partialShape.length);
+        rearrange[dimension] = 0;
+        rearrange[0] = dimension;
+
+        DoubleTensor permuted = value.permute(rearrange);
+        double[] permutedBuffer = permuted.asFlatDoubleArray();
+
+        Map<Vertex, PartialDerivatives> concattedPartial = new HashMap<>();
+
+        int bufferOffset = 0;
+        for (DoubleVertex vertex : input) {
+            int[] ofWrtShape = TensorShape.concat(Arrays.copyOfRange(value.getShape(), 0, vertex.getValue().getRank()), vertex.getShape());
+            int inputSize = (int) (value.getLength() / (value.getShape()[value.getShape().length / 2 + dimension])) * vertex.getShape()[dimension];
+            double[] inputsDualNumbers = Arrays.copyOfRange(permutedBuffer, bufferOffset, bufferOffset + inputSize);
+            DoubleTensor unpermuted = DoubleTensor.create(inputsDualNumbers, ofWrtShape).permute(rearrange);
+            PartialDerivatives partial = new PartialDerivatives(getId(), unpermuted);
+            concattedPartial.put(vertex, partial);
+            bufferOffset += inputSize;
+        }
+
+        return concattedPartial;
     }
 
     @Override

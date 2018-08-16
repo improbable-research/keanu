@@ -117,6 +117,7 @@ public class Differentiator {
         return ofWrt;
     }
 
+    //TODO: move this into the PartialDerivative multiply
     public static PartialDerivatives reshapeReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary, DoubleTensor secondary) {
         Map<Long, DoubleTensor> reshapedPartials = new HashMap<>();
 
@@ -125,22 +126,6 @@ public class Differentiator {
             if (primary.isScalar()) {
                 int[] nonScalarDimensions = TensorShape.nonScalarDimensions(secondary.getShape());
                 partial = partialDerivative.getValue().sum(nonScalarDimensions).reshape(TensorShape.concat(secondary.getShape(), primary.getShape()));
-            } else {
-                partial = partialDerivative.getValue();
-            }
-            reshapedPartials.put(partialDerivative.getKey(), partial);
-        }
-
-        return new PartialDerivatives(reshapedPartials);
-    }
-
-    public static PartialDerivatives reshapeAdditionReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary) {
-        Map<Long, DoubleTensor> reshapedPartials = new HashMap<>();
-
-        for (Map.Entry<Long, DoubleTensor> partialDerivative : partialDerivatives.asMap().entrySet()) {
-            DoubleTensor partial;
-            if (primary.isScalar()) {
-                partial = DoubleTensor.ones(TensorShape.concat(primary.getShape(), primary.getShape()));
             } else {
                 partial = partialDerivative.getValue();
             }

@@ -199,7 +199,8 @@ public class PartialDerivatives {
                 TensorShape.dimensionRange(multiplier.getRank(), partial.getRank())
             ).reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
         } else {
-            return partial.times(multiplierReshaped);
+//            return partial.times(multiplierReshaped);
+            return partial.times(multiplier);
         }
     }
 

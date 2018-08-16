@@ -1,14 +1,21 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import jdk.nashorn.internal.ir.annotations.Immutable;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 public class ConcatenationVertexTest {
 
@@ -154,6 +161,56 @@ public class ConcatenationVertexTest {
         Assert.assertArrayEquals(
             cPartial.withRespectTo(b).concat(0, dPartial.withRespectTo(b)).asFlatDoubleArray(),
             concatPartial.withRespectTo(b).asFlatDoubleArray(),
+            0.0001
+        );
+    }
+
+    @Test
+    public void canConcatenateSimpleAutoDiffForwardBackward() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+
+        DoubleVertex e = new UniformVertex(0, 10);
+        e.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        DoubleVertex f = new UniformVertex(0, 10);
+        f.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
+
+        DoubleVertex c = a.times(b);
+        DoubleVertex d = e.plus(f);
+
+        ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
+
+        PartialDerivatives concatPartial = concat.getDualNumber().getPartialDerivatives();
+
+        PartialDerivatives cPartial = c.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dPartial = d.getDualNumber().getPartialDerivatives();
+
+        Assert.assertArrayEquals(
+            cPartial.withRespectTo(a).asFlatDoubleArray(),
+            concatPartial.withRespectTo(a).asFlatDoubleArray(),
+            0.0001
+        );
+        Assert.assertArrayEquals(
+            cPartial.withRespectTo(b).asFlatDoubleArray(),
+            concatPartial.withRespectTo(b).asFlatDoubleArray(),
+            0.0001
+        );
+
+        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, ImmutableSet.of(a, b, e, f));
+        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(concat, ImmutableSet.of(a, b, e, f));
+
+        Assert.assertArrayEquals(
+            cPartial.withRespectTo(a).asFlatDoubleArray(),
+            backward.withRespectTo(a).asFlatDoubleArray(),
+            0.0001
+        );
+        Assert.assertArrayEquals(
+            cPartial.withRespectTo(b).asFlatDoubleArray(),
+            backward.withRespectTo(b).asFlatDoubleArray(),
             0.0001
         );
     }

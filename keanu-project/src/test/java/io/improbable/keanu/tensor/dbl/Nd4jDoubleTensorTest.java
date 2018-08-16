@@ -251,6 +251,40 @@ public class Nd4jDoubleTensorTest {
         assertEquals(expected, diff);
     }
 
+    @Test
+    public void canPermute() {
+        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{4, 5, 6}, new int[]{1, 3});
+
+        DoubleTensor concatDimensionZero = x.concat(0, y);
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatDimensionZero.asFlatDoubleArray(), 1e-6);
+
+        DoubleTensor concatDimensionOne = x.concat(1, y);
+        DoubleTensor permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0);
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, permuttedConcatDimensionOne.asFlatDoubleArray(), 1e-6);
+
+        x = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+        y = Nd4jDoubleTensor.create(new double[]{9, 10, 11, 12, 13, 14, 15, 16}, new int[]{2, 2, 2});
+
+        concatDimensionZero = x.concat(0, y);
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, concatDimensionZero.asFlatDoubleArray(), 1e-6);
+
+        concatDimensionOne = x.concat(1, y);
+        permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0, 2);
+
+        double[] sliced = new double[permuttedConcatDimensionOne.asFlatDoubleArray().length / 2];
+        for (int i = 0; i < permuttedConcatDimensionOne.asFlatDoubleArray().length / 2; i++) {
+            sliced[i] = permuttedConcatDimensionOne.asFlatDoubleArray()[i];
+        }
+
+        DoubleTensor answer = DoubleTensor.create(sliced, x.getShape()).permute(1, 0, 2);
+        System.out.println(x.getLength());
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, answer.asFlatDoubleArray(), 1e-6);
+    }
+
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.times(right);
         assertEquals(actual, expected);

@@ -403,6 +403,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor tensorAlongDimension(int index, int... dimension) {
+        return null;
+    }
+
+    @Override
+    public DoubleTensor permute(int... rearrange) {
+        //TODO: scalar permute? Error?
+        return DoubleTensor.scalar(value);
+    }
+
+    @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
         return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
     }

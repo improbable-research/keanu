@@ -192,5 +192,18 @@ public class TensorShape {
         }
         return nonScalarDimensions.stream().mapToInt(i -> i).toArray();
     }
+
+    public static int[] removeDimension(int[] shape, int dimensionToRemove) {
+        int[] shapeWithDimensionRemoved = new int[shape.length];
+        int count = 0;
+        for (int i = 0; i < shape.length; i++) {
+            if (i != dimensionToRemove) {
+                shapeWithDimensionRemoved[count] = shape[count];
+                count++;
+            }
+        }
+        return shapeWithDimensionRemoved;
+    }
+
 }
 
