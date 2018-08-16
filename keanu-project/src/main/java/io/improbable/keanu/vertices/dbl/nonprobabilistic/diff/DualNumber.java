@@ -92,13 +92,13 @@ public class DualNumber {
         if (this.partialDerivatives.isEmpty()) {
             thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
+            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true, false);
         }
 
         if (that.partialDerivatives.isEmpty()) {
             thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
+            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false, false);
         }
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);

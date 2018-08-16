@@ -208,39 +208,51 @@ public class PartialDerivatives {
         }
     }
 
-    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft, boolean reverseMode) {
         Map<Long, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
 
-            DoubleTensor reshapedMultiplier = increaseRankByAppendingOnesToShape(multiplier, partial.getValue().getRank());
-            int[] partialShape = partial.getValue().getShape();
-            int[] resultShape = Arrays.copyOf(partialShape, partialShape.length);
+            int partialRank = partial.getValue().getRank();
 
             DoubleTensor v;
             if (partialIsLeft) {
-//                resultShape[0] = partialShape[0];
-//                resultShape[1] = multiplier.getShape()[1];
-//                v = partial.getValue()
-//                    .tensorMultiply(reshapedMultiplier, new int[]{1}, new int[]{0})
-//                    .reshape(-1, resultShape[1])
-//                    .transpose()
-//                    .reshape(resultShape);
 
-                int partialRank = partial.getValue().getRank();
-                int[] per = TensorShape.dimensionRange(-1, partialRank - 1);
-                per[0] = 0;
-                per[1] = partialRank - 1;
+                if (reverseMode) {
+                    v = partial.getValue()
+                        .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{0});
+                } else {
 
-                v = partial.getValue()
-                    .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                    .permute(per);
+                    int[] per = TensorShape.dimensionRange(-1, partialRank - 1);
+                    per[0] = 0;
+                    per[1] = partialRank - 1;
+                    v = partial.getValue()
+                        .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
+                        .permute(per);
+                }
+
             } else {
-                resultShape[0] = multiplier.getShape()[0];
-                resultShape[1] = partialShape[1];
-                v = reshapedMultiplier
-                    .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0})
-                    .reshape(resultShape);
+
+                if (reverseMode) {
+                    int[] per = TensorShape.dimensionRange(0, partialRank);
+                    per[partialRank - 1] = partialRank - 2;
+                    per[partialRank - 2] = partialRank - 1;
+
+                    v = partial.getValue()
+                        .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{1})
+                        .permute(per);
+
+                } else {
+                    DoubleTensor reshapedMultiplier = increaseRankByAppendingOnesToShape(multiplier, partial.getValue().getRank());
+                    int[] partialShape = partial.getValue().getShape();
+                    int[] resultShape = Arrays.copyOf(partialShape, partialShape.length);
+                    resultShape[0] = multiplier.getShape()[0];
+                    resultShape[1] = partialShape[1];
+                    v = reshapedMultiplier
+                        .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0})
+                        .reshape(resultShape);
+
+                }
             }
             multiplied.put(partial.getKey(), v);
         }
