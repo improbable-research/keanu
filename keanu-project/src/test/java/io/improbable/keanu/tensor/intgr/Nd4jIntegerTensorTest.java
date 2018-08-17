@@ -383,4 +383,76 @@ public class Nd4jIntegerTensorTest {
         assertEquals(expected, diff);
     }
 
+    @Test
+    public void doesPositiveDivisionCorrectly() {
+        assertDropsFractionCorrectlyOnDivision(5, 3);
+    }
+
+    @Test
+    public void doesNegativeDivisionCorrectly() {
+        assertDropsFractionCorrectlyOnDivision(-5, 3);
+    }
+
+    @Test
+    public void canStartAsMaxInteger() {
+        assertDropsFractionCorrectlyOnDivision(Integer.MAX_VALUE, 3);
+    }
+
+    @Test
+    public void canStartAsMinInteger() {
+        assertDropsFractionCorrectlyOnDivision(Integer.MIN_VALUE, 3);
+    }
+
+    private void assertDropsFractionCorrectlyOnDivision(int numerator, int denominator) {
+        int expected = numerator / denominator;
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{numerator, numerator, numerator, numerator},
+            new int[]{2, 2}
+        );
+        IntegerTensor result = tensor.div(denominator);
+        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canResultInMaxInteger() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0, 0, 0, 0},
+            new int[]{2, 2}
+        );
+        IntegerTensor result = tensor.plus(Integer.MAX_VALUE);
+        int expected = Integer.MAX_VALUE;
+        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canResultInMinInteger() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0, 0, 0, 0},
+            new int[]{2, 2}
+        );
+        IntegerTensor result = tensor.plus(Integer.MIN_VALUE);
+        int expected = Integer.MIN_VALUE;
+        assertArrayEquals(new int[]{expected, expected, expected, expected}, result.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canRepresentAllValues() {
+        IntegerTensor tensor = IntegerTensor.create(
+            new int[]{0,0,0,0},
+            new int[]{2, 2}
+        );
+
+        /*
+         * Construct a value that has the most significant two bits and the least significant bit set to 1 with all
+         * others set to 0.  This value will stretch any floating point backing representation by requiring at least a
+         * <Num bits> - 1 length Mantissa.  Simply using INT MAX often doesn't work for this test as the closest
+         * floating point value is usually > INT MAX and when converting back, the value will be clamped back to max
+         */
+        final int biggestBitRange = (0x3 << Integer.SIZE - 2) + 1;
+
+        tensor.plusInPlace(biggestBitRange);
+        assertArrayEquals(new int[]{biggestBitRange, biggestBitRange, biggestBitRange, biggestBitRange},
+            tensor.asFlatIntegerArray());
+    }
+
 }

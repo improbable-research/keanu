@@ -87,8 +87,20 @@ public interface Tensor<T> {
         return getLength() == 1;
     }
 
+    /**
+     * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
+     *
+     * (1, 2, 3) is a 1x3 vector.
+     *
+     * (1)
+     * (2)
+     * (3) is a 3x1 vector.
+     *
+     *
+     * @return true if the tensor is a vector
+     */
     default boolean isVector() {
-        return getRank() == 1;
+        return getRank() == 1 || (getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1));
     }
 
     default boolean isMatrix() {

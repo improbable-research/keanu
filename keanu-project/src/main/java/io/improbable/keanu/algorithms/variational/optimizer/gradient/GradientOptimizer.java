@@ -39,6 +39,14 @@ public class GradientOptimizer implements Optimizer {
     }
 
     public static GradientOptimizer of(BayesianNetwork bayesNet) {
+        List<Vertex> discreteLatentVertices = bayesNet.getDiscreteLatentVertices();
+        boolean containsDiscreteLatents = !discreteLatentVertices.isEmpty();
+
+        if (containsDiscreteLatents) {
+            throw new UnsupportedOperationException("Gradient Optimization unsupported on Networks containing " +
+                "Discrete Latents (" + discreteLatentVertices.size() + " found)");
+        }
+
         return GradientOptimizer.builder()
             .bayesianNetwork(bayesNet)
             .build();

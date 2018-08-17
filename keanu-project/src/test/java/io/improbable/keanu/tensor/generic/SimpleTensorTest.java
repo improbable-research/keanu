@@ -1,15 +1,9 @@
 package io.improbable.keanu.tensor.generic;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericPluckVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import org.junit.Test;
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-
-import java.util.Arrays;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
@@ -73,7 +67,7 @@ public class SimpleTensorTest {
     }
 
     @Test
-    public void canPluck() {
+    public void canTake() {
 
         Tensor<Something> somethingTensor = new GenericTensor<>(
             new Something[]{
@@ -86,9 +80,9 @@ public class SimpleTensorTest {
 
         ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(somethingTensor);
 
-        GenericPluckVertex<Something> pluck = new GenericPluckVertex(somethingVertex, 0, 0);
+        GenericTakeVertex<Something> take = new GenericTakeVertex(somethingVertex, 0, 0);
 
-        assertEquals(Something.A, pluck.getValue().scalar());
+        assertEquals(Something.A, take.getValue().scalar());
     }
 
     @Test

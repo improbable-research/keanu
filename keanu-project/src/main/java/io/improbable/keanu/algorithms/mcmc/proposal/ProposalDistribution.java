@@ -1,9 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
+import java.util.Set;
+
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.Set;
 
 public interface ProposalDistribution {
 
@@ -13,7 +14,7 @@ public interface ProposalDistribution {
 
     Proposal getProposal(Set<Vertex> vertices, KeanuRandom random);
 
-    <T> double logProb(Vertex<T> vertex, T ofValue, T givenValue);
+    <T> double logProb(Probabilistic<T> vertex, T ofValue, T givenValue);
 
     /**
      * Represents q(x|x') where q is the proposal distribution,
@@ -26,7 +27,7 @@ public interface ProposalDistribution {
     default double logProbAtFromGivenTo(Proposal proposal) {
         double sumLogProb = 0.0;
         for (Vertex v : proposal.getVerticesWithProposal()) {
-            sumLogProb += logProb(v, proposal.getProposalFrom(v), proposal.getProposalTo(v));
+            sumLogProb += logProb((Probabilistic) v, proposal.getProposalFrom(v), proposal.getProposalTo(v));
         }
         return sumLogProb;
     }
@@ -42,7 +43,7 @@ public interface ProposalDistribution {
     default double logProbAtToGivenFrom(Proposal proposal) {
         double sumLogProb = 0.0;
         for (Vertex v : proposal.getVerticesWithProposal()) {
-            sumLogProb += logProb(v, proposal.getProposalTo(v), proposal.getProposalFrom(v));
+            sumLogProb += logProb((Probabilistic) v, proposal.getProposalTo(v), proposal.getProposalFrom(v));
         }
         return sumLogProb;
     }

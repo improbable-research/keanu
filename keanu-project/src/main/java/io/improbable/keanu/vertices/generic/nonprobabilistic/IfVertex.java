@@ -4,8 +4,9 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class IfVertex<T> extends NonProbabilistic<Tensor<T>> {
+public class IfVertex<T> extends Vertex<Tensor<T>> {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends Tensor<T>> thn;
@@ -15,7 +16,8 @@ public class IfVertex<T> extends NonProbabilistic<Tensor<T>> {
                     Vertex<? extends BooleanTensor> predicate,
                     Vertex<? extends Tensor<T>> thn,
                     Vertex<? extends Tensor<T>> els) {
-
+        super(
+            new NonProbabilisticValueUpdater<>(v -> ((IfVertex) v).op(predicate.getValue(), thn.getValue(), els.getValue())));
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
@@ -28,12 +30,7 @@ public class IfVertex<T> extends NonProbabilistic<Tensor<T>> {
         return op(predicate.sample(random), thn.sample(random), els.sample(random));
     }
 
-    @Override
-    public Tensor<T> getDerivedValue() {
-        return op(predicate.getValue(), thn.getValue(), els.getValue());
-    }
-
-    protected Tensor<T> op(BooleanTensor predicate, Tensor<T> thn, Tensor<T> els) {
+    private Tensor<T> op(BooleanTensor predicate, Tensor<T> thn, Tensor<T> els) {
         return predicate.setIf(thn, els);
     }
 }

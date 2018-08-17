@@ -1,21 +1,22 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.ConstantVertex;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class SelectVertexTest {
-    private final Logger log = LoggerFactory.getLogger(SelectVertexTest.class);
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+public class CategoricalVertexTest {
+    private final Logger log = LoggerFactory.getLogger(CategoricalVertexTest.class);
 
     private static double epsilon = 0.01;
     private static int N = 100000;
@@ -84,7 +85,7 @@ public class SelectVertexTest {
     private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,
                                                        KeanuRandom random) {
 
-        SelectVertex<TestEnum> select = new SelectVertex<>(selectableValues);
+        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
 
         LinkedHashMap<TestEnum, Integer> sampleFrequencies = new LinkedHashMap<>();
         sampleFrequencies.put(TestEnum.A, 0);

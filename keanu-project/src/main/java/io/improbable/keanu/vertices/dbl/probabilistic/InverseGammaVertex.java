@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.B;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -16,11 +17,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
-
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
-
-public class InverseGammaVertex extends ProbabilisticDouble {
+public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -35,6 +34,8 @@ public class InverseGammaVertex extends ProbabilisticDouble {
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+        super(new ProbabilisticValueUpdater<>());
+
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
         this.alpha = alpha;
@@ -79,7 +80,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         DoubleTensor alphaValues = alpha.getValue();
         DoubleTensor betaValues = beta.getValue();
 
@@ -88,7 +89,7 @@ public class InverseGammaVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = InverseGamma.withParameters(alpha.getValue(), beta.getValue()).dLogProb(value);
 
         return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
