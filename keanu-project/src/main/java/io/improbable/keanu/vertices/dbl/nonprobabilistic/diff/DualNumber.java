@@ -4,7 +4,12 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class DualNumber {
 
@@ -16,7 +21,7 @@ public class DualNumber {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
-    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els){
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els) {
         if (predicate.allTrue()) {
             return new DualNumber(thn.value, thn.getPartialDerivatives());
         } else if (predicate.allFalse()) {
@@ -318,7 +323,7 @@ public class DualNumber {
         }
 
         for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivativesOfInputs.entrySet()) {
-            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivatives(dimension, partials.getValue()));
         }
 
         DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
@@ -326,7 +331,7 @@ public class DualNumber {
 
     }
 
-    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+    private DoubleTensor concatPartialDerivatives(int dimension, List<DoubleTensor> partialDerivates) {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {
