@@ -360,6 +360,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
+        if (this == o) return true;
+        if (!this.hasSameShapeAs(o)) return false;
+        double difference = value - o.scalar();
+        return (Math.abs(difference) <= epsilon);
+    }
+
+    @Override
     public DoubleTensor standardize() {
         return duplicate().standardizeInPlace();
     }
@@ -655,6 +663,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardizeInPlace() {
         throw new IllegalStateException("Cannot standardize a scalar");
+    }
+
+    @Override
+    public DoubleTensor setAllInPlace(double value) {
+        this.value = value;
+        return this;
     }
 
     @Override

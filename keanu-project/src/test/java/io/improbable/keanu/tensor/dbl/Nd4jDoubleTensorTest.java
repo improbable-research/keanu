@@ -187,11 +187,54 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void canSetAllValues(){
+        DoubleTensor rank5 = DoubleTensor.create(new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
+            6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
+        }, new int[]{2, 2, 2, 2, 2});
+        rank5.setAllInPlace(0.0);
+        assertAllValuesAre(rank5,0.0);
+        rank5.setAllInPlace(0.8);
+        assertAllValuesAre(rank5,0.8);
+    }
+
+    @Test
+    public void canEqualsWithEpsilon(){
+        double[] aData = new double[]{
+            1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
+            6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3};
+        double[] bData = new double[aData.length];
+        for ( int i =0;i<aData.length;i++){
+            if ( i%2 == 0 ) {
+                bData[i] = aData[i] + 0.4;
+            }else{
+                bData[i] = aData[i] - 0.4;
+            }
+        }
+        double[] cData = bData.clone();
+        cData[0] = cData[0]-1.0;
+
+        DoubleTensor a = DoubleTensor.create(aData, new int[]{2, 2, 2, 2, 2});
+        DoubleTensor b = DoubleTensor.create(bData, new int[]{2, 2, 2, 2, 2});
+        DoubleTensor c = DoubleTensor.create(cData, new int[]{2, 2, 2, 2, 2});
+        assertTrue("equals with epsilon should be true",a.equalsWithinEpsilon(b,0.5));
+        assertTrue("equals with epsilon should be true (inverted order)",b.equalsWithinEpsilon(a,0.5));
+        assertTrue("equals with epsilon should be not true (max delta is 0.4)",!a.equalsWithinEpsilon(b,0.2));
+        assertTrue("equals with epsilon should be not true (max delta is 1.0)",!a.equalsWithinEpsilon(c,0.5));
+    }
+
+    @Test
     public void doesClampTensor() {
         DoubleTensor A = Nd4jDoubleTensor.create(new double[]{0.25, 3, -4, -5}, new int[]{1, 4});
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5}, new int[]{1, 4});
         assertEquals(expected, clampedA);
+    }
+
+    private void assertAllValuesAre(DoubleTensor tensor, double v) {
+        for( double element : tensor.asFlatList() ){
+            assertEquals( element , v , 0.01);
+        }
     }
 
     @Test

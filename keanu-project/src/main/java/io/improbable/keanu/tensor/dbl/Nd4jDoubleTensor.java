@@ -193,6 +193,21 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
+        if (this == o) return true;
+
+        if (o instanceof Nd4jDoubleTensor) {
+            return tensor.equalsWithEps(((Nd4jDoubleTensor) o).tensor, epsilon);
+        } else {
+            if (this.hasSameShapeAs(o)) {
+                DoubleTensor difference = o.minus(this);
+                return difference.abs().lessThan(epsilon).allTrue();
+            }
+        }
+        return false;
+    }
+
+    @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
         return duplicate().clampInPlace(min, max);
     }
@@ -738,6 +753,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardizeInPlace() {
         tensor.subi(average()).divi(standardDeviation());
+        return this;
+    }
+
+    @Override
+    public DoubleTensor setAllInPlace(double value) {
+        this.tensor.assign(value);
         return this;
     }
 
