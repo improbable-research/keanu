@@ -5,15 +5,15 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
+public class DoubleCPTVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
     private final Map<CPTCondition, DoubleVertex> conditions;
@@ -22,7 +22,6 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
     public DoubleCPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
                            Map<CPTCondition, DoubleVertex> conditions,
                            DoubleVertex defaultResult) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleCPTVertex) v).op()));
         this.inputs = inputs;
         this.conditions = conditions;
         this.defaultResult = defaultResult;
@@ -38,7 +37,8 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
         return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
-    protected DoubleTensor op() {
+    @Override
+    public DoubleTensor calculate() {
         final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
         return vertex == null ? defaultResult.getValue() : vertex.getValue();
@@ -50,5 +50,4 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable {
         DoubleVertex vertex = conditions.get(condition);
         return vertex == null ? dualNumbers.get(defaultResult) : dualNumbers.get(vertex);
     }
-
 }

@@ -162,6 +162,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     double standardDeviation();
 
+    boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
+
     DoubleTensor standardize();
 
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
@@ -236,6 +238,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor sigmoidInPlace();
 
     DoubleTensor standardizeInPlace();
+
+    DoubleTensor setAllInPlace(double value);
 
     // Comparisons
     BooleanTensor lessThan(double value);

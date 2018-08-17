@@ -1,17 +1,18 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     private final DoubleVertex left;
     private final DoubleVertex right;
@@ -29,16 +30,13 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
     }
 
     /**
-     * A vertex that performs a user defined operation on two input vertices
+     * A vertex that performs a user defined operation on two vertices
      *
-     * @param shape the shape of the tensor
-     * @param left  first input vertex
-     * @param right second input vertex
+     * @param shape the shape of the resulting vertex
+     * @param left  a vertex
+     * @param right a vertex
      */
-    public DoubleBinaryOpVertex(
-        int[] shape,
-        DoubleVertex left, DoubleVertex right) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpVertex) v).op(left.getValue(), right.getValue())));
+    public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
         this.left = left;
         this.right = right;
         setParents(left, right);
@@ -48,6 +46,11 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(left.sample(random), right.sample(random));
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return op(left.getValue(), right.getValue());
     }
 
     public DoubleVertex getLeft() {

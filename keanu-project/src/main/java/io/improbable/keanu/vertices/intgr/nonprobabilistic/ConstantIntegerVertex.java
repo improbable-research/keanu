@@ -2,14 +2,13 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConstantIntegerVertex extends IntegerVertex {
+public class ConstantIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     public ConstantIntegerVertex(IntegerTensor constant) {
-        super(new NonProbabilisticValueUpdater<>(v -> v.getValue()));
         setValue(constant);
     }
 
@@ -23,6 +22,11 @@ public class ConstantIntegerVertex extends IntegerVertex {
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
+        return getValue();
+    }
+
+    @Override
+    public IntegerTensor calculate() {
         return getValue();
     }
 }

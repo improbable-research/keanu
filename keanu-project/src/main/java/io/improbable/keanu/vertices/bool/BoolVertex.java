@@ -17,13 +17,8 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrM
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
-import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
-
-    public BoolVertex(ValueUpdater<BooleanTensor> valueUpdater) {
-        super(valueUpdater);
-    }
 
     @SafeVarargs
     public final BoolVertex or(Vertex<BooleanTensor>... those) {
