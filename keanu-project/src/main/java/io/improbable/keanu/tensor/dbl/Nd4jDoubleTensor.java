@@ -187,9 +187,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public double standardDeviation() {
-        double average = average();
-        return Math.sqrt(Transforms.pow(tensor.sub(average), 2, false)
-            .sumNumber().doubleValue() / (tensor.length() - 1));
+        return tensor.stdNumber().doubleValue();
     }
 
     @Override
