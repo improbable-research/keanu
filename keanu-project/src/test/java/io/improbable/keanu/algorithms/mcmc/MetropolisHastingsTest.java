@@ -1,6 +1,9 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -204,6 +207,74 @@ public class MetropolisHastingsTest {
         );
 
         assertEquals(sampleCount + 1, n.get());
+    }
+
+    @Test
+    public void canDefaultToSettingsInBuilderAndIsConfigurableAfterBuilding() {
+
+        GaussianVertex A = new GaussianVertex(0.0, 1.0);
+        BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
+        net.probeForNonZeroProbability(100, random);
+
+        MetropolisHastings algo = MetropolisHastings.builder()
+            .useCacheOnRejection(false)
+            .build();
+
+        assertNotNull(algo.getProposalDistribution());
+        assertNotNull(algo.getRandom());
+        assertNotNull(algo.getVariableSelector());
+
+        NetworkSamples posteriorSamples = algo.getPosteriorSamples(
+            net,
+            net.getLatentVertices(),
+            2
+        );
+
+        algo.setVariableSelector(null);
+        assertNull(algo.getVariableSelector());
+
+        assertFalse(posteriorSamples.get(A).asList().isEmpty());
+    }
+
+    @Test
+    public void doesNotStoreSamplesThatWillBeDropped() {
+
+        MetropolisHastings algo = MetropolisHastings.withDefaultConfig();
+
+        int sampleCount = 1000;
+        int dropCount = 100;
+        int downSampleInterval = 2;
+        GaussianVertex A = new GaussianVertex(0, 1);
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+        NetworkSamples samples = algo.generatePosteriorSamples(network, network.getLatentVertices())
+            .dropCount(dropCount)
+            .downSampleInterval(downSampleInterval)
+            .generate(sampleCount);
+
+        assertEquals((sampleCount - dropCount) / downSampleInterval, samples.size());
+        assertEquals(0.0, samples.getDoubleTensorSamples(A).getAverages().scalar(), 0.1);
+    }
+
+    @Test
+    public void canStreamSamples() {
+
+        MetropolisHastings algo = MetropolisHastings.withDefaultConfig();
+
+        int sampleCount = 1000;
+        int dropCount = 100;
+        int downSampleInterval = 2;
+        GaussianVertex A = new GaussianVertex(0, 1);
+        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+
+        double averageA = algo.generatePosteriorSamples(network, network.getLatentVertices())
+            .dropCount(dropCount)
+            .downSampleInterval(downSampleInterval)
+            .stream()
+            .limit(200)
+            .mapToDouble(networkState -> networkState.get(A).scalar())
+            .average().getAsDouble();
+
+        assertEquals(0.0, averageA, 0.1);
     }
 
 }
