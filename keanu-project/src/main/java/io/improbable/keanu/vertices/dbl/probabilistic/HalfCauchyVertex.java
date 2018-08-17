@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class HalfCauchyVertex extends CauchyVertex {
 
@@ -34,9 +35,14 @@ public class HalfCauchyVertex extends CauchyVertex {
     @Override
     public double logProb(DoubleTensor value) {
         if (value.greaterThanOrEqual(0.0).allTrue()) {
-            return super.logProb(value) + LOG_TWO;
+            return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
+    }
+
+    @Override
+    public DoubleTensor sample(KeanuRandom random) {
+        return super.sample(random).absInPlace();
     }
 
 }
