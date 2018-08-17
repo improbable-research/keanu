@@ -44,9 +44,7 @@ public class Multinomial implements DiscreteDistribution {
         );
 
         numCategories = p.getShape()[0];
-        for (int category = 0; category < numCategories; category++) {
-            TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, category).getShape());
-        }
+        TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
         this.n = n;
         this.p = p;
     }
