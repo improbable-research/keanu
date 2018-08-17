@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -50,7 +51,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(T value) {
-        throw new UnsupportedOperationException();
+        return Collections.emptyMap();
     }
 
 }

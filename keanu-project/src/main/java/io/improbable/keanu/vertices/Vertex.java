@@ -23,9 +23,22 @@ public abstract class Vertex<T> implements Observable<T> {
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
     private final Observable<T> observation;
+    private VertexLabel label = null;
 
     public Vertex() {
         this.observation = Observable.observableTypeFor(this.getClass());
+    }
+
+    /**
+     * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
+     * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
+     */
+    public void setLabel(VertexLabel label) {
+        this.label = label;
+    }
+
+    public VertexLabel getLabel() {
+        return this.label;
     }
 
     /**

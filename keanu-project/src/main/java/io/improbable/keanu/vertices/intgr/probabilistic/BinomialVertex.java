@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.discrete.Binomial;
@@ -63,7 +64,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
-        throw new UnsupportedOperationException();
+        return Collections.emptyMap();
     }
 
     @Override

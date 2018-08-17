@@ -9,7 +9,7 @@ public class Categorical<T> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
-    public static <T> Categorical withParameters(Map<T, DoubleVertex> selectableValues) {
+    public static <T> Categorical<T> withParameters(Map<T, DoubleVertex> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 

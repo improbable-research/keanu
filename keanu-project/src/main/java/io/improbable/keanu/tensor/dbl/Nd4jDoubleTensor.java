@@ -116,6 +116,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor permute(int... rearrange) {
+        return new Nd4jDoubleTensor(tensor.permute(rearrange));
+    }
+
+    @Override
     public DoubleTensor diag() {
         return new Nd4jDoubleTensor(Nd4j.diag(tensor));
     }
