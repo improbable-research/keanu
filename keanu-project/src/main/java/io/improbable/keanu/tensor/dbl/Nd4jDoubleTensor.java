@@ -1,13 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.INDArrayExtensions;
-import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import static java.util.Arrays.copyOf;
+
+import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
@@ -24,11 +23,14 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
-import static java.util.Arrays.copyOf;
+import io.improbable.keanu.tensor.INDArrayExtensions;
+import io.improbable.keanu.tensor.INDArrayShim;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TypedINDArrayFactory;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -389,7 +391,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -684,7 +686,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 

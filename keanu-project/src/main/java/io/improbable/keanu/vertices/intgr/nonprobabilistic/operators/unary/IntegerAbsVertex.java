@@ -15,7 +15,7 @@ public class IntegerAbsVertex extends IntegerUnaryOpVertex {
     }
 
     @Override
-    protected IntegerTensor op(IntegerTensor a) {
-        return a.abs();
+    protected IntegerTensor op(IntegerTensor value) {
+        return value.abs();
     }
 }

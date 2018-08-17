@@ -1,9 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -11,7 +7,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class DualNumber {
+import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+
+public class DualNumber implements DoubleOperators<DualNumber> {
 
     public static DualNumber createConstant(DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
@@ -166,6 +167,11 @@ public class DualNumber {
 
         PartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new DualNumber(newValue, newInf);
+    }
+
+    @Override
+    public DualNumber pow(double exponent) {
+        return pow(new DualNumber(DoubleTensor.scalar(exponent), PartialDerivatives.OF_CONSTANT));
     }
 
     public DualNumber plus(DualNumber that) {
@@ -366,5 +372,4 @@ public class DualNumber {
             .slice(0, indexToTakeFrom)
             .reshape(takeShape);
     }
-
 }

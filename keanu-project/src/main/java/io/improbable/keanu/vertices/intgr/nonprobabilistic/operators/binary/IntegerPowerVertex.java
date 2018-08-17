@@ -3,21 +3,19 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-
-public class IntegerDivisionVertex extends IntegerBinaryOpVertex {
-
+public class IntegerPowerVertex extends IntegerBinaryOpVertex {
     /**
-     * Divides one vertex by another
+     * Raises one vertex to the power of another
      *
-     * @param a a vertex to be divided
-     * @param b a vertex to divide by
+     * @param a the base vertex
+     * @param b the exponent vertex
      */
-    public IntegerDivisionVertex(IntegerVertex a, IntegerVertex b) {
+    public IntegerPowerVertex(IntegerVertex a, IntegerVertex b) {
         super(a, b);
     }
 
     @Override
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-        return l.div(r);
+        return l.pow(r);
     }
 }
