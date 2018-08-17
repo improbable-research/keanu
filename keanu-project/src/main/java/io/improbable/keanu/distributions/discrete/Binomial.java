@@ -16,27 +16,27 @@ import org.nd4j.linalg.util.ArrayUtil;
  */
 public class Binomial implements DiscreteDistribution {
 
-    private final DoubleTensor successProbability;
     private final IntegerTensor numberOfTrials;
+    private final DoubleTensor successProbability;
 
     /**
-     * @param successProbability probability of success
      * @param numberOfTrials     number of trials
+     * @param successProbability probability of success
      * @return an instance of {@link DiscreteDistribution}
      */
-    public static DiscreteDistribution withParameters(DoubleTensor successProbability, IntegerTensor numberOfTrials) {
-        return new Binomial(successProbability, numberOfTrials);
+    public static DiscreteDistribution withParameters(IntegerTensor numberOfTrials, DoubleTensor successProbability) {
+        return new Binomial(numberOfTrials, successProbability);
     }
 
-    private Binomial(DoubleTensor successProbability, IntegerTensor numberOfTrials) {
-        this.successProbability = successProbability;
+    private Binomial(IntegerTensor numberOfTrials, DoubleTensor successProbability) {
         this.numberOfTrials = numberOfTrials;
+        this.successProbability = successProbability;
     }
 
     @Override
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> pWrapped = successProbability.getFlattenedView();
         Tensor.FlattenedView<Integer> nWrapped = numberOfTrials.getFlattenedView();
+        Tensor.FlattenedView<Double> pWrapped = successProbability.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         int[] samples = new int[length];
