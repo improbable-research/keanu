@@ -6,8 +6,10 @@ import static org.junit.Assert.assertTrue;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.dual.Diffs;
@@ -22,8 +24,10 @@ import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorC
 
 public class KDEApproximationTest {
 
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
+
     private static final double DELTA = 0.1;
-    private static final long randomSeed = 420;
 
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
@@ -123,7 +127,7 @@ public class KDEApproximationTest {
         double bucketSize = 0.1;
 
         ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod(
-            KDE, from, to, bucketSize, 1e-2, new KeanuRandom(randomSeed), 1000
+            KDE, from, to, bucketSize, 1e-2, KeanuRandom.getDefaultRandom(), 1000
         );
     }
 
@@ -138,7 +142,7 @@ public class KDEApproximationTest {
         KDEVertex resampledKDE = new GaussianKDE().approximate(samples);
 
         int nSamples = 1000;
-        resampledKDE.resample(nSamples, new KeanuRandom(randomSeed));
+        resampledKDE.resample(nSamples, KeanuRandom.getDefaultRandom());
         assertEquals(1, resampledKDE.getSampleShape()[0]);
         assertEquals(nSamples, resampledKDE.getSampleShape()[1]);
     }
