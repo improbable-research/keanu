@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class TriangularVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -29,7 +28,6 @@ public class TriangularVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
     public TriangularVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 

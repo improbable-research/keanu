@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.K;
 import static io.improbable.keanu.distributions.dual.Diffs.THETA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
@@ -18,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -35,7 +33,6 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(int[] tensorShape, DoubleVertex theta, DoubleVertex k) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, theta.getShape(), k.getShape());
 
@@ -48,8 +45,8 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     /**
      * One to one constructor for mapping some shape of theta and k to matching shaped gamma.
      *
-     * @param theta    the theta (scale) of the Gamma with either the same shape as specified for this vertex
-     * @param k        the k (shape) of the Gamma with either the same shape as specified for this vertex
+     * @param theta the theta (scale) of the Gamma with either the same shape as specified for this vertex
+     * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(DoubleVertex theta, DoubleVertex k) {
         this(checkHasSingleNonScalarShapeOrAllScalar(theta.getShape(), k.getShape()), theta, k);

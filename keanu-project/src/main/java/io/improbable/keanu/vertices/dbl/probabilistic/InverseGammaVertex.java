@@ -17,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -34,7 +33,6 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
     public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 

@@ -3,13 +3,13 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class DoubleUnaryOpVertex extends DoubleVertex {
+public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     protected final DoubleVertex inputVertex;
 
@@ -29,10 +29,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex {
      * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
      */
-    public DoubleUnaryOpVertex(
-        int[] shape,
-        DoubleVertex inputVertex) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpVertex) v).op(inputVertex.getValue())));
+    public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(DoubleTensor.placeHolder(shape));
@@ -41,6 +38,11 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(inputVertex.sample(random));
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return op(inputVertex.getValue());
     }
 
     @Override
