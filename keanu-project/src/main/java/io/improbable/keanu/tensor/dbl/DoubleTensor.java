@@ -95,6 +95,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     @Override
     DoubleTensor reshape(int... newShape);
 
+    DoubleTensor permute(int... rearrange);
+
     @Override
     DoubleTensor duplicate();
 

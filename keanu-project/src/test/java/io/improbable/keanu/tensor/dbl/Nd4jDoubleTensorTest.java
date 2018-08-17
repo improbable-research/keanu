@@ -1,11 +1,11 @@
 package io.improbable.keanu.tensor.dbl;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class Nd4jDoubleTensorTest {
 
@@ -287,6 +287,34 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor actual = DoubleTensor.arange(3, 7, 1.5);
         DoubleTensor expected = DoubleTensor.create(new double[]{3.0, 4.5, 6.0});
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canPermuteForTranspose() {
+        DoubleTensor a = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+        DoubleTensor permuted = a.permute(1, 0);
+        DoubleTensor transposed = a.transpose();
+
+        assertEquals(transposed, permuted);
+    }
+
+    @Test
+    public void canPermuteUpperDimensions() {
+        DoubleTensor a = DoubleTensor.create(new double[]{
+            1, 2,
+            3, 4,
+            5, 6,
+            7, 8
+        }, new int[]{1, 2, 2, 2});
+        DoubleTensor permuted = a.permute(0, 1, 3, 2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{
+            1, 3,
+            2, 4,
+            5, 7,
+            6, 8
+        }, new int[]{1, 2, 2, 2});
+
+        assertEquals(expected, permuted);
     }
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
