@@ -1,8 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import java.util.Map;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
 public abstract class DoubleUnaryOpVertex extends DoubleVertex {
@@ -10,12 +14,24 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex {
     protected final DoubleVertex inputVertex;
 
     /**
-     * A vertex that performs a user defined operation on a singe input vertex
+     * A vertex that performs a user defined operation on a single input vertex
      *
-     * @param shape       the shape of the resulting vertex
-     * @param inputVertex a vertex
+     * @param inputVertex the input vertex
      */
-    public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {
+    public DoubleUnaryOpVertex(
+        DoubleVertex inputVertex) {
+        this(inputVertex.getShape(), inputVertex);
+    }
+
+    /**
+     * A vertex that performs a user defined operation on a single input vertex
+     *
+     * @param shape       the shape of the tensor
+     * @param inputVertex the input vertex
+     */
+    public DoubleUnaryOpVertex(
+        int[] shape,
+        DoubleVertex inputVertex) {
         super(new NonProbabilisticValueUpdater<>(v -> ((DoubleUnaryOpVertex) v).op(inputVertex.getValue())));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
@@ -27,6 +43,16 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex {
         return op(inputVertex.sample(random));
     }
 
-    protected abstract DoubleTensor op(DoubleTensor a);
+    @Override
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        try {
+            return dualOp(dualNumbers.get(inputVertex));
+        } catch (UnsupportedOperationException e) {
+            return super.calculateDualNumber(dualNumbers);
+        }
+    }
 
+    protected abstract DoubleTensor op(DoubleTensor value);
+
+    protected abstract DualNumber dualOp(DualNumber dualNumber);
 }

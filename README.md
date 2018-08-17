@@ -16,7 +16,7 @@
 
 Keanu is a general purpose probabilistic programming library built in Java and developed by Improbable's research team.
 It enables you to build Bayesian networks through which you can make
-probablistic predictions about large, complex and multifaceted problems.
+probabilistic predictions about large, complex and multifaceted problems.
 
 This is an early stage, pre-alpha version of Keanu. We have an ambitious team
 attempting to build an even more ambitious product with the help of the open source community.

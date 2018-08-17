@@ -1,12 +1,18 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-import java.util.*;
-
-public class DualNumber {
+public class DualNumber implements DoubleOperators<DualNumber> {
 
     public static DualNumber createConstant(DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
@@ -16,7 +22,7 @@ public class DualNumber {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
-    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els){
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els) {
         if (predicate.allTrue()) {
             return new DualNumber(thn.value, thn.getPartialDerivatives());
         } else if (predicate.allFalse()) {
@@ -161,6 +167,11 @@ public class DualNumber {
 
         PartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new DualNumber(newValue, newInf);
+    }
+
+    @Override
+    public DualNumber pow(double exponent) {
+        return pow(new DualNumber(DoubleTensor.scalar(exponent), PartialDerivatives.OF_CONSTANT));
     }
 
     public DualNumber plus(DualNumber that) {
@@ -318,7 +329,7 @@ public class DualNumber {
         }
 
         for (Map.Entry<Long, List<DoubleTensor>> partials : combinedPartialDerivativesOfInputs.entrySet()) {
-            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivates(dimension, partials.getValue()));
+            concatenatedPartialDerivatives.put(partials.getKey(), concatPartialDerivatives(dimension, partials.getValue()));
         }
 
         DoubleTensor concatValue = this.getValue().concat(dimension, toConcat);
@@ -326,7 +337,7 @@ public class DualNumber {
 
     }
 
-    private DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+    private DoubleTensor concatPartialDerivatives(int dimension, List<DoubleTensor> partialDerivates) {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {
@@ -361,5 +372,4 @@ public class DualNumber {
             .slice(0, indexToTakeFrom)
             .reshape(takeShape);
     }
-
 }
