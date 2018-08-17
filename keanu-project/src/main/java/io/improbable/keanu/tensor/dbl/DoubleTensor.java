@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.NumberTensor;
@@ -204,6 +206,16 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     @Override
     DoubleTensor slice(int dimension, int index);
+
+    default List<DoubleTensor> sliceAlongDimension(int dimension, int indexStart, int indexEnd) {
+        List<DoubleTensor> slicedTensors = new ArrayList<>();
+
+        for (int i = indexStart; i < indexEnd; i++) {
+            slicedTensors.add(slice(dimension, i));
+        }
+
+        return slicedTensors;
+    }
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 

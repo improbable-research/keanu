@@ -9,7 +9,6 @@ import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.util.ArrayUtil;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
@@ -54,19 +53,14 @@ public class Multinomial implements DiscreteDistribution {
         TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, n.getShape());
 
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
-        List<Tensor.FlattenedView<Double>> pFlattened = Lists.newArrayList();
-
-        for (int category = 0; category < numCategories; category++) {
-            DoubleTensor probsForCategory = p.slice(0, category);
-            pFlattened.add(probsForCategory.getFlattenedView());
-        }
+        List<DoubleTensor> sliced = p.sliceAlongDimension(0, 0, numCategories);
 
         int length = ArrayUtil.prod(shape);
         int[] samples = new int[0];
 
         for (int i = 0; i < length; i++) {
             final int j = i;
-            List<Double> categoryProbabilities = pFlattened.stream().map(p -> p.getOrScalar(j)).collect(Collectors.toList());
+            List<Double> categoryProbabilities = sliced.stream().map(p -> p.getFlattenedView().getOrScalar(j)).collect(Collectors.toList());
             int[] sample = drawNTimes(nFlattened.getOrScalar(i), random, categoryProbabilities.toArray(new Double[0]));
             samples = ArrayUtils.addAll(samples, sample);
         }
