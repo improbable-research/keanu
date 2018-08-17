@@ -19,50 +19,50 @@ public class Gaussian implements ContinuousDistribution {
 
     private static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
     static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
-    private final DoubleTensor location;
-    private final DoubleTensor scale;
+    private final DoubleTensor mean;
+    private final DoubleTensor standardDeviation;
 
     /**
-     * @param location shifts the distribution; mean
-     * @param scale    stretches/shrinks the distribution; variance
+     * @param mean              the mean of Gaussian Distribution
+     * @param standardDeviation the standard deviation of Gaussian Distribution
      */
-    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
-        return new Gaussian(location, scale);
+    public static ContinuousDistribution withParameters(DoubleTensor mean, DoubleTensor standardDeviation) {
+        return new Gaussian(mean, standardDeviation);
     }
 
-    private Gaussian(DoubleTensor location, DoubleTensor scale) {
-        this.location = location;
-        this.scale = scale;
+    private Gaussian(DoubleTensor mean, DoubleTensor standardDeviation) {
+        this.mean = mean;
+        this.standardDeviation = standardDeviation;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
         DoubleTensor unityGaussian = random.nextGaussian(shape);
-        return unityGaussian.timesInPlace(scale).plusInPlace(location);
+        return unityGaussian.timesInPlace(standardDeviation).plusInPlace(mean);
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor lnSigma = scale.log();
-        final DoubleTensor xMinusMuSquared = x.minus(location).powInPlace(2);
-        final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(scale.pow(2).timesInPlace(2.0));
+        final DoubleTensor lnSigma = standardDeviation.log();
+        final DoubleTensor xMinusMuSquared = x.minus(mean).powInPlace(2);
+        final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(standardDeviation.pow(2).timesInPlace(2.0));
         return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor variance = scale.pow(2);
-        final DoubleTensor xMinusMu = x.minus(location);
+        final DoubleTensor variance = standardDeviation.pow(2);
+        final DoubleTensor xMinusMu = x.minus(mean);
 
-        final DoubleTensor dLogPdlocation = xMinusMu.div(variance);
-        final DoubleTensor dLogPdscale = xMinusMu.powInPlace(2)
-            .divInPlace(variance.timesInPlace(scale))
-            .minusInPlace(scale.reciprocal());
-        final DoubleTensor dLogPdx = dLogPdlocation.unaryMinus();
+        final DoubleTensor dLogPdmu = xMinusMu.div(standardDeviation);
+        final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
+        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
+            .divInPlace(variance.timesInPlace(standardDeviation))
+            .minusInPlace(standardDeviation.reciprocal());
 
         return new Diffs()
-            .put(MU, dLogPdlocation)
-            .put(SIGMA, dLogPdscale)
+            .put(MU, dLogPdmu)
+            .put(SIGMA, dLogPdsigma)
             .put(X, dLogPdx);
     }
 
