@@ -57,8 +57,8 @@ public class Multinomial implements DiscreteDistribution {
         List<Tensor.FlattenedView<Double>> pFlattened = Lists.newArrayList();
 
         for (int category = 0; category < numCategories; category++) {
-            DoubleTensor p_i = p.slice(0, category);
-            pFlattened.add(p_i.getFlattenedView());
+            DoubleTensor probsForCategory = p.slice(0, category);
+            pFlattened.add(probsForCategory.getFlattenedView());
         }
 
         int length = ArrayUtil.prod(shape);
@@ -66,8 +66,8 @@ public class Multinomial implements DiscreteDistribution {
 
         for (int i = 0; i < length; i++) {
             final int j = i;
-            List<Double> ps = pFlattened.stream().map(p -> p.getOrScalar(j)).collect(Collectors.toList());
-            int[] sample = sample(nFlattened.getOrScalar(i), random, ps.toArray(new Double[0]));
+            List<Double> categoryProbabilities = pFlattened.stream().map(p -> p.getOrScalar(j)).collect(Collectors.toList());
+            int[] sample = drawNTimes(nFlattened.getOrScalar(i), random, categoryProbabilities.toArray(new Double[0]));
             samples = ArrayUtils.addAll(samples, sample);
         }
         return constructSampleTensor(shape, samples);
@@ -98,21 +98,21 @@ public class Multinomial implements DiscreteDistribution {
         return IntegerTensor.create(kabArray, ArrayUtils.insert(0, outputShape, numCategories));
     }
 
-    private static int[] sample(int n, KeanuRandom random, Double... p) {
-        int[] counts = new int[p.length];
+    private static int[] drawNTimes(int n, KeanuRandom random, Double... categoryProbabilities) {
+        int[] categoryDrawCounts = new int[categoryProbabilities.length];
         for (int i = 0; i < n; i++) {
-            int index = sample(random, p);
-            counts[index] += 1;
+            int index = draw(random, categoryProbabilities);
+            categoryDrawCounts[index] += 1;
         }
-        return counts;
+        return categoryDrawCounts;
     }
 
-    private static int sample(KeanuRandom random, Double... p) {
+    private static int draw(KeanuRandom random, Double... categoryProbabilities) {
         double value = random.nextDouble();
         int index = 0;
         Double pCumulative = 0.;
-        while (index < p.length) {
-            Double currentP = p[index++];
+        while (index < categoryProbabilities.length) {
+            Double currentP = categoryProbabilities[index++];
             if (currentP == 0.) {
                 continue;
             }
