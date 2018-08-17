@@ -20,7 +20,7 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     }
 
     public BoolBinaryOpVertex(int[] shape, Vertex<A> a, Vertex<B> b) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((BoolBinaryOpVertex) v).op(a.getValue(), b.getValue())));
+        super(new NonProbabilisticValueUpdater<>(v -> ((BoolBinaryOpVertex<A, B>) v).op(a.getValue(), b.getValue())));
 
         this.a = a;
         this.b = b;

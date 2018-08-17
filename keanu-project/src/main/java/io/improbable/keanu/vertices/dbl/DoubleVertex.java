@@ -31,7 +31,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinV
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
@@ -162,22 +162,12 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SumVertex(this);
     }
 
-    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> calculation, Function<DualNumber, DualNumber> dualNumberCalculation) {
-        return lambda(this.getShape(), calculation, dualNumberCalculation);
+    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> calculation, Function<DualNumber, DualNumber> dualNumberCalculation) {
-        return new DoubleUnaryOpVertex(outputShape, this) {
-            @Override
-            protected DoubleTensor op(DoubleTensor value) {
-                return calculation.apply(value);
-            }
-
-            @Override
-            protected DualNumber dualOp(DualNumber dualNumber) {
-                return dualNumberCalculation.apply(dualNumber);
-            }
-        };
+    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation);
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
