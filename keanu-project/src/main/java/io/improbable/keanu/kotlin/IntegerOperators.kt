@@ -7,6 +7,6 @@ interface IntegerOperators<T> : Operators<T> {
     operator fun plus(value: Int): T
     operator fun times(value: Int): T
     operator fun div(value: Int): T
-    fun pow(value: Int): T
+    fun pow(exponent: Int): T
 
 }

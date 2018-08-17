@@ -12,7 +12,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public class DualNumber implements DoubleOperators<DualNumber>  {
+public class DualNumber implements DoubleOperators<DualNumber> {
 
     public static DualNumber createConstant(DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
@@ -167,6 +167,11 @@ public class DualNumber implements DoubleOperators<DualNumber>  {
 
         PartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new DualNumber(newValue, newInf);
+    }
+
+    @Override
+    public DualNumber pow(double exponent) {
+        return pow(new DualNumber(DoubleTensor.scalar(exponent), PartialDerivatives.OF_CONSTANT));
     }
 
     public DualNumber plus(DualNumber that) {
@@ -366,10 +371,5 @@ public class DualNumber implements DoubleOperators<DualNumber>  {
         return from.reshape(subShapeLength, -1)
             .slice(0, indexToTakeFrom)
             .reshape(takeShape);
-    }
-
-    @Override
-    public DualNumber pow(double exponent) {
-        throw new UnsupportedOperationException();
     }
 }

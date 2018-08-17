@@ -24,7 +24,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
 
     @Override
     protected DualNumber dualOp(DualNumber a, DualNumber b) {
-        DoubleTensor denominator = ((b.getValue().pow(2)).timesInPlace((a.getValue().pow(2))));
+        DoubleTensor denominator = ((b.getValue().pow(2)).plusInPlace((a.getValue().pow(2))));
 
         PartialDerivatives thisInfA = a.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
         PartialDerivatives thisInfB = b.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());

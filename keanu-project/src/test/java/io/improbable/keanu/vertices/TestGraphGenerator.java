@@ -29,7 +29,6 @@ public class TestGraphGenerator {
 
     static class PassThroughVertex extends DoubleUnaryOpVertex {
 
-        private final long id;
         private final AtomicInteger opCount;
         private final AtomicInteger dualNumberCount;
         private final Consumer<Long> onOp;
@@ -39,13 +38,12 @@ public class TestGraphGenerator {
             this.opCount = opCount;
             this.dualNumberCount = dualNumberCount;
             this.onOp = onOp;
-            id = Vertex.ID_GENERATOR.get();
         }
 
         @Override
         protected DoubleTensor op(DoubleTensor a) {
             opCount.incrementAndGet();
-            onOp.accept(id);
+            onOp.accept(getId());
             return a;
         }
 
@@ -65,7 +63,6 @@ public class TestGraphGenerator {
         private final AtomicInteger opCount;
         private final AtomicInteger dualNumberCount;
         private final Consumer<Long> onOp;
-        private final long id;
 
         public SumVertex(DoubleVertex left, DoubleVertex right,
                          AtomicInteger opCount, AtomicInteger dualNumberCount,
@@ -74,13 +71,12 @@ public class TestGraphGenerator {
             this.opCount = opCount;
             this.dualNumberCount = dualNumberCount;
             this.onOp = onOp;
-            id = Vertex.ID_GENERATOR.get();
         }
 
         @Override
         protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
             opCount.incrementAndGet();
-            onOp.accept(id);
+            onOp.accept(getId());
             return l.plus(r);
         }
 

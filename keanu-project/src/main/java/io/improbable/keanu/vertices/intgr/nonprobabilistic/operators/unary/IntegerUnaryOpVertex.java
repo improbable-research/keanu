@@ -16,7 +16,6 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex {
      */
     public IntegerUnaryOpVertex(IntegerVertex inputVertex) {
         this(inputVertex.getShape(), inputVertex);
-
     }
 
     /**
