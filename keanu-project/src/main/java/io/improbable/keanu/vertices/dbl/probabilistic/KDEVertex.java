@@ -4,7 +4,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -12,7 +11,8 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
-    public double bandwidth;
+
+    private final double bandwidth;
     private DoubleTensor samples;
 
     public KDEVertex(DoubleTensor samples, double bandwidth) {
@@ -41,14 +41,13 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     private DoubleTensor getDiffs(DoubleTensor x) {
-        DoubleTensor diffs = DoubleTensor.zeros(new int[]{(int) samples.getShape()[0], (int) x.getShape()[1]});
+        DoubleTensor diffs = DoubleTensor.zeros(new int[]{samples.getShape()[0], x.getShape()[1]});
         return diffs.plusInPlace(x).minusInPlace(samples).divInPlace(bandwidth);
     }
 
     public DoubleTensor pdf(DoubleTensor x) {
         DoubleTensor diffs = getDiffs(x);
-        DoubleTensor pdfs = gaussianKernel(diffs).sum(0).divInPlace(samples.getLength() * bandwidth);
-        return pdfs;
+        return gaussianKernel(diffs).sum(0).divInPlace(samples.getLength() * bandwidth);
     }
 
     @Override
@@ -58,58 +57,47 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        Map<Long, DoubleTensor> partialDerivates = new HashMap<>();
+        Map<Long, DoubleTensor> partialDerivatives = new HashMap<>();
 
-        DoubleTensor dlnPdfs = dlnPdf(value).dLogPdx;
+        DoubleTensor dlnPdfs = dPdx(value).divInPlace(pdf(value));
 
-        partialDerivates.put(getId(), dlnPdfs);
-        return partialDerivates;
+        partialDerivatives.put(getId(), dlnPdfs);
+        return partialDerivatives;
     }
 
     private DoubleTensor dPdx(DoubleTensor x) {
         DoubleTensor diff = getDiffs(x);
-        return gaussianKernel(diff).timesInPlace(diff).unaryMinusInPlace().sum(0).divInPlace(bandwidth).divInPlace(bandwidth * samples.getLength());
-    }
-
-    public DiffLogP dlnPdf(DoubleTensor value) {
-        return new DiffLogP(dPdx(value).divInPlace(pdf(value)));
+        return gaussianKernel(diff).timesInPlace(diff).unaryMinusInPlace().sum(0)
+            .divInPlace(bandwidth * bandwidth * samples.getLength());
     }
 
     private DoubleTensor gaussianKernel(DoubleTensor x) {
-        DoubleTensor exponent = x.pow(2.).times(-1. / 2.);
-        DoubleTensor power = DoubleTensor.create(Math.E, x.getShape()).powInPlace(exponent);
+        DoubleTensor power = x.pow(2.).timesInPlace(-0.5).expInPlace();
         return power.timesInPlace(1. / Math.sqrt(2. * Math.PI));
     }
 
-    private static double getMean(DoubleTensor samples) {
-        return samples.sum() / samples.getLength();
-    }
-
-    private static double getVariance(DoubleTensor samples) {
-        double mean = getMean(samples);
-        return samples.minus(DoubleTensor.create(mean, samples.getShape())).powInPlace(2).sum() / samples.getLength();
-    }
-
-    private static double getStandardDeviation(DoubleTensor samples) {
-        return Math.sqrt(getVariance(samples));
-    }
-
     private static double scottsBandwidth(DoubleTensor samples) {
-        return 1.06 * getStandardDeviation(samples) * Math.pow(samples.getLength(), -1. / 5.);
+        return 1.06 * samples.standardDeviation() * Math.pow(samples.getLength(), -1. / 5.);
     }
 
     public DoubleTensor sample(int nSamples, KeanuRandom random) {
         // get a random sample as the mean of a gaussian
         // then draw a sample from the gaussian around that mean with the bandwidth as the standard deviation
-        DoubleTensor value = Uniform.withParameters(DoubleTensor.create(0, new int[]{1}), DoubleTensor.create(samples.getLength(), new int[]{1})).sample(new int[]{nSamples}, random);
-        DoubleTensor index = value.floor();
-        double[] newSamples = new double[nSamples];
+        DoubleTensor value = Uniform.withParameters(
+            DoubleTensor.scalar(0),
+            DoubleTensor.scalar(samples.getLength())
+        ).sample(new int[]{1, nSamples}, random);
+
+        DoubleTensor index = value.floorInPlace();
+        double[] shuffledSamples = new double[nSamples];
         int j = 0;
         for (Double i : index.asFlatList()) {
-            newSamples[j] = Gaussian.withParameters(DoubleTensor.create(samples.getValue(i.intValue()), new int[]{1}), DoubleTensor.create(bandwidth, new int[]{1})).sample(new int[]{nSamples}, random).scalar();
+            shuffledSamples[j] = samples.getValue(i.intValue());
             j++;
         }
-        return DoubleTensor.create(newSamples);
+
+        DoubleTensor sampleMus = DoubleTensor.create(shuffledSamples);
+        return random.nextGaussian(new int[]{1, nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
     }
 
     @Override
@@ -119,14 +107,6 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
 
     public void resample(int nSamples, KeanuRandom random) {
         samples = sample(nSamples, random);
-    }
-
-    public static class DiffLogP {
-        public final DoubleTensor dLogPdx;
-
-        public DiffLogP(DoubleTensor dLogPdx) {
-            this.dLogPdx = dLogPdx;
-        }
     }
 
     public int[] getSampleShape() {

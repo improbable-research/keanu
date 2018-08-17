@@ -28,16 +28,10 @@ public class KDEApproximationTest {
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
         BayesianNetwork network = new BayesianNetwork(gaussian.getConnectedGraph());
-        DoubleVertexSamples samples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(network, Arrays.asList(gaussian), nSamples).getDoubleTensorSamples(gaussian);
+        DoubleVertexSamples samples = MetropolisHastings.withDefaultConfig()
+            .getPosteriorSamples(network, Arrays.asList(gaussian), nSamples)
+            .getDoubleTensorSamples(gaussian);
         return samples;
-    }
-
-    public static double[] linspace(double min, double max, int points) {
-        double[] d = new double[points];
-        for (int i = 0; i < points; i++) {
-            d[i] = min + i * (max - min) / (points - 1);
-        }
-        return d;
     }
 
     public static void isCloseMostOfTheTime(DoubleTensor expected, DoubleTensor approximated, double correctPercentage, double delta) {
@@ -63,8 +57,12 @@ public class KDEApproximationTest {
 
         KDEVertex KDE = new GaussianKDE().approximate(samples);
 
-        DoubleTensor x = DoubleTensor.create(linspace(-3., 3., 100));
-        DoubleTensor gaussianLogPdf = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).logProb(x);
+        DoubleTensor x = DoubleTensor.linspace(-3., 3., 100);
+        DoubleTensor gaussianLogPdf = Gaussian.withParameters(
+            DoubleTensor.scalar(mu),
+            DoubleTensor.scalar(sigma)
+        ).logProb(x);
+
         DoubleTensor expectedPdf = DoubleTensor.create(Math.E, x.getShape()).pow(gaussianLogPdf);
         DoubleTensor approximatedPdf = KDE.pdf(x);
 
@@ -81,8 +79,12 @@ public class KDEApproximationTest {
 
         KDEVertex KDE = new GaussianKDE().approximate(samples);
 
-        DoubleTensor xTensor = DoubleTensor.create(linspace(-1. + mu, 1. + mu, 10));
-        Diffs diffLog = Gaussian.withParameters(DoubleTensor.create(mu, new int[]{1}), DoubleTensor.create(sigma, new int[]{1})).dLogProb(xTensor);
+        DoubleTensor xTensor = DoubleTensor.linspace(-1. + mu, 1. + mu, 10);
+        Diffs diffLog = Gaussian.withParameters(
+            DoubleTensor.scalar(mu),
+            DoubleTensor.scalar(sigma)
+        ).dLogProb(xTensor);
+
         DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor).get(KDE.getId());
         DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
@@ -100,7 +102,7 @@ public class KDEApproximationTest {
 
         KDEVertex KDE = new GaussianKDE().approximate(samples);
 
-        DoubleTensor x = DoubleTensor.create(linspace(-1., 1., 100));
+        DoubleTensor x = DoubleTensor.linspace(-1., 1., 100);
         DoubleTensor approximateDerivative = KDE.dLogPdf(x).get(KDE.getId());
         DoubleTensor expectedDerivative = gaussian.dLogProb(x).get(gaussian.getId());
 
@@ -120,7 +122,9 @@ public class KDEApproximationTest {
         double to = 3;
         double bucketSize = 0.1;
 
-        ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod(KDE, from, to, bucketSize, 1e-2, new KeanuRandom(randomSeed), 1000);
+        ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod(
+            KDE, from, to, bucketSize, 1e-2, new KeanuRandom(randomSeed), 1000
+        );
     }
 
     @Test
