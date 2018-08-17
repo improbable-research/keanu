@@ -21,7 +21,8 @@ public class Poisson implements DiscreteDistribution {
     private final DoubleTensor rate;
 
     /**
-     * @param rate rate of occurrence
+     * @param rate rate of occurrence, must be greater than 0
+     * @return an instance of {@link DiscreteDistribution}
      */
     public static DiscreteDistribution withParameters(DoubleTensor rate) {
         return new Poisson(rate);
@@ -31,6 +32,12 @@ public class Poisson implements DiscreteDistribution {
         this.rate = rate;
     }
 
+     /**
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
+     * @throws IllegalArgumentException if <code>rate</code> passed to {@link #withParameters(DoubleTensor rate)} is less than or equal to 0
+     */
     @Override
     public IntegerTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> rateWrapped = rate.getFlattenedView();

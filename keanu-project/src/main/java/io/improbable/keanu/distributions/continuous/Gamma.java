@@ -31,10 +31,9 @@ public class Gamma implements ContinuousDistribution {
     private final DoubleTensor alpha;
 
     /**
-     * <h3>Gamma Distribution</h3>
-     *
      * @param scale    stretches/shrinks the distribution, must be greater than 0
      * @param alpha    shape parameter (not to be confused with tensor shape)
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor alpha) {
         return new Gamma(scale, alpha);
@@ -46,7 +45,10 @@ public class Gamma implements ContinuousDistribution {
     }
 
     /**
-     * @throws IllegalArgumentException if scale or alpha passed to {@link #withParameters(DoubleTensor scale, DoubleTensor alpha)}
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
+     * @throws IllegalArgumentException if <code>scale</code> passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
      *                                  is less than or equal to 0
      */
     @Override

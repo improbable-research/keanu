@@ -21,6 +21,7 @@ public class Triangular implements ContinuousDistribution {
      * @param xMin minimum value of random variable x
      * @param xMax maximum value of random variable x
      * @param mode location of mode
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, DoubleTensor mode) {
         return new Triangular(xMin, xMax, mode);

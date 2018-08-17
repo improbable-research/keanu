@@ -25,6 +25,7 @@ public class Gaussian implements ContinuousDistribution {
     /**
      * @param mean              the mean of Gaussian Distribution
      * @param standardDeviation the standard deviation of Gaussian Distribution
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor mean, DoubleTensor standardDeviation) {
         return new Gaussian(mean, standardDeviation);

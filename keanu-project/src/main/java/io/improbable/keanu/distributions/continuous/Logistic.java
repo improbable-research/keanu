@@ -23,6 +23,7 @@ public class Logistic implements ContinuousDistribution {
     /**
      * @param location shifts the distribution
      * @param scale    stretches/shrinks the distribution
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Logistic(location, scale);

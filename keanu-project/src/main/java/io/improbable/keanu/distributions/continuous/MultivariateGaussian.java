@@ -17,6 +17,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     /**
      * @param mean       the mean of Multivariate Gaussian Distribution
      * @param covariance the covariance of Multivariate Gaussian Distribution
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor mean, DoubleTensor covariance) {
         return new MultivariateGaussian(mean, covariance);

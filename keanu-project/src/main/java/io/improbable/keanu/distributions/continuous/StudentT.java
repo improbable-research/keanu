@@ -26,6 +26,7 @@ public class StudentT implements ContinuousDistribution {
 
     /**
      * @param alpha shape parameter; number of degrees of freedom
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(IntegerTensor alpha) {
         return new StudentT(alpha);

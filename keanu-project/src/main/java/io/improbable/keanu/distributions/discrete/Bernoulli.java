@@ -17,8 +17,9 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     /**
      * @param probOfEvent probability of an event
+     * @return an instance of {@link Bernoulli}
      */
-    public static Distribution<BooleanTensor> withParameters(DoubleTensor probOfEvent) {
+    public static Bernoulli withParameters(DoubleTensor probOfEvent) {
         return new Bernoulli(probOfEvent);
     }
 

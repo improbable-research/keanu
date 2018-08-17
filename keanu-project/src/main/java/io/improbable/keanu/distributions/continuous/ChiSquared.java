@@ -21,6 +21,7 @@ public class ChiSquared implements ContinuousDistribution {
 
     /**
      * @param alpha shape parameter (not to be confused with tensor shape); number of degrees of freedom
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(IntegerTensor alpha) {
         return new ChiSquared(alpha);

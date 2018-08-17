@@ -25,6 +25,7 @@ public class InverseGamma implements ContinuousDistribution {
     /**
      * @param alpha    shape parameter (not to be confused with tensor shape)
      * @param scale    stretches/shrinks the distribution
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor scale) {
         return new InverseGamma(alpha, scale);

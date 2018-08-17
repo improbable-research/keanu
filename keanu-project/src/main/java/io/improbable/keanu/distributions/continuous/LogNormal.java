@@ -24,6 +24,7 @@ public class LogNormal implements ContinuousDistribution {
     /**
      * @param scale shape parameter (not to be confused with tensor shape)
      * @param alpha stretches/shrinks the distribution
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor alpha) {
         return new LogNormal(scale, alpha);

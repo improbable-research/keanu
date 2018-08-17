@@ -20,6 +20,7 @@ public class Exponential implements ContinuousDistribution {
 
     /**
      * @param rate inverse scale
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor rate) {
         return new Exponential(rate);

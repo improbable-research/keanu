@@ -19,6 +19,7 @@ public class Uniform implements ContinuousDistribution {
     /**
      * @param xMin minimum value of random variable x
      * @param xMax maximum value of random variable x
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
         return new Uniform(xMin, xMax);

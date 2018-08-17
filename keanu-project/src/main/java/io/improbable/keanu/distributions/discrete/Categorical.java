@@ -13,9 +13,11 @@ public class Categorical<T> {
     private final Map<T, DoubleVertex> selectableValues;
 
     /**
-     * @param selectableValues a mapping of category T to event probability
+     * @param selectableValues a mapping of category T to event probability, the total sum of probabilities must not be equal to 0
+     * @param <T>              Category object type
+     * @return an instance of {@link Categorical}
      */
-    public static <T> Categorical withParameters(Map<T, DoubleVertex> selectableValues) {
+    public static <T> Categorical<T> withParameters(Map<T, DoubleVertex> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
@@ -23,6 +25,11 @@ public class Categorical<T> {
         this.selectableValues = selectableValues;
     }
 
+    /**
+     * @param random {@link KeanuRandom}
+     * @return a sample of T
+     * @throws IllegalArgumentException if <code>selectedValues</code> from {@link Categorical#withParameters(Map selectedValues)} sum to 0
+     */
     public T sample(KeanuRandom random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
@@ -48,6 +55,11 @@ public class Categorical<T> {
         return value;
     }
 
+    /**
+     * @param x T
+     * @return log probability at x
+     * @throws IllegalArgumentException if <code>selectedValues</code> from {@link Categorical#withParameters(Map selectedValues)} sum to 0
+     */
     public double logProb(T x) {
         double sumOfProbabilities = getSumOfProbabilities();
         if (sumOfProbabilities == 0.0) {

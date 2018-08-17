@@ -25,6 +25,7 @@ public class Cauchy implements ContinuousDistribution {
     /**
      * @param location shifts the distribution
      * @param scale    stretches/shrinks the distribution, must be greater than 0
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Cauchy(location, scale);
@@ -36,7 +37,11 @@ public class Cauchy implements ContinuousDistribution {
     }
 
     /**
-     * @throws IllegalArgumentException if non-positive scale was passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
+     * @throws IllegalArgumentException if <code>scale</code> passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
+     *                                  is less than or equal to 0
      */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {

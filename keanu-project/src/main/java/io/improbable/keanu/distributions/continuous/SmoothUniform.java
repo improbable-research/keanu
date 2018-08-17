@@ -45,7 +45,8 @@ public class SmoothUniform implements ContinuousDistribution {
     /**
      * @param xMin          minimum value of random variable x
      * @param xMax          maximum value of random variable x
-     * @param edgeSharpness sharpness as a percentage of (xMax - xMin), which determines the width of the shoulder
+     * @param edgeSharpness sharpness as a percentage of <code>(xMax - xMin)</code>, which determines the width of the shoulder
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax, double edgeSharpness) {
         return new SmoothUniform(xMin, xMax, edgeSharpness);
@@ -58,6 +59,10 @@ public class SmoothUniform implements ContinuousDistribution {
 
     /**
      * Samples between <code>xMin</code> and <code>xMax</code> as well as left and right shoulder
+     *
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
      */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {

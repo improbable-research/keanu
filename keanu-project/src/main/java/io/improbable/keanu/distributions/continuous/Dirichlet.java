@@ -19,6 +19,7 @@ public class Dirichlet implements ContinuousDistribution {
     /**
      * @param concentration a type of numerical parameter of parametric family of probability distributions,
      *                      sum of values must equal to 1
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor concentration) {
         return new Dirichlet(concentration);
@@ -39,7 +40,9 @@ public class Dirichlet implements ContinuousDistribution {
     }
 
     /**
-     * @throws IllegalArgumentException if sum of values in concentration passed to
+     * @param x {@link DoubleTensor}
+     * @return the log probability
+     * @throws IllegalArgumentException if sum of values in <code>concentration</code> passed to
      *                                  {@link #withParameters(DoubleTensor concentration)} does not equal to 1
      */
     @Override

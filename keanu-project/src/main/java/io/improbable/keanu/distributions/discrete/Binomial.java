@@ -22,6 +22,7 @@ public class Binomial implements DiscreteDistribution {
     /**
      * @param successProbability probability of success
      * @param numberOfTrials     number of trials
+     * @return an instance of {@link DiscreteDistribution}
      */
     public static DiscreteDistribution withParameters(DoubleTensor successProbability, IntegerTensor numberOfTrials) {
         return new Binomial(successProbability, numberOfTrials);
