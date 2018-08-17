@@ -104,7 +104,7 @@ public class MultinomialVertexTest {
         int n = 100;
         DoubleTensor p = DoubleTensor.create(0.01, 0.09, 0.9).transpose();
         MultinomialVertex multinomial = new MultinomialVertex(
-            ConstantVertex.of(n), ConstantVertex.of(p));
+            n, ConstantVertex.of(p));
         IntegerTensor samples = multinomial.sample(KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(3, 1));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
