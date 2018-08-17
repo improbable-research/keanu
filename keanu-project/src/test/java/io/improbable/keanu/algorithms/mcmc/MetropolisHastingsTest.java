@@ -19,7 +19,6 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
@@ -178,24 +177,17 @@ public class MetropolisHastingsTest {
 
         DoubleVertex start = new GaussianVertex(new int[]{1, 3}, 0, 1);
 
-        DoubleVertex blackBox = new DoubleUnaryOpLambda<>(start,
+        DoubleVertex blackBox = start.lambda(
             (startValue) -> {
                 n.incrementAndGet();
                 return startValue.plus(1);
-            }
+            },
+            null
         );
 
-        DoubleVertex pluck0 = new DoubleUnaryOpLambda<>(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(0))
-        );
-
-        DoubleVertex pluck1 = new DoubleUnaryOpLambda<>(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(1))
-        );
-
-        DoubleVertex pluck2 = new DoubleUnaryOpLambda<>(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(2))
-        );
+        DoubleVertex pluck0 = blackBox.lambda(bb -> DoubleTensor.scalar(bb.getValue(0)), null);
+        DoubleVertex pluck1 = blackBox.lambda(bb -> DoubleTensor.scalar(bb.getValue(1)), null);
+        DoubleVertex pluck2 = blackBox.lambda(bb -> DoubleTensor.scalar(bb.getValue(2)), null);
 
         GaussianVertex out1 = new GaussianVertex(pluck0, 1);
         GaussianVertex out2 = new GaussianVertex(pluck1, 1);

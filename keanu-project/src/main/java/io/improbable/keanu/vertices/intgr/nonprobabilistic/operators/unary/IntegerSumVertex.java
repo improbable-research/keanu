@@ -15,7 +15,7 @@ public class IntegerSumVertex extends IntegerUnaryOpVertex {
     }
 
     @Override
-    protected IntegerTensor op(IntegerTensor a) {
-        return IntegerTensor.scalar(a.sum());
+    protected IntegerTensor op(IntegerTensor value) {
+        return IntegerTensor.scalar(value.sum());
     }
 }

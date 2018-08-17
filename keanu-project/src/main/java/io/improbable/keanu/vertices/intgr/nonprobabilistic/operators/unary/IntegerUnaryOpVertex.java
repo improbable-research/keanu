@@ -12,8 +12,17 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex {
     /**
      * A vertex that performs a user defined operation on a singe input vertex
      *
-     * @param shape the shape of the resulting vertex
-     * @param inputVertex a vertex
+     * @param inputVertex the input vertex
+     */
+    public IntegerUnaryOpVertex(IntegerVertex inputVertex) {
+        this(inputVertex.getShape(), inputVertex);
+    }
+
+    /**
+     * A vertex that performs a user defined operation on a singe input vertex
+     *
+     * @param shape       the shape of the tensor
+     * @param inputVertex the input vertex
      */
     public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {
         super(
@@ -28,6 +37,5 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex {
         return op(inputVertex.sample(random));
     }
 
-    protected abstract IntegerTensor op(IntegerTensor a);
-
+    protected abstract IntegerTensor op(IntegerTensor value);
 }

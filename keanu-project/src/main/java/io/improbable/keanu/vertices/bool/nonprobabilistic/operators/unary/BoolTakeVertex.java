@@ -3,11 +3,9 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
-
     private final int[] index;
 
     /**
@@ -18,13 +16,12 @@ public class BoolTakeVertex extends BoolUnaryOpVertex<BooleanTensor> {
      */
     public BoolTakeVertex(BoolVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
-        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
+        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
     }
 
     @Override
-    protected BooleanTensor op(BooleanTensor a) {
-        return BooleanTensor.scalar(a.getValue(index));
+    protected BooleanTensor op(BooleanTensor value) {
+        return BooleanTensor.scalar(value.getValue(index));
     }
-
 }
