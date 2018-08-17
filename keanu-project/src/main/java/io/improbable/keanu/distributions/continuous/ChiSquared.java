@@ -17,30 +17,30 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class ChiSquared implements ContinuousDistribution {
 
     private static final double LOG_TWO = Math.log(2);
-    private final IntegerTensor alpha;
+    private final IntegerTensor degreesOfFreedom;
 
     /**
-     * @param alpha shape parameter (not to be confused with tensor shape); number of degrees of freedom
+     * @param degreesOfFreedom number of degrees of freedom
      * @return an instance of {@link ContinuousDistribution}
      */
-    public static ContinuousDistribution withParameters(IntegerTensor alpha) {
-        return new ChiSquared(alpha);
+    public static ContinuousDistribution withParameters(IntegerTensor degreesOfFreedom) {
+        return new ChiSquared(degreesOfFreedom);
     }
 
-    private ChiSquared(IntegerTensor alpha) {
-        this.alpha = alpha;
+    private ChiSquared(IntegerTensor degreesOfFreedom) {
+        this.degreesOfFreedom = degreesOfFreedom;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, alpha.toDouble().div(2));
+        return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, degreesOfFreedom.toDouble().div(2));
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        DoubleTensor halfDof = alpha.toDouble().div(2);
-        DoubleTensor numerator = halfDof.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
-        DoubleTensor denominator = halfDof.times(LOG_TWO).plusInPlace(halfDof.apply(Gamma::gamma).logInPlace());
+        DoubleTensor halfK = degreesOfFreedom.toDouble().div(2);
+        DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
+        DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.apply(Gamma::gamma).logInPlace());
         return numerator.minusInPlace(denominator);
     }
 
