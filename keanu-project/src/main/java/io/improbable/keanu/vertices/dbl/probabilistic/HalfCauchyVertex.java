@@ -3,8 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-import java.util.Map;
-
 public class HalfCauchyVertex extends CauchyVertex {
 
     private static final double LOG_TWO = Math.log(2);
@@ -39,15 +37,6 @@ public class HalfCauchyVertex extends CauchyVertex {
             return super.logProb(value) + LOG_TWO;
         }
         return Double.NEGATIVE_INFINITY;
-    }
-
-    @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        Map<Long, DoubleTensor> map = super.dLogProb(value);
-        for (DoubleTensor x: map.values()) {
-            x.timesInPlace(2.0);
-        }
-        return map;
     }
 
 }
