@@ -55,7 +55,7 @@ public class Gaussian implements ContinuousDistribution {
         final DoubleTensor variance = standardDeviation.pow(2);
         final DoubleTensor xMinusMu = x.minus(mean);
 
-        final DoubleTensor dLogPdmu = xMinusMu.div(standardDeviation);
+        final DoubleTensor dLogPdmu = xMinusMu.div(variance);
         final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
         final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
             .divInPlace(variance.timesInPlace(standardDeviation))

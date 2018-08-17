@@ -73,7 +73,7 @@ public class Laplace implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor locationMinusXAbsNegDivScale = location.minus(x).abs().divInPlace(scale);
         final DoubleTensor logTwoScale = scale.times(2).logInPlace();
-        return  locationMinusXAbsNegDivScale.plusInPlace(logTwoScale).unaryMinus();
+        return locationMinusXAbsNegDivScale.plusInPlace(logTwoScale).unaryMinus();
     }
 
     @Override

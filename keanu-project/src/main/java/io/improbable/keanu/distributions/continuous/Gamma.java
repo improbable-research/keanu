@@ -106,8 +106,8 @@ public class Gamma implements ContinuousDistribution {
         }
     }
 
-    private static double exponentialSample(double alpha, KeanuRandom random) {
-        return -alpha * Math.log(random.nextDouble());
+    private static double exponentialSample(double scale, KeanuRandom random) {
+        return -scale * Math.log(random.nextDouble());
     }
 
     @Override
