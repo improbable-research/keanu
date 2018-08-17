@@ -37,9 +37,6 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     public static MetropolisHastings withDefaultConfig(KeanuRandom random) {
         return MetropolisHastings.builder()
-            .proposalDistribution(DEFAULT_PROPOSAL_DISTRIBUTION)
-            .variableSelector(DEFAULT_VARIABLE_SELECTOR)
-            .useCacheOnRejection(DEFAULT_USE_CACHE_ON_REJECTION)
             .random(random)
             .build();
     }

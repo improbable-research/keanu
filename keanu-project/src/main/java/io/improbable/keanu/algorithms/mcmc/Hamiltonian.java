@@ -39,8 +39,6 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
     public static Hamiltonian withDefaultConfig(KeanuRandom random) {
         return Hamiltonian.builder()
             .random(random)
-            .leapFrogCount(DEFAULT_LEAP_FROG_COUNT)
-            .stepSize(DEFAULT_STEP_SIZE)
             .build();
     }
 

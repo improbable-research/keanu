@@ -41,8 +41,6 @@ public class NUTS implements PosteriorSamplingAlgorithm {
     public static NUTS withDefaultConfig(KeanuRandom random) {
         return NUTS.builder()
             .random(random)
-            .adaptCount(DEFAULT_ADAPT_COUNT)
-            .targetAcceptanceProb(DEFAULT_TARGET_ACCEPTANCE_PROB)
             .build();
     }
 

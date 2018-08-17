@@ -35,9 +35,6 @@ public class SimulatedAnnealing {
 
     public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
         return SimulatedAnnealing.builder()
-            .proposalDistribution(ProposalDistribution.usePrior())
-            .variableSelector(SINGLE_VARIABLE_SELECTOR)
-            .useCacheOnRejection(true)
             .random(random)
             .build();
     }
