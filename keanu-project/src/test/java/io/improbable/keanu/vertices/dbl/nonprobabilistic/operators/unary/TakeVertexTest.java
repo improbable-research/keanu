@@ -56,7 +56,7 @@ public class TakeVertexTest {
         DoubleTensor takePartial2 = take2.getDualNumber().getPartialDerivatives().withRespectTo(m);
 
         Assert.assertArrayEquals(new int[]{1, 1, 2, 2}, takePartial2.getShape());
-        Assert.assertArrayEquals(new double[]{0, 0, 10, 20}, takePartial2.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(new double[]{15, 25, 0, 0}, takePartial2.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
