@@ -26,13 +26,8 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.Integ
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
-import io.improbable.keanu.vertices.update.ValueUpdater;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
-
-    public IntegerVertex(ValueUpdater<IntegerTensor> valueUpdater) {
-        super(valueUpdater);
-    }
 
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);

@@ -1,8 +1,11 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Optional;
+
 public class Observation<T> implements Observable<T> {
     // package private - because it's created by the factory method Observable.observableTypeFor
-    Observation() {}
+    Observation() {
+    }
 
     private T observedValue = null;
 
@@ -14,6 +17,11 @@ public class Observation<T> implements Observable<T> {
     @Override
     public void unobserve() {
         this.observedValue = null;
+    }
+
+    @Override
+    public Optional<T> getObservedValue() {
+        return Optional.of(observedValue);
     }
 
     @Override

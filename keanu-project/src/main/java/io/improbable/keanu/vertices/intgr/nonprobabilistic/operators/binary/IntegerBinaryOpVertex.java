@@ -4,11 +4,11 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public abstract class IntegerBinaryOpVertex extends IntegerVertex {
+public abstract class IntegerBinaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     protected final IntegerVertex a;
     protected final IntegerVertex b;
@@ -16,8 +16,8 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex {
     /**
      * A vertex that performs a user defined operation on two input vertices
      *
-     * @param a  first input vertex
-     * @param b  second input vertex
+     * @param a first input vertex
+     * @param b second input vertex
      */
     public IntegerBinaryOpVertex(IntegerVertex a, IntegerVertex b) {
         this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
@@ -31,9 +31,6 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex {
      * @param b     second input vertex
      */
     public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b) {
-        super(
-            new NonProbabilisticValueUpdater<>(v -> ((IntegerBinaryOpVertex) v).op(a.getValue(), b.getValue()))
-        );
         this.a = a;
         this.b = b;
         setParents(a, b);
@@ -43,6 +40,11 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex {
     @Override
     public IntegerTensor sample(KeanuRandom random) {
         return op(a.sample(random), b.sample(random));
+    }
+
+    @Override
+    public IntegerTensor calculate() {
+        return op(a.getValue(), b.getValue());
     }
 
     protected abstract IntegerTensor op(IntegerTensor l, IntegerTensor r);
