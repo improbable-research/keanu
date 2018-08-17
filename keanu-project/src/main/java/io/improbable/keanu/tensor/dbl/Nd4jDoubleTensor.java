@@ -186,7 +186,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public boolean equalsWithEps(DoubleTensor o, double epsilon) {
+    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
         if (this == o) return true;
 
         if (o instanceof Nd4jDoubleTensor) {

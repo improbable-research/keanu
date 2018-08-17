@@ -217,10 +217,10 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor a = DoubleTensor.create(aData, new int[]{2, 2, 2, 2, 2});
         DoubleTensor b = DoubleTensor.create(bData, new int[]{2, 2, 2, 2, 2});
         DoubleTensor c = DoubleTensor.create(cData, new int[]{2, 2, 2, 2, 2});
-        assertTrue("equals with epsilon should be true",a.equalsWithEps(b,0.5));
-        assertTrue("equals with epsilon should be true (inverted order)",b.equalsWithEps(a,0.5));
-        assertTrue("equals with epsilon should be not true (max delta is 0.4)",!a.equalsWithEps(b,0.2));
-        assertTrue("equals with epsilon should be not true (max delta is 1.0)",!a.equalsWithEps(c,0.5));
+        assertTrue("equals with epsilon should be true",a.equalsWithinEpsilon(b,0.5));
+        assertTrue("equals with epsilon should be true (inverted order)",b.equalsWithinEpsilon(a,0.5));
+        assertTrue("equals with epsilon should be not true (max delta is 0.4)",!a.equalsWithinEpsilon(b,0.2));
+        assertTrue("equals with epsilon should be not true (max delta is 1.0)",!a.equalsWithinEpsilon(c,0.5));
     }
 
     @Test

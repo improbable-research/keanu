@@ -186,7 +186,7 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     double standardDeviation();
 
-    boolean equalsWithEps(DoubleTensor other, double epsilon);
+    boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
 
     DoubleTensor standardize();
 
