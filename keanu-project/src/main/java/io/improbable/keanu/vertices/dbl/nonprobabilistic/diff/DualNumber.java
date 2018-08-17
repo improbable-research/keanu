@@ -31,7 +31,12 @@ public class DualNumber {
         }
     }
 
-    public static DualNumber concat(Map<Vertex, DualNumber> dualNumbers, List<DualNumber> dualNumbersOfInputs, DoubleVertex[] input, int dimension, DoubleTensor[] dualValues) {
+    public static DualNumber concat(Map<Vertex, DualNumber> dualNumbers,
+                                    List<DualNumber> dualNumbersOfInputs,
+                                    DoubleVertex[] input,
+                                    int dimension,
+                                    DoubleTensor[] dualValues) {
+
         Map<Long, List<DoubleTensor>> dualNumbersToConcat = new HashMap<>();
         List<Pair<Long, List<Integer>>> vertexIds = findShapesOfVertexWithRespectTo(dualNumbersOfInputs);
 
