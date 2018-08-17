@@ -101,6 +101,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor permute(int... rearrange) {
+        return new ScalarDoubleTensor(value);
+    }
+
+    @Override
     public DoubleTensor diag() {
         return duplicate();
     }

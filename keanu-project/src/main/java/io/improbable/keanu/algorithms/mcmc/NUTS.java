@@ -43,7 +43,7 @@ public class NUTS {
      * @return Samples taken with NUTS
      */
     public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<DoubleVertex> sampleFromVertices,
+                                                     final List<? extends Vertex> sampleFromVertices,
                                                      final int sampleCount,
                                                      final int adaptCount,
                                                      final double targetAcceptanceProb) {
