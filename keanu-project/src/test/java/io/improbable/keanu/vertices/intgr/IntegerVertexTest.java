@@ -1,15 +1,19 @@
 package io.improbable.keanu.vertices.intgr;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.function.Function;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.function.Function;
-
-import static org.junit.Assert.*;
 
 public class IntegerVertexTest {
 
@@ -44,6 +48,16 @@ public class IntegerVertexTest {
         result.eval();
         Integer expected = 1;
         assertEquals(result.getValue().scalar(), expected);
+    }
+
+    @Test
+    public void doesEqualTo() {
+        IntegerVertex v3 = ConstantVertex.of(3);
+
+        assertFalse(v1.equalTo(v2).eval().scalar());
+        assertTrue(v1.notEqualTo(v2).eval().scalar());
+        assertFalse(v2.equalTo(v3).eval().scalar());
+        assertTrue(v2.notEqualTo(v3).eval().scalar());
     }
 
     @Test

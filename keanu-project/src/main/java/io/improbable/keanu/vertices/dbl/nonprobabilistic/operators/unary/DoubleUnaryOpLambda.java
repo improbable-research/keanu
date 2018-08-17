@@ -56,5 +56,3 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
         throw new UnsupportedOperationException();
     }
 }
-
-

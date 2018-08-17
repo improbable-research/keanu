@@ -3,11 +3,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.Map;
 
 public class TakeVertex extends DoubleUnaryOpVertex {
 
@@ -21,17 +18,17 @@ public class TakeVertex extends DoubleUnaryOpVertex {
      */
     public TakeVertex(DoubleVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
-        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
+        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return DoubleTensor.scalar(a.getValue(index));
+    protected DoubleTensor op(DoubleTensor value) {
+        return DoubleTensor.scalar(value.getValue(index));
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).take(index);
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.take(index);
     }
 }

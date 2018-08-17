@@ -20,6 +20,10 @@ public class IntegerUnaryOpLambda<IN> extends IntegerVertex implements NonProbab
         setValue(IntegerTensor.placeHolder(shape));
     }
 
+    public IntegerUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+        this(inputVertex.getShape(), inputVertex, op);
+    }
+
     @Override
     public IntegerTensor sample(KeanuRandom random) {
         return op.apply(inputVertex.sample(random));

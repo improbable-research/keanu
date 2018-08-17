@@ -5,8 +5,17 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
@@ -60,24 +69,27 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new PowerVertex(this, exponent);
     }
 
+    @Override
     public DoubleVertex minus(double that) {
-        return new DifferenceVertex(this, new ConstantDoubleVertex(that));
+        return minus(new ConstantDoubleVertex(that));
     }
 
+    @Override
     public DoubleVertex plus(double that) {
-        return new AdditionVertex(this, new ConstantDoubleVertex(that));
+        return plus(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex multiply(double that) {
-        return new MultiplicationVertex(this, new ConstantDoubleVertex(that));
+        return multiply(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex divideBy(double that) {
-        return new DivisionVertex(this, new ConstantDoubleVertex(that));
+        return divideBy(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex pow(double power) {
-        return new PowerVertex(this, new ConstantDoubleVertex(power));
+    @Override
+    public DoubleVertex pow(double that) {
+        return pow(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex abs() {
@@ -96,6 +108,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new RoundVertex(this);
     }
 
+    @Override
     public DoubleVertex exp() {
         return new ExpVertex(this);
     }
@@ -108,10 +121,12 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SigmoidVertex(this);
     }
 
+    @Override
     public DoubleVertex sin() {
         return new SinVertex(this);
     }
 
+    @Override
     public DoubleVertex cos() {
         return new CosVertex(this);
     }
@@ -120,10 +135,12 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new TanVertex(this);
     }
 
+    @Override
     public DoubleVertex asin() {
         return new ArcSinVertex(this);
     }
 
+    @Override
     public DoubleVertex acos() {
         return new ArcCosVertex(this);
     }
@@ -144,25 +161,58 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
 
+    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation);
+    }
+
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    @Override
     public DoubleVertex times(DoubleVertex that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(DoubleVertex that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex times(double that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(double that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
+    }
+
+    public BoolVertex equalTo(DoubleVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new NotEqualsVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+        return new GreaterThanVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new GreaterThanOrEqualVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+        return new LessThanVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new LessThanOrEqualVertex<>(this, rhs);
     }
 
     public DoubleVertex take(int... index) {

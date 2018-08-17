@@ -8,4 +8,5 @@ interface Operators<T> {
     operator fun times(that: T): T
     operator fun div(that: T): T
     operator fun unaryMinus(): T
+    fun pow(exponent: T): T
 }
