@@ -41,16 +41,13 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        List<DualNumber> duals = new ArrayList<>();
+        List<DualNumber> dualNumbersOfInputs = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {
-            duals.add(dualNumbers.get(vertex));
+            dualNumbersOfInputs.add(dualNumbers.get(vertex));
         }
-
-        DualNumber dualOfPrimary = duals.remove(0);
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
-        DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
-        return dualOfPrimary.concat(dimension, duals, dualToConcat);
+        return DualNumber.concat(dualNumbers, dualNumbersOfInputs, input, dimension, inputValues);
     }
 
     @Override
