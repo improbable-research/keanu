@@ -113,37 +113,37 @@ public class MultinomialVertexTest {
     @Test
     public void itWorksWithTensors() {
         IntegerVertex n = ConstantVertex.of(IntegerTensor.create(new int[]{
-            1, 10,
-            100, 1000},
-            2, 2));
+            1, 5, 8, 10,
+            100, 200, 500, 1000},
+            2, 4));
 
         DoubleVertex p = ConstantVertex.of(DoubleTensor.create(new double[]{
-                .1, .8,
-                .25, .2,
+                .1, .2, .3, .8,
+                .25, .25, .4, .45,
 
-                .1, .1,
-                .50, .3,
+                .1, .2, .3, .1,
+                .50, .25, .4, .45,
 
-                .8, .1,
-                .25, .5
+                .8, .6, .4, .1,
+                .25, .5, .2, .1
             },
-            3, 2, 2));
+            3, 2, 4));
         //
         MultinomialVertex multinomial = new MultinomialVertex(n, p);
         IntegerTensor sample = multinomial.sample(KeanuRandom.getDefaultRandom());
-        assertThat(sample, hasShape(3, 2, 2));
+        assertThat(sample, hasShape(3, 2, 4));
         double logProb = multinomial.logProb(IntegerTensor.create(new int[]{
-                0, 10,
-                25, 200,
+                0, 1, 2, 10,
+                25, 50, 200, 450,
 
-                0, 0,
-                50, 300,
+                0, 0, 2, 0,
+                50, 50, 200, 450,
 
-                1, 0,
-                25, 500,
+                1, 4, 4, 0,
+                25, 100, 100, 100,
             },
-            3, 2, 2));
-        assertThat(logProb, closeTo(-14.165389164658901, 1e-8));
+            3, 2, 4));
+        assertThat(logProb, closeTo(-30.193364297395277, 1e-8));
     }
 
     @Test

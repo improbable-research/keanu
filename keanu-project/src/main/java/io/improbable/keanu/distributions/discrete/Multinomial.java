@@ -70,13 +70,32 @@ public class Multinomial implements DiscreteDistribution {
             int[] sample = sample(nFlattened.getOrScalar(i), random, ps.toArray(new Double[0]));
             samples = ArrayUtils.addAll(samples, sample);
         }
+        return constructSampleTensor(shape, samples);
+    }
+
+    /**
+     * This method is necessary because I've constructed a flat array by concatenation samples of size k
+     * So for example, if the shape of n is [a, b]
+     * then I've now got a tensor of shape [a, b, k]
+     * which I need to convert to a tensor of shape [k, a, b]
+     * by doing a slice in the highest dimension and then concatenating again
+     * @param shape - the desired shape, not including the probabilities dimension
+     * @param samples - the flat array of samples
+     * @return
+     */
+    private IntegerTensor constructSampleTensor(int[] shape, int[] samples) {
         int[] outputShape = shape;
         if (shape[0] == 1) {
             outputShape = ArrayUtils.remove(outputShape, 0);
         }
-        outputShape = ArrayUtils.add(outputShape, numCategories);
-        return IntegerTensor.create(samples, outputShape).transpose();
+        IntegerTensor abkTensor = IntegerTensor.create(samples, ArrayUtils.add(outputShape, numCategories));
+        int[] kabArray = new int[] {};
+        for (int category = 0; category < numCategories; category++) {
+            IntegerTensor abTensor = abkTensor.slice(outputShape.length, category);
+            kabArray = ArrayUtils.addAll(kabArray, abTensor.asFlatIntegerArray());
+        }
 
+        return IntegerTensor.create(kabArray, ArrayUtils.insert(0, outputShape, numCategories));
     }
 
     private static int[] sample(int n, KeanuRandom random, Double... p) {
