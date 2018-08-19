@@ -40,12 +40,26 @@ public class HalfCauchyVertexTest {
     }
 
     @Test
+    public void matchesKnownLogDensityOfNegativeScalar() {
+
+        HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorHalfCauchyVertex, -0.5, Double.NEGATIVE_INFINITY);
+    }
+
+    @Test
     public void matchesKnownLogDensityOfVector() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75)  + 2.0 * Math.log(2.0);
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorHalfCauchyVertex, new double[]{0.25, 0.75}, expectedLogDensity);
+    }
+
+    @Test
+    public void matchesKnownLogDensityOfNegativeVector() {
+
+        HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorHalfCauchyVertex, new double[]{-0.25, 0.75}, Double.NEGATIVE_INFINITY);
     }
 
     @Test
