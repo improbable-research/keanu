@@ -6,6 +6,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class HalfCauchyVertex extends CauchyVertex {
 
+    private static final double LOC_ZERO = 0.0;
     private static final double LOG_TWO = Math.log(2);
 
     /**
@@ -17,24 +18,24 @@ public class HalfCauchyVertex extends CauchyVertex {
      * @param scale       the scale of the HalfCauchy with either the same tensorShape as specified for this vertex or a scalar
      */
     public HalfCauchyVertex(int[] tensorShape, DoubleVertex scale) {
-        super(tensorShape, 0.0, scale);
+        super(tensorShape, LOC_ZERO, scale);
     }
 
     public HalfCauchyVertex(int[] tensorShape, double scale) {
-        super(tensorShape, 0.0, scale);
+        super(tensorShape, LOC_ZERO, scale);
     }
 
     public HalfCauchyVertex(DoubleVertex scale) {
-        super(0.0, scale);
+        super(LOC_ZERO, scale);
     }
 
     public HalfCauchyVertex(double scale) {
-        super(0.0, scale);
+        super(LOC_ZERO, scale);
     }
 
     @Override
     public double logProb(DoubleTensor value) {
-        if (value.greaterThanOrEqual(0.0).allTrue()) {
+        if (value.greaterThanOrEqual(LOC_ZERO).allTrue()) {
             return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
