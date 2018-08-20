@@ -3,14 +3,15 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
  * Returns true if a vertex value is equal to another vertex value within an epsilon.
  */
-public class NumericalEqualsVertex extends NonProbabilisticBool {
+public class NumericalEqualsVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     protected Vertex<? extends NumberTensor> a;
     protected Vertex<? extends NumberTensor> b;
@@ -31,7 +32,7 @@ public class NumericalEqualsVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public BooleanTensor getDerivedValue() {
+    public BooleanTensor calculate() {
         return op(a.getValue(), b.getValue(), epsilon.getValue());
     }
 

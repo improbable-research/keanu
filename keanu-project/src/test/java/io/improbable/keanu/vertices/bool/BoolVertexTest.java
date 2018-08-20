@@ -1,5 +1,17 @@
 package io.improbable.keanu.vertices.bool;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+
+import java.util.Collections;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.Prior;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -8,34 +20,22 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Collections;
-
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.assertArrayEquals;
 
 public class BoolVertexTest {
 
     private KeanuRandom random;
-    private Flip v1;
-    private Flip v2;
+    private BernoulliVertex v1;
+    private BernoulliVertex v2;
     private double pV2 = 0.4;
     private double pV1 = 0.25;
 
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        v1 = new Flip(pV1);
-        v2 = new Flip(pV2);
+        v1 = new BernoulliVertex(pV1);
+        v2 = new BernoulliVertex(pV2);
     }
 
     @Test
@@ -68,8 +68,20 @@ public class BoolVertexTest {
     }
 
     @Test
+    public void doesEqualTo() {
+        v1.setValue(true);
+        v2.setValue(false);
+        BoolVertex v3 = ConstantVertex.of(true);
+
+        assertFalse(v1.equalTo(v2).eval().scalar());
+        assertTrue(v1.notEqualTo(v2).eval().scalar());
+        assertFalse(v2.equalTo(v3).eval().scalar());
+        assertTrue(v2.notEqualTo(v3).eval().scalar());
+    }
+
+    @Test
     public void TheOperatorsAreExecutedInOrder() {
-        Flip v3 = new Flip(0.5);
+        BernoulliVertex v3 = new BernoulliVertex(0.5);
 
         BoolVertex v4 = v1.and(v2).or(v3); // (v1 AND v2) OR v3
         BoolVertex v5 = v1.and(v2.or(v3)); // v1 AND (v2 OR v3)
@@ -84,7 +96,7 @@ public class BoolVertexTest {
 
     @Test
     public void YouCanSpecifyYourOwnOrderingOfOperations() {
-        Flip v3 = new Flip(0.5);
+        BernoulliVertex v3 = new BernoulliVertex(0.5);
         BoolVertex v5 = v1.and(v2.or(v3));
 
         v1.setValue(false);
@@ -131,7 +143,7 @@ public class BoolVertexTest {
     public void castVertexWorksAsExpected() {
         double p = 0.5;
 
-        Flip f = new Flip(0.5);
+        BernoulliVertex f = new BernoulliVertex(0.5);
 
         CastBoolVertex a = new CastBoolVertex(f);
 
@@ -142,7 +154,7 @@ public class BoolVertexTest {
     public void constantVertexWorksAsExpected() {
         double p = 0.5;
 
-        Flip f = new Flip(0.5);
+        BernoulliVertex f = new BernoulliVertex(0.5);
         ConstantBoolVertex tru = ConstantVertex.of(true);
         ConstantBoolVertex fal = ConstantVertex.of(false);
 
@@ -153,7 +165,7 @@ public class BoolVertexTest {
 
     @Test
     public void canObserveArrayOfValues() {
-        BoolVertex flip = new Flip(0.5);
+        BoolVertex flip = new BernoulliVertex(0.5);
         boolean[] observation = new boolean[]{true, false, true};
         flip.observe(observation);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
@@ -161,7 +173,7 @@ public class BoolVertexTest {
 
     @Test
     public void canSetAndCascadeArrayOfValues() {
-        BoolVertex flip = new Flip(0.5);
+        BoolVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
@@ -169,7 +181,7 @@ public class BoolVertexTest {
 
     @Test
     public void canSetValueArrayOfValues() {
-        BoolVertex flip = new Flip(0.5);
+        BoolVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setValue(values);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
@@ -177,24 +189,24 @@ public class BoolVertexTest {
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        BoolVertex flip = new BernoulliVertex(new int[]{2, 1}, 0.5);
         flip.setValue(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new Flip(new int[]{2, 1}, 0.5);
+        BoolVertex flip = new BernoulliVertex(new int[]{2, 1}, 0.5);
         flip.setAndCascade(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canPluckValue() {
-        BoolVertex flip = new Flip(0.5);
+        BoolVertex flip = new BernoulliVertex(0.5);
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
-        assertEquals(true, flip.pluck(0, 0).getValue().scalar());
+        assertEquals(true, flip.take(0, 0).getValue().scalar());
     }
 
     private double andProbability(double pA, double pB) {

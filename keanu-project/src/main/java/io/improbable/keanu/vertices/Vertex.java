@@ -1,48 +1,44 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Optional;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
+
+import com.google.common.collect.ImmutableSet;
+
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicLong;
-
-public abstract class Vertex<T> {
+public abstract class Vertex<T> implements Observable<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
     private long uuid = ID_GENERATOR.getAndIncrement();
-    private Set<Vertex> children = new HashSet<>();
-    private Set<Vertex> parents = new HashSet<>();
+    private Set<Vertex> children = Collections.emptySet();
+    private Set<Vertex> parents = Collections.emptySet();
     private T value;
-    private boolean observed;
+    private final Observable<T> observation;
+    private VertexLabel label = null;
 
-    /**
-     * This is the natural log of the probability at the supplied value. In the
-     * case of continuous vertices, this is actually the log of the density, which
-     * will differ from the probability by a constant.
-     *
-     * @param value The supplied value.
-     * @return The natural log of the probability density at the supplied value
-     */
-    public abstract double logProb(T value);
-
-    public double logProbAtValue() {
-        return logProb(getValue());
+    public Vertex() {
+        this.observation = Observable.observableTypeFor(this.getClass());
     }
 
     /**
-     * The partial derivatives of the natural log prob.
-     *
-     * @param value at a given value
-     * @return the partial derivatives of the log density
+     * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
+     * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
      */
-    public abstract Map<Long, DoubleTensor> dLogProb(T value);
+    public void setLabel(VertexLabel label) {
+        this.label = label;
+    }
 
-    public final Map<Long, DoubleTensor> dLogProbAtValue() {
-        return dLogProb(getValue());
+    public VertexLabel getLabel() {
+        return this.label;
     }
 
     /**
@@ -55,15 +51,6 @@ public abstract class Vertex<T> {
     public T sample() {
         return sample(KeanuRandom.getDefaultRandom());
     }
-
-    /**
-     * This causes a non-probabilistic vertex to recalculate it's value based off it's
-     * parent's current values.
-     *
-     * @return The updated value
-     */
-    public abstract T updateValue();
-
 
     /**
      * This is similar to eval() except it only propagates as far up the graph as required until
@@ -97,7 +84,9 @@ public abstract class Vertex<T> {
      * not derived from it's parents. However, the probability of the
      * vertex's value may be dependent on it's parents values.
      */
-    public abstract boolean isProbabilistic();
+    public final boolean isProbabilistic() {
+        return this instanceof Probabilistic;
+    }
 
     /**
      * Sets the value if the vertex isn't already observed.
@@ -105,7 +94,7 @@ public abstract class Vertex<T> {
      * @param value the observed value
      */
     public void setValue(T value) {
-        if (!this.observed) {
+        if (!observation.isObserved()) {
             this.value = value;
         }
     }
@@ -155,24 +144,32 @@ public abstract class Vertex<T> {
      *
      * @param value the value to be observed
      */
+    @Override
     public void observe(T value) {
         this.value = value;
-        this.observed = true;
+        observation.observe(value);
     }
 
     /**
      * Cause this vertex to observe its own value, for example when generating test data
      */
     public void observeOwnValue() {
-        this.observed = true;
+        observation.observe(getValue());
     }
 
+    @Override
     public void unobserve() {
-        observed = false;
+        observation.unobserve();
     }
 
+    @Override
     public boolean isObserved() {
-        return observed;
+        return observation.isObserved();
+    }
+
+    @Override
+    public Optional<T> getObservedValue() {
+        return observation.getObservedValue();
     }
 
     public long getId() {
@@ -184,11 +181,11 @@ public abstract class Vertex<T> {
     }
 
     public void addChild(Vertex<?> v) {
-        children.add(v);
+        children = ImmutableSet.<Vertex>builder().addAll(children).add(v).build();
     }
 
     public void setParents(Collection<? extends Vertex> parents) {
-        this.parents = new HashSet<>();
+        this.parents = Collections.emptySet();
         addParents(parents);
     }
 
@@ -197,16 +194,16 @@ public abstract class Vertex<T> {
     }
 
     public void addParents(Collection<? extends Vertex> parents) {
-        parents.forEach(this::addParent);
+        this.parents = ImmutableSet.<Vertex>builder().addAll(this.getParents()).addAll(parents).build();
+        parents.forEach(p -> p.addChild(this));
     }
 
     public void addParent(Vertex<?> parent) {
-        this.parents.add(parent);
-        parent.addChild(this);
+        addParents(ImmutableSet.of(parent));
     }
 
     public Set<Vertex> getParents() {
-        return this.parents;
+        return parents;
     }
 
     @Override

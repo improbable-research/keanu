@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class SmoothUniformVertex extends ProbabilisticDouble {
+public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
@@ -34,7 +34,6 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
-
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
@@ -114,7 +113,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         final DoubleTensor density = SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
@@ -122,7 +121,7 @@ public class SmoothUniformVertex extends ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
+    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);

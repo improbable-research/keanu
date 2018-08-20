@@ -1,23 +1,24 @@
 package io.improbable.keanu.vertices.bool;
 
+import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.collect.ImmutableList;
+
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.DiscreteVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolPluckVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-
-public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
+public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
     @SafeVarargs
     public final BoolVertex or(Vertex<BooleanTensor>... those) {
@@ -37,11 +38,19 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
         return new NotVertex(vertex);
     }
 
+    public BoolVertex equalTo(BoolVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new NotEqualsVertex<>(this, rhs);
+    }
+
     private List<Vertex<BooleanTensor>> inputList(Vertex<BooleanTensor>[] those) {
-        List<Vertex<BooleanTensor>> inputs = new LinkedList<>();
-        inputs.addAll(Arrays.asList(those));
-        inputs.add(this);
-        return inputs;
+        return ImmutableList.<Vertex<BooleanTensor>>builder()
+            .addAll(Arrays.asList(those))
+            .add(this)
+            .build();
     }
 
     public BoolVertex slice(int dimension, int index) {
@@ -72,28 +81,12 @@ public abstract class BoolVertex extends DiscreteVertex<BooleanTensor> {
         super.observe(BooleanTensor.create(values));
     }
 
-    public double logPmf(boolean value) {
-        return this.logPmf(BooleanTensor.scalar(value));
-    }
-
-    public double logPmf(boolean[] values) {
-        return this.logPmf(BooleanTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(boolean value) {
-        return this.dLogPmf(BooleanTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(boolean[] values) {
-        return this.dLogPmf(BooleanTensor.create(values));
-    }
-
     public boolean getValue(int... index) {
         return getValue().getValue(index);
     }
 
-    public BoolVertex pluck(int... index) {
-        return new BoolPluckVertex(this, index);
+    public BoolVertex take(int... index) {
+        return new BoolTakeVertex(this, index);
     }
 
 

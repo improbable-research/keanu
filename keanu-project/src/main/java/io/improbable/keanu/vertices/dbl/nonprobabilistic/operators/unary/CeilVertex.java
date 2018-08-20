@@ -1,11 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
-import java.util.Map;
 
 public class CeilVertex extends DoubleUnaryOpVertex {
 
@@ -16,16 +13,16 @@ public class CeilVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex to be ceil'd
      */
     public CeilVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.ceil();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.ceil();
     }
 
     @Override
-    protected DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber dualOp(DualNumber dualNumber) {
         throw new UnsupportedOperationException();
     }
 }

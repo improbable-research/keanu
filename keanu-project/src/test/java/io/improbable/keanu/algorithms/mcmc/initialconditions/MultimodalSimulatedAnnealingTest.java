@@ -4,7 +4,7 @@ import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.Flip;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
@@ -60,7 +60,7 @@ public class MultimodalSimulatedAnnealingTest {
         DoubleVertex C = new UniformVertex(-3.0, 0.0);
         DoubleVertex D = C.multiply(C);
 
-        BoolVertex E = new Flip(0.5);
+        BoolVertex E = new BernoulliVertex(0.5);
 
         DoubleVertex F = If.isTrue(E)
             .then(B)

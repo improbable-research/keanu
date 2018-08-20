@@ -1,19 +1,49 @@
 package io.improbable.keanu.vertices.dbl;
 
 
-import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ContinuousVertex;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
-
-import java.util.*;
+import java.util.Map;
 import java.util.function.Function;
 
-public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implements DoubleOperators<DoubleVertex> {
+import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+
+public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
@@ -39,24 +69,27 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new PowerVertex(this, exponent);
     }
 
+    @Override
     public DoubleVertex minus(double that) {
-        return new DifferenceVertex(this, new ConstantDoubleVertex(that));
+        return minus(new ConstantDoubleVertex(that));
     }
 
+    @Override
     public DoubleVertex plus(double that) {
-        return new AdditionVertex(this, new ConstantDoubleVertex(that));
+        return plus(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex multiply(double that) {
-        return new MultiplicationVertex(this, new ConstantDoubleVertex(that));
+        return multiply(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex divideBy(double that) {
-        return new DivisionVertex(this, new ConstantDoubleVertex(that));
+        return divideBy(new ConstantDoubleVertex(that));
     }
 
-    public DoubleVertex pow(double power) {
-        return new PowerVertex(this, new ConstantDoubleVertex(power));
+    @Override
+    public DoubleVertex pow(double that) {
+        return pow(new ConstantDoubleVertex(that));
     }
 
     public DoubleVertex abs() {
@@ -75,6 +108,7 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new RoundVertex(this);
     }
 
+    @Override
     public DoubleVertex exp() {
         return new ExpVertex(this);
     }
@@ -87,10 +121,12 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new SigmoidVertex(this);
     }
 
+    @Override
     public DoubleVertex sin() {
         return new SinVertex(this);
     }
 
+    @Override
     public DoubleVertex cos() {
         return new CosVertex(this);
     }
@@ -99,10 +135,12 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new TanVertex(this);
     }
 
+    @Override
     public DoubleVertex asin() {
         return new ArcSinVertex(this);
     }
 
+    @Override
     public DoubleVertex acos() {
         return new ArcCosVertex(this);
     }
@@ -123,79 +161,67 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation);
     }
 
+    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
+        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation);
+    }
+
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    @Override
     public DoubleVertex times(DoubleVertex that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(DoubleVertex that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex times(double that) {
         return multiply(that);
     }
 
+    @Override
     public DoubleVertex div(double that) {
         return divideBy(that);
     }
 
+    @Override
     public DoubleVertex unaryMinus() {
         return multiply(-1.0);
     }
 
-    public DoubleVertex pluck(int... index) {
-        return new PluckVertex(this, index);
+    public BoolVertex equalTo(DoubleVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new NotEqualsVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+        return new GreaterThanVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new GreaterThanOrEqualVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+        return new LessThanVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new LessThanOrEqualVertex<>(this, rhs);
+    }
+
+    public DoubleVertex take(int... index) {
+        return new TakeVertex(this, index);
     }
 
     public DoubleVertex slice(int dimension, int index) {
         return new SliceVertex(this, dimension, index);
     }
-
-    public final DualNumber getDualNumber() {
-        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
-        Deque<DoubleVertex> stack = new ArrayDeque<>();
-        stack.push(this);
-
-        while (!stack.isEmpty()) {
-
-            DoubleVertex head = stack.peek();
-            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
-
-            if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
-
-                DoubleVertex top = stack.pop();
-                DualNumber dual = top.calculateDualNumber(dualNumbers);
-                dualNumbers.put(top, dual);
-
-            } else {
-
-                for (Vertex vertex : parentsThatDualNumberIsNotCalculated) {
-                    if (vertex instanceof DoubleVertex) {
-                        stack.push((DoubleVertex) vertex);
-                    } else {
-                        throw new IllegalArgumentException("Can only calculate Diff Numbers on a graph made of Doubles");
-                    }
-                }
-
-            }
-
-        }
-
-        return dualNumbers.get(this);
-    }
-
-    private Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Set<Vertex> parents) {
-        Set<Vertex> notCalculatedParents = new HashSet<>();
-        for (Vertex<?> next : parents) {
-            if (!dualNumbers.containsKey(next)) {
-                notCalculatedParents.add(next);
-            }
-        }
-        return notCalculatedParents;
-    }
-
-    protected abstract DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
     public void setValue(double value) {
         super.setValue(DoubleTensor.scalar(value));
@@ -221,23 +247,16 @@ public abstract class DoubleVertex extends ContinuousVertex<DoubleTensor> implem
         super.observe(DoubleTensor.create(values));
     }
 
-    public double logPdf(double value) {
-        return this.logPdf(DoubleTensor.scalar(value));
-    }
-
-    public double logPdf(double[] values) {
-        return this.logPdf(DoubleTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPdf(double value) {
-        return this.dLogPdf(DoubleTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPdf(double[] values) {
-        return this.dLogPdf(DoubleTensor.create(values));
-    }
-
     public double getValue(int... index) {
         return getValue().getValue(index);
+    }
+
+    @Override
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        if (isObserved()) {
+            return DualNumber.createConstant(getValue());
+        } else {
+            return DualNumber.createWithRespectToSelf(getId(), getValue());
+        }
     }
 }

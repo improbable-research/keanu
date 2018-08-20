@@ -1,19 +1,18 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.NonProbabilisticInteger;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerConcatenationVertex extends NonProbabilisticInteger {
+public class IntegerConcatenationVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private final int dimension;
     private final IntegerVertex[] input;
@@ -22,7 +21,7 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input the input vertices to concatenate
+     * @param input     the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
         this.dimension = dimension;
@@ -33,7 +32,7 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
     }
 
     @Override
-    public IntegerTensor getDerivedValue() {
+    public IntegerTensor calculate() {
         return op(extractFromInputs(IntegerTensor.class, Vertex::getValue));
     }
 
@@ -42,7 +41,7 @@ public class IntegerConcatenationVertex extends NonProbabilisticInteger {
         return op(extractFromInputs(IntegerTensor.class, Vertex::sample));
     }
 
-    protected IntegerTensor op(IntegerTensor... inputs) {
+    private IntegerTensor op(IntegerTensor... inputs) {
         IntegerTensor primary = inputs[0];
         IntegerTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
         return primary.concat(dimension, toConcat);

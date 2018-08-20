@@ -1,19 +1,18 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.function.Function;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class BoolConcatenationVertex extends NonProbabilisticBool {
+public class BoolConcatenationVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     private final int dimension;
     private final BoolVertex[] input;
@@ -22,7 +21,7 @@ public class BoolConcatenationVertex extends NonProbabilisticBool {
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
      * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input the input vertices to concatenate
+     * @param input     the input vertices to concatenate
      */
     public BoolConcatenationVertex(int dimension, BoolVertex... input) {
         this.dimension = dimension;
@@ -33,7 +32,7 @@ public class BoolConcatenationVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public BooleanTensor getDerivedValue() {
+    public BooleanTensor calculate() {
         return op(extractFromInputs(BooleanTensor.class, Vertex::getValue));
     }
 

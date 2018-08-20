@@ -1,17 +1,19 @@
 package io.improbable.keanu.tensor.bool;
 
+import static java.util.Arrays.copyOf;
+
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
+
+import java.util.Arrays;
+
+import org.apache.commons.lang3.ArrayUtils;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.Arrays;
-
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static java.util.Arrays.copyOf;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 
@@ -93,15 +95,23 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue) {
-        FlattenedView<Double> trueValuesFlattened = trueValue.getFlattenedView();
-        FlattenedView<Double> falseValuesFlattened = falseValue.getFlattenedView();
+        double[] trueValues = trueValue.asFlatDoubleArray();
+        double[] falseValues = falseValue.asFlatDoubleArray();
 
         double[] result = new double[data.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] = data[i] ? getOrScalar(trueValues, i) : getOrScalar(falseValues, i);
         }
 
         return DoubleTensor.create(result, copyOf(shape, shape.length));
+    }
+
+    private double getOrScalar(double[] values, int index) {
+        if (values.length == 1) {
+            return values[0];
+        } else {
+            return values[index];
+        }
     }
 
     @Override
@@ -297,6 +307,24 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public String toString() {
+
+        StringBuilder dataString = new StringBuilder();
+        if (data.length > 20) {
+            dataString.append(Arrays.toString(Arrays.copyOfRange(data, 0, 10)));
+            dataString.append("...");
+            dataString.append(Arrays.toString(Arrays.copyOfRange(data, data.length - 10, data.length)));
+        } else {
+            dataString.append(Arrays.toString(data));
+        }
+
+        return "{\n" +
+            "shape = " + Arrays.toString(shape) +
+            "\ndata = " + dataString.toString() +
+            "\n}";
+    }
+
+    @Override
     public FlattenedView<Boolean> getFlattenedView() {
         return new SimpleBooleanFlattenedView(data);
     }
@@ -365,4 +393,5 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public Boolean[] asFlatArray() {
         return ArrayUtils.toObject(data);
     }
+
 }

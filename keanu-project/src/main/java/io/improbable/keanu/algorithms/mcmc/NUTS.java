@@ -1,80 +1,85 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Algorithm 6: "No-U-Turn Sampler with Dual Averaging".
  * The No-U-Turn Sampler: Adaptively Setting Path Lengths in Hamiltonian Monte Carlo
  * https://arxiv.org/pdf/1111.4246.pdf
  */
-public class NUTS {
+@Builder
+public class NUTS implements PosteriorSamplingAlgorithm {
+
+    private static final int DEFAULT_ADAPT_COUNT = 1000;
+    private static final double DEFAULT_TARGET_ACCEPTANCE_PROB = 0.65;
 
     private static final double DELTA_MAX = 1000.0;
     private static final double STABILISER = 10;
     private static final double SHRINKAGE_FACTOR = 0.05;
     private static final double TEND_TO_ZERO_EXPONENT = 0.75;
 
-    private NUTS() {
+    public static NUTS withDefaultConfig() {
+        return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
+
+    public static NUTS withDefaultConfig(KeanuRandom random) {
+        return NUTS.builder()
+            .random(random)
+            .build();
+    }
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private KeanuRandom random = KeanuRandom.getDefaultRandom();
+
+    //The number of samples for which the stepsize will be tuned. For the remaining samples
+    //in which it is not tuned, the stepsize will be frozen to its last calculated value
+    @Getter
+    @Setter
+    @Builder.Default
+    private int adaptCount = DEFAULT_ADAPT_COUNT;
+
+    //The target acceptance probability, a suggested value of this is 0.65,
+    //Beskos et al., 2010; Neal, 2011
+    @Getter
+    @Setter
+    @Builder.Default
+    private double targetAcceptanceProb = DEFAULT_TARGET_ACCEPTANCE_PROB;
 
     /**
      * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
      *
-     * @param bayesNet             the bayesian network to sample from
-     * @param sampleFromVertices   the vertices to sample from
-     * @param sampleCount          the number of samples to take
-     * @param adaptCount           the number of samples for which the stepsize will be tuned. For the remaining samples
-     *                             in which it is not tuned, the stepsize will be frozen to its last calculated value
-     * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
-     *                             Beskos et al., 2010; Neal, 2011
+     * @param bayesNet           the bayesian network to sample from
+     * @param sampleFromVertices the vertices inside the bayesNet to sample from
+     * @param sampleCount        the number of samples to take
      * @return Samples taken with NUTS
      */
-    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<DoubleVertex> sampleFromVertices,
-                                                     final int sampleCount,
-                                                     final int adaptCount,
-                                                     final double targetAcceptanceProb) {
-
-        return getPosteriorSamples(bayesNet, sampleFromVertices, sampleCount, adaptCount, targetAcceptanceProb, KeanuRandom.getDefaultRandom());
-    }
-
-
-    /**
-     * Sample from the posterior of a Bayesian Network using the No-U-Turn-Sampling algorithm
-     *
-     * @param bayesNet             the bayesian network to sample from
-     * @param sampleFromVertices   the vertices inside the bayesNet to sample from
-     * @param sampleCount          the number of samples to take
-     * @param adaptCount           the number of samples for which the stepsize will be tuned. For the remaining samples
-     *                             in which it is not tuned, the stepsize will be frozen to its last calculated value
-     * @param targetAcceptanceProb the target acceptance probability, a suggested value of this is 0.65,
-     *                             Beskos et al., 2010; Neal, 2011
-     * @param random               the source of randomness
-     * @return Samples taken with NUTS
-     */
-    public static NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
-                                                     final List<? extends Vertex> sampleFromVertices,
-                                                     final int sampleCount,
-                                                     final int adaptCount,
-                                                     final double targetAcceptanceProb,
-                                                     final KeanuRandom random) {
+    @Override
+    public NetworkSamples getPosteriorSamples(final BayesianNetwork bayesNet,
+                                              final List<? extends Vertex> sampleFromVertices,
+                                              final int sampleCount) {
 
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<Vertex> probabilisticVertices = bayesNet.getLatentAndObservedVertices();
+        List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentAndObservedVertices());
 
         final Map<Long, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));
@@ -186,7 +191,7 @@ public class NUTS {
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
                                                   List<Vertex<DoubleTensor>> latentVertices,
-                                                  List<Vertex> probabilisticVertices,
+                                                  List<? extends Probabilistic> probabilisticVertices,
                                                   final List<? extends Vertex> sampleFromVertices,
                                                   double u,
                                                   int buildDirection,
@@ -246,7 +251,7 @@ public class NUTS {
     }
 
     private static BuiltTree buildTree(List<Vertex<DoubleTensor>> latentVertices,
-                                       List<Vertex> probabilisticVertices,
+                                       List<? extends Probabilistic> probabilisticVertices,
                                        final List<? extends Vertex> sampleFromVertices,
                                        Map<Long, DoubleTensor> position,
                                        Map<Long, DoubleTensor> gradient,
@@ -332,7 +337,7 @@ public class NUTS {
     }
 
     private static BuiltTree builtTreeBaseCase(List<Vertex<DoubleTensor>> latentVertices,
-                                               List<Vertex> probabilisticVertices,
+                                               List<? extends Probabilistic> probabilisticVertices,
                                                final List<? extends Vertex> sampleFromVertices,
                                                Map<Long, DoubleTensor> position,
                                                Map<Long, DoubleTensor> gradient,
@@ -380,9 +385,9 @@ public class NUTS {
         );
     }
 
-    private static double getLogProb(List<Vertex> probabilisticVertices) {
+    private static double getLogProb(List<? extends Probabilistic> probabilisticVertices) {
         double sum = 0.0;
-        for (Vertex<?> vertex : probabilisticVertices) {
+        for (Probabilistic vertex : probabilisticVertices) {
             sum += vertex.logProbAtValue();
         }
         return sum;
@@ -446,7 +451,7 @@ public class NUTS {
     }
 
     private static LeapFrogged leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                        final List<Vertex> probabilisticVertices,
+                                        final List<? extends Probabilistic> probabilisticVertices,
                                         final Map<Long, DoubleTensor> position,
                                         final Map<Long, DoubleTensor> gradient,
                                         final Map<Long, DoubleTensor> momentum,
@@ -617,7 +622,7 @@ public class NUTS {
     private static double findStartingStepSize(Map<Long, DoubleTensor> position,
                                                Map<Long, DoubleTensor> gradient,
                                                List<Vertex<DoubleTensor>> vertices,
-                                               List<Vertex> probabilisticVertices,
+                                               List<? extends Probabilistic> probabilisticVertices,
                                                KeanuRandom random) {
         double stepsize = 1;
         double probBeforeLeapfrog = getLogProb(probabilisticVertices);
