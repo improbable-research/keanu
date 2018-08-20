@@ -34,7 +34,7 @@ public class HalfGaussianVertexTest {
     public void matchesKnownLogDensityOfScalar() {
 
         NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
-        GaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
+        HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
         double expectedDensity = distribution.logDensity(0.5) + Math.log(2);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, 0.5, expectedDensity);
     }
@@ -42,7 +42,7 @@ public class HalfGaussianVertexTest {
     @Test
     public void matchesKnownLogDensityOfNegativeScalar() {
 
-        GaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
+        HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGaussianVertex, -0.5, Double.NEGATIVE_INFINITY);
     }
 
@@ -51,14 +51,14 @@ public class HalfGaussianVertexTest {
 
         NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2 * Math.log(2);
-        GaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
+        HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGaussianVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfNegativeVector() {
 
-        GaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
+        HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGaussianVertex, new double[]{-0.25, 0.75}, Double.NEGATIVE_INFINITY);
     }
 
@@ -70,7 +70,7 @@ public class HalfGaussianVertexTest {
         UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        GaussianVertex tensorGaussianVertex = new HalfGaussianVertex(sigmaTensor);
+        HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(sigmaTensor);
         Map<Long, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
@@ -87,14 +87,14 @@ public class HalfGaussianVertexTest {
         UniformVertex sigmaTensor = new UniformVertex(0.0, 1.0);
         sigmaTensor.setValue(1.0);
 
-        Supplier<GaussianVertex> vertexSupplier = () -> new HalfGaussianVertex(sigmaTensor);
+        Supplier<HalfGaussianVertex> vertexSupplier = () -> new HalfGaussianVertex(sigmaTensor);
 
         ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test
     public void isTreatedAsConstantWhenObserved() {
-        GaussianVertex vertexUnderTest = new HalfGaussianVertex(
+        HalfGaussianVertex vertexUnderTest = new HalfGaussianVertex(
             3.0
         );
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
@@ -105,7 +105,7 @@ public class HalfGaussianVertexTest {
     @Test
     public void dLogProbMatchesFiniteDifferenceCalculationFordPdsigma() {
         UniformVertex uniformA = new UniformVertex(1.5, 3.0);
-        GaussianVertex gaussian = new HalfGaussianVertex(uniformA);
+        HalfGaussianVertex gaussian = new HalfGaussianVertex(uniformA);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(0.0);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(0.5);
@@ -127,7 +127,7 @@ public class HalfGaussianVertexTest {
     public void gaussianSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        GaussianVertex vertex = new HalfGaussianVertex(
+        HalfGaussianVertex vertex = new HalfGaussianVertex(
             new int[]{sampleCount, 1},
             ConstantVertex.of(2.0)
         );
