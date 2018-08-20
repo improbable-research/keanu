@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
+
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
-
 public class IntegerSliceVertex extends IntegerUnaryOpVertex {
-
     private final int dimension;
     private final int index;
 
@@ -24,8 +23,7 @@ public class IntegerSliceVertex extends IntegerUnaryOpVertex {
     }
 
     @Override
-    protected IntegerTensor op(IntegerTensor input) {
-        return input.slice(dimension, index);
+    protected IntegerTensor op(IntegerTensor value) {
+        return value.slice(dimension, index);
     }
-
 }

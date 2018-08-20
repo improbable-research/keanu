@@ -4,19 +4,12 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerReshapeVertex extends IntegerUnaryOpVertex {
-
-    private int[] proposedShape;
-
     public IntegerReshapeVertex(IntegerVertex inputVertex, int... proposedShape) {
         super(proposedShape, inputVertex);
-        this.proposedShape = proposedShape;
     }
 
-    /**
-     * Returns the supplied vertex with a new shape of the same length
-     */
     @Override
-    protected IntegerTensor op(IntegerTensor a) {
-        return a.reshape(proposedShape);
+    protected IntegerTensor op(IntegerTensor value) {
+        return value.reshape(getShape());
     }
 }

@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
@@ -30,7 +29,6 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
      * @param probTrue the probability the bernoulli returns true
      */
     public BernoulliVertex(int[] shape, Vertex<DoubleTensor> probTrue) {
-        super(new ProbabilisticValueUpdater<>());
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, probTrue.getShape());
         this.probTrue = probTrue;
         setParents(probTrue);

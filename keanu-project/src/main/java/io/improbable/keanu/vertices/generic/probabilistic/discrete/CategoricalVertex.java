@@ -11,7 +11,6 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> {
 
@@ -30,7 +29,6 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     public CategoricalVertex(Map<T, DoubleVertex> selectableValues) {
-        super(new ProbabilisticValueUpdater<>());
         this.selectableValues = selectableValues;
         setParents(this.selectableValues.values());
     }

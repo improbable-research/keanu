@@ -17,7 +17,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -34,8 +33,6 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
      */
     public LaplaceVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
-        super(new ProbabilisticValueUpdater<>());
-
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), beta.getShape());
 

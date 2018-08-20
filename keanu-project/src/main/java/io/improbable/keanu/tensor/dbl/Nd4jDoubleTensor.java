@@ -1,13 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
-import io.improbable.keanu.tensor.INDArrayExtensions;
-import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import static java.util.Arrays.copyOf;
+
+import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
@@ -24,11 +23,14 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
-import static java.util.Arrays.copyOf;
+import io.improbable.keanu.tensor.INDArrayExtensions;
+import io.improbable.keanu.tensor.INDArrayShim;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TypedINDArrayFactory;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -116,6 +118,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor permute(int... rearrange) {
+        return new Nd4jDoubleTensor(tensor.permute(rearrange));
+    }
+
+    @Override
     public DoubleTensor diag() {
         return new Nd4jDoubleTensor(Nd4j.diag(tensor));
     }
@@ -180,9 +187,22 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public double standardDeviation() {
-        double average = average();
-        return Math.sqrt(Transforms.pow(tensor.sub(average), 2, false)
-            .sumNumber().doubleValue() / (tensor.length() - 1));
+        return tensor.stdNumber().doubleValue();
+    }
+
+    @Override
+    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
+        if (this == o) return true;
+
+        if (o instanceof Nd4jDoubleTensor) {
+            return tensor.equalsWithEps(((Nd4jDoubleTensor) o).tensor, epsilon);
+        } else {
+            if (this.hasSameShapeAs(o)) {
+                DoubleTensor difference = o.minus(this);
+                return difference.abs().lessThan(epsilon).allTrue();
+            }
+        }
+        return false;
     }
 
     @Override
@@ -384,7 +404,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -506,40 +526,68 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return this;
     }
 
+    /**
+     * @param that Right operand.
+     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
+     * Otherwise return <i>this</i>.
+     */
     @Override
     public DoubleTensor minusInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.subi(that.scalar());
+        } else if (this.isScalar()) {
+            return this.minus(that);
         } else {
             INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
         }
         return this;
     }
 
+     /**
+     * @param that Right operand.
+     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
+     * Otherwise return <i>this</i>.
+     */
     @Override
     public DoubleTensor plusInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.addi(that.scalar());
+        } else if (this.isScalar()) {
+            return this.plus(that);
         } else {
             INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
         }
         return this;
     }
 
+     /**
+     * @param that Right operand.
+     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
+     * Otherwise return <i>this</i>.
+     */
     @Override
     public DoubleTensor timesInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.muli(that.scalar());
+        } else if (this.isScalar()) {
+            return this.times(that);
         } else {
             INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
         }
         return this;
     }
 
+     /**
+     * @param that Right operand.
+     * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
+     * Otherwise return <i>this</i>.
+     */
     @Override
     public DoubleTensor divInPlace(DoubleTensor that) {
         if (that.isScalar()) {
             tensor.divi(that.scalar());
+        } else if (this.isScalar()) {
+            return this.div(that);
         } else {
             INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
         }
@@ -651,7 +699,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
@@ -703,6 +751,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardizeInPlace() {
         tensor.subi(average()).divi(standardDeviation());
+        return this;
+    }
+
+    @Override
+    public DoubleTensor setAllInPlace(double value) {
+        this.tensor.assign(value);
         return this;
     }
 

@@ -1,8 +1,9 @@
 package io.improbable.keanu.kotlin
 
+import com.google.common.math.IntMath
+
 
 class ArithmeticInteger(val value: Int) : IntegerOperators<ArithmeticInteger> {
-
     override fun minus(that: ArithmeticInteger): ArithmeticInteger {
         return ArithmeticInteger(value - that.value)
     }
@@ -37,6 +38,14 @@ class ArithmeticInteger(val value: Int) : IntegerOperators<ArithmeticInteger> {
 
     override fun unaryMinus(): ArithmeticInteger {
         return ArithmeticInteger(value) * -1
+    }
+
+    override fun pow(exponent: ArithmeticInteger): ArithmeticInteger {
+        return ArithmeticInteger(IntMath.pow(this.value, exponent.value))
+    }
+
+    override fun pow(exponent: Int): ArithmeticInteger {
+        return ArithmeticInteger(IntMath.pow(this.value, exponent))
     }
 
 }
