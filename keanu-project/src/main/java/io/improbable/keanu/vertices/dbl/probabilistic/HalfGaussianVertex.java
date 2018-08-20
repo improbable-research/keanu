@@ -7,35 +7,36 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
 public class HalfGaussianVertex extends GaussianVertex {
 
+    private static final double MU_ZERO = 0.0;
     private static final double LOG_TWO = Math.log(2);
 
     /**
-     * One sigma that match a proposed tensor shape of Gaussian
+     * One sigma that matches a proposed tensor shape of HalfGaussian (a Gaussian with mu = 0 and x >= 0).
      * <p>
      * If provided parameter is scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
-     * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
+     * @param sigma       the sigma of the HalfGaussian with either the same tensorShape as specified for this vertex or a scalar
      */
     public HalfGaussianVertex(int[] tensorShape, DoubleVertex sigma) {
-        super(tensorShape, 0.0, sigma);
+        super(tensorShape, MU_ZERO, sigma);
     }
 
     public HalfGaussianVertex(DoubleVertex sigma) {
-        super(0.0, sigma);
+        super(MU_ZERO, sigma);
     }
 
     public HalfGaussianVertex(double sigma) {
-        super(0.0, new ConstantDoubleVertex(sigma));
+        super(MU_ZERO, new ConstantDoubleVertex(sigma));
     }
 
     public HalfGaussianVertex(int[] tensorShape, double sigma) {
-        super(tensorShape, 0.0, new ConstantDoubleVertex(sigma));
+        super(tensorShape, MU_ZERO, new ConstantDoubleVertex(sigma));
     }
 
     @Override
     public double logProb(DoubleTensor value) {
-        if (value.greaterThanOrEqual(0.0).allTrue()) {
+        if (value.greaterThanOrEqual(MU_ZERO).allTrue()) {
             return super.logProb(value) + LOG_TWO * value.getLength();
         }
         return Double.NEGATIVE_INFINITY;
