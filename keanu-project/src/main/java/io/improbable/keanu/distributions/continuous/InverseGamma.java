@@ -53,14 +53,15 @@ public class InverseGamma implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dLogPdalpha = x.log().unaryMinusInPlace().minusInPlace(distributionShape.apply(Gamma::digamma)).plusInPlace(scale.log());
-        final DoubleTensor dLogPdscale = x.reciprocal().unaryMinusInPlace().plusInPlace(distributionShape.div(scale));
+        final DoubleTensor dPdalpha = x.log().unaryMinusInPlace().minusInPlace(distributionShape.apply(Gamma::digamma)).plusInPlace(scale.log());
+        final DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(distributionShape.div(scale));
         final DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(distributionShape.plus(1).unaryMinusInPlace()).plusInPlace(scale));
 
         return new Diffs()
-            .put(A, dLogPdalpha)
-            .put(B, dLogPdscale)
+            .put(A, dPdalpha)
+            .put(B, dLogPdbeta)
             .put(X, dLogPdx);
     }
+
 
 }

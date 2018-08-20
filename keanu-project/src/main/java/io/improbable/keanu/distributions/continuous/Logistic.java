@@ -57,7 +57,7 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor bTimesExpAOverB = expAOverB.times(scale);
         final DoubleTensor bTimesExpXOverB = expXOverB.times(scale);
 
-        final DoubleTensor dLogPdlocation = expXOverB.minus(expAOverB).divInPlace(scale.times(expPlus));
+        final DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(scale.times(expPlus));
         final DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
         final DoubleTensor numeratorPartOne = location.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
@@ -66,11 +66,11 @@ public class Logistic implements ContinuousDistribution {
         final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
         final DoubleTensor denominator = scale.pow(2).timesInPlace(expPlus);
 
-        final DoubleTensor dLogPdscale = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
+        final DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
         return new Diffs()
-            .put(MU, dLogPdlocation)
-            .put(S, dLogPdscale)
+            .put(MU, dLogPdmu)
+            .put(S, dLogPds)
             .put(X, dLogPdx);
     }
 

@@ -35,11 +35,11 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     @Override
     public DoubleTensor logProb(BooleanTensor x) {
-        DoubleTensor probOfEventClamped = probOfEvent.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+        DoubleTensor probTrueClamped = probOfEvent.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
 
         DoubleTensor probability = x.setDoubleIf(
-            probOfEventClamped,
-            probOfEventClamped.unaryMinus().plusInPlace(1.0)
+            probTrueClamped,
+            probTrueClamped.unaryMinus().plusInPlace(1.0)
         );
 
         return probability.logInPlace();

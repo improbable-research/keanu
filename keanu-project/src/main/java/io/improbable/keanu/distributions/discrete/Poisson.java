@@ -38,26 +38,26 @@ public class Poisson implements DiscreteDistribution {
      * @return an instance of {@link DoubleTensor}
      * @throws IllegalArgumentException if <code>rate</code> passed to {@link #withParameters(DoubleTensor rate)} is less than or equal to 0
      */
-    @Override
-    public IntegerTensor sample(int[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> rateWrapped = rate.getFlattenedView();
+     @Override
+     public IntegerTensor sample(int[] shape, KeanuRandom random) {
+         Tensor.FlattenedView<Double> muWrapped = rate.getFlattenedView();
 
-        int length = ArrayUtil.prod(shape);
-        int[] samples = new int[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = sample(rateWrapped.getOrScalar(i), random);
-        }
+         int length = ArrayUtil.prod(shape);
+         int[] samples = new int[length];
+         for (int i = 0; i < length; i++) {
+             samples[i] = sample(muWrapped.getOrScalar(i), random);
+         }
 
-        return IntegerTensor.create(samples, shape);
-    }
+         return IntegerTensor.create(samples, shape);
+     }
 
-    private static int sample(double rate, KeanuRandom random) {
-        if (rate <= 0.) {
-            throw new IllegalArgumentException("Invalid value for rate: " + rate);
+    private static int sample(double mu, KeanuRandom random) {
+        if (mu <= 0.) {
+            throw new IllegalArgumentException("Invalid value for mu: " + mu);
         }
 
         double b = 1.;
-        double stopB = Math.exp(-rate);
+        double stopB = Math.exp(-mu);
         int i;
 
         for (i = 0; b >= stopB; i++) {
@@ -68,27 +68,27 @@ public class Poisson implements DiscreteDistribution {
     }
 
     @Override
-    public DoubleTensor logProb(IntegerTensor x) {
-        Tensor.FlattenedView<Double> rateFlattenedView = rate.getFlattenedView();
-        Tensor.FlattenedView<Integer> kFlattenedView = x.getFlattenedView();
+    public DoubleTensor logProb(IntegerTensor k) {
+        Tensor.FlattenedView<Double> muFlattenedView = rate.getFlattenedView();
+        Tensor.FlattenedView<Integer> kFlattenedView = k.getFlattenedView();
 
-        double[] result = new double[(int) x.getLength()];
+        double[] result = new double[(int) k.getLength()];
         for (int i = 0; i < result.length; i++) {
-            result[i] = Math.log(pmf(rateFlattenedView.getOrScalar(i), kFlattenedView.getOrScalar(i)));
+            result[i] = Math.log(pmf(muFlattenedView.getOrScalar(i), kFlattenedView.getOrScalar(i)));
         }
 
-        return DoubleTensor.create(result, x.getShape());
+        return DoubleTensor.create(result, k.getShape());
     }
 
-    private static double pmf(double rate, int x) {
-        if (x >= 0 && x < 20) {
-            return (Math.pow(rate, x) / factorial(x)) * Math.exp(-rate);
-        } else if (x >= 20) {
+    private static double pmf(double mu, int k) {
+        if (k >= 0 && k < 20) {
+            return (Math.pow(mu, k) / factorial(k)) * Math.exp(-mu);
+        } else if (k >= 20) {
             double sumOfFactorial = 0;
-            for (int i = 1; i <= x; i++) {
+            for (int i = 1; i <= k; i++) {
                 sumOfFactorial += Math.log(i);
             }
-            return Math.exp((x * Math.log(rate)) - sumOfFactorial - rate);
+            return Math.exp((k * Math.log(mu)) - sumOfFactorial - mu);
         }
         return 0;
     }
