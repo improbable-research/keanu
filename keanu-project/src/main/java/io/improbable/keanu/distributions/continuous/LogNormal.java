@@ -19,45 +19,45 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 public class LogNormal implements ContinuousDistribution {
 
     private final DoubleTensor scale;
-    private final DoubleTensor alpha;
+    private final DoubleTensor distributionShape;
 
     /**
-     * @param scale shape parameter (not to be confused with tensor shape)
-     * @param alpha stretches/shrinks the distribution
+     * @param scale             stretches/shrinks the distribution
+     * @param distributionShape shape parameter (not to be confused with tensor shape)
      * @return an instance of {@link ContinuousDistribution}
      */
-    public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor alpha) {
-        return new LogNormal(scale, alpha);
+    public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor distributionShape) {
+        return new LogNormal(scale, distributionShape);
     }
 
-    private LogNormal(DoubleTensor scale, DoubleTensor alpha) {
+    private LogNormal(DoubleTensor scale, DoubleTensor distributionShape) {
         this.scale = scale;
-        this.alpha = alpha;
+        this.distributionShape = distributionShape;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return Gaussian.withParameters(scale, alpha).sample(shape, random).expInPlace();
+        return Gaussian.withParameters(scale, distributionShape).sample(shape, random).expInPlace();
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor lnSigmaX = alpha.times(x).logInPlace();
+        final DoubleTensor lnSigmaX = distributionShape.times(x).logInPlace();
         final DoubleTensor lnXMinusMuSquared = x.log().minusInPlace(scale).powInPlace(2);
-        final DoubleTensor lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.divInPlace(alpha.pow(2).timesInPlace(2.0));
+        final DoubleTensor lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.divInPlace(distributionShape.pow(2).timesInPlace(2.0));
         return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor variance = alpha.pow(2);
+        final DoubleTensor variance = distributionShape.pow(2);
         final DoubleTensor lnXMinusMu = x.log().minusInPlace(scale);
 
         final DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
         final DoubleTensor dLogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
         final DoubleTensor dLogPdsigma = lnXMinusMu.powInPlace(2)
-            .divInPlace(variance.timesInPlace(alpha))
-            .minusInPlace(alpha.reciprocal());
+            .divInPlace(variance.timesInPlace(distributionShape))
+            .minusInPlace(distributionShape.reciprocal());
 
         return new Diffs()
             .put(MU, dLogPdmu)

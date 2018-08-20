@@ -28,20 +28,20 @@ public class Gamma implements ContinuousDistribution {
     private static final double M_E = 0.577215664901532860606512090082;
 
     private final DoubleTensor scale;
-    private final DoubleTensor alpha;
+    private final DoubleTensor distributionShape;
 
     /**
-     * @param scale    stretches/shrinks the distribution, must be greater than 0
-     * @param alpha    shape parameter (not to be confused with tensor shape)
+     * @param scale             stretches/shrinks the distribution, must be greater than 0
+     * @param distributionShape shape parameter (not to be confused with tensor shape)
      * @return an instance of {@link ContinuousDistribution}
      */
-    public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor alpha) {
-        return new Gamma(scale, alpha);
+    public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor distributionShape) {
+        return new Gamma(scale, distributionShape);
     }
 
-    private Gamma(DoubleTensor scale, DoubleTensor alpha) {
+    private Gamma(DoubleTensor scale, DoubleTensor distributionShape) {
         this.scale = scale;
-        this.alpha = alpha;
+        this.distributionShape = distributionShape;
     }
 
     /**
@@ -54,7 +54,7 @@ public class Gamma implements ContinuousDistribution {
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> scaleWrapped = scale.getFlattenedView();
-        Tensor.FlattenedView<Double> alphaWrapped = alpha.getFlattenedView();
+        Tensor.FlattenedView<Double> alphaWrapped = distributionShape.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
@@ -113,17 +113,17 @@ public class Gamma implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor minusXOverTheta = x.div(scale).unaryMinusInPlace();
-        final DoubleTensor kLnTheta = alpha.times(scale.log());
-        final DoubleTensor xPowKMinus1 = x.pow(alpha.minus(1));
-        final DoubleTensor lnXToKMinus1 = (xPowKMinus1.divInPlace(alpha.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
+        final DoubleTensor kLnTheta = distributionShape.times(scale.log());
+        final DoubleTensor xPowKMinus1 = x.pow(distributionShape.minus(1));
+        final DoubleTensor lnXToKMinus1 = (xPowKMinus1.divInPlace(distributionShape.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
         return minusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXToKMinus1);
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dLogPdx = alpha.minus(1.).divInPlace(x).minusInPlace(scale.reciprocal());
-        final DoubleTensor dLogPdtheta = scale.times(alpha).plusInPlace(x.unaryMinus()).divInPlace(scale.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dLogPdk = x.log().minusInPlace(scale.log()).minusInPlace(alpha.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdx = distributionShape.minus(1.).divInPlace(x).minusInPlace(scale.reciprocal());
+        final DoubleTensor dLogPdtheta = scale.times(distributionShape).plusInPlace(x.unaryMinus()).divInPlace(scale.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dLogPdk = x.log().minusInPlace(scale.log()).minusInPlace(distributionShape.apply(org.apache.commons.math3.special.Gamma::digamma));
 
         return new Diffs()
         .put(THETA, dLogPdtheta)
