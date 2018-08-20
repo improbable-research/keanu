@@ -8,9 +8,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import org.apache.commons.math3.util.Pair;
