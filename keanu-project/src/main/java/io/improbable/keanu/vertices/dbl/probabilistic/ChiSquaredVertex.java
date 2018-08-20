@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -27,8 +26,6 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param k           the number of degrees of freedom
      */
     public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
-        super(new ProbabilisticValueUpdater<>());
-
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 
         this.k = k;

@@ -17,18 +17,21 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     /**
      * Adds one vertex to another
      *
-     * @param left  a vertex to add
+     * @param left a vertex to add
      * @param right a vertex to add
      */
     public AdditionVertex(DoubleVertex left, DoubleVertex right) {
-        super(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
+        super(left, right);
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        DualNumber leftDual = dualNumbers.get(left);
-        DualNumber rightDual = dualNumbers.get(right);
-        return leftDual.plus(rightDual);
+    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+        return l.plus(r);
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        return l.plus(r);
     }
 
     @Override
@@ -37,11 +40,6 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
         partials.put(left, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf, left.getValue(), right.getValue()));
         partials.put(right, Differentiator.reshapeReverseAutoDiff(derivativeOfOutputsWithRespectToSelf, right.getValue(),  left.getValue()));
         return partials;
-    }
-
-    @Override
-    protected DoubleTensor op(DoubleTensor left, DoubleTensor right) {
-        return left.plus(right);
     }
 
 }

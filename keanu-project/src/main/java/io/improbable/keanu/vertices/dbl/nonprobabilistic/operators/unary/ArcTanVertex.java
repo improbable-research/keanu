@@ -17,17 +17,17 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ArcTanVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);;
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.atan();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.atan();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).atan();
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.atan();
     }
 
     @Override

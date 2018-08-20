@@ -1,15 +1,33 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+
+import java.util.Map;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;
+
+    /**
+     * A vertex that performs a user defined operation on two vertices
+     *
+     * @param left  a vertex
+     * @param right a vertex
+     */
+    public DoubleBinaryOpVertex(
+        DoubleVertex left, DoubleVertex right) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()),
+            left, right);
+    }
 
     /**
      * A vertex that performs a user defined operation on two vertices
@@ -19,7 +37,6 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
      * @param right a vertex
      */
     public DoubleBinaryOpVertex(int[] shape, DoubleVertex left, DoubleVertex right) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((DoubleBinaryOpVertex) v).op(left.getValue(), right.getValue())));
         this.left = left;
         this.right = right;
         setParents(left, right);
@@ -31,7 +48,10 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
         return op(left.sample(random), right.sample(random));
     }
 
-    protected abstract DoubleTensor op(DoubleTensor left, DoubleTensor right);
+    @Override
+    public DoubleTensor calculate() {
+        return op(left.getValue(), right.getValue());
+    }
 
     public DoubleVertex getLeft() {
         return left;
@@ -41,4 +61,16 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex {
         return right;
     }
 
+    @Override
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        try {
+            return dualOp(dualNumbers.get(left), dualNumbers.get(right));
+        } catch (UnsupportedOperationException e) {
+            return super.calculateDualNumber(dualNumbers);
+        }
+    }
+
+    protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);
+
+    protected abstract DualNumber dualOp(DualNumber l, DualNumber r);
 }

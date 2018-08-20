@@ -1,19 +1,21 @@
 package io.improbable.keanu.vertices;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
 
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Consumer;
 
-import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class EvalPropagationTest {
 
@@ -33,7 +35,7 @@ public class EvalPropagationTest {
 
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = new FloorVertex(ConstantVertex.of(4.2));
+        DoubleVertex start = ConstantVertex.of(4.2).floor();
 
         int links = 20;
         DoubleVertex end = addLinks(start, n, m, links);
@@ -106,30 +108,37 @@ public class EvalPropagationTest {
         assertEquals(3, n.get());
     }
 
+    static class BlackBoxVertex extends DoubleUnaryOpVertex {
+
+        private final AtomicInteger n;
+
+        public BlackBoxVertex(DoubleVertex inputVertex, AtomicInteger n) {
+            super(inputVertex);
+            this.n = n;
+        }
+
+        @Override
+        protected DoubleTensor op(DoubleTensor value) {
+            n.incrementAndGet();
+            return DoubleTensor.create(new double[]{0, 1, 2});
+        }
+
+        @Override
+        protected DualNumber dualOp(DualNumber dualNumber) {
+            return null;
+        }
+    }
     @Test
     public void doesNotRedoWorkAlreadyDoneOnLazyEval() {
         AtomicInteger n = new AtomicInteger(0);
 
         DoubleVertex start = new GaussianVertex(0, 1);
 
-        DoubleVertex blackBox = new DoubleUnaryOpLambda<>(start,
-            (startValue) -> {
-                n.incrementAndGet();
-                return DoubleTensor.create(new double[]{0, 1, 2});
-            }
-        );
+        DoubleVertex blackBox = new BlackBoxVertex(start, n);
 
-        DoubleVertex pluck0 = new DoubleUnaryOpLambda<>(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(0))
-        );
-
-        DoubleVertex pluck1 = new DoubleUnaryOpLambda<>(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(1))
-        );
-
-        DoubleVertex pluck2 = new DoubleUnaryOpLambda<>(blackBox,
-            bb -> DoubleTensor.scalar(bb.getValue(2))
-        );
+        DoubleVertex pluck0 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(0)), null, null);
+        DoubleVertex pluck1 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(1)), null, null);
+        DoubleVertex pluck2 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(2)), null, null);
 
         pluck0.lazyEval();
         pluck1.lazyEval();

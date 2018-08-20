@@ -17,17 +17,17 @@ public class SinVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public SinVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.sin();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.sin();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).sin();
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.sin();
     }
 
     @Override

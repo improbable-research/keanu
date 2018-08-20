@@ -6,6 +6,15 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import static java.util.Collections.singletonMap;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -98,6 +107,17 @@ public class PartialDerivatives {
         derivativeWithRespectTo.put(id, value);
     }
 
+    /**
+     * This will sum partial derivatives that are represented as tensors over given dimensions.
+     * There is the option to reshape to a lower rank tensor where the summation has caused a
+     * dimension to go to length 1.
+     *
+     * @param reshape        Returns the sum and drops the summed over dimensions (now length one)
+     *                       in the shape if true. Returns a same ranked tensor but with a shape
+     *                       that has ones for the dimensions summed over.
+     * @param overDimensions The dimensions to sum over. Dimensions are counted from zero
+     * @return The summed partial derivatives over given dimensions
+     */
     public PartialDerivatives sum(boolean reshape, int... overDimensions) {
         Map<Long, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
@@ -208,7 +228,7 @@ public class PartialDerivatives {
         }
     }
 
-    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft, boolean reverseMode) {
+    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
         Map<Long, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
@@ -217,36 +237,16 @@ public class PartialDerivatives {
 
             DoubleTensor v;
             if (partialIsLeft) {
-
-                if (reverseMode) {
-                    v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{1});
-                } else {
-
-                    int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
-                    rearrange[0] = 0;
-                    rearrange[1] = partialRank - 1;
-                    v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                        .permute(rearrange);
-                }
+                int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
+                rearrange[0] = 0;
+                rearrange[1] = partialRank - 1;
+                v = partial.getValue()
+                    .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
+                    .permute(rearrange);
 
             } else {
-
-                if (reverseMode) {
-                    int[] rearrange = TensorShape.dimensionRange(0, partialRank);
-                    rearrange[partialRank - 1] = partialRank - 2;
-                    rearrange[partialRank - 2] = partialRank - 1;
-
-                    v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{0})
-                        .permute(rearrange);
-
-                } else {
-
-                    v = multiplier
-                        .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
-                }
+                v = multiplier
+                    .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
             }
             multiplied.put(partial.getKey(), v);
         }

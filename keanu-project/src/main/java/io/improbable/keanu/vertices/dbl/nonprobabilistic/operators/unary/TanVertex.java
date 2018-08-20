@@ -17,17 +17,17 @@ public class TanVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public TanVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.tan();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.tan();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).tan();
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.tan();
     }
 
     @Override

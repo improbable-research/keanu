@@ -17,17 +17,17 @@ public class ExpVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ExpVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.exp();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.exp();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).exp();
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.exp();
     }
 
     @Override

@@ -17,16 +17,16 @@ public class AbsVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public AbsVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.abs();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.abs();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber dualOp(DualNumber dualNumber) {
         throw new UnsupportedOperationException();
     }
 

@@ -10,24 +10,18 @@ import java.util.Map;
 
 public class ReshapeVertex extends DoubleUnaryOpVertex {
 
-    private int[] proposedShape;
-
     public ReshapeVertex(DoubleVertex inputVertex, int... proposedShape) {
         super(proposedShape, inputVertex);
-        this.proposedShape = proposedShape;
-    }
-
-    /**
-     * Returns the supplied vertex with a new shape of the same length
-     */
-    @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.reshape(proposedShape);
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).reshape(proposedShape);
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.reshape(getShape());
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.reshape(getShape());
     }
 
     @Override

@@ -17,16 +17,16 @@ public class CeilVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex to be ceil'd
      */
     public CeilVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.ceil();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.ceil();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber dualOp(DualNumber dualNumber) {
         throw new UnsupportedOperationException();
     }
 

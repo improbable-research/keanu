@@ -15,7 +15,7 @@ public class DoubleUnaryOpLambdaTest {
 
         UniformVertex matrix = new UniformVertex(new int[]{2, 2}, 0, 5);
         matrix.setAndCascade(DoubleTensor.create(2.5, new int[]{2, 2}));
-        DoubleVertex matrixLambda = new DoubleUnaryOpLambda<>(matrix.getShape(), matrix, (val) -> val.times(2));
+        DoubleVertex matrixLambda = matrix.lambda((val) -> val.times(2), null, null);
 
         assertArrayEquals(new double[]{5, 5, 5, 5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
     }

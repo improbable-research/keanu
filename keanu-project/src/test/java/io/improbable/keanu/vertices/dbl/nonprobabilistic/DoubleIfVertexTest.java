@@ -202,8 +202,8 @@ public class DoubleIfVertexTest {
 
         BoolVertex leftFlip = new BernoulliVertex(0.5);
         BoolVertex rightFlip = new BernoulliVertex(0.5);
-        leftFlip.setValue(false);
-        rightFlip.setValue(true);
+        leftFlip.observe(false);
+        rightFlip.observe(true);
 
         DoubleVertex ifVertex = If.isTrue(leftFlip.or(rightFlip))
             .then(a)
@@ -232,8 +232,8 @@ public class DoubleIfVertexTest {
 
         BoolVertex leftFlip = new BernoulliVertex(0.5);
         BoolVertex rightFlip = new BernoulliVertex(0.5);
-        leftFlip.setValue(false);
-        rightFlip.setValue(false);
+        leftFlip.observe(false);
+        rightFlip.observe(false);
 
         DoubleVertex ifVertex = If.isTrue(leftFlip.or(rightFlip))
             .then(a)

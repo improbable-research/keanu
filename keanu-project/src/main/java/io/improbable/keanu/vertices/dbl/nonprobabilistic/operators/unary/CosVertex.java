@@ -17,17 +17,17 @@ public class CosVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public CosVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.cos();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.cos();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).cos();
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.cos();
     }
 
     @Override

@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class GreaterThanVertexTest {
 
@@ -25,12 +24,12 @@ public class GreaterThanVertexTest {
     }
 
     private void isGreaterThan(int a, int b, boolean expected) {
-        GreaterThanVertex<IntegerTensor, IntegerTensor> vertex = new GreaterThanVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
+        BoolVertex vertex = ConstantVertex.of(a).greaterThan(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 
     private void isGreaterThan(double a, double b, boolean expected) {
-        GreaterThanVertex<DoubleTensor, DoubleTensor> vertex = new GreaterThanVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
+        BoolVertex vertex = ConstantVertex.of(a).greaterThan(ConstantVertex.of(b));
         assertEquals(expected, vertex.eval().scalar());
     }
 

@@ -14,15 +14,16 @@ import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ReduceVertex extends DoubleVertex implements Differentiable {
+public class ReduceVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+
     private final List<? extends Vertex<DoubleTensor>> inputs;
     private final BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction;
     private final Supplier<DualNumber> dualNumberSupplier;
@@ -32,7 +33,6 @@ public class ReduceVertex extends DoubleVertex implements Differentiable {
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<DualNumber> dualNumberSupplier,
                         Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((ReduceVertex) v).applyReduce(Vertex::getValue)));
         if (inputs.size() < 2) {
             throw new IllegalArgumentException("ReduceVertex should have at least two input vertices, called with " + inputs.size());
         }
@@ -89,6 +89,11 @@ public class ReduceVertex extends DoubleVertex implements Differentiable {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return applyReduce(vertex -> vertex.sample(random));
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return applyReduce(Vertex::getValue);
     }
 
     private DoubleTensor applyReduce(Function<Vertex<DoubleTensor>, DoubleTensor> mapper) {

@@ -30,7 +30,7 @@ public class ReduceVertexTest {
 
     @Test
     public void calculatesSumCorrectly() {
-        DoubleVertex sum = new ReduceVertex(verts, (a, b) -> (a.plus(b)));
+        DoubleVertex sum = new ReduceVertex(verts, DoubleTensor::plus);
         assertEquals(sum.eval().scalar(), total, 0.0001);
     }
 

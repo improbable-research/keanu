@@ -17,16 +17,17 @@ public class LogVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public LogVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
-    }
-
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.log();
+        super(inputVertex);
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).log();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.log();
+    }
+
+    @Override
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.log();
     }
 
     @Override

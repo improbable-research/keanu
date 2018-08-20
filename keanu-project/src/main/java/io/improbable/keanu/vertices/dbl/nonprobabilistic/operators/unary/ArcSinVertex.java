@@ -17,17 +17,17 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex
      */
     public ArcSinVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.asin();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.asin();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(inputVertex).asin();
+    protected DualNumber dualOp(DualNumber dualNumber) {
+        return dualNumber.asin();
     }
 
     @Override

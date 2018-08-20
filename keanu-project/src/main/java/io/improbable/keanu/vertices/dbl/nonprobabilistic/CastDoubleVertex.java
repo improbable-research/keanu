@@ -4,19 +4,18 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class CastDoubleVertex extends DoubleVertex {
+public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends NumberTensor> inputVertex;
 
     public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
-        super(new NonProbabilisticValueUpdater<>(v -> ((CastDoubleVertex) v).inputVertex.getValue().toDouble()));
         this.inputVertex = inputVertex;
         setParents(inputVertex);
     }
@@ -24,6 +23,11 @@ public class CastDoubleVertex extends DoubleVertex {
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return inputVertex.sample(random).toDouble();
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return inputVertex.getValue().toDouble();
     }
 
     @Override

@@ -1,13 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import com.google.common.collect.ImmutableList;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.util.Pair;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -17,17 +18,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.Pair;
-
-import com.google.common.collect.ImmutableList;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 public class ProbabilisticDoubleTensorContract {
 
@@ -44,11 +41,11 @@ public class ProbabilisticDoubleTensorContract {
      */
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void sampleMethodMatchesLogProbMethod(V vertexUnderTest,
-                                                        double from,
-                                                        double to,
-                                                        double bucketSize,
-                                                        double maxError,
-                                                        KeanuRandom random) {
+                                          double from,
+                                          double to,
+                                          double bucketSize,
+                                          double maxError,
+                                          KeanuRandom random) {
         double bucketCount = ((to - from) / bucketSize);
 
         if (bucketCount != (int) bucketCount) {
@@ -77,12 +74,12 @@ public class ProbabilisticDoubleTensorContract {
 
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void sampleUnivariateMethodMatchesLogProbMethod(V vertexUnderTest,
-                                                                  double from,
-                                                                  double to,
-                                                                  double bucketSize,
-                                                                  double maxError,
-                                                                  KeanuRandom random,
-                                                                  int sampleCount) {
+                                                    double from,
+                                                    double to,
+                                                    double bucketSize,
+                                                    double maxError,
+                                                    KeanuRandom random,
+                                                    int sampleCount) {
         double bucketCount = ((to - from) / bucketSize);
 
         if (bucketCount != (int) bucketCount) {
@@ -119,11 +116,11 @@ public class ProbabilisticDoubleTensorContract {
 
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void samplingProducesRealisticMeanAndStandardDeviation(int numberOfSamples,
-                                                                         V vertexUnderTest,
-                                                                         double expectedMean,
-                                                                         double expectedStandardDeviation,
-                                                                         double maxError,
-                                                                         KeanuRandom random) {
+                                                           V vertexUnderTest,
+                                                           double expectedMean,
+                                                           double expectedStandardDeviation,
+                                                           double maxError,
+                                                           KeanuRandom random) {
         List<Double> samples = new ArrayList<>();
 
         for (int i = 0; i < numberOfSamples; i++) {
@@ -143,14 +140,14 @@ public class ProbabilisticDoubleTensorContract {
 
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(DoubleTensor hyperParameterStartValue,
-                                                                                          DoubleTensor hyperParameterEndValue,
-                                                                                          double hyperParameterValueIncrement,
-                                                                                          V hyperParameterVertex,
-                                                                                          V vertexUnderTest,
-                                                                                          DoubleTensor vertexStartValue,
-                                                                                          DoubleTensor vertexEndValue,
-                                                                                          double vertexValueIncrement,
-                                                                                          double gradientDelta) {
+                                                                            DoubleTensor hyperParameterEndValue,
+                                                                            double hyperParameterValueIncrement,
+                                                                            DoubleVertex hyperParameterVertex,
+                                                                            V vertexUnderTest,
+                                                                            DoubleTensor vertexStartValue,
+                                                                            DoubleTensor vertexEndValue,
+                                                                            double vertexValueIncrement,
+                                                                            double gradientDelta) {
 
         for (DoubleTensor value = vertexStartValue; value.scalar() <= vertexEndValue.scalar(); value.plusInPlace(vertexValueIncrement)) {
             vertexUnderTest.setAndCascade(value);
@@ -159,47 +156,44 @@ public class ProbabilisticDoubleTensorContract {
                 hyperParameterEndValue,
                 hyperParameterValueIncrement,
                 hyperParameterVertex,
-                value,
                 vertexUnderTest,
                 gradientDelta
             );
         }
     }
 
-    public static <V extends DoubleVertex & ProbabilisticDouble>
-    void testGradientAcrossMultipleHyperParameterValues(DoubleTensor hyperParameterStartValue,
+    public static void testGradientAcrossMultipleHyperParameterValues(DoubleTensor hyperParameterStartValue,
                                                                       DoubleTensor hyperParameterEndValue,
                                                                       double hyperParameterValueIncrement,
-                                                                      V hyperParameterVertex,
-                                                                      DoubleTensor vertexValue,
-                                                                      Probabilistic<DoubleTensor> vertexUnderTest,
+                                                                      DoubleVertex hyperParameterVertex,
+                                                                      Probabilistic<?> vertexUnderTest,
                                                                       double gradientDelta) {
 
         for (DoubleTensor parameterValue = hyperParameterStartValue; parameterValue.scalar() <= hyperParameterEndValue.scalar(); parameterValue.plusInPlace(hyperParameterValueIncrement)) {
             testGradientAtHyperParameterValue(
                 parameterValue,
                 hyperParameterVertex,
-                vertexValue,
                 vertexUnderTest,
                 gradientDelta
             );
         }
     }
 
-    public static <V extends DoubleVertex & ProbabilisticDouble>
-    void testGradientAtHyperParameterValue(DoubleTensor hyperParameterValue,
-                                                         V hyperParameterVertex,
-                                                         DoubleTensor vertexValue,
-                                                         Probabilistic<DoubleTensor> vertexUnderTest,
+    public static void testGradientAtHyperParameterValue(DoubleTensor hyperParameterValue,
+                                                         DoubleVertex hyperParameterVertex,
+                                                         Probabilistic<?> vertexUnderTest,
                                                          double gradientDelta) {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue.minus(gradientDelta));
-        double lnDensityA1 = vertexUnderTest.logProb(vertexValue);
+        double lnDensityA1 = vertexUnderTest.logProbAtValue();
 
         hyperParameterVertex.setAndCascade(hyperParameterValue.plus(gradientDelta));
-        double lnDensityA2 = vertexUnderTest.logProb(vertexValue);
+        double lnDensityA2 = vertexUnderTest.logProbAtValue();
 
-        double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
+        double diffLnDensityApproxExpected = 0.0;
+        if (lnDensityA1 != lnDensityA2) {
+            diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
+        }
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
@@ -207,7 +201,7 @@ public class ProbabilisticDoubleTensorContract {
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
-        assertEquals("Diff ln density problem at " + vertexValue + " hyper param value " + hyperParameterValue,
+        assertEquals("Diff ln density problem at " + vertexUnderTest.getValue() + " hyper param value " + hyperParameterValue,
             diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
     }
 
@@ -278,14 +272,14 @@ public class ProbabilisticDoubleTensorContract {
 
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void sampleMethodMatchesLogProbMethodMultiVariate(V vertexUnderTest,
-                                                                    double from,
-                                                                    double to,
-                                                                    double bucketSize,
-                                                                    double maxError,
-                                                                    int sampleCount,
-                                                                    KeanuRandom random,
-                                                                    double bucketVolume,
-                                                                    boolean isVector) {
+                                                      double from,
+                                                      double to,
+                                                      double bucketSize,
+                                                      double maxError,
+                                                      int sampleCount,
+                                                      KeanuRandom random,
+                                                      double bucketVolume,
+                                                      boolean isVector) {
         double bucketCount = ((to - from) / bucketSize);
         double halfBucket = bucketSize / 2;
 

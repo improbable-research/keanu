@@ -295,7 +295,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, double valueToApply) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, Double valueToApply) {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
@@ -306,7 +306,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return this.duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -357,6 +357,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public double standardDeviation() {
         throw new IllegalStateException("Cannot find the standard deviation of a scalar");
+    }
+
+    @Override
+    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
+        if (this == o) return true;
+        if (!this.hasSameShapeAs(o)) return false;
+        double difference = value - o.scalar();
+        return (Math.abs(difference) <= epsilon);
     }
 
     @Override
@@ -663,6 +671,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor setAllInPlace(double value) {
+        this.value = value;
+        return this;
+    }
+
+    @Override
     public BooleanTensor lessThan(double that) {
         return BooleanTensor.scalar(this.value < that);
     }
@@ -793,6 +807,9 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public String toString() {
-        return "Value: " + value + " Shape: " + Arrays.toString(shape);
+        return "{\n" +
+            "data = [" + value + "]" +
+            "\nshape = " + Arrays.toString(shape) +
+            "\n}";
     }
 }

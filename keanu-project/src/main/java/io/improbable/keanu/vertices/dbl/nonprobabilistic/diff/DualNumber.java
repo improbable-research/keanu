@@ -11,7 +11,15 @@ import org.apache.commons.math3.util.Pair;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class DualNumber {
+import io.improbable.keanu.kotlin.DoubleOperators;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import org.apache.commons.math3.util.Pair;
+
+public class DualNumber implements DoubleOperators<DualNumber> {
 
     public static DualNumber createConstant(DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
@@ -21,7 +29,7 @@ public class DualNumber {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
-    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els){
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els) {
         if (predicate.allTrue()) {
             return new DualNumber(thn.value, thn.getPartialDerivatives());
         } else if (predicate.allFalse()) {
@@ -32,16 +40,21 @@ public class DualNumber {
         }
     }
 
-    public static DualNumber concat(Map<Vertex, DualNumber> dualNumbers, List<DualNumber> toConcat, DoubleVertex[] input, int dimension, DoubleTensor[] dualValues) {
+    public static DualNumber concat(Map<Vertex, DualNumber> dualNumbers,
+                                    List<DualNumber> dualNumbersOfInputs,
+                                    DoubleVertex[] input,
+                                    int dimension,
+                                    DoubleTensor[] dualValues) {
+
         Map<Long, List<DoubleTensor>> dualNumbersToConcat = new HashMap<>();
-        List<Pair<Long, List<Integer>>> vertexIds = findAllShapesWithRespectTo(toConcat);
+        List<Pair<Long, List<Integer>>> vertexIds = findShapesOfVertexWithRespectTo(dualNumbersOfInputs);
 
         for (Pair<Long, List<Integer>> wrtVertex : vertexIds) {
-
             long vertexId = wrtVertex.getFirst();
 
             for (DoubleVertex ofVertex : input) {
-                int[] wrtVertexShape = Arrays.copyOfRange(wrtVertex.getSecond().stream().mapToInt(i->i).toArray(), ofVertex.getValue().getRank(), wrtVertex.getSecond().size());
+                int[] shapeOfVertexWithRespectTo = wrtVertex.getSecond().stream().mapToInt(i -> i).toArray();
+                int[] wrtVertexShape = Arrays.copyOfRange(shapeOfVertexWithRespectTo, ofVertex.getValue().getRank(), wrtVertex.getSecond().size());
                 int[] shape = TensorShape.concat(ofVertex.getShape(), wrtVertexShape);
                 DualNumber dualNumberOf = dualNumbers.get(ofVertex);
 
@@ -52,7 +65,6 @@ public class DualNumber {
                 }
 
             }
-
         }
 
         Map<Long, DoubleTensor> concattedDualNumbers = new HashMap<>();
@@ -62,7 +74,8 @@ public class DualNumber {
             concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
         }
 
-        return new DualNumber(dualValues[0].concat(dimension, Arrays.copyOfRange(dualValues, 1, dualValues.length)), concattedDualNumbers);
+        final DoubleTensor concattedValues = dualValues[0].concat(dimension, Arrays.copyOfRange(dualValues, 1, dualValues.length));
+        return new DualNumber(concattedValues, concattedDualNumbers);
     }
 
     private static DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
@@ -73,6 +86,22 @@ public class DualNumber {
             DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
             return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
         }
+    }
+
+    private static List<Pair<Long, List<Integer>>> findShapesOfVertexWithRespectTo(List<DualNumber> dualNumbers) {
+        List<Pair<Long, List<Integer>>> vertexInfo = new ArrayList<>();
+        Set ids = new HashSet();
+
+        for (DualNumber dualNumber : dualNumbers) {
+            for (Map.Entry<Long, DoubleTensor> entry : dualNumber.getPartialDerivatives().asMap().entrySet()) {
+                if (!ids.contains(entry.getKey())) {
+                    vertexInfo.add(new Pair<>(entry.getKey(), Arrays.stream(entry.getValue().getShape()).boxed().collect(Collectors.toList())));
+                    ids.add(entry.getKey());
+                }
+            }
+        }
+
+        return vertexInfo;
     }
 
     private DoubleTensor value;
@@ -139,13 +168,13 @@ public class DualNumber {
         if (this.partialDerivatives.isEmpty()) {
             thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true, false);
+            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
         }
 
         if (that.partialDerivatives.isEmpty()) {
             thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false, false);
+            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
         }
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
@@ -222,6 +251,11 @@ public class DualNumber {
 
         PartialDerivatives newInf = thisInfBase.add(thisInfExponent);
         return new DualNumber(newValue, newInf);
+    }
+
+    @Override
+    public DualNumber pow(double exponent) {
+        return pow(new DualNumber(DoubleTensor.scalar(exponent), PartialDerivatives.OF_CONSTANT));
     }
 
     public DualNumber plus(DualNumber that) {
