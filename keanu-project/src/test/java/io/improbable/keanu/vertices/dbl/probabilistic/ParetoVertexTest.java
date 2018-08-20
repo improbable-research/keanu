@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
+import java.util.function.Supplier;
 
 import org.apache.commons.math3.distribution.ParetoDistribution;
 import org.junit.Before;
@@ -54,5 +55,21 @@ public class ParetoVertexTest {
         assertEquals(paretoLogDiff.dPdXm, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);
         assertEquals(paretoLogDiff.dPdAlpha, actual.withRespectTo(scaleTensor.getId()).scalar(), 1e-5);
         assertEquals(paretoLogDiff.dPdX, actual.withRespectTo(vertex.getId()).scalar(), 1e-5);
+    }
+
+    @Test
+    public void matchesKnownDerivativeLogDensityOfVector() {
+
+        double[] vector = new double[]{1.1, 1.3, 1.8, 2.5, 5};
+
+        UniformVertex locationTensor = new UniformVertex(0.0, 1.0);
+        locationTensor.setValue(1.0);
+
+        UniformVertex scaleTensor = new UniformVertex(0.0, 2.0);
+        scaleTensor.setValue(1.5);
+
+        Supplier<ParetoVertex> vertexSupplier = () -> new ParetoVertex(locationTensor, scaleTensor);
+
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 }
