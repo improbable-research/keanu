@@ -24,6 +24,17 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     private final DoubleVertex alpha;
     private final DoubleVertex xm;
 
+    /**
+     * Provides a Vertex implementing the Pareto Distribution.
+     *
+     * Requires at least on of location (xm) or scale(alpha) that match a proposed tensor shape
+     * <p>
+     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * @param tensorShape the desired shape of the tensor in this vertex
+     * @param xm          the xm (location) value(s) of the Pareto with either the same tensorShape as specified for this vertex or a scalar
+     * @param alpha       the alpha (scale) value(s) of the Pareto with either the same tensorShape as specified for this vertex or a scalar
+     */
     public ParetoVertex(int[] tensorShape, DoubleVertex xm, DoubleVertex alpha) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xm.getShape(), alpha.getShape());
 
