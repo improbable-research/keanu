@@ -8,11 +8,19 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import static io.improbable.keanu.distributions.dual.Diffs.C;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
+/**
+ * @see <a href="https://en.wikipedia.org/wiki/Dirichlet_distribution">Wikipedia</a>
+ */
 public class Dirichlet implements ContinuousDistribution {
 
     private static final double EPSILON =  0.00001;
     private final DoubleTensor concentration;
 
+    /**
+     * @param concentration a type of numerical parameter of parametric family of probability distributions,
+     *                      sum of values must equal to 1
+     * @return an instance of {@link ContinuousDistribution}
+     */
     public static ContinuousDistribution withParameters(DoubleTensor concentration) {
         return new Dirichlet(concentration);
     }
@@ -31,6 +39,12 @@ public class Dirichlet implements ContinuousDistribution {
         return normalise(gammaSamples);
     }
 
+    /**
+     * @param x {@link DoubleTensor}
+     * @return the log probability
+     * @throws IllegalArgumentException if sum of values in <code>concentration</code> passed to
+     *                                  {@link #withParameters(DoubleTensor concentration)} does not equal to 1
+     */
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         if (Math.abs(x.sum() - 1.0) > EPSILON) {
@@ -58,4 +72,5 @@ public class Dirichlet implements ContinuousDistribution {
         double sum = gammaSamples.sum();
         return gammaSamples.div(sum);
     }
+
 }

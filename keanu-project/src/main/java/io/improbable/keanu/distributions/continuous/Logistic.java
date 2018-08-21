@@ -9,34 +9,40 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.14 page 27"
+ */
 public class Logistic implements ContinuousDistribution {
 
-    private final DoubleTensor mu;
-    private final DoubleTensor s;
+    private final DoubleTensor location;
+    private final DoubleTensor scale;
 
     /**
-     * @param mu     location parameter (any real number)
-     * @param s      scale parameter (b greater than 0)
-     * @return       a new ContinuousDistribution object
+     * @param location shifts the distribution
+     * @param scale    stretches/shrinks the distribution
+     * @return an instance of {@link ContinuousDistribution}
      */
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor s) {
-        return new Logistic(mu, s);
+    public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
+        return new Logistic(location, scale);
     }
 
-    private Logistic(DoubleTensor mu, DoubleTensor s) {
-        this.mu = mu;
-        this.s = s;
+    private Logistic(DoubleTensor location, DoubleTensor scale) {
+        this.location = location;
+        this.scale = scale;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(mu.minus(s));
+        return random.nextDouble(shape).reciprocalInPlace().minusInPlace(1).logInPlace().timesInPlace(location.minus(scale));
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor xMinusAOverB = x.minus(mu).divInPlace(s);
-        final DoubleTensor ln1OverB = s.reciprocal().logInPlace();
+        final DoubleTensor xMinusAOverB = x.minus(location).divInPlace(scale);
+        final DoubleTensor ln1OverB = scale.reciprocal().logInPlace();
 
         return xMinusAOverB.plus(ln1OverB).minusInPlace(
             xMinusAOverB.expInPlace().plusInPlace(1).logInPlace().timesInPlace(2)
@@ -45,20 +51,20 @@ public class Logistic implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor expAOverB = mu.div(s).expInPlace();
-        final DoubleTensor expXOverB = x.div(s).expInPlace();
+        final DoubleTensor expAOverB = location.div(scale).expInPlace();
+        final DoubleTensor expXOverB = x.div(scale).expInPlace();
         final DoubleTensor expPlus = expAOverB.plus(expXOverB);
-        final DoubleTensor bTimesExpAOverB = expAOverB.times(s);
-        final DoubleTensor bTimesExpXOverB = expXOverB.times(s);
+        final DoubleTensor bTimesExpAOverB = expAOverB.times(scale);
+        final DoubleTensor bTimesExpXOverB = expXOverB.times(scale);
 
-        final DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(s.times(expPlus));
+        final DoubleTensor dLogPdmu = expXOverB.minus(expAOverB).divInPlace(scale.times(expPlus));
         final DoubleTensor dLogPdx = expAOverB.minus(expXOverB).divInPlace(bTimesExpAOverB.plus(bTimesExpXOverB));
 
-        final DoubleTensor numeratorPartOne = mu.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
-            mu.times(expAOverB.unaryMinus())
+        final DoubleTensor numeratorPartOne = location.times(expXOverB).plusInPlace(x.times(expAOverB)).plusInPlace(
+            location.times(expAOverB.unaryMinus())
         );
         final DoubleTensor numeratorPartTwo = bTimesExpAOverB.plus(bTimesExpXOverB).minusInPlace(x.times(expXOverB));
-        final DoubleTensor denominator = s.pow(2).timesInPlace(expPlus);
+        final DoubleTensor denominator = scale.pow(2).timesInPlace(expPlus);
 
         final DoubleTensor dLogPds = numeratorPartOne.plus(numeratorPartTwo).divInPlace(denominator).unaryMinusInPlace();
 
@@ -67,4 +73,5 @@ public class Logistic implements ContinuousDistribution {
             .put(S, dLogPds)
             .put(X, dLogPdx);
     }
+
 }

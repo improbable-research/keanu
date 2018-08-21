@@ -6,10 +6,10 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
- * Computer Generation of Statistical Distributions
+ * @see " * Computer Generation of Statistical Distributions
  * by Richard Saucier
  * ARL-TR-2168 March 2000
- * 5.1.8 page 48
+ * 5.1.25 page 38"
  */
 public class Uniform implements ContinuousDistribution {
 
@@ -17,9 +17,9 @@ public class Uniform implements ContinuousDistribution {
     private final DoubleTensor xMax;
 
     /**
-     * @param xMin   minimum x value
-     * @param xMax   maximum x value
-     * @return       a new ContinuousDistribution object
+     * @param xMin minimum value of random variable x
+     * @param xMax maximum value of random variable x
+     * @return an instance of {@link ContinuousDistribution}
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
         return new Uniform(xMin, xMax);
@@ -48,4 +48,5 @@ public class Uniform implements ContinuousDistribution {
     public Diffs dLogProb(DoubleTensor x) {
         throw new UnsupportedOperationException();
     }
+
 }

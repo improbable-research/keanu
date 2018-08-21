@@ -11,35 +11,45 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
- * Computer Generation of Statistical Distributions
+ * @see "Computer Generation of Statistical Distributions
  * by Richard Saucier
  * ARL-TR-2168 March 2000
- * 5.2.8 page 49
+ * 5.2.8 page 49"
  */
 public class Poisson implements DiscreteDistribution {
 
-    private final DoubleTensor mu;
+    private final DoubleTensor rate;
 
-    public static DiscreteDistribution withParameters(DoubleTensor mu) {
-        return new Poisson(mu);
+    /**
+     * @param rate rate of occurrence, must be greater than 0
+     * @return an instance of {@link DiscreteDistribution}
+     */
+    public static DiscreteDistribution withParameters(DoubleTensor rate) {
+        return new Poisson(rate);
     }
 
-    private Poisson(DoubleTensor mu) {
-        this.mu = mu;
+    private Poisson(DoubleTensor rate) {
+        this.rate = rate;
     }
 
-    @Override
-    public IntegerTensor sample(int[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
+     /**
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
+     * @throws IllegalArgumentException if <code>rate</code> passed to {@link #withParameters(DoubleTensor rate)} is less than or equal to 0
+     */
+     @Override
+     public IntegerTensor sample(int[] shape, KeanuRandom random) {
+         Tensor.FlattenedView<Double> muWrapped = rate.getFlattenedView();
 
-        int length = ArrayUtil.prod(shape);
-        int[] samples = new int[length];
-        for (int i = 0; i < length; i++) {
-            samples[i] = sample(muWrapped.getOrScalar(i), random);
-        }
+         int length = ArrayUtil.prod(shape);
+         int[] samples = new int[length];
+         for (int i = 0; i < length; i++) {
+             samples[i] = sample(muWrapped.getOrScalar(i), random);
+         }
 
-        return IntegerTensor.create(samples, shape);
-    }
+         return IntegerTensor.create(samples, shape);
+     }
 
     private static int sample(double mu, KeanuRandom random) {
         if (mu <= 0.) {
@@ -59,7 +69,7 @@ public class Poisson implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
-        Tensor.FlattenedView<Double> muFlattenedView = mu.getFlattenedView();
+        Tensor.FlattenedView<Double> muFlattenedView = rate.getFlattenedView();
         Tensor.FlattenedView<Integer> kFlattenedView = k.getFlattenedView();
 
         double[] result = new double[(int) k.getLength()];
@@ -82,4 +92,5 @@ public class Poisson implements DiscreteDistribution {
         }
         return 0;
     }
+
 }

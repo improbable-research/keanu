@@ -17,30 +17,44 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.11 page 23"
+ */
 public class Gamma implements ContinuousDistribution {
 
     private static final double M_E = 0.577215664901532860606512090082;
-    private final DoubleTensor theta;
-    private final DoubleTensor k;
+
+    private final DoubleTensor scale;
+    private final DoubleTensor distributionShape;
 
     /**
-     * @param theta  scale
-     * @param k      shape
-     * @return       a new ContinuousDistribution object
+     * @param scale             stretches/shrinks the distribution, must be greater than 0
+     * @param distributionShape shape parameter (not to be confused with tensor shape)
+     * @return an instance of {@link ContinuousDistribution}
      */
-    public static ContinuousDistribution withParameters(DoubleTensor theta, DoubleTensor k) {
-        return new Gamma(theta, k);
+    public static ContinuousDistribution withParameters(DoubleTensor scale, DoubleTensor distributionShape) {
+        return new Gamma(scale, distributionShape);
     }
 
-    private Gamma(DoubleTensor theta, DoubleTensor k) {
-        this.theta = theta;
-        this.k = k;
+    private Gamma(DoubleTensor scale, DoubleTensor distributionShape) {
+        this.scale = scale;
+        this.distributionShape = distributionShape;
     }
 
+    /**
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
+     * @throws IllegalArgumentException if <code>scale</code> passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
+     *                                  is less than or equal to 0
+     */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
-        Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
+        Tensor.FlattenedView<Double> thetaWrapped = scale.getFlattenedView();
+        Tensor.FlattenedView<Double> kWrapped = distributionShape.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);
         double[] samples = new double[length];
@@ -91,11 +105,6 @@ public class Gamma implements ContinuousDistribution {
         }
     }
 
-    /**
-     * @param lambda   shape
-     * @param random   source of randomness
-     * @return a random number from the Exponential distribution
-     */
     private static double exponentialSample(double lambda, KeanuRandom random) {
         if (lambda <= 0.0) {
             throw new IllegalArgumentException("Invalid value for b");
@@ -105,23 +114,23 @@ public class Gamma implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor minusXOverTheta = x.div(theta).unaryMinusInPlace();
-        final DoubleTensor kLnTheta = k.times(theta.log());
-        final DoubleTensor xPowKMinus1 = x.pow(k.minus(1));
-        final DoubleTensor lnXToKMinus1 = (xPowKMinus1.divInPlace(k.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
+        final DoubleTensor minusXOverTheta = x.div(scale).unaryMinusInPlace();
+        final DoubleTensor kLnTheta = distributionShape.times(scale.log());
+        final DoubleTensor xPowKMinus1 = x.pow(distributionShape.minus(1));
+        final DoubleTensor lnXToKMinus1 = (xPowKMinus1.divInPlace(distributionShape.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
         return minusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXToKMinus1);
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dLogPdx = k.minus(1.).divInPlace(x).minusInPlace(theta.reciprocal());
-        final DoubleTensor dLogPdtheta = theta.times(k).plusInPlace(x.unaryMinus()).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdx = distributionShape.minus(1.).divInPlace(x).minusInPlace(scale.reciprocal());
+        final DoubleTensor dLogPdtheta = scale.times(distributionShape).plusInPlace(x.unaryMinus()).divInPlace(scale.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dLogPdk = x.log().minusInPlace(scale.log()).minusInPlace(distributionShape.apply(org.apache.commons.math3.special.Gamma::digamma));
 
         return new Diffs()
-        .put(THETA, dLogPdtheta)
-        .put(K, dLogPdk)
-        .put(X, dLogPdx);
+            .put(THETA, dLogPdtheta)
+            .put(K, dLogPdk)
+            .put(X, dLogPdx);
     }
 
 }

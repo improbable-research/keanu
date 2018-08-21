@@ -10,12 +10,23 @@ import static io.improbable.keanu.distributions.dual.Diffs.L;
 import static io.improbable.keanu.distributions.dual.Diffs.S;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
+/**
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier,
+ * ARL-TR-2168 March 2000,
+ * 5.1.3 page 15"
+ */
 public class Cauchy implements ContinuousDistribution {
 
     private static final double NEG_LOG_PI = -Math.log(Math.PI);
     private final DoubleTensor location;
     private final DoubleTensor scale;
 
+    /**
+     * @param location shifts the distribution
+     * @param scale    stretches/shrinks the distribution, must be greater than 0
+     * @return an instance of {@link ContinuousDistribution}
+     */
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
         return new Cauchy(location, scale);
     }
@@ -25,6 +36,13 @@ public class Cauchy implements ContinuousDistribution {
         this.scale = scale;
     }
 
+    /**
+     * @param shape  an integer array describing the shape of the tensors to be sampled
+     * @param random {@link KeanuRandom}
+     * @return an instance of {@link DoubleTensor}
+     * @throws IllegalArgumentException if <code>scale</code> passed to {@link #withParameters(DoubleTensor location, DoubleTensor scale)}
+     *                                  is less than or equal to 0
+     */
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
         if (!scale.greaterThan(0.0).allTrue()) {
@@ -61,4 +79,5 @@ public class Cauchy implements ContinuousDistribution {
             .put(S, dLogPdscale)
             .put(X, dLogPdx);
     }
+
 }

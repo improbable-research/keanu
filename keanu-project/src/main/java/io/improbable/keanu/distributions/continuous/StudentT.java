@@ -14,41 +14,38 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
- * Student T Distribution
- * https://en.wikipedia.org/wiki/Student%27s_t-distribution#Sampling_distribution
+ * @see "Computer Generation of Statistical Distributions
+ * by Richard Saucier
+ * ARL-TR-2168 March 2000
+ * 5.1.23 page 36"
  */
 public class StudentT implements ContinuousDistribution {
 
     private static final double HALF_LOG_PI = log(PI) / 2;
-    private final IntegerTensor v;
+    private final IntegerTensor degreesOfFreedom;
 
     /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
-     * 5.1.23 page 36
-     *
-     * @param v      Degrees of Freedom
-     * @return       a new ContinuousDistribution object
+     * @param degreesOfFreedom number of degrees of freedom
+     * @return an instance of {@link ContinuousDistribution}
      */
-    public static ContinuousDistribution withParameters(IntegerTensor v) {
-        return new StudentT(v);
+    public static ContinuousDistribution withParameters(IntegerTensor degreesOfFreedom) {
+        return new StudentT(degreesOfFreedom);
     }
 
-    private StudentT(IntegerTensor v) {
-        this.v = v;
+    private StudentT(IntegerTensor degreesOfFreedom) {
+        this.degreesOfFreedom = degreesOfFreedom;
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        DoubleTensor chi2Samples = ChiSquared.withParameters(v).sample(shape, random);
-        return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
+        DoubleTensor chi2Samples = ChiSquared.withParameters(degreesOfFreedom).sample(shape, random);
+        return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(degreesOfFreedom.toDouble()).sqrtInPlace());
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor t) {
 
-        DoubleTensor vAsDouble = v.toDouble();
+        DoubleTensor vAsDouble = degreesOfFreedom.toDouble();
         DoubleTensor halfVPlusOne = vAsDouble.plus(1).divInPlace(2);
 
         DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.apply(Gamma::logGamma);
@@ -68,7 +65,7 @@ public class StudentT implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor t) {
-        DoubleTensor vAsDouble = v.toDouble();
+        DoubleTensor vAsDouble = degreesOfFreedom.toDouble();
         DoubleTensor dPdt = t.unaryMinus()
             .timesInPlace(vAsDouble.plus(1.0))
             .divInPlace(
@@ -78,4 +75,5 @@ public class StudentT implements ContinuousDistribution {
         return new Diffs()
             .put(T, dPdt);
     }
+
 }
