@@ -53,7 +53,7 @@ public class Pareto implements ContinuousDistribution {
          * If we've been passed invalid values, then return Negative Infinity for all values, else just return the
          * calculated value
          */
-        if (!xm.greaterThan(0).allTrue() || !alpha.greaterThan(0).allTrue()) {
+        if (!xm.greaterThan(0.0).allTrue() || !alpha.greaterThan(0.0).allTrue()) {
             result = DoubleTensor.create(Double.NEGATIVE_INFINITY, x.getShape());
         } else {
             DoubleTensor invalids = x.getLessThanOrEqualToMask(xm);
