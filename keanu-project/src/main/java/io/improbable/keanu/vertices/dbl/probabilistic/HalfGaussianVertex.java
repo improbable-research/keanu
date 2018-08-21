@@ -11,7 +11,7 @@ public class HalfGaussianVertex extends GaussianVertex {
     private static final double LOG_TWO = Math.log(2);
 
     /**
-     * One sigma that matches a proposed tensor shape of HalfGaussian (a Gaussian with mu = 0 and x >= 0).
+     * One sigma that matches a proposed tensor shape of HalfGaussian (a Gaussian with mu = 0 and non-negative x).
      * <p>
      * If provided parameter is scalar then the proposed shape determines the shape
      *
