@@ -16,10 +16,6 @@ public class Pareto implements ContinuousDistribution {
 
     public static ContinuousDistribution withParameters(DoubleTensor xm, DoubleTensor alpha) {
 
-        if (!xm.greaterThan(0).allTrue() || !alpha.greaterThan(0).allTrue()) {
-            throw new IllegalArgumentException("Pareto Parameters must all be > 0");
-        }
-
         return new Pareto(xm, alpha);
     }
 
@@ -51,11 +47,21 @@ public class Pareto implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        DoubleTensor valids = x.getLessThanMask(xm);
-        DoubleTensor result = alpha.log().plusInPlace(xm.log().timesInPlace(alpha))
-            .minusInPlace(alpha.plus(1.0).timesInPlace(x.log()));
+        DoubleTensor result;
 
-        result.setWithMaskInPlace(valids, Double.NEGATIVE_INFINITY) ;
+        /*
+         * If we've been passed invalid values, then return Negative Infinity for all values, else just return the
+         * calculated value
+         */
+        if (!xm.greaterThan(0).allTrue() || !alpha.greaterThan(0).allTrue()) {
+            result = DoubleTensor.create(Double.NEGATIVE_INFINITY, x.getShape());
+        } else {
+            DoubleTensor invalids = x.getLessThanOrEqualToMask(xm);
+            result = alpha.log().plusInPlace(xm.log().timesInPlace(alpha))
+                .minusInPlace(alpha.plus(1.0).timesInPlace(x.log()));
+
+            result.setWithMaskInPlace(invalids, Double.NEGATIVE_INFINITY);
+        }
 
         return result;
     }
