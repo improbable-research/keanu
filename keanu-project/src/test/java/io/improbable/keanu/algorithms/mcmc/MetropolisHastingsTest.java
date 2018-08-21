@@ -270,7 +270,7 @@ public class MetropolisHastingsTest {
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .stream()
-            .limit(200)
+            .limit(sampleCount)
             .mapToDouble(networkState -> networkState.get(A).scalar())
             .average().getAsDouble();
 
