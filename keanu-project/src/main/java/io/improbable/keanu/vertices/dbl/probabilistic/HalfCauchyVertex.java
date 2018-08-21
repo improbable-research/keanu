@@ -10,7 +10,7 @@ public class HalfCauchyVertex extends CauchyVertex {
     private static final double LOG_TWO = Math.log(2);
 
     /**
-     * One scale that matches a proposed tensor shape of HalfCauchy (Cauchy with location = 0 and x >= 0)
+     * One scale that matches a proposed tensor shape of HalfCauchy (Cauchy with location = 0 and non-negative x)
      * <p>
      * If provided parameter is scalar then the proposed shape determines the shape
      *
