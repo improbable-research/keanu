@@ -810,6 +810,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor slice(int dimension, int[] indices) {
+        INDArray dup = tensor.dup();
+        INDArray[] toConcat = new INDArray[indices.length];
+        int count = 0;
+        for (int index : indices) {
+            toConcat[count] = dup.slice(index, dimension);
+            count++;
+        }
+        return new Nd4jDoubleTensor(Nd4j.concat(dimension, toConcat));
+    }
+
+    @Override
     public DoubleTensor tensorAlongDimension(int index, int... dimension) {
         INDArray dup = tensor.dup();
         INDArray tad = dup.tensorAlongDimension(index, dimension);

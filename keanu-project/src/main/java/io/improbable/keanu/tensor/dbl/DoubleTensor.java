@@ -186,6 +186,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     @Override
     DoubleTensor slice(int dimension, int index);
 
+    DoubleTensor slice(int dimension, int[] index);
+
     DoubleTensor tensorAlongDimension(int index, int... dimension);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);

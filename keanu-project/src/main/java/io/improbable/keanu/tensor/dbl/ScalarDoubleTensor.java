@@ -422,6 +422,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor slice(int dimension, int[] index) {
+        return duplicate();
+    }
+
+    @Override
     public DoubleTensor tensorAlongDimension(int index, int... dimension) {
         return null;
     }

@@ -33,10 +33,14 @@ public class INDArrayShim {
     }
 
     private static void broadcastMultiply(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        execBroadcast(a, b,
-            new BroadcastMulOp(a, b, result, broadcastDimensions)
-        );
+        int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+        if (a.shape().length < b.shape().length) {
+            broadcastMultiply(b, a, b.dup());
+        } else {
+            execBroadcast(a, b,
+                new BroadcastMulOp(a, b, result, broadcastDimensions)
+            );
+        }
     }
 
     public static void divi(INDArray left, INDArray right, INDArray result) {
@@ -48,10 +52,14 @@ public class INDArrayShim {
     }
 
     private static void broadcastDivide(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        execBroadcast(a, b,
-            new BroadcastDivOp(a, b, result, broadcastDimensions)
-        );
+        int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+        if (a.shape().length < b.shape().length) {
+            broadcastDivide(b, a, b.dup());
+        } else {
+            execBroadcast(a, b,
+                new BroadcastDivOp(a, b, result, broadcastDimensions)
+            );
+        }
     }
 
     public static void addi(INDArray left, INDArray right, INDArray result) {
@@ -64,9 +72,13 @@ public class INDArrayShim {
 
     private static void broadcastPlus(INDArray a, INDArray b, INDArray result) {
         int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        execBroadcast(a, b,
-            new BroadcastAddOp(a, b, result, broadcastDimensions)
-        );
+        if (a.shape().length < b.shape().length) {
+            broadcastPlus(b, a, b.dup());
+        } else {
+            execBroadcast(a, b,
+                new BroadcastAddOp(a, b, result, broadcastDimensions)
+            );
+        }
     }
 
     public static void subi(INDArray left, INDArray right, INDArray result) {
@@ -79,9 +91,13 @@ public class INDArrayShim {
 
     private static void broadcastMinus(INDArray a, INDArray b, INDArray result) {
         int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
-        execBroadcast(a, b,
-            new BroadcastSubOp(a, b, result, broadcastDimensions)
-        );
+        if (a.shape().length < b.shape().length) {
+            broadcastMinus(b, a, b.dup());
+        } else {
+            execBroadcast(a, b,
+                new BroadcastSubOp(a, b, result, broadcastDimensions)
+            );
+        }
     }
 
     private static void execBroadcast(INDArray a, INDArray b, BroadcastOp op) {
@@ -89,11 +105,42 @@ public class INDArrayShim {
         Nd4j.getExecutioner().exec(op, executeAlong);
     }
 
-    private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
-        int minRank = Math.min(shapeA.length, shapeB.length);
+    private static int[] getBroadcastDimensions(int[] shapeA, int[] shapeB) {
+        int maxRank = Math.max(shapeA.length, shapeB.length);
+
+        if (shapeA.length == shapeB.length) {
+            // do nuthing
+        } else if (shapeA.length < shapeB.length) {
+            shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
+        } else {
+            shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
+        }
+
         List<Integer> along = new ArrayList<>();
-        for (int i = 0; i < minRank; i++) {
-            if (shapeA[i] == shapeB[i]) {
+
+        for (int i = maxRank - 1; i >= 0; i--) {
+            if (shapeA[i] != shapeB[i]){
+                along.add(i);
+            }
+        }
+        return Ints.toArray(along);
+    }
+
+    private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
+        int maxRank = Math.max(shapeA.length, shapeB.length);
+
+        if (shapeA.length == shapeB.length) {
+            // do nuthing
+        } else if (shapeA.length < shapeB.length) {
+            shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
+        } else {
+            shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
+        }
+
+        List<Integer> along = new ArrayList<>();
+
+        for (int i = maxRank - 1; i >= 0; i--) {
+            if (shapeA[i] == shapeB[i]){
                 along.add(i);
             }
         }

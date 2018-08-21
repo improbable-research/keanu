@@ -193,6 +193,57 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void canBroadcastMultiplyRank4ContainingMatrixAndMatrixUneven() {
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+
+        assertTimesOperationEquals(rank4, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canSuperBroadcast() {
+        DoubleTensor x = Nd4jDoubleTensor.zeros(new int[]{2, 2, 2, 2});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{1, 0, 1, 0}, new int[]{2, 2});
+
+        DoubleTensor diff = x.plus(y);
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0
+        }, new int[]{2, 2, 2, 2});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canSuperBroadcastInPlace() {
+        DoubleTensor x = Nd4jDoubleTensor.zeros(new int[]{2, 2, 2, 2});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{1, 0, 1, 0}, new int[]{2, 2});
+
+        DoubleTensor diff = x.plusInPlace(y);
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0
+        }, new int[]{2, 2, 2, 2});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
     public void canSetAllValues(){
         DoubleTensor rank5 = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
@@ -333,7 +384,6 @@ public class Nd4jDoubleTensorTest {
         }
 
         DoubleTensor answer = DoubleTensor.create(sliced, x.getShape()).permute(1, 0, 2);
-        System.out.println(x.getLength());
         assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, answer.asFlatDoubleArray(), 1e-6);
     }
 
@@ -512,6 +562,14 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
 
         assertArrayEquals(smallerTensor.times(largerTensor).asFlatDoubleArray(), smallerTensor.timesInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimess() {
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
+
+        assertArrayEquals(largerTensor.times(smallerTensor).asFlatDoubleArray(), largerTensor.timesInPlace(smallerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test

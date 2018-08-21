@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
-import com.google.common.collect.ImmutableSet;
+import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,14 +10,6 @@ import org.apache.commons.math3.util.Pair;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
-import io.improbable.keanu.kotlin.DoubleOperators;
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import org.apache.commons.math3.util.Pair;
 
 public class DualNumber implements DoubleOperators<DualNumber> {
 
@@ -63,7 +55,6 @@ public class DualNumber implements DoubleOperators<DualNumber> {
                 } else {
                     dualNumbersToConcat.computeIfAbsent(vertexId, k -> new ArrayList<>()).add(DoubleTensor.zeros(shape));
                 }
-
             }
         }
 
