@@ -26,7 +26,7 @@ public class Pareto implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        DoubleTensor dLogPdx = alpha.plus(1.0).divInPlace(x).timesInPlace(-1.0);
+        DoubleTensor dLogPdx = alpha.plus(1.0).divInPlace(x).unaryMinusInPlace();
         DoubleTensor dLogPdxm = DoubleTensor.zeros(x.getShape()).plusInPlace(alpha).divInPlace(xm);
         DoubleTensor dLogPdalpha = alpha.reciprocal().plusInPlace(xm.log()).minusInPlace(x.log());
 
