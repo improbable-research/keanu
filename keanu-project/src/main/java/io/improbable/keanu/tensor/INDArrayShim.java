@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
-import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.BroadcastOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastAddOp;
