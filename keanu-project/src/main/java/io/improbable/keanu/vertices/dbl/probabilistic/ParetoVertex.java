@@ -21,6 +21,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
+
     private final DoubleVertex scale;
     private final DoubleVertex location;
 

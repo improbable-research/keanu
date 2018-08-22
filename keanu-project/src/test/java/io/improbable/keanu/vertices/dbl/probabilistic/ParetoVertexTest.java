@@ -22,9 +22,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ParetoVertexTest {
-    private KeanuRandom random;
+
     private final double VERTEX_INC = 0.1;
 
+    private KeanuRandom random;
 
     @Before
     public void setup() {
@@ -154,7 +155,8 @@ public class ParetoVertexTest {
 
         /*
          * Note, this value is set low as the Gradient Optimizer seems to struggle with values greater than this - we
-         * should revisit to see if the Optimizer can be Optimzed to deal better with this case.
+         * should revisit with a more configurable Optimiser or a different Optimiser Entirely to see if we can get this
+         * to work for all scale values.
          */
         double trueScale = 0.1;
 
