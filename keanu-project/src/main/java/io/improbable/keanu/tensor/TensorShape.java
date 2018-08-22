@@ -173,37 +173,5 @@ public class TensorShape {
         return newShape;
     }
 
-    public static int[] scalarDimensions(int[] shape) {
-        List<Integer> scalarDimensions = new ArrayList<>();
-        for (int i = 0; i < shape.length; i++) {
-            if (shape[i] == 1) {
-                scalarDimensions.add(i);
-            }
-        }
-        return scalarDimensions.stream().mapToInt(i -> i).toArray();
-    }
-
-    public static int[] nonScalarDimensions(int[] shape) {
-        List<Integer> nonScalarDimensions = new ArrayList<>();
-        for (int i = 0; i < shape.length; i++) {
-            if (shape[i] > 1) {
-                nonScalarDimensions.add(i);
-            }
-        }
-        return nonScalarDimensions.stream().mapToInt(i -> i).toArray();
-    }
-
-    public static int[] removeDimension(int[] shape, int dimensionToRemove) {
-        int[] shapeWithDimensionRemoved = new int[shape.length];
-        int count = 0;
-        for (int i = 0; i < shape.length; i++) {
-            if (i != dimensionToRemove) {
-                shapeWithDimensionRemoved[count] = shape[count];
-                count++;
-            }
-        }
-        return shapeWithDimensionRemoved;
-    }
-
 }
 
