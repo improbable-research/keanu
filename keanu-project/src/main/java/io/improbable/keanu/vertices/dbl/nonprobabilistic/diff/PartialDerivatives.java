@@ -43,17 +43,22 @@ public class PartialDerivatives {
             DoubleTensor elsPartial = elsePartials.get(wrt);
             DoubleTensor broadcastedTrueMask;
             DoubleTensor broadcastedFalseMask;
+            int[] range = TensorShape.dimensionRange(0, thnPartial == null ? elsPartial.getRank() : thnPartial.getRank());
+            int[] permute = TensorShape.concat(
+                Arrays.copyOfRange(range, range.length - 2, range.length),
+                Arrays.copyOfRange(range, 0, range.length - 2)
+            );
 
             DoubleTensor newPartial;
             if (thnPartial == null) {
-                broadcastedFalseMask = DoubleTensor.zeros(elsPartial.getShape()).plusInPlace(falseMask);
+                broadcastedFalseMask = DoubleTensor.zeros(elsPartial.getShape()).plusInPlace(falseMask).permute(permute);
                 newPartial = broadcastedFalseMask.timesInPlace(elsPartial);
             } else if (elsPartial == null) {
-                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
+                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask).permute(permute);
                 newPartial = broadcastedTrueMask.timesInPlace(thnPartial);
             } else {
-                broadcastedFalseMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(falseMask);
-                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask);
+                broadcastedFalseMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(falseMask).permute(permute);
+                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask).permute(permute);
 
                 newPartial = broadcastedTrueMask.timesInPlace(thnPartial)
                     .plusInPlace(broadcastedFalseMask.timesInPlace(elsPartial));
