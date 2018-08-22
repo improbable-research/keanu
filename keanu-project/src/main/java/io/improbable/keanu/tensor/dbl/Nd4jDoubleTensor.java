@@ -555,7 +555,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.plus(that);
         } else {
-            INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jDoubleTensor(INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }
@@ -572,7 +572,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.times(that);
         } else {
-            INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jDoubleTensor(INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }
@@ -589,7 +589,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.div(that);
         } else {
-            INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jDoubleTensor(INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }

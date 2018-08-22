@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
+import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.BroadcastOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastAddOp;
@@ -24,61 +25,61 @@ import java.util.List;
  */
 public class INDArrayShim {
 
-    public static void muli(INDArray left, INDArray right, INDArray result) {
+    public static INDArray muli(INDArray left, INDArray right, INDArray result) {
         if (Arrays.equals(left.shape(), right.shape())) {
-            left.muli(right);
+            return left.muli(right);
         } else {
-            broadcastMultiply(left, right, result);
+            return broadcastMultiply(left, right, result);
         }
     }
 
-    private static void broadcastMultiply(INDArray a, INDArray b, INDArray result) {
+    private static INDArray broadcastMultiply(INDArray a, INDArray b, INDArray result) {
         int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
-            broadcastMultiply(b, a, b.dup());
-        } else {
-            execBroadcast(a, b,
-                new BroadcastMulOp(a, b, result, broadcastDimensions)
-            );
+            return broadcastMultiply(b, a, result);
         }
+        result = a.dup();
+        return execBroadcast(a, b,
+            new BroadcastMulOp(a, b, result, broadcastDimensions)
+        );
     }
 
-    public static void divi(INDArray left, INDArray right, INDArray result) {
+    public static INDArray divi(INDArray left, INDArray right, INDArray result) {
         if (Arrays.equals(left.shape(), right.shape())) {
-            left.divi(right);
+            return left.divi(right);
         } else {
-            broadcastDivide(left, right, result);
+            return broadcastDivide(left, right, result);
         }
     }
 
-    private static void broadcastDivide(INDArray a, INDArray b, INDArray result) {
+    private static INDArray broadcastDivide(INDArray a, INDArray b, INDArray result) {
         int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
-            broadcastDivide(b, a, b.dup());
-        } else {
-            execBroadcast(a, b,
-                new BroadcastDivOp(a, b, result, broadcastDimensions)
-            );
+            return broadcastDivide(b, a, result);
         }
+        result = a.dup();
+        return execBroadcast(a, b,
+            new BroadcastDivOp(a, b, result, broadcastDimensions)
+        );
     }
 
-    public static void addi(INDArray left, INDArray right, INDArray result) {
+    public static INDArray addi(INDArray left, INDArray right, INDArray result) {
         if (Arrays.equals(left.shape(), right.shape())) {
-            left.addi(right);
+            return left.addi(right);
         } else {
-            broadcastPlus(left, right, result);
+            return broadcastPlus(left, right, result);
         }
     }
 
-    private static void broadcastPlus(INDArray a, INDArray b, INDArray result) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
+    private static INDArray broadcastPlus(INDArray a, INDArray b, INDArray result) {
+        int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
-            broadcastPlus(b, a, b.dup());
-        } else {
-            execBroadcast(a, b,
-                new BroadcastAddOp(a, b, result, broadcastDimensions)
-            );
+            return broadcastPlus(b, a, result);
         }
+        result = a.dup();
+        return execBroadcast(a, b,
+            new BroadcastAddOp(a, b, result, broadcastDimensions)
+        );
     }
 
     public static void subi(INDArray left, INDArray right, INDArray result) {
@@ -100,9 +101,9 @@ public class INDArrayShim {
         }
     }
 
-    private static void execBroadcast(INDArray a, INDArray b, BroadcastOp op) {
+    private static INDArray execBroadcast(INDArray a, INDArray b, BroadcastOp op) {
         int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        Nd4j.getExecutioner().exec(op, executeAlong);
+        return Nd4j.getExecutioner().exec(op, executeAlong);
     }
 
     private static int[] getBroadcastDimensions(int[] shapeA, int[] shapeB) {

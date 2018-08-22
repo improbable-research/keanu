@@ -193,23 +193,6 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void canBroadcastMultiplyRank4ContainingMatrixAndMatrixUneven() {
-        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-        }, new int[]{4, 2, 2, 2});
-
-
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-    @Test
     public void canSuperBroadcast() {
         DoubleTensor x = Nd4jDoubleTensor.zeros(new int[]{2, 2, 2, 2});
         DoubleTensor y = Nd4jDoubleTensor.create(new double[]{1, 0, 1, 0}, new int[]{2, 2});
@@ -491,7 +474,27 @@ public class Nd4jDoubleTensorTest {
     }
 
     private void assertTimesInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
-        left.timesInPlace(right);
+        left = left.timesInPlace(right);
+        assertEquals(left, expected);
+    }
+
+    private void assertPlusOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        DoubleTensor actual = left.plus(right);
+        assertEquals(actual, expected);
+    }
+
+    private void assertPlusInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        left = left.plusInPlace(right);
+        assertEquals(left, expected);
+    }
+
+    private void assertDivideOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        DoubleTensor actual = left.plus(right);
+        assertEquals(actual, expected);
+    }
+
+    private void assertDivideInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        left = left.plusInPlace(right);
         assertEquals(left, expected);
     }
 
@@ -579,4 +582,103 @@ public class Nd4jDoubleTensorTest {
 
         assertArrayEquals(smallerTensor.div(largerTensor).asFlatDoubleArray(), smallerTensor.divInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
+
+    @Test
+    public void canBroadcastMultiplyDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+
+        assertTimesOperationEquals(rank4, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastMultiplyDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+
+        assertTimesOperationEquals(matrix, rank4, expected);
+        assertTimesInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canBroadcastPlusDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+        assertPlusOperationEquals(rank4, matrix, expected);
+        assertPlusInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastPlusDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+        assertPlusOperationEquals(matrix, rank4, expected);
+        assertPlusInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canBroadcastDivideDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(10.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+        }, new int[]{4, 2, 2, 2});
+
+        assertDivideOperationEquals(rank4, matrix, expected);
+        assertDivideInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastDivideDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2}).times(10.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+        }, new int[]{4, 2, 2, 2});
+
+        assertDivideOperationEquals(matrix, rank4, expected);
+        assertDivideInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
 }
