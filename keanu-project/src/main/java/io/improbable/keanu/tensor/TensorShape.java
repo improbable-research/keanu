@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class TensorShape {
 
@@ -159,7 +161,7 @@ public class TensorShape {
         if (append) {
             System.arraycopy(lowRankTensorShape, 0, paddedShape, 0, lowRankTensorShape.length);
         } else {
-            System.arraycopy(lowRankTensorShape, 0, paddedShape, lowRankTensorShape.length, lowRankTensorShape.length);
+            System.arraycopy(lowRankTensorShape, 0, paddedShape, paddedShape.length - lowRankTensorShape.length, lowRankTensorShape.length);
         }
 
         return paddedShape;
@@ -170,5 +172,38 @@ public class TensorShape {
         newShape[dimension] = 1;
         return newShape;
     }
+
+    public static int[] scalarDimensions(int[] shape) {
+        List<Integer> scalarDimensions = new ArrayList<>();
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[i] == 1) {
+                scalarDimensions.add(i);
+            }
+        }
+        return scalarDimensions.stream().mapToInt(i -> i).toArray();
+    }
+
+    public static int[] nonScalarDimensions(int[] shape) {
+        List<Integer> nonScalarDimensions = new ArrayList<>();
+        for (int i = 0; i < shape.length; i++) {
+            if (shape[i] > 1) {
+                nonScalarDimensions.add(i);
+            }
+        }
+        return nonScalarDimensions.stream().mapToInt(i -> i).toArray();
+    }
+
+    public static int[] removeDimension(int[] shape, int dimensionToRemove) {
+        int[] shapeWithDimensionRemoved = new int[shape.length];
+        int count = 0;
+        for (int i = 0; i < shape.length; i++) {
+            if (i != dimensionToRemove) {
+                shapeWithDimensionRemoved[count] = shape[count];
+                count++;
+            }
+        }
+        return shapeWithDimensionRemoved;
+    }
+
 }
 
