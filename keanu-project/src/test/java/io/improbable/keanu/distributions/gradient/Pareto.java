@@ -14,13 +14,13 @@ public class Pareto {
     }
 
     public static class Diff {
-        public final double dPdXm;
-        public final double dPdAlpha;
+        public final double dPdLoc;
+        public final double dPdScale;
         public final double dPdX;
 
-        public Diff(double dPdXm, double dPdAlpha, double dPdX) {
-            this.dPdXm = dPdXm;
-            this.dPdAlpha = dPdAlpha;
+        public Diff(double dPdLoc, double dPdScale, double dPdX) {
+            this.dPdLoc = dPdLoc;
+            this.dPdScale = dPdScale;
             this.dPdX = dPdX;
         }
     }

@@ -21,88 +21,86 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
-    private final DoubleVertex alpha;
-    private final DoubleVertex xm;
+    private final DoubleVertex scale;
+    private final DoubleVertex location;
 
     /**
      * Provides a Vertex implementing the Pareto Distribution.
      *
-     * Requires at least on of location (xm) or scale(alpha) that match a proposed tensor shape
-     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
-     * @param xm          the xm (location) value(s) of the Pareto with either the same tensorShape as specified for this vertex or a scalar
-     * @param alpha       the alpha (scale) value(s) of the Pareto with either the same tensorShape as specified for this vertex or a scalar
+     * @param location    the location value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
+     * @param scale       the scale value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      */
-    public ParetoVertex(int[] tensorShape, DoubleVertex xm, DoubleVertex alpha) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xm.getShape(), alpha.getShape());
+    public ParetoVertex(int[] tensorShape, DoubleVertex location, DoubleVertex scale) {
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
-        this.alpha = alpha;
-        this.xm = xm;
-        setParents(xm, alpha);
+        this.scale = scale;
+        this.location = location;
+        setParents(location, scale);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public ParetoVertex(DoubleVertex xm, DoubleVertex alpha) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xm.getShape(), alpha.getShape()), xm, alpha);
+    public ParetoVertex(DoubleVertex location, DoubleVertex scale) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
 
-    public ParetoVertex(double xm, DoubleVertex alpha) {
-        this(new ConstantDoubleVertex(xm), alpha);
+    public ParetoVertex(double location, DoubleVertex scale) {
+        this(new ConstantDoubleVertex(location), scale);
     }
 
-    public ParetoVertex(DoubleVertex xm, double alpha) {
-        this(xm, new ConstantDoubleVertex(alpha));
+    public ParetoVertex(DoubleVertex location, double scale) {
+        this(location, new ConstantDoubleVertex(scale));
     }
 
-    public ParetoVertex(double xm, double alpha) {
-        this(new ConstantDoubleVertex(xm), new ConstantDoubleVertex(alpha));
+    public ParetoVertex(double location, double scale) {
+        this(new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    public ParetoVertex(int[] tensorShape, double xm, DoubleVertex alpha) {
-        this(tensorShape, new ConstantDoubleVertex(xm), alpha);
+    public ParetoVertex(int[] tensorShape, double location, DoubleVertex scale) {
+        this(tensorShape, new ConstantDoubleVertex(location), scale);
     }
 
-    public ParetoVertex(int[] tensorShape, DoubleVertex xm, double alpha) {
-        this(tensorShape, xm, new ConstantDoubleVertex(alpha));
+    public ParetoVertex(int[] tensorShape, DoubleVertex location, double scale) {
+        this(tensorShape, location, new ConstantDoubleVertex(scale));
     }
 
-    public ParetoVertex(int[] tensorShape, double xm, double alpha) {
-        this(tensorShape, new ConstantDoubleVertex(xm), new ConstantDoubleVertex(alpha));
+    public ParetoVertex(int[] tensorShape, double location, double scale) {
+        this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    public DoubleVertex getAlpha() {
-        return alpha;
+    public DoubleVertex getScale() {
+        return scale;
     }
 
-    public DoubleVertex getXm() {
-        return xm;
+    public DoubleVertex getLocation() {
+        return location;
     }
 
     @Override
     public double logProb(DoubleTensor value) {
-        DoubleTensor xmValues = xm.getValue();
-        DoubleTensor alphaValues = alpha.getValue();
+        DoubleTensor locValues = location.getValue();
+        DoubleTensor scaleValues = scale.getValue();
 
-        DoubleTensor logPdfs = Pareto.withParameters(xmValues, alphaValues).logProb(value);
+        DoubleTensor logPdfs = Pareto.withParameters(locValues, scaleValues).logProb(value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        Diffs dlnP = Pareto.withParameters(xm.getValue(), alpha.getValue()).dLogProb(value);
+        Diffs dlnP = Pareto.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdXm,
-                                                             DoubleTensor dLogPdAlpha,
+    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdLoc,
+                                                             DoubleTensor dLogPdScale,
                                                              DoubleTensor dLogPdX) {
 
-        PartialDerivatives dLogPdInputsFromXm = xm.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdXm);
-        PartialDerivatives dLogPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdAlpha);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromXm.add(dLogPdInputsFromAlpha);
+        PartialDerivatives dLogPdInputsFromLoc = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdLoc);
+        PartialDerivatives dLogPdInputsFromScale = scale.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdScale);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromLoc.add(dLogPdInputsFromScale);
 
         if (!this.isObserved()) {
             dLogPdInputs.putWithRespectTo(getId(), dLogPdX.reshape(
@@ -117,7 +115,7 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Pareto.withParameters(xm.getValue(), alpha.getValue()).sample(getShape(), random);
+        return Pareto.withParameters(location.getValue(), scale.getValue()).sample(getShape(), random);
     }
 
     @Override
