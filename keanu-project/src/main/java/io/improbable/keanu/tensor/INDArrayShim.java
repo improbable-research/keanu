@@ -55,7 +55,7 @@ public class INDArrayShim {
     private static INDArray broadcastDivide(INDArray a, INDArray b, INDArray result) {
         int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
-            return broadcastDivide(b, a, result);
+            return broadcastMultiply(b, a.rdiv(1.0), result);
         }
         result = a.dup();
         return execBroadcast(a, b,
@@ -82,20 +82,20 @@ public class INDArrayShim {
         );
     }
 
-    public static void subi(INDArray left, INDArray right, INDArray result) {
+    public static INDArray subi(INDArray left, INDArray right, INDArray result) {
         if (Arrays.equals(left.shape(), right.shape())) {
-            left.subi(right);
+            return left.subi(right);
         } else {
-            broadcastMinus(left, right, result);
+            return broadcastMinus(left, right, result);
         }
     }
 
-    private static void broadcastMinus(INDArray a, INDArray b, INDArray result) {
+    private static INDArray broadcastMinus(INDArray a, INDArray b, INDArray result) {
         int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
-            broadcastMinus(b, a, b.dup());
+            return broadcastPlus(a.neg(), b, b.dup());
         } else {
-            execBroadcast(a, b,
+            return execBroadcast(a, b,
                 new BroadcastSubOp(a, b, result, broadcastDimensions)
             );
         }

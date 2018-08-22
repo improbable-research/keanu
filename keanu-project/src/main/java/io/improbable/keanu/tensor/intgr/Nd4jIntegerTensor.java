@@ -338,7 +338,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.subi(that.scalar());
         } else {
-            INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jIntegerTensor(INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }
@@ -348,7 +348,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.addi(that.scalar());
         } else {
-            INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jIntegerTensor(INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }
@@ -358,7 +358,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.muli(that.scalar());
         } else {
-            INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jIntegerTensor(INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }
@@ -368,7 +368,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.divi(that.scalar());
         } else {
-            INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(result, false));
         }
         INDArrayExtensions.castToInteger(tensor, false);
         return this;

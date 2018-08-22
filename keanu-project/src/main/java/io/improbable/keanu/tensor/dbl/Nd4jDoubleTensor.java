@@ -538,7 +538,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
+            return new Nd4jDoubleTensor(INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor));
         }
         return this;
     }
