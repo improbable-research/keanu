@@ -1,5 +1,9 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.distributions.BaseDistribution;
+import io.improbable.keanu.distributions.IntegerSupport;
+import io.improbable.keanu.distributions.Support;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
 
 import org.nd4j.linalg.util.ArrayUtil;
@@ -81,5 +85,23 @@ public class Poisson implements DiscreteDistribution {
             return Math.exp((k * Math.log(mu)) - sumOfFactorial - mu);
         }
         return 0;
+    }
+
+    @Override
+    public Support<IntegerTensor> getSupport() {
+        return new IntegerSupport(
+            Nd4jIntegerTensor.zeros(mu.getShape()),
+            Nd4jIntegerTensor.create(Integer.MAX_VALUE, mu.getShape()),
+            mu.getShape());
+    }
+
+    @Override
+    public DoubleTensor computeKLDivergence(BaseDistribution q) {
+        if (q instanceof Poisson) {
+            DoubleTensor qMu = ((Poisson) q).mu;
+            return mu.times(mu.div(qMu).logInPlace()).plus(qMu).minus(mu);
+        } else {
+            return DiscreteDistribution.super.computeKLDivergence(q);
+        }
     }
 }

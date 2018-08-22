@@ -1,6 +1,8 @@
 package io.improbable.keanu.distributions.discrete;
 
+import io.improbable.keanu.distributions.BaseDistribution;
 import io.improbable.keanu.distributions.Distribution;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -56,5 +58,22 @@ public class Bernoulli implements Distribution<BooleanTensor> {
         );
 
         return dLogPdp;
+    }
+
+    @Override
+    public DoubleTensor computeKLDivergence(BaseDistribution q) {
+        if (q instanceof Bernoulli) {
+            checkTensorsMatchNonScalarShapeOrAreScalar(this.probTrue.getShape(), ((Bernoulli) q).probTrue.getShape());
+
+            DoubleTensor pPmf = this.probTrue;
+            DoubleTensor qPmf = ((Bernoulli) q).probTrue;
+
+            DoubleTensor pPmfPlusNeg1 = pPmf.unaryMinus().plusInPlace(1.);
+            DoubleTensor qPmfPlusNeg1 = qPmf.unaryMinus().plusInPlace(1.);
+
+            return pPmf.times(pPmf.div(qPmf).logInPlace()).plus(pPmfPlusNeg1.times(pPmfPlusNeg1.div(qPmfPlusNeg1).logInPlace()));
+        } else {
+            return Distribution.super.computeKLDivergence(q);
+        }
     }
 }
