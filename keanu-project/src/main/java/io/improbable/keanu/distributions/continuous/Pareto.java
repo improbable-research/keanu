@@ -15,7 +15,6 @@ public class Pareto implements ContinuousDistribution {
     private final DoubleTensor scale;
 
     public static ContinuousDistribution withParameters(DoubleTensor location, DoubleTensor scale) {
-
         return new Pareto(location, scale);
     }
 
@@ -38,11 +37,8 @@ public class Pareto implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        DoubleTensor result = DoubleTensor.create(1., shape);
-        result = result.minusInPlace(random.nextDouble(shape)).powInPlace(scale.reciprocal()).reciprocal()
-            .timesInPlace(location);
-
-        return result;
+        return random.nextDouble(shape).unaryMinusInPlace().plusInPlace(1.0).powInPlace(scale.reciprocal())
+            .reciprocalInPlace().timesInPlace(location);
     }
 
     @Override
