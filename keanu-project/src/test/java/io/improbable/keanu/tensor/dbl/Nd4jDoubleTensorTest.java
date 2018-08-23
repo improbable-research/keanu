@@ -1,15 +1,11 @@
 package io.improbable.keanu.tensor.dbl;
 
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
-
-import org.junit.Before;
-import org.junit.Test;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 public class Nd4jDoubleTensorTest {
 
@@ -30,6 +26,12 @@ public class Nd4jDoubleTensorTest {
         vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
         rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+    }
+
+    @Test
+    public void canCreateTensorFromScalar() {
+        DoubleTensor result = DoubleTensor.create(5, new int[]{2, 2});
+        System.out.println(result.getShape());
     }
 
     @Test

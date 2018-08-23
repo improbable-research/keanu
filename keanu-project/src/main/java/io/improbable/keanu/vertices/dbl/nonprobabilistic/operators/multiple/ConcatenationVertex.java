@@ -10,7 +10,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -53,11 +52,25 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+
+        //TODO: Make this work.
+        //Wrt self produces an identity matrix, which we can flatten.
+        //Eg a concat of a 2x2 and 2x2 on dimension zero to make a 4x2. Produces a 4x2x4x2.
+        //Flatten this to an 8x8 identity matrix.
+        //If we slice the identity matrix halfway down the rows to make a 4x8.
+        //10000000
+        //01000000
+        //00100000
+        //00010000
+        //Then read downwards along columns we produce the correct results.
+        //Why? I don't know. Oh god.
+
         DoubleTensor value = derivativeOfOutputsWithRespectToSelf.asMap().get(this.getId());
         int[] partialShape = value.getShape();
         int[] rearrange = TensorShape.dimensionRange(0, partialShape.length);
         rearrange[dimension] = 0;
         rearrange[0] = dimension;
+        //Doing a permute of (3, 1, 0, 2) works. Why?!
 
         DoubleTensor permuted = value.permute(rearrange);
         double[] permutedBuffer = permuted.asFlatDoubleArray();
@@ -69,11 +82,13 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             int[] ofWrtShape = TensorShape.concat(Arrays.copyOfRange(value.getShape(), 0, vertex.getValue().getRank()), vertex.getShape());
             int inputSize = (int) (value.getLength() / (value.getShape()[value.getShape().length / 2 + dimension])) * vertex.getShape()[dimension];
             double[] inputsDualNumbers = Arrays.copyOfRange(permutedBuffer, bufferOffset, bufferOffset + inputSize);
+
             DoubleTensor bufferExtracted = DoubleTensor.create(inputsDualNumbers, ofWrtShape);
-            DoubleTensor mask = calculateMask(input, vertex);
-            DoubleTensor unpermuted = bufferExtracted.permute(rearrange);
-            DoubleTensor poo = extractSomeShit(permuted, vertex, input);
-            PartialDerivatives partial = new PartialDerivatives(getId(), poo);
+            //Not currently using the buffer as permute is not producing the correct numbers.
+            //How do we go from wrtSelf to the correct split partials?
+
+            DoubleTensor alongDimension = extractAlongDimension(permuted, vertex, input);
+            PartialDerivatives partial = new PartialDerivatives(getId(), alongDimension);
             concattedPartial.put(vertex, partial);
             bufferOffset += inputSize;
         }
@@ -81,35 +96,19 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         return concattedPartial;
     }
 
-    private DoubleTensor extractSomeShit(DoubleTensor buffer, DoubleVertex input, DoubleVertex[] inputs) {
-        int[] fart = new int[input.getShape()[dimension]];
+    private DoubleTensor extractAlongDimension(DoubleTensor buffer, DoubleVertex input, DoubleVertex[] inputs) {
+        int[] sizeOfInput = new int[input.getShape()[dimension]];
         int count = 0;
         for (int i = 0; i < inputs.length; i++) {
-            if (inputs[0] != input) {
+            if (inputs[i] != input) {
                 count += input.getShape()[dimension];
             } else {
-                fart = TensorShape.dimensionRange(count, count + input.getShape()[dimension]);
+                sizeOfInput = TensorShape.dimensionRange(count, count + input.getShape()[dimension]);
             }
         }
-        DoubleTensor poo = buffer.slice(input.getShape()[dimension], fart);
-        DoubleTensor pooReshaped = poo.reshape(TensorShape.concat(getShape(), input.getShape()));
-        return pooReshaped;
-    }
-
-    private DoubleTensor calculateMask(DoubleVertex[] inputs, DoubleVertex input) {
-        DoubleTensor[] toConcat = new DoubleTensor[inputs.length];
-        int count = 0;
-
-        for (DoubleVertex vertex : inputs) {
-            if (vertex == input) {
-                toConcat[count] = DoubleTensor.ones(vertex.getShape());
-            } else {
-                toConcat[count] = DoubleTensor.zeros(vertex.getShape());
-            }
-            count++;
-        }
-
-        return toConcat[0].concat(dimension, Arrays.copyOfRange(toConcat, 1, toConcat.length));
+        DoubleTensor slice = buffer.slice(input.getShape()[dimension], sizeOfInput);
+        DoubleTensor reshaped = slice.reshape(TensorShape.concat(getShape(), input.getShape()));
+        return reshaped;
     }
 
     @Override
