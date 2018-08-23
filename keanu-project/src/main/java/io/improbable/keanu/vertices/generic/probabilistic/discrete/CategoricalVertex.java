@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -39,13 +40,13 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
 
     @Override
     public T sample(KeanuRandom random) {
-        Categorical<T> categorical = Categorical.withParameters(selectableValues);
+        Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.sample(random);
     }
 
     @Override
     public double logProb(T value) {
-        Categorical<T> categorical = Categorical.withParameters(selectableValues);
+        Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.logProb(value);
     }
 
@@ -54,4 +55,9 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
         return Collections.emptyMap();
     }
 
+    private Map<T, DoubleTensor> selectableValuesMappedToDoubleTensor() {
+        return selectableValues.entrySet()
+            .stream()
+            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
+    }
 }
