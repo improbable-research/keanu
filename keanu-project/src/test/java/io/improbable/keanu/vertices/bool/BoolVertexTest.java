@@ -9,6 +9,8 @@ import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 
 import java.util.Collections;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -97,7 +99,6 @@ public class BoolVertexTest {
     @Test
     public void YouCanSpecifyYourOwnOrderingOfOperations() {
         BernoulliVertex v3 = new BernoulliVertex(0.5);
-        BoolVertex v5 = v1.and(v2.or(v3));
 
         v1.setValue(false);
         v2.setValue(true);
@@ -169,6 +170,15 @@ public class BoolVertexTest {
         boolean[] observation = new boolean[]{true, false, true};
         flip.observe(observation);
         assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+    }
+
+    @Test
+    public void canObserveTensor() {
+        BoolVertex flip = new BernoulliVertex(0.5);
+        BooleanTensor observation = BooleanTensor.create(new boolean[]{true, false, true, false}, new int[]{2, 2});
+        flip.observe(observation);
+        assertArrayEquals(observation.asFlatArray(), flip.getValue().asFlatArray());
+        assertArrayEquals(flip.getShape(), observation.getShape());
     }
 
     @Test
