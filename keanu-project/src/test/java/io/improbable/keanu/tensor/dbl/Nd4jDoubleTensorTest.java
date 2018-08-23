@@ -455,4 +455,5 @@ public class Nd4jDoubleTensorTest {
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
     }
+
 }
