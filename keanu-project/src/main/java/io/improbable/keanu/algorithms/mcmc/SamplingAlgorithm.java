@@ -8,20 +8,23 @@ import io.improbable.keanu.network.NetworkState;
 public interface SamplingAlgorithm {
 
     /**
-     * Same effect as a sample but the result isn't saved or returned.
+     * Move forward the state of the Sampling Algorithm by a single step.
      */
     void step();
 
     /**
-     * Takes a sample with the algorithm and saves it in the supplied map
+     * Takes a sample with the algorithm and saves it in the supplied map.  Repeated calls to this function will return
+     * the same values without an intermediary call to 'step()'
      *
      * @param samples map to store sampled vertex values
      */
     void sample(Map<Long, List<?>> samples);
 
     /**
-     * @return a network state that represents the value of vertices at the
-     * end of the algorithm step
+     * Takes a sample with the algorithm and returns the state of the network for that sample.  Repeated calls to this
+     * function will return the same values without an intermediary call to 'step()'
+     *
+     * @return a network state that represents the current state of the algorithm.
      */
     NetworkState sample();
 }
