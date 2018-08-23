@@ -1,6 +1,8 @@
 package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
+import io.improbable.keanu.distributions.IntegerSupport;
+import io.improbable.keanu.distributions.Support;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -39,5 +41,10 @@ public class UniformInt implements DiscreteDistribution {
         logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(xDouble.getLessThanMask(minBound), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
+    }
+
+    @Override
+    public Support<IntegerTensor> getSupport() {
+        return new IntegerSupport(xMin, xMax, xMin.getShape());
     }
 }

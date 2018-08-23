@@ -99,7 +99,7 @@ public class Poisson implements DiscreteDistribution {
     public DoubleTensor computeKLDivergence(BaseDistribution q) {
         if (q instanceof Poisson) {
             DoubleTensor qMu = ((Poisson) q).mu;
-            return mu.times(mu.div(qMu).logInPlace()).plus(qMu).minus(mu);
+            return mu.times(mu.div(qMu).logInPlace()).plusInPlace(qMu).minusInPlace(mu);
         } else {
             return DiscreteDistribution.super.computeKLDivergence(q);
         }

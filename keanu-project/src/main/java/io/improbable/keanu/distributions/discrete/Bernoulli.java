@@ -63,15 +63,13 @@ public class Bernoulli implements Distribution<BooleanTensor> {
     @Override
     public DoubleTensor computeKLDivergence(BaseDistribution q) {
         if (q instanceof Bernoulli) {
-            checkTensorsMatchNonScalarShapeOrAreScalar(this.probTrue.getShape(), ((Bernoulli) q).probTrue.getShape());
-
             DoubleTensor pPmf = this.probTrue;
             DoubleTensor qPmf = ((Bernoulli) q).probTrue;
 
             DoubleTensor pPmfPlusNeg1 = pPmf.unaryMinus().plusInPlace(1.);
             DoubleTensor qPmfPlusNeg1 = qPmf.unaryMinus().plusInPlace(1.);
 
-            return pPmf.times(pPmf.div(qPmf).logInPlace()).plus(pPmfPlusNeg1.times(pPmfPlusNeg1.div(qPmfPlusNeg1).logInPlace()));
+            return pPmf.times(pPmf.div(qPmf).logInPlace()).plusInPlace(pPmfPlusNeg1.times(pPmfPlusNeg1.div(qPmfPlusNeg1).logInPlace()));
         } else {
             return Distribution.super.computeKLDivergence(q);
         }
