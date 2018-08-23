@@ -324,6 +324,14 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
+    public void doesCompareGreaterThanOrEqualScalarTensor() {
+        IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        BooleanTensor result = matrix.greaterThanOrEqual(Nd4jIntegerTensor.scalar(3));
+        Boolean[] expected = new Boolean[]{false, false, true, true};
+        assertArrayEquals(expected, result.asFlatArray());
+    }
+
+    @Test
     public void canBroadcastAdd() {
         IntegerTensor x = Nd4jIntegerTensor.create(new int[]{1, 2, 3}, new int[]{3, 1});
         IntegerTensor s = Nd4jIntegerTensor.create(new int[]{

@@ -1,17 +1,16 @@
 package io.improbable.keanu.tensor.dbl;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import static junit.framework.TestCase.assertTrue;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class Nd4jDoubleTensorTest {
 
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
-    Nd4jDoubleTensor matrixC;
     Nd4jDoubleTensor scalarA;
     Nd4jDoubleTensor vectorA;
     Nd4jDoubleTensor vectorB;
@@ -21,17 +20,10 @@ public class Nd4jDoubleTensorTest {
     public void setup() {
         matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        matrixC = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, new int[]{4, 4});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
         vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
         rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
-    }
-
-    @Test
-    public void canCreateTensorFromScalar() {
-        DoubleTensor result = DoubleTensor.create(5, new int[]{2, 2});
-        System.out.println(result.getShape());
     }
 
     @Test
@@ -580,149 +572,10 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimess() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
-
-        assertArrayEquals(largerTensor.times(smallerTensor).asFlatDoubleArray(), largerTensor.timesInPlace(smallerTensor).asFlatDoubleArray(), 1e-6);
-    }
-
-    @Test
     public void smallerTensorDivInPlaceLargerTensorBehavesSameAsDiv() {
         DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
         DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
 
         assertArrayEquals(smallerTensor.div(largerTensor).asFlatDoubleArray(), smallerTensor.divInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
-
-    @Test
-    public void canBroadcastMultiplyDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-        }, new int[]{4, 2, 2, 2});
-
-
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-    @Test
-    public void canBroadcastMultiplyDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-        }, new int[]{4, 2, 2, 2});
-
-
-        assertTimesOperationEquals(matrix, rank4, expected);
-        assertTimesInPlaceOperationEquals(matrix, rank4, expected);
-    }
-
-    @Test
-    public void canBroadcastPlusDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2});
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-        }, new int[]{4, 2, 2, 2});
-
-        assertPlusOperationEquals(rank4, matrix, expected);
-        assertPlusInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-    @Test
-    public void canBroadcastPlusDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2});
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-            1, 2, 3, 4, 1, 2, 3, 4,
-        }, new int[]{4, 2, 2, 2});
-
-        assertPlusOperationEquals(matrix, rank4, expected);
-        assertPlusInPlaceOperationEquals(matrix, rank4, expected);
-    }
-
-    @Test
-    public void canBroadcastDivideDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(10.);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-        }, new int[]{4, 2, 2, 2});
-
-        assertDivideOperationEquals(rank4, matrix, expected);
-        assertDivideInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-    @Test
-    public void canBroadcastDivideDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(10.);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-        }, new int[]{4, 2, 2, 2});
-
-        assertDivideOperationEquals(matrix, rank4, expected);
-        assertDivideInPlaceOperationEquals(matrix, rank4, expected);
-    }
-
-    @Test
-    public void canBroadcastMinusDifferentRankedTensorsBigToSmall() {
-        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(5.);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1
-        }, new int[]{4, 2, 2, 2});
-
-        assertMinusOperationEquals(rank4, matrix, expected);
-        assertMinusInPlaceOperationEquals(rank4, matrix, expected);
-    }
-
-    @Test
-    public void canBroadcastMinusDifferentRankedTensorsSmallToBig() {
-        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(5.);
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1
-        }, new int[]{4, 2, 2, 2});
-
-        assertMinusOperationEquals(matrix, rank4, expected);
-        assertMinusInPlaceOperationEquals(matrix, rank4, expected);
-    }
-
 }

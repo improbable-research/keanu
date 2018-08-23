@@ -428,7 +428,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor tensorAlongDimension(int index, int... dimension) {
-        return null;
+        return duplicate();
     }
 
     @Override

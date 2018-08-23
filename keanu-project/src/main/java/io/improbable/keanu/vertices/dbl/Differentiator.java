@@ -127,7 +127,6 @@ public class Differentiator {
         return ofWrt;
     }
 
-    //TODO: move this into the PartialDerivative multiply
     public static PartialDerivatives reshapeReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary, DoubleTensor secondary) {
         Map<Long, DoubleTensor> reshapedPartials = new HashMap<>();
 

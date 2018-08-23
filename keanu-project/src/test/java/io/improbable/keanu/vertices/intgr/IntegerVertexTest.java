@@ -7,6 +7,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.Function;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -86,6 +91,16 @@ public class IntegerVertexTest {
         int[] observation = new int[]{1, 2, 3};
         binomialVertex.observe(observation);
         assertArrayEquals(observation, binomialVertex.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void canObserveTensor() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        IntegerTensor observation = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        binomialVertex.observe(observation);
+        assertArrayEquals(observation.asFlatIntegerArray(), binomialVertex.getValue().asFlatIntegerArray());
+        assertArrayEquals(observation.getShape(), binomialVertex.getShape());
+
     }
 
     @Test

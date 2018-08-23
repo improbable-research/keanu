@@ -166,39 +166,6 @@ public class ConcatenationVertexTest {
     }
 
     @Test
-    public void canConcatenateSimpleAutoDiffForwardNoSharedParents() {
-        DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(5, new int[]{2, 2}));
-
-        DoubleVertex b = new UniformVertex(0, 10);
-        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
-
-        DoubleVertex c = new UniformVertex(0, 10);
-        c.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
-
-        DoubleVertex d = new UniformVertex(0, 10);
-        d.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
-
-        DoubleVertex e = a.times(b);
-        DoubleVertex f = c.plus(d);
-
-        ConcatenationVertex concat = new ConcatenationVertex(0, e, f);
-
-        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, Arrays.asList(a, b, c, d));
-        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(concat, ImmutableSet.of(a, b, c, d));
-
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, backward.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, backward.withRespectTo(c).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, backward.withRespectTo(d).getShape());
-
-        Assert.assertArrayEquals(forward.withRespectTo(a).asFlatDoubleArray(), backward.withRespectTo(a).asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(forward.withRespectTo(b).asFlatDoubleArray(), backward.withRespectTo(b).asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(forward.withRespectTo(c).asFlatDoubleArray(), backward.withRespectTo(c).asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(forward.withRespectTo(d).asFlatDoubleArray(), backward.withRespectTo(d).asFlatDoubleArray(), 1e-6);
-    }
-
-    @Test
     public void canConcatenateSimpleAutoDiffForwardNoSharedParentsDimensionOne() {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(DoubleTensor.create(new double[]{5}, 2, 2));
