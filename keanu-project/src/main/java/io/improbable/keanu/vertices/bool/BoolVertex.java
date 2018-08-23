@@ -81,6 +81,10 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         super.observe(BooleanTensor.create(values));
     }
 
+    public void observe(BooleanTensor value) {
+        super.observe(value);
+    }
+
     public boolean getValue(int... index) {
         return getValue().getValue(index);
     }

@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbl;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
@@ -14,6 +16,15 @@ public class DoubleVertexTest {
         double[] observation = new double[]{1, 2, 3};
         gaussianVertex.observe(observation);
         assertArrayEquals(observation, gaussianVertex.getValue().asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canObserveTensor() {
+        DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
+        DoubleTensor observation = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+        gaussianVertex.observe(observation);
+        assertArrayEquals(observation.asFlatDoubleArray(), gaussianVertex.getValue().asFlatDoubleArray(), 0.0);
+        assertArrayEquals(observation.getShape(), gaussianVertex.getShape());
     }
 
     @Test
