@@ -1,5 +1,17 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+
+import org.apache.commons.math3.distribution.CauchyDistribution;
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -7,17 +19,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.distribution.CauchyDistribution;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertEquals;
 
 public class CauchyVertexTest {
 
@@ -109,7 +110,7 @@ public class CauchyVertexTest {
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
             Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(1.5),
+            Nd4jDoubleTensor.scalar(3.0),
             0.1,
             uniformA,
             cauchy,

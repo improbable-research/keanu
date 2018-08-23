@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -445,5 +446,13 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
 
         assertArrayEquals(smallerTensor.div(largerTensor).asFlatDoubleArray(), smallerTensor.divInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void doesCompareGreaterThanOrEqualScalarTensor() {
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new int[]{2, 2});
+        BooleanTensor result = matrix.greaterThanOrEqual(Nd4jDoubleTensor.scalar(3.));
+        Boolean[] expected = new Boolean[]{false, false, true, true};
+        assertArrayEquals(expected, result.asFlatArray());
     }
 }
