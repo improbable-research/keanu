@@ -65,6 +65,10 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         //Then read downwards along columns we produce the correct results.
         //Why? I don't know. Oh god.
 
+        //If we concat along dimension 1. And do a permute of (1, 0, 3, 2).
+        //And then repeat the algorithm above.
+        //Our answer is so so close. But one 1 is in the wrong place.
+
         DoubleTensor value = derivativeOfOutputsWithRespectToSelf.asMap().get(this.getId());
         int[] partialShape = value.getShape();
         int[] rearrange = TensorShape.dimensionRange(0, partialShape.length);
