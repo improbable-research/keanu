@@ -61,16 +61,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor linspace(double start, double end, int numberOfPoints) {
-        return new Nd4jDoubleTensor(Nd4j.linspace(start, end, numberOfPoints));
+        return new Nd4jDoubleTensor(TypedINDArrayFactory.linspace(start, end, numberOfPoints, BUFFER_TYPE));
     }
 
     public static Nd4jDoubleTensor arange(double start, double end) {
-        return new Nd4jDoubleTensor(Nd4j.arange(start, end));
+        return new Nd4jDoubleTensor(TypedINDArrayFactory.arange(start, end, BUFFER_TYPE));
     }
 
     public static Nd4jDoubleTensor arange(double start, double end, double stepSize) {
         double stepCount = Math.ceil((end - start) / stepSize);
-        INDArray arangeWithStep = Nd4j.arange(0, stepCount).muli(stepSize).addi(start);
+        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount, BUFFER_TYPE).muli(stepSize).addi(start);
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
@@ -904,7 +904,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         INDArray mask;
         if (value.isScalar()) {
-            mask = tensor.gt(value.scalar());
+            mask = tensor.gte(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();

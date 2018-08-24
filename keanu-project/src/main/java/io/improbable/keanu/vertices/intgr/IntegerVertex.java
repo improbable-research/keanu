@@ -180,6 +180,10 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         super.observe(IntegerTensor.create(values));
     }
 
+    public void observe(IntegerTensor value) {
+        super.observe(value);
+    }
+
     public int getValue(int... index) {
         return getValue().getValue(index);
     }

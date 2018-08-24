@@ -473,7 +473,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         INDArray mask;
         if (value.isScalar()) {
-            mask = tensor.gt(value.scalar());
+            mask = tensor.gte(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();

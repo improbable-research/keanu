@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.distributions.discrete.UniformInt;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -75,16 +76,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     @Override
     public double logProb(IntegerTensor value) {
-
-        DoubleTensor maxBound = max.getValue().toDouble();
-        DoubleTensor minBound = min.getValue().toDouble();
-        DoubleTensor x = value.toDouble();
-
-        DoubleTensor logOfWithinBounds = maxBound.minus(minBound).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanMask(maxBound), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getLessThanOrEqualToMask(minBound), Double.NEGATIVE_INFINITY);
-
-        return logOfWithinBounds.sum();
+        return UniformInt.withParameters(min.getValue(), max.getValue()).logProb(value).sum();
     }
 
     @Override
@@ -94,11 +86,6 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-
-        DoubleTensor minDouble = min.getValue().toDouble();
-        DoubleTensor delta = max.getValue().toDouble().minus(minDouble);
-        DoubleTensor randoms = random.nextDouble(getShape());
-
-        return delta.timesInPlace(randoms).plusInPlace(minDouble).toInteger();
+        return UniformInt.withParameters(min.getValue(), max.getValue()).sample(getShape(), random);
     }
 }
