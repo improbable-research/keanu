@@ -141,4 +141,13 @@ public class IntegerVertexTest {
         assertEquals(1, (long) binomialVertex.take(0, 0).getValue().scalar());
     }
 
+    @Test
+    public void canReshape() {
+        IntegerVertex binomialVertex = new BinomialVertex(0, 1);
+        binomialVertex.setAndCascade(IntegerTensor.ones(2, 2));
+        assertArrayEquals(binomialVertex.getShape(), new int[]{2, 2});
+        IntegerVertex reshaped = binomialVertex.reshape(4, 1);
+        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+    }
+
 }
