@@ -26,6 +26,14 @@ public interface BooleanTensor extends Tensor<Boolean> {
         return new SimpleBooleanTensor(shape);
     }
 
+    static BooleanTensor trues(int... shape) {
+        return new SimpleBooleanTensor(true, shape);
+    }
+
+    static BooleanTensor falses(int... shape) {
+        return new SimpleBooleanTensor(false, shape);
+    }
+
     @Override
     BooleanTensor reshape(int... newShape);
 

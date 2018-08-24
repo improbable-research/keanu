@@ -21,11 +21,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.Inte
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.*;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
@@ -131,6 +127,9 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSliceVertex(this, dimension, index);
     }
 
+    public IntegerVertex reshape(int... proposedShape) {
+        return new IntegerReshapeVertex(this, proposedShape);
+    }
 
     public BoolVertex equalTo(IntegerVertex rhs) {
         return new EqualsVertex<>(this, rhs);
