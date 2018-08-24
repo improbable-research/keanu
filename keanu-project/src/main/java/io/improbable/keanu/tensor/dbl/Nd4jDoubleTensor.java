@@ -538,12 +538,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
 
-     /**
+    /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
      * Otherwise return <i>this</i>.
@@ -555,12 +558,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.plus(that);
         } else {
-            INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
 
-     /**
+    /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
      * Otherwise return <i>this</i>.
@@ -572,12 +578,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.times(that);
         } else {
-            INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
 
-     /**
+    /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
      * Otherwise return <i>this</i>.
@@ -589,7 +598,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.div(that);
         } else {
-            INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }

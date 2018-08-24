@@ -159,7 +159,7 @@ public class TensorShape {
         if (append) {
             System.arraycopy(lowRankTensorShape, 0, paddedShape, 0, lowRankTensorShape.length);
         } else {
-            System.arraycopy(lowRankTensorShape, 0, paddedShape, lowRankTensorShape.length, lowRankTensorShape.length);
+            System.arraycopy(lowRankTensorShape, 0, paddedShape, paddedShape.length - lowRankTensorShape.length, lowRankTensorShape.length);
         }
 
         return paddedShape;
@@ -170,5 +170,6 @@ public class TensorShape {
         newShape[dimension] = 1;
         return newShape;
     }
+
 }
 
