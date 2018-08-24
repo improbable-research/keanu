@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.distributions.Distribution;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import static java.lang.Math.pow;
@@ -119,9 +120,27 @@ public class Gamma implements ContinuousDistribution {
         final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
 
         return new Diffs()
-        .put(THETA, dLogPdtheta)
-        .put(K, dLogPdk)
-        .put(X, dLogPdx);
+            .put(THETA, dLogPdtheta)
+            .put(K, dLogPdk)
+            .put(X, dLogPdx);
     }
 
+    @Override
+    public DoubleTensor computeKLDivergence(Distribution<DoubleTensor> q) {
+        if (q instanceof Gamma) {
+            DoubleTensor qK = ((Gamma) q).k;
+            DoubleTensor qTheta = ((Gamma) q).theta;
+
+            DoubleTensor kDiffTimesDigammaK = k.minus(qK).timesInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+
+            return kDiffTimesDigammaK
+                .plusInPlace(qK.apply(org.apache.commons.math3.special.Gamma::digamma))
+                .minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma))
+                .plusInPlace(qK.times(theta.log().unaryMinusInPlace()))
+                .minusInPlace(qK.times(qTheta.log().unaryMinusInPlace()))
+                .plusInPlace(k.times(theta.div(qTheta).minusInPlace(1.)));
+        } else {
+            return ContinuousDistribution.super.computeKLDivergence(q);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
+import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -57,5 +58,35 @@ public class Dirichlet implements ContinuousDistribution {
     private DoubleTensor normalise(DoubleTensor gammaSamples) {
         double sum = gammaSamples.sum();
         return gammaSamples.div(sum);
+    }
+
+    @Override
+    public DoubleTensor computeKLDivergence(Distribution<DoubleTensor> q) {
+        if (q instanceof Dirichlet) {
+            DoubleTensor qConcentration = ((Dirichlet) q).concentration;
+
+            DoubleTensor concentrationDiff = qConcentration.minus(concentration);
+
+            DoubleTensor digammaPConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::digamma);
+            DoubleTensor digammaSumP = concentration.sum(-1).applyInPlace(org.apache.commons.math3.special.Gamma::digamma);
+            DoubleTensor digammaDiff = digammaPConcentration.minusInPlace(digammaSumP);
+
+            return concentrationDiff
+                .timesInPlace(digammaDiff)
+                .sum(-1)
+                .minusInPlace(logBetaX(concentration))
+                .plusInPlace(logBetaX(qConcentration));
+        } else {
+            return ContinuousDistribution.super.computeKLDivergence(q);
+        }
+    }
+
+    private DoubleTensor logBetaX(DoubleTensor x) {
+        DoubleTensor logProdGammaX = x.sum(-1).applyInPlace(org.apache.commons.math3.special.Gamma::logGamma);
+
+        DoubleTensor sumX = x.sum(-1);
+        DoubleTensor logGammaSumX = sumX.applyInPlace(org.apache.commons.math3.special.Gamma::logGamma);
+
+        return logProdGammaX.minusInPlace(logGammaSumX);
     }
 }
