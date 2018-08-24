@@ -14,7 +14,7 @@ public interface SamplingAlgorithm {
 
     /**
      * Takes a sample with the algorithm and saves it in the supplied map (creating a new entry in the list if the
-     * Vertex already exists.
+     * Vertex already exists).
      *
      * @param samples map to store sampled vertex values
      */
