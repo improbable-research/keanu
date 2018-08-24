@@ -25,7 +25,8 @@ import java.util.List;
  * To work around another issue in ND4J where you cannot broadcast
  * a higher rank tensor onto a lower rank tensor, the shim broadcast operations
  * ensure the higher rank tensor is always being operated on. In the case of
- * subtract and minus, this requires a small change in the logic, as A - B != B - A.
+ * subtract and minus, this requires a small change in the logic, as A - B != B - A and
+ * A / B != B / A.
  */
 public class INDArrayShim {
 
