@@ -41,13 +41,13 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     @Override
     public T sample(KeanuRandom random) {
         Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
-        return categorical.sample(random);
+        return categorical.sample(getShape(), random);
     }
 
     @Override
     public double logProb(T value) {
         Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
-        return categorical.logProb(value);
+        return categorical.logProb(value).sum();
     }
 
     @Override

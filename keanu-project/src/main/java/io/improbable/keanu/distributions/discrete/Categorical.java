@@ -2,10 +2,11 @@ package io.improbable.keanu.distributions.discrete;
 
 import java.util.Map;
 
+import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Categorical<T> {
+public class Categorical<T> implements Distribution<T> {
 
     private final Map<T, DoubleTensor> selectableValues;
 
@@ -17,7 +18,7 @@ public class Categorical<T> {
         this.selectableValues = selectableValues;
     }
 
-    public T sample(KeanuRandom random) {
+    public T sample(int[] shape, KeanuRandom random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;
@@ -42,13 +43,13 @@ public class Categorical<T> {
         return value;
     }
 
-    public double logProb(T x) {
+    public DoubleTensor logProb(T x) {
         double sumOfProbabilities = getSumOfProbabilities();
         if (sumOfProbabilities == 0.0) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
         final double probability = selectableValues.get(x).scalar() / sumOfProbabilities;
-        return Math.log(probability);
+        return DoubleTensor.scalar(Math.log(probability));
     }
 
     private double getSumOfProbabilities() {
