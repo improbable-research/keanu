@@ -538,7 +538,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            return new Nd4jDoubleTensor(INDArrayShim.subi(tensor, unsafeGetNd4J(that)));
+            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
@@ -555,7 +558,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.plus(that);
         } else {
-            return new Nd4jDoubleTensor(INDArrayShim.addi(tensor, unsafeGetNd4J(that)));
+            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
@@ -572,7 +578,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.times(that);
         } else {
-            return new Nd4jDoubleTensor(INDArrayShim.muli(tensor, unsafeGetNd4J(that)));
+            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
@@ -589,7 +598,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.div(that);
         } else {
-            return new Nd4jDoubleTensor(INDArrayShim.divi(tensor, unsafeGetNd4J(that)));
+            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }

@@ -21,6 +21,11 @@ import java.util.List;
  * Until this is fixed in the ND4J codebase, these methods can be
  * used to work around the issue. The need for this should be
  * reevaluated each time the ND4J dependency is updated.
+ *
+ * To work around another issue in ND4J where you cannot broadcast
+ * a higher rank tensor onto a lower rank tensor, the shim broadcast operations
+ * ensure the higher rank tensor is always being operated on. In the case of
+ * subtract and minus, this requires a small change in the logic, as A - B != B - A.
  */
 public class INDArrayShim {
 
@@ -33,13 +38,14 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastMultiply(INDArray a, INDArray b) {
-        int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
             return broadcastMultiply(b, a);
+        } else {
+            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+            return execBroadcast(a, b,
+                new BroadcastMulOp(a, b, a.dup(), broadcastDimensions)
+            );
         }
-        return execBroadcast(a, b,
-            new BroadcastMulOp(a, b, a.dup(), broadcastDimensions)
-        );
     }
 
     public static INDArray divi(INDArray left, INDArray right) {
@@ -51,13 +57,14 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastDivide(INDArray a, INDArray b) {
-        int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
             return broadcastMultiply(b, a.rdiv(1.0));
+        } else {
+            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+            return execBroadcast(a, b,
+                new BroadcastDivOp(a, b, a.dup(), broadcastDimensions)
+            );
         }
-        return execBroadcast(a, b,
-            new BroadcastDivOp(a, b, a.dup(), broadcastDimensions)
-        );
     }
 
     public static INDArray addi(INDArray left, INDArray right) {
@@ -69,13 +76,14 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastPlus(INDArray a, INDArray b) {
-        int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
             return broadcastPlus(b, a);
+        } else {
+            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+            return execBroadcast(a, b,
+                new BroadcastAddOp(a, b, a.dup(), broadcastDimensions)
+            );
         }
-        return execBroadcast(a, b,
-            new BroadcastAddOp(a, b, a.dup(), broadcastDimensions)
-        );
     }
 
     public static INDArray subi(INDArray left, INDArray right) {
@@ -87,10 +95,10 @@ public class INDArrayShim {
     }
 
     private static INDArray broadcastMinus(INDArray a, INDArray b) {
-        int[] broadcastDimensions = Shape.getBroadcastDimensions(a.shape(), b.shape());
         if (a.shape().length < b.shape().length) {
             return broadcastPlus(a.neg(), b);
         } else {
+            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
             return execBroadcast(a, b,
                 new BroadcastSubOp(a, b, a.dup(), broadcastDimensions)
             );
