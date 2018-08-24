@@ -378,7 +378,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             tensor.divi(that.scalar());
         } else {
             INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
-            return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(result, false));
+            if (result != tensor) {
+                return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(result, false));
+            }
         }
         INDArrayExtensions.castToInteger(tensor, false);
         return this;

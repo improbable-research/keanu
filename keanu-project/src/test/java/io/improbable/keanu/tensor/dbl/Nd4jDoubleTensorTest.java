@@ -12,7 +12,6 @@ public class Nd4jDoubleTensorTest {
 
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
-    Nd4jDoubleTensor matrixC;
     Nd4jDoubleTensor scalarA;
     Nd4jDoubleTensor vectorA;
     Nd4jDoubleTensor vectorB;
@@ -22,7 +21,6 @@ public class Nd4jDoubleTensorTest {
     public void setup() {
         matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        matrixC = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4, 1, 2, 3, 4}, new int[]{4, 4});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
         vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
