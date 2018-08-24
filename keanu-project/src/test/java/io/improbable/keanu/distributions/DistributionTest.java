@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.LinkedHashMap;
 
-public class BaseDistributionTest {
+public class DistributionTest {
     @Test(expected = IllegalArgumentException.class)
     public void cannotComputeKLDivergenceIfPIsPoissonAndQHasSmallerSupport() {
         DiscreteDistribution p = Poisson.withParameters(DoubleTensor.scalar(1.0));
@@ -205,20 +205,6 @@ public class BaseDistributionTest {
 
         Categorical<TestEnum> p = Categorical.withParameters(pSelectableValues);
         Categorical<TestEnum> q = Categorical.withParameters(qSelectableValues);
-
-        p.computeKLDivergence(q);
-    }
-
-    @Test(expected = IllegalArgumentException.class)
-    public void cannotComputeKLDivergenceWithDifferentTypesForCategorical() {
-        LinkedHashMap<TestEnum, DoubleTensor> pSelectableValues = new LinkedHashMap<>();
-        pSelectableValues.put(TestEnum.A, DoubleTensor.scalar(1.));
-
-        LinkedHashMap<TestEnum2, DoubleTensor> qSelectableValues = new LinkedHashMap<>();
-        qSelectableValues.put(TestEnum2.A, DoubleTensor.scalar(0.25));
-
-        Categorical<TestEnum> p = Categorical.withParameters(pSelectableValues);
-        Categorical<TestEnum2> q = Categorical.withParameters(qSelectableValues);
 
         p.computeKLDivergence(q);
     }

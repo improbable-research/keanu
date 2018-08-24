@@ -63,12 +63,8 @@ public class Categorical<T> implements Distribution<T> {
     }
 
     @Override
-    public DoubleTensor computeKLDivergence(BaseDistribution q) {
+    public DoubleTensor computeKLDivergence(Distribution<T> q) {
         if (q instanceof Categorical) {
-            if (getType() == null || !getType().equals(((Categorical) q).getType())) {
-                 throw new IllegalArgumentException("can't compute KLDivergence between categorical distributions of different types");
-            }
-
             Map qSelectableValues = ((Categorical) q).selectableValues;
             if ((qSelectableValues.keySet().containsAll(this.selectableValues.keySet()))) {
                 DoubleTensor sum = Nd4jDoubleTensor.scalar(0);
@@ -84,7 +80,7 @@ public class Categorical<T> implements Distribution<T> {
                 throw new IllegalArgumentException("q must have wider support than p");
             }
         } else {
-            return BaseDistribution.super.computeKLDivergence(q);
+            return Distribution.super.computeKLDivergence(q);
         }
     }
 

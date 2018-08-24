@@ -10,4 +10,7 @@ public interface Distribution<T> {
     default Support<T> getSupport() {
         throw new NotImplementedException("getSupport is not implemented for this distribution");
     }
+    default DoubleTensor computeKLDivergence(Distribution<T> q) {
+        throw new NotImplementedException("computeKLDivergence is not implemented for this distribution");
+    }
 }

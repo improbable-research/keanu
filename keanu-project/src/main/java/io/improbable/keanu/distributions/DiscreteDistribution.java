@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -9,10 +8,9 @@ import java.util.Collections;
 
 public interface DiscreteDistribution extends Distribution<IntegerTensor> {
     @Override
-    default DoubleTensor computeKLDivergence(BaseDistribution q) {
+    default DoubleTensor computeKLDivergence(Distribution<IntegerTensor> q) {
         Support<IntegerTensor> pSupport = this.getSupport();
-        Support<IntegerTensor> qSupport = ((DiscreteDistribution) q).getSupport();
-
+        Support<IntegerTensor> qSupport = q.getSupport();
         if (!pSupport.isSubsetOf(qSupport)) {
             throw new IllegalArgumentException("q has to have greater or equal support than p");
         }
@@ -23,7 +21,7 @@ public interface DiscreteDistribution extends Distribution<IntegerTensor> {
             IntegerTensor t = this.getSupport().getMin().plus(i);
 
             DoubleTensor pLogPmf = this.logProb(t);
-            DoubleTensor qLogPmf = ((DiscreteDistribution) q).logProb(t);
+            DoubleTensor qLogPmf = q.logProb(t);
 
             DoubleTensor pPmf = pLogPmf.exp();
 

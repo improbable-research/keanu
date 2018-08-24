@@ -1,6 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
-import io.improbable.keanu.distributions.BaseDistribution;
+import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.distributions.IntegerSupport;
 import io.improbable.keanu.distributions.Support;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
@@ -96,7 +96,7 @@ public class Poisson implements DiscreteDistribution {
     }
 
     @Override
-    public DoubleTensor computeKLDivergence(BaseDistribution q) {
+    public DoubleTensor computeKLDivergence(Distribution<IntegerTensor> q) {
         if (q instanceof Poisson) {
             DoubleTensor qMu = ((Poisson) q).mu;
             return mu.times(mu.div(qMu).logInPlace()).plusInPlace(qMu).minusInPlace(mu);
