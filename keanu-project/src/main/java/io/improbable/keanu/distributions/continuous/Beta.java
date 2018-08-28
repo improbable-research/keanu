@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.distributions.Distribution;
 import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.B;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
@@ -74,5 +75,39 @@ public class Beta implements ContinuousDistribution {
             .put(A, dLogPda)
             .put(B, dLogPdb)
             .put(X, dLogPdx);
+    }
+
+    @Override
+    public DoubleTensor computeKLDivergence(Distribution<DoubleTensor> q) {
+        if (q instanceof Beta) {
+            DoubleTensor qAlpha = ((Beta) q).alpha;
+            DoubleTensor qBeta = ((Beta) q).beta;
+
+            DoubleTensor pTotal = alpha.plus(beta);
+            DoubleTensor qTotal = qAlpha.plus(qBeta);
+
+            DoubleTensor digammaPAlpha = alpha.apply(Gamma::digamma);
+            DoubleTensor digammaPBeta = beta.apply(Gamma::digamma);
+            DoubleTensor digammaPTotal = pTotal.apply(Gamma::digamma);
+
+            DoubleTensor digammaQAlpha = qAlpha.apply(Gamma::digamma);
+            DoubleTensor digammaQBeta = qBeta.apply(Gamma::digamma);
+            DoubleTensor digammaQTotal = qTotal.apply(Gamma::digamma);
+
+            DoubleTensor pLogNormalization = digammaPBeta.plus(digammaPAlpha).minusInPlace(digammaPTotal);
+            DoubleTensor qLogNormalization = digammaQBeta.plus(digammaQAlpha).minusInPlace(digammaQTotal);
+
+            DoubleTensor deltaLogNormalization = qLogNormalization.minusInPlace(pLogNormalization);
+            DoubleTensor deltaAlpha = qAlpha.minus(alpha);
+            DoubleTensor deltaBeta = qBeta.minus(beta);
+            DoubleTensor deltaTotal = qTotal.minus(pTotal);
+
+            return deltaLogNormalization
+                .minusInPlace(digammaPAlpha.timesInPlace(deltaAlpha))
+                .minusInPlace(digammaPBeta.timesInPlace(deltaBeta))
+                .plusInPlace(digammaPTotal.timesInPlace(deltaTotal));
+        } else {
+            return ContinuousDistribution.super.computeKLDivergence(q);
+        }
     }
 }

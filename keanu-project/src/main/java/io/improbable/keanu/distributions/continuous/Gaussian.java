@@ -1,5 +1,6 @@
 package io.improbable.keanu.distributions.continuous;
 
+import io.improbable.keanu.distributions.Distribution;
 import static io.improbable.keanu.distributions.dual.Diffs.MU;
 import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
@@ -56,4 +57,21 @@ public class Gaussian implements ContinuousDistribution {
             .put(X, dLogPdx);
     }
 
+    @Override
+    public DoubleTensor computeKLDivergence(Distribution<DoubleTensor> q) {
+        if (q instanceof Gaussian) {
+            DoubleTensor qMu = ((Gaussian) q).mu;
+            DoubleTensor qSigma = ((Gaussian) q).sigma;
+
+            DoubleTensor qSigmaDivPSigmaLog = qSigma.div(sigma).logInPlace();
+
+            DoubleTensor pMuMinusQMuPow2 = mu.minus(qMu).powInPlace(2);
+            DoubleTensor qSigmaPow2Times2 = qSigma.pow(2).timesInPlace(2);
+            DoubleTensor pSigmaPow2PlusMuDiffSquaredDivQSigmaPow2Times2 = sigma.pow(2).plusInPlace(pMuMinusQMuPow2).divInPlace(qSigmaPow2Times2);
+
+            return qSigmaDivPSigmaLog.plusInPlace(pSigmaPow2PlusMuDiffSquaredDivQSigmaPow2Times2).minusInPlace(0.5);
+        } else {
+            return ContinuousDistribution.super.computeKLDivergence(q);
+        }
+    }
 }
