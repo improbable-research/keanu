@@ -18,7 +18,7 @@ public abstract class Vertex<T> implements Observable<T> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
-    private long uuid = ID_GENERATOR.getAndIncrement();
+    private Object uuid; //= ID_GENERATOR.getAndIncrement();
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
