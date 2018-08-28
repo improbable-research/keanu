@@ -1,21 +1,23 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Map;
+
+import org.junit.Rule;
+import org.junit.Test;
+
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Rule;
-import org.junit.Test;
-
-import java.util.Map;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class BernoulliVertexTest {
 
@@ -49,7 +51,7 @@ public class BernoulliVertexTest {
         DoubleVertex C = A.times(B);
         BernoulliVertex D = new BernoulliVertex(C);
 
-        Map<Long, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}));
+        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}));
 
         DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.5, (-1.0 / 0.88) * 0.2});
         DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.25, (-1.0 / 0.88) * 0.6});
@@ -127,7 +129,7 @@ public class BernoulliVertexTest {
             true, true
         }, shape);
 
-        Map<Long, DoubleTensor> dLogPmf = D.dLogPmf(atValue);
+        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(atValue);
 
         DoubleTensor expectedWrtA = atValue.setDoubleIf(
             AValue.reciprocal(),

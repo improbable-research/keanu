@@ -17,6 +17,7 @@ import io.improbable.keanu.distributions.gradient.Beta;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -61,7 +62,7 @@ public class BetaVertexTest {
         betaTensor.setValue(3.0);
 
         BetaVertex tensorBetaVertex = new BetaVertex(alphaTensor, betaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorBetaVertex.dLogPdf(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

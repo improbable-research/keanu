@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -70,7 +71,7 @@ public class DualNumbersTest {
         DualNumber cDual = vC.getDualNumber();
 
         DoubleTensor C = cDual.getValue();
-        Map<Long, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();
+        Map<VertexId, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();
 
         double da = 0.00000001;
 

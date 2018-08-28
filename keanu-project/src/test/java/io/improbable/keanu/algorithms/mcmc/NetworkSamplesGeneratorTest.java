@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.vertices.VertexId;
 import lombok.Value;
 
 public class NetworkSamplesGeneratorTest {
@@ -71,7 +72,7 @@ public class NetworkSamplesGeneratorTest {
         }
 
         @Override
-        public void sample(Map<Long, List<?>> samples) {
+        public void sample(Map<VertexId, List<?>> samples) {
             sampleCount.incrementAndGet();
         }
 
