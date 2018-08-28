@@ -45,7 +45,7 @@ public class VertexId implements Comparable<VertexId> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VertexId vertexId = (VertexId) o;
-        return Objects.equals(idValues, vertexId.idValues);
+        return compareTo(vertexId) == 0;
     }
 
     @Override
