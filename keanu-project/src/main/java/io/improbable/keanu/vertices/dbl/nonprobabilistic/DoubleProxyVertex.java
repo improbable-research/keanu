@@ -26,12 +26,6 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
         this(Tensor.SCALAR_SHAPE);
     }
 
-    /**
-     * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
-     * model in model scenarios) but allows linking at a later point in time.
-     *
-     * @param shape
-     */
     public DoubleProxyVertex(int[] shape) {
         this.shape = shape;
     }
@@ -60,11 +54,7 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        try {
-            return dualNumbers.get(parentVertex);
-        } catch (UnsupportedOperationException e) {
-            return super.calculateDualNumber(dualNumbers);
-        }
+        return dualNumbers.get(parentVertex);
     }
 
 }
