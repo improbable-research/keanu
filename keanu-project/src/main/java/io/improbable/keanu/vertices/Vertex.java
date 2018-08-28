@@ -16,8 +16,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class Vertex<T> implements Observable<T> {
 
-
-    private VertexId id = new VertexId();
+    private final VertexId id = new VertexId();
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;

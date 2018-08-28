@@ -27,8 +27,9 @@ public class VertexId implements Comparable<VertexId> {
     @Override
     public int compareTo(VertexId that) {
         long comparisonValue = 0;
+        int  minOfListSizes = Math.min(this.idValues.size(), that.idValues.size());
 
-        for (int i = 0; i < Math.min(this.idValues.size(), that.idValues.size()) && comparisonValue == 0; i++) {
+        for (int i = 0; i < minOfListSizes && comparisonValue == 0; i++) {
             comparisonValue = this.idValues.get(i) - that.idValues.get(i);
         }
 
@@ -44,7 +45,7 @@ public class VertexId implements Comparable<VertexId> {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VertexId vertexId = (VertexId) o;
-        return Objects.equals(idValues, vertexId.idValues);
+        return compareTo(vertexId) == 0;
     }
 
     @Override
