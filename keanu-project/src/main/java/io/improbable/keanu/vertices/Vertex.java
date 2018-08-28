@@ -3,9 +3,9 @@ package io.improbable.keanu.vertices;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -16,9 +16,8 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class Vertex<T> implements Observable<T> {
 
-    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
-    private Object uuid; //= ID_GENERATOR.getAndIncrement();
+    private VertexId id = new VertexId();
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
@@ -172,8 +171,8 @@ public abstract class Vertex<T> implements Observable<T> {
         return observation.getObservedValue();
     }
 
-    public long getId() {
-        return uuid;
+    public VertexId getId() {
+        return id;
     }
 
     public Set<Vertex> getChildren() {
@@ -213,12 +212,12 @@ public abstract class Vertex<T> implements Observable<T> {
 
         Vertex<?> vertex = (Vertex<?>) o;
 
-        return uuid == vertex.uuid;
+        return Objects.equals(this.id, vertex.id);
     }
 
     @Override
     public int hashCode() {
-        return (int) (uuid ^ (uuid >>> 32));
+        return (int)Objects.hash(id);
     }
 
     public Set<Vertex> getConnectedGraph() {

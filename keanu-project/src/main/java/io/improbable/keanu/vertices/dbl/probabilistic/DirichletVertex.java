@@ -10,6 +10,7 @@ import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -70,7 +71,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Dirichlet.withParameters(concentration.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(C).getValue(), dlnP.get(X).getValue());
     }
@@ -80,7 +81,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
         return Dirichlet.withParameters(concentration.getValue()).sample(getShape(), random);
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdc,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdc,
                                                              DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputs = concentration.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdc);

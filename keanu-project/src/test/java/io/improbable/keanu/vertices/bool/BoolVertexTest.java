@@ -11,6 +11,9 @@ import java.util.Collections;
 
 import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -217,6 +220,15 @@ public class BoolVertexTest {
         boolean[] values = new boolean[]{true, false, true};
         flip.setAndCascade(values);
         assertEquals(true, flip.take(0, 0).getValue().scalar());
+    }
+
+    @Test
+    public void canReshape() {
+        BoolVertex flip = new BernoulliVertex(0.5);
+        flip.setAndCascade(BooleanTensor.trues(2, 2));
+        assertArrayEquals(flip.getShape(), new int[]{2, 2});
+        BoolVertex reshaped = flip.reshape(4, 1);
+        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
     }
 
     private double andProbability(double pA, double pB) {

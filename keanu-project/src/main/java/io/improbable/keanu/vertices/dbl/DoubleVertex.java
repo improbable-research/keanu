@@ -25,23 +25,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Divisi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.*;
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
@@ -155,6 +139,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex sum() {
         return new SumVertex(this);
+    }
+
+    public DoubleVertex reshape(int... proposedShape) {
+        return new ReshapeVertex(this, proposedShape);
     }
 
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {

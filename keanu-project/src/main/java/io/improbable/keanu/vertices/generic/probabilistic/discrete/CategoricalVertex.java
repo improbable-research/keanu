@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -41,17 +42,17 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     @Override
     public T sample(KeanuRandom random) {
         Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
-        return categorical.sample(random);
+        return categorical.sample(getShape(), random);
     }
 
     @Override
     public double logProb(T value) {
         Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
-        return categorical.logProb(value);
+        return categorical.logProb(value).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(T value) {
+    public Map<VertexId, DoubleTensor> dLogProb(T value) {
         return Collections.emptyMap();
     }
 

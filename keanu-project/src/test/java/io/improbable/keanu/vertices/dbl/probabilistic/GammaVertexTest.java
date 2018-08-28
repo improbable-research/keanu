@@ -17,6 +17,7 @@ import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -62,7 +63,7 @@ public class GammaVertexTest {
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(thetaTensor, kTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5));
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5));
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

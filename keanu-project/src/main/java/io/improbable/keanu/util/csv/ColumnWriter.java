@@ -1,17 +1,17 @@
 package io.improbable.keanu.util.csv;
 
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Vertex;
+import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.Vertex;
 
 public class ColumnWriter extends Writer {
 
-    private static final String HEADER_STYLE = "{%d}";
+    private static final String HEADER_STYLE = "{%s}";
 
     private List<? extends Vertex<? extends Tensor>> vertices;
 
@@ -44,7 +44,7 @@ public class ColumnWriter extends Writer {
     @Override
     public Writer withDefaultHeader() {
         int headerSize = vertices.size();
-        String[] header = createHeader(headerSize, HEADER_STYLE, i -> (int) vertices.get(i).getId());
+        String[] header = createHeader(headerSize, HEADER_STYLE, i -> vertices.get(i).getId().toString());
         withHeader(header);
         return this;
     }
