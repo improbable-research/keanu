@@ -1,8 +1,10 @@
 package io.improbable.keanu.network;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Map;
+import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -34,16 +36,8 @@ public class ModelCompositionTest {
 
     @Before
     public void setup() {
-        loc = new DoubleProxyVertex();
-        loc.setLabel(new VertexLabel("Loc"));
-        size = new DoubleProxyVertex();
-        size.setLabel(new VertexLabel("Size"));
-        gaussian = new GaussianVertex(loc, size);
-        gaussian.setLabel(new VertexLabel("Output1"));
-        pareto = new ParetoVertex(loc, size);
-        pareto.setLabel(new VertexLabel("Output2"));
 
-        innerNet = new BayesianNetwork(gaussian.getConnectedGraph());
+        createInnerNet();
 
         trueLoc = new UniformVertex(5.0, 10.0);
         trueSize = new UniformVertex(0.1, 10.0);
@@ -58,6 +52,19 @@ public class ModelCompositionTest {
         paretoOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output2"));
 
         outerNet = new BayesianNetwork(paretoOutputVertex.getConnectedGraph());
+    }
+
+    private void createInnerNet() {
+        loc = new DoubleProxyVertex();
+        loc.setLabel(new VertexLabel("Loc"));
+        size = new DoubleProxyVertex();
+        size.setLabel(new VertexLabel("Size"));
+        gaussian = new GaussianVertex(loc, size);
+        gaussian.setLabel(new VertexLabel("Output1"));
+        pareto = new ParetoVertex(loc, size);
+        pareto.setLabel(new VertexLabel("Output2"));
+
+        innerNet = new BayesianNetwork(gaussian.getConnectedGraph());
     }
 
     @Test
@@ -78,7 +85,12 @@ public class ModelCompositionTest {
 
     @Test
     public void idOrderingStillImpliesTopologicalOrdering() {
-
+        for (Vertex v: outerNet.getAllVertices()) {
+            Set<Vertex> parentSet = v.getParents();
+            for (Vertex parent : parentSet) {
+                assertTrue(v.getId().compareTo(parent.getId()) > 0);
+            }
+        }
     }
 
     @Test

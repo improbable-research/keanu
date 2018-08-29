@@ -28,6 +28,11 @@ public class VertexId implements Comparable<VertexId> {
         idValues.addFirst(ID_GENERATOR.get());
     }
 
+    public void resetID() {
+        idValues.clear();
+        idValues.addFirst(ID_GENERATOR.getAndIncrement());
+    }
+
     @Override
     public int compareTo(VertexId that) {
         long comparisonValue = 0;
