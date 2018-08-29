@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,7 +24,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class ParetoVertexTest {
 
-    private final double VERTEX_INC = 0.1;
+    private final double VERTEX_INCREMENT = 0.1;
 
     private KeanuRandom random;
 
@@ -41,7 +42,7 @@ public class ParetoVertexTest {
     }
 
     @Test
-    public void matchesKnownLogDensityofVector() {
+    public void matchesKnownLogDensityOfVector() {
         ParetoDistribution baseline = new ParetoDistribution(1.0, 1.5);
         ParetoVertex vertex = new ParetoVertex(1.0, 1.5);
         double expected = baseline.logDensity(1.25) + baseline.logDensity(6.5);
@@ -62,7 +63,7 @@ public class ParetoVertexTest {
         Map<Long, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5);
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
-        assertEquals(paretoLogDiff.dPdLoc, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);
+        assertEquals(paretoLogDiff.dPdLocation, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);
         assertEquals(paretoLogDiff.dPdScale, actual.withRespectTo(scaleTensor.getId()).scalar(), 1e-5);
         assertEquals(paretoLogDiff.dPdX, actual.withRespectTo(vertex.getId()).scalar(), 1e-5);
     }
@@ -94,9 +95,9 @@ public class ParetoVertexTest {
     }
 
     @Test
-    public void dLogProbMatchesFiniteDifferenceCalculationFordPdLoc() {
-        UniformVertex loc = new UniformVertex(0.1, 1.0);
-        ParetoVertex pareto = new ParetoVertex(loc, 3.0);
+    public void dLogProbMatchesFiniteDifferenceCalculationFordPdLocation() {
+        UniformVertex location = new UniformVertex(0.1, 1.0);
+        ParetoVertex pareto = new ParetoVertex(location, 3.0);
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.5);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
@@ -105,11 +106,11 @@ public class ParetoVertexTest {
             Nd4jDoubleTensor.scalar(0.1),
             Nd4jDoubleTensor.scalar(1.0),
             0.1,
-            loc,
+            location,
             pareto,
             vertexStartValue,
             vertexEndValue,
-            VERTEX_INC,
+            VERTEX_INCREMENT,
             1e-5
         );
     }
@@ -121,7 +122,6 @@ public class ParetoVertexTest {
 
         DoubleTensor vertexStartValue = Nd4jDoubleTensor.scalar(1.5);
         DoubleTensor vertexEndValue = Nd4jDoubleTensor.scalar(5.0);
-        double vertexInc = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
             Nd4jDoubleTensor.scalar(0.1),
@@ -131,7 +131,7 @@ public class ParetoVertexTest {
             pareto,
             vertexStartValue,
             vertexEndValue,
-            VERTEX_INC,
+            VERTEX_INCREMENT,
             1e-5
         );
     }
@@ -151,7 +151,7 @@ public class ParetoVertexTest {
 
     @Test
     public void inferHyperParamsFromSamples() {
-        double trueLoc = 5.0;
+        double trueLocation = 5.0;
 
         /*
          * Note, this value is set low as the Gradient Optimizer seems to struggle with values greater than this - we
@@ -161,15 +161,15 @@ public class ParetoVertexTest {
         double trueScale = 0.1;
 
         List<DoubleVertex> trueParams = new ArrayList<>();
-        trueParams.add(ConstantVertex.of(trueLoc));
+        trueParams.add(ConstantVertex.of(trueLocation));
         trueParams.add(ConstantVertex.of(trueScale));
 
         List<DoubleVertex> latentParams = new ArrayList<>();
-        UniformVertex latentLoc = new UniformVertex(0.1, 15.0);
-        latentLoc.setAndCascade(6.0);
+        UniformVertex latentLocation = new UniformVertex(0.1, 15.0);
+        latentLocation.setAndCascade(6.0);
         UniformVertex latentScale = new UniformVertex(0.01, 10);
         latentScale.setAndCascade(9.0);
-        latentParams.add(latentLoc);
+        latentParams.add(latentLocation);
         latentParams.add(latentScale);
 
         int numSamples = 2000;
@@ -182,21 +182,20 @@ public class ParetoVertexTest {
     }
 
     @Test
-    public void inferHyperParamsFromSamplesFixedLoc() {
-        double trueLoc = 5.0;
+    public void inferHyperParamsFromSamplesFixedLocation() {
+        double trueLocation = 5.0;
         double trueScale = 3.5;
 
         List<DoubleVertex> trueParams = new ArrayList<>();
-        trueParams.add(ConstantVertex.of(trueLoc));
+        trueParams.add(ConstantVertex.of(trueLocation));
         trueParams.add(ConstantVertex.of(trueScale));
 
         List<DoubleVertex> latentParams = new ArrayList<>();
-        ConstantDoubleVertex latentLoc = new ConstantDoubleVertex(trueLoc);
+        ConstantDoubleVertex latentLocation = new ConstantDoubleVertex(trueLocation);
         UniformVertex latentScale = new UniformVertex(0.01, 10);
         latentScale.setAndCascade(0.1);
-        latentParams.add(latentLoc);
+        latentParams.add(latentLocation);
         latentParams.add(latentScale);
-
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
@@ -209,18 +208,18 @@ public class ParetoVertexTest {
 
     @Test
     public void inferHyperParamsFromSamplesFixedScale() {
-        double trueLoc = 5.0;
+        double trueLocation = 5.0;
         double trueScale = 3.5;
 
         List<DoubleVertex> trueParams = new ArrayList<>();
-        trueParams.add(ConstantVertex.of(trueLoc));
+        trueParams.add(ConstantVertex.of(trueLocation));
         trueParams.add(ConstantVertex.of(trueScale));
 
         List<DoubleVertex> latentParams = new ArrayList<>();
-        UniformVertex latentLoc = new UniformVertex(0.01, 10);
-        latentLoc.setAndCascade(10.0);
+        UniformVertex latentLocation = new UniformVertex(0.01, 10);
+        latentLocation.setAndCascade(10.0);
         ConstantDoubleVertex latentScale = new ConstantDoubleVertex(trueScale);
-        latentParams.add(latentLoc);
+        latentParams.add(latentLocation);
         latentParams.add(latentScale);
 
 

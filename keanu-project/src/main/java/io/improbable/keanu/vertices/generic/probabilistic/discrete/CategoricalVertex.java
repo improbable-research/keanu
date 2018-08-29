@@ -1,9 +1,10 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
+import static java.util.stream.Collectors.toMap;
+
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -56,8 +57,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     private Map<T, DoubleTensor> selectableValuesMappedToDoubleTensor() {
-        return selectableValues.entrySet()
-            .stream()
-            .collect(Collectors.toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
+        return selectableValues.entrySet().stream()
+            .collect(toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
     }
 }
