@@ -7,8 +7,8 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.sun.tools.javac.util.List;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.vertices.Vertex;
@@ -53,7 +53,7 @@ public class ModelCompositionTest {
             new VertexLabel("Size"), trueSize);
 
         Map<VertexLabel, Vertex> outputs = ModelComposition.createModelVertices(
-            innerNet, inputVertices, List.of(new VertexLabel("Output1"), new VertexLabel("Output2")));
+            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"), new VertexLabel("Output2")));
         gaussOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output1"));
         paretoOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output2"));
 
@@ -74,6 +74,11 @@ public class ModelCompositionTest {
         assertEquals(size.getId().getDepth(), 2);
         assertEquals(gaussian.getId().getDepth(), 2);
         assertEquals(pareto.getId().getDepth(), 2);
+    }
+
+    @Test
+    public void idOrderingStillImpliesTopologicalOrdering() {
+
     }
 
     @Test
