@@ -1,6 +1,4 @@
-package io.improbable.keanu.vertices.generic;
-
-import io.improbable.keanu.vertices.Vertex;
+package io.improbable.keanu.vertices;
 
 /**
  * A Proxy vertex is one which has no parents at creation time but can at a later point "hook up" a parent node.  All
