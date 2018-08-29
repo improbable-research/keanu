@@ -84,6 +84,12 @@ public class ModelCompositionTest {
     }
 
     @Test
+    public void netsAtCorrectDepth() {
+        assertEquals(innerNet.getDepth(), 2);
+        assertEquals(outerNet.getDepth(), 1);
+    }
+
+    @Test
     public void idOrderingStillImpliesTopologicalOrdering() {
         for (Vertex v: outerNet.getAllVertices()) {
             Set<Vertex> parentSet = v.getParents();

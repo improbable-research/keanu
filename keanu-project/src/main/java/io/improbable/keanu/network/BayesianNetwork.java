@@ -22,6 +22,7 @@ public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
     private final Map<VertexLabel, Vertex> vertexLabels;
+    private int depth = 1;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
@@ -159,6 +160,14 @@ public class BayesianNetwork {
         return getLatentVertices().stream()
             .filter(v -> !(v.getValue() instanceof DoubleTensor))
             .collect(Collectors.toList());
+    }
+
+    public int getDepth() {
+        return depth;
+    }
+
+    public void incrementDepth() {
+        depth++;
     }
 
 }
