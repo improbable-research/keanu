@@ -24,6 +24,10 @@ public class VertexId implements Comparable<VertexId> {
         idValues.push(newId);
     }
 
+    public void increaseDepth() {
+        idValues.addFirst(ID_GENERATOR.get());
+    }
+
     @Override
     public int compareTo(VertexId that) {
         long comparisonValue = 0;

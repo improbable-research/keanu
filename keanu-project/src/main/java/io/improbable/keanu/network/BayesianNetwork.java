@@ -52,6 +52,10 @@ public class BayesianNetwork {
         return labelMap;
     }
 
+    public List<? extends Vertex> getAllVertices() {
+        return vertices;
+    }
+
     public List<Vertex> getLatentAndObservedVertices() {
         return vertices.stream()
             .filter(v -> v.isProbabilistic() || v.isObserved())
