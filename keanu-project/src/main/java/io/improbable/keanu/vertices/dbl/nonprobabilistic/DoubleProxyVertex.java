@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.ProxyVertex;
 
 public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
-    private DoubleVertex parentVertex = null;
+    private DoubleVertex parentVertex;
     private final int[] shape;
 
     /**
@@ -49,7 +49,7 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
 
     @Override
     public boolean hasParent() {
-        return parentVertex == null;
+        return parentVertex != null;
     }
 
     @Override
