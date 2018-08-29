@@ -30,7 +30,7 @@ public class VertexId implements Comparable<VertexId> {
 
     public void resetID() {
         idValues.clear();
-        idValues.addFirst(ID_GENERATOR.getAndIncrement());
+        idValues.addFirst(ID_GENERATOR.incrementAndGet());
     }
 
     @Override

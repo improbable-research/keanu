@@ -79,8 +79,8 @@ public class ModelCompositionTest {
         assertEquals(trueSize.getId().getDepth(), 1);
         assertEquals(loc.getId().getDepth(), 2);
         assertEquals(size.getId().getDepth(), 2);
-        assertEquals(gaussian.getId().getDepth(), 2);
-        assertEquals(pareto.getId().getDepth(), 2);
+        assertEquals(gaussian.getId().getDepth(), 1);
+        assertEquals(pareto.getId().getDepth(), 1);
     }
 
     @Test

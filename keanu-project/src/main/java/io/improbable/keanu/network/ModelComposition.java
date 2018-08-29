@@ -14,7 +14,7 @@ public class ModelComposition {
                                                                Map<VertexLabel, Vertex> inputVertices,
                                                                List<VertexLabel> desiredOutputs) {
         Map<VertexLabel, Vertex> outputMap = extractOutputs(bayesianNetwork, desiredOutputs);
-        increaseDepth(bayesianNetwork);
+        increaseDepth(bayesianNetwork, outputMap);
         checkAndLinkInputs(bayesianNetwork, inputVertices);
 
         return outputMap;
@@ -39,11 +39,14 @@ public class ModelComposition {
         return outputMap;
     }
 
-    private static void increaseDepth(BayesianNetwork bayesianNetwork) {
+    private static void increaseDepth(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> outputVertices) {
         bayesianNetwork.incrementDepth();
-        for (Vertex v : bayesianNetwork.getAllVertices()) {
-            v.getId().increaseDepth();
-        }
+        bayesianNetwork.getAllVertices().stream()
+            .filter(v -> !outputVertices.containsKey(v.getLabel()))
+            .forEach(v -> v.getId().increaseDepth());
+        bayesianNetwork.getAllVertices().stream()
+            .filter(v -> outputVertices.containsKey(v.getLabel()))
+            .forEach(v -> v.getId().resetID());
     }
 
     private static void checkAndLinkInputs(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> inputs) {
