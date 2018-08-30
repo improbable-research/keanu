@@ -1,14 +1,14 @@
 package io.improbable.docs;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
+import java.util.Arrays;
+
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
+import io.improbable.keanu.algorithms.mcmc.NetworkSamplesGenerator;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-
-import java.util.Arrays;
 
 public class WetGrass {
 
@@ -42,14 +42,18 @@ public class WetGrass {
 
         //What does that observation say about the probability that it rained or that
         //the sprinkler was on?
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        long keepSampleCount = 100000;
+        NetworkSamplesGenerator networkSamplesGenerator = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
             new BayesianNetwork(wetGrass.getConnectedGraph()),
-            Arrays.asList(sprinkler, rain),
-            100000
-        ).drop(10000).downSample(2);
+            Arrays.asList(sprinkler, rain)
+        ).dropCount(10000).downSampleInterval(2);
 
-        double probabilityOfRainGivenWetGrass = posteriorSamples.get(rain).probability(isRaining -> isRaining.scalar() == true);
+        double probabilityOfRainGivenWetGrass = networkSamplesGenerator.stream()
+            .limit(keepSampleCount)
+            .filter(isRaining -> isRaining.get(rain).scalar())
+            .count() / (double) keepSampleCount;
 
-        System.out.println(probabilityOfRainGivenWetGrass);
+        System.out.println();
+        System.out.println("Probability Of Rain Given Wet Grass: " + probabilityOfRainGivenWetGrass);
     }
 }

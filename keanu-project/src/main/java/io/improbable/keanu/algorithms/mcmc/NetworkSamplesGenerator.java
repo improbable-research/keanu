@@ -7,6 +7,7 @@ import java.util.stream.Stream;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.util.ProgressBar;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -24,6 +25,7 @@ public class NetworkSamplesGenerator {
     @Setter
     private int downSampleInterval = 1;
 
+    private ProgressBar progressBar = new ProgressBar();
 
     public NetworkSamplesGenerator(SamplingAlgorithm algorithm) {
         this.algorithm = algorithm;
@@ -44,8 +46,11 @@ public class NetworkSamplesGenerator {
             } else {
                 algorithm.step();
             }
+
+            progressBar.progress();
         }
 
+        progressBar.finished();
         return new NetworkSamples(samplesByVertex, sampleCount);
     }
 
@@ -57,15 +62,19 @@ public class NetworkSamplesGenerator {
 
             for (int i = 0; i < downSampleInterval - 1; i++) {
                 algorithm.step();
+                progressBar.progress();
             }
 
+            progressBar.progress();
             return algorithm.sample();
-        });
+
+        }).onClose(() -> progressBar.finished());
     }
 
     private void dropSamples(int dropCount) {
         for (int i = 0; i < dropCount; i++) {
             algorithm.step();
+            progressBar.progress();
         }
     }
 
