@@ -1,9 +1,12 @@
 package io.improbable.keanu.distributions.discrete;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
+import io.improbable.keanu.distributions.IntegerSupport;
+import io.improbable.keanu.distributions.Support;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.util.CombinatoricsUtils;
 import org.nd4j.linalg.util.ArrayUtil;
@@ -75,4 +78,10 @@ public class Binomial implements DiscreteDistribution {
         long binomialCoefficient = CombinatoricsUtils.binomialCoefficient(n, k);
         return Math.log(binomialCoefficient);
     }
+
+    @Override
+    public Support<IntegerTensor> getSupport() {
+        return new IntegerSupport(Nd4jIntegerTensor.zeros(n.getShape()), n, n.getShape());
+    }
+
 }

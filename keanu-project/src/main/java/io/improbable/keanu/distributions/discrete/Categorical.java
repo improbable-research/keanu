@@ -1,9 +1,11 @@
 package io.improbable.keanu.distributions.discrete;
 
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class Categorical<T> implements Distribution<T> {
@@ -58,5 +60,36 @@ public class Categorical<T> implements Distribution<T> {
             sumP += p.scalar();
         }
         return sumP;
+    }
+
+    @Override
+    public DoubleTensor computeKLDivergence(Distribution<T> q) {
+        if (q instanceof Categorical) {
+            Map qSelectableValues = ((Categorical) q).selectableValues;
+            if ((qSelectableValues.keySet().containsAll(this.selectableValues.keySet()))) {
+                DoubleTensor sum = Nd4jDoubleTensor.scalar(0);
+                for (T key : selectableValues.keySet()) {
+                    DoubleTensor pProb = selectableValues.get(key);
+                    DoubleTensor qProb = (DoubleTensor) qSelectableValues.get(key);
+
+                    sum.plusInPlace(pProb.times(pProb.div(qProb).logInPlace()));
+                }
+
+                return sum;
+            } else {
+                throw new IllegalArgumentException("q must have wider support than p");
+            }
+        } else {
+            return Distribution.super.computeKLDivergence(q);
+        }
+    }
+
+    private Class<?> getType() {
+        Set keys = selectableValues.keySet();
+        if (keys.isEmpty()) {
+            return null;
+        } else {
+            return keys.iterator().next().getClass();
+        }
     }
 }
