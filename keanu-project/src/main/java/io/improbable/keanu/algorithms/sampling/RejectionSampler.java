@@ -74,17 +74,20 @@ public class RejectionSampler {
         bayesNet.cascadeObservations();
 
         Map<VertexId, List<?>> samples = new HashMap<>();
+        List<Double> logProbs = new ArrayList<>();
+
         long acceptedCount = 0;
 
         while (acceptedCount < sampleCount) {
             sampleLatents(bayesNet.getLatentVertices(), random);
             if (matchesObservation(bayesNet.getObservedVertices())) {
                 takeSamples(samples, fromVertices);
+                logProbs.add(bayesNet.getLogOfMasterP());
                 acceptedCount++;
             }
         }
 
-        return new NetworkSamples(samples, sampleCount);
+        return new NetworkSamples(samples, logProbs, sampleCount);
     }
 
     private static void sampleLatents(List<? extends Vertex> latents, KeanuRandom random) {
