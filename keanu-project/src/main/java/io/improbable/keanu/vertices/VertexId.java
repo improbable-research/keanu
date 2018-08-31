@@ -1,10 +1,10 @@
 package io.improbable.keanu.vertices;
 
-import java.util.LinkedList;
-import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.primitives.Ints;
+
+import lombok.EqualsAndHashCode;
 
 /**
  * An object representing the ID value of a vertex.  IDs are assigned in such a way that a Lexicographic ordering of
@@ -13,52 +13,39 @@ import com.google.common.primitives.Ints;
  * Ids also encapsulate the notion of "Depth".  When we have graphs within graphs, the depth tells us at what level the
  * graph exists - ie depth 1 is the outermost graph, depth 2 is a graph within a graph etc.
  */
+@EqualsAndHashCode
 public class VertexId implements Comparable<VertexId> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
 
-    LinkedList<Long> idValues = new LinkedList<>();
+    long[] idValues = new long[1];
 
     public VertexId() {
-        long newId = ID_GENERATOR.getAndIncrement();
-        idValues.push(newId);
+        idValues[0] = ID_GENERATOR.getAndIncrement();
     }
 
     @Override
     public int compareTo(VertexId that) {
         long comparisonValue = 0;
-        int  minOfListSizes = Math.min(this.idValues.size(), that.idValues.size());
+        int minDepth = Math.min(this.idValues.length, that.idValues.length);
 
-        for (int i = 0; i < minOfListSizes && comparisonValue == 0; i++) {
-            comparisonValue = this.idValues.get(i) - that.idValues.get(i);
+        for (int i = 0; i < minDepth && comparisonValue == 0; i++) {
+            comparisonValue = this.idValues[i] - that.idValues[i];
         }
 
         if (comparisonValue == 0) {
-            comparisonValue = this.idValues.size() - that.idValues.size();
+            comparisonValue = this.idValues.length - that.idValues.length;
         }
 
         return Ints.saturatedCast(comparisonValue);
     }
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        VertexId vertexId = (VertexId) o;
-        return compareTo(vertexId) == 0;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(idValues);
-    }
-
-    @Override
     public String toString() {
-        return idValues.peek().toString();
+        return idValues.toString();
     }
 
     public int getDepth() {
-        return idValues.size();
+        return idValues.length;
     }
 }
