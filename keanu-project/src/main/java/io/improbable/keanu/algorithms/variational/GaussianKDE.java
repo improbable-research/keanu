@@ -16,24 +16,24 @@ import io.improbable.keanu.vertices.dbl.probabilistic.KDEVertex;
 
 public class GaussianKDE {
 
-    public KDEVertex approximate(VertexSamples<DoubleTensor> vertexSamples) {
+    public static KDEVertex approximate(VertexSamples<DoubleTensor> vertexSamples) {
 
         List<Double> samples = vertexSamples.asList().stream()
-            .map(this::checkIfScalar)
+            .map(GaussianKDE::checkIfScalar)
             .map(tensor -> tensor.scalar())
             .collect(Collectors.toList());
 
         return new KDEVertex(samples);
     }
 
-    public KDEVertex approximate(DoubleVertex vertex, Integer nSamples) {
+    public static KDEVertex approximate(DoubleVertex vertex, Integer nSamples) {
         BayesianNetwork network = new BayesianNetwork(vertex.getConnectedGraph());
         DoubleVertexSamples vertexSamples = MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(network, ImmutableList.of(vertex), nSamples).getDoubleTensorSamples(vertex);
         return approximate(vertexSamples);
     }
 
-    private DoubleTensor checkIfScalar(DoubleTensor tensor) throws IllegalArgumentException {
+    private static DoubleTensor checkIfScalar(DoubleTensor tensor) throws IllegalArgumentException {
         if (!tensor.isScalar()) {
             throw new IllegalArgumentException("The provided samples are not scalars, but have shape " + Arrays.toString(tensor.getShape()));
         }

@@ -95,7 +95,7 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void YouCanSpecifyYourOwnOrderingOfOperations() {
+    public void canSpecifyYourOwnOrderingOfOperations() {
         BernoulliVertex v3 = new BernoulliVertex(0.5);
 
         v1.setValue(false);
@@ -104,7 +104,7 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void youCanCombineTheOperatorsInDisjunctiveNormalForm() {
+    public void canCombineTheOperatorsInDisjunctiveNormalForm() {
         assertFalse(xor(false, false));
         assertTrue(xor(false, true));
         assertTrue(xor(true, false));
