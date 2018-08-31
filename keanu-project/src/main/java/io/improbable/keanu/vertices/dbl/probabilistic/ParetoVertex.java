@@ -28,7 +28,7 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
     /**
      * Provides a Vertex implementing the Pareto Distribution.
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
@@ -96,13 +96,13 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
         return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdLoc,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdLocation,
                                                                  DoubleTensor dLogPdScale,
                                                                  DoubleTensor dLogPdX) {
 
-        PartialDerivatives dLogPdInputsFromLoc = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdLoc);
+        PartialDerivatives dLogPdInputsFromLocation = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdLocation);
         PartialDerivatives dLogPdInputsFromScale = scale.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdScale);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromLoc.add(dLogPdInputsFromScale);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromLocation.add(dLogPdInputsFromScale);
 
         if (!this.isObserved()) {
             dLogPdInputs.putWithRespectTo(getId(), dLogPdX.reshape(
