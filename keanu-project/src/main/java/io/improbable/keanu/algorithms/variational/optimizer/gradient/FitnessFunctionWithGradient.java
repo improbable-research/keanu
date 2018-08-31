@@ -14,6 +14,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 
@@ -45,7 +46,7 @@ public class FitnessFunctionWithGradient {
             setAndCascadePoint(point, latentVertices);
 
             List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(this.vertices);
-            Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
+            Map<VertexId, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, latentVertices);
 
@@ -70,7 +71,7 @@ public class FitnessFunctionWithGradient {
         };
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<Long /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
+    private static double[] alignGradientsToAppropriateIndex(Map<VertexId, DoubleTensor /*Gradient*/> diffs,
                                                              List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();

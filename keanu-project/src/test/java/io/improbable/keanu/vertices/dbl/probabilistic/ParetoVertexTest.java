@@ -17,6 +17,7 @@ import io.improbable.keanu.distributions.gradient.Pareto;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -60,7 +61,7 @@ public class ParetoVertexTest {
         scaleTensor.setValue(1.5);
 
         ParetoVertex vertex = new ParetoVertex(locationTensor, scaleTensor);
-        Map<Long, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5);
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(paretoLogDiff.dPdLocation, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);

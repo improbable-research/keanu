@@ -13,12 +13,13 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 
 public class PartialDerivatives {
 
     public static PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
 
-    public static PartialDerivatives withRespectToSelf(long withRespectTo, int[] shape) {
+    public static PartialDerivatives withRespectToSelf(VertexId withRespectTo, int[] shape) {
         return new PartialDerivatives(
             singletonMap(
                 withRespectTo,
@@ -31,14 +32,14 @@ public class PartialDerivatives {
         DoubleTensor trueMask = predicate.toDoubleMask();
         DoubleTensor falseMask = predicate.not().toDoubleMask();
 
-        Map<Long, DoubleTensor> thenPartials = thn.derivativeWithRespectTo;
-        Map<Long, DoubleTensor> elsePartials = els.derivativeWithRespectTo;
-        Set<Long> wrtUnion = new HashSet<>();
+        Map<VertexId, DoubleTensor> thenPartials = thn.derivativeWithRespectTo;
+        Map<VertexId, DoubleTensor> elsePartials = els.derivativeWithRespectTo;
+        Set<VertexId> wrtUnion = new HashSet<>();
         wrtUnion.addAll(thenPartials.keySet());
         wrtUnion.addAll(elsePartials.keySet());
 
-        Map<Long, DoubleTensor> mixedPartials = new HashMap<>();
-        for (Long wrt : wrtUnion) {
+        Map<VertexId, DoubleTensor> mixedPartials = new HashMap<>();
+        for (VertexId wrt : wrtUnion) {
             DoubleTensor thnPartial = thenPartials.get(wrt);
             DoubleTensor elsPartial = elsePartials.get(wrt);
             DoubleTensor broadcastedTrueMask;
@@ -70,14 +71,14 @@ public class PartialDerivatives {
         return new PartialDerivatives(mixedPartials);
     }
 
-    private Map<Long, DoubleTensor> derivativeWithRespectTo;
+    private Map<VertexId, DoubleTensor> derivativeWithRespectTo;
 
-    public PartialDerivatives(long id, DoubleTensor derivativeWithRespectTo) {
+    public PartialDerivatives(VertexId id, DoubleTensor derivativeWithRespectTo) {
         this.derivativeWithRespectTo = new HashMap<>();
         this.derivativeWithRespectTo.put(id, derivativeWithRespectTo);
     }
 
-    public PartialDerivatives(Map<Long, DoubleTensor> derivativeWithRespectTo) {
+    public PartialDerivatives(Map<VertexId, DoubleTensor> derivativeWithRespectTo) {
         this.derivativeWithRespectTo = derivativeWithRespectTo;
     }
 
@@ -85,7 +86,7 @@ public class PartialDerivatives {
         return withRespectTo(vertex.getId());
     }
 
-    public DoubleTensor withRespectTo(long id) {
+    public DoubleTensor withRespectTo(VertexId id) {
         return derivativeWithRespectTo.getOrDefault(id, DoubleTensor.ZERO_SCALAR);
     }
 
@@ -93,11 +94,11 @@ public class PartialDerivatives {
         return derivativeWithRespectTo.isEmpty();
     }
 
-    public Map<Long, DoubleTensor> asMap() {
+    public Map<VertexId, DoubleTensor> asMap() {
         return derivativeWithRespectTo;
     }
 
-    public void putWithRespectTo(long id, DoubleTensor value) {
+    public void putWithRespectTo(VertexId id, DoubleTensor value) {
         derivativeWithRespectTo.put(id, value);
     }
 
@@ -113,10 +114,10 @@ public class PartialDerivatives {
      * @return The summed partial derivatives over given dimensions
      */
     public PartialDerivatives sum(boolean reshape, int... overDimensions) {
-        Map<Long, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
+        Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
             DoubleTensor reshapedV = v.sum(overDimensions);
             if (reshape) {
@@ -130,10 +131,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives add(PartialDerivatives toAdd) {
-        Map<Long, DoubleTensor> added = cloneInfinitesimals(derivativeWithRespectTo);
+        Map<VertexId, DoubleTensor> added = cloneInfinitesimals(derivativeWithRespectTo);
 
-        for (Map.Entry<Long, DoubleTensor> entry : toAdd.derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : toAdd.derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
             if (added.containsKey(k)) {
@@ -147,10 +148,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives subtract(PartialDerivatives toSubtract) {
-        Map<Long, DoubleTensor> subtracted = cloneInfinitesimals(derivativeWithRespectTo);
+        Map<VertexId, DoubleTensor> subtracted = cloneInfinitesimals(derivativeWithRespectTo);
 
-        for (Map.Entry<Long, DoubleTensor> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
             if (subtracted.containsKey(k)) {
@@ -164,10 +165,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives multiplyBy(DoubleTensor multiplier) {
-        Map<Long, DoubleTensor> multiplied = new HashMap<>();
+        Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = elementWiseMultiplyDiff(entry.getValue(), multiplier);
             multiplied.put(k, v);
         }
@@ -203,9 +204,9 @@ public class PartialDerivatives {
     }
 
     public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
-        Map<Long, DoubleTensor> multiplied = new HashMap<>();
+        Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
 
             int partialRank = partial.getValue().getRank();
 
@@ -229,10 +230,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives multiplyBy(double multiplier) {
-        Map<Long, DoubleTensor> multiplied = new HashMap<>();
+        Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue().times(multiplier);
             multiplied.put(k, v);
         }
@@ -241,10 +242,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives divideBy(DoubleTensor divisor) {
-        Map<Long, DoubleTensor> divided = new HashMap<>();
+        Map<VertexId, DoubleTensor> divided = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor partial = entry.getValue();
             DoubleTensor v = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
             divided.put(k, v);
@@ -254,10 +255,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives divideBy(double divisor) {
-        Map<Long, DoubleTensor> divided = new HashMap<>();
+        Map<VertexId, DoubleTensor> divided = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue().div(divisor);
             divided.put(k, v);
         }
@@ -266,10 +267,10 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives powerTo(double power) {
-        Map<Long, DoubleTensor> powered = new HashMap<>();
+        Map<VertexId, DoubleTensor> powered = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            long k = entry.getKey();
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue().pow(power);
             powered.put(k, v);
         }
@@ -282,9 +283,9 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives reshape(int currentRank, int[] proposedShape) {
-        Map<Long, DoubleTensor> reshapedDerivatives = new HashMap<>();
+        Map<VertexId, DoubleTensor> reshapedDerivatives = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
             int[] shape = partialDerivative.getValue().getShape();
             int[] wrtShape = extractWrtShape(shape, currentRank);
             int[] newPartialShape = TensorShape.concat(proposedShape, wrtShape);
@@ -297,9 +298,9 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives slice(int dimension, int index) {
-        Map<Long, DoubleTensor> slicedDerivatives = new HashMap<>();
+        Map<VertexId, DoubleTensor> slicedDerivatives = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
             int[] partialDerivativeShape = partialDerivative.getValue().getShape();
             partialDerivativeShape[dimension] = 1;
             DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
@@ -310,9 +311,9 @@ public class PartialDerivatives {
         return new PartialDerivatives(slicedDerivatives);
     }
 
-    private static Map<Long, DoubleTensor> cloneInfinitesimals(Map<Long, DoubleTensor> infinitesimals) {
-        Map<Long, DoubleTensor> clone = new HashMap<>();
-        for (Map.Entry<Long, DoubleTensor> entry : infinitesimals.entrySet()) {
+    private static Map<VertexId, DoubleTensor> cloneInfinitesimals(Map<VertexId, DoubleTensor> infinitesimals) {
+        Map<VertexId, DoubleTensor> clone = new HashMap<>();
+        for (Map.Entry<VertexId, DoubleTensor> entry : infinitesimals.entrySet()) {
             clone.put(entry.getKey(), entry.getValue());
         }
         return clone;

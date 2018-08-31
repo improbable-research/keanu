@@ -1,15 +1,16 @@
 package io.improbable.keanu.algorithms.sampling;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class Prior {
 
@@ -43,7 +44,7 @@ public class Prior {
         }
 
         List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
-        Map<Long, List> samplesByVertex = new HashMap<>();
+        Map<VertexId, List> samplesByVertex = new HashMap<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
             nextSample(topologicallySorted, random);
@@ -63,11 +64,11 @@ public class Prior {
         vertex.setAndCascade(vertex.sample(random));
     }
 
-    private static void takeSamples(Map<Long, List> samples, List<? extends Vertex> fromVertices) {
+    private static void takeSamples(Map<VertexId, List> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
-    private static void addSampleForVertex(Vertex vertex, Map<Long, List> samples) {
+    private static void addSampleForVertex(Vertex vertex, Map<VertexId, List> samples) {
         List samplesForVertex = samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<>());
         samplesForVertex.add(vertex.getValue());
     }

@@ -182,7 +182,7 @@ public class LinearRegression {
 
         optimizer.maxLikelihood();
 
-        System.out.println("W1 = " + w.getValue(0) + " W2 = " + w.getValue(1));
+        log.info("W1 = " + w.getValue(0) + " W2 = " + w.getValue(1));
         assertEquals(expectedW1, w.getValue(0), 0.05);
         assertEquals(expectedW2, w.getValue(1), 0.05);
     }
