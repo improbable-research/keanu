@@ -76,7 +76,7 @@ public class BayesianNetwork {
 
     public List<Vertex> getLatentAndObservedVerticesAtDepth(int maxDepth) {
         return getFilteredVertexList((isProbabilistic, isObserved, depth)
-            -> (isProbabilistic || isObserved) && maxDepth >= this.depth);
+            -> (isProbabilistic || isObserved) && maxDepth >= depth);
     }
 
     /**
@@ -88,7 +88,7 @@ public class BayesianNetwork {
 
     public List<Vertex> getLatentVerticesAtDepth(int maxDepth) {
         return getFilteredVertexList((isProbabilistic, isObserved, depth)
-            -> (isProbabilistic && !isObserved) && maxDepth >= this.depth);
+            -> (isProbabilistic && !isObserved) && maxDepth >= depth);
     }
 
     /**
@@ -100,7 +100,7 @@ public class BayesianNetwork {
 
     public List<Vertex> getObservedVerticesAtDepth(int maxDepth) {
         return getFilteredVertexList((isProbabilistic, isObserved, depth) ->
-            isObserved && maxDepth >= this.depth);
+            isObserved && maxDepth >= depth);
     }
 
     public double getLogOfMasterP() {

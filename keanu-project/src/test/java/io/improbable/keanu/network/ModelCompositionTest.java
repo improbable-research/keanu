@@ -3,6 +3,7 @@ package io.improbable.keanu.network;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -11,6 +12,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.vertices.Vertex;
@@ -110,6 +112,14 @@ public class ModelCompositionTest {
 
         assertEquals(trueLocation.getValue().scalar(), REAL_HYPER_LOC, 0.05);
         assertEquals(size.getValue().scalar(), REAL_HYPER_SIZE, 0.05);
+    }
+
+    @Test
+    public void bayesNetCanFilterOnDepth() {
+        Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, paretoOutputVertex, gaussOutputVertex);
+        Set<Vertex> filteredVertices = new HashSet<>(outerNet.getLatentVerticesAtDepth(outerNet.getDepth()));
+
+        assertEquals(latentOuterVertices.containsAll(filteredVertices), true);
     }
 
 }
