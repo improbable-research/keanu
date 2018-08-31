@@ -120,6 +120,7 @@ public class ModelCompositionTest {
         Set<Vertex> filteredVertices = new HashSet<>(outerNet.getLatentVerticesAtDepth(outerNet.getDepth()));
 
         assertEquals(latentOuterVertices.containsAll(filteredVertices), true);
+        assertEquals(filteredVertices.containsAll(latentOuterVertices), true);
     }
 
 }
