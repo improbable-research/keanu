@@ -15,6 +15,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -79,7 +80,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
                                                             final List<? extends Vertex> verticesToSampleFrom) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom));
+        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), new ProgressBar());
     }
 
     private SamplingAlgorithm setupSampler(final BayesianNetwork bayesianNetwork,

@@ -1,17 +1,25 @@
 package io.improbable.keanu.algorithms.mcmc;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.anyDouble;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
+import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.VertexId;
 import lombok.Value;
 
@@ -24,17 +32,17 @@ public class NetworkSamplesGeneratorTest {
         AtomicInteger sampleCount = new AtomicInteger(0);
 
         TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
-        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm);
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, new ProgressBar());
 
         int totalGenerated = 12;
         int dropCount = 3;
         int downSampleInterval = 2;
         unitUnderTest.dropCount(dropCount).downSampleInterval(downSampleInterval);
-        unitUnderTest.generate(totalGenerated);
+        NetworkSamples samples = unitUnderTest.generate(totalGenerated);
 
         int expectedCollected = (int) Math.ceil((totalGenerated - dropCount) / (double) downSampleInterval);
         assertEquals(totalGenerated, algorithm.stepCount.get() + algorithm.sampleCount.get());
-        assertEquals(expectedCollected, algorithm.sampleCount.get());
+        assertEquals(expectedCollected, samples.size());
     }
 
     @Test
@@ -44,7 +52,7 @@ public class NetworkSamplesGeneratorTest {
         AtomicInteger sampleCount = new AtomicInteger(0);
 
         TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
-        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm);
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, new ProgressBar());
 
         int totalCollected = 5;
         int dropCount = 3;
@@ -58,6 +66,32 @@ public class NetworkSamplesGeneratorTest {
         int expectedTotal = dropCount + totalCollected * downSampleInterval;
         assertEquals(expectedTotal, algorithm.stepCount.get() + algorithm.sampleCount.get());
         assertEquals(totalCollected, algorithm.sampleCount.get());
+    }
+
+    @Test
+    public void doesUpdateProgressAndFinishProgressOnGeneration() {
+        AtomicInteger stepCount = new AtomicInteger(0);
+        AtomicInteger sampleCount = new AtomicInteger(0);
+
+        ProgressBar progressBar = mock(ProgressBar.class);
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(stepCount, sampleCount);
+        NetworkSamplesGenerator unitUnderTest = new NetworkSamplesGenerator(algorithm, progressBar);
+        unitUnderTest.generate(10);
+
+        Mockito.verify(progressBar, times(10)).progress(anyString(), anyDouble());
+        Mockito.verify(progressBar).finish();
+    }
+
+    @Test
+    public void doesUpdateProgressAndFinishProgressWhenStreaming() {
+        ProgressBar progressBar = mock(ProgressBar.class);
+        TestSamplingAlgorithm algorithm = new TestSamplingAlgorithm(new AtomicInteger(0), new AtomicInteger(0));
+        Stream<NetworkState> sampleStream = new NetworkSamplesGenerator(algorithm, progressBar).stream();
+        sampleStream.limit(10).count();
+        sampleStream.close();
+
+        Mockito.verify(progressBar, times(10)).progress(anyString());
+        Mockito.verify(progressBar).finish();
     }
 
     @Value

@@ -27,10 +27,11 @@ public class NetworkSamplesGenerator {
     @Setter
     private int downSampleInterval = 1;
 
-    private ProgressBar progressBar = new ProgressBar();
+    private ProgressBar progressBar;
 
-    public NetworkSamplesGenerator(SamplingAlgorithm algorithm) {
+    public NetworkSamplesGenerator(SamplingAlgorithm algorithm, ProgressBar progressBar) {
         this.algorithm = algorithm;
+        this.progressBar = progressBar;
     }
 
     public NetworkSamples generate(final int totalSampleCount) {

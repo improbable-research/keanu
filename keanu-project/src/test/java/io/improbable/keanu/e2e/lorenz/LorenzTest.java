@@ -30,7 +30,7 @@ public class LorenzTest {
         double[] priorMu = new double[]{3, 3, 3};
         double error = Double.MAX_VALUE;
         double convergedError = 0.01;
-        int windowSize = 100;
+        int windowSize = 300;
         int window = 0;
         int maxWindows = 5;
 
