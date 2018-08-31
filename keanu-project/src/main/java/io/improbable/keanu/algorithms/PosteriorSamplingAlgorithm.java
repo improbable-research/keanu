@@ -10,4 +10,8 @@ public interface PosteriorSamplingAlgorithm {
     NetworkSamples getPosteriorSamples(BayesianNetwork bayesNet,
                                        List<? extends Vertex> verticesToSampleFrom,
                                        int sampleCount);
+
+    default NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork, int sampleCount) {
+        return getPosteriorSamples(bayesianNetwork, bayesianNetwork.getLatentVertices(), sampleCount);
+    }
 }

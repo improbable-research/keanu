@@ -57,6 +57,9 @@ public class BayesianNetwork {
         return vertices;
     }
 
+    /**
+     * @return The union of getLatentVertices and getObservedVertices
+     */
     public List<Vertex> getLatentAndObservedVertices() {
         return vertices.stream()
             .filter(v -> v.isProbabilistic() || v.isObserved())
