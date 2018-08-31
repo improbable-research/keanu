@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,18 +22,15 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 public class LorenzTest {
     private final Logger log = LoggerFactory.getLogger(LorenzTest.class);
 
-    public static void main(String[] args) {
-        new LorenzTest().convergesOnLorenz();
-    }
-
+    @Test
     public void convergesOnLorenz() {
 
         double[] priorMu = new double[]{3, 3, 3};
         double error = Double.MAX_VALUE;
         double convergedError = 0.01;
-        int windowSize = 300;
+        int windowSize = 8;
         int window = 0;
-        int maxWindows = 5;
+        int maxWindows = 100;
 
         LorenzModel model = new LorenzModel();
         List<LorenzModel.Coordinates> observed = model.runModel(windowSize * maxWindows);

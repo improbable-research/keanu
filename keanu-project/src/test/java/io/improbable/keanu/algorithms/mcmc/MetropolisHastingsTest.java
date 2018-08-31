@@ -50,7 +50,7 @@ public class MetropolisHastingsTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
             Arrays.asList(A, B),
-            10000000
+            100000
         );
 
         double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();

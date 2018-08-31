@@ -30,7 +30,14 @@ public class ProgressBar {
         ENABLED.set(true);
     }
 
-    private static final PrintStream NULL_PRINT_STREAM = new PrintStream(NullOutputStream.NULL_OUTPUT_STREAM);
+    private static ScheduledExecutorService getDefaultScheduledExecutorService() {
+        return Executors.newScheduledThreadPool(1, r -> {
+            Thread t = Executors.defaultThreadFactory().newThread(r);
+            t.setDaemon(true);
+            return t;
+        });
+    }
+
     private static final AtomicBoolean ENABLED = new AtomicBoolean(true);
     private static final long FRAME_PERIOD_MS = 500;
     private static final ProgressUpdate DEFAULT_UPDATE = new ProgressUpdate();
@@ -62,14 +69,6 @@ public class ProgressBar {
 
     public ProgressBar() {
         this(DEFAULT_PRINT_STREAM, getDefaultScheduledExecutorService());
-    }
-
-    private static ScheduledExecutorService getDefaultScheduledExecutorService() {
-        return Executors.newScheduledThreadPool(1, r -> {
-            Thread t = Executors.defaultThreadFactory().newThread(r);
-            t.setDaemon(true);
-            return t;
-        });
     }
 
     public void progress() {
