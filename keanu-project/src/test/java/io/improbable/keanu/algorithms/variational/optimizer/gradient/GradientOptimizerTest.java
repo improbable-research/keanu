@@ -1,14 +1,16 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.distributions.discrete.Poisson;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
+
 import org.junit.Test;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 
 public class GradientOptimizerTest {
 
@@ -19,8 +21,8 @@ public class GradientOptimizerTest {
         GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(
             new GaussianVertex(0, 1)
         );
-        optimizer.onFitnessCalculation((point, fitness) -> fitnessTimesCalled.incrementAndGet());
-        optimizer.onGradientCalculation((point, fitness) -> gradientTimesCalled.incrementAndGet());
+        optimizer.addFitnessCalculationHandler((point, fitness) -> fitnessTimesCalled.incrementAndGet());
+        optimizer.addGradientCalculationHandler((point, fitness) -> gradientTimesCalled.incrementAndGet());
         optimizer.maxAPosteriori();
 
         assertTrue(fitnessTimesCalled.get() > 0);
@@ -33,5 +35,24 @@ public class GradientOptimizerTest {
         PoissonVertex v2 = new PoissonVertex(v1);
 
         GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
+    }
+
+    @Test
+    public void canRemoveFitnessCalculationHandler() {
+        GaussianVertex gaussianVertex = new GaussianVertex(0, 1);
+
+        GradientOptimizer optimizer = GradientOptimizer.of(gaussianVertex.getConnectedGraph());
+
+        AtomicBoolean didCallFitness = new AtomicBoolean(false);
+        BiConsumer<double[], Double> fitnessHandler = (position, logProb) -> {
+            didCallFitness.set(true);
+        };
+
+        optimizer.addFitnessCalculationHandler(fitnessHandler);
+        optimizer.removeFitnessCalculationHandler(fitnessHandler);
+
+        optimizer.maxAPosteriori();
+
+        assertFalse(didCallFitness.get());
     }
 }

@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.mcmc;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
@@ -47,10 +48,10 @@ public class NetworkSamplesGenerator {
                 algorithm.step();
             }
 
-            progressBar.progress();
+            progressBar.progress("Sampling...", (i + 1) / (double) samplesLeft);
         }
 
-        progressBar.finished();
+        progressBar.finish();
         return new NetworkSamples(samplesByVertex, sampleCount);
     }
 
@@ -58,23 +59,27 @@ public class NetworkSamplesGenerator {
 
         dropSamples(dropCount);
 
+        final AtomicInteger sampleNumber = new AtomicInteger(0);
+
         return Stream.generate(() -> {
+
+            sampleNumber.getAndIncrement();
 
             for (int i = 0; i < downSampleInterval - 1; i++) {
                 algorithm.step();
-                progressBar.progress();
             }
 
-            progressBar.progress();
-            return algorithm.sample();
+            NetworkState sample = algorithm.sample();
+            progressBar.progress(String.format("Sample #%,d completed", sampleNumber.get()));
+            return sample;
 
-        }).onClose(() -> progressBar.finished());
+        }).onClose(() -> progressBar.finish());
     }
 
     private void dropSamples(int dropCount) {
         for (int i = 0; i < dropCount; i++) {
             algorithm.step();
-            progressBar.progress();
+            progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);
         }
     }
 
