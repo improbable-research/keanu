@@ -57,31 +57,37 @@ public class BayesianNetwork {
         return vertices;
     }
 
+    private interface VertexProbabilisticObservedFilter {
+        boolean filter(boolean isObserved, boolean b);
+    }
+
+    private List<Vertex> getFilteredVertexList(VertexProbabilisticObservedFilter filter) {
+        return vertices.stream()
+            .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved()))
+            .collect(Collectors.toList());
+    }
+
     /**
      * @return The union of getLatentVertices and getObservedVertices
      */
     public List<Vertex> getLatentAndObservedVertices() {
-        return vertices.stream()
-            .filter(v -> v.isProbabilistic() || v.isObserved())
-            .collect(Collectors.toList());
+        return getFilteredVertexList((isProbabilistic, isObserved) -> isProbabilistic || isObserved);
     }
+
+    //public List<Vertex> getLatent
 
     /**
      * @return All vertices that are latent (i.e. probabilistic non-observed)
      */
     public List<Vertex> getLatentVertices() {
-        return vertices.stream()
-            .filter(v -> v.isProbabilistic() && !v.isObserved())
-            .collect(Collectors.toList());
+        return getFilteredVertexList((isProbabilistic, isObserved) -> isProbabilistic && !isObserved);
     }
 
     /**
      * @return All vertices that are observed - which may be probabilistic or non-probabilistic
      */
     public List<Vertex> getObservedVertices() {
-        return vertices.stream()
-            .filter(Vertex::isObserved)
-            .collect(Collectors.toList());
+        return getFilteredVertexList((isProbabilistic, isObserved) -> isObserved);
     }
 
     public double getLogOfMasterP() {

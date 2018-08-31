@@ -38,7 +38,7 @@ public class ModelCompositionTest {
 
         createInnerNet();
 
-        trueLocation = new UniformVertex(5.0, 10.0);
+        trueLocation = new UniformVertex(-50.0, 50.0);
 
         Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
