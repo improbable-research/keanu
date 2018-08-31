@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.vertices.VertexId;
 
 public interface SamplingAlgorithm {
 
@@ -18,7 +19,7 @@ public interface SamplingAlgorithm {
      *
      * @param samples map to store sampled vertex values
      */
-    void sample(Map<Long, List<?>> samples);
+    void sample(Map<VertexId, List<?>> samples);
 
     /**
      * Takes a sample with the algorithm and returns the state of the network for that sample.

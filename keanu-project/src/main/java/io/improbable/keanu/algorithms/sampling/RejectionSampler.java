@@ -10,6 +10,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class RejectionSampler {
@@ -72,7 +73,7 @@ public class RejectionSampler {
 
         bayesNet.cascadeObservations();
 
-        Map<Long, List<?>> samples = new HashMap<>();
+        Map<VertexId, List<?>> samples = new HashMap<>();
         long acceptedCount = 0;
 
         while (acceptedCount < sampleCount) {
@@ -100,11 +101,11 @@ public class RejectionSampler {
             .noneMatch(v -> ((NonProbabilistic) v).contradictsObservation());
     }
 
-    private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
+    private static void takeSamples(Map<VertexId, List<?>> samples, List<? extends Vertex<?>> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex(vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<Long, List<?>> samples) {
+    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<VertexId, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
     }

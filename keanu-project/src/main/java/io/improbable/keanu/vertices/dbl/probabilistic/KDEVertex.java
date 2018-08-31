@@ -6,6 +6,7 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -54,8 +55,8 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        Map<Long, DoubleTensor> partialDerivatives = new HashMap<>();
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
+        Map<VertexId, DoubleTensor> partialDerivatives = new HashMap<>();
 
         DoubleTensor dlnPdfs = dPdx(value).divInPlace(pdf(value));
 

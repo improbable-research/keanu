@@ -11,6 +11,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
@@ -70,7 +71,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(IntegerTensor value) {
         return Collections.emptyMap();
     }
 
