@@ -1,18 +1,24 @@
 package io.improbable.keanu.e2e.rocket;
 
-import io.improbable.keanu.algorithms.sampling.RejectionSampler;
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
+
+import java.util.Arrays;
+import java.util.stream.Stream;
+
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import static io.improbable.keanu.vertices.bool.BoolVertexTest.priorProbabilityTrue;
-import static org.junit.Assert.assertEquals;
 
 public class RocketTest {
     private final Logger log = LoggerFactory.getLogger(RocketTest.class);
@@ -23,7 +29,7 @@ public class RocketTest {
         KeanuRandom random = new KeanuRandom(1);
         BernoulliVertex oRingFailure = new BernoulliVertex(0.001);
 
-        Vertex<BooleanTensor> oRingFailureCausesOverheat = new BernoulliVertex(0.94);
+        BoolVertex oRingFailureCausesOverheat = new BernoulliVertex(0.94);
         Vertex<BooleanTensor> overHeatDueToORing = oRingFailure.and(oRingFailureCausesOverheat);
 
         BernoulliVertex residualFuel = new BernoulliVertex(0.002);
@@ -64,35 +70,54 @@ public class RocketTest {
         alarm2.observe(false);
 
         BayesianNetwork net = new BayesianNetwork(oRingFailure.getConnectedGraph());
+        net.probeForNonZeroProbability(1000);
 
-        double posteriorProbOfORingFailure = RejectionSampler.getPosteriorProbability(
-            net.getLatentVertices(),
-            net.getObservedVertices(),
-            () -> oRingFailure.getValue().scalar() == true,
-            10000,
-            random
-        );
-        double posteriorProbOfResidualFuel = RejectionSampler.getPosteriorProbability(
-            net.getLatentVertices(),
-            net.getObservedVertices(),
-            () -> residualFuel.getValue().scalar() == true,
-            10000,
-            random
-        );
+        Stream<NetworkState> networkSamples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
+            net,
+            Arrays.asList(oRingFailure, residualFuel, alarm1FalsePositive)
+        ).stream();
 
-        double posteriorProbOfAlarm1FalsePositive = RejectionSampler.getPosteriorProbability(
-            net.getLatentVertices(),
-            net.getObservedVertices(),
-            () -> alarm1FalsePositive.getValue().scalar() == true,
-            10000,
-            random
-        );
+        long sampleCount = 10000;
+        EventCounts eventCounts = networkSamples
+            .limit(sampleCount)
+            .map(state -> new EventCounts(
+                state.get(oRingFailure).scalar(),
+                state.get(residualFuel).scalar(),
+                state.get(alarm1FalsePositive).scalar()
+            )).reduce(new EventCounts(), EventCounts::combine);
+
+        double posteriorProbOfORingFailure = eventCounts.oRingFailureCount / (double) sampleCount;
+        double posteriorProbOfResidualFuel = eventCounts.residualFuelCount / (double) sampleCount;
+        double posteriorProbOfAlarm1FalsePositive = eventCounts.alarm1FalsePositiveCount / (double) sampleCount;
 
         log.info("Probability that there is an ORing failure given the evidence: " + posteriorProbOfORingFailure);
         log.info("Probability that there is residual fuel given the evidence: " + posteriorProbOfResidualFuel);
         log.info("Probability that alarm1 is a false positive given the evidence: " + posteriorProbOfAlarm1FalsePositive);
 
         assertEquals(posteriorProbOfAlarm1FalsePositive, 1, 0.001);
+    }
+
+    private static class EventCounts {
+        public long oRingFailureCount;
+        public long residualFuelCount;
+        public long alarm1FalsePositiveCount;
+
+        public EventCounts() {
+        }
+
+        public EventCounts(boolean oRingFailure, boolean residualFuel, boolean alarm1FalsePositive) {
+            oRingFailureCount = oRingFailure ? 1 : 0;
+            residualFuelCount = residualFuel ? 1 : 0;
+            alarm1FalsePositiveCount = alarm1FalsePositive ? 1 : 0;
+        }
+
+        public EventCounts combine(EventCounts that) {
+            EventCounts counts = new EventCounts();
+            counts.oRingFailureCount = this.oRingFailureCount + that.oRingFailureCount;
+            counts.residualFuelCount = this.residualFuelCount + that.residualFuelCount;
+            counts.alarm1FalsePositiveCount = this.alarm1FalsePositiveCount + that.alarm1FalsePositiveCount;
+            return counts;
+        }
     }
 
 }
