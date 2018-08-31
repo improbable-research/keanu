@@ -57,13 +57,13 @@ public class BayesianNetwork {
         return vertices;
     }
 
-    private interface VertexProbabilisticObservedFilter {
-        boolean filter(boolean isObserved, boolean b);
+    private interface VertexFilter {
+        boolean filter(boolean isProbabilistic, boolean isObserved, int depth);
     }
 
-    private List<Vertex> getFilteredVertexList(VertexProbabilisticObservedFilter filter) {
+    private List<Vertex> getFilteredVertexList(VertexFilter filter) {
         return vertices.stream()
-            .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved()))
+            .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved(), v.getId().getDepth()))
             .collect(Collectors.toList());
     }
 
@@ -71,23 +71,36 @@ public class BayesianNetwork {
      * @return The union of getLatentVertices and getObservedVertices
      */
     public List<Vertex> getLatentAndObservedVertices() {
-        return getFilteredVertexList((isProbabilistic, isObserved) -> isProbabilistic || isObserved);
+        return getLatentAndObservedVerticesAtDepth(Integer.MAX_VALUE);
     }
 
-    //public List<Vertex> getLatent
+    public List<Vertex> getLatentAndObservedVerticesAtDepth(int maxDepth) {
+        return getFilteredVertexList((isProbabilistic, isObserved, depth)
+            -> (isProbabilistic || isObserved) && maxDepth >= this.depth);
+    }
 
     /**
      * @return All vertices that are latent (i.e. probabilistic non-observed)
      */
     public List<Vertex> getLatentVertices() {
-        return getFilteredVertexList((isProbabilistic, isObserved) -> isProbabilistic && !isObserved);
+        return getLatentVerticesAtDepth(Integer.MAX_VALUE);
+    }
+
+    public List<Vertex> getLatentVerticesAtDepth(int maxDepth) {
+        return getFilteredVertexList((isProbabilistic, isObserved, depth)
+            -> (isProbabilistic && !isObserved) && maxDepth >= this.depth);
     }
 
     /**
      * @return All vertices that are observed - which may be probabilistic or non-probabilistic
      */
     public List<Vertex> getObservedVertices() {
-        return getFilteredVertexList((isProbabilistic, isObserved) -> isObserved);
+        return getObservedVerticesAtDepth(Integer.MAX_VALUE);
+    }
+
+    public List<Vertex> getObservedVerticesAtDepth(int maxDepth) {
+        return getFilteredVertexList((isProbabilistic, isObserved, depth) ->
+            isObserved && maxDepth >= this.depth);
     }
 
     public double getLogOfMasterP() {
