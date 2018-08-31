@@ -233,7 +233,7 @@ public class PartialDerivatives {
         }
     }
 
-    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft, boolean reverseMode) {
         Map<Long, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<Long, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
@@ -242,16 +242,36 @@ public class PartialDerivatives {
 
             DoubleTensor v;
             if (partialIsLeft) {
-                int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
-                rearrange[0] = 0;
-                rearrange[1] = partialRank - 1;
-                v = partial.getValue()
-                    .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                    .permute(rearrange);
+
+                if (reverseMode) {
+                    v = partial.getValue()
+                        .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{1});
+                } else {
+
+                    int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
+                    rearrange[0] = 0;
+                    rearrange[1] = partialRank - 1;
+                    v = partial.getValue()
+                        .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
+                        .permute(rearrange);
+                }
 
             } else {
-                v = multiplier
-                    .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
+
+                if (reverseMode) {
+                    int[] rearrange = TensorShape.dimensionRange(0, partialRank);
+                    rearrange[partialRank - 1] = partialRank - 2;
+                    rearrange[partialRank - 2] = partialRank - 1;
+
+                    v = partial.getValue()
+                        .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{0})
+                        .permute(rearrange);
+
+                } else {
+
+                    v = multiplier
+                        .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
+                }
             }
             multiplied.put(partial.getKey(), v);
         }

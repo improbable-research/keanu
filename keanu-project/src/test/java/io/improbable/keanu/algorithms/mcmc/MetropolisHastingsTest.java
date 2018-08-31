@@ -10,8 +10,10 @@ import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
+import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -24,12 +26,8 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class MetropolisHastingsTest {
 
-    private KeanuRandom random;
-
-    @Before
-    public void setup() {
-        random = new KeanuRandom(1);
-    }
+    @Rule
+    public DeterministicRule rule = new DeterministicRule();
 
     @Test
     public void samplesContinuousPrior() {
@@ -45,7 +43,7 @@ public class MetropolisHastingsTest {
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroProbability(100, random);
+        bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
@@ -74,7 +72,7 @@ public class MetropolisHastingsTest {
         Cobserved.observe(46.0);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
-        bayesNet.probeForNonZeroProbability(100, random);
+        bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
@@ -106,7 +104,7 @@ public class MetropolisHastingsTest {
         C.observe(true);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C));
-        bayesNet.probeForNonZeroProbability(100, random);
+        bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
@@ -136,7 +134,7 @@ public class MetropolisHastingsTest {
         E.observe(true);
 
         BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, C, D, E));
-        bayesNet.probeForNonZeroProbability(100, random);
+        bayesNet.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesNet,
@@ -158,7 +156,7 @@ public class MetropolisHastingsTest {
         C.observe(false);
 
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroProbability(100, random);
+        net.probeForNonZeroProbability(100);
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             net,
@@ -215,7 +213,7 @@ public class MetropolisHastingsTest {
 
         GaussianVertex A = new GaussianVertex(0.0, 1.0);
         BayesianNetwork net = new BayesianNetwork(A.getConnectedGraph());
-        net.probeForNonZeroProbability(100, random);
+        net.probeForNonZeroProbability(100);
 
         MetropolisHastings algo = MetropolisHastings.builder()
             .useCacheOnRejection(false)

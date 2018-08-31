@@ -1,16 +1,23 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.math3.util.Pair;
+
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import org.apache.commons.math3.util.Pair;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 public class DualNumber implements DoubleOperators<DualNumber> {
 
@@ -160,13 +167,13 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (this.partialDerivatives.isEmpty()) {
             thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
+            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true, false);
         }
 
         if (that.partialDerivatives.isEmpty()) {
             thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
+            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false, false);
         }
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
