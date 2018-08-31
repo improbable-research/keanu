@@ -9,11 +9,6 @@ import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 
 import java.util.Collections;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,6 +16,7 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.sampling.Prior;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
@@ -100,7 +96,7 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void YouCanSpecifyYourOwnOrderingOfOperations() {
+    public void canSpecifyYourOwnOrderingOfOperations() {
         BernoulliVertex v3 = new BernoulliVertex(0.5);
 
         v1.setValue(false);
@@ -109,7 +105,7 @@ public class BoolVertexTest {
     }
 
     @Test
-    public void youCanCombineTheOperatorsInDisjunctiveNormalForm() {
+    public void canCombineTheOperatorsInDisjunctiveNormalForm() {
         assertFalse(xor(false, false));
         assertTrue(xor(false, true));
         assertTrue(xor(true, false));
@@ -119,7 +115,7 @@ public class BoolVertexTest {
     private boolean xor(boolean b1, boolean b2) {
         BoolVertex v3 =
             v1.and(not(v2))
-            .or(not(v1).and(v2));
+                .or(not(v1).and(v2));
         v1.setValue(b1);
         v2.setValue(b2);
         return v3.eval().scalar();
