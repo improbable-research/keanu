@@ -9,18 +9,13 @@ import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 
 import java.util.Collections;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.sampling.Prior;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
@@ -119,7 +114,7 @@ public class BoolVertexTest {
     private boolean xor(boolean b1, boolean b2) {
         BoolVertex v3 =
             v1.and(not(v2))
-            .or(not(v1).and(v2));
+                .or(not(v1).and(v2));
         v1.setValue(b1);
         v2.setValue(b2);
         return v3.eval().scalar();
@@ -131,7 +126,7 @@ public class BoolVertexTest {
 
         double pV3True = orProbability(pV1, pV2);
 
-        assertEquals(priorProbabilityTrue(v3, 10000, random), pV3True, 0.01);
+        assertEquals(priorProbabilityTrue(v3, 30000, random), pV3True, 0.01);
     }
 
     @Test
@@ -242,8 +237,13 @@ public class BoolVertexTest {
     public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
         BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
 
-        NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount, random);
-        return samples.get(vertex).probability(val -> val.scalar());
+        long trueCount = MetropolisHastings.withDefaultConfig(random)
+            .generatePosteriorSamples(net, Collections.singletonList(vertex)).stream()
+            .limit(sampleCount)
+            .filter(state -> state.get(vertex).scalar())
+            .count();
+
+        return trueCount / (double) sampleCount;
     }
 
 }
