@@ -37,11 +37,11 @@ public class BayesianNetwork {
         return vertexLabels.get(label);
     }
 
-    private static Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
+    private Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
             VertexLabel label = v.getLabel();
-            if (label != null) {
+            if (v.getId().getDepth() == this.depth && label != null) {
                 if (labelMap.containsKey(label)) {
                     throw new IllegalArgumentException("Vertex Label Repeated: " + label);
                 } else {
