@@ -24,10 +24,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 public class ModelCompositionTest {
 
     private BayesianNetwork innerNet;
-    private UniformVertex trueLoc;
-    private UniformVertex trueSize;
+    private UniformVertex trueLocation;
     private BayesianNetwork outerNet;
-    private DoubleVertex loc;
+    private DoubleVertex location;
     private DoubleVertex size;
     private DoubleVertex gaussian;
     private DoubleVertex pareto;
@@ -39,12 +38,9 @@ public class ModelCompositionTest {
 
         createInnerNet();
 
-        trueLoc = new UniformVertex(5.0, 10.0);
-        trueSize = new UniformVertex(0.1, 10.0);
+        trueLocation = new UniformVertex(5.0, 10.0);
 
-        Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(
-            new VertexLabel("Loc"), trueLoc,
-            new VertexLabel("Size"), trueSize);
+        Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
         Map<VertexLabel, Vertex> outputs = ModelComposition.createModelVertices(
             innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"), new VertexLabel("Output2")));
@@ -55,13 +51,13 @@ public class ModelCompositionTest {
     }
 
     private void createInnerNet() {
-        loc = new DoubleProxyVertex();
-        loc.setLabel(new VertexLabel("Loc"));
-        size = new DoubleProxyVertex();
+        location = new DoubleProxyVertex();
+        location.setLabel(new VertexLabel("Location"));
+        size = new UniformVertex(0.1, 20);
         size.setLabel(new VertexLabel("Size"));
-        gaussian = new GaussianVertex(loc, size);
+        gaussian = new GaussianVertex(location, size);
         gaussian.setLabel(new VertexLabel("Output1"));
-        pareto = new ParetoVertex(loc, size);
+        pareto = new ParetoVertex(location, size);
         pareto.setLabel(new VertexLabel("Output2"));
 
         innerNet = new BayesianNetwork(gaussian.getConnectedGraph());
@@ -75,9 +71,8 @@ public class ModelCompositionTest {
 
     @Test
     public void verticesAreAtCorrectDepth() {
-        assertEquals(trueLoc.getId().getDepth(), 1);
-        assertEquals(trueSize.getId().getDepth(), 1);
-        assertEquals(loc.getId().getDepth(), 2);
+        assertEquals(trueLocation.getId().getDepth(), 1);
+        assertEquals(location.getId().getDepth(), 2);
         assertEquals(size.getId().getDepth(), 2);
         assertEquals(gaussian.getId().getDepth(), 1);
         assertEquals(pareto.getId().getDepth(), 1);
@@ -105,16 +100,16 @@ public class ModelCompositionTest {
         final double REAL_HYPER_LOC = 5.1;
         final double REAL_HYPER_SIZE = 1.0;
 
-        trueLoc.setValue(9.9);
-        trueSize.setValue(9.9);
+        trueLocation.setValue(9.9);
+        size.setValue(9.9);
         GaussianVertex sourceOfTruth = new GaussianVertex(new int[]{NUM_SAMPLES, 1}, REAL_HYPER_LOC, REAL_HYPER_SIZE);
 
         gaussOutputVertex.observe(sourceOfTruth.sample());
         GradientOptimizer optimizer = GradientOptimizer.of(outerNet);
         optimizer.maxAPosteriori();
 
-        assertEquals(trueLoc.getValue().scalar(), REAL_HYPER_LOC, 0.05);
-        assertEquals(trueSize.getValue().scalar(), REAL_HYPER_SIZE, 0.05);
+        assertEquals(trueLocation.getValue().scalar(), REAL_HYPER_LOC, 0.05);
+        assertEquals(size.getValue().scalar(), REAL_HYPER_SIZE, 0.05);
     }
 
 }

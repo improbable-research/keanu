@@ -6,6 +6,7 @@ import java.util.Map;
 
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 
 public class ModelComposition {
@@ -40,10 +41,11 @@ public class ModelComposition {
     }
 
     private static void increaseDepth(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> outputVertices) {
+        VertexId newPrefix = new VertexId();
         bayesianNetwork.incrementDepth();
         bayesianNetwork.getAllVertices().stream()
             .filter(v -> !outputVertices.containsKey(v.getLabel()))
-            .forEach(v -> v.getId().increaseDepth());
+            .forEach(v -> v.getId().increaseDepth(newPrefix));
         bayesianNetwork.getAllVertices().stream()
             .filter(v -> outputVertices.containsKey(v.getLabel()))
             .forEach(v -> v.getId().resetID());
@@ -52,15 +54,20 @@ public class ModelComposition {
     private static void checkAndLinkInputs(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> inputs) {
         for (Map.Entry<VertexLabel, Vertex> entry: inputs.entrySet()) {
             Vertex v = bayesianNetwork.getVertexByLabel(entry.getKey());
+
+            if (v == null) {
+                throw new IllegalArgumentException("No node labelled \"" + entry.getKey() + "\" found");
+            }
+
             if (v instanceof ProxyVertex) {
                 ProxyVertex proxyVertex = (ProxyVertex)v;
                 if (proxyVertex.hasParent()) {
-                    throw new IllegalArgumentException("Proxy Vertex for " + v.getLabel() + " already has Parent");
+                    throw new IllegalArgumentException("Proxy Vertex for \"" + v.getLabel() + "\" already has Parent");
                 } else {
                     proxyVertex.setParent(entry.getValue());
                 }
             } else {
-                throw new IllegalArgumentException("Input is not a Proxy Vertex");
+                throw new IllegalArgumentException("Input node \"" + entry.getKey() + "\" is not a Proxy Vertex");
             }
         }
     }

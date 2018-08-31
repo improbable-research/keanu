@@ -17,20 +17,24 @@ import lombok.EqualsAndHashCode;
 public class VertexId implements Comparable<VertexId> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
+    private static final int DEPTH_ONE_ARRAY_SIZE = 1;
 
-    long[] idValues = new long[1];
+    long[] idValues = new long[DEPTH_ONE_ARRAY_SIZE];
 
     public VertexId() {
         idValues[0] = ID_GENERATOR.getAndIncrement();
     }
 
-    public void increaseDepth() {
-        idValues.addFirst(ID_GENERATOR.get());
+    public void increaseDepth(VertexId prefix) {
+        long[] newIdValues = new long[idValues.length + prefix.idValues.length];
+        System.arraycopy(prefix.idValues, 0, newIdValues, 0, prefix.idValues.length);
+        System.arraycopy(idValues, 0, newIdValues, prefix.idValues.length, idValues.length);
+        idValues = newIdValues;
     }
 
     public void resetID() {
-        idValues.clear();
-        idValues.addFirst(ID_GENERATOR.incrementAndGet());
+        idValues = new long[DEPTH_ONE_ARRAY_SIZE];
+        idValues[0] = ID_GENERATOR.getAndIncrement();
     }
 
     @Override
