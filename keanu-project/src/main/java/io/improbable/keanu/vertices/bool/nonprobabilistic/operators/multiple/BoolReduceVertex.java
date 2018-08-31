@@ -1,15 +1,20 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.NonProbabilisticBool;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-public class BoolReduceVertex extends NonProbabilisticBool {
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
@@ -25,6 +30,7 @@ public class BoolReduceVertex extends NonProbabilisticBool {
         setValue(BooleanTensor.placeHolder(shape));
     }
 
+
     public BoolReduceVertex(int[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
     }
@@ -35,7 +41,7 @@ public class BoolReduceVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public BooleanTensor getDerivedValue() {
+    public BooleanTensor calculate() {
         return applyReduce(Vertex::getValue);
     }
 

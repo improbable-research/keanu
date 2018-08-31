@@ -1,9 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
@@ -16,16 +13,16 @@ public class RoundVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the vertex to be rounded
      */
     public RoundVertex(DoubleVertex inputVertex) {
-        super(inputVertex.getShape(), inputVertex);
+        super(inputVertex);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor a) {
-        return a.round();
+    protected DoubleTensor op(DoubleTensor value) {
+        return value.round();
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    protected DualNumber dualOp(DualNumber dualNumber) {
         throw new UnsupportedOperationException();
     }
 }

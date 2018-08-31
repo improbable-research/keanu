@@ -1,24 +1,27 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Collections;
+import java.util.Map;
+
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-import java.util.Map;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-public class BinomialVertex extends ProbabilisticInteger {
+public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
 
     public BinomialVertex(int[] tensorShape, DoubleVertex p, IntegerVertex n) {
+
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
         this.p = p;
         this.n = n;
@@ -56,13 +59,13 @@ public class BinomialVertex extends ProbabilisticInteger {
     }
 
     @Override
-    public double logPmf(IntegerTensor kTensor) {
+    public double logProb(IntegerTensor kTensor) {
         return Binomial.withParameters(p.getValue(), n.getValue()).logProb(kTensor).sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPmf(IntegerTensor value) {
-        throw new UnsupportedOperationException();
+    public Map<VertexId, DoubleTensor> dLogProb(IntegerTensor value) {
+        return Collections.emptyMap();
     }
 
     @Override

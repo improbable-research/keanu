@@ -1,10 +1,11 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class ConstantBoolVertex extends NonProbabilisticBool {
+public class ConstantBoolVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     public static final BoolVertex TRUE = new ConstantBoolVertex(true);
     public static final BoolVertex FALSE = new ConstantBoolVertex(false);
@@ -27,7 +28,7 @@ public class ConstantBoolVertex extends NonProbabilisticBool {
     }
 
     @Override
-    public BooleanTensor getDerivedValue() {
+    public BooleanTensor calculate() {
         return getValue();
     }
 }

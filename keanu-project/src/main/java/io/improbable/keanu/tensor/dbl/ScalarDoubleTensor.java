@@ -1,14 +1,15 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.Arrays;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.util.FastMath;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.util.FastMath;
-
-import java.util.Arrays;
-import java.util.function.Function;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -97,6 +98,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
         ScalarDoubleTensor reshapedScalar = new ScalarDoubleTensor(value);
         reshapedScalar.shape = newShape;
         return reshapedScalar;
+    }
+
+    @Override
+    public DoubleTensor permute(int... rearrange) {
+        return new ScalarDoubleTensor(value);
     }
 
     @Override
@@ -289,7 +295,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, double valueToApply) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, Double valueToApply) {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
@@ -300,7 +306,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return this.duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -351,6 +357,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public double standardDeviation() {
         throw new IllegalStateException("Cannot find the standard deviation of a scalar");
+    }
+
+    @Override
+    public boolean equalsWithinEpsilon(DoubleTensor o, double epsilon) {
+        if (this == o) return true;
+        if (!this.hasSameShapeAs(o)) return false;
+        double difference = value - o.scalar();
+        return (Math.abs(difference) <= epsilon);
     }
 
     @Override
@@ -652,6 +666,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor setAllInPlace(double value) {
+        this.value = value;
+        return this;
+    }
+
+    @Override
     public BooleanTensor lessThan(double that) {
         return BooleanTensor.scalar(this.value < that);
     }
@@ -778,5 +798,13 @@ public class ScalarDoubleTensor implements DoubleTensor {
         int result = value != null ? value.hashCode() : 0;
         result = 31 * result + Arrays.hashCode(shape);
         return result;
+    }
+
+    @Override
+    public String toString() {
+        return "{\n" +
+            "data = [" + value + "]" +
+            "\nshape = " + Arrays.toString(shape) +
+            "\n}";
     }
 }

@@ -1,13 +1,13 @@
 package io.improbable.keanu.tensor;
 
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
+import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.apache.commons.math3.util.MathArrays.copyOf;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 
 public interface Tensor<T> {
 
@@ -89,13 +89,12 @@ public interface Tensor<T> {
 
     /**
      * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
-     *
+     * <p>
      * (1, 2, 3) is a 1x3 vector.
-     *
+     * <p>
      * (1)
      * (2)
      * (3) is a 3x1 vector.
-     *
      *
      * @return true if the tensor is a vector
      */

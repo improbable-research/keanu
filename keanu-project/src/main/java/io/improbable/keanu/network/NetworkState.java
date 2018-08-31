@@ -1,8 +1,9 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.Set;
+
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 
 /**
  * Depending on how a NetworkState is being used, it may be significantly more efficient
@@ -15,7 +16,7 @@ public interface NetworkState {
 
     <T> T get(Vertex<T> vertex);
 
-    <T> T get(long vertexId);
+    <T> T get(VertexId vertexId);
 
-    Set<Long> getVertexIds();
+    Set<VertexId> getVertexIds();
 }

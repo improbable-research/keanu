@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.NonProbabilistic;
 
-public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
+public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonProbabilistic<OUT> {
 
     protected final Vertex<IN> inputVertex;
 
@@ -19,7 +19,8 @@ public abstract class UnaryOpVertex<IN, OUT> extends NonProbabilistic<OUT> {
         return op(inputVertex.sample(random));
     }
 
-    public OUT getDerivedValue() {
+    @Override
+    public OUT calculate() {
         return op(inputVertex.getValue());
     }
 

@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
-
 public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
-
     private final int dimension;
     private final int index;
 
@@ -24,8 +23,7 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
     }
 
     @Override
-    protected BooleanTensor op(BooleanTensor input) {
-        return input.slice(dimension, index);
+    protected BooleanTensor op(BooleanTensor value) {
+        return value.slice(dimension, index);
     }
-
 }

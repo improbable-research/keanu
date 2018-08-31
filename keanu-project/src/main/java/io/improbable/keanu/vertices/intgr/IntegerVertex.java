@@ -1,26 +1,34 @@
 package io.improbable.keanu.vertices.intgr;
 
+import java.util.function.Function;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.NumberTensor;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.DiscreteVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 
-import java.util.Map;
-import java.util.function.Function;
-
-public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
+public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);
@@ -54,6 +62,11 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return new IntegerDivisionVertex(this, new CastIntegerVertex(that));
     }
 
+    @Override
+    public IntegerVertex pow(IntegerVertex exponent) {
+        return new IntegerPowerVertex(this, exponent);
+    }
+
     public IntegerVertex minus(int value) {
         return new IntegerDifferenceVertex(this, new ConstantIntegerVertex(value));
     }
@@ -70,6 +83,10 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return new IntegerDivisionVertex(this, new ConstantIntegerVertex(divisor));
     }
 
+    public IntegerVertex pow(int exponent) {
+        return new IntegerPowerVertex(this, new ConstantIntegerVertex(exponent));
+    }
+
     public IntegerVertex abs() {
         return new IntegerAbsVertex(this);
     }
@@ -83,7 +100,7 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
     }
 
     public IntegerVertex lambda(Function<IntegerTensor, IntegerTensor> op) {
-        return new IntegerUnaryOpLambda<>(this.getShape(), this, op);
+        return new IntegerUnaryOpLambda<>(this, op);
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
@@ -115,6 +132,34 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
         return new IntegerSliceVertex(this, dimension, index);
     }
 
+    public IntegerVertex reshape(int... proposedShape) {
+        return new IntegerReshapeVertex(this, proposedShape);
+    }
+
+    public BoolVertex equalTo(IntegerVertex rhs) {
+        return new EqualsVertex<>(this, rhs);
+    }
+
+    public <T extends Tensor> BoolVertex notEqualTo(Vertex<T> rhs) {
+        return new NotEqualsVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThan(Vertex<T> rhs) {
+        return new GreaterThanVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex greaterThanOrEqualTo(Vertex<T> rhs) {
+        return new GreaterThanOrEqualVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThan(Vertex<T> rhs) {
+        return new LessThanVertex<>(this, rhs);
+    }
+
+    public <T extends NumberTensor> BoolVertex lessThanOrEqualTo(Vertex<T> rhs) {
+        return new LessThanOrEqualVertex<>(this, rhs);
+    }
+
     public void setValue(int value) {
         super.setValue(IntegerTensor.scalar(value));
     }
@@ -137,22 +182,6 @@ public abstract class IntegerVertex extends DiscreteVertex<IntegerTensor> implem
 
     public void observe(int[] values) {
         super.observe(IntegerTensor.create(values));
-    }
-
-    public double logPmf(int value) {
-        return this.logPmf(IntegerTensor.scalar(value));
-    }
-
-    public double logPmf(int[] values) {
-        return this.logPmf(IntegerTensor.create(values));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(int value) {
-        return this.dLogPmf(IntegerTensor.scalar(value));
-    }
-
-    public Map<Long, DoubleTensor> dLogPmf(int[] values) {
-        return this.dLogPmf(IntegerTensor.create(values));
     }
 
     public int getValue(int... index) {

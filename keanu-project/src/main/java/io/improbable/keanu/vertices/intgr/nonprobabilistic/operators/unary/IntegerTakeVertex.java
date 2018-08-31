@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerTakeVertex extends IntegerUnaryOpVertex {
-
     private final int[] index;
 
     /**
@@ -17,13 +16,12 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
      */
     public IntegerTakeVertex(IntegerVertex inputVertex, int... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
-        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;
+        TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
     }
 
     @Override
-    protected IntegerTensor op(IntegerTensor a) {
-        return IntegerTensor.scalar(a.getValue(index));
+    protected IntegerTensor op(IntegerTensor value) {
+        return IntegerTensor.scalar(value.getValue(index));
     }
-
 }

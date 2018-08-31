@@ -1,40 +1,43 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
-import org.apache.commons.math3.analysis.MultivariateFunction;
-import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
+import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 
-import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
-import static io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction.logOfTotalProbability;
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.analysis.MultivariateVectorFunction;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
 
 
 public class FitnessFunctionWithGradient {
 
-    private final List<Vertex> probabilisticVertices;
+    private final List<? extends Vertex> vertices;
     private final List<? extends Vertex<DoubleTensor>> latentVertices;
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<? extends Vertex> vertices,
                                        List<? extends Vertex<DoubleTensor>> latentVertices,
                                        BiConsumer<double[], double[]> onGradientCalculation,
                                        BiConsumer<double[], Double> onFitnessCalculation) {
-        this.probabilisticVertices = probabilisticVertices;
+        this.vertices = vertices;
         this.latentVertices = latentVertices;
         this.onGradientCalculation = onGradientCalculation;
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(List<Vertex> probabilisticVertices,
+    public FitnessFunctionWithGradient(List<? extends Vertex> vertices,
                                        List<? extends Vertex<DoubleTensor>> latentVertices) {
-        this(probabilisticVertices, latentVertices, null, null);
+        this(vertices, latentVertices, null, null);
     }
 
     public MultivariateVectorFunction gradient() {
@@ -42,7 +45,8 @@ public class FitnessFunctionWithGradient {
 
             setAndCascadePoint(point, latentVertices);
 
-            Map<Long, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
+            List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(this.vertices);
+            Map<VertexId, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, latentVertices);
 
@@ -57,7 +61,7 @@ public class FitnessFunctionWithGradient {
     public MultivariateFunction fitness() {
         return point -> {
             setAndCascadePoint(point, latentVertices);
-            double logOfTotalProbability = logOfTotalProbability(probabilisticVertices);
+            double logOfTotalProbability = ProbabilityCalculator.calculateLogProbFor(vertices);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);
@@ -67,7 +71,7 @@ public class FitnessFunctionWithGradient {
         };
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<Long /*Vertex Label*/, DoubleTensor /*Gradient*/> diffs,
+    private static double[] alignGradientsToAppropriateIndex(Map<VertexId, DoubleTensor /*Gradient*/> diffs,
                                                              List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();

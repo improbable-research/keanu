@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.B;
+import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -12,88 +12,69 @@ import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
+public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
 
-public class ExponentialVertex extends ProbabilisticDouble {
-
-    private final DoubleVertex location;
     private final DoubleVertex lambda;
 
     /**
-     * One location or lambda or both driving an arbitrarily shaped tensor of Exponential
+     * Lambda driving an arbitrarily shaped tensor of Exponential
      * <p>
      * pdf = lambda * exp(-lambda*x)
      * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
-     * @param location    the horizontal shift of the Exponential with either the same shape as specified
-     *                    for this vertex or location scalar
-     * @param lambda      the lambda of the Exponential with either the same shape as specified for this
-     *                    vertex or location scalar.
+     * @param lambda      the lambda of the Exponential with either be the same shape as specified for this
+     *                    vertex or scalar.
      */
-    public ExponentialVertex(int[] tensorShape, DoubleVertex location, DoubleVertex lambda) {
+    public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), lambda.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
 
-        this.location = location;
         this.lambda = lambda;
-        setParents(location, lambda);
+        setParents(lambda);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
     /**
-     * One to one constructor for mapping some shape of location and lambda to
-     * location matching shaped exponential.
+     * One to one constructor for mapping some shape of lambda to matching shaped exponential.
      *
-     * @param location the location of the Exponential with either the same shape as specified for this vertex or location scalar
-     * @param lambda   the lambda of the Exponential with either the same shape as specified for this vertex or location scalar
+     * @param lambda the lambda of the Exponential with either the same shape as specified for this vertex or scalar
      */
-    public ExponentialVertex(DoubleVertex location, DoubleVertex lambda) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), lambda.getShape()), location, lambda);
+    public ExponentialVertex(DoubleVertex lambda) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(lambda.getShape()), lambda);
     }
 
-    public ExponentialVertex(DoubleVertex location, double lambda) {
-        this(location, new ConstantDoubleVertex(lambda));
-    }
-
-    public ExponentialVertex(double location, DoubleVertex lambda) {
-        this(new ConstantDoubleVertex(location), lambda);
-    }
-
-    public ExponentialVertex(double location, double lambda) {
-        this(new ConstantDoubleVertex(location), new ConstantDoubleVertex(lambda));
+    public ExponentialVertex(double lambda) {
+        this(new ConstantDoubleVertex(lambda));
     }
 
     @Override
-    public double logPdf(DoubleTensor value) {
+    public double logProb(DoubleTensor value) {
 
-        DoubleTensor locationValues = location.getValue();
         DoubleTensor lambdaValues = lambda.getValue();
 
-        DoubleTensor logPdfs = Exponential.withParameters(locationValues, lambdaValues).logProb(value);
+        DoubleTensor logPdfs = Exponential.withParameters(lambdaValues).logProb(value);
 
         return logPdfs.sum();
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogPdf(DoubleTensor value) {
-        Diffs dlnP = Exponential.withParameters(location.getValue(), lambda.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(A).getValue(), dlnP.get(B).getValue(), dlnP.get(X).getValue());
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
+        Diffs dlnP = Exponential.withParameters(lambda.getValue()).dLogProb(value);
+        return convertDualNumbersToDiff(dlnP.get(LAMBDA).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
-                                                             DoubleTensor dLogPdlambda,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlambda,
                                                              DoubleTensor dLogPdx) {
 
-        PartialDerivatives dLogPdInputsFromA = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlocation);
-        PartialDerivatives dLogPdInputsFromB = lambda.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlambda);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromA.add(dLogPdInputsFromB);
+        PartialDerivatives dLogPdInputs = lambda.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlambda);
 
         if (!this.isObserved()) {
             dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
@@ -107,7 +88,7 @@ public class ExponentialVertex extends ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Exponential.withParameters(location.getValue(), lambda.getValue()).sample(getShape(), random);
+        return Exponential.withParameters(lambda.getValue()).sample(getShape(), random);
     }
 
 }

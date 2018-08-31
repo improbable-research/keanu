@@ -1,22 +1,21 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
+import java.util.List;
+import java.util.Map;
+
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Function;
-
-public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
+public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> implements NonProbabilistic<OUT> {
 
     private final List<Vertex<? extends Tensor<Boolean>>> inputs;
-    private final Map<Condition, ? extends Vertex<OUT>> conditions;
+    private final Map<CPTCondition, ? extends Vertex<OUT>> conditions;
     private final Vertex<OUT> defaultResult;
 
     public CPTVertex(List<Vertex<? extends Tensor<Boolean>>> inputs,
-                     Map<Condition, ? extends Vertex<OUT>> conditions,
+                     Map<CPTCondition, ? extends Vertex<OUT>> conditions,
                      Vertex<OUT> defaultResult) {
         this.conditions = conditions;
         this.inputs = inputs;
@@ -28,50 +27,16 @@ public class CPTVertex<OUT extends Tensor> extends NonProbabilistic<OUT> {
 
     @Override
     public OUT sample(KeanuRandom random) {
-        final Condition condition = getCondition((vertex) -> vertex.sample(random).scalar());
+        final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.sample(random).scalar());
         Vertex<OUT> vertex = conditions.get(condition);
         return vertex == null ? defaultResult.sample(random) : vertex.sample(random);
     }
 
     @Override
-    public OUT getDerivedValue() {
-        final Condition condition = getCondition(v -> v.getValue().scalar());
+    public OUT calculate() {
+        final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         Vertex<OUT> vertex = conditions.get(condition);
         return vertex == null ? defaultResult.getValue() : vertex.getValue();
-    }
-
-    private Condition getCondition(Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {
-
-        Boolean[] condition = new Boolean[inputs.size()];
-
-        for (int i = 0; i < condition.length; i++) {
-            condition[i] = mapper.apply(inputs.get(i));
-        }
-
-        return new Condition(condition);
-    }
-
-    public static class Condition {
-        private final Boolean[] conditions;
-
-        public Condition(Boolean[] condition) {
-            this.conditions = condition;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            Condition condition1 = (Condition) o;
-
-            return Arrays.equals(conditions, condition1.conditions);
-        }
-
-        @Override
-        public int hashCode() {
-            return Arrays.hashCode(conditions);
-        }
     }
 
 }

@@ -1,19 +1,20 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
-import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.network.LambdaSection;
-import io.improbable.keanu.network.NetworkSnapshot;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.Value;
-
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+
+import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
+import io.improbable.keanu.algorithms.mcmc.proposal.Proposal;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.network.LambdaSection;
+import io.improbable.keanu.network.NetworkSnapshot;
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Value;
 
 class MetropolisHastingsStep {
 
@@ -123,21 +124,7 @@ class MetropolisHastingsStep {
                                                       Map<Vertex, LambdaSection> affectedVertices) {
         double sumLogProb = 0.0;
         for (Vertex v : vertices) {
-            sumLogProb += sumLogProbability(affectedVertices.get(v).getLatentAndObservedVertices());
-        }
-        return sumLogProb;
-    }
-
-    /**
-     * This returns the log probability of typically a subset of a bayesian network.
-     *
-     * @param vertices Vertices to consider in log probability calculation
-     * @return the log probability of the set of vertices
-     */
-    private static double sumLogProbability(Set<Vertex> vertices) {
-        double sumLogProb = 0.0;
-        for (Vertex v : vertices) {
-            sumLogProb += v.logProbAtValue();
+            sumLogProb += ProbabilityCalculator.calculateLogProbFor(affectedVertices.get(v).getLatentAndObservedVertices());
         }
         return sumLogProb;
     }

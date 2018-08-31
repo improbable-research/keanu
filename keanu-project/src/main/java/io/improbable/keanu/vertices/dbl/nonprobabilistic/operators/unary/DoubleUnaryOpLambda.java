@@ -1,19 +1,21 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.NonProbabilisticDouble;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-
 import java.util.Map;
 import java.util.function.Function;
 
-public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiable;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
-    protected final Vertex<IN> inputVertex;
-    protected final Function<IN, DoubleTensor> op;
-    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
+public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+
+    private final Vertex<IN> inputVertex;
+    private final Function<IN, DoubleTensor> op;
+    private final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
 
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op, Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation) {
         this.inputVertex = inputVertex;
@@ -41,7 +43,7 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor getDerivedValue() {
+    public DoubleTensor calculate() {
         return op.apply(inputVertex.getValue());
     }
 
@@ -54,5 +56,3 @@ public class DoubleUnaryOpLambda<IN> extends NonProbabilisticDouble {
         throw new UnsupportedOperationException();
     }
 }
-
-

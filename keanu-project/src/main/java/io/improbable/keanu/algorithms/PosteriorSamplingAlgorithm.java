@@ -1,9 +1,9 @@
 package io.improbable.keanu.algorithms;
 
+import java.util.List;
+
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.Vertex;
-
-import java.util.List;
 
 public interface PosteriorSamplingAlgorithm {
 

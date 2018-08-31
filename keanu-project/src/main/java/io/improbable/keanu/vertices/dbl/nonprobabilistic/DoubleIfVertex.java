@@ -4,11 +4,13 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
-public class DoubleIfVertex extends NonProbabilisticDouble {
+public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     private final Vertex<? extends BooleanTensor> predicate;
     private final Vertex<? extends DoubleTensor> thn;
@@ -18,7 +20,6 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
-
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
@@ -32,17 +33,16 @@ public class DoubleIfVertex extends NonProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor getDerivedValue() {
+    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
+    }
+
+    @Override
+    public DoubleTensor calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
         return predicate.setDoubleIf(thn, els);
     }
-
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
-    }
-
 }

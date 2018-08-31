@@ -1,23 +1,29 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.network.grouping.NetworkStateGrouper;
-import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.junit.Test;
 
-import java.util.*;
-
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.network.grouping.NetworkStateGrouper;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class NetworkStateGrouperTest {
 
     private KeanuRandom random = new KeanuRandom(1);
 
-    long v1Id = 1;
-    long v2Id = 2;
-    long v3Id = 3;
-    long v4Id = 4;
-    long v5Id = 5;
+    VertexId v1Id = new VertexId();
+    VertexId v2Id = new VertexId();
+    VertexId v3Id = new VertexId();
+    VertexId v4Id = new VertexId();
+    VertexId v5Id = new VertexId();
 
     @Test
     public void finds5Groupings() {
@@ -30,8 +36,8 @@ public class NetworkStateGrouperTest {
         networkStates.addAll(createGroup(true, false, 6.0, 5.0, 4.0));
         networkStates.addAll(createGroup(false, false, 100.0, 200.0, 50000.0));
 
-        List<Long> discreteIds = Arrays.asList(v1Id, v2Id);
-        List<Long> continuousIds = Arrays.asList(v3Id, v4Id, v5Id);
+        List<VertexId> discreteIds = Arrays.asList(v1Id, v2Id);
+        List<VertexId> continuousIds = Arrays.asList(v3Id, v4Id, v5Id);
 
         NetworkStateGrouper grouper = new NetworkStateGrouper(new DBSCANContinuousPointGrouper(1.0, 3));
         List<List<NetworkState>> filteredStates = grouper.groupNetworkStates(networkStates, discreteIds, continuousIds);
@@ -44,7 +50,7 @@ public class NetworkStateGrouperTest {
         List<NetworkState> group = new ArrayList<>();
 
         for (int i = 0; i < 100; i++) {
-            Map<Long, ? super Object> values = new HashMap<>();
+            Map<VertexId, ? super Object> values = new HashMap<>();
             values.put(v1Id, v1);
             values.put(v2Id, v2);
             values.put(v3Id, v3 + (random.nextDouble() - 0.5));

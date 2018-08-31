@@ -1,21 +1,34 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import java.util.Map;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.VertexId;
 
-public abstract class ProbabilisticInteger extends IntegerVertex {
-
-    @Override
-    public IntegerTensor updateValue() {
-        if (!hasValue()) {
-            setValue(sample());
-        }
-        return getValue();
+public interface ProbabilisticInteger extends Probabilistic<IntegerTensor> {
+    default double logPmf(int value) {
+        return logPmf(IntegerTensor.scalar(value));
     }
 
-    @Override
-    public boolean isProbabilistic() {
-        return true;
+    default double logPmf(int[] values) {
+        return logPmf(IntegerTensor.create(values));
     }
 
+    default double logPmf(IntegerTensor value) {
+        return logProb(value);
+    }
+
+    default Map<VertexId, DoubleTensor> dLogPmf(int value) {
+        return dLogPmf(IntegerTensor.scalar(value));
+    }
+
+    default Map<VertexId, DoubleTensor> dLogPmf(int[] values) {
+        return dLogPmf(IntegerTensor.create(values));
+    }
+
+    default Map<VertexId,DoubleTensor> dLogPmf(IntegerTensor value) {
+        return dLogProb(value);
+    }
 }

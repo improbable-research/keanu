@@ -1,20 +1,23 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
-import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import lombok.Builder;
+import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
+import io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 /**
  * Simulated Annealing is a modified version of Metropolis Hastings that causes the MCMC random walk to
@@ -23,27 +26,39 @@ import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelecto
 @Builder
 public class SimulatedAnnealing {
 
+    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION = ProposalDistribution.usePrior();
+    private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
+    private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
+
     public static SimulatedAnnealing withDefaultConfig() {
         return withDefaultConfig(KeanuRandom.getDefaultRandom());
     }
 
     public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
         return SimulatedAnnealing.builder()
-            .proposalDistribution(ProposalDistribution.usePrior())
-            .variableSelector(SINGLE_VARIABLE_SELECTOR)
-            .useCacheOnRejection(true)
             .random(random)
             .build();
     }
 
-    private final KeanuRandom random;
-    private final ProposalDistribution proposalDistribution;
-
+    @Getter
+    @Setter
     @Builder.Default
-    private final MHStepVariableSelector variableSelector = SINGLE_VARIABLE_SELECTOR;
+    private KeanuRandom random = KeanuRandom.getDefaultRandom();
 
+    @Getter
+    @Setter
     @Builder.Default
-    private final boolean useCacheOnRejection = true;
+    private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
+
+    @Getter
+    @Setter
+    @Builder.Default
+    private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
 
     public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet,
                                           int sampleCount) {
@@ -69,7 +84,7 @@ public class SimulatedAnnealing {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<Long, ?> maxSamplesByVertex = new HashMap<>();
+        Map<VertexId, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
         double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
@@ -107,12 +122,12 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(maxSamplesByVertex);
     }
 
-    private static void setSamplesAsMax(Map<Long, ?> samples, List<? extends Vertex> fromVertices) {
+    private static void setSamplesAsMax(Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<Long, ?> samples) {
-        ((Map<Long, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<VertexId, ?> samples) {
+        ((Map<VertexId, ? super T>) samples).put(vertex.getId(), vertex.getValue());
     }
 
     /**

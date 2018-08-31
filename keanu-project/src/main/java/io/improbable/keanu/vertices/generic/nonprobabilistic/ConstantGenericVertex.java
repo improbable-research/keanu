@@ -1,8 +1,10 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class ConstantGenericVertex<T> extends NonProbabilistic<T> {
+public class ConstantGenericVertex<T> extends Vertex<T> implements NonProbabilistic<T> {
 
     public ConstantGenericVertex(T value) {
         setValue(value);
@@ -14,7 +16,7 @@ public class ConstantGenericVertex<T> extends NonProbabilistic<T> {
     }
 
     @Override
-    public T getDerivedValue() {
+    public T calculate() {
         return getValue();
     }
 }
