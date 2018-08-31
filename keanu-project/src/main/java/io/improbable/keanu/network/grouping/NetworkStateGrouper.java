@@ -1,15 +1,18 @@
 package io.improbable.keanu.network.grouping;
 
-import io.improbable.keanu.network.NetworkState;
-import io.improbable.keanu.network.SimpleNetworkState;
-import io.improbable.keanu.network.grouping.continuouspointgroupers.ContinuousPointGrouper;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toMap;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.*;
+import io.improbable.keanu.network.NetworkState;
+import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.ContinuousPointGrouper;
+import io.improbable.keanu.vertices.VertexId;
 
 /**
  * This class has the ability to group NetworkStates that are similar. Which NetworkStates
@@ -34,8 +37,8 @@ public class NetworkStateGrouper {
      * of the supplied networkStates
      */
     public List<List<NetworkState>> groupNetworkStates(List<NetworkState> networkStates,
-                                                       List<Long> discreteVertexIds,
-                                                       List<Long> continuousVertexIds) {
+                                                       List<VertexId> discreteVertexIds,
+                                                       List<VertexId> continuousVertexIds) {
 
 
         Map<DiscretePoint, List<NetworkState>> statesGroupedByDiscretePoint = networkStates.stream()
@@ -58,26 +61,26 @@ public class NetworkStateGrouper {
 
     private Stream<List<NetworkState>> toListOfNetworkStates(DiscretePoint discretePoint,
                                                              List<List<ContinuousPoint>> continuousPoints,
-                                                             List<Long> discreteVertexIds,
-                                                             List<Long> continuousVertexIds) {
+                                                             List<VertexId> discreteVertexIds,
+                                                             List<VertexId> continuousVertexIds) {
 
-        Map<Long, ?> discreteValues = fromDiscretePoint(discretePoint, discreteVertexIds);
+        Map<VertexId, ?> discreteValues = fromDiscretePoint(discretePoint, discreteVertexIds);
 
         return continuousPoints.stream()
             .map(groupedPoints -> toNetworkState(discreteValues, groupedPoints, continuousVertexIds));
     }
 
-    private List<NetworkState> toNetworkState(Map<Long, ?> discreteValues, List<ContinuousPoint> continuousPoints, List<Long> continuousVertexIds) {
+    private List<NetworkState> toNetworkState(Map<VertexId, ?> discreteValues, List<ContinuousPoint> continuousPoints, List<VertexId> continuousVertexIds) {
         return continuousPoints.stream().map(point -> {
-            Map<Long, ? super Object> networkState = new HashMap<>();
-            Map<Long, Double> continuousValues = fromContinuousPoint(point, continuousVertexIds);
+            Map<VertexId, ? super Object> networkState = new HashMap<>();
+            Map<VertexId, Double> continuousValues = fromContinuousPoint(point, continuousVertexIds);
             networkState.putAll(continuousValues);
             networkState.putAll(discreteValues);
             return new SimpleNetworkState(networkState);
         }).collect(toList());
     }
 
-    private DiscretePoint toDiscretePoint(NetworkState networkState, List<Long> discreteVertexIds) {
+    private DiscretePoint toDiscretePoint(NetworkState networkState, List<VertexId> discreteVertexIds) {
         Object[] point = new Object[discreteVertexIds.size()];
         for (int vertex = 0; vertex < discreteVertexIds.size(); vertex++) {
             point[vertex] = networkState.get(discreteVertexIds.get(vertex));
@@ -85,8 +88,8 @@ public class NetworkStateGrouper {
         return new DiscretePoint(point);
     }
 
-    private Map<Long, ?> fromDiscretePoint(DiscretePoint discretePoint, List<Long> discreteVertexIds) {
-        Map<Long, ? super Object> discreteStates = new HashMap<>();
+    private Map<VertexId, ?> fromDiscretePoint(DiscretePoint discretePoint, List<VertexId> discreteVertexIds) {
+        Map<VertexId, ? super Object> discreteStates = new HashMap<>();
         Object[] discreteValues = discretePoint.getPoint();
         for (int i = 0; i < discreteVertexIds.size(); i++) {
             discreteStates.put(discreteVertexIds.get(i), discreteValues[i]);
@@ -95,17 +98,17 @@ public class NetworkStateGrouper {
         return discreteStates;
     }
 
-    private List<ContinuousPoint> toContinuousPoints(List<NetworkState> networkStates, List<Long> continuousVertexIds) {
+    private List<ContinuousPoint> toContinuousPoints(List<NetworkState> networkStates, List<VertexId> continuousVertexIds) {
         return networkStates.stream()
             .map(p -> toContinuousPoint(p, continuousVertexIds))
             .collect(toList());
     }
 
-    private ContinuousPoint toContinuousPoint(NetworkState networkState, List<Long> continuousVertexIds) {
+    private ContinuousPoint toContinuousPoint(NetworkState networkState, List<VertexId> continuousVertexIds) {
         double[] point = new double[continuousVertexIds.size()];
 
         int i = 0;
-        for (Long vertexId : continuousVertexIds) {
+        for (VertexId vertexId : continuousVertexIds) {
             point[i] = networkState.get(vertexId);
             i++;
         }
@@ -113,8 +116,8 @@ public class NetworkStateGrouper {
         return new ContinuousPoint(point);
     }
 
-    private Map<Long, Double> fromContinuousPoint(ContinuousPoint point, List<Long> continuousVertexIds) {
-        Map<Long, Double> continuousStates = new HashMap<>();
+    private Map<VertexId, Double> fromContinuousPoint(ContinuousPoint point, List<VertexId> continuousVertexIds) {
+        Map<VertexId, Double> continuousStates = new HashMap<>();
         double[] continuousValues = point.getPoint();
         for (int i = 0; i < continuousVertexIds.size(); i++) {
             continuousStates.put(continuousVertexIds.get(i), continuousValues[i]);

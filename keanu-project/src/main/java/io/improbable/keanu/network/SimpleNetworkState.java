@@ -1,15 +1,16 @@
 package io.improbable.keanu.network;
 
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.Map;
 import java.util.Set;
 
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+
 public class SimpleNetworkState implements NetworkState {
 
-    private final Map<Long, ?> vertexValues;
+    private final Map<VertexId, ?> vertexValues;
 
-    public SimpleNetworkState(Map<Long, ?> vertexValues) {
+    public SimpleNetworkState(Map<VertexId, ?> vertexValues) {
         this.vertexValues = vertexValues;
     }
 
@@ -19,12 +20,12 @@ public class SimpleNetworkState implements NetworkState {
     }
 
     @Override
-    public <T> T get(long vertexId) {
+    public <T> T get(VertexId vertexId) {
         return (T) vertexValues.get(vertexId);
     }
 
     @Override
-    public Set<Long> getVertexIds() {
+    public Set<VertexId> getVertexIds() {
         return vertexValues.keySet();
     }
 }

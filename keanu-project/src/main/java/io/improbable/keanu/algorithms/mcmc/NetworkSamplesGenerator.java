@@ -9,6 +9,7 @@ import java.util.stream.Stream;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.VertexId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -34,7 +35,7 @@ public class NetworkSamplesGenerator {
 
     public NetworkSamples generate(final int totalSampleCount) {
 
-        Map<Long, List<?>> samplesByVertex = new HashMap<>();
+        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
 
         dropSamples(dropCount);
 

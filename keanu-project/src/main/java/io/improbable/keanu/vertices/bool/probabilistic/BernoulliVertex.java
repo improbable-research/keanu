@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -63,7 +64,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(BooleanTensor value) {
 
         if (!(probTrue instanceof Differentiable)) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");

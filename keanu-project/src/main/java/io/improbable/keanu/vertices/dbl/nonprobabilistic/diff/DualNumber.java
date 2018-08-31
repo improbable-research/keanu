@@ -1,16 +1,24 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.math3.util.Pair;
+
+import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
-import java.util.*;
-import java.util.stream.Collectors;
-
-import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import org.apache.commons.math3.util.Pair;
 
 public class DualNumber implements DoubleOperators<DualNumber> {
 
@@ -18,7 +26,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(value, PartialDerivatives.OF_CONSTANT);
     }
 
-    public static DualNumber createWithRespectToSelf(long withRespectTo, DoubleTensor value) {
+    public static DualNumber createWithRespectToSelf(VertexId withRespectTo, DoubleTensor value) {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
@@ -39,11 +47,11 @@ public class DualNumber implements DoubleOperators<DualNumber> {
                                     int dimension,
                                     DoubleTensor[] dualValues) {
 
-        Map<Long, List<DoubleTensor>> dualNumbersToConcat = new HashMap<>();
-        List<Pair<Long, List<Integer>>> vertexIds = findShapesOfVertexWithRespectTo(dualNumbersOfInputs);
+        Map<VertexId, List<DoubleTensor>> dualNumbersToConcat = new HashMap<>();
+        List<Pair<VertexId, List<Integer>>> vertexIds = findShapesOfVertexWithRespectTo(dualNumbersOfInputs);
 
-        for (Pair<Long, List<Integer>> wrtVertex : vertexIds) {
-            long vertexId = wrtVertex.getFirst();
+        for (Pair<VertexId, List<Integer>> wrtVertex : vertexIds) {
+            VertexId vertexId = wrtVertex.getFirst();
 
             for (DoubleVertex ofVertex : input) {
                 int[] shapeOfVertexWithRespectTo = wrtVertex.getSecond().stream().mapToInt(i -> i).toArray();
@@ -60,9 +68,9 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             }
         }
 
-        Map<Long, DoubleTensor> concattedDualNumbers = new HashMap<>();
+        Map<VertexId, DoubleTensor> concattedDualNumbers = new HashMap<>();
 
-        for (Map.Entry<Long, List<DoubleTensor>> dualNumberForVertex : dualNumbersToConcat.entrySet()) {
+        for (Map.Entry<VertexId, List<DoubleTensor>> dualNumberForVertex : dualNumbersToConcat.entrySet()) {
             DoubleTensor concatted = concatPartialDerivates(dimension, dualNumberForVertex.getValue());
             concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
         }
@@ -81,12 +89,12 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         }
     }
 
-    private static List<Pair<Long, List<Integer>>> findShapesOfVertexWithRespectTo(List<DualNumber> dualNumbers) {
-        List<Pair<Long, List<Integer>>> vertexInfo = new ArrayList<>();
+    private static List<Pair<VertexId, List<Integer>>> findShapesOfVertexWithRespectTo(List<DualNumber> dualNumbers) {
+        List<Pair<VertexId, List<Integer>>> vertexInfo = new ArrayList<>();
         Set ids = new HashSet();
 
         for (DualNumber dualNumber : dualNumbers) {
-            for (Map.Entry<Long, DoubleTensor> entry : dualNumber.getPartialDerivatives().asMap().entrySet()) {
+            for (Map.Entry<VertexId, DoubleTensor> entry : dualNumber.getPartialDerivatives().asMap().entrySet()) {
                 if (!ids.contains(entry.getKey())) {
                     vertexInfo.add(new Pair<>(entry.getKey(), Arrays.stream(entry.getValue().getShape()).boxed().collect(Collectors.toList())));
                     ids.add(entry.getKey());
@@ -105,11 +113,11 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         this.partialDerivatives = partialDerivatives;
     }
 
-    public DualNumber(DoubleTensor value, Map<Long, DoubleTensor> partialDerivatives) {
+    public DualNumber(DoubleTensor value, Map<VertexId, DoubleTensor> partialDerivatives) {
         this(value, new PartialDerivatives(partialDerivatives));
     }
 
-    public DualNumber(DoubleTensor value, long infinitesimalLabel) {
+    public DualNumber(DoubleTensor value, VertexId infinitesimalLabel) {
         this(value, new PartialDerivatives(Collections.singletonMap(infinitesimalLabel, DoubleTensor.ones(value.getShape()))));
     }
 
@@ -379,9 +387,9 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     }
 
     public DualNumber take(int... index) {
-        Map<Long, DoubleTensor> dualsAtIndex = new HashMap<>();
+        Map<VertexId, DoubleTensor> dualsAtIndex = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> entry : this.partialDerivatives.asMap().entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> entry : this.partialDerivatives.asMap().entrySet()) {
             DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
             int desiredRank = entry.getValue().getShape().length;
             int[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);

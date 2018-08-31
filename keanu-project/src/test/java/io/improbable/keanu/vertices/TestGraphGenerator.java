@@ -31,9 +31,9 @@ public class TestGraphGenerator {
 
         private final AtomicInteger opCount;
         private final AtomicInteger dualNumberCount;
-        private final Consumer<Long> onOp;
+        private final Consumer<VertexId> onOp;
 
-        public PassThroughVertex(DoubleVertex inputVertex, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
+        public PassThroughVertex(DoubleVertex inputVertex, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
             super(inputVertex);
             this.opCount = opCount;
             this.dualNumberCount = dualNumberCount;
@@ -54,7 +54,7 @@ public class TestGraphGenerator {
         }
     }
 
-    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
+    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
         return new PassThroughVertex(from, opCount, dualNumberCount, onOp);
     }
 
@@ -62,11 +62,11 @@ public class TestGraphGenerator {
 
         private final AtomicInteger opCount;
         private final AtomicInteger dualNumberCount;
-        private final Consumer<Long> onOp;
+        private final Consumer<VertexId> onOp;
 
         public SumVertex(DoubleVertex left, DoubleVertex right,
                          AtomicInteger opCount, AtomicInteger dualNumberCount,
-                         Consumer<Long> onOp) {
+                         Consumer<VertexId> onOp) {
             super(left, right);
             this.opCount = opCount;
             this.dualNumberCount = dualNumberCount;
@@ -87,7 +87,7 @@ public class TestGraphGenerator {
         }
     }
 
-    static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<Long> onOp) {
+    static DoubleVertex sumVertex(DoubleVertex left, DoubleVertex right, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
         return new SumVertex(left, right, opCount, dualNumberCount, onOp);
     }
 

@@ -10,6 +10,7 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
@@ -63,7 +64,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(IntegerTensor value) {
         return Collections.emptyMap();
     }
 

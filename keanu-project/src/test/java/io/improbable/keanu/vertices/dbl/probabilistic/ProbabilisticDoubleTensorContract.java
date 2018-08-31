@@ -1,14 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.Pair;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,13 +16,18 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.util.Pair;
+
+import com.google.common.collect.ImmutableList;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ProbabilisticDoubleTensorContract {
 
@@ -197,7 +200,7 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<Long, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
+        Map<VertexId, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
@@ -250,14 +253,14 @@ public class ProbabilisticDoubleTensorContract {
 
         V tensorVertex = vertexUnderTestSupplier.get();
 
-        Map<Long, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
             DoubleTensor.create(vector, new int[]{vector.length, 1})
         );
 
-        HashSet<Long> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
+        HashSet<VertexId> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
         hyperParameterVertices.remove(tensorVertex.getId());
 
-        for (Long id : hyperParameterVertices) {
+        for (VertexId id : hyperParameterVertices) {
             assertEquals(expectedPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
         }
 
