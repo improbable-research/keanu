@@ -225,7 +225,7 @@ public class PartialDerivatives {
         }
     }
 
-    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft, boolean reverseMode) {
+    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
         Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
@@ -234,36 +234,41 @@ public class PartialDerivatives {
 
             DoubleTensor v;
             if (partialIsLeft) {
-
-                if (reverseMode) {
-                    v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{1});
-                } else {
-
-                    int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
-                    rearrange[0] = 0;
-                    rearrange[1] = partialRank - 1;
-                    v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
-                        .permute(rearrange);
-                }
-
+                int[] rearrange = TensorShape.dimensionRange(-1, partialRank - 1);
+                rearrange[0] = 0;
+                rearrange[1] = partialRank - 1;
+                v = partial.getValue()
+                    .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
+                    .permute(rearrange);
             } else {
+                v = multiplier
+                    .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
+            }
+            multiplied.put(partial.getKey(), v);
+        }
 
-                if (reverseMode) {
-                    int[] rearrange = TensorShape.dimensionRange(0, partialRank);
-                    rearrange[partialRank - 1] = partialRank - 2;
-                    rearrange[partialRank - 2] = partialRank - 1;
+        return new PartialDerivatives(multiplied);
+    }
 
-                    v = partial.getValue()
-                        .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{0})
-                        .permute(rearrange);
+    public static PartialDerivatives matrixMultiplyReverse(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
+        Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
-                } else {
+        for (Map.Entry<VertexId, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
 
-                    v = multiplier
-                        .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});
-                }
+            int partialRank = partial.getValue().getRank();
+
+            DoubleTensor v;
+            if (partialIsLeft) {
+                v = partial.getValue()
+                    .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{1});
+            } else {
+                int[] rearrange = TensorShape.dimensionRange(0, partialRank);
+                rearrange[partialRank - 1] = partialRank - 2;
+                rearrange[partialRank - 2] = partialRank - 1;
+
+                v = partial.getValue()
+                    .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{0})
+                    .permute(rearrange);
             }
             multiplied.put(partial.getKey(), v);
         }
