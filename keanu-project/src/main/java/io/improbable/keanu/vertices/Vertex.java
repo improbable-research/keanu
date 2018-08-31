@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -211,12 +210,12 @@ public abstract class Vertex<T> implements Observable<T> {
 
         Vertex<?> vertex = (Vertex<?>) o;
 
-        return Objects.equals(this.id, vertex.id);
+        return this.id.equals(vertex.id);
     }
 
     @Override
     public int hashCode() {
-        return (int)Objects.hash(id);
+        return id.hashCode();
     }
 
     public Set<Vertex> getConnectedGraph() {
