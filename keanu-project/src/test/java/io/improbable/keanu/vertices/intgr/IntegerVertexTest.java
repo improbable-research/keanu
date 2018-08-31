@@ -7,15 +7,11 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
@@ -139,6 +135,15 @@ public class IntegerVertexTest {
         int[] values = new int[]{1, 2, 3};
         binomialVertex.setValue(values);
         assertEquals(1, (long) binomialVertex.take(0, 0).getValue().scalar());
+    }
+
+    @Test
+    public void canReshape() {
+        IntegerVertex binomialVertex = new BinomialVertex(0, 1);
+        binomialVertex.setAndCascade(IntegerTensor.ones(2, 2));
+        assertArrayEquals(binomialVertex.getShape(), new int[]{2, 2});
+        IntegerVertex reshaped = binomialVertex.reshape(4, 1);
+        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
     }
 
 }

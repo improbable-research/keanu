@@ -16,6 +16,7 @@ import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -61,7 +62,7 @@ public class CauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         CauchyVertex tensorCauchyVertex = new CauchyVertex(locationTensor, scaleTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

@@ -14,6 +14,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolReshapeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
@@ -81,16 +82,16 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         super.observe(BooleanTensor.create(values));
     }
 
-    public void observe(BooleanTensor value) {
-        super.observe(value);
-    }
-
     public boolean getValue(int... index) {
         return getValue().getValue(index);
     }
 
     public BoolVertex take(int... index) {
         return new BoolTakeVertex(this, index);
+    }
+
+    public BoolVertex reshape(int... proposedShape) {
+        return new BoolReshapeVertex(this, proposedShape);
     }
 
 

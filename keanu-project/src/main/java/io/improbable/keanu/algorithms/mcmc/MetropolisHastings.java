@@ -16,6 +16,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -135,30 +136,31 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
         }
 
         @Override
-        public void sample(Map<Long, List<?>> samplesByVertex) {
+        public void sample(Map<VertexId, List<?>> samplesByVertex) {
             step();
             takeSamples(samplesByVertex, verticesToSampleFrom);
         }
 
         @Override
         public NetworkState sample() {
+            step();
             return new SimpleNetworkState(takeSample(verticesToSampleFrom));
         }
     }
 
-    private static Map<Long, ?> takeSample(List<? extends Vertex> fromVertices) {
-        Map<Long, Object> sample = new HashMap<>();
+    private static Map<VertexId, ?> takeSample(List<? extends Vertex> fromVertices) {
+        Map<VertexId, Object> sample = new HashMap<>();
         for (Vertex v : fromVertices) {
             sample.put(v.getId(), v.getValue());
         }
         return sample;
     }
 
-    private static void takeSamples(Map<Long, List<?>> samples, List<? extends Vertex> fromVertices) {
+    private static void takeSamples(Map<VertexId, List<?>> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> addSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<Long, List<?>> samples) {
+    private static <T> void addSampleForVertex(Vertex<T> vertex, Map<VertexId, List<?>> samples) {
         List<T> samplesForVertex = (List<T>) samples.computeIfAbsent(vertex.getId(), v -> new ArrayList<T>());
         samplesForVertex.add(vertex.getValue());
     }

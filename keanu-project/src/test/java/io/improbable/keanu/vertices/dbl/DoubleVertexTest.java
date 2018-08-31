@@ -64,4 +64,13 @@ public class DoubleVertexTest {
         gaussianVertex.setAndCascade(values);
         assertEquals(1, gaussianVertex.take(0, 0).getValue().scalar(), 0.0);
     }
+
+    @Test
+    public void canReshape() {
+        DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
+        gaussianVertex.setAndCascade(DoubleTensor.ones(2, 2));
+        assertArrayEquals(gaussianVertex.getShape(), new int[]{2, 2});
+        DoubleVertex reshaped = gaussianVertex.reshape(4, 1);
+        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+    }
 }

@@ -37,6 +37,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleU
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
@@ -159,6 +160,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SumVertex(this);
     }
 
+    public DoubleVertex reshape(int... proposedShape) {
+        return new ReshapeVertex(this, proposedShape);
+    }
+
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
@@ -251,10 +256,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public void observe(double[] values) {
         super.observe(DoubleTensor.create(values));
-    }
-
-    public void observe(DoubleTensor value) {
-        super.observe(value);
     }
 
     public double getValue(int... index) {

@@ -261,7 +261,7 @@ public class MetropolisHastingsTest {
 
         int sampleCount = 1000;
         int dropCount = 100;
-        int downSampleInterval = 2;
+        int downSampleInterval = 0;
         GaussianVertex A = new GaussianVertex(0, 1);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
 
@@ -269,7 +269,7 @@ public class MetropolisHastingsTest {
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .stream()
-            .limit(200)
+            .limit(sampleCount)
             .mapToDouble(networkState -> networkState.get(A).scalar())
             .average().getAsDouble();
 

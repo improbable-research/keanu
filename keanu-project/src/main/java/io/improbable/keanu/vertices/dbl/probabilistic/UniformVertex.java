@@ -9,6 +9,7 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -86,7 +87,7 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
         dLogPdx = dLogPdx.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
         dLogPdx = dLogPdx.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);

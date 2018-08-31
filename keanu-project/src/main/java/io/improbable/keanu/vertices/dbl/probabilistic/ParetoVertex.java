@@ -14,6 +14,7 @@ import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -27,7 +28,7 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
     /**
      * Provides a Vertex implementing the Pareto Distribution.
-     *
+     * <p>
      * If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
@@ -90,18 +91,18 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Pareto.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdLoc,
-                                                             DoubleTensor dLogPdScale,
-                                                             DoubleTensor dLogPdX) {
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdLocation,
+                                                                 DoubleTensor dLogPdScale,
+                                                                 DoubleTensor dLogPdX) {
 
-        PartialDerivatives dLogPdInputsFromLoc = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdLoc);
+        PartialDerivatives dLogPdInputsFromLocation = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdLocation);
         PartialDerivatives dLogPdInputsFromScale = scale.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdScale);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromLoc.add(dLogPdInputsFromScale);
+        PartialDerivatives dLogPdInputs = dLogPdInputsFromLocation.add(dLogPdInputsFromScale);
 
         if (!this.isObserved()) {
             dLogPdInputs.putWithRespectTo(getId(), dLogPdX.reshape(

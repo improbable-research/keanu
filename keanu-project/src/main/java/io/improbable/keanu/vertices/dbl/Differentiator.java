@@ -17,6 +17,7 @@ import java.util.Set;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
@@ -28,7 +29,7 @@ public class Differentiator {
 
     public static Map<Vertex, PartialDerivatives> forwardModeAutoDiff(Collection<DoubleVertex> of, Collection<DoubleVertex> wrt) {
 
-        PriorityQueue<DoubleVertex> priorityQueue = new PriorityQueue<>(Comparator.comparingLong(Vertex::getId));
+        PriorityQueue<DoubleVertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(wrt);
 
         HashSet<Vertex> alreadyQueued = new HashSet<>(wrt);
@@ -57,9 +58,9 @@ public class Differentiator {
         return ofWrt;
     }
 
-    public static Map<Long, PartialDerivatives> reverseModeAutoDiff(Set<DoubleVertex> of, Set<DoubleVertex> wrt) {
+    public static Map<VertexId, PartialDerivatives> reverseModeAutoDiff(Set<DoubleVertex> of, Set<DoubleVertex> wrt) {
 
-        PriorityQueue<DoubleVertex> priorityQueue = new PriorityQueue<>(Comparator.<Vertex>comparingLong(Vertex::getId).reversed());
+        PriorityQueue<DoubleVertex> priorityQueue = new PriorityQueue<>(Comparator.<DoubleVertex, VertexId>comparing(Vertex::getId, Comparator.naturalOrder()).reversed());
         priorityQueue.addAll(of);
 
         HashSet<Vertex> alreadyQueued = new HashSet<>(of);
@@ -67,7 +68,7 @@ public class Differentiator {
         Map<Vertex, PartialDerivatives> dwrtOf = new HashMap<>();
         of.forEach(v -> dwrtOf.put(v, PartialDerivatives.withRespectToSelf(v.getId(), v.getShape())));
 
-        Map<Long, PartialDerivatives> wrtOf = new HashMap<>();
+        Map<VertexId, PartialDerivatives> wrtOf = new HashMap<>();
 
         while (!priorityQueue.isEmpty()) {
             DoubleVertex visiting = priorityQueue.poll();
@@ -108,13 +109,13 @@ public class Differentiator {
         return reverseModeAutoDiff(singleton(of), new HashSet<>(Arrays.asList(wrt))).get(of.getId());
     }
 
-    private static Map<Long, PartialDerivatives> wrtOfToOfWrt(Map<Long, PartialDerivatives> wrtOf) {
-        Map<Long, PartialDerivatives> ofWrt = new HashMap<>();
+    private static Map<VertexId, PartialDerivatives> wrtOfToOfWrt(Map<VertexId, PartialDerivatives> wrtOf) {
+        Map<VertexId, PartialDerivatives> ofWrt = new HashMap<>();
 
-        for (Map.Entry<Long, PartialDerivatives> wrtOfEntry : wrtOf.entrySet()) {
-            Map<Long, DoubleTensor> ofs = wrtOfEntry.getValue().asMap();
+        for (Map.Entry<VertexId, PartialDerivatives> wrtOfEntry : wrtOf.entrySet()) {
+            Map<VertexId, DoubleTensor> ofs = wrtOfEntry.getValue().asMap();
 
-            for (Map.Entry<Long, DoubleTensor> ofsEntry : ofs.entrySet()) {
+            for (Map.Entry<VertexId, DoubleTensor> ofsEntry : ofs.entrySet()) {
 
                 if (ofWrt.containsKey(ofsEntry.getKey())) {
                     ofWrt.get(ofsEntry.getKey()).putWithRespectTo(wrtOfEntry.getKey(), ofsEntry.getValue());
@@ -128,9 +129,9 @@ public class Differentiator {
     }
 
     public static PartialDerivatives reshapeReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary, DoubleTensor secondary) {
-        Map<Long, DoubleTensor> reshapedPartials = new HashMap<>();
+        Map<VertexId, DoubleTensor> reshapedPartials = new HashMap<>();
 
-        for (Map.Entry<Long, DoubleTensor> partialDerivative : partialDerivatives.asMap().entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : partialDerivatives.asMap().entrySet()) {
             DoubleTensor partial;
             if (primary.isScalar()) {
                 int[] nonScalarDimensions = TensorShape.nonScalarDimensions(secondary.getShape());
