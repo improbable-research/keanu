@@ -398,22 +398,6 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(value.slice(dimension, index), slicedPartialDerivatives);
     }
 
-    private static List<Pair<VertexId, List<Integer>>> findAllShapesWithRespectTo(List<DualNumber> dualNumbers) {
-        List<Pair<VertexId, List<Integer>>> vertexInfo = new ArrayList<>();
-        Set<VertexId> ids = new HashSet<>();
-
-        for (DualNumber dualNumber : dualNumbers) {
-            for (Map.Entry<VertexId, DoubleTensor> entry : dualNumber.getPartialDerivatives().asMap().entrySet()) {
-                if (!ids.contains(entry.getKey())) {
-                    vertexInfo.add(new Pair<>(entry.getKey(), Arrays.stream(entry.getValue().getShape()).boxed().collect(Collectors.toList())));
-                    ids.add(entry.getKey());
-                }
-            }
-        }
-
-        return vertexInfo;
-    }
-
     public DualNumber take(int... index) {
         Map<VertexId, DoubleTensor> dualsAtIndex = new HashMap<>();
 
