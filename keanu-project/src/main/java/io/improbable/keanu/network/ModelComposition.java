@@ -9,7 +9,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 
-public class ModelComposition {
+public final class ModelComposition {
+
+    private ModelComposition() { }
 
     public static Map<VertexLabel, Vertex> createModelVertices(BayesianNetwork bayesianNetwork,
                                                                Map<VertexLabel, Vertex> inputVertices,
