@@ -3,7 +3,9 @@ package io.improbable.keanu.network;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -18,6 +20,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ParetoVertex;
@@ -33,23 +36,32 @@ public class ModelCompositionTest {
     private DoubleVertex gaussian;
     private DoubleVertex pareto;
     private DoubleVertex gaussOutputVertex;
-    private DoubleVertex paretoOutputVertex;
 
+    /*
+     * These tests run over a single graph within a graph.  The "inner" graph has a single Proxy input for the location
+     * a probabilistic value for size and two potential outputs:
+     *
+     * | Proxy "Location" |              | Uniform - Size |
+     *                     \            /
+     *     | Gaussian ("Output1" & Pareto ("Output2") |
+     *
+     * The Outer graph hooks up a Uniform to the "Location" input of the inner graph and takes the Output "Output1" as
+     * the single output it cares about.
+     */
     @Before
     public void setup() {
 
         createInnerNet();
 
-        trueLocation = new UniformVertex(-50.0, 50.0);
+        trueLocation = new UniformVertex(0.1, 50.0);
 
         Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
         Map<VertexLabel, Vertex> outputs = ModelComposition.createModelVertices(
-            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"), new VertexLabel("Output2")));
+            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1")));
         gaussOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output1"));
-        paretoOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output2"));
 
-        outerNet = new BayesianNetwork(paretoOutputVertex.getConnectedGraph());
+        outerNet = new BayesianNetwork(gaussOutputVertex.getConnectedGraph());
     }
 
     private void createInnerNet() {
@@ -68,7 +80,6 @@ public class ModelCompositionTest {
     @Test
     public void outputVerticesCorrectlyReturned() {
         assertEquals(gaussOutputVertex, gaussian);
-        assertEquals(paretoOutputVertex, pareto);
     }
 
     @Test
@@ -77,7 +88,7 @@ public class ModelCompositionTest {
         assertEquals(location.getId().getDepth(), 2);
         assertEquals(size.getId().getDepth(), 2);
         assertEquals(gaussian.getId().getDepth(), 1);
-        assertEquals(pareto.getId().getDepth(), 1);
+        assertEquals(pareto.getId().getDepth(), 2);
     }
 
     @Test
@@ -98,7 +109,7 @@ public class ModelCompositionTest {
 
     @Test
     public void inferenceWorksOnGraph() {
-        final int NUM_SAMPLES = 10000;
+        final int NUM_SAMPLES = 50000;
         final double REAL_HYPER_LOC = 5.1;
         final double REAL_HYPER_SIZE = 1.0;
 
@@ -116,11 +127,68 @@ public class ModelCompositionTest {
 
     @Test
     public void bayesNetCanFilterOnDepth() {
-        Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, paretoOutputVertex, gaussOutputVertex);
+        Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, gaussOutputVertex);
         Set<Vertex> filteredVertices = new HashSet<>(outerNet.getLatentVerticesAtDepth(outerNet.getDepth()));
 
         assertEquals(latentOuterVertices.containsAll(filteredVertices), true);
         assertEquals(filteredVertices.containsAll(latentOuterVertices), true);
+    }
+
+    private void triggerCompositionWarnings(List<VertexLabel> outputs,
+                                            String inputLabel,
+                                            String outputLabel,
+                                            String plusLabel) {
+        DoubleVertex inputVertex = new DoubleProxyVertex();
+        inputVertex.setLabel(new VertexLabel(inputLabel));
+        DoubleVertex plusValue = new ConstantDoubleVertex(1.0);
+        plusValue.setLabel(new VertexLabel(plusLabel));
+        DoubleVertex outputVertex = inputVertex.plus(plusValue);
+        outputVertex.setLabel(new VertexLabel(outputLabel));
+        BayesianNetwork bayesNet = new BayesianNetwork(outputVertex.getConnectedGraph());
+        DoubleVertex outerInput = new GaussianVertex(0.0, 1.0);
+
+        ModelComposition.createModelVertices(bayesNet,
+            ImmutableMap.of(new VertexLabel("Input1"), outerInput),
+            outputs);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void willRejectEmptyOutput() {
+        triggerCompositionWarnings(new ArrayList<>(), "Input1", "Output1", "Plus");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void willRejectMissingOutput() {
+        triggerCompositionWarnings(ImmutableList.of(new VertexLabel("Invalid Label")),
+            "Input1", "Output1", "Plus");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void willRejectMissingInput() {
+        triggerCompositionWarnings(ImmutableList.of(new VertexLabel("Output1")),
+            "Random Name", "Output1", "Plus");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void willRejectNonProxyInput() {
+        triggerCompositionWarnings(ImmutableList.of(new VertexLabel("Output1")),
+            "Random Name", "Output1", "Input1");
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void willRejectProxyWithParent() {
+        DoubleProxyVertex proxy = new DoubleProxyVertex();
+        proxy.setLabel(new VertexLabel("Input1"));
+        DoubleVertex output = new GaussianVertex(proxy, 1.0);
+        output.setLabel(new VertexLabel("Output1"));
+        DoubleVertex outerInput = new UniformVertex(-1.0, 1.0);
+        DoubleVertex invalidParent = new ConstantDoubleVertex(0.0);
+        proxy.setParent(invalidParent);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
+        ModelComposition.createModelVertices(bayesNet,
+            ImmutableMap.of(new VertexLabel("Input1"), outerInput),
+            ImmutableList.of(new VertexLabel("Output1")));
     }
 
 }
