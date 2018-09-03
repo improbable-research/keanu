@@ -1,23 +1,23 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Cauchy;
-import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
-
-import java.util.Map;
-
 import static io.improbable.keanu.distributions.dual.Diffs.L;
 import static io.improbable.keanu.distributions.dual.Diffs.S;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
+import io.improbable.keanu.distributions.continuous.Cauchy;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -34,7 +34,6 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param scale       the scale of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      */
     public CauchyVertex(int[] tensorShape, DoubleVertex location, DoubleVertex scale) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
@@ -92,12 +91,12 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Cauchy.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
                                                              DoubleTensor dLogPdscale,
                                                              DoubleTensor dLogPdx) {
 

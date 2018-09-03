@@ -9,10 +9,10 @@ import java.util.Map;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -29,7 +29,6 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
     public UniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
@@ -88,7 +87,7 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         DoubleTensor dLogPdx = DoubleTensor.zeros(this.xMax.getShape());
         dLogPdx = dLogPdx.setWithMaskInPlace(value.getGreaterThanMask(xMax.getValue()), Double.NEGATIVE_INFINITY);
         dLogPdx = dLogPdx.setWithMaskInPlace(value.getLessThanOrEqualToMask(xMin.getValue()), Double.POSITIVE_INFINITY);

@@ -10,14 +10,14 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.update.NonProbabilisticValueUpdater;
 
-public class ConcatenationVertex extends DoubleVertex implements Differentiable {
+public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final int dimension;
     private final DoubleVertex[] input;
@@ -29,9 +29,6 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
      * @param input     the input vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... input) {
-        super(new NonProbabilisticValueUpdater<>(
-            v -> ((ConcatenationVertex) v).op(((ConcatenationVertex) v).extractFromInputs(DoubleTensor.class, Vertex::getValue))
-        ));
         this.dimension = dimension;
         this.input = input;
         setParents(input);
@@ -41,21 +38,23 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        List<DualNumber> duals = new ArrayList<>();
+        List<DualNumber> dualNumbersOfInputs = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {
-            duals.add(dualNumbers.get(vertex));
+            dualNumbersOfInputs.add(dualNumbers.get(vertex));
         }
-
-        DualNumber dualOfPrimary = duals.remove(0);
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
-        DoubleTensor[] dualToConcat = Arrays.copyOfRange(inputValues, 1, inputValues.length);
-        return dualOfPrimary.concat(dimension, duals, dualToConcat);
+        return DualNumber.concat(dualNumbers, dualNumbersOfInputs, input, dimension, inputValues);
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(extractFromInputs(DoubleTensor.class, Vertex::sample));
+    }
+
+    @Override
+    public DoubleTensor calculate() {
+        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
@@ -71,6 +70,5 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable 
         }
         return extract;
     }
-
 
 }

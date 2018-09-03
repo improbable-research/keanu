@@ -1,23 +1,26 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Exponential;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.distribution.ExponentialDistribution;
-import org.junit.Before;
-import org.junit.Test;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
+import org.apache.commons.math3.distribution.ExponentialDistribution;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.distributions.continuous.Exponential;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ExponentialVertexTest {
 
@@ -65,12 +68,24 @@ public class ExponentialVertexTest {
         bTensor.setValue(2.5);
 
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(bTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(exponentialLogDiff.dPdlambda, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
         assertEquals(exponentialLogDiff.dPdx, actual.withRespectTo(tensorExponentialVertex.getId()).scalar(), 1e-5);
+    }
+
+    @Test
+    public void matchesKnownDerivativeLogDensityOfVector() {
+        double[] vector = new double[]{1.0, 1.25, 1.5, 3.0, 5.0};
+
+        UniformVertex lambdaVertex = new UniformVertex(0.0, 1.0);
+        lambdaVertex.setValue(1.0);
+
+        Supplier<ExponentialVertex> vertexSupplier = () -> new ExponentialVertex(lambdaVertex);
+
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
     }
 
     @Test

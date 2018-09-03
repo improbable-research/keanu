@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.MU;
 import static io.improbable.keanu.distributions.dual.Diffs.S;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -12,14 +13,11 @@ import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
-
-
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 
 public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -36,7 +34,6 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
     public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
 
@@ -73,12 +70,12 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(MU).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
                                                              DoubleTensor dLogPds,
                                                              DoubleTensor dLogPdx) {
 

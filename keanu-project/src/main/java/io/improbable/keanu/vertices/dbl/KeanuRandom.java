@@ -78,8 +78,8 @@ public class KeanuRandom {
         }
     }
 
-    public DoubleTensor nextGamma(int[] shape, DoubleTensor a, DoubleTensor theta, DoubleTensor k) {
-        return Gamma.withParameters(a, theta, k).sample(shape, this);
+    public DoubleTensor nextGamma(int[] shape, DoubleTensor theta, DoubleTensor k) {
+        return Gamma.withParameters(theta, k).sample(shape, this);
     }
 
     public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {

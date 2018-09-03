@@ -1,18 +1,19 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.ConstantVertex;
-import org.junit.Before;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class CategoricalVertexTest {
     private final Logger log = LoggerFactory.getLogger(CategoricalVertexTest.class);
@@ -79,6 +80,55 @@ public class CategoricalVertexTest {
         LinkedHashMap<TestEnum, Double> proportions = testSample(selectableValues, random);
         LinkedHashMap<TestEnum, DoubleVertex> normalisedSelectableValues = normaliseSelectableValues(selectableValues, 4.0);
         assertProportionsWithinExpectedRanges(normalisedSelectableValues, proportions);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotSampleIfProbabilitiesSumToZero() {
+        double probA = 0.0;
+        double probB = 0.0;
+
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
+
+        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
+        select.sample(random);
+    }
+
+    @Test
+    public void logProbOfCategoryIsEquivalentToItsLogProbabilityDividedBySum() {
+        double probA = 0.25;
+        double probB = 0.75;
+        double probC = 1.25;
+        double probD = 1.75;
+
+        double total = probA + probB + probC + probD;
+
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(0.25));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(0.75));
+        selectableValues.put(TestEnum.C, ConstantVertex.of(1.25));
+        selectableValues.put(TestEnum.D, ConstantVertex.of(1.75));
+
+        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
+
+        assertEquals(Math.log(probA / total), select.logProb(TestEnum.A), 1e-6);
+        assertEquals(Math.log(probB / total), select.logProb(TestEnum.B), 1e-6);
+        assertEquals(Math.log(probC / total), select.logProb(TestEnum.C), 1e-6);
+        assertEquals(Math.log(probD / total), select.logProb(TestEnum.D), 1e-6);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void cannotComputeLogProbIfProbabilitiesSumToZero() {
+        double probA = 0.0;
+        double probB = 0.0;
+
+        LinkedHashMap<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(probB));
+
+        CategoricalVertex<TestEnum> select = new CategoricalVertex<>(selectableValues);
+        select.logProb(TestEnum.A);
     }
 
     private LinkedHashMap<TestEnum, Double> testSample(LinkedHashMap<TestEnum, DoubleVertex> selectableValues,

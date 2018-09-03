@@ -16,6 +16,7 @@ import io.improbable.keanu.distributions.gradient.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -59,7 +60,7 @@ public class InverseGammaVertexTest {
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

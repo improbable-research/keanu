@@ -92,13 +92,12 @@ public interface Tensor<T> {
 
     /**
      * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
-     *
+     * <p>
      * (1, 2, 3) is a 1x3 vector.
-     *
+     * <p>
      * (1)
      * (2)
      * (3) is a 3x1 vector.
-     *
      *
      * @return true if the tensor is a vector
      */

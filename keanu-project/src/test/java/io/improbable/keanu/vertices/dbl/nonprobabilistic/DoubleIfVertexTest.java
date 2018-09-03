@@ -100,10 +100,14 @@ public class DoubleIfVertexTest {
         DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
         Assert.assertArrayEquals(new double[]{
-            5, 7, 0, 0,
-            0, 5, 0, 6,
-            6, 8, 0, 0,
-            0, 7, 0, 8
+            5, 7,
+            0, 0,
+            0, 5,
+            0, 6,
+            0, 0,
+            5, 7,
+            0, 7,
+            0, 8
         }, dIfdA.asFlatDoubleArray(), 1e-6);
 
         Assert.assertArrayEquals(dDda.getShape(), dIfdA.getShape());
@@ -141,17 +145,25 @@ public class DoubleIfVertexTest {
         DoubleTensor dIfdD = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(d);
 
         Assert.assertArrayEquals(new double[]{
-            5, 7, 0, 0,
-            0, 0, 0, 0,
-            6, 8, 0, 0,
-            0, 0, 0, 0
+            5, 7,
+            0, 0,
+            0, 0,
+            0, 0,
+            0, 0,
+            5, 7,
+            0, 0,
+            0, 0
         }, dIfdA.asFlatDoubleArray(), 1e-6);
 
         Assert.assertArrayEquals(new double[]{
-            0, 0, 0, 0,
-            0, 0, 13, 15,
-            0, 0, 0, 0,
-            0, 0, 14, 16
+            0, 0,
+            0, 0,
+            14, 16,
+            0, 0,
+            0, 0,
+            0, 0,
+            0, 0,
+            14, 16
         }, dIfdD.asFlatDoubleArray(), 1e-6);
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
@@ -190,8 +202,8 @@ public class DoubleIfVertexTest {
 
         BoolVertex leftFlip = new BernoulliVertex(0.5);
         BoolVertex rightFlip = new BernoulliVertex(0.5);
-        leftFlip.setValue(false);
-        rightFlip.setValue(true);
+        leftFlip.observe(false);
+        rightFlip.observe(true);
 
         DoubleVertex ifVertex = If.isTrue(leftFlip.or(rightFlip))
             .then(a)
@@ -220,8 +232,8 @@ public class DoubleIfVertexTest {
 
         BoolVertex leftFlip = new BernoulliVertex(0.5);
         BoolVertex rightFlip = new BernoulliVertex(0.5);
-        leftFlip.setValue(false);
-        rightFlip.setValue(false);
+        leftFlip.observe(false);
+        rightFlip.observe(false);
 
         DoubleVertex ifVertex = If.isTrue(leftFlip.or(rightFlip))
             .then(a)

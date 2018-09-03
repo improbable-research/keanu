@@ -8,20 +8,13 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 import java.util.Map;
 
-import static java.util.Collections.singletonMap;
-
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.Map;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -42,8 +35,6 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
-        super(new ProbabilisticValueUpdater<>());
-
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
@@ -131,7 +122,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
         ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
