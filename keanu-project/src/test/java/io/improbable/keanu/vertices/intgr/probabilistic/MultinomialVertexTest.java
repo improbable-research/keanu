@@ -261,13 +261,13 @@ public class MultinomialVertexTest {
             Colours.RED, ConstantVertex.of(p.getValue(0)),
             Colours.GREEN, ConstantVertex.of(p.getValue(1)),
             Colours.BLUE, ConstantVertex.of(p.getValue(2)));
-        CategoricalVertex categorical = new CategoricalVertex(selectableValues);
+        CategoricalVertex categoricalVertex = new CategoricalVertex(selectableValues);
 
-        double pRed = categorical.logProb(Colours.RED);
+        double pRed = categoricalVertex.logProb(Colours.RED);
         assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).transpose()).scalar(), closeTo(pRed, 1e-7));
-        double pGreen = categorical.logProb(Colours.GREEN);
+        double pGreen = categoricalVertex.logProb(Colours.GREEN);
         assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0).transpose()).scalar(), closeTo(pGreen, 1e-7));
-        double pBlue = categorical.logProb(Colours.BLUE);
+        double pBlue = categoricalVertex.logProb(Colours.BLUE);
         assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).transpose()).scalar(), closeTo(pBlue, 1e-7));
     }
 
