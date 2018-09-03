@@ -34,7 +34,7 @@ public class NetworkSamplesGenerator {
     public NetworkSamples generate(final int totalSampleCount) {
 
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
-        List<Double> logProbs = new ArrayList<>();
+        List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         dropSamples(dropCount);
 
@@ -42,14 +42,14 @@ public class NetworkSamplesGenerator {
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
             if (i % downSampleInterval == 0) {
-                algorithm.sample(samplesByVertex, logProbs);
+                algorithm.sample(samplesByVertex, logOfMasterPForEachSample);
                 sampleCount++;
             } else {
                 algorithm.step();
             }
         }
 
-        return new NetworkSamples(samplesByVertex, logProbs, sampleCount);
+        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
     }
 
     public Stream<NetworkState> stream() {

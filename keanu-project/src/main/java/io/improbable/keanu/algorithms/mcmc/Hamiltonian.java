@@ -92,8 +92,8 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         final Map<VertexId, DoubleTensor> momentumBeforeLeapfrog = new HashMap<>();
 
         double logOfMasterPBeforeLeapfrog = bayesNet.getLogOfMasterP();
-        final List<Double> logProbs = new ArrayList<>();
-        logProbs.add(logOfMasterPBeforeLeapfrog);
+        final List<Double> logOfMasterPForEachSample = new ArrayList<>();
+        logOfMasterPForEachSample.add(logOfMasterPBeforeLeapfrog);
 
         final Map<VertexId, ?> sampleBeforeLeapfrog = new HashMap<>();
 
@@ -139,15 +139,14 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
                 gradientBeforeLeapfrog = tempSwap;
 
                 addSampleFromCache(samples, sampleBeforeLeapfrog);
-                logProbs.add(logOfMasterPBeforeLeapfrog);
             } else {
                 addSampleFromVertices(samples, fromVertices);
-                logProbs.add(logOfMasterPAfterLeapfrog);
                 logOfMasterPBeforeLeapfrog = logOfMasterPAfterLeapfrog;
             }
+            logOfMasterPForEachSample.add(logOfMasterPBeforeLeapfrog);
         }
 
-        return new NetworkSamples(samples, logProbs, sampleCount);
+        return new NetworkSamples(samples, logOfMasterPForEachSample, sampleCount);
     }
 
     private static void cachePosition(List<Vertex<DoubleTensor>> latentVertices, Map<VertexId, DoubleTensor> position) {
