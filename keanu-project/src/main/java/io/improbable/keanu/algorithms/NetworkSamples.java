@@ -110,12 +110,8 @@ public class NetworkSamples {
         return (double) trueCount / networkStates.size();
     }
 
-    public List<Object> getSample(int sample) {
-        List<Object> values = new ArrayList<>();
-        for (VertexId id : samplesByVertex.keySet()) {
-            values.add(samplesByVertex.get(id).get(sample));
-        }
-        return values;
+    public NetworkState getNetworkState(int sample) {
+        return new SamplesBackedNetworkState(samplesByVertex, sample);
     }
 
     public double getLogOfMasterP(int sample) {
