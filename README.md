@@ -73,7 +73,7 @@ For IntelliJ:
 
 Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)
 
-[travis-image]: https://travis-ci.org/improbable-research/keanu.svg?branch=develop
+[travis-image]: https://api.travis-ci.org/improbable-research/keanu.svg?branch=develop
 [travis-url]: https://travis-ci.org/improbable-research/keanu
 [maven-image]: https://img.shields.io/maven-central/v/io.improbable/keanu.svg?colorB=brightgreen
 [maven-url]: https://search.maven.org/artifact/io.improbable/keanu/0.0.12/jar
