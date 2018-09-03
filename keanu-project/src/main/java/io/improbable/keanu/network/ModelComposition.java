@@ -21,7 +21,7 @@ public final class ModelComposition {
      *     - Increment the depth for all "internal" nodes and the BayesNet itself
      *     - Pass back any specified output nodes from the Bayesnet (keeping them at the outer depth)
      *
-     *     Output nodes will have be returned unlabelled
+     *     Output nodes will be returned unlabelled
      * </p>
      * @param bayesianNetwork The Bayesian Network to compose in to the current model
      * @param inputVertices The mapping from Proxy label to actual input vertex
