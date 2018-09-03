@@ -20,7 +20,6 @@ public class BoolSliceVertexTest {
 
     @Test
     public void canGetTensorAlongDimensionOfRank2() {
-        System.out.println(Arrays.toString(matrixA.getShape()));
         BoolSliceVertex rowOne = new BoolSliceVertex(matrixA, 0, 0);
 
         Assert.assertArrayEquals(new double[]{1, 1, 0}, rowOne.getValue().asFlatDoubleArray(), 1e-6);

@@ -10,11 +10,11 @@ import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -23,11 +23,10 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     /**
      * Dirichlet distribution. The shape is driven from concentration, which must be a vector.
      *
-     * @param tensorShape the desired shape of the vertex
+     * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
-        super(new ProbabilisticValueUpdater<>());
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
             throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
@@ -48,7 +47,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     /**
      * Matches a scalar concentration value to a desired shape of a Dirichlet distribution
      *
-     * @param tensorShape the desired shape of the vertex
+     * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, double concentration) {
@@ -72,7 +71,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Dirichlet.withParameters(concentration.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(C).getValue(), dlnP.get(X).getValue());
     }
@@ -82,7 +81,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
         return Dirichlet.withParameters(concentration.getValue()).sample(getShape(), random);
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdc,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdc,
                                                              DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputs = concentration.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdc);

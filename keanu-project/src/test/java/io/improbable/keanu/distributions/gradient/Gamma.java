@@ -15,22 +15,19 @@ public class Gamma {
     private Gamma() {
     }
 
-    public static Diff dlnPdf(double a, double theta, double k, double x) {
-        double dPdx = (k - 1) / (x - a) - (1 / theta);
-        double dPda = (k - 1) / (a - x) + (1 / theta);
-        double dPdtheta = -((a + (theta * k) - x) / Math.pow(theta, 2));
-        double dPdk = Math.log(x - a) - Math.log(theta) - digamma(k);
-        return new Diff(dPda, dPdtheta, dPdk, dPdx);
+    public static Diff dlnPdf(double theta, double k, double x) {
+        double dPdx = (k - 1) / x - (1 / theta);
+        double dPdtheta = -(theta * k - x) / Math.pow(theta, 2);
+        double dPdk = Math.log(x) - Math.log(theta) - digamma(k);
+        return new Diff(dPdtheta, dPdk, dPdx);
     }
 
     public static class Diff {
-        public final double dPda;
         public final double dPdtheta;
         public final double dPdk;
         public final double dPdx;
 
-        public Diff(double dPda, double dPdtheta, double dPdk, double dPdx) {
-            this.dPda = dPda;
+        public Diff(double dPdtheta, double dPdk, double dPdx) {
             this.dPdtheta = dPdtheta;
             this.dPdk = dPdk;
             this.dPdx = dPdx;

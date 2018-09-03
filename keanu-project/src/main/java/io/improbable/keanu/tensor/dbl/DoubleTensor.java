@@ -3,13 +3,15 @@ package io.improbable.keanu.tensor.dbl;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
+import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public interface DoubleTensor extends NumberTensor<Double> {
+public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
+
+    DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
 
     DoubleTensor ZERO_SCALAR = scalar(0.0);
 
@@ -95,6 +97,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     @Override
     DoubleTensor reshape(int... newShape);
 
+    DoubleTensor permute(int... rearrange);
+
     @Override
     DoubleTensor duplicate();
 
@@ -146,32 +150,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor exp();
 
-    DoubleTensor minus(DoubleTensor that);
-
-    DoubleTensor plus(DoubleTensor that);
-
-    DoubleTensor times(DoubleTensor that);
-
-    DoubleTensor div(DoubleTensor that);
-
-    DoubleTensor unaryMinus();
-
-    DoubleTensor getGreaterThanMask(DoubleTensor greaterThanThis);
-
-    DoubleTensor getGreaterThanOrEqualToMask(DoubleTensor greaterThanThis);
-
-    DoubleTensor getLessThanMask(DoubleTensor lessThanThis);
-
-    DoubleTensor getLessThanOrEqualToMask(DoubleTensor lessThanThis);
-
-    DoubleTensor setWithMaskInPlace(DoubleTensor mask, double value);
-
-    DoubleTensor setWithMask(DoubleTensor mask, double value);
-
-    DoubleTensor abs();
-
-    DoubleTensor apply(Function<Double, Double> function);
-
     DoubleTensor max(DoubleTensor max);
 
     DoubleTensor inverse();
@@ -185,6 +163,8 @@ public interface DoubleTensor extends NumberTensor<Double> {
     double average();
 
     double standardDeviation();
+
+    boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
 
     DoubleTensor standardize();
 
@@ -231,8 +211,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor divInPlace(double value);
 
-    DoubleTensor powInPlace(DoubleTensor exponent);
-
     DoubleTensor powInPlace(double exponent);
 
     DoubleTensor sqrtInPlace();
@@ -257,20 +235,6 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor expInPlace();
 
-    DoubleTensor minusInPlace(DoubleTensor that);
-
-    DoubleTensor plusInPlace(DoubleTensor that);
-
-    DoubleTensor timesInPlace(DoubleTensor that);
-
-    DoubleTensor divInPlace(DoubleTensor that);
-
-    DoubleTensor unaryMinusInPlace();
-
-    DoubleTensor absInPlace();
-
-    DoubleTensor applyInPlace(Function<Double, Double> function);
-
     DoubleTensor maxInPlace(DoubleTensor max);
 
     DoubleTensor minInPlace(DoubleTensor max);
@@ -287,21 +251,16 @@ public interface DoubleTensor extends NumberTensor<Double> {
 
     DoubleTensor standardizeInPlace();
 
+    DoubleTensor setAllInPlace(double value);
+
     // Comparisons
     BooleanTensor lessThan(double value);
 
     BooleanTensor lessThanOrEqual(double value);
 
-    BooleanTensor lessThan(DoubleTensor value);
-
-    BooleanTensor lessThanOrEqual(DoubleTensor value);
-
     BooleanTensor greaterThan(double value);
 
     BooleanTensor greaterThanOrEqual(double value);
 
-    BooleanTensor greaterThan(DoubleTensor value);
-
-    BooleanTensor greaterThanOrEqual(DoubleTensor value);
 
 }

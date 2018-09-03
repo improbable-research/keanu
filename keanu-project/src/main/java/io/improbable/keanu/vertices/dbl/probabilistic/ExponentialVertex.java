@@ -1,22 +1,22 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import io.improbable.keanu.distributions.continuous.Exponential;
-import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
-
-import java.util.Map;
-
 import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
+
+import java.util.Map;
+
+import io.improbable.keanu.distributions.continuous.Exponential;
+import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -34,7 +34,6 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
      *                    vertex or scalar.
      */
     public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
 
@@ -67,12 +66,12 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Exponential.withParameters(lambda.getValue()).dLogProb(value);
         return convertDualNumbersToDiff(dlnP.get(LAMBDA).getValue(), dlnP.get(X).getValue());
     }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlambda,
+    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlambda,
                                                              DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputs = lambda.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlambda);

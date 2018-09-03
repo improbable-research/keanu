@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
@@ -42,7 +43,7 @@ public class UniformIntVertexTest {
         Integer maxSample = Collections.max(samples);
 
         assertTrue(minSample >= lowerBound);
-        assertTrue(maxSample <= upperBound);
+        assertTrue(maxSample < upperBound);
     }
 
     @Test
@@ -72,5 +73,17 @@ public class UniformIntVertexTest {
         Set<Integer> uniqueValues = new HashSet<>(sample.asFlatList());
 
         assertTrue(uniqueValues.size() > 1);
+    }
+
+    @Test
+    public void logProbUpperBoundIsNegativeInfinity() {
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        assertEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(upperBound)), Double.NEGATIVE_INFINITY, 1e-6);
+    }
+
+    @Test
+    public void logProbLowerBoundIsNotNegativeInfinity() {
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        assertNotEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 }

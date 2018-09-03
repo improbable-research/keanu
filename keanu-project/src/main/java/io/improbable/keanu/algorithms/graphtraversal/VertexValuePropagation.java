@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
+import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 
 /**
@@ -35,7 +36,7 @@ public class VertexValuePropagation {
      */
     public static void cascadeUpdate(Collection<? extends Vertex> cascadeFrom) {
 
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparingLong(Vertex::getId));
+        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(cascadeFrom);
 
         HashSet<Vertex> alreadyQueued = new HashSet<>(cascadeFrom);
@@ -43,7 +44,7 @@ public class VertexValuePropagation {
         while (!priorityQueue.isEmpty()) {
             Vertex<?> visiting = priorityQueue.poll();
 
-            visiting.updateValue();
+            updateVertexValue(visiting);
 
             for (Vertex<?> child : visiting.getChildren()) {
 
@@ -72,7 +73,7 @@ public class VertexValuePropagation {
             if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
                 Vertex<?> top = stack.pop();
-                top.updateValue();
+                updateVertexValue(top);
                 hasCalculated.add(top);
 
             } else {
@@ -111,7 +112,7 @@ public class VertexValuePropagation {
             if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
                 Vertex<?> top = stack.pop();
-                top.updateValue();
+                updateVertexValue(top);
 
             } else {
 
@@ -140,5 +141,17 @@ public class VertexValuePropagation {
             stack.push(v);
         }
         return stack;
+    }
+
+    private static <T> void updateVertexValue(Vertex<T> vertex) {
+        if (vertex.isProbabilistic()) {
+            if (!vertex.hasValue()) {
+                vertex.setValue(vertex.sample());
+            }
+        } else {
+            if (!vertex.isObserved()) {
+                vertex.setValue(((NonProbabilistic<T>) vertex).calculate());
+            }
+        }
     }
 }

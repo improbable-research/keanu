@@ -5,9 +5,9 @@ import java.util.Map;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -23,7 +23,6 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
     public MultivariateGaussianVertex(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
@@ -69,7 +68,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         throw new UnsupportedOperationException();
     }
 

@@ -1,13 +1,10 @@
 package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.INDArrayExtensions;
-import io.improbable.keanu.tensor.INDArrayShim;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TypedINDArrayFactory;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import static java.util.Arrays.copyOf;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -20,10 +17,14 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static java.util.Arrays.copyOf;
+import io.improbable.keanu.tensor.INDArrayExtensions;
+import io.improbable.keanu.tensor.INDArrayShim;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TypedINDArrayFactory;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 
 public class Nd4jIntegerTensor implements IntegerTensor {
 
@@ -156,7 +157,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMask(IntegerTensor mask, int value) {
+    public IntegerTensor setWithMask(IntegerTensor mask, Integer value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -253,7 +254,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMaskInPlace(IntegerTensor mask, int value) {
+    public IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value) {
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
@@ -337,7 +338,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.subi(that.scalar());
         } else {
-            INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jIntegerTensor(result);
+            }
         }
         return this;
     }
@@ -347,7 +351,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.addi(that.scalar());
         } else {
-            INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jIntegerTensor(result);
+            }
         }
         return this;
     }
@@ -357,7 +364,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.muli(that.scalar());
         } else {
-            INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jIntegerTensor(result);
+            }
         }
         return this;
     }
@@ -367,7 +377,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             tensor.divi(that.scalar());
         } else {
-            INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(result, false));
+            }
         }
         INDArrayExtensions.castToInteger(tensor, false);
         return this;
@@ -462,7 +475,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
         INDArray mask;
         if (value.isScalar()) {
-            mask = tensor.gt(value.scalar());
+            mask = tensor.gte(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();

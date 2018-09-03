@@ -10,10 +10,10 @@ import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger {
 
@@ -21,7 +21,6 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     private final IntegerVertex n;
 
     public MultinomialVertex(int[] tensorShape, IntegerVertex n, DoubleVertex p) {
-        super(new ProbabilisticValueUpdater<>());
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, n.getShape());
         int[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
@@ -48,7 +47,7 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(IntegerTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(IntegerTensor value) {
         throw new UnsupportedOperationException();
     }
 

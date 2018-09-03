@@ -6,21 +6,15 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.update.ProbabilisticValueUpdater;
 
 public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -35,8 +29,6 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param v           Degrees of Freedom
      */
     public StudentTVertex(int[] tensorShape, IntegerVertex v) {
-        super(new ProbabilisticValueUpdater<>());
-
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());
         this.v = v;
         setParents(v);
@@ -65,9 +57,9 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor t) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor t) {
         Diffs diff = StudentT.withParameters(v.getValue()).dLogProb(t);
-        Map<Long, DoubleTensor> m = new HashMap<>();
+        Map<VertexId, DoubleTensor> m = new HashMap<>();
         m.put(getId(), diff.get(T).getValue());
         return m;
     }
