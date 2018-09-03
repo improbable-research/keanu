@@ -78,20 +78,20 @@ public class NetworkSamples {
         final Map<VertexId, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
-                e -> downSample(e.getValue(), downSampleInterval)
+                e -> downSample((List<?>) e.getValue(), downSampleInterval)
                 )
             );
-        final List<Double> withLogProbsDownSampled = (List<Double>) downSample(logOfMasterPForEachSample, downSampleInterval);
+        final List<Double> withLogProbsDownSampled = downSample(logOfMasterPForEachSample, downSampleInterval);
 
         return new NetworkSamples(withSamplesDownSampled, withLogProbsDownSampled, size / downSampleInterval);
     }
 
-    private static List<?> downSample(final List<?> samples, final int downSampleInterval) {
+    private static <T> List<T> downSample(final List<T> samples, final int downSampleInterval) {
 
-        List<Object> downSampled = new ArrayList<>();
+        List<T> downSampled = new ArrayList<>();
         int i = 0;
 
-        for (Object sample : samples) {
+        for (T sample : samples) {
             if (i % downSampleInterval == 0) {
                 downSampled.add(sample);
             }
