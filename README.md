@@ -75,7 +75,7 @@ Interested in working for Improbable on cool problems? Start [here](https://impr
 
 [travis-image]: https://travis-ci.org/improbable-research/keanu.svg?branch=develop
 [travis-url]: https://travis-ci.org/improbable-research/keanu
-[maven-image]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu/badge.svg
-[maven-url]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu
+[maven-image]: https://img.shields.io/maven-central/v/io.improbable/keanu.svg?colorB=brightgreen
+[maven-url]: https://search.maven.org/artifact/io.improbable/keanu/0.0.12/jar
 [sonar-image]: https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status
 [sonar-url]: https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project
