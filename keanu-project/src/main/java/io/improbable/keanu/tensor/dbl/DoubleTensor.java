@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 
@@ -34,7 +36,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor create(double[] values) {
+    static DoubleTensor create(double... values) {
         return create(values, 1, values.length);
     }
 
@@ -54,7 +56,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor zeros(int[] shape) {
+    static DoubleTensor zeros(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
@@ -185,6 +187,16 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     @Override
     DoubleTensor slice(int dimension, int index);
+
+    default List<DoubleTensor> sliceAlongDimension(int dimension, int indexStart, int indexEnd) {
+        List<DoubleTensor> slicedTensors = new ArrayList<>();
+
+        for (int i = indexStart; i < indexEnd; i++) {
+            slicedTensors.add(slice(dimension, i));
+        }
+
+        return slicedTensors;
+    }
 
     DoubleTensor slice(int dimension, int[] index);
 

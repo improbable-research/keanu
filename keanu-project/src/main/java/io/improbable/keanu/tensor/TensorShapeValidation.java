@@ -1,11 +1,12 @@
 package io.improbable.keanu.tensor;
 
+import static java.util.stream.Collectors.toSet;
+
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
-
-import static java.util.stream.Collectors.toSet;
 
 public class TensorShapeValidation {
 
@@ -71,20 +72,28 @@ public class TensorShapeValidation {
     }
 
     public static int[] checkAllShapesMatch(int[]... shapes) {
-        return checkAllShapesMatch(Arrays.stream(shapes));
+        return checkAllShapesMatch(Arrays.stream(shapes), Optional.empty());
+    }
+
+    public static int[] checkAllShapesMatch(String errorMessage, int[]... shapes) {
+        return checkAllShapesMatch(Arrays.stream(shapes), Optional.of(errorMessage));
+    }
+
+    public static int[] checkAllShapesMatch(String errorMessage, Collection<int[]> shapes) {
+        return checkAllShapesMatch(shapes.stream(), Optional.of(errorMessage));
     }
 
     public static int[] checkAllShapesMatch(Collection<int[]> shapes) {
-        return checkAllShapesMatch(shapes.stream());
+        return checkAllShapesMatch(shapes.stream(), Optional.empty());
     }
 
-    private static int[] checkAllShapesMatch(Stream<int[]> shapesStream) {
+    private static int[] checkAllShapesMatch(Stream<int[]> shapesStream, Optional<String> errorMessage) {
         Set<TensorShape> uniqueShapes = shapesStream
             .map(TensorShape::new)
             .collect(toSet());
 
         if (uniqueShapes.size() != 1) {
-            throw new IllegalArgumentException("Shapes must match");
+            throw new IllegalArgumentException(errorMessage.orElse("Shapes must match"));
         }
 
         return uniqueShapes.iterator().next().getShape();
