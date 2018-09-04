@@ -18,6 +18,7 @@ import com.google.common.collect.ImmutableSet;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -189,6 +190,17 @@ public class ModelCompositionTest {
         ModelComposition.createModelVertices(bayesNet,
             ImmutableMap.of(new VertexLabel("Input1"), outerInput),
             ImmutableList.of(new VertexLabel("Output1")));
+    }
+
+    @Test
+    public void vertexIdPrefixMatchingWorks() {
+        VertexId prefix = new VertexId();
+        VertexId shouldMatch = new VertexId();
+        shouldMatch.addPrefix(prefix);
+        VertexId shouldNotMatch = new VertexId();
+
+        assertEquals(shouldMatch.prefixMatches(prefix), true);
+        assertEquals(shouldNotMatch.prefixMatches(prefix), false);
     }
 
 }

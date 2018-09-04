@@ -63,7 +63,7 @@ public final class ModelComposition {
         bayesianNetwork.incrementIndentation();
         bayesianNetwork.getAllVertices().stream()
             .filter(v -> !outputVertices.containsKey(v.getLabel()))
-            .forEach(v -> v.getId().increaseDepth(newPrefix));
+            .forEach(v -> v.getId().addPrefix(newPrefix));
         bayesianNetwork.getAllVertices().stream()
             .filter(v -> outputVertices.containsKey(v.getLabel()))
             .forEach(v -> v.getId().resetID());
