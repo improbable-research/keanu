@@ -72,7 +72,7 @@ public class VertexId implements Comparable<VertexId> {
         return idValues.toString();
     }
 
-    public int getDepth() {
+    public int getIndentation() {
         return idValues.length;
     }
 }

@@ -85,11 +85,11 @@ public class ModelCompositionTest {
 
     @Test
     public void verticesAreAtCorrectDepth() {
-        assertEquals(trueLocation.getId().getDepth(), 1);
-        assertEquals(location.getId().getDepth(), 2);
-        assertEquals(size.getId().getDepth(), 2);
-        assertEquals(gaussian.getId().getDepth(), 1);
-        assertEquals(pareto.getId().getDepth(), 2);
+        assertEquals(trueLocation.getId().getIndentation(), 1);
+        assertEquals(location.getId().getIndentation(), 2);
+        assertEquals(size.getId().getIndentation(), 2);
+        assertEquals(gaussian.getId().getIndentation(), 1);
+        assertEquals(pareto.getId().getIndentation(), 2);
     }
 
     @Test
