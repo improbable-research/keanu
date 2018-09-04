@@ -173,5 +173,4 @@ public class Differentiator {
         }
         return notCalculatedParents;
     }
-
 }

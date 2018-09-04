@@ -262,6 +262,7 @@ public class PartialDerivatives {
                 v = partial.getValue()
                     .tensorMultiply(multiplier, new int[]{1}, new int[]{0})
                     .permute(rearrange);
+
             } else {
                 v = multiplier
                     .tensorMultiply(partial.getValue(), new int[]{1}, new int[]{0});

@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.dbl;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 

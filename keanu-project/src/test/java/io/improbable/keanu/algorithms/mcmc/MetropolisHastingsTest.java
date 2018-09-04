@@ -9,7 +9,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
@@ -20,7 +19,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
@@ -49,7 +47,7 @@ public class MetropolisHastingsTest {
             bayesNet,
             Arrays.asList(A, B),
             100000
-        ).drop(10000).downSample(20);
+        );
 
         double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
         double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();

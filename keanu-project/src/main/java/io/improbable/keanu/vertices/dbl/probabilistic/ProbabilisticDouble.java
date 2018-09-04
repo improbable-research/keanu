@@ -30,5 +30,4 @@ public interface ProbabilisticDouble extends Probabilistic<DoubleTensor> {
     default Map<VertexId, DoubleTensor> dLogPdf(DoubleTensor value) {
         return dLogProb(value);
     }
-
 }
