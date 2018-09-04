@@ -17,9 +17,10 @@ public interface SamplingAlgorithm {
      * Takes a sample with the algorithm and saves it in the supplied map (creating a new entry in the list if the
      * Vertex already exists).
      *
-     * @param samples map to store sampled vertex values
+     * @param samples                   map to store sampled vertex values
+     * @param logOfMasterPForEachSample list of log of master probability for each sample
      */
-    void sample(Map<VertexId, List<?>> samples);
+    void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample);
 
     /**
      * Takes a sample with the algorithm and returns the state of the network for that sample.

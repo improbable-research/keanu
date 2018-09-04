@@ -24,10 +24,12 @@ import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
 public class NetworkSamples {
 
     private final Map<VertexId, ? extends List> samplesByVertex;
+    private final List<Double> logOfMasterPForEachSample;
     private final int size;
 
-    public NetworkSamples(Map<VertexId, ? extends List> samplesByVertex, int size) {
+    public NetworkSamples(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int size) {
         this.samplesByVertex = samplesByVertex;
+        this.logOfMasterPForEachSample = logOfMasterPForEachSample;
         this.size = size;
     }
 
@@ -66,8 +68,9 @@ public class NetworkSamples {
                 Map.Entry::getKey,
                 e -> e.getValue().subList(dropCount, size))
             );
+        final List<Double> withLogProbsDropped = logOfMasterPForEachSample.subList(dropCount, size);
 
-        return new NetworkSamples(withSamplesDropped, size - dropCount);
+        return new NetworkSamples(withSamplesDropped, withLogProbsDropped, size - dropCount);
     }
 
     public NetworkSamples downSample(final int downSampleInterval) {
@@ -75,19 +78,20 @@ public class NetworkSamples {
         final Map<VertexId, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
-                e -> downSample(e.getValue(), downSampleInterval)
+                e -> downSample((List<?>) e.getValue(), downSampleInterval)
                 )
             );
+        final List<Double> withLogProbsDownSampled = downSample(logOfMasterPForEachSample, downSampleInterval);
 
-        return new NetworkSamples(withSamplesDownSampled, size / downSampleInterval);
+        return new NetworkSamples(withSamplesDownSampled, withLogProbsDownSampled, size / downSampleInterval);
     }
 
-    private static List<?> downSample(final List<?> samples, final int downSampleInterval) {
+    private static <T> List<T> downSample(final List<T> samples, final int downSampleInterval) {
 
-        List<Object> downSampled = new ArrayList<>();
+        List<T> downSampled = new ArrayList<>();
         int i = 0;
 
-        for (Object sample : samples) {
+        for (T sample : samples) {
             if (i % downSampleInterval == 0) {
                 downSampled.add(sample);
             }
@@ -104,6 +108,14 @@ public class NetworkSamples {
             .count();
 
         return (double) trueCount / networkStates.size();
+    }
+
+    public NetworkState getNetworkState(int sample) {
+        return new SamplesBackedNetworkState(samplesByVertex, sample);
+    }
+
+    public double getLogOfMasterP(int sample) {
+        return logOfMasterPForEachSample.get(sample);
     }
 
     public List<NetworkState> toNetworkStates() {
