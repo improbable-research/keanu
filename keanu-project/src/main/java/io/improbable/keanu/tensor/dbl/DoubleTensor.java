@@ -100,6 +100,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor permute(int... rearrange);
 
+    DoubleTensor swapAxes(int dimension, int with);
+
     @Override
     DoubleTensor duplicate();
 

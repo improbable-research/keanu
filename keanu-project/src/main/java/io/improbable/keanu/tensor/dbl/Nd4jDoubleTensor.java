@@ -123,6 +123,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor swapAxes(int dimension, int with) {
+        return new Nd4jDoubleTensor(tensor.swapAxes(dimension, with));
+    }
+
+    @Override
     public DoubleTensor diag() {
         return new Nd4jDoubleTensor(Nd4j.diag(tensor));
     }

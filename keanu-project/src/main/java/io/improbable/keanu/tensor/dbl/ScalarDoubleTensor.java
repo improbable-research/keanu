@@ -106,6 +106,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor swapAxes(int dimension, int with) {
+        return new ScalarDoubleTensor(value);
+    }
+
+    @Override
     public DoubleTensor diag() {
         return duplicate();
     }

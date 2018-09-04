@@ -1,6 +1,10 @@
 package io.improbable.keanu.tensor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.primitives.Ints;
 
 public class TensorShape {
 
@@ -139,6 +143,13 @@ public class TensorShape {
             dims[i] = i + fromDimension;
         }
         return dims;
+    }
+
+    public static int[] moveAxis(int dimension, int with, int[] shape) {
+        List<Integer> shapeList = new ArrayList<>(Ints.asList(shape));
+        Integer dimLength = shapeList.remove(dimension);
+        shapeList.add(with, dimLength);
+        return Ints.toArray(shapeList);
     }
 
     public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {

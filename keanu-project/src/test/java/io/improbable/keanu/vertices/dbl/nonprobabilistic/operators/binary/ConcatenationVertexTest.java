@@ -1,21 +1,22 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import com.google.common.collect.ImmutableSet;
+import static org.junit.Assert.assertEquals;
+
+import java.util.Arrays;
+
+import org.junit.Assert;
+import org.junit.Test;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.LogNormalVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.Arrays;
 
 public class ConcatenationVertexTest {
 
@@ -80,7 +81,7 @@ public class ConcatenationVertexTest {
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void errorThrownOnConcatOfWrongSize() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
@@ -372,4 +373,84 @@ public class ConcatenationVertexTest {
             0.0001
         );
     }
+
+    @Test
+    public void canSplit2() {
+
+        INDArray A = Nd4j.arange(24).reshape(new int[]{2, 3, 1, 4});
+        INDArray B = Nd4j.arange(24, 96).reshape(new int[]{2, 3, 3, 4});
+        INDArray C = Nd4j.arange(96, 144).reshape(new int[]{2, 3, 2, 4});
+
+        INDArray D = Nd4j.concat(2, A, B, C);
+
+        INDArray permutedD = D.permute(2, 0, 1, 3).reshape(1, D.length());
+
+        double[] rawData = permutedD.data().asDouble();
+        System.out.println(Arrays.toString(rawData));
+
+        int blength = B.length();
+        double[] bbuffer = new double[blength];
+
+        System.arraycopy(rawData, A.length(), bbuffer, 0, bbuffer.length);
+
+        System.out.println(Arrays.toString(bbuffer));
+
+        INDArray newB = Nd4j.create(bbuffer, new int[]{1, bbuffer.length}).reshape(3, 2, 3, 4).permute(1, 2, 0, 3);
+
+        System.out.println(newB.equals(B));
+
+        assertEquals(B, newB);
+    }
+
+    @Test
+    public void canSplit() {
+
+        int dim = 2;
+        DoubleTensor A = DoubleTensor.arange(0, 24).reshape(new int[]{2, 3, 1, 4});
+        DoubleTensor B = DoubleTensor.arange(24, 96).reshape(new int[]{2, 3, 3, 4});
+        DoubleTensor C = DoubleTensor.arange(96, 144).reshape(new int[]{2, 3, 2, 4});
+
+        long alength = A.getLength();
+        long blength = B.getLength();
+        long clength = C.getLength();
+
+        DoubleTensor[] concatList = new DoubleTensor[]{A, B, C};
+        int[][] shapeList = new int[][]{A.getShape(), B.getShape(), C.getShape()};
+        long[] lengthList = new long[]{alength, blength, clength};
+
+        DoubleTensor D = A.concat(dim, B, C);
+
+        int[] movedDim = TensorShape.moveAxis(dim, 0, TensorShape.dimensionRange(0, D.getShape().length));
+        DoubleTensor permutedD = D.permute(movedDim).reshape(1, (int) D.getLength());
+
+        double[] rawData = permutedD.asFlatDoubleArray();
+        System.out.println(Arrays.toString(rawData));
+
+//        double[] abuffer = new double[(int) alength];
+//        System.arraycopy(rawData, (int) alength, abuffer, 0, abuffer.length);
+
+        double[] bbuffer = new double[(int) blength];
+        System.arraycopy(rawData, (int) alength, bbuffer, 0, bbuffer.length);
+
+//        double[] cbuffer = new double[(int) clength];
+//        System.arraycopy(rawData, (int) clength, cbuffer, 0, cbuffer.length);
+
+//        int[] aPermutedShape = TensorShape.moveAxis(dim, 0, A.getShape());
+        int[] bPermutedShape = TensorShape.moveAxis(dim, 0, B.getShape());
+//        int[] cPermutedShape = TensorShape.moveAxis(dim, 0, C.getShape());
+
+//        DoubleTensor newA = DoubleTensor.create(abuffer, new int[]{1, (int) alength}).reshape(aPermutedShape).swapAxes(dim, 0);
+        DoubleTensor newB = DoubleTensor.create(bbuffer, new int[]{1, (int) blength}).reshape(bPermutedShape).permute(movedDim);
+//        DoubleTensor newC = DoubleTensor.create(cbuffer, new int[]{1, (int) clength}).reshape(cPermutedShape).swapAxes(dim, 0);
+
+//        System.out.println(newA.equals(A));
+        System.out.println(newB.equals(B));
+//        System.out.println(newC.equals(C));
+
+//        assertEquals(A, newA);
+        assertEquals(B, newB);
+//        assertEquals(C, newC);
+    }
+
+
 }
