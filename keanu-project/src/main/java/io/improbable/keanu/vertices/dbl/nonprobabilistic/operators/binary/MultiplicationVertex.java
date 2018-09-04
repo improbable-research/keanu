@@ -34,8 +34,8 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
         PartialDerivatives rightPartial = derivativeOfOutputsWithRespectToSelf.multiplyBy(right.getValue());
         PartialDerivatives leftPartial = derivativeOfOutputsWithRespectToSelf.multiplyBy(left.getValue());
 
-        partials.put(left, Differentiator.reshapeReverseAutoDiff(rightPartial, left.getValue(), right.getValue()));
-        partials.put(right, Differentiator.reshapeReverseAutoDiff(leftPartial, right.getValue(), left.getValue()));
+        partials.put(left, rightPartial);
+        partials.put(right, leftPartial);
 
         return partials;
     }

@@ -81,10 +81,20 @@ public class Differentiator {
             Map<Vertex, PartialDerivatives> partialDerivatives = visiting.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
 
             for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
-                if (dwrtOf.containsKey(v.getKey())) {
-                    dwrtOf.put(v.getKey(), v.getValue().add(dwrtOf.get(v.getKey())));
+
+                int[] wrtShape = v.getKey().getShape();
+
+                PartialDerivatives dwrtV;
+                if (TensorShape.isScalar(wrtShape)) {
+                    dwrtV = v.getValue().sum(false, TensorShape.dimensionRange(-wrtShape.length, 0));
                 } else {
-                    dwrtOf.put(v.getKey(), v.getValue());
+                    dwrtV = v.getValue();
+                }
+
+                if (dwrtOf.containsKey(v.getKey())) {
+                    dwrtOf.put(v.getKey(), dwrtOf.get(v.getKey()).add(dwrtV));
+                } else {
+                    dwrtOf.put(v.getKey(), dwrtV);
                 }
             }
 
@@ -126,23 +136,6 @@ public class Differentiator {
         }
 
         return ofWrt;
-    }
-
-    public static PartialDerivatives reshapeReverseAutoDiff(PartialDerivatives partialDerivatives, DoubleTensor primary, DoubleTensor secondary) {
-        Map<VertexId, DoubleTensor> reshapedPartials = new HashMap<>();
-
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : partialDerivatives.asMap().entrySet()) {
-            DoubleTensor partial;
-            if (primary.isScalar()) {
-                int[] nonScalarDimensions = TensorShape.nonScalarDimensions(secondary.getShape());
-                partial = partialDerivative.getValue().sum(nonScalarDimensions).reshape(TensorShape.concat(secondary.getShape(), primary.getShape()));
-            } else {
-                partial = partialDerivative.getValue();
-            }
-            reshapedPartials.put(partialDerivative.getKey(), partial);
-        }
-
-        return new PartialDerivatives(reshapedPartials);
     }
 
     public static <V extends Vertex & Differentiable> DualNumber calculateDual(V vertex) {

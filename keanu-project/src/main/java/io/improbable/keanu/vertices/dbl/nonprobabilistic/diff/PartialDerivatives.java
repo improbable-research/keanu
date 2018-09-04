@@ -124,7 +124,7 @@ public class PartialDerivatives {
             if (reshape) {
                 summed.put(k, reshapedV);
             } else {
-                summed.put(k, increaseRankByPrependingOnesToShape(reshapedV, v.getRank()));
+                summed.put(k, reshapedV.reshape(onesToShape(v.getShape(), overDimensions)));
             }
         }
 
@@ -389,17 +389,22 @@ public class PartialDerivatives {
     }
 
     private int[] extractWrtShape(int[] partialDerivativeShape, int rankOfSource) {
-        int[] wrtShape = Arrays.copyOfRange(partialDerivativeShape, rankOfSource, partialDerivativeShape.length);
-        return wrtShape;
+        return Arrays.copyOfRange(partialDerivativeShape, rankOfSource, partialDerivativeShape.length);
     }
 
-    public static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
-        return lowRankTensor.reshape(
-            TensorShape.shapeToDesiredRankByPrependingOnes(lowRankTensor.getShape(), desiredRank)
-        );
+    private static int[] onesToShape(int[] shape, int[] onesDimensions) {
+
+        int[] shapeWithOnes = Arrays.copyOf(shape, shape.length);
+
+        for (int onesDimension : onesDimensions) {
+            int resolvedDimension = onesDimension >= 0 ? onesDimension : shape.length + onesDimension;
+            shapeWithOnes[resolvedDimension] = 1;
+        }
+
+        return shapeWithOnes;
     }
 
-    public static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+    private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
         return lowRankTensor.reshape(
             TensorShape.shapeDesiredToRankByAppendingOnes(lowRankTensor.getShape(), desiredRank)
         );
