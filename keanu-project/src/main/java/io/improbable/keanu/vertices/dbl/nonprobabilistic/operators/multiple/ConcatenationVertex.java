@@ -56,6 +56,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
 
 
 
+
         return null;
     }
 

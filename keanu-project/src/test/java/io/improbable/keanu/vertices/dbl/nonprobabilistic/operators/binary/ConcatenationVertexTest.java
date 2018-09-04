@@ -397,8 +397,6 @@ public class ConcatenationVertexTest {
 
         INDArray newB = Nd4j.create(bbuffer, new int[]{1, bbuffer.length}).reshape(3, 2, 3, 4).permute(1, 2, 0, 3);
 
-        System.out.println(newB.equals(B));
-
         assertEquals(B, newB);
     }
 
@@ -422,35 +420,23 @@ public class ConcatenationVertexTest {
 
         int[] movedDim = TensorShape.moveAxis(dim, 0, TensorShape.dimensionRange(0, D.getShape().length));
         DoubleTensor permutedD = D.permute(movedDim).reshape(1, (int) D.getLength());
-
         double[] rawData = permutedD.asFlatDoubleArray();
-        System.out.println(Arrays.toString(rawData));
 
-//        double[] abuffer = new double[(int) alength];
-//        System.arraycopy(rawData, (int) alength, abuffer, 0, abuffer.length);
+        int[] moveBackDim = TensorShape.moveAxis(0, dim, TensorShape.dimensionRange(0, D.getShape().length));
 
-        double[] bbuffer = new double[(int) blength];
-        System.arraycopy(rawData, (int) alength, bbuffer, 0, bbuffer.length);
+        int position = 0;
+        for (int i = 0; i < concatList.length; i++) {
+            double[] buffer = new double[(int) lengthList[i]];
 
-//        double[] cbuffer = new double[(int) clength];
-//        System.arraycopy(rawData, (int) clength, cbuffer, 0, cbuffer.length);
+            System.arraycopy(rawData, position, buffer, 0, buffer.length);
+            int[] permutedShape = TensorShape.moveAxis(dim, 0, shapeList[i]);
+            DoubleTensor newTensor = DoubleTensor.create(buffer, new int[]{1, (int) lengthList[i]}).reshape(permutedShape).permute(moveBackDim);
 
-//        int[] aPermutedShape = TensorShape.moveAxis(dim, 0, A.getShape());
-        int[] bPermutedShape = TensorShape.moveAxis(dim, 0, B.getShape());
-//        int[] cPermutedShape = TensorShape.moveAxis(dim, 0, C.getShape());
+            assertEquals(concatList[i], newTensor);
 
-//        DoubleTensor newA = DoubleTensor.create(abuffer, new int[]{1, (int) alength}).reshape(aPermutedShape).swapAxes(dim, 0);
-        DoubleTensor newB = DoubleTensor.create(bbuffer, new int[]{1, (int) blength}).reshape(bPermutedShape).permute(movedDim);
-//        DoubleTensor newC = DoubleTensor.create(cbuffer, new int[]{1, (int) clength}).reshape(cPermutedShape).swapAxes(dim, 0);
+            position += buffer.length;
+        }
 
-//        System.out.println(newA.equals(A));
-        System.out.println(newB.equals(B));
-//        System.out.println(newC.equals(C));
-
-//        assertEquals(A, newA);
-        assertEquals(B, newB);
-//        assertEquals(C, newC);
     }
-
 
 }
