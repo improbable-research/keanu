@@ -41,7 +41,7 @@ public final class ModelComposition {
 
     private static Map<VertexLabel, Vertex> extractOutputs(BayesianNetwork bayesianNetwork,
                                                            List<VertexLabel> desiredOutputs) {
-        if (desiredOutputs.size() == 0) {
+        if (desiredOutputs.isEmpty()) {
             throw new IllegalArgumentException("At least one output must be specified");
         }
 

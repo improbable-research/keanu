@@ -51,7 +51,7 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
 
     @Override
     public boolean hasParent() {
-        return getParents().size() > 0;
+        return !getParents().isEmpty();
     }
 
     @Override

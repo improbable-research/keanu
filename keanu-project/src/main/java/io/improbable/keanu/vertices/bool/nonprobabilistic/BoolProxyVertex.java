@@ -47,7 +47,7 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
 
     @Override
     public boolean hasParent() {
-        return getParents().size() > 0;
+        return !getParents().isEmpty();
     }
 
 }

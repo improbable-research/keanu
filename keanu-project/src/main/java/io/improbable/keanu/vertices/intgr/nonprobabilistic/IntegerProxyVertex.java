@@ -47,7 +47,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
 
     @Override
     public boolean hasParent() {
-        return getParents().size() > 0;
+        return !getParents().isEmpty();
     }
 
 }
