@@ -6,14 +6,12 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 
@@ -30,6 +28,7 @@ public class PartialDerivatives {
         );
     }
 
+    //TODO: broadcast or stretch?!?
     public static PartialDerivatives ifThenElse(BooleanTensor predicate, PartialDerivatives thn, PartialDerivatives els) {
         DoubleTensor trueMask = predicate.toDoubleMask();
         DoubleTensor falseMask = predicate.not().toDoubleMask();
@@ -133,46 +132,38 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives add(PartialDerivatives toAdd) {
-        return add(toAdd, new HashMap<>());
+        return add(toAdd, null);
     }
 
-    public PartialDerivatives add(PartialDerivatives toAdd, Map<VertexId, List<Integer>> reshapes) {
-        Map<VertexId, DoubleTensor> added = new HashMap<>();
+    public PartialDerivatives add(PartialDerivatives addition, int[] ofShape) {
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            VertexId k = entry.getKey();
-            DoubleTensor v = entry.getValue();
-            if (reshapes.containsKey(k)) {
-                int[] desiredShape = reshapes.get(k).stream().mapToInt(i -> i).toArray();
-                added.put(k, Nd4jDoubleTensor.ones(desiredShape).times(v));
-            } else {
-                added.put(k, v);
-            }
-        }
+        Map<VertexId, DoubleTensor> added = cloneWithCorrectShape(derivativeWithRespectTo, ofShape);
+        Map<VertexId, DoubleTensor> toAdd = cloneWithCorrectShape(addition.derivativeWithRespectTo, ofShape);
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : toAdd.derivativeWithRespectTo.entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> entry : toAdd.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
             if (added.containsKey(k)) {
                 added.put(k, added.get(k).plus(v));
             } else {
-                if (reshapes.containsKey(k)) {
-                    int[] desiredShape = reshapes.get(k).stream().mapToInt(i -> i).toArray();
-                    added.put(k, Nd4jDoubleTensor.ones(desiredShape).times(v));
-                } else {
-                    added.put(k, v);
-                }
+                added.put(k, v);
             }
         }
 
         return new PartialDerivatives(added);
     }
 
-    public PartialDerivatives subtract(PartialDerivatives toSubtract) {
-        Map<VertexId, DoubleTensor> subtracted = cloneInfinitesimals(derivativeWithRespectTo);
+    public PartialDerivatives subtract(PartialDerivatives subtraction) {
+        return subtract(subtraction, null);
+    }
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : toSubtract.derivativeWithRespectTo.entrySet()) {
+    public PartialDerivatives subtract(PartialDerivatives subtraction, int[] ofShape) {
+
+        Map<VertexId, DoubleTensor> subtracted = cloneWithCorrectShape(derivativeWithRespectTo, ofShape);
+        Map<VertexId, DoubleTensor> toSubtract = cloneWithCorrectShape(subtraction.derivativeWithRespectTo, ofShape);
+
+        for (Map.Entry<VertexId, DoubleTensor> entry : toSubtract.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
 
@@ -184,6 +175,37 @@ public class PartialDerivatives {
         }
 
         return new PartialDerivatives(subtracted);
+    }
+
+    private static Map<VertexId, DoubleTensor> cloneWithCorrectShape(Map<VertexId, DoubleTensor> infinitesimals, int[] ofShape) {
+
+        Map<VertexId, DoubleTensor> clone = new HashMap<>();
+        for (Map.Entry<VertexId, DoubleTensor> entry : infinitesimals.entrySet()) {
+            VertexId k = entry.getKey();
+            DoubleTensor v = entry.getValue();
+
+            if (ofShape == null || ofShapeMatches(ofShape, v.getShape())) {
+                clone.put(k, v);
+            } else {
+                clone.put(k, DoubleTensor.zeros(shapeWrtScalar(ofShape, v.getShape())).plus(v));
+            }
+        }
+        return clone;
+    }
+
+    private static boolean ofShapeMatches(int[] ofShape, int[] partialShape) {
+        for (int i = 0; i < ofShape.length; i++) {
+            if (ofShape[i] != partialShape[i]) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private static int[] shapeWrtScalar(int[] ofShape, int[] partialShape) {
+        int[] fixedShape = Arrays.copyOf(partialShape, partialShape.length);
+        System.arraycopy(ofShape, 0, fixedShape, 0, ofShape.length);
+        return fixedShape;
     }
 
     public PartialDerivatives multiplyBy(DoubleTensor multiplier) {

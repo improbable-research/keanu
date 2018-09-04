@@ -135,28 +135,15 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     public DualNumber add(DualNumber that) {
         // dc = da + db;
         DoubleTensor newValue = this.value.plus(that.value);
-        Map<VertexId, List<Integer>> reshapes = new HashMap<>();
-        reshapes = reshapeScalarOperations(this.value, this.getPartialDerivatives(), newValue, reshapes);
-        reshapes = reshapeScalarOperations(that.value, that.getPartialDerivatives(), newValue, reshapes);
-        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives, reshapes);
+        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives, newValue.getShape());
         return new DualNumber(newValue, newInf);
-    }
-
-    private Map<VertexId, List<Integer>> reshapeScalarOperations(DoubleTensor primary, PartialDerivatives partials, DoubleTensor newValue, Map<VertexId, List<Integer>> reshapedScalars) {
-        if (primary.isScalar()) {
-            for (Map.Entry<VertexId, DoubleTensor> partial : partials.asMap().entrySet()) {
-                if (partial.getValue().isScalar()) {
-                    int[] desiredShape = TensorShape.concat(newValue.getShape(), primary.getShape());
-                    reshapedScalars.put(partial.getKey(), Arrays.stream(desiredShape).boxed().collect(Collectors.toList()));
-                }
-            }
-        }
-        return reshapedScalars;
     }
 
     public DualNumber subtract(DualNumber that) {
         // dc = da - db;
-        return plus(that.unaryMinus());
+        DoubleTensor newValue = this.value.minus(that.value);
+        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives, newValue.getShape());
+        return new DualNumber(newValue, newInf);
     }
 
     public DualNumber matrixMultiplyBy(DualNumber that) {
