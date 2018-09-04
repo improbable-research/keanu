@@ -58,7 +58,7 @@ public class WriteCsvTest {
         Map<VertexId, List<DoubleTensor>> networkSamples = new HashMap<>();
         networkSamples.put(g1.getId(), Arrays.asList(g1.getValue(), g1.times(2).getValue()));
         networkSamples.put(g2.getId(), Arrays.asList(g2.getValue(), g2.times(2).getValue()));
-        samples = new NetworkSamples(networkSamples, 2);
+        samples = new NetworkSamples(networkSamples, new ArrayList<>(), 2);
     }
 
     @Test

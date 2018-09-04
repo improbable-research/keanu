@@ -44,14 +44,17 @@ public class Prior {
         }
 
         List<? extends Vertex> topologicallySorted = TopologicalSort.sort(bayesNet.getLatentVertices());
+
         Map<VertexId, List> samplesByVertex = new HashMap<>();
+        List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
             nextSample(topologicallySorted, random);
             takeSamples(samplesByVertex, fromVertices);
+            logOfMasterPForEachSample.add(bayesNet.getLogOfMasterP());
         }
 
-        return new NetworkSamples(samplesByVertex, sampleCount);
+        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
     }
 
     private static void nextSample(List<? extends Vertex> topologicallySorted, KeanuRandom random) {

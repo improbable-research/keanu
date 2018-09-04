@@ -73,9 +73,9 @@ For IntelliJ:
 
 Interested in working for Improbable on cool problems? Start [here](https://improbable.io/careers/joining-us)
 
-[travis-image]: https://travis-ci.org/improbable-research/keanu.svg?branch=develop
+[travis-image]: https://api.travis-ci.org/improbable-research/keanu.svg?branch=develop
 [travis-url]: https://travis-ci.org/improbable-research/keanu
-[maven-image]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu/badge.svg
-[maven-url]: https://maven-badges.herokuapp.com/maven-central/io.improbable/keanu
+[maven-image]: https://img.shields.io/maven-central/v/io.improbable/keanu.svg?colorB=brightgreen
+[maven-url]: https://search.maven.org/artifact/io.improbable/keanu/
 [sonar-image]: https://sonarcloud.io/api/project_badges/measure?project=keanu%3Akeanu-project&metric=alert_status
 [sonar-url]: https://sonarcloud.io/dashboard?id=keanu%3Akeanu-project
