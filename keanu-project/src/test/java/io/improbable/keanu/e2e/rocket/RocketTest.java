@@ -92,11 +92,10 @@ public class RocketTest {
         }
 
         public EventCounts combine(EventCounts that) {
-            EventCounts counts = new EventCounts();
-            counts.oRingFailureCount = this.oRingFailureCount + that.oRingFailureCount;
-            counts.residualFuelCount = this.residualFuelCount + that.residualFuelCount;
-            counts.alarm1FalsePositiveCount = this.alarm1FalsePositiveCount + that.alarm1FalsePositiveCount;
-            return counts;
+            this.oRingFailureCount += that.oRingFailureCount;
+            this.residualFuelCount += that.residualFuelCount;
+            this.alarm1FalsePositiveCount += that.alarm1FalsePositiveCount;
+            return this;
         }
     }
 
