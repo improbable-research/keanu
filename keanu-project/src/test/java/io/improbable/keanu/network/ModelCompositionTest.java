@@ -43,7 +43,7 @@ public class ModelCompositionTest {
      *
      * | Proxy "Location" |              | Uniform - Size |
      *                     \            /
-     *     | Gaussian ("Output1" & Pareto ("Output2") |
+     *     | Gaussian ("Output1") & Pareto ("Output2") |
      *
      * The Outer graph hooks up a Uniform to the "Location" input of the inner graph and takes the Output "Output1" as
      * the single output it cares about.
