@@ -28,9 +28,9 @@ public final class ModelComposition {
      * @param desiredOutputs The set of labels we wish to output from the supplied BayesNet
      * @return A map of Labels to Output Vertices
      */
-    public static Map<VertexLabel, Vertex> createModelVertices(BayesianNetwork bayesianNetwork,
-                                                               Map<VertexLabel, Vertex> inputVertices,
-                                                               List<VertexLabel> desiredOutputs) {
+    public static Map<VertexLabel, Vertex> composeModel(BayesianNetwork bayesianNetwork,
+                                                        Map<VertexLabel, Vertex> inputVertices,
+                                                        List<VertexLabel> desiredOutputs) {
         Map<VertexLabel, Vertex> outputMap = extractOutputs(bayesianNetwork, desiredOutputs);
         increaseDepth(bayesianNetwork, outputMap);
         checkAndLinkInputs(bayesianNetwork, inputVertices);
@@ -47,7 +47,7 @@ public final class ModelComposition {
 
         Map<VertexLabel, Vertex> outputMap = new HashMap<>();
 
-        for (VertexLabel label: desiredOutputs) {
+        for (VertexLabel label : desiredOutputs) {
             Vertex v = bayesianNetwork.getVertexByLabel(label);
             if (v == null) {
                 throw new IllegalArgumentException("Unable to find Output Vertex: " + label);
@@ -70,7 +70,7 @@ public final class ModelComposition {
     }
 
     private static void checkAndLinkInputs(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> inputs) {
-        for (Map.Entry<VertexLabel, Vertex> entry: inputs.entrySet()) {
+        for (Map.Entry<VertexLabel, Vertex> entry : inputs.entrySet()) {
             Vertex v = bayesianNetwork.getVertexByLabel(entry.getKey());
 
             if (v == null) {
@@ -78,7 +78,7 @@ public final class ModelComposition {
             }
 
             if (v instanceof ProxyVertex) {
-                ProxyVertex proxyVertex = (ProxyVertex)v;
+                ProxyVertex proxyVertex = (ProxyVertex) v;
                 if (proxyVertex.hasParent()) {
                     throw new IllegalArgumentException("Proxy Vertex for \"" + v.getLabel() + "\" already has Parent");
                 } else {

@@ -52,20 +52,20 @@ public class ModelCompositionTest {
     @Before
     public void setup() {
 
-        createInnerNet();
+        innerNet = createInnerNet();
 
         trueLocation = new UniformVertex(0.1, 50.0);
 
         Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
-        Map<VertexLabel, Vertex> outputs = ModelComposition.createModelVertices(
+        Map<VertexLabel, Vertex> outputs = ModelComposition.composeModel(
             innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1")));
         gaussOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output1"));
 
         outerNet = new BayesianNetwork(gaussOutputVertex.getConnectedGraph());
     }
 
-    private void createInnerNet() {
+    private BayesianNetwork createInnerNet() {
         location = new DoubleProxyVertex();
         location.setLabel(new VertexLabel("Location"));
         size = new UniformVertex(0.1, 20);
@@ -75,7 +75,7 @@ public class ModelCompositionTest {
         pareto = new ParetoVertex(location, size);
         pareto.setLabel(new VertexLabel("Output2"));
 
-        innerNet = new BayesianNetwork(gaussian.getConnectedGraph());
+        return new BayesianNetwork(gaussian.getConnectedGraph());
     }
 
     @Test
@@ -148,7 +148,7 @@ public class ModelCompositionTest {
         BayesianNetwork bayesNet = new BayesianNetwork(outputVertex.getConnectedGraph());
         DoubleVertex outerInput = new GaussianVertex(0.0, 1.0);
 
-        ModelComposition.createModelVertices(bayesNet,
+        ModelComposition.composeModel(bayesNet,
             ImmutableMap.of(new VertexLabel("Input1"), outerInput),
             outputs);
     }
@@ -187,7 +187,7 @@ public class ModelCompositionTest {
         proxy.setParent(invalidParent);
 
         BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
-        ModelComposition.createModelVertices(bayesNet,
+        ModelComposition.composeModel(bayesNet,
             ImmutableMap.of(new VertexLabel("Input1"), outerInput),
             ImmutableList.of(new VertexLabel("Output1")));
     }
