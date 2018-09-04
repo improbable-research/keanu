@@ -100,7 +100,7 @@ public class ModelCompositionTest {
 
     @Test
     public void idOrderingStillImpliesTopologicalOrdering() {
-        for (Vertex v: outerNet.getAllVertices()) {
+        for (Vertex v: outerNet.getVertices()) {
             Set<Vertex> parentSet = v.getParents();
             for (Vertex parent : parentSet) {
                 assertTrue(v.getId().compareTo(parent.getId()) > 0);

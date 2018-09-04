@@ -14,7 +14,7 @@ public final class ModelComposition {
     private ModelComposition() { }
 
     /**
-     * Compose one model within a wider model.
+     * Connects one model within an other, marking it such that it's clear this is a nested model
      * <p>
      *     This function will take a previously constructed BayesNet and do a number of things:
      *     - Hook up any Proxy Vertices to the parents specified in the inputVertices
@@ -61,10 +61,10 @@ public final class ModelComposition {
     private static void increaseDepth(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> outputVertices) {
         VertexId newPrefix = new VertexId();
         bayesianNetwork.incrementIndentation();
-        bayesianNetwork.getAllVertices().stream()
+        bayesianNetwork.getVertices().stream()
             .filter(v -> !outputVertices.containsKey(v.getLabel()))
             .forEach(v -> v.getId().addPrefix(newPrefix));
-        bayesianNetwork.getAllVertices().stream()
+        bayesianNetwork.getVertices().stream()
             .filter(v -> outputVertices.containsKey(v.getLabel()))
             .forEach(v -> v.getId().resetID());
     }
