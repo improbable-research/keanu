@@ -22,7 +22,8 @@ public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
     private final Map<VertexLabel, Vertex> vertexLabels;
-    private int depth = 1;
+    private final int TOP_LEVEL_INDENTATION = 1;
+    private int indentation = TOP_LEVEL_INDENTATION;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
@@ -41,7 +42,7 @@ public class BayesianNetwork {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
             VertexLabel label = v.getLabel();
-            if (v.getId().getDepth() == this.depth && label != null) {
+            if (v.getId().getDepth() == this.indentation && label != null) {
                 if (labelMap.containsKey(label)) {
                     throw new IllegalArgumentException("Vertex Label Repeated: " + label);
                 } else {
@@ -58,7 +59,7 @@ public class BayesianNetwork {
     }
 
     private interface VertexFilter {
-        boolean filter(boolean isProbabilistic, boolean isObserved, int depth);
+        boolean filter(boolean isProbabilistic, boolean isObserved, int indentation);
     }
 
     private List<Vertex> getFilteredVertexList(VertexFilter filter) {
@@ -71,36 +72,48 @@ public class BayesianNetwork {
      * @return The union of getLatentVertices and getObservedVertices
      */
     public List<Vertex> getLatentAndObservedVertices() {
-        return getLatentAndObservedVerticesAtDepth(Integer.MAX_VALUE);
+        return getLatentAndObservedVertices(Integer.MAX_VALUE);
     }
 
-    public List<Vertex> getLatentAndObservedVerticesAtDepth(int maxDepth) {
-        return getFilteredVertexList((isProbabilistic, isObserved, depth)
-            -> (isProbabilistic || isObserved) && maxDepth >= depth);
+    public List<Vertex> getTopLevelLatentAndObservedVertices() {
+        return getLatentAndObservedVertices(TOP_LEVEL_INDENTATION);
+    }
+
+    private List<Vertex> getLatentAndObservedVertices(int maxIndentation) {
+        return getFilteredVertexList((isProbabilistic, isObserved, indentation)
+            -> (isProbabilistic || isObserved) && maxIndentation >= indentation);
     }
 
     /**
      * @return All vertices that are latent (i.e. probabilistic non-observed)
      */
     public List<Vertex> getLatentVertices() {
-        return getLatentVerticesAtDepth(Integer.MAX_VALUE);
+        return getLatentVertices(Integer.MAX_VALUE);
     }
 
-    public List<Vertex> getLatentVerticesAtDepth(int maxDepth) {
-        return getFilteredVertexList((isProbabilistic, isObserved, depth)
-            -> (isProbabilistic && !isObserved) && maxDepth >= depth);
+    public List<Vertex> getTopLevelLatentVertices() {
+        return getLatentVertices(TOP_LEVEL_INDENTATION);
+    }
+
+    private List<Vertex> getLatentVertices(int maxIndentation) {
+        return getFilteredVertexList((isProbabilistic, isObserved, indentation)
+            -> (isProbabilistic && !isObserved) && maxIndentation >= indentation);
     }
 
     /**
      * @return All vertices that are observed - which may be probabilistic or non-probabilistic
      */
     public List<Vertex> getObservedVertices() {
-        return getObservedVerticesAtDepth(Integer.MAX_VALUE);
+        return getObservedVertices(Integer.MAX_VALUE);
     }
 
-    public List<Vertex> getObservedVerticesAtDepth(int maxDepth) {
-        return getFilteredVertexList((isProbabilistic, isObserved, depth) ->
-            isObserved && maxDepth >= depth);
+    public List<Vertex> getTopLevelObservedVertices() {
+        return getObservedVertices(TOP_LEVEL_INDENTATION);
+    }
+
+    private List<Vertex> getObservedVertices(int maxIndentation) {
+        return getFilteredVertexList((isProbabilistic, isObserved, indentation) ->
+            isObserved && maxIndentation >= indentation);
     }
 
     public double getLogOfMasterP() {
@@ -184,12 +197,12 @@ public class BayesianNetwork {
             .collect(Collectors.toList());
     }
 
-    public int getDepth() {
-        return depth;
+    public int getIndentation() {
+        return indentation;
     }
 
-    public void incrementDepth() {
-        depth++;
+    public void incrementIndentation() {
+        indentation++;
     }
 
 }

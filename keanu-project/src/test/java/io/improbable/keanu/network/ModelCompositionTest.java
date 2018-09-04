@@ -93,8 +93,8 @@ public class ModelCompositionTest {
 
     @Test
     public void netsAtCorrectDepth() {
-        assertEquals(innerNet.getDepth(), 2);
-        assertEquals(outerNet.getDepth(), 1);
+        assertEquals(innerNet.getIndentation(), 2);
+        assertEquals(outerNet.getIndentation(), 1);
     }
 
     @Test
@@ -126,9 +126,9 @@ public class ModelCompositionTest {
     }
 
     @Test
-    public void bayesNetCanFilterOnDepth() {
+    public void bayesNetCanReturnTopLevelVerticesOnly() {
         Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, gaussOutputVertex);
-        Set<Vertex> filteredVertices = new HashSet<>(outerNet.getLatentVerticesAtDepth(outerNet.getDepth()));
+        Set<Vertex> filteredVertices = new HashSet<>(outerNet.getTopLevelLatentVertices());
 
         assertEquals(latentOuterVertices.containsAll(filteredVertices), true);
         assertEquals(filteredVertices.containsAll(latentOuterVertices), true);

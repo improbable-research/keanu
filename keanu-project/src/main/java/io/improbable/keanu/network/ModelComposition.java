@@ -60,7 +60,7 @@ public final class ModelComposition {
 
     private static void increaseDepth(BayesianNetwork bayesianNetwork, Map<VertexLabel, Vertex> outputVertices) {
         VertexId newPrefix = new VertexId();
-        bayesianNetwork.incrementDepth();
+        bayesianNetwork.incrementIndentation();
         bayesianNetwork.getAllVertices().stream()
             .filter(v -> !outputVertices.containsKey(v.getLabel()))
             .forEach(v -> v.getId().increaseDepth(newPrefix));
