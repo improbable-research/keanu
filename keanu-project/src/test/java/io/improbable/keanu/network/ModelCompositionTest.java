@@ -84,7 +84,7 @@ public class ModelCompositionTest {
     }
 
     @Test
-    public void verticesAreAtCorrectDepth() {
+    public void verticesAreAtCorrectIndentation() {
         assertEquals(trueLocation.getId().getIndentation(), 1);
         assertEquals(location.getId().getIndentation(), 2);
         assertEquals(size.getId().getIndentation(), 2);
@@ -93,7 +93,7 @@ public class ModelCompositionTest {
     }
 
     @Test
-    public void netsAtCorrectDepth() {
+    public void netsAtCorrectIdentation() {
         assertEquals(innerNet.getIndentation(), 2);
         assertEquals(outerNet.getIndentation(), 1);
     }
