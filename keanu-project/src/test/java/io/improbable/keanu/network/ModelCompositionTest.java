@@ -85,11 +85,11 @@ public class ModelCompositionTest {
 
     @Test
     public void verticesAreAtCorrectIndentation() {
-        assertEquals(trueLocation.getId().getIndentation(), 1);
-        assertEquals(location.getId().getIndentation(), 2);
-        assertEquals(size.getId().getIndentation(), 2);
-        assertEquals(gaussian.getId().getIndentation(), 1);
-        assertEquals(pareto.getId().getIndentation(), 2);
+        assertEquals(trueLocation.getIndentation(), 1);
+        assertEquals(location.getIndentation(), 2);
+        assertEquals(size.getIndentation(), 2);
+        assertEquals(gaussian.getIndentation(), 1);
+        assertEquals(pareto.getIndentation(), 2);
     }
 
     @Test

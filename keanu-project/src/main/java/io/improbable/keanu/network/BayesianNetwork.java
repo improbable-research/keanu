@@ -42,7 +42,7 @@ public class BayesianNetwork {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
             VertexLabel label = v.getLabel();
-            if (v.getId().getIndentation() == this.indentation && label != null) {
+            if (v.getIndentation() == this.indentation && label != null) {
                 if (labelMap.containsKey(label)) {
                     throw new IllegalArgumentException("Vertex Label Repeated: " + label);
                 } else {
@@ -64,7 +64,7 @@ public class BayesianNetwork {
 
     private List<Vertex> getFilteredVertexList(VertexFilter filter) {
         return vertices.stream()
-            .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved(), v.getId().getIndentation()))
+            .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved(), v.getIndentation()))
             .collect(Collectors.toList());
     }
 
