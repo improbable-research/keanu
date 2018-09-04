@@ -4,6 +4,8 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 import java.util.Map;
 
+import com.google.common.collect.Iterables;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -15,9 +17,6 @@ import io.improbable.keanu.vertices.ProxyVertex;
 
 public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
-    private DoubleVertex parentVertex;
-    private final int[] shape;
-
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
      * model in model scenarios) but allows linking at a later point in time.
@@ -27,34 +26,37 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
     }
 
     public DoubleProxyVertex(int[] shape) {
-        this.shape = shape;
+        this.setValue(DoubleTensor.placeHolder(shape));
     }
 
     @Override
     public DoubleTensor calculate() {
-        return parentVertex.getValue();
+        return getParent().getValue();
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return parentVertex.sample();
+        return getParent().sample();
     }
 
     @Override
     public void setParent(DoubleVertex newParent) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, newParent.getShape());
-        parentVertex = newParent;
-        setParents(parentVertex);
+        checkTensorsMatchNonScalarShapeOrAreScalar(getShape(), newParent.getShape());
+        setParents(newParent);
+    }
+
+    public DoubleVertex getParent() {
+        return (DoubleVertex) Iterables.getOnlyElement(getParents(), null);
     }
 
     @Override
     public boolean hasParent() {
-        return parentVertex != null;
+        return getParents().size() > 0;
     }
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return dualNumbers.get(parentVertex);
+        return dualNumbers.get(getParent());
     }
 
 }
