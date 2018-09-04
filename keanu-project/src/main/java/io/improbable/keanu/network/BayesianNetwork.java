@@ -54,7 +54,7 @@ public class BayesianNetwork {
         return labelMap;
     }
 
-    List<? extends Vertex> getAllVertices() {
+    List<? extends Vertex> getVertices() {
         return vertices;
     }
 
@@ -69,17 +69,17 @@ public class BayesianNetwork {
     }
 
     /**
-     * @return The union of getLatentVertices and getObservedVertices
+     * @return All vertices that are latent or observed
      */
-    public List<Vertex> getLatentAndObservedVertices() {
-        return getLatentAndObservedVertices(Integer.MAX_VALUE);
+    public List<Vertex> getLatentOrObservedVertices() {
+        return getLatentOrObservedVertices(Integer.MAX_VALUE);
     }
 
-    public List<Vertex> getTopLevelLatentAndObservedVertices() {
-        return getLatentAndObservedVertices(TOP_LEVEL_INDENTATION);
+    public List<Vertex> getTopLevelLatentOrObservedVertices() {
+        return getLatentOrObservedVertices(TOP_LEVEL_INDENTATION);
     }
 
-    private List<Vertex> getLatentAndObservedVertices(int maxIndentation) {
+    private List<Vertex> getLatentOrObservedVertices(int maxIndentation) {
         return getFilteredVertexList((isProbabilistic, isObserved, indentation)
             -> (isProbabilistic || isObserved) && maxIndentation >= indentation);
     }
@@ -117,7 +117,7 @@ public class BayesianNetwork {
     }
 
     public double getLogOfMasterP() {
-        return ProbabilityCalculator.calculateLogProbFor(getLatentAndObservedVertices());
+        return ProbabilityCalculator.calculateLogProbFor(getLatentOrObservedVertices());
     }
 
     public void cascadeObservations() {
