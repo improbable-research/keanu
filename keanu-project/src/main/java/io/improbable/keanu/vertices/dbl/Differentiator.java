@@ -43,24 +43,7 @@ public class Differentiator {
             }
 
             Map<Vertex, PartialDerivatives> partialDerivatives = visiting.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
-
-            for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
-
-                int[] wrtShape = v.getKey().getShape();
-
-                PartialDerivatives dwrtV;
-                if (TensorShape.isScalar(wrtShape)) {
-                    dwrtV = v.getValue().sum(false, TensorShape.dimensionRange(-wrtShape.length, 0));
-                } else {
-                    dwrtV = v.getValue();
-                }
-
-                if (dwrtOf.containsKey(v.getKey())) {
-                    dwrtOf.put(v.getKey(), dwrtOf.get(v.getKey()).add(dwrtV));
-                } else {
-                    dwrtOf.put(v.getKey(), dwrtV);
-                }
-            }
+            collectPartials(partialDerivatives, dwrtOf);
 
             if (!visiting.isProbabilistic()) {
                 for (Vertex parent : visiting.getParents()) {
@@ -73,6 +56,27 @@ public class Differentiator {
         }
 
         return wrtOfToOfWrt(wrtOf);
+    }
+
+    private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives, Map<Vertex, PartialDerivatives> dwrtOf) {
+
+        for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
+
+            int[] wrtShape = v.getKey().getShape();
+
+            PartialDerivatives dwrtV;
+            if (TensorShape.isScalar(wrtShape)) {
+                dwrtV = v.getValue().sum(false, TensorShape.dimensionRange(-wrtShape.length, 0));
+            } else {
+                dwrtV = v.getValue();
+            }
+
+            if (dwrtOf.containsKey(v.getKey())) {
+                dwrtOf.put(v.getKey(), dwrtOf.get(v.getKey()).add(dwrtV));
+            } else {
+                dwrtOf.put(v.getKey(), dwrtV);
+            }
+        }
     }
 
     public static PartialDerivatives reverseModeAutoDiff(DoubleVertex of, Set<DoubleVertex> wrt) {

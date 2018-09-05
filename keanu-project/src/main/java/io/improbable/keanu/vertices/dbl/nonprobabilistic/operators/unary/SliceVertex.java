@@ -35,7 +35,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         //TODO
-        return null;
+        throw new UnsupportedOperationException("Reverse mode autodiff not supported for this operation");
     }
 
     @Override
