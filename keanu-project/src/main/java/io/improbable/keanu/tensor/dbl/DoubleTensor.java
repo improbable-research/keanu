@@ -205,8 +205,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 
-    List<DoubleTensor> split(int dimension, int[] indices);
-
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();

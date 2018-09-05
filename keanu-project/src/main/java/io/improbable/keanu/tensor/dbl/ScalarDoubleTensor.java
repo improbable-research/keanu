@@ -444,11 +444,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public List<DoubleTensor> split(int dimension, int[] indices) {
-        return Collections.singletonList(this);
-    }
-
-    @Override
     public DoubleTensor reciprocalInPlace() {
         value = 1.0 / value;
         return this;
