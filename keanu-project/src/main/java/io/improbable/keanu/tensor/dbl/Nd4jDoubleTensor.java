@@ -861,13 +861,23 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      */
     @Override
     public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+
+        int[] shape = getShape();
+        if (dimension < 0 || dimension >= shape.length) {
+            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
+        }
+
         Nd4j.getCompressor().autoDecompress(tensor);
 
-        List<DoubleTensor> slices = new ArrayList<>();
+        List<DoubleTensor> splits = new ArrayList<>();
         int previousSplitIndex = 0;
         for (int i = 0; i < splitAtIndices.length; i++) {
 
             INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
+
+            if(previousSplitIndex == splitAtIndices[i]){
+                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndices[i] + " at dimension " + dimension + " for tensor of shape " + Arrays.toString(shape));
+            }
 
             indices[dimension] = NDArrayIndex.interval(previousSplitIndex, splitAtIndices[i]);
             previousSplitIndex = splitAtIndices[i];
@@ -878,10 +888,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
                 }
             }
 
-            slices.add(new Nd4jDoubleTensor(tensor.get(indices)));
+            splits.add(new Nd4jDoubleTensor(tensor.get(indices)));
         }
 
-        return slices;
+        return splits;
     }
 
     // Comparisons

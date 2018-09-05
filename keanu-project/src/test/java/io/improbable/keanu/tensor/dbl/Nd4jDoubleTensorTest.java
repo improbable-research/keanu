@@ -767,6 +767,18 @@ public class Nd4jDoubleTensorTest {
         assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 4, 2, 6, 9, 2}, 0);
     }
 
+    @Test(expected= IllegalArgumentException.class)
+    public void doesThrowOnZeroLengthSplit() {
+        DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
+        A.split(0, new int[]{0});
+    }
+
+    @Test(expected= IllegalArgumentException.class)
+    public void doesThrowOnNegativeDimensionSplit() {
+        DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
+        A.split(-1, new int[]{1, 5});
+    }
+
     @Test
     public void doesSatisfyJavaDocExample() {
         DoubleTensor A = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3}, 2, 6);
