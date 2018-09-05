@@ -21,6 +21,8 @@ import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.INDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -28,7 +30,6 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
@@ -818,13 +819,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor slice(int dimension, int index) {
-        INDArray dup = tensor.dup();
-        INDArray slice = dup.slice(index, dimension);
-        return new Nd4jDoubleTensor(slice);
-    }
-
-    @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
         INDArray dup = tensor.dup();
         INDArray[] toConcat = new INDArray[those.length + 1];
@@ -836,12 +830,19 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(concat);
     }
 
+    @Override
+    public DoubleTensor slice(int dimension, int index) {
+        INDArray dup = tensor.dup();
+        INDArray slice = dup.slice(index, dimension);
+        return new Nd4jDoubleTensor(slice);
+    }
+
     /**
-     * @param dimension      the dimension to split on
-     * @param splitAtIndices the indices that the dimension to split on should be split on
-     * @return pieces of the tensor split in the order specified by splitAtIndices. To get
+     * @param dimension      the dimension to slice on
+     * @param splitAtIndices the indices that the dimension to slice on should be slice on
+     * @return pieces of the tensor slice in the order specified by splitAtIndices. To get
      * pieces that encompasses the entire tensor, the last index in the splitAtIndices must
-     * be the length of the dimension being split on.
+     * be the length of the dimension being slice on.
      * <p>
      * e.g A =
      * [
@@ -849,56 +850,38 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * 7, 8, 9, 1, 2, 3
      * ]
      * <p>
-     * A.split(0, [1]) gives List([1, 2, 3, 4, 5, 6])
-     * A.split(0, [1, 2]) gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
+     * A.slice(0, [1]) gives List([1, 2, 3, 4, 5, 6])
+     * A.slice(0, [1, 2]) gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
      * <p>
-     * A.split(1, [1, 3, 6]) gives
+     * A.slice(1, [1, 3, 6]) gives
      * List(
      * [1, [2, 3  , [4, 5, 6,
-     *  7]  8, 9]    1, 2, 3]
+     * 7]  8, 9]    1, 2, 3]
      * )
      */
     @Override
     public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+        Nd4j.getCompressor().autoDecompress(tensor);
 
-        DoubleTensor duplicateTensor = this.duplicate();
-        int[] tensorShape = duplicateTensor.getShape();
-        int[] dimensionRange = TensorShape.dimensionRange(0, tensorShape.length);
-        int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, dimensionRange);
-        int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, dimensionRange);
+        List<DoubleTensor> slices = new ArrayList<>();
+        int previousSplitIndex = 0;
+        for (int i = 0; i < splitAtIndices.length; i++) {
 
-        DoubleTensor permutedTensor = duplicateTensor.permute(moveDimToZero).reshape(1, (int) duplicateTensor.getLength());
+            INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
 
-        double[] rawBuffer = permutedTensor.asFlatDoubleArray();
+            indices[dimension] = NDArrayIndex.interval(previousSplitIndex, splitAtIndices[i]);
+            previousSplitIndex = splitAtIndices[i];
 
-        List<DoubleTensor> splitTensor = new ArrayList<>();
-
-        int previousSplitAtIndex = 0;
-        int rawBufferPosition = 0;
-        for (int splitAtIndex : splitAtIndices) {
-
-            int[] subTensorShape = Arrays.copyOf(tensorShape, tensorShape.length);
-            int subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
-
-            if (subTensorLengthInDimension > tensorShape[dimension] || subTensorLengthInDimension <= 0) {
-                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndex + " at " + dimension + " for tensor of shape " + Arrays.toString(tensorShape));
+            for (int j = 0; j < tensor.rank(); j++) {
+                if (j != dimension) {
+                    indices[j] = NDArrayIndex.all();
+                }
             }
 
-            subTensorShape[dimension] = subTensorLengthInDimension;
-            int subTensorLength = (int) TensorShape.getLength(subTensorShape);
-
-            double[] buffer = new double[subTensorLength];
-            System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
-
-            int[] subTensorPermutedShape = TensorShape.slideDimension(dimension, 0, subTensorShape);
-            DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
-            splitTensor.add(subTensor);
-
-            previousSplitAtIndex = splitAtIndex;
-            rawBufferPosition += buffer.length;
+            slices.add(new Nd4jDoubleTensor(tensor.get(indices)));
         }
 
-        return splitTensor;
+        return slices;
     }
 
     // Comparisons
