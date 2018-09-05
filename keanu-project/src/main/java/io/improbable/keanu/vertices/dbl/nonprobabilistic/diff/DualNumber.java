@@ -169,6 +169,13 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(newValue, newInf);
     }
 
+    public DualNumber inverse() {
+        DoubleTensor newValue = this.value.inverse();
+        PartialDerivatives newPartials = PartialDerivatives.OF_CONSTANT;
+
+        return new DualNumber(newValue, newPartials);
+    }
+
     public DualNumber multiplyBy(DualNumber that) {
         // dc = A * db + da * B;
         DoubleTensor newValue = this.value.times(that.value);
