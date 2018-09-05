@@ -36,23 +36,4 @@ public class GradientOptimizerTest {
 
         GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
     }
-
-    @Test
-    public void canRemoveFitnessCalculationHandler() {
-        GaussianVertex gaussianVertex = new GaussianVertex(0, 1);
-
-        GradientOptimizer optimizer = GradientOptimizer.of(gaussianVertex.getConnectedGraph());
-
-        AtomicBoolean didCallFitness = new AtomicBoolean(false);
-        BiConsumer<double[], Double> fitnessHandler = (position, logProb) -> {
-            didCallFitness.set(true);
-        };
-
-        optimizer.addFitnessCalculationHandler(fitnessHandler);
-        optimizer.removeFitnessCalculationHandler(fitnessHandler);
-
-        optimizer.maxAPosteriori();
-
-        assertFalse(didCallFitness.get());
-    }
 }

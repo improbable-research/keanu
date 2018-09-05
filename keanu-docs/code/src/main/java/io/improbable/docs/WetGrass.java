@@ -43,7 +43,7 @@ public class WetGrass {
 
         //What does that observation say about the probability that it rained or that
         //the sprinkler was on?
-        long keepSampleCount = 100000;
+        final long keepSampleCount = 100000;
         Stream<NetworkState> networkSamplesStream = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
             new BayesianNetwork(wetGrass.getConnectedGraph()),
             Arrays.asList(sprinkler, rain)
@@ -51,7 +51,7 @@ public class WetGrass {
 
         double probabilityOfRainGivenWetGrass = networkSamplesStream
             .limit(keepSampleCount)
-            .filter(isRaining -> isRaining.get(rain).scalar())
+            .filter(sample -> sample.get(rain).scalar())
             .count() / (double) keepSampleCount;
 
         networkSamplesStream.close();

@@ -2,6 +2,8 @@ package io.improbable.keanu.algorithms.variational.optimizer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -116,9 +118,8 @@ public class OptimizerTest {
     private void canRemoveFitnessCalculationHandler(Optimizer optimizer) {
 
         AtomicBoolean didCallFitness = new AtomicBoolean(false);
-        BiConsumer<double[], Double> fitnessHandler = (position, logProb) -> {
-            didCallFitness.set(true);
-        };
+
+        BiConsumer<double[], Double> fitnessHandler = mock(BiConsumer.class);
 
         optimizer.addFitnessCalculationHandler(fitnessHandler);
         optimizer.removeFitnessCalculationHandler(fitnessHandler);
@@ -126,5 +127,6 @@ public class OptimizerTest {
         optimizer.maxAPosteriori();
 
         assertFalse(didCallFitness.get());
+        verifyNoMoreInteractions(fitnessHandler);
     }
 }

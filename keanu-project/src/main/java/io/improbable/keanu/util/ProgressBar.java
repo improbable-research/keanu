@@ -10,11 +10,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.commons.io.output.NullOutputStream;
-
 public class ProgressBar {
 
-    public static PrintStream DEFAULT_PRINT_STREAM = System.out;
+    public static PrintStream defaultPrintStream = System.out;
 
     /**
      * Disables all progress bars globally
@@ -68,7 +66,7 @@ public class ProgressBar {
     }
 
     public ProgressBar() {
-        this(DEFAULT_PRINT_STREAM, getDefaultScheduledExecutorService());
+        this(defaultPrintStream, getDefaultScheduledExecutorService());
     }
 
     public void progress() {
@@ -76,19 +74,29 @@ public class ProgressBar {
     }
 
     public void progress(String message, Double progressPercentage) {
-        progress(new ProgressUpdate(message, progressPercentage));
+        if (shouldUpdate()) {
+            progress(new ProgressUpdate(message, progressPercentage));
+        }
     }
 
     public void progress(String message) {
-        progress(new ProgressUpdate(message));
+        if (shouldUpdate()) {
+            progress(new ProgressUpdate(message));
+        }
     }
 
     public void progress(Double progressPercentage) {
-        progress(new ProgressUpdate(progressPercentage));
+        if (shouldUpdate()) {
+            progress(new ProgressUpdate(progressPercentage));
+        }
     }
 
     public void progress(ProgressUpdate progressUpdate) {
         latestProgressUpdate.set(progressUpdate);
+    }
+
+    private boolean shouldUpdate() {
+        return ENABLED.get();
     }
 
     public ProgressUpdate getProgress() {
