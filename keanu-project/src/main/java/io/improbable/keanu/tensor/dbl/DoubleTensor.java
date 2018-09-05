@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
-
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -205,6 +204,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor tensorAlongDimension(int index, int... dimension);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
+
+    List<DoubleTensor> split(int dimension, int[] indices);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

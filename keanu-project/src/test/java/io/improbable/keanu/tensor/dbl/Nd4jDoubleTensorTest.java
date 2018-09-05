@@ -5,9 +5,14 @@ import static org.junit.Assert.assertEquals;
 
 import static junit.framework.TestCase.assertTrue;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class Nd4jDoubleTensorTest {
@@ -727,6 +732,66 @@ public class Nd4jDoubleTensorTest {
 
         assertMinusOperationEquals(matrix, rank4, expected);
         assertMinusInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canSplit() {
+
+        int dim = 2;
+        DoubleTensor A = DoubleTensor.arange(0, 24).reshape(2, 3, 1, 4);
+        DoubleTensor B = DoubleTensor.arange(24, 96).reshape(2, 3, 3, 4);
+        DoubleTensor C = DoubleTensor.arange(96, 144).reshape(2, 3, 2, 4);
+
+        DoubleTensor D = A.concat(dim, B, C);
+        List<DoubleTensor> splitTensor = D.split(dim, new int[]{1, 4, 6});
+
+        DoubleTensor[] concatList = new DoubleTensor[]{A, B, C};
+        for (int i = 0; i < splitTensor.size(); i++) {
+            assertEquals(concatList[i], splitTensor.get(i));
+        }
+
+    }
+
+    @Test
+    public void canSplitHighRank() {
+        assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 2, 6}, 1);
+    }
+
+    @Test
+    public void canSplitEndDimension() {
+        assertCanSplit(new int[]{2, 3, 4, 5}, new int[]{3, 4, 2}, 3);
+    }
+
+    @Test
+    public void canSplitFirstDimension() {
+        assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 4, 2, 6, 9, 2}, 0);
+    }
+
+    private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
+
+        int[] splitIndices = new int[concatenatedIndices.length];
+        List<DoubleTensor> toConcat = new ArrayList<>();
+
+        long previousEndLength = 0;
+        int splitPosition = 0;
+        for (int i = 0; i < concatenatedIndices.length; i++) {
+            int[] shape = Arrays.copyOf(baseShape, baseShape.length);
+            shape[concatenatedDimension] = concatenatedIndices[i];
+
+            splitIndices[i] = splitPosition + concatenatedIndices[i];
+            splitPosition = splitIndices[i];
+
+            long newEndLength = previousEndLength + TensorShape.getLength(shape);
+            toConcat.add(DoubleTensor.arange(previousEndLength, newEndLength).reshape(shape));
+            previousEndLength = newEndLength;
+        }
+
+        DoubleTensor D = toConcat.get(0).concat(concatenatedDimension, toConcat.subList(1, toConcat.size()).toArray(new DoubleTensor[toConcat.size() - 1]));
+        List<DoubleTensor> splitTensor = D.split(concatenatedDimension, splitIndices);
+
+        for (int i = 0; i < splitTensor.size(); i++) {
+            assertEquals(toConcat.get(i), splitTensor.get(i));
+        }
     }
 
 }

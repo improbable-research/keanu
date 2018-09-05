@@ -10,10 +10,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -53,11 +53,29 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
+        Map<Vertex, PartialDerivatives> split = new HashMap<>();
 
+        int splitPosition = 0;
+        int[] splitIndices = new int[input.length];
 
+        for (int i = 0; i < input.length; i++) {
+            splitIndices[i] = splitPosition + input[i].getShape()[dimension];
+            splitPosition = splitIndices[i];
+            split.put(input[i], new PartialDerivatives(new HashMap<>()));
+        }
 
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+            DoubleTensor partial = entry.getValue();
 
-        return null;
+            List<DoubleTensor> splitPartial = partial.split(dimension, splitIndices);
+
+            for (int i = 0; i < splitPartial.size(); i++) {
+                split.get(input[i]).putWithRespectTo(entry.getKey(), splitPartial.get(i));
+            }
+
+        }
+
+        return split;
     }
 
     @Override

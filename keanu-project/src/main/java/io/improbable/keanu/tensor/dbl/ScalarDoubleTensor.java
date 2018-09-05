@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor.dbl;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -439,6 +441,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor concat(int dimension, DoubleTensor... those) {
         return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
+    }
+
+    @Override
+    public List<DoubleTensor> split(int dimension, int[] indices) {
+        return Collections.singletonList(this);
     }
 
     @Override
