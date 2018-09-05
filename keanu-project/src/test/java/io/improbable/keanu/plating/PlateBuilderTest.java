@@ -1,13 +1,19 @@
 package io.improbable.keanu.plating;
 
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class PlateBuilderTest {
 
@@ -70,4 +76,23 @@ public class PlateBuilderTest {
     }
 
 
+    @Test
+    public void youCanCreateASetOfPlatesWithACommonParameter() {
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        Plates plates = new PlateBuilder<Bean>()
+            .fromIterator(ROWS.iterator())
+            .withFactory((plate, bean) -> {
+                BernoulliVertex flip = new BernoulliVertex(commonTheta);
+                flip.observe(false);
+                plate.add("flip", flip);
+            })
+            .build();
+
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> flip = plate.get("flip");
+            assertThat(flip.getParents(), contains(commonTheta));
+        }
+    }
 }
