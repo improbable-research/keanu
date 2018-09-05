@@ -165,15 +165,15 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        return new DoubleUnaryOpLambda<>(outputShape, this, op, dualNumberCalculation, reverseModeAutoDiffLambda);
+        return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        return new DoubleUnaryOpLambda<>(this, op, dualNumberCalculation, reverseModeAutoDiffLambda);
+        return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)

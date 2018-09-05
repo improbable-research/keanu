@@ -279,18 +279,21 @@ public class PartialDerivatives {
 
             int partialRank = partial.getValue().getRank();
 
+            int wrtRightDimension = partialRank - 1;
+            int wrtLeftDimension = partialRank - 2;
+
             DoubleTensor v;
             if (partialIsLeft) {
                 v = partial.getValue()
-                    .tensorMultiply(multiplier, new int[]{partialRank - 1}, new int[]{1});
+                    .tensorMultiply(multiplier, new int[]{wrtRightDimension}, new int[]{1});
             } else {
-                int[] rearrange = TensorShape.dimensionRange(0, partialRank);
-                rearrange[partialRank - 1] = partialRank - 2;
-                rearrange[partialRank - 2] = partialRank - 1;
+                int[] transposeWrt = TensorShape.dimensionRange(0, partialRank);
+                transposeWrt[wrtRightDimension] = wrtLeftDimension;
+                transposeWrt[wrtLeftDimension] = wrtRightDimension;
 
                 v = partial.getValue()
-                    .tensorMultiply(multiplier, new int[]{partialRank - 2}, new int[]{0})
-                    .permute(rearrange);
+                    .tensorMultiply(multiplier, new int[]{wrtLeftDimension}, new int[]{0})
+                    .permute(transposeWrt);
             }
             multiplied.put(partial.getKey(), v);
         }
