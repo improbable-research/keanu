@@ -287,7 +287,6 @@ public class MultinomialVertexTest {
         assertThat(samples, hasShape(4, N));
 
         for (int i = 0; i < samples.getShape()[0]; i++) {
-            System.out.println(i);
             IntegerTensor sample = samples.slice(0, i);
             Double probability = p.slice(0, i).scalar();
             double mean = sample.toDouble().average();
