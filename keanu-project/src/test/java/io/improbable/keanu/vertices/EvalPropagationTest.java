@@ -136,9 +136,9 @@ public class EvalPropagationTest {
 
         DoubleVertex blackBox = new BlackBoxVertex(start, n);
 
-        DoubleVertex pluck0 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(0)), null);
-        DoubleVertex pluck1 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(1)), null);
-        DoubleVertex pluck2 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(2)), null);
+        DoubleVertex pluck0 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(0)), null, null);
+        DoubleVertex pluck1 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(1)), null, null);
+        DoubleVertex pluck2 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(2)), null, null);
 
         pluck0.lazyEval();
         pluck1.lazyEval();

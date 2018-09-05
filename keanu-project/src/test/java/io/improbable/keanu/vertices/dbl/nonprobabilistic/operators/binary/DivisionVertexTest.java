@@ -49,4 +49,26 @@ public class DivisionVertexTest {
             DoubleVertex::divideBy
         );
     }
+
+    @Test
+    public void calculatesDualNumberOfAVectorsAndScalarMultiplied() {
+        calculatesDualNumberOfAVectorsAndScalar(
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            2,
+            DoubleTensor.eye(4).div(2).reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{-0.25, -0.5, -0.75, -1.0}, 1, 4, 1, 1),
+            DoubleVertex::divideBy
+        );
+    }
+
+    @Test
+    public void calculatesDualNumberofAScalarAndVectorsMultiplied() {
+        calculatesDualNumberOfAScalarAndVector(
+            2,
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.create(new double[]{1. / 1., 1. / 2., 1. / 3., 1. / 4.}, 1, 4, 1, 1),
+            DoubleTensor.create(new double[]{-2.0 / 1.0, -2.0 / 4.0, -2.0 / 9.0, -2.0 / 16.}).diag().reshape(1, 4, 1, 4),
+            DoubleVertex::divideBy
+        );
+    }
 }
