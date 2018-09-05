@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -16,13 +17,16 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
      * model in model scenarios) but allows linking at a later point in time.
+     *
+     * @param label The label for this Vertex (all Proxy Vertices must be labelled)
      */
-    public IntegerProxyVertex() {
-        this(Tensor.SCALAR_SHAPE);
+    public IntegerProxyVertex(VertexLabel label) {
+        this(Tensor.SCALAR_SHAPE, label);
     }
 
-    public IntegerProxyVertex(int[] shape) {
+    public IntegerProxyVertex(int[] shape, VertexLabel label) {
         setValue(IntegerTensor.placeHolder(shape));
+        setLabel(label);
     }
 
     @Override

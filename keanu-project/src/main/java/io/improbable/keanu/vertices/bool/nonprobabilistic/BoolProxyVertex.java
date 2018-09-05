@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
@@ -16,13 +17,16 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
      * model in model scenarios) but allows linking at a later point in time.
+     *
+     * @param label The label for this Vertex (all Proxy Vertices must be labelled)
      */
-    public BoolProxyVertex() {
-        this(Tensor.SCALAR_SHAPE);
+    public BoolProxyVertex(VertexLabel label) {
+        this(Tensor.SCALAR_SHAPE, label);
     }
 
-    public BoolProxyVertex(int[] shape) {
+    public BoolProxyVertex(int[] shape, VertexLabel label) {
         this.setValue(BooleanTensor.placeHolder(shape));
+        this.setLabel(label);
     }
 
     @Override

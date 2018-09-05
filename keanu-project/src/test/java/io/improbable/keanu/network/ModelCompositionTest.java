@@ -66,8 +66,7 @@ public class ModelCompositionTest {
     }
 
     private BayesianNetwork createInnerNet() {
-        location = new DoubleProxyVertex();
-        location.setLabel(new VertexLabel("Location"));
+        location = new DoubleProxyVertex(new VertexLabel("Location"));
         size = new UniformVertex(0.1, 20);
         size.setLabel(new VertexLabel("Size"));
         gaussian = new GaussianVertex(location, size);
@@ -139,8 +138,7 @@ public class ModelCompositionTest {
                                             String inputLabel,
                                             String outputLabel,
                                             String plusLabel) {
-        DoubleVertex inputVertex = new DoubleProxyVertex();
-        inputVertex.setLabel(new VertexLabel(inputLabel));
+        DoubleVertex inputVertex = new DoubleProxyVertex(new VertexLabel(inputLabel));
         DoubleVertex plusValue = new ConstantDoubleVertex(1.0);
         plusValue.setLabel(new VertexLabel(plusLabel));
         DoubleVertex outputVertex = inputVertex.plus(plusValue);
@@ -178,8 +176,7 @@ public class ModelCompositionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void willRejectProxyWithParent() {
-        DoubleProxyVertex proxy = new DoubleProxyVertex();
-        proxy.setLabel(new VertexLabel("Input1"));
+        DoubleProxyVertex proxy = new DoubleProxyVertex(new VertexLabel("Input1"));
         DoubleVertex output = new GaussianVertex(proxy, 1.0);
         output.setLabel(new VertexLabel("Output1"));
         DoubleVertex outerInput = new UniformVertex(-1.0, 1.0);
