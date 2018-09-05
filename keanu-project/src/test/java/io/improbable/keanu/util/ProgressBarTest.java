@@ -1,9 +1,13 @@
 package io.improbable.keanu.util;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayOutputStream;
@@ -90,6 +94,50 @@ public class ProgressBarTest {
         String result = getResultWithNewLinesInsteadOfCR();
 
         assertEquals("", result);
+    }
+
+    @Test
+    public void doesPrintProgressInAppropriateFormat() {
+        ProgressBar.enable();
+
+        progressBar.progress(0.0);
+        progressUpdateCall.get().run();
+        progressBar.progress(0.675);
+        progressBar.finish();
+
+        String result = getResultWithNewLinesInsteadOfCR();
+
+        assertThat(result, containsString("67.5%"));
+    }
+
+    @Test
+    public void doesLimitProgressTo100Percent() {
+        ProgressBar.enable();
+
+        progressBar.progress(-0.7);
+        progressUpdateCall.get().run();
+        progressBar.progress(1.5);
+        progressBar.finish();
+
+        String result = getResultWithNewLinesInsteadOfCR();
+        String[] lines = result.split("\n");
+
+        assertThat(lines[1], containsString("0.0%"));
+        assertThat(lines[2], containsString("100.0%"));
+    }
+
+    @Test
+    public void doesCallFinishHandler() {
+        ProgressBar.enable();
+
+        Runnable finishHandler = mock(Runnable.class);
+        progressBar.addFinishHandler(finishHandler);
+        progressBar.progress();
+        progressUpdateCall.get().run();
+        progressBar.finish();
+
+        verify(finishHandler).run();
+        verifyNoMoreInteractions(finishHandler);
     }
 
 }

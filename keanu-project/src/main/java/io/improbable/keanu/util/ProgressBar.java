@@ -139,7 +139,7 @@ public class ProgressBar {
             }
 
             if (update.getProgressPercentage() != null) {
-                sb.append(String.format(" %3.0f%%", update.getProgressPercentage() * 100));
+                sb.append(String.format(" %3.1f%%", Math.min(100.0, Math.max(0, update.getProgressPercentage() * 100))));
             }
 
             printStream.print(sb.toString());
