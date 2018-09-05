@@ -74,9 +74,9 @@ public class TensorShape {
     }
 
     /**
-     * @param shape shape to find the index for
+     * @param shape  shape to find the index for
      * @param stride stride to find the index for
-     * @param index the index in each dimension
+     * @param index  the index in each dimension
      * @return the flat index from a N dimensional index
      */
     public static int getFlatIndex(int[] shape, int[] stride, int... index) {
@@ -96,9 +96,9 @@ public class TensorShape {
 
     /**
      * This method can be interpreted as the opposite to getFlatIndex.
-
-     * @param shape the shape to find the index of
-     * @param stride the stride to find the index of
+     *
+     * @param shape     the shape to find the index of
+     * @param stride    the stride to find the index of
      * @param flatIndex the index to f
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */

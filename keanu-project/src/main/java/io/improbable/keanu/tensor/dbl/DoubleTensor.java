@@ -187,6 +187,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     @Override
     DoubleTensor slice(int dimension, int index);
 
+    List<DoubleTensor> split(int dimension, int[] splitAtIndices);
+
     default List<DoubleTensor> sliceAlongDimension(int dimension, int indexStart, int indexEnd) {
         List<DoubleTensor> slicedTensors = new ArrayList<>();
 
@@ -198,8 +200,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
-
-    List<DoubleTensor> split(int dimension, int[] indices);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

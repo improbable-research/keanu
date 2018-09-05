@@ -16,6 +16,7 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
@@ -45,6 +46,11 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         }
         DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
         return DualNumber.concat(dualNumbers, dualNumbersOfInputs, input, dimension, inputValues);
+    }
+
+    @Override
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
