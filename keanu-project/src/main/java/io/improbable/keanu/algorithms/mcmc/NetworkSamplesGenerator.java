@@ -1,5 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +34,7 @@ public class NetworkSamplesGenerator {
     public NetworkSamples generate(final int totalSampleCount) {
 
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+        List<Double> logOfMasterPForEachSample = new ArrayList<>();
 
         dropSamples(dropCount);
 
@@ -40,14 +42,14 @@ public class NetworkSamplesGenerator {
         int samplesLeft = totalSampleCount - dropCount;
         for (int i = 0; i < samplesLeft; i++) {
             if (i % downSampleInterval == 0) {
-                algorithm.sample(samplesByVertex);
+                algorithm.sample(samplesByVertex, logOfMasterPForEachSample);
                 sampleCount++;
             } else {
                 algorithm.step();
             }
         }
 
-        return new NetworkSamples(samplesByVertex, sampleCount);
+        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
     }
 
     public Stream<NetworkState> stream() {

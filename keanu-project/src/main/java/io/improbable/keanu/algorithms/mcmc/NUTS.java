@@ -93,6 +93,8 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         Map<VertexId, DoubleTensor> momentum = new HashMap<>();
 
         double initialLogOfMasterP = getLogProb(probabilisticVertices);
+        final List<Double> logOfMasterPForEachSample = new ArrayList<>();
+        logOfMasterPForEachSample.add(initialLogOfMasterP);
 
         double stepSize = findStartingStepSize(position,
             gradient,
@@ -185,9 +187,10 @@ public class NUTS implements PosteriorSamplingAlgorithm {
             tree.gradientBackward = tree.gradientAtAcceptedPosition;
 
             addSampleFromCache(samples, tree.sampleAtAcceptedPosition);
+            logOfMasterPForEachSample.add(tree.logOfMasterPAtAcceptedPosition);
         }
 
-        return new NetworkSamples(samples, sampleCount);
+        return new NetworkSamples(samples, logOfMasterPForEachSample, sampleCount);
     }
 
     private static BuiltTree buildOtherHalfOfTree(BuiltTree currentTree,
