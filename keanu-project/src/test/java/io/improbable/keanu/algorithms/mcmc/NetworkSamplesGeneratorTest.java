@@ -136,7 +136,7 @@ public class NetworkSamplesGeneratorTest {
         }
 
         @Override
-        public void sample(Map<VertexId, List<?>> samples) {
+        public void sample(Map<VertexId, List<?>> samples, List<Double> logOfMasterPForEachSample) {
             sampleCount.incrementAndGet();
         }
 

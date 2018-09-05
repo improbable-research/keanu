@@ -493,4 +493,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
         return new Integer[]{value};
     }
 
+    @Override
+    public String toString() {
+        return "ScalarIntegerTensor{" +
+            "value=" + value +
+            '}';
+    }
+
 }
