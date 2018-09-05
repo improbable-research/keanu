@@ -145,7 +145,7 @@ public class TensorShape {
         return dims;
     }
 
-    public static int[] moveAxis(int from, int to, int[] shape) {
+    public static int[] slideDimension(int from, int to, int[] shape) {
         List<Integer> shapeList = new ArrayList<>(Ints.asList(shape));
         Integer dimLength = shapeList.remove(from);
         shapeList.add(to, dimLength);

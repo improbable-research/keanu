@@ -850,7 +850,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * ]
      * <p>
      * A.split(0, [1]) gives List([1, 2, 3, 4, 5, 6])
-     * A.split(0, [1, 2] gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
+     * A.split(0, [1, 2]) gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
      * <p>
      * A.split(1, [1, 3, 6]) gives
      * List(
@@ -864,8 +864,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         DoubleTensor duplicateTensor = this.duplicate();
         int[] tensorShape = duplicateTensor.getShape();
         int[] dimensionRange = TensorShape.dimensionRange(0, tensorShape.length);
-        int[] moveDimToZero = TensorShape.moveAxis(dimension, 0, dimensionRange);
-        int[] moveZeroToDim = TensorShape.moveAxis(0, dimension, dimensionRange);
+        int[] moveDimToZero = TensorShape.slideDimension(dimension, 0, dimensionRange);
+        int[] moveZeroToDim = TensorShape.slideDimension(0, dimension, dimensionRange);
 
         DoubleTensor permutedTensor = duplicateTensor.permute(moveDimToZero).reshape(1, (int) duplicateTensor.getLength());
 
@@ -873,33 +873,29 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         List<DoubleTensor> splitTensor = new ArrayList<>();
 
-        int previousIndex = 0;
+        int previousSplitAtIndex = 0;
         int rawBufferPosition = 0;
-        for (int index : splitAtIndices) {
+        for (int splitAtIndex : splitAtIndices) {
 
             int[] subTensorShape = Arrays.copyOf(tensorShape, tensorShape.length);
-            int subTensorLengthInDimension = index - previousIndex;
+            int subTensorLengthInDimension = splitAtIndex - previousSplitAtIndex;
 
-            if (subTensorLengthInDimension > tensorShape[dimension] || subTensorLengthInDimension < 0) {
-                throw new IllegalArgumentException("Invalid index to split on " + index + " at " + dimension + " for tensor of shape " + Arrays.toString(tensorShape));
+            if (subTensorLengthInDimension > tensorShape[dimension] || subTensorLengthInDimension <= 0) {
+                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndex + " at " + dimension + " for tensor of shape " + Arrays.toString(tensorShape));
             }
 
             subTensorShape[dimension] = subTensorLengthInDimension;
-            previousIndex = index;
-
             int subTensorLength = (int) TensorShape.getLength(subTensorShape);
 
             double[] buffer = new double[subTensorLength];
             System.arraycopy(rawBuffer, rawBufferPosition, buffer, 0, buffer.length);
 
-            int[] subTensorPermutedShape = TensorShape.moveAxis(dimension, 0, subTensorShape);
-
-            DoubleTensor subTensor = DoubleTensor.create(buffer, new int[]{1, subTensorLength}).reshape(subTensorPermutedShape).permute(moveZeroToDim);
-
+            int[] subTensorPermutedShape = TensorShape.slideDimension(dimension, 0, subTensorShape);
+            DoubleTensor subTensor = DoubleTensor.create(buffer, subTensorPermutedShape).permute(moveZeroToDim);
             splitTensor.add(subTensor);
 
+            previousSplitAtIndex = splitAtIndex;
             rawBufferPosition += buffer.length;
-
         }
 
         return splitTensor;

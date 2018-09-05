@@ -429,7 +429,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public List<DoubleTensor> split(int dimension, int[] indices) {
+    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
         return Collections.singletonList(this);
     }
 
