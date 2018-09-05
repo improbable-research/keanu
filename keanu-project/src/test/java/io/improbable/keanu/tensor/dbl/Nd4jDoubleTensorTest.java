@@ -767,6 +767,21 @@ public class Nd4jDoubleTensorTest {
         assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 4, 2, 6, 9, 2}, 0);
     }
 
+    @Test
+    public void doesSatisfyJavaDocExample() {
+        DoubleTensor A = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3}, 2, 6);
+
+        List<DoubleTensor> actual = A.split(1, new int[]{1, 3, 6});
+
+        DoubleTensor expected0 = DoubleTensor.create(new double[]{1, 7}, 1, 2);
+        DoubleTensor expected1 = DoubleTensor.create(new double[]{2, 3, 8, 9}, 2, 2);
+        DoubleTensor expected2 = DoubleTensor.create(new double[]{4, 5, 6, 1, 2, 3}, 2, 3);
+
+        assertEquals(expected0, actual.get(0));
+        assertEquals(expected1, actual.get(1));
+        assertEquals(expected2, actual.get(2));
+    }
+
     private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
 
         int[] splitIndices = new int[concatenatedIndices.length];

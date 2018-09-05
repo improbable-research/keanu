@@ -860,6 +860,28 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(concat);
     }
 
+    /**
+     * @param dimension      the dimension to split on
+     * @param splitAtIndices the indices that the dimension to split on should be split on
+     * @return pieces of the tensor split in the order specified by splitAtIndices. To get
+     * pieces that encompasses the entire tensor, the last index in the splitAtIndices must
+     * be the length of the dimension being split on.
+     * <p>
+     * e.g A =
+     * [
+     * 1, 2, 3, 4, 5, 6
+     * 7, 8, 9, 1, 2, 3
+     * ]
+     * <p>
+     * A.split(0, [1]) gives List([1, 2, 3, 4, 5, 6])
+     * A.split(0, [1, 2] gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
+     * <p>
+     * A.split(1, [1, 3, 6]) gives
+     * List(
+     * [1, [2, 3  , [4, 5, 6,
+     * 7]   8, 9]    1, 2, 3]
+     * )
+     */
     @Override
     public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
 
