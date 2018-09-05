@@ -64,6 +64,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
                 } else {
                     dualNumbersToConcat.computeIfAbsent(vertexId, k -> new ArrayList<>()).add(DoubleTensor.zeros(shape));
                 }
+
             }
         }
 

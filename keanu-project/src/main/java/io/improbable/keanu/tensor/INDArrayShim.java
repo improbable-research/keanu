@@ -1,18 +1,18 @@
 package io.improbable.keanu.tensor;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.primitives.Ints;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.BroadcastOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastAddOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastDivOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastSubOp;
+import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Nd4j;
 
-import com.google.common.primitives.Ints;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * This class provides shim methods for the ND4J INDArray class.
@@ -21,7 +21,7 @@ import com.google.common.primitives.Ints;
  * Until this is fixed in the ND4J codebase, these methods can be
  * used to work around the issue. The need for this should be
  * reevaluated each time the ND4J dependency is updated.
- * <p>
+ *
  * To work around another issue in ND4J where you cannot broadcast
  * a higher rank tensor onto a lower rank tensor, the shim broadcast operations
  * ensure the higher rank tensor is always being operated on. In the case of
@@ -123,7 +123,7 @@ public class INDArrayShim {
         List<Integer> along = new ArrayList<>();
 
         for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] != shapeB[i]) {
+            if (shapeA[i] != shapeB[i]){
                 along.add(i);
             }
         }
@@ -142,7 +142,7 @@ public class INDArrayShim {
         List<Integer> along = new ArrayList<>();
 
         for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] == shapeB[i]) {
+            if (shapeA[i] == shapeB[i]){
                 along.add(i);
             }
         }

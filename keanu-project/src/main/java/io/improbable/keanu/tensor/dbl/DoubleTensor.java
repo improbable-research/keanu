@@ -99,8 +99,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor permute(int... rearrange);
 
-    DoubleTensor swapAxes(int dimension, int with);
-
     @Override
     DoubleTensor duplicate();
 
@@ -198,10 +196,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
         return slicedTensors;
     }
-
-    DoubleTensor slice(int dimension, int[] index);
-
-    DoubleTensor tensorAlongDimension(int index, int... dimension);
 
     DoubleTensor concat(int dimension, DoubleTensor... those);
 

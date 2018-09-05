@@ -1,19 +1,18 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+
+import java.util.function.BiFunction;
+
 import com.google.common.collect.ImmutableSet;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-
-import java.util.Arrays;
-import java.util.function.BiFunction;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class BinaryOperationTestHelpers {
 
@@ -136,13 +135,13 @@ public class BinaryOperationTestHelpers {
     }
 
     public static void calculatesDualNumberOfAScalarAndVector(double aValue,
-                                                               DoubleTensor bValues,
-                                                               DoubleTensor expectedGradientWrtA,
-                                                               DoubleTensor expectedGradientWrtB,
-                                                               BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+                                                              DoubleTensor bValues,
+                                                              DoubleTensor expectedGradientWrtA,
+                                                              DoubleTensor expectedGradientWrtB,
+                                                              BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
         UniformVertex A = new UniformVertex(0.0, 1.0);
         A.setAndCascade(DoubleTensor.scalar(aValue));
-        UniformVertex B = new UniformVertex(bValues.getShape(),0.0, 1.0);
+        UniformVertex B = new UniformVertex(bValues.getShape(), 0.0, 1.0);
         B.setAndCascade(bValues);
 
         DoubleVertex output = op.apply(A, B);

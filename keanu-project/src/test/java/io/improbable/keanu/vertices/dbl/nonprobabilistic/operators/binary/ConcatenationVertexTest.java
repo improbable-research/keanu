@@ -1,15 +1,10 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static org.junit.Assert.assertEquals;
-
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -215,6 +210,29 @@ public class ConcatenationVertexTest {
         Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
         Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());
         Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(d).getShape());
+    }
+
+    @Test
+    public void canConcatenateSimpleAutoDiffForwardSharedParentsAndDifferentSize() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 3));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 3));
+
+        DoubleVertex d = new UniformVertex(0, 10);
+        d.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 3, 2));
+
+        DoubleVertex e = a.times(b);
+        DoubleVertex f = b.matrixMultiply(d);
+
+        ConcatenationVertex concat = new ConcatenationVertex(1, e, f);
+
+        PartialDerivatives forward = concat.getDualNumber().getPartialDerivatives();
+
+        Assert.assertArrayEquals(new int[]{2, 5, 2, 3}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new int[]{2, 5, 2, 3}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new int[]{2, 5, 3, 2}, forward.withRespectTo(d).getShape());
     }
 
     @Test

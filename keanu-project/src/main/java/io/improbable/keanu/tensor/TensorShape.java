@@ -1,10 +1,6 @@
 package io.improbable.keanu.tensor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import com.google.common.primitives.Ints;
 
 public class TensorShape {
 
@@ -74,9 +70,9 @@ public class TensorShape {
     }
 
     /**
-     * @param shape  shape to find the index for
+     * @param shape shape to find the index for
      * @param stride stride to find the index for
-     * @param index  the index in each dimension
+     * @param index the index in each dimension
      * @return the flat index from a N dimensional index
      */
     public static int getFlatIndex(int[] shape, int[] stride, int... index) {
@@ -96,9 +92,9 @@ public class TensorShape {
 
     /**
      * This method can be interpreted as the opposite to getFlatIndex.
-     *
-     * @param shape     the shape to find the index of
-     * @param stride    the stride to find the index of
+
+     * @param shape the shape to find the index of
+     * @param stride the stride to find the index of
      * @param flatIndex the index to f
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */
@@ -143,13 +139,6 @@ public class TensorShape {
             dims[i] = i + fromDimension;
         }
         return dims;
-    }
-
-    public static int[] moveAxis(int from, int to, int[] shape) {
-        List<Integer> shapeList = new ArrayList<>(Ints.asList(shape));
-        Integer dimLength = shapeList.remove(from);
-        shapeList.add(to, dimLength);
-        return Ints.toArray(shapeList);
     }
 
     public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {

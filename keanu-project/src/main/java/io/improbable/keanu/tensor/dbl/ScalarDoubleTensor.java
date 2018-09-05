@@ -1,8 +1,6 @@
 package io.improbable.keanu.tensor.dbl;
 
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -104,11 +102,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor permute(int... rearrange) {
-        return new ScalarDoubleTensor(value);
-    }
-
-    @Override
-    public DoubleTensor swapAxes(int dimension, int with) {
         return new ScalarDoubleTensor(value);
     }
 
@@ -426,16 +419,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
         } else {
             throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
         }
-    }
-
-    @Override
-    public DoubleTensor slice(int dimension, int[] index) {
-        return duplicate();
-    }
-
-    @Override
-    public DoubleTensor tensorAlongDimension(int index, int... dimension) {
-        return duplicate();
     }
 
     @Override

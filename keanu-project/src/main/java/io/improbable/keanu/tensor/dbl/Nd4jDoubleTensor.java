@@ -4,9 +4,7 @@ import static java.util.Arrays.copyOf;
 
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -28,7 +26,6 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
@@ -123,11 +120,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor permute(int... rearrange) {
         return new Nd4jDoubleTensor(tensor.permute(rearrange));
-    }
-
-    @Override
-    public DoubleTensor swapAxes(int dimension, int with) {
-        return new Nd4jDoubleTensor(tensor.swapAxes(dimension, with));
     }
 
     @Override
@@ -827,25 +819,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);
         return new Nd4jDoubleTensor(slice);
-    }
-
-    @Override
-    public DoubleTensor slice(int dimension, int[] indices) {
-        INDArray dup = tensor.dup();
-        INDArray[] toConcat = new INDArray[indices.length];
-        int count = 0;
-        for (int index : indices) {
-            toConcat[count] = dup.slice(index, dimension);
-            count++;
-        }
-        return new Nd4jDoubleTensor(Nd4j.concat(dimension, toConcat));
-    }
-
-    @Override
-    public DoubleTensor tensorAlongDimension(int index, int... dimension) {
-        INDArray dup = tensor.dup();
-        INDArray tad = dup.tensorAlongDimension(index, dimension);
-        return new Nd4jDoubleTensor(tad);
     }
 
     @Override

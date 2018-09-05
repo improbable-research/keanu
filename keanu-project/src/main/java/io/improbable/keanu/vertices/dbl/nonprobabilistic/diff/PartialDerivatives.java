@@ -8,7 +8,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Function;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -29,7 +28,6 @@ public class PartialDerivatives {
         );
     }
 
-    //TODO: broadcast or stretch?!?
     public static PartialDerivatives ifThenElse(BooleanTensor predicate, PartialDerivatives thn, PartialDerivatives els) {
         DoubleTensor trueMask = predicate.toDoubleMask();
         DoubleTensor falseMask = predicate.not().toDoubleMask();
@@ -102,10 +100,6 @@ public class PartialDerivatives {
 
     public void putWithRespectTo(VertexId id, DoubleTensor value) {
         derivativeWithRespectTo.put(id, value);
-    }
-
-    public void forEach(Function<DoubleTensor, DoubleTensor> mapper){
-
     }
 
     /**
