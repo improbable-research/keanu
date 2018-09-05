@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
@@ -27,18 +28,20 @@ public class NetworkSamplesGenerator {
     @Setter
     private int downSampleInterval = 1;
 
-    private ProgressBar progressBar;
+    private Supplier<ProgressBar> progressBarSupplier;
 
-    public NetworkSamplesGenerator(SamplingAlgorithm algorithm, ProgressBar progressBar) {
+    public NetworkSamplesGenerator(SamplingAlgorithm algorithm, Supplier<ProgressBar> progressBarSupplier) {
         this.algorithm = algorithm;
-        this.progressBar = progressBar;
+        this.progressBarSupplier = progressBarSupplier;
     }
 
     public NetworkSamples generate(final int totalSampleCount) {
 
+        ProgressBar progressBar = progressBarSupplier.get();
+
         Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
 
-        dropSamples(dropCount);
+        dropSamples(dropCount, progressBar);
 
         int sampleCount = 0;
         int samplesLeft = totalSampleCount - dropCount;
@@ -59,7 +62,9 @@ public class NetworkSamplesGenerator {
 
     public Stream<NetworkState> stream() {
 
-        dropSamples(dropCount);
+        ProgressBar progressBar = progressBarSupplier.get();
+
+        dropSamples(dropCount, progressBar);
 
         final AtomicInteger sampleNumber = new AtomicInteger(0);
 
@@ -78,7 +83,7 @@ public class NetworkSamplesGenerator {
         }).onClose(() -> progressBar.finish());
     }
 
-    private void dropSamples(int dropCount) {
+    private void dropSamples(int dropCount, ProgressBar progressBar) {
         for (int i = 0; i < dropCount; i++) {
             algorithm.step();
             progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);

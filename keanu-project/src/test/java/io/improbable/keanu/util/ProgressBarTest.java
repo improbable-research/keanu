@@ -74,7 +74,7 @@ public class ProgressBarTest {
 
         String result = getResultWithNewLinesInsteadOfCR();
 
-        assertEquals(3, result.split("\n").length);
+        assertEquals(5, result.split("\n").length);
     }
 
     @Test

@@ -80,7 +80,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
                                                             final List<? extends Vertex> verticesToSampleFrom) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), new ProgressBar());
+        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), ProgressBar::new);
     }
 
     private SamplingAlgorithm setupSampler(final BayesianNetwork bayesianNetwork,
