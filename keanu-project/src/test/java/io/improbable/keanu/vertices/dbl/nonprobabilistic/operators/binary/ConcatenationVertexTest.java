@@ -1,12 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import java.util.Arrays;
-
 import org.junit.Assert;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -180,8 +177,7 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(1, e, f);
 
-        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, Arrays.asList(a, b, c, d));
-        //TODO: make this work for backward
+        PartialDerivatives forward = concat.getDualNumber().getPartialDerivatives();
 
         Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(a).getShape());
         Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(b).getShape());
@@ -205,7 +201,7 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(0, e, f);
 
-        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(concat, Arrays.asList(a, b, d));
+        PartialDerivatives forward = concat.getDualNumber().getPartialDerivatives();
 
         Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
         Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());

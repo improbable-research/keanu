@@ -5,7 +5,6 @@ import static java.util.Collections.singleton;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.HashMap;
@@ -22,41 +21,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class Differentiator {
-
-    public static PartialDerivatives forwardModeAutoDiff(DoubleVertex of, Collection<DoubleVertex> wrt) {
-        return forwardModeAutoDiff(Collections.singletonList(of), wrt).get(of);
-    }
-
-    public static Map<Vertex, PartialDerivatives> forwardModeAutoDiff(Collection<DoubleVertex> of, Collection<DoubleVertex> wrt) {
-
-        PriorityQueue<DoubleVertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
-        priorityQueue.addAll(wrt);
-
-        HashSet<Vertex> alreadyQueued = new HashSet<>(wrt);
-
-        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
-        Map<Vertex, PartialDerivatives> ofWrt = new HashMap<>();
-
-        while (!priorityQueue.isEmpty()) {
-            DoubleVertex visiting = priorityQueue.poll();
-
-            DualNumber dualNumber = visiting.calculateDualNumber(dualNumbers);
-            dualNumbers.put(visiting, dualNumber);
-            if (of.contains(visiting)) {
-                ofWrt.put(visiting, dualNumber.getPartialDerivatives());
-            }
-
-            for (Vertex child : visiting.getChildren()) {
-
-                if (!child.isProbabilistic() && !alreadyQueued.contains(child) && child instanceof DoubleVertex) {
-                    priorityQueue.offer((DoubleVertex) child);
-                    alreadyQueued.add(child);
-                }
-            }
-        }
-
-        return ofWrt;
-    }
 
     public static Map<VertexId, PartialDerivatives> reverseModeAutoDiff(Set<DoubleVertex> of, Set<DoubleVertex> wrt) {
 
@@ -119,6 +83,13 @@ public class Differentiator {
         return reverseModeAutoDiff(singleton(of), new HashSet<>(Arrays.asList(wrt))).get(of.getId());
     }
 
+    /**
+     * Reorganize collection of partials to be easily used to get partial OF Y WRT X. This structure is what
+     * forward mode auto diff returns but needs to be used on reverse mode so that it is in the same form.
+     *
+     * @param wrtOf map of partials where key is wrt vertex and key in partial is key of vertex
+     * @return a reordered map with the key being the of vertex and the key in the partial being wrt vertex
+     */
     private static Map<VertexId, PartialDerivatives> wrtOfToOfWrt(Map<VertexId, PartialDerivatives> wrtOf) {
         Map<VertexId, PartialDerivatives> ofWrt = new HashMap<>();
 
