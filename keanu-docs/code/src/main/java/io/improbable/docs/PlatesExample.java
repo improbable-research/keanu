@@ -39,8 +39,10 @@ public class PlatesExample {
      * b |
      *  \|
      *   +
-     *   |
-     *   y
+     *
+     * The input data file defines, for each plate:
+     *  - the value of the constant vertex "x"
+     *  - the observed value of the vertex "+" (a.k.a. "y")
      *
      * @param dataFileName - the file containing data in (x,y) format
      */
