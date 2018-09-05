@@ -1,18 +1,13 @@
 package io.improbable.docs;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
-import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -86,12 +81,4 @@ public class PlatesExample {
 
         return plates;
     }
-
-    public static void main(String[] args) {
-        Plates plates = new PlatesExample().buildPlates("plates_example_data.csv");
-        Plate plate1 = plates.asList().get(1);
-        Vertex<DoubleTensor> x = plate1.get("x");
-        assertThat(x.getValue().scalar(), equalTo(0.2));
-    }
-
 }
