@@ -855,7 +855,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * A.split(1, [1, 3, 6]) gives
      * List(
      * [1, [2, 3  , [4, 5, 6,
-     * 7]   8, 9]    1, 2, 3]
+     *  7]  8, 9]    1, 2, 3]
      * )
      */
     @Override
