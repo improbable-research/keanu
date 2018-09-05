@@ -875,7 +875,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
             INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
 
-            if(previousSplitIndex == splitAtIndices[i]){
+            if (previousSplitIndex == splitAtIndices[i]) {
                 throw new IllegalArgumentException("Invalid index to split on " + splitAtIndices[i] + " at dimension " + dimension + " for tensor of shape " + Arrays.toString(shape));
             }
 
