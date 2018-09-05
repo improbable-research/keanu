@@ -802,9 +802,13 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public String toString() {
-        return "{\n" +
-            "data = [" + value + "]" +
-            "\nshape = " + Arrays.toString(shape) +
-            "\n}";
+        if (isScalar()) {
+            return scalar().toString();
+        } else {
+            return "{\n" +
+                "data = [" + value + "]" +
+                "\nshape = " + Arrays.toString(shape) +
+                "\n}";
+        }
     }
 }
