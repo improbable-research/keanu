@@ -135,7 +135,7 @@ public class NonGradientOptimizer implements Optimizer {
      */
     @Override
     public double maxAPosteriori() {
-        return optimize(bayesianNetwork.getLatentAndObservedVertices());
+        return optimize(bayesianNetwork.getLatentOrObservedVertices());
     }
 
     /**

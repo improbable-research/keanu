@@ -1,11 +1,10 @@
 package io.improbable.keanu.vertices.bool;
 
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
 
 import java.util.Collections;
 

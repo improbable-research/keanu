@@ -17,10 +17,23 @@ import lombok.EqualsAndHashCode;
 public class VertexId implements Comparable<VertexId> {
 
     public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
+    private static final int TOP_LEVEL_ARRAY_SIZE = 1;
 
-    long[] idValues = new long[1];
+    long[] idValues = new long[TOP_LEVEL_ARRAY_SIZE];
 
     public VertexId() {
+        idValues[0] = ID_GENERATOR.getAndIncrement();
+    }
+
+    public void addPrefix(VertexId prefix) {
+        long[] newIdValues = new long[idValues.length + prefix.idValues.length];
+        System.arraycopy(prefix.idValues, 0, newIdValues, 0, prefix.idValues.length);
+        System.arraycopy(idValues, 0, newIdValues, prefix.idValues.length, idValues.length);
+        idValues = newIdValues;
+    }
+
+    public void resetID() {
+        idValues = new long[TOP_LEVEL_ARRAY_SIZE];
         idValues[0] = ID_GENERATOR.getAndIncrement();
     }
 
@@ -40,12 +53,26 @@ public class VertexId implements Comparable<VertexId> {
         return Ints.saturatedCast(comparisonValue);
     }
 
+    public boolean prefixMatches(VertexId prefix) {
+        if (prefix.idValues.length > idValues.length) {
+            return false;
+        }
+
+        for (int i = 0; i < prefix.idValues.length; i++) {
+            if (idValues[i] != prefix.idValues[i]) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
     @Override
     public String toString() {
         return idValues.toString();
     }
 
-    public int getDepth() {
+    public int getIndentation() {
         return idValues.length;
     }
 }
