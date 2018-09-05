@@ -86,7 +86,7 @@ public class SliceVertexTest {
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimOneIndexZero() {
         assertSlice(1, 0, new double[]{11, 23, 36, 48}, new int[]{4, 1}, new int[]{4, 1, 4, 2});
     }
-    
+
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimOneIndexOne() {
         assertSlice(1, 1, new double[]{17, 29, 42, 54}, new int[]{4, 1}, new int[]{4, 1, 4, 2});

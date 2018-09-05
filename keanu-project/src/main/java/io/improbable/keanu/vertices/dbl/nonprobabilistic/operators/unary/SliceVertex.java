@@ -8,6 +8,7 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -38,8 +39,13 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        DoubleTensor paddedPartial = padSliceWithZeros(derivativeOfOutputsWithRespectToSelf);
-        partials.put(inputVertex, new PartialDerivatives(getId(), paddedPartial));
+
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+            VertexId k = entry.getKey();
+            DoubleTensor v = entry.getValue();
+            DoubleTensor padded = padSliceWithZeros(v);
+            partials.put(inputVertex, new PartialDerivatives(k, padded));
+        }
         return partials;
     }
 
@@ -48,9 +54,8 @@ public class SliceVertex extends DoubleUnaryOpVertex {
         return dualNumber.slice(dimension, index);
     }
 
-    private DoubleTensor padSliceWithZeros(PartialDerivatives derivativeWrtSelf) {
-        DoubleTensor partial = derivativeWrtSelf.withRespectTo(getId());
-        int[] partialShape = partial.getShape();
+    private DoubleTensor padSliceWithZeros(DoubleTensor tensor) {
+        int[] partialShape = tensor.getShape();
         int[] inputShape = inputVertex.getShape();
         int length = getShape().length;
         int dimensionOfWrtToExtend = dimension + length;
@@ -58,16 +63,16 @@ public class SliceVertex extends DoubleUnaryOpVertex {
 
         if (index == 0) {
             partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return partial.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape));
+            return tensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape));
         } else if (index == lengthInSlicedDimension) {
             partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return DoubleTensor.zeros(partialShape).concat(dimensionOfWrtToExtend, partial);
+            return DoubleTensor.zeros(partialShape).concat(dimensionOfWrtToExtend, tensor);
         } else {
             int[] zerosBeforeSlice = Arrays.copyOf(partialShape, partialShape.length);
             int[] zerosAfterSlice = Arrays.copyOf(partialShape, partialShape.length);
             zerosBeforeSlice[dimensionOfWrtToExtend] = index;
             zerosAfterSlice[dimensionOfWrtToExtend] = lengthInSlicedDimension - index;
-            return DoubleTensor.zeros(zerosBeforeSlice).concat(dimensionOfWrtToExtend, partial, DoubleTensor.zeros(zerosAfterSlice));
+            return DoubleTensor.zeros(zerosBeforeSlice).concat(dimensionOfWrtToExtend, tensor, DoubleTensor.zeros(zerosAfterSlice));
         }
     }
 

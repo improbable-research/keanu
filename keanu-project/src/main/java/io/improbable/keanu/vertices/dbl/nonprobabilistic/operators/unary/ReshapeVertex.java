@@ -26,7 +26,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        //TODO
+        
         return null;
     }
 
