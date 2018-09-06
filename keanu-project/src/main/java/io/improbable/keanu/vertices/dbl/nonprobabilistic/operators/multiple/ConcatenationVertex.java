@@ -52,7 +52,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> split = new HashMap<>();
+        Map<Vertex, PartialDerivatives> splitPartials = new HashMap<>();
 
         int splitPosition = 0;
         int[] splitIndices = new int[input.length];
@@ -60,21 +60,22 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         for (int i = 0; i < input.length; i++) {
             splitIndices[i] = splitPosition + input[i].getShape()[dimension];
             splitPosition = splitIndices[i];
-            split.put(input[i], new PartialDerivatives(new HashMap<>()));
+            splitPartials.put(input[i], new PartialDerivatives(new HashMap<>()));
         }
 
+        int concatAlongWrtDimension = input[0].getShape().length + dimension;
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = entry.getValue();
 
-            List<DoubleTensor> splitPartial = partial.split(input[0].getShape().length + dimension, splitIndices);
+            List<DoubleTensor> splitPartial = partial.split(concatAlongWrtDimension, splitIndices);
 
             for (int i = 0; i < splitPartial.size(); i++) {
-                split.get(input[i]).putWithRespectTo(entry.getKey(), splitPartial.get(i));
+                splitPartials.get(input[i]).putWithRespectTo(entry.getKey(), splitPartial.get(i));
             }
 
         }
 
-        return split;
+        return splitPartials;
     }
 
     @Override
