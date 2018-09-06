@@ -118,7 +118,7 @@ public class FoodPoisoningTest {
 
         sample(10000);
 
-        personPlates.asList().forEach(plate -> {
+        personPlates.forEach(plate -> {
             plate.get(didEatOystersLabel).observeOwnValue();
             plate.get(didEatLambLabel).observeOwnValue();
             plate.get(didEatPooLabel).observeOwnValue();

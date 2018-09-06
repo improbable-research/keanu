@@ -17,15 +17,16 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
      * model in model scenarios) but allows linking at a later point in time.
-     * @param label
+     *
+     * @param label The label for this Vertex (all Proxy Vertices must be labelled)
      */
-    public BoolProxyVertex(String label) {
-        this(Tensor.SCALAR_SHAPE);
-        setLabel(new VertexLabel(label));
+    public BoolProxyVertex(VertexLabel label) {
+        this(Tensor.SCALAR_SHAPE, label);
     }
 
-    public BoolProxyVertex(int[] shape) {
+    public BoolProxyVertex(int[] shape, VertexLabel label) {
         this.setValue(BooleanTensor.placeHolder(shape));
+        this.setLabel(label);
     }
 
     @Override

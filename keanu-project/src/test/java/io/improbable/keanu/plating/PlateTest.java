@@ -41,9 +41,9 @@ public class PlateTest {
 
     @Test
     public void youCanGetAllTheProxyVertices() {
-        DoubleProxyVertex proxy1 = new DoubleProxyVertex("proxy1");
-        IntegerProxyVertex proxy2 = new IntegerProxyVertex("proxy2");
-        BoolProxyVertex proxy3 = new BoolProxyVertex("proxy3");
+        DoubleProxyVertex proxy1 = new DoubleProxyVertex(new VertexLabel("proxy1"));
+        IntegerProxyVertex proxy2 = new IntegerProxyVertex(new VertexLabel("proxy2"));
+        BoolProxyVertex proxy3 = new BoolProxyVertex(new VertexLabel("proxy3"));
         plate.add(proxy1);
         plate.add(proxy2);
         plate.add(proxy3);

@@ -151,7 +151,7 @@ public class PlateBuilderTest {
             .withProxyMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .count(10)
             .withFactory((plate) -> {
-                DoubleVertex xPrevious = new DoubleProxyVertex("xPrevious");
+                DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
                 DoubleVertex x = new ExponentialVertex(xPrevious).labelled(xLabel);
                 IntegerVertex y = new PoissonVertex(x).labelled(yLabel);
                 plate.add(xPrevious);
@@ -193,7 +193,7 @@ public class PlateBuilderTest {
             .withProxyMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .fromIterator(ys.iterator())
             .withFactory((plate, observedY) -> {
-                DoubleVertex xPreviousProxy = new DoubleProxyVertex("xPreviousProxy");
+                DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
                 DoubleVertex x = new ExponentialVertex(xPreviousProxy).labelled(xLabel);
                 IntegerVertex y = new PoissonVertex(x).labelled(yLabel);
                 y.observe(observedY);
