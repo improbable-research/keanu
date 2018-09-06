@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -41,11 +40,12 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
         return reshapedDerivatives;
     }
 
-    private int[] calculateShape(int[] wrtSelfShape, int[] originalShape) {
+    private int[] calculateShape(int[] wrtSelfShape, int[] inputShape) {
         int[] partialShape = Arrays.copyOf(wrtSelfShape, wrtSelfShape.length);
+        int ofLength = partialShape.length - inputShape.length;
 
-        for (int i = partialShape.length - originalShape.length; i < partialShape.length; i++) {
-            partialShape[i] = originalShape[Math.abs(partialShape.length - originalShape.length - i)];
+        for (int i = ofLength; i < partialShape.length; i++) {
+            partialShape[i] = inputShape[i - ofLength];
         }
 
         return partialShape;
