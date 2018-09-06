@@ -103,7 +103,7 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
-        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(sliceN, Arrays.asList(m, alpha));
+        PartialDerivatives forward = sliceN.getDualNumber().getPartialDerivatives();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha));
 
         DoubleTensor originalPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m);

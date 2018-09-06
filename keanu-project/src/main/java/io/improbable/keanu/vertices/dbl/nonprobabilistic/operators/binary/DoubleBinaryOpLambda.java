@@ -19,19 +19,19 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
     protected final Vertex<A> left;
     protected final Vertex<B> right;
     protected final BiFunction<A, B, DoubleTensor> op;
-    protected final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation;
+    protected final Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda;
     protected final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
     public DoubleBinaryOpLambda(int[] shape,
                                 Vertex<A> left,
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                                Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
                                 Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         this.left = left;
         this.right = right;
         this.op = op;
-        this.dualNumberCalculation = dualNumberCalculation;
+        this.forwardModeAutoDiffLambda = forwardModeAutoDiffLambda;
         this.reverseModeAutoDiffLambda = reverseModeAutoDiffLambda;
         setParents(left, right);
         setValue(DoubleTensor.placeHolder(shape));
@@ -44,9 +44,9 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
     public DoubleBinaryOpLambda(Vertex<A> left,
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
-                                Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                                Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
                                 Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, dualNumberCalculation, reverseModeAutoDiffLambda);
+        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     public DoubleBinaryOpLambda(Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
@@ -65,8 +65,8 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        if (dualNumberCalculation != null) {
-            return dualNumberCalculation.apply(dualNumbers);
+        if (forwardModeAutoDiffLambda != null) {
+            return forwardModeAutoDiffLambda.apply(dualNumbers);
         }
 
         throw new UnsupportedOperationException();

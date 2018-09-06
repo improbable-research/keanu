@@ -48,7 +48,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
         }
 
         return partials;
-    }
+     }
 
     @Override
     protected DualNumber dualOp(DualNumber dualNumber) {

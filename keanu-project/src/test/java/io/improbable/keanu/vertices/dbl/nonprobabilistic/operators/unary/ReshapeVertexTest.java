@@ -38,13 +38,13 @@ public class ReshapeVertexTest {
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
 
-        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(reshapedN, Arrays.asList(m, alpha));
+        PartialDerivatives forward = reshapedN.getDualNumber().getPartialDerivatives();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha));
 
         Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(m).getShape());
         Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, backward.withRespectTo(m).getShape());
 
-        double[] expectedPartial = Differentiator.forwardModeAutoDiff(N, Arrays.asList(m, alpha)).withRespectTo(m).asFlatDoubleArray();
+        double[] expectedPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m).asFlatDoubleArray();
 
         Assert.assertArrayEquals(expectedPartial, forward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(expectedPartial, backward.withRespectTo(m).asFlatDoubleArray(), 1e-6);

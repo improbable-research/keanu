@@ -1,23 +1,19 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.sampling.Prior;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.FALSE;
 import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.BoolVertexTest;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class IfVertexTest {
 
@@ -62,7 +58,7 @@ public class IfVertexTest {
 
         double pV4True = ifProbability(pV1, pV2, pV3);
 
-        assertEquals(priorProbabilityTrue(v4, 10000, random), pV4True, 0.01);
+        assertEquals(BoolVertexTest.priorProbabilityTrue(v4, 10000, random), pV4True, 0.01);
     }
 
     private double ifProbability(double pThn, double pThnIsValue, double pElsIsValue) {
@@ -72,10 +68,4 @@ public class IfVertexTest {
         return pThnAndThnIsValue + pElsAndElsIsValue;
     }
 
-    public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
-        BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
-
-        NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount, random);
-        return samples.get(vertex).probability(val -> val.scalar());
-    }
 }

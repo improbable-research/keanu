@@ -1,6 +1,11 @@
 package io.improbable.keanu.vertices.dbl;
 
+import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
+
 import com.google.common.collect.ImmutableSet;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -8,11 +13,6 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import org.junit.Test;
-
-import java.util.Arrays;
-
-import static org.junit.Assert.assertEquals;
 
 public class DifferentiatorTest {
 
@@ -23,7 +23,7 @@ public class DifferentiatorTest {
         DoubleVertex B = new GaussianVertex(0, 1);
         DoubleVertex C = A.times(B);
 
-        PartialDerivatives dC = Differentiator.forwardModeAutoDiff(C, Arrays.asList(A, B));
+        PartialDerivatives dC = C.getDualNumber().getPartialDerivatives();
 
         DoubleTensor dCdA = dC.withRespectTo(A);
         DoubleTensor dCdB = dC.withRespectTo(B);

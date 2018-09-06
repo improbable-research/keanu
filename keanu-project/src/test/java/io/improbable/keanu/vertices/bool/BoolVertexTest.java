@@ -12,8 +12,7 @@ import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
-import io.improbable.keanu.algorithms.sampling.Prior;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -127,7 +126,7 @@ public class BoolVertexTest {
 
         double pV3True = orProbability(pV1, pV2);
 
-        assertEquals(priorProbabilityTrue(v3, 10000, random), pV3True, 0.01);
+        assertEquals(priorProbabilityTrue(v3, 30000, random), pV3True, 0.01);
     }
 
     @Test
@@ -238,8 +237,13 @@ public class BoolVertexTest {
     public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
         BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
 
-        NetworkSamples samples = Prior.sample(net, Collections.singletonList(vertex), sampleCount, random);
-        return samples.get(vertex).probability(val -> val.scalar());
+        long trueCount = MetropolisHastings.withDefaultConfig(random)
+            .generatePosteriorSamples(net, Collections.singletonList(vertex)).stream()
+            .limit(sampleCount)
+            .filter(state -> state.get(vertex).scalar())
+            .count();
+
+        return trueCount / (double) sampleCount;
     }
 
 }

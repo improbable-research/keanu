@@ -16,7 +16,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     private final Vertex<IN> inputVertex;
     private final Function<IN, DoubleTensor> op;
-    private final Function<Map<Vertex, DualNumber>, DualNumber> dualNumberSupplier;
+    private final Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda;
     private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex,
@@ -25,7 +25,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         this.inputVertex = inputVertex;
         this.op = op;
-        this.dualNumberSupplier = dualNumberCalculation;
+        this.forwardModeAutoDiffLambda = dualNumberCalculation;
         this.reverseModeAutoDiffLambda = reverseModeAutoDiffLambda;
         setParents(inputVertex);
         setValue(DoubleTensor.placeHolder(shape));
@@ -58,8 +58,8 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        if (dualNumberSupplier != null) {
-            return dualNumberSupplier.apply(dualNumbers);
+        if (forwardModeAutoDiffLambda != null) {
+            return forwardModeAutoDiffLambda.apply(dualNumbers);
         }
 
         throw new UnsupportedOperationException();
