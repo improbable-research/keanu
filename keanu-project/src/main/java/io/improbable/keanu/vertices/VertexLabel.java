@@ -34,4 +34,8 @@ public class VertexLabel {
 
         return Objects.hash(namespace, label);
     }
+
+    public VertexLabel inNamespace(String newNamespace) {
+        return new VertexLabel(newNamespace, this.label);
+    }
 }
