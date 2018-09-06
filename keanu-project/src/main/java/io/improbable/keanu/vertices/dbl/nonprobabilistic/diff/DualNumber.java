@@ -171,9 +171,15 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
     public DualNumber inverse() {
         DoubleTensor newValue = this.value.inverse();
-        PartialDerivatives newPartials = PartialDerivatives.OF_CONSTANT;
 
-        return new DualNumber(newValue, newPartials);
+        if (this.partialDerivatives.isEmpty()) {
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
+        } else {
+            DoubleTensor negatedValue = newValue.unaryMinus();
+            PartialDerivatives newInf = PartialDerivatives.matrixMultiply(this.partialDerivatives, negatedValue, false);
+            newInf = PartialDerivatives.matrixMultiply(newInf, newValue, true);
+            return new DualNumber(newValue, newInf);
+        }
     }
 
     public DualNumber multiplyBy(DualNumber that) {
