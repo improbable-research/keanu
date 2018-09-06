@@ -86,6 +86,21 @@ public class PlateBuilderTest {
             .build();
     }
 
+    @Test(expected = IllegalArgumentException.class)
+    public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
+        new PlateBuilder<Integer>()
+            .count(10)
+            .withFactory((plate) -> {
+                VertexLabel label = new VertexLabel("x");
+                DoubleVertex vertex1 = ConstantVertex.of(1.).labelled(label);
+                DoubleVertex vertex2 = ConstantVertex.of(1.).labelled(label);
+                plate.add(vertex1);
+                plate.add(vertex2);
+            })
+            .build();
+
+    }
+
 
     @Test
     public void youCanCreateASetOfPlatesWithACommonParameterFromACount() {

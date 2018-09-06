@@ -18,7 +18,10 @@ public class Plate implements VertexDictionary {
     }
 
     public <T extends Vertex<?>> T add(T v) {
-        contents.put(v.getLabel(), v);
+        if (contents.containsKey(v.getLabel())) {
+            throw new IllegalArgumentException("Key " + v.getLabel() + " already exists");
+        }
+        contents.putIfAbsent(v.getLabel(), v);
         return v;
     }
 
