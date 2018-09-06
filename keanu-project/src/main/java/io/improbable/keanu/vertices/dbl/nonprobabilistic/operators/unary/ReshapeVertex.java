@@ -44,9 +44,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
         int[] partialShape = Arrays.copyOf(wrtSelfShape, wrtSelfShape.length);
         int ofLength = partialShape.length - inputShape.length;
 
-        for (int i = ofLength; i < partialShape.length; i++) {
-            partialShape[i] = inputShape[i - ofLength];
-        }
+        System.arraycopy(inputShape, 0, partialShape, ofLength, partialShape.length - ofLength);
 
         return partialShape;
     }
