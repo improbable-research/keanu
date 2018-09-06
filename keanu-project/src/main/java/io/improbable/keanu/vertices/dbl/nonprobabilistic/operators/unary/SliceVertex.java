@@ -43,9 +43,10 @@ public class SliceVertex extends DoubleUnaryOpVertex {
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
-            DoubleTensor padded = padSliceWithZeros(v);
+            DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(v);
             partials.put(inputVertex, new PartialDerivatives(k, padded));
         }
+
         return partials;
     }
 
@@ -54,7 +55,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
         return dualNumber.slice(dimension, index);
     }
 
-    private DoubleTensor padSliceWithZeros(DoubleTensor tensor) {
+    private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
         int[] partialShape = tensor.getShape();
         int[] inputShape = inputVertex.getShape();
         int length = getShape().length;
