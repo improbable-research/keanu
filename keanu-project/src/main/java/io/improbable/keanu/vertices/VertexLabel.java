@@ -36,6 +36,9 @@ public class VertexLabel {
     }
 
     public VertexLabel inNamespace(String newNamespace) {
+        if (namespace != null) {
+            newNamespace += "." + namespace;
+        }
         return new VertexLabel(newNamespace, this.label);
     }
 }

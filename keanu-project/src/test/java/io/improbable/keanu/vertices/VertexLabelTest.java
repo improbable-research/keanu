@@ -61,4 +61,14 @@ public class VertexLabelTest {
         VertexLabel newFoo = foo.inNamespace(namespace);
         assertThat(newFoo, equalTo(new VertexLabel(namespace, name)));
     }
+
+    @Test
+    public void youCanAugmentTheNamespace() {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(innerNamespace, name);
+        VertexLabel newFoo = foo.inNamespace(outerNamespace);
+        assertThat(newFoo, equalTo(new VertexLabel(outerNamespace + "." + innerNamespace, name)));
+    }
 }
