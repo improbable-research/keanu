@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
@@ -23,6 +24,11 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
 
     public IntegerProxyVertex(int[] shape) {
         setValue(IntegerTensor.placeHolder(shape));
+    }
+
+    public IntegerProxyVertex(String label) {
+        this();
+        setLabel(new VertexLabel(label));
     }
 
     @Override

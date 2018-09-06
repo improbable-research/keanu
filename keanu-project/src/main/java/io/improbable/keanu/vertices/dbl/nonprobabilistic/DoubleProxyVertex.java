@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
@@ -20,9 +21,11 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
     /**
      * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly known (ie for
      * model in model scenarios) but allows linking at a later point in time.
+     * @param label
      */
-    public DoubleProxyVertex() {
+    public DoubleProxyVertex(String label) {
         this(Tensor.SCALAR_SHAPE);
+        this.setLabel(new VertexLabel(label));
     }
 
     public DoubleProxyVertex(int[] shape) {

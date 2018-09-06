@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -45,10 +47,10 @@ public class PlateBuilderTest {
     @Test
     public void buildPlatesFromCount_PlateContents() {
         int n = 100;
-        String vertexName = "vertexName";
+        VertexLabel vertexName = new VertexLabel("vertexName");
         Plates plates = new PlateBuilder<>()
             .count(n)
-            .withFactory((plate) -> plate.add(vertexName, new BernoulliVertex(0.5)))
+            .withFactory((plate) -> plate.add(new BernoulliVertex(0.5).labelled(vertexName)))
             .build();
         plates.asList().forEach(plate -> {
             assertNotNull(plate.get(vertexName));
@@ -80,18 +82,20 @@ public class PlateBuilderTest {
     public void youCanCreateASetOfPlatesWithACommonParameter() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
+        VertexLabel label = new VertexLabel("flip");
+
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
-                BernoulliVertex flip = new BernoulliVertex(commonTheta);
+                BoolVertex flip = new BernoulliVertex(commonTheta).labelled(label);
                 flip.observe(false);
-                plate.add("flip", flip);
+                plate.add(flip);
             })
             .build();
 
 
         for (Plate plate : plates) {
-            Vertex<DoubleTensor> flip = plate.get("flip");
+            Vertex<DoubleTensor> flip = plate.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
