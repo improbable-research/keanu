@@ -1,11 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
+
+import java.util.Arrays;
 
 public class ReshapeVertexTest {
 
@@ -32,9 +37,17 @@ public class ReshapeVertexTest {
         DoubleVertex N = m.matrixMultiply(alpha);
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
-        DoubleTensor reshapedPartial = reshapedN.getDualNumber().getPartialDerivatives().withRespectTo(m);
 
-        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, reshapedPartial.getShape());
+        PartialDerivatives forward = Differentiator.forwardModeAutoDiff(reshapedN, Arrays.asList(m, alpha));
+        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha));
+
+        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(m).getShape());
+        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, backward.withRespectTo(m).getShape());
+
+        double[] expectedPartial = Differentiator.forwardModeAutoDiff(N, Arrays.asList(m, alpha)).withRespectTo(m).asFlatDoubleArray();
+
+        Assert.assertArrayEquals(expectedPartial, forward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(expectedPartial, backward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
