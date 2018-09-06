@@ -86,7 +86,30 @@ public class PlateBuilderTest {
 
 
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameter() {
+    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() {
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        VertexLabel label = new VertexLabel("flip");
+
+        Plates plates = new PlateBuilder<Bean>()
+            .count(10)
+            .withFactory((plate) -> {
+                BoolVertex flip = new BernoulliVertex(commonTheta).labelled(label);
+                flip.observe(false);
+                plate.add(flip);
+            })
+            .build();
+
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> flip = plate.get(label);
+            assertThat(flip.getParents(), contains(commonTheta));
+        }
+    }
+
+
+    @Test
+    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
@@ -106,7 +129,6 @@ public class PlateBuilderTest {
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
-
 
     /**
      * This is a Hidden Markov Model -
