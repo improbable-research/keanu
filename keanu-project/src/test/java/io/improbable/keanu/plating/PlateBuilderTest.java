@@ -10,12 +10,19 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 
 public class PlateBuilderTest {
 
@@ -97,6 +104,47 @@ public class PlateBuilderTest {
         for (Plate plate : plates) {
             Vertex<DoubleTensor> flip = plate.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
+        }
+    }
+
+
+    /**
+     * This is a Hidden Markov Model -
+     * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     */
+    @Test
+    public void youCanCreateATimeSeriesFromPlates() {
+
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel yLabel = new VertexLabel("y");
+
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(0.).labelled(xLabel);
+        List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(initialX)
+            .fromIterator(ys.iterator())
+            .withFactory((plate, observedY) -> {
+                DoubleVertex x = new DoubleProxyVertex("x");
+                x.setLabel(xLabel);
+                IntegerVertex y = new PoissonVertex(x).labelled(yLabel);
+                y.setParents(x);
+                y.observe(observedY);
+                plate.add(x);
+                plate.add(y);
+            })
+            .build();
+
+
+        Vertex<DoubleTensor> previousX = initialX;
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> x = plate.get(xLabel);
+            Vertex<DoubleTensor> y = plate.get(yLabel);
+            assertThat(x.getParents(), contains(previousX));
+            assertThat(y.getParents(), contains(x));
+            previousX = x;
         }
     }
 }
