@@ -169,30 +169,6 @@ public class MatrixMultiplicationVertexTest {
     }
 
     @Test
-    public void canShare() {
-        DoubleVertex sharedMatrix = new UniformVertex(0, 10);
-        sharedMatrix.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
-
-        DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
-
-        DoubleVertex b = new UniformVertex(0, 10);
-        b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
-
-        DoubleVertex c = sharedMatrix.matrixMultiply(a);
-        DoubleVertex d = sharedMatrix.matrixMultiply(b);
-
-        DoubleVertex e = c.plus(d);
-
-        PartialDerivatives forward = e.getDualNumber().getPartialDerivatives();
-        PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(e, a, b, sharedMatrix);
-
-        assertEquals(forward.withRespectTo(a), reverse.withRespectTo(a));
-        assertEquals(forward.withRespectTo(b), reverse.withRespectTo(b));
-        assertEquals(forward.withRespectTo(sharedMatrix), reverse.withRespectTo(sharedMatrix));
-    }
-
-    @Test
     public void canDoDoubleMatrixMultiplyAutoDiff() {
 
         DoubleVertex m = new UniformVertex(0, 10);
