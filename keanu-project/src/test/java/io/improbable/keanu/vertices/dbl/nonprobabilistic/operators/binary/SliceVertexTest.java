@@ -12,8 +12,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 public class SliceVertexTest {
 
     private DoubleVertex matrixA;
@@ -64,42 +62,32 @@ public class SliceVertexTest {
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimZeroIndexZero() {
-        assertSlice(0, 0, new double[]{11, 17}, new int[]{1, 2}, new int[]{1, 2, 4, 2});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(0, 0, new double[]{140, 170}, new int[]{1, 2}, new int[]{1, 2, 2, 3});
     }
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimZeroIndexOne() {
-        assertSlice(0, 1, new double[]{23, 29}, new int[]{1, 2}, new int[]{1, 2, 4, 2});
-    }
-
-    @Test
-    public void sliceCorrectlySplitsRowOfPartialDerivativeDimZeroIndexTwo() {
-        assertSlice(0, 2, new double[]{36, 42}, new int[]{1, 2}, new int[]{1, 2, 4, 2});
-    }
-
-    @Test
-    public void sliceCorrectlySplitsRowOfPartialDerivativeDimZeroIndexThree() {
-        assertSlice(0, 3, new double[]{48, 54}, new int[]{1, 2}, new int[]{1, 2, 4, 2});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(0, 1, new double[]{320, 395}, new int[]{1, 2}, new int[]{1, 2, 2, 3});
     }
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimOneIndexZero() {
-        assertSlice(1, 0, new double[]{11, 23, 36, 48}, new int[]{4, 1}, new int[]{4, 1, 4, 2});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(1, 0, new double[]{140, 320}, new int[]{2, 1}, new int[]{2, 1, 2, 3});
     }
 
     @Test
     public void sliceCorrectlySplitsRowOfPartialDerivativeDimOneIndexOne() {
-        assertSlice(1, 1, new double[]{17, 29, 42, 54}, new int[]{4, 1}, new int[]{4, 1, 4, 2});
+        assertPartialsOfSliceWithRespectToOriginalAreCorrect(1, 1, new double[]{170, 395}, new int[]{2, 1}, new int[]{2, 1, 2, 3});
     }
 
-    private void assertSlice(int dim, int ind, double[] expectedValue, int[] expectedShape, int[] expectedPartialShape) {
+    private void assertPartialsOfSliceWithRespectToOriginalAreCorrect(int dim, int ind, double[] expectedValue, int[] expectedShape, int[] expectedPartialShape) {
         DoubleVertex m = new UniformVertex(0, 10);
-        m.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 6, 7, 8, 9}, 4, 2));
+        m.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 2, 3));
 
         DoubleVertex alpha = new UniformVertex(0, 10);
-        alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35, 40, 45}, 4, 2));
+        alpha.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25, 30, 35}, 3, 2));
 
-        DoubleVertex N = m.plus(alpha);
+        DoubleVertex N = m.matrixMultiply(alpha);
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 

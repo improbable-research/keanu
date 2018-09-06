@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,12 +33,22 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
         Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            int[] newPartialShape = TensorShape.concat(getShape(), inputVertex.getShape());
+            int[] newPartialShape = calculateShape(partialDerivative.getValue().getShape(), inputVertex.getShape());
             DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
             reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
         }
 
         return reshapedDerivatives;
+    }
+
+    private int[] calculateShape(int[] wrtSelfShape, int[] originalShape) {
+        int[] partialShape = Arrays.copyOf(wrtSelfShape, wrtSelfShape.length);
+
+        for (int i = partialShape.length - originalShape.length; i < partialShape.length; i++) {
+            partialShape[i] = originalShape[Math.abs(partialShape.length - originalShape.length - i)];
+        }
+
+        return partialShape;
     }
 
 }

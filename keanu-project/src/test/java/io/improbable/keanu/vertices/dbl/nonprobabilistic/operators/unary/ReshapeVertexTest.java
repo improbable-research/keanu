@@ -10,8 +10,6 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import org.junit.Assert;
 import org.junit.Test;
 
-import java.util.Arrays;
-
 public class ReshapeVertexTest {
 
     @Test
@@ -73,6 +71,50 @@ public class ReshapeVertexTest {
 
         Assert.assertArrayEquals(nWrtMpartialsBeforeReshape, reshapedPartialWrtM.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(nWrtApartialsBeforeReshape, reshapedPartialWrtA.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void partialCorrectlyFlowsThroughReshape() {
+        DoubleVertex A = new UniformVertex(0, 10);
+        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex B = new UniformVertex(0, 10);
+        B.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex C = A.plus(B);
+
+        DoubleVertex D = C.reshape(4, 1);
+
+        DoubleVertex E = new UniformVertex(0, 10);
+        E.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 4, 1));
+
+        DoubleVertex F = D.times(E);
+
+        PartialDerivatives forward = F.getDualNumber().getPartialDerivatives();
+        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
+
+        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(A).getShape());
+        Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void partialCorrectlyFlowsThroughTwoReshapes() {
+        DoubleVertex A = new UniformVertex(0, 10);
+        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex B = new UniformVertex(0, 10);
+        B.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex C = A.plus(B);
+
+        DoubleVertex D = C.reshape(4, 1);
+        DoubleVertex E = D.reshape(1, 4);
+
+        PartialDerivatives forward = E.getDualNumber().getPartialDerivatives();
+        PartialDerivatives backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
+
+        Assert.assertArrayEquals(new int[]{1, 4, 2, 2}, forward.withRespectTo(A).getShape());
+        Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
     }
 
 }
