@@ -11,6 +11,7 @@ import java.util.List;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -20,6 +21,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
@@ -138,20 +140,21 @@ public class PlateBuilderTest {
     public void youCanCreateATimeSeriesFromPlatesFromACount() {
 
         VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xPreviousLabel = new VertexLabel("xPrevious");
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(0.).labelled(xLabel);
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labelled(xLabel);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
-        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialX)
+            .withProxyMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .count(10)
             .withFactory((plate) -> {
-                DoubleVertex x = new DoubleProxyVertex("x");
-                x.setLabel(xLabel);
+                DoubleVertex xPrevious = new DoubleProxyVertex("xPrevious");
+                DoubleVertex x = new ExponentialVertex(xPrevious).labelled(xLabel);
                 IntegerVertex y = new PoissonVertex(x).labelled(yLabel);
-                y.setParents(x);
+                plate.add(xPrevious);
                 plate.add(x);
                 plate.add(y);
             })
@@ -161,9 +164,11 @@ public class PlateBuilderTest {
         Vertex<DoubleTensor> previousX = initialX;
 
         for (Plate plate : plates) {
+            Vertex<DoubleTensor> xPreviousProxy = plate.get(xPreviousLabel);
             Vertex<DoubleTensor> x = plate.get(xLabel);
             Vertex<DoubleTensor> y = plate.get(yLabel);
-            assertThat(x.getParents(), contains(previousX));
+            assertThat(xPreviousProxy.getParents(), contains(previousX));
+            assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
             previousX = x;
         }
@@ -177,21 +182,22 @@ public class PlateBuilderTest {
     public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
 
         VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xPreviousLabel = new VertexLabel("xPreviousProxy");
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(0.).labelled(xLabel);
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labelled(xLabel);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
-        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialX)
+            .withProxyMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .fromIterator(ys.iterator())
             .withFactory((plate, observedY) -> {
-                DoubleVertex x = new DoubleProxyVertex("x");
-                x.setLabel(xLabel);
+                DoubleVertex xPreviousProxy = new DoubleProxyVertex("xPreviousProxy");
+                DoubleVertex x = new ExponentialVertex(xPreviousProxy).labelled(xLabel);
                 IntegerVertex y = new PoissonVertex(x).labelled(yLabel);
-                y.setParents(x);
                 y.observe(observedY);
+                plate.add(xPreviousProxy);
                 plate.add(x);
                 plate.add(y);
             })
@@ -201,9 +207,11 @@ public class PlateBuilderTest {
         Vertex<DoubleTensor> previousX = initialX;
 
         for (Plate plate : plates) {
+            Vertex<DoubleTensor> xPreviousProxy = plate.get(xPreviousLabel);
             Vertex<DoubleTensor> x = plate.get(xLabel);
             Vertex<DoubleTensor> y = plate.get(yLabel);
-            assertThat(x.getParents(), contains(previousX));
+            assertThat(xPreviousProxy.getParents(), contains(previousX));
+            assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
             previousX = x;
         }

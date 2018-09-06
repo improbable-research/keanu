@@ -39,9 +39,4 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     public DoubleTensor calculate() {
         return getValue();
     }
-
-    @Override
-    public String toString() {
-        return "ConstantDoubleVertex(" + getValue() + ")";
-    }
 }

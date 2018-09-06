@@ -1,6 +1,8 @@
 package io.improbable.keanu.plating;
 
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -16,6 +18,7 @@ import io.improbable.keanu.vertices.VertexLabel;
  */
 public class PlateBuilder<T> {
     private VertexDictionary initialState;
+    private Map<VertexLabel, VertexLabel> proxyMapping = Collections.emptyMap();
 
     private interface PlateCount {
         int getCount();
@@ -39,6 +42,11 @@ public class PlateBuilder<T> {
         return this;
     }
 
+    public PlateBuilder<T> withProxyMapping(Map<VertexLabel, VertexLabel> proxyMapping) {
+        this.proxyMapping = proxyMapping;
+        return this;
+    }
+
     /**
      * Build a fixed number of plates without additional data
      *
@@ -56,7 +64,7 @@ public class PlateBuilder<T> {
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator) {
-        return new FromIterator(iterator, 0, initialState);
+        return new FromIterator(iterator, 0, initialState, proxyMapping);
     }
 
     /**
@@ -67,7 +75,7 @@ public class PlateBuilder<T> {
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator, int sizeHint) {
-        return new FromIterator(iterator, sizeHint, initialState);
+        return new FromIterator(iterator, sizeHint, initialState, proxyMapping);
     }
 
     /**
@@ -93,7 +101,7 @@ public class PlateBuilder<T> {
          * @return A builder with count and plate factory set
          */
         public FromCountFactory withFactory(Consumer<Plate> factory) {
-            return new FromCountFactory(factory, this, initialState);
+            return new FromCountFactory(factory, this, initialState, proxyMapping);
         }
     }
 
@@ -105,7 +113,7 @@ public class PlateBuilder<T> {
         private int size;
         private final VertexDictionary initialState;
 
-        private FromIterator(Iterator<T> iterator, int size, VertexDictionary initialState) {
+        private FromIterator(Iterator<T> iterator, int size, VertexDictionary initialState, Map<VertexLabel, VertexLabel> proxyMapping) {
             this.iterator = iterator;
             this.size = size;
             this.initialState = initialState;
@@ -149,7 +157,7 @@ public class PlateBuilder<T> {
             while (iter.hasNext()) {
                 Plate plate = new Plate();
                 factory.accept(plate, iter.next());
-                connectProxyVariables(previousPlate, plate);
+                connectProxyVariables(previousPlate, plate, proxyMapping);
                 plates.add(plate);
                 previousPlate = plate;
             }
@@ -157,9 +165,9 @@ public class PlateBuilder<T> {
         }
     }
 
-    private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate) {
+    private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> proxyMapping) {
         for (Vertex<?> proxy : plate.getProxyVertices()) {
-            VertexLabel label = proxy.getLabel();
+            VertexLabel label = proxyMapping.get(proxy.getLabel());
             Vertex<?> parent = candidateVertices.get(label);
             proxy.setParents(parent);
         }
@@ -172,7 +180,7 @@ public class PlateBuilder<T> {
         private Consumer<Plate> factory;
         private PlateCount count;
 
-        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState) {
+        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> proxyMapping) {
             this.factory = factory;
             this.count = count;
         }
@@ -184,7 +192,7 @@ public class PlateBuilder<T> {
             for (int i = 0; i < count.getCount(); i++) {
                 Plate plate = new Plate();
                 factory.accept(plate);
-                connectProxyVariables(previousPlate, plate);
+                connectProxyVariables(previousPlate, plate, proxyMapping);
                 plates.add(plate);
                 previousPlate = plate;
             }
