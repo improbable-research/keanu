@@ -88,8 +88,8 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
-                                                             DoubleTensor dLogPdsigma,
-                                                             DoubleTensor dLogPdx) {
+                                                                 DoubleTensor dLogPdsigma,
+                                                                 DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdmu);
         PartialDerivatives dLogPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdsigma);

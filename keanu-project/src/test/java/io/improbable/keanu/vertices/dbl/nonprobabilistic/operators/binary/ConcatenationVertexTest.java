@@ -1,16 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import org.junit.Assert;
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
-import org.junit.Test;
-
-import java.util.Arrays;
 
 public class ConcatenationVertexTest {
 
@@ -75,7 +73,7 @@ public class ConcatenationVertexTest {
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
-    @Test (expected = IllegalArgumentException.class)
+    @Test(expected = IllegalArgumentException.class)
     public void errorThrownOnConcatOfWrongSize() {
         UniformVertex a = new UniformVertex(0.0, 1.0);
         a.setValue(new double[]{1, 2, 3});
@@ -161,9 +159,9 @@ public class ConcatenationVertexTest {
     }
 
     @Test
-    public void canConcatenateSimpleAutoDiffForwardNoSharedParents() {
+    public void canConcatenateSimpleAutoDiffForwardNoSharedParentsDimensionOne() {
         DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.create(new double[]{5}, 1, 1));
+        a.setValue(DoubleTensor.create(new double[]{5}, 2, 2));
 
         DoubleVertex b = new UniformVertex(0, 10);
         b.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
@@ -177,14 +175,14 @@ public class ConcatenationVertexTest {
         DoubleVertex e = a.times(b);
         DoubleVertex f = c.plus(d);
 
-        ConcatenationVertex concat = new ConcatenationVertex(0, e, f);
+        ConcatenationVertex concat = new ConcatenationVertex(1, e, f);
 
         PartialDerivatives forward = concat.getDualNumber().getPartialDerivatives();
 
-        Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(c).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(c).getShape());
+        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(d).getShape());
     }
 
     @Test
@@ -389,4 +387,5 @@ public class ConcatenationVertexTest {
             0.0001
         );
     }
+
 }
