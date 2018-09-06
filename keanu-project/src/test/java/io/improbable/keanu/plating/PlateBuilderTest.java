@@ -135,7 +135,46 @@ public class PlateBuilderTest {
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlates() {
+    public void youCanCreateATimeSeriesFromPlatesFromACount() {
+
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel yLabel = new VertexLabel("y");
+
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(0.).labelled(xLabel);
+        List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(initialX)
+            .count(10)
+            .withFactory((plate) -> {
+                DoubleVertex x = new DoubleProxyVertex("x");
+                x.setLabel(xLabel);
+                IntegerVertex y = new PoissonVertex(x).labelled(yLabel);
+                y.setParents(x);
+                plate.add(x);
+                plate.add(y);
+            })
+            .build();
+
+
+        Vertex<DoubleTensor> previousX = initialX;
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> x = plate.get(xLabel);
+            Vertex<DoubleTensor> y = plate.get(yLabel);
+            assertThat(x.getParents(), contains(previousX));
+            assertThat(y.getParents(), contains(x));
+            previousX = x;
+        }
+    }
+
+    /**
+     * This is a Hidden Markov Model -
+     * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     */
+    @Test
+    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
 
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel yLabel = new VertexLabel("y");

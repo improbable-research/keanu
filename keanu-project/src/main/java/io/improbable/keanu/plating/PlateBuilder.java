@@ -180,10 +180,13 @@ public class PlateBuilder<T> {
 
         public Plates build() {
             Plates plates = new Plates(count.getCount());
+            VertexDictionary previousPlate = initialState;
             for (int i = 0; i < count.getCount(); i++) {
                 Plate plate = new Plate();
                 factory.accept(plate);
+                connectProxyVariables(previousPlate, plate);
                 plates.add(plate);
+                previousPlate = plate;
             }
             return plates;
         }
