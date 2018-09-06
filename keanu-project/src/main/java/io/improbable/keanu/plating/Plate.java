@@ -7,9 +7,10 @@ import java.util.stream.Collectors;
 
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 
-public class Plate {
+public class Plate implements VertexDictionary {
     private Map<VertexLabel, Vertex<?>> contents;
 
     public Plate() {
@@ -21,6 +22,7 @@ public class Plate {
         return v;
     }
 
+    @Override
     public <T> Vertex<T> get(VertexLabel label) {
         return (Vertex<T>) contents.get(label);
     }
