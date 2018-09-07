@@ -52,7 +52,7 @@ An IntegerVertex can also be used by most arithmetic operators.
 A BoolVertex can be used by most boolean operators. These can be observed directly and used in MCMC.
 
 * Probabilistic
-    * Flip
+    * Bernoulli
     
 * Non-Probabilistic
     * Operators
@@ -68,19 +68,19 @@ An example of this is the SelectVertex<T> where T is any type.
         A, B, C, D
     }
 
-    public SelectVertex<MyType> getSelectorForMyType() {
+    public CategorticalVertex<MyType> getCategoricalForMyType() {
 
-        LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
+        Map<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
         frequency.put(A, ConstantVertex.of(0.25));
         frequency.put(B, ConstantVertex.of(0.25));
         frequency.put(C, ConstantVertex.of(0.25));
         frequency.put(D, ConstantVertex.of(0.25));
 
-        return new SelectVertex<MyType>(frequency);
+        return new CategoricalVertex<>(frequency);
     }
 ```
 
-The getSelectorForMyType() method would return a probabilistic vertex that would contain an 
+The getCategoricalForMyType() method would return a probabilistic vertex that would contain an 
 object of type MyType A, B, C or D, 25% of the time respectively.
 
 * Probabilistic
