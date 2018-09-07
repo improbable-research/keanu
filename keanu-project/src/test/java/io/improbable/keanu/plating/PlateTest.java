@@ -2,17 +2,21 @@ package io.improbable.keanu.plating;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
 import java.util.Collection;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
@@ -21,6 +25,9 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PlateTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     public static final VertexLabel VERTEX_LABEL_1 = new VertexLabel("foo");
     private Plate plate;
@@ -50,5 +57,12 @@ public class PlateTest {
 
         Collection<Vertex<?>> proxies = plate.getProxyVertices();
         assertThat(proxies, containsInAnyOrder(proxy1, proxy2, proxy3));
+    }
+
+    @Test
+    public void itThrowsIfYouAddAVertexWithNoLabel()  {
+        expectedException.expect(PlateException.class);
+        expectedException.expectMessage(endsWith(" has no label"));
+        plate.add(ConstantVertex.of(1.));
     }
 }
