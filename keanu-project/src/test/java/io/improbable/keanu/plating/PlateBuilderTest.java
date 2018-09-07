@@ -13,6 +13,7 @@ import org.junit.Test;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -122,6 +123,23 @@ public class PlateBuilderTest {
             Vertex<DoubleTensor> flip = plate.get(label);
             assertThat(flip.getParents(), contains(commonTheta));
         }
+    }
+    @Test
+    public void youCanPutThePlatesIntoABayesNet() throws VertexLabelException {
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        VertexLabel label = new VertexLabel("flip");
+
+        Plates plates = new PlateBuilder<Bean>()
+            .count(10)
+            .withFactory((plate) -> {
+                BoolVertex flip = new BernoulliVertex(commonTheta).labelled(label);
+                flip.observe(false);
+                plate.add(flip);
+            })
+            .build();
+
+        new BayesianNetwork(commonTheta.getConnectedGraph());
     }
 
 

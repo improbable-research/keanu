@@ -18,16 +18,33 @@ public class Plate implements VertexDictionary {
     }
 
     public <T extends Vertex<?>> T add(T v) {
-        if (contents.containsKey(v.getLabel())) {
-            throw new IllegalArgumentException("Key " + v.getLabel() + " already exists");
+        VertexLabel label = scoped(v.getLabel());
+        if (contents.containsKey(label)) {
+            throw new IllegalArgumentException("Key " + label + " already exists");
         }
-        contents.putIfAbsent(v.getLabel(), v);
+        contents.put(label, v);
+        v.setLabel(label);
         return v;
+    }
+
+    private String getUniqueName() {
+        return "Plate_" + this.hashCode();
+    }
+
+    private VertexLabel scoped(VertexLabel label) {
+        return label.inNamespace(getUniqueName());
     }
 
     @Override
     public <T> Vertex<T> get(VertexLabel label) {
-        return (Vertex<T>) contents.get(label);
+        Vertex<?> vertex = contents.get(label);
+        if (vertex == null) {
+            vertex = contents.get(scoped(label));
+        }
+        if (vertex == null) {
+            throw new IllegalArgumentException("Cannot find VertexLabel " + label);
+        }
+        return (Vertex<T>) vertex;
     }
 
     public Collection<Vertex<?>> getProxyVertices() {

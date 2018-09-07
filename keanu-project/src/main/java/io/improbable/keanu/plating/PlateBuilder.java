@@ -169,7 +169,16 @@ public class PlateBuilder<T> {
     private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> proxyMapping) throws VertexLabelException {
         for (Vertex<?> proxy : plate.getProxyVertices()) {
             VertexLabel label = proxyMapping.get(proxy.getLabel());
+            if (label == null) {
+                label = proxyMapping.get(proxy.getLabel().dropNamespace());
+            }
+            if (label == null) {
+                throw new VertexLabelException("Cannot find proxy mapping for " + proxy.getLabel());
+            }
             Vertex<?> parent = candidateVertices.get(label);
+            if (parent == null) {
+                throw new VertexLabelException("Cannot find VertexLabel " + label);
+            }
             proxy.setParents(parent);
         }
     }
