@@ -105,10 +105,10 @@ public class GradientOptimizer implements Optimizer {
 
     @Override
     public double maxAPosteriori() {
-        if (bayesianNetwork.getLatentAndObservedVertices().isEmpty()) {
+        if (bayesianNetwork.getLatentOrObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot find MAP of network without any probabilistic vertices");
         }
-        return optimize(bayesianNetwork.getLatentAndObservedVertices());
+        return optimize(bayesianNetwork.getLatentOrObservedVertices());
     }
 
     @Override
