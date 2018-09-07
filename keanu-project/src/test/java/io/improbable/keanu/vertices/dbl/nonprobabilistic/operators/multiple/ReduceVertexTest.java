@@ -49,23 +49,23 @@ public class ReduceVertexTest {
 
     @Test
     public void varargsConstrution() {
-        DoubleVertex max = new ReduceVertex(DoubleTensor::max, null, verts.get(0), verts.get(1));
+        DoubleVertex max = new ReduceVertex(DoubleTensor::max, null, null, verts.get(0), verts.get(1));
         assertEquals(max.eval().scalar(), Math.max(verts.get(0).eval().scalar(), verts.get(1).eval().scalar()), 0.0001);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void zeroArgThrowsException() {
-        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null);
+        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, null);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void singleArgThrowsException() {
-        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, verts.get(0));
+        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, null, verts.get(0));
     }
 
     @Test
     public void doubleArgExecutesAsExpected() {
-        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, verts.get(0), verts.get(1));
+        DoubleVertex min = new ReduceVertex(DoubleTensor::max, null, null, verts.get(0), verts.get(1));
         assertEquals(min.eval().scalar(), Math.max(verts.get(0).eval().scalar(), verts.get(1).eval().scalar()), 0.0);
     }
 }

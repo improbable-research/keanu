@@ -136,14 +136,14 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     public DualNumber add(DualNumber that) {
         // dc = da + db;
         DoubleTensor newValue = this.value.plus(that.value);
-        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives);
+        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives, newValue.getShape());
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber subtract(DualNumber that) {
         // dc = da - db;
         DoubleTensor newValue = this.value.minus(that.value);
-        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives);
+        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives, newValue.getShape());
         return new DualNumber(newValue, newInf);
     }
 
@@ -226,7 +226,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (thisInfMultiplied.isEmpty() && thatInfMultiplied.isEmpty()) {
             newInf = PartialDerivatives.OF_CONSTANT;
         } else {
-            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
+            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.pow(2));
         }
 
         return new DualNumber(newValue, newInf);
@@ -369,7 +369,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (this.partialDerivatives.isEmpty()) {
             return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
-            DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
+            DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dArcTan));
         }
     }

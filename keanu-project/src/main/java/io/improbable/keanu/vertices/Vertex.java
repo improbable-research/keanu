@@ -173,6 +173,10 @@ public abstract class Vertex<T> implements Observable<T> {
         return id;
     }
 
+    public int getIndentation() {
+        return id.getIndentation();
+    }
+
     public Set<Vertex> getChildren() {
         return children;
     }

@@ -14,8 +14,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
-    private final DoubleVertex left;
-    private final DoubleVertex right;
+    protected final DoubleVertex left;
+    protected final DoubleVertex right;
 
     /**
      * A vertex that performs a user defined operation on two vertices
