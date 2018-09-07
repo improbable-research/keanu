@@ -46,29 +46,36 @@ public class MatrixInverseVertexTest {
     }
 
     @Test
-    public void inverseMultipliedEqualsIdentity() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{3,3}, 0.0, 20.0);
-        DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
-        DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
-
-        DoubleTensor result = multiplied.eval();
-
-        assertEquals(result, DoubleTensor.eye(3));
-
-        DoubleTensor changeInMultipliedWrtInput =
-            multiplied.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-        System.out.println(changeInMultipliedWrtInput);
-        assertEquals(changeInMultipliedWrtInput.sum(), 0.0, 1e-10);
-    }
-
-    @Test
     public void canCalculateDualCorrectly() {
         DoubleVertex matrix = new UniformVertex(1.0, 100.0);
         matrix.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
         DoubleVertex inverse = new MatrixInverseVertex(matrix);
 
+        inverse.lazyEval();
+
         DoubleTensor partialD = inverse.getDualNumber().getPartialDerivatives().withRespectTo(matrix);
 
+        System.out.println(inverse.getValue());
         System.out.println(partialD);
     }
+
+    @Test
+    public void inverseMultipliedEqualsIdentity() {
+        final int NUM_ITERATIONS = 10;
+        DoubleVertex inputVertex = new UniformVertex(new int[]{3,3}, -20.0, 20.0);
+        DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
+        DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
+
+        for (int i = 0; i < NUM_ITERATIONS; i++) {
+            inputVertex.setValue(inputVertex.sample());
+            DoubleTensor result = multiplied.eval();
+
+            assertEquals(result, DoubleTensor.eye(3));
+
+            DoubleTensor changeInMultipliedWrtInput =
+                multiplied.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+            assertEquals(changeInMultipliedWrtInput.sum(), 0.0, 1e-10);
+        }
+    }
+
 }
