@@ -17,6 +17,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -43,7 +44,7 @@ public class PlateBuilderTest {
     );
 
     @Test
-    public void buildPlatesFromCount_Size() {
+    public void buildPlatesFromCount_Size() throws VertexLabelException {
         int n = 100;
         Plates plates = new PlateBuilder()
             .count(n)
@@ -54,7 +55,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void buildPlatesFromCount_PlateContents() {
+    public void buildPlatesFromCount_PlateContents() throws VertexLabelException {
         int n = 100;
         VertexLabel vertexName = new VertexLabel("vertexName");
         Plates plates = new PlateBuilder<>()
@@ -67,7 +68,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void buildPlatesFromData_Size() {
+    public void buildPlatesFromData_Size() throws VertexLabelException {
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
@@ -77,7 +78,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void buildPlatesFromData_Contents() {
+    public void buildPlatesFromData_Contents() throws VertexLabelException {
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
@@ -87,7 +88,7 @@ public class PlateBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
+    public void youCannotAddTheSameLabelTwiceIntoOnePlate() throws VertexLabelException {
         new PlateBuilder<Integer>()
             .count(10)
             .withFactory((plate) -> {
@@ -101,9 +102,8 @@ public class PlateBuilderTest {
 
     }
 
-
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() {
+    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() throws VertexLabelException {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
@@ -126,7 +126,7 @@ public class PlateBuilderTest {
 
 
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() {
+    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() throws VertexLabelException {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
@@ -152,7 +152,7 @@ public class PlateBuilderTest {
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlatesFromACount() {
+    public void youCanCreateATimeSeriesFromPlatesFromACount() throws VertexLabelException {
 
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel xPreviousLabel = new VertexLabel("xPrevious");
@@ -194,7 +194,7 @@ public class PlateBuilderTest {
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
+    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() throws VertexLabelException {
 
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel xPreviousLabel = new VertexLabel("xPreviousProxy");

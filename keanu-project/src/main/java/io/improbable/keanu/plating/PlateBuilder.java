@@ -9,6 +9,7 @@ import java.util.function.Consumer;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
 
 /**
  * PlateBuilder allows plates to constructed in steps
@@ -34,7 +35,7 @@ public class PlateBuilder<T> {
          *
          * @return Collection of all created plates
          */
-        Plates build();
+        Plates build() throws VertexLabelException;
     }
 
     public PlateBuilder<T> withInitialState(Vertex... initialState) {
@@ -150,7 +151,7 @@ public class PlateBuilder<T> {
             this.initialState = initialState;
         }
 
-        public Plates build() {
+        public Plates build() throws VertexLabelException {
             Plates plates = new Plates(this.size);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousPlate = initialState;
@@ -165,7 +166,7 @@ public class PlateBuilder<T> {
         }
     }
 
-    private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> proxyMapping) {
+    private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> proxyMapping) throws VertexLabelException {
         for (Vertex<?> proxy : plate.getProxyVertices()) {
             VertexLabel label = proxyMapping.get(proxy.getLabel());
             Vertex<?> parent = candidateVertices.get(label);
@@ -186,7 +187,7 @@ public class PlateBuilder<T> {
         }
 
 
-        public Plates build() {
+        public Plates build() throws VertexLabelException {
             Plates plates = new Plates(count.getCount());
             VertexDictionary previousPlate = initialState;
             for (int i = 0; i < count.getCount(); i++) {

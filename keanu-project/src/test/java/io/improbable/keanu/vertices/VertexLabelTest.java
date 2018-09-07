@@ -10,7 +10,7 @@ public class VertexLabelTest {
     @Test
     public void byDefaultALabelHasNoNamespace() {
         VertexLabel foo = new VertexLabel("foo");
-        assertThat(foo.toString(), equalTo("null:foo"));
+        assertThat(foo.toString(), equalTo(":foo"));
     }
 
     @Test
@@ -54,12 +54,21 @@ public class VertexLabelTest {
     }
 
     @Test
+    public void vertexLabelsWithDifferentDepthNamespacesAreNotEqual() {
+        VertexLabel foo1 = new VertexLabel("foo", "inner", "outer");
+        VertexLabel foo2 = new VertexLabel("foo", "outer.inner");
+        assertThat(foo1, not(equalTo(foo2)));
+        assertThat(foo1.hashCode(), not(equalTo(foo2.hashCode())));
+        assertThat(foo1.toString(), equalTo(foo2.toString()));
+    }
+
+    @Test
     public void youCanSetTheNamespace() {
         String namespace = "namespace";
         String name = "foo";
         VertexLabel foo = new VertexLabel(name);
         VertexLabel newFoo = foo.inNamespace(namespace);
-        assertThat(newFoo, equalTo(new VertexLabel(namespace, name)));
+        assertThat(newFoo, equalTo(new VertexLabel(name, namespace)));
     }
 
     @Test
@@ -67,8 +76,24 @@ public class VertexLabelTest {
         String innerNamespace = "inner";
         String outerNamespace = "outer";
         String name = "foo";
-        VertexLabel foo = new VertexLabel(innerNamespace, name);
+        VertexLabel foo = new VertexLabel(name, innerNamespace);
         VertexLabel newFoo = foo.inNamespace(outerNamespace);
-        assertThat(newFoo, equalTo(new VertexLabel(outerNamespace + "." + innerNamespace, name)));
+        assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace, outerNamespace)));
+    }
+
+    @Test
+    public void youCanDiminishTheNamespace() throws VertexLabelException {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(name, innerNamespace, outerNamespace);
+        VertexLabel newFoo = foo.dropNamespace();
+        assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace)));
+    }
+
+    @Test(expected = VertexLabelException.class)
+    public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() throws VertexLabelException {
+        VertexLabel foo = new VertexLabel("foo");
+        foo.dropNamespace();
     }
 }

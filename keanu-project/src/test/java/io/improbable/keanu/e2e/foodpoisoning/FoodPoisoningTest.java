@@ -16,6 +16,7 @@ import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -38,7 +39,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void oystersAreInfected() {
+    public void oystersAreInfected() throws VertexLabelException {
         generateSurveyData(50, true, false, false);
 
         int dropCount = 10000;
@@ -50,7 +51,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void lambAndOystersAreInfected() {
+    public void lambAndOystersAreInfected() throws VertexLabelException {
         generateSurveyData(50, true, true, false);
         NetworkSamples samples = sample(15000);
 
@@ -61,7 +62,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void nothingIsInfected() {
+    public void nothingIsInfected() throws VertexLabelException {
         generateSurveyData(50, false, false, false);
         NetworkSamples samples = sample(15000);
 
@@ -78,7 +79,7 @@ public class FoodPoisoningTest {
         return MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(myNet, myNet.getLatentVertices(), n);
     }
 
-    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {
+    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) throws VertexLabelException {
 
         VertexLabel didEatOystersLabel = new VertexLabel("didEatOysters");
         VertexLabel didEatLambLabel = new VertexLabel("didEatLamb");
