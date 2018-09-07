@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -24,10 +25,27 @@ public class PlatesExample {
         }
     }
 
-    public void buildPlates() {
+    /**
+     * Each plate contains a linear regression model:
+     *
+     * m    x
+     *  \  /
+     *   *
+     *   |
+     * b |
+     *  \|
+     *   +
+     *
+     * The input data file defines, for each plate:
+     *  - the value of the constant vertex "x"
+     *  - the observed value of the vertex "+" (a.k.a. "y")
+     *
+     * @param dataFileName - the file containing data in (x,y) format
+     */
+    public Plates buildPlates(String dataFileName) {
 
         //Read data from a csv file
-        CsvReader csvReader = ReadCsv.fromFile("./my_file.csv");
+        CsvReader csvReader = ReadCsv.fromResources(dataFileName);
 
         //Parse the csv data to MyData objects
         List<MyData> allMyData = csvReader.streamLines()
@@ -56,12 +74,13 @@ public class PlatesExample {
             .build();
 
         //now you have access to the "x" from any one of the plates
-        double valueForXAtCSVLine1 = plates.asList()
+        DoubleTensor valueForXAtCSVLine1 = plates.asList()
             .get(1) // get plate 1 which is build from csv line 1
-            .<Double>get(xLabel) //get the vertex that we labelled "x" in that plate
+            .<DoubleTensor>get(xLabel) //get the vertex that we labelled "x" in that plate
             .getValue(); //get the value from that vertex
 
         //Now run an inference algorithm on vertex m and vertex b and you have linear regression
 
+        return plates;
     }
 }
