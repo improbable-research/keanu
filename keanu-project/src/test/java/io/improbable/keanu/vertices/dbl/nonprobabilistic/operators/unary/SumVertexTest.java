@@ -71,4 +71,55 @@ public class SumVertexTest {
         assertThat(dfdaReverse, equalTo(expectedDfdx));
         assertThat(dfdaForward, equalTo(expectedDfdx));
     }
+
+    @Test
+    public void canDoSumAutoDiffWhenOfIsScalar() {
+        DoubleVertex a = new UniformVertex(new int[]{2, 3}, 0, 10);
+        a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
+
+        DoubleVertex d = a.sum();
+
+        DoubleVertex e = new UniformVertex(0, 10);
+        e.setValue(2);
+
+        DoubleVertex f = d.times(e);
+
+        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+
+        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a, e);
+        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
+
+        DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
+            2, 2, 2,
+            2, 2, 2
+        }, 1, 1, 2, 3);
+
+        assertThat(dfdaForward, equalTo(expectedDfdx));
+        assertThat(dfdaReverse, equalTo(expectedDfdx));
+    }
+
+    @Test
+    public void canDoSumAutoDiffWhenWrtIsScalar() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(2);
+
+        DoubleVertex d = a.sum();
+
+        DoubleVertex e = new UniformVertex(0, 10);
+        e.setValue(new double[]{1, 2, 3});
+
+        DoubleVertex f = d.times(e);
+
+        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+
+        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a, e);
+        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
+
+        DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
+            1, 2, 3,
+        }, 1, 3, 1, 1);
+
+        assertThat(dfdaForward, equalTo(expectedDfdx));
+        assertThat(dfdaReverse, equalTo(expectedDfdx));
+    }
 }
