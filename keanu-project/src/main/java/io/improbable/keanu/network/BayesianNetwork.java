@@ -22,6 +22,8 @@ public class BayesianNetwork {
 
     private final List<? extends Vertex> vertices;
     private final Map<VertexLabel, Vertex> vertexLabels;
+    private final int TOP_LEVEL_INDENTATION = 1;
+    private int indentation = TOP_LEVEL_INDENTATION;
 
     public BayesianNetwork(Set<? extends Vertex> vertices) {
         this.vertices = ImmutableList.copyOf(vertices);
@@ -36,11 +38,11 @@ public class BayesianNetwork {
         return vertexLabels.get(label);
     }
 
-    private static Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
+    private Map<VertexLabel, Vertex> buildLabelMap(Set<? extends Vertex> vertices) {
         Map<VertexLabel, Vertex> labelMap = new HashMap<>();
         for (Vertex v : vertices) {
             VertexLabel label = v.getLabel();
-            if (label != null) {
+            if (v.getIndentation() == this.indentation && label != null) {
                 if (labelMap.containsKey(label)) {
                     throw new IllegalArgumentException("Vertex Label Repeated: " + label);
                 } else {
@@ -52,32 +54,70 @@ public class BayesianNetwork {
         return labelMap;
     }
 
-    public List<Vertex> getLatentAndObservedVertices() {
+    List<? extends Vertex> getVertices() {
+        return vertices;
+    }
+
+    private interface VertexFilter {
+        boolean filter(boolean isProbabilistic, boolean isObserved, int indentation);
+    }
+
+    private List<Vertex> getFilteredVertexList(VertexFilter filter) {
         return vertices.stream()
-            .filter(v -> v.isProbabilistic() || v.isObserved())
+            .filter(v -> filter.filter(v.isProbabilistic(), v.isObserved(), v.getIndentation()))
             .collect(Collectors.toList());
+    }
+
+    /**
+     * @return All vertices that are latent or observed
+     */
+    public List<Vertex> getLatentOrObservedVertices() {
+        return getLatentOrObservedVertices(Integer.MAX_VALUE);
+    }
+
+    public List<Vertex> getTopLevelLatentOrObservedVertices() {
+        return getLatentOrObservedVertices(TOP_LEVEL_INDENTATION);
+    }
+
+    private List<Vertex> getLatentOrObservedVertices(int maxIndentation) {
+        return getFilteredVertexList((isProbabilistic, isObserved, indentation)
+            -> (isProbabilistic || isObserved) && maxIndentation >= indentation);
     }
 
     /**
      * @return All vertices that are latent (i.e. probabilistic non-observed)
      */
     public List<Vertex> getLatentVertices() {
-        return vertices.stream()
-            .filter(v -> v.isProbabilistic() && !v.isObserved())
-            .collect(Collectors.toList());
+        return getLatentVertices(Integer.MAX_VALUE);
+    }
+
+    public List<Vertex> getTopLevelLatentVertices() {
+        return getLatentVertices(TOP_LEVEL_INDENTATION);
+    }
+
+    private List<Vertex> getLatentVertices(int maxIndentation) {
+        return getFilteredVertexList((isProbabilistic, isObserved, indentation)
+            -> (isProbabilistic && !isObserved) && maxIndentation >= indentation);
     }
 
     /**
      * @return All vertices that are observed - which may be probabilistic or non-probabilistic
      */
     public List<Vertex> getObservedVertices() {
-        return vertices.stream()
-            .filter(Vertex::isObserved)
-            .collect(Collectors.toList());
+        return getObservedVertices(Integer.MAX_VALUE);
+    }
+
+    public List<Vertex> getTopLevelObservedVertices() {
+        return getObservedVertices(TOP_LEVEL_INDENTATION);
+    }
+
+    private List<Vertex> getObservedVertices(int maxIndentation) {
+        return getFilteredVertexList((isProbabilistic, isObserved, indentation) ->
+            isObserved && maxIndentation >= indentation);
     }
 
     public double getLogOfMasterP() {
-        return ProbabilityCalculator.calculateLogProbFor(getLatentAndObservedVertices());
+        return ProbabilityCalculator.calculateLogProbFor(getLatentOrObservedVertices());
     }
 
     public void cascadeObservations() {
@@ -155,6 +195,14 @@ public class BayesianNetwork {
         return getLatentVertices().stream()
             .filter(v -> !(v.getValue() instanceof DoubleTensor))
             .collect(Collectors.toList());
+    }
+
+    public int getIndentation() {
+        return indentation;
+    }
+
+    public void incrementIndentation() {
+        indentation++;
     }
 
 }

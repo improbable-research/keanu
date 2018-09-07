@@ -208,24 +208,33 @@ public class PartialDerivatives {
     }
 
     public PartialDerivatives multiplyBy(DoubleTensor multiplier) {
+        return multiplyBy(multiplier, false);
+    }
+
+    public PartialDerivatives multiplyBy(DoubleTensor multiplier, boolean alongWrtDimensions) {
         Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
-            DoubleTensor v = elementWiseMultiplyDiff(entry.getValue(), multiplier);
+            DoubleTensor v = elementWiseMultiplyDiff(entry.getValue(), multiplier, alongWrtDimensions);
             multiplied.put(k, v);
         }
 
         return new PartialDerivatives(multiplied);
     }
 
-    private DoubleTensor elementWiseMultiplyDiff(DoubleTensor partial, DoubleTensor multiplier) {
+    private DoubleTensor elementWiseMultiplyDiff(DoubleTensor partial, DoubleTensor multiplier, boolean alongWrtDimensions) {
 
         if (multiplier.isScalar()) {
             return partial.times(multiplier.scalar());
         }
 
-        DoubleTensor multiplierReshaped = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
+        DoubleTensor multiplierReshaped;
+        if (alongWrtDimensions) {
+            multiplierReshaped = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
+        } else {
+            multiplierReshaped = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
+        }
 
         if (partial.isScalar()) {
             return multiplierReshaped.times(partial.scalar());
@@ -246,7 +255,7 @@ public class PartialDerivatives {
         }
     }
 
-    public static PartialDerivatives matrixMultiply(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivatives matrixMultiplyAlongOfDimensions(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
         Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
@@ -272,7 +281,7 @@ public class PartialDerivatives {
         return new PartialDerivatives(multiplied);
     }
 
-    public static PartialDerivatives matrixMultiplyReverse(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
+    public static PartialDerivatives matrixMultiplyAlongWrtDimensions(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
         Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partial : partials.derivativeWithRespectTo.entrySet()) {
@@ -405,6 +414,12 @@ public class PartialDerivatives {
         }
 
         return shapeWithOnes;
+    }
+
+    private static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return lowRankTensor.reshape(
+            TensorShape.shapeToDesiredRankByPrependingOnes(lowRankTensor.getShape(), desiredRank)
+        );
     }
 
     private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
