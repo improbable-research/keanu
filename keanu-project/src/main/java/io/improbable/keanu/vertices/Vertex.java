@@ -226,4 +226,15 @@ public abstract class Vertex<T> implements Observable<T> {
         return DiscoverGraph.getEntireGraph(this);
     }
 
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        if (this.getLabel() != null) {
+            stringBuilder.append('"').append(this.getLabel()).append('"').append(": ");
+        }
+        stringBuilder.append(this.getClass().getSimpleName());
+        stringBuilder.append("(" + getValue() + ")");
+        return stringBuilder.toString();
+    }
 }
