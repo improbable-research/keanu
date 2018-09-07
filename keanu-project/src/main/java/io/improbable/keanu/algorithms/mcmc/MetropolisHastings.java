@@ -168,7 +168,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
         bayesNet.cascadeObservations();
-        if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
+        if (bayesNet.getLatentOrObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");

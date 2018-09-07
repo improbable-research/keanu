@@ -236,11 +236,11 @@ public class PartialDerivatives {
         if (TensorShape.isScalar(partialOfShape)) {
 
             int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
+            int[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
 
-            return partial.tensorMultiply(multiplierReshaped,
-                TensorShape.dimensionRange(0, partialOfShape.length),
-                TensorShape.dimensionRange(multiplier.getRank(), partial.getRank())
-            ).reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
+            return DoubleTensor.ones(resultShape)
+                .times(multiplierReshaped)
+                .times(partial);
         } else {
             return partial.times(multiplierReshaped);
         }
