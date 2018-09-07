@@ -37,6 +37,10 @@ public class VertexId implements Comparable<VertexId> {
         idValues[0] = ID_GENERATOR.getAndIncrement();
     }
 
+    public VertexId(long id) {
+        idValues[0] = id;
+    }
+
     @Override
     public int compareTo(VertexId that) {
         long comparisonValue = 0;

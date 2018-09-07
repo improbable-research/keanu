@@ -1,12 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ReshapeVertex extends DoubleUnaryOpVertex {
 
@@ -26,8 +29,22 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        //TODO
-        throw new UnsupportedOperationException("Reverse mode autodiff not supported for this operation");
+        Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
+
+        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+            int[] newPartialShape = updatePartialShapeToMatchInput(partialDerivative.getValue().getShape(), inputVertex.getShape());
+            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
+            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
+        }
+
+        return reshapedDerivatives;
+    }
+
+    private int[] updatePartialShapeToMatchInput(int[] wrtSelfShape, int[] inputShape) {
+        int[] partialShape = Arrays.copyOf(wrtSelfShape, wrtSelfShape.length);
+        int ofLength = partialShape.length - inputShape.length;
+        System.arraycopy(inputShape, 0, partialShape, ofLength, partialShape.length - ofLength);
+        return partialShape;
     }
 
 }
