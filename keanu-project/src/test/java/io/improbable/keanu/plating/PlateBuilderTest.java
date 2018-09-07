@@ -1,10 +1,18 @@
 package io.improbable.keanu.plating;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsInAnyOrder;
+import static org.hamcrest.Matchers.empty;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import static io.improbable.keanu.vertices.VertexMatchers.hasNoLabel;
+import static io.improbable.keanu.vertices.VertexMatchers.hasParents;
 
 import java.util.Arrays;
 import java.util.List;
@@ -15,6 +23,7 @@ import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableSet;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -23,11 +32,14 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 
@@ -262,6 +274,92 @@ public class PlateBuilderTest {
             assertThat(x.getParents(), contains(xPreviousProxy));
             assertThat(y.getParents(), contains(x));
             previousX = x;
+        }
+    }
+
+    @Test
+    public void youCanCreateALoopFromPlatesFromACount() throws VertexLabelException {
+        // inputs
+        VertexLabel plusLabel = new VertexLabel("plus");
+        VertexLabel runningTotalLabel = new VertexLabel("runningTotal");
+        VertexLabel valueOutLabel = new VertexLabel("valueOut");
+
+        // intermediate
+        VertexLabel oneLabel = new VertexLabel("one");
+        VertexLabel conditionLabel = new VertexLabel("condition");
+
+        // outputs
+        VertexLabel valueInLabel = new VertexLabel("valueIn");
+        VertexLabel loopLabel = new VertexLabel("loop");
+        VertexLabel stillLoopingLabel = new VertexLabel("stillLooping");
+
+        // base case
+        DoubleVertex initialSum = ConstantVertex.of(0.).labelled(plusLabel);
+        BoolVertex tru = ConstantVertex.of(true).labelled(loopLabel);
+        DoubleVertex initialValue = ConstantVertex.of(0.).labelled(valueOutLabel);
+
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(initialSum, tru, initialValue)
+            .withProxyMapping(ImmutableMap.of(
+                runningTotalLabel, plusLabel,
+                stillLoopingLabel, loopLabel,
+                valueInLabel, valueOutLabel
+            ))
+            .count(100)
+            .withFactory((plate) -> {
+                // inputs
+                DoubleVertex runningTotal = new DoubleProxyVertex(runningTotalLabel);
+                BoolVertex stillLooping = new BoolProxyVertex(stillLoopingLabel);
+                DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
+                plate.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
+
+                // intermediate
+                DoubleVertex one = ConstantVertex.of(1.).labelled(oneLabel);
+                BoolVertex condition = new BernoulliVertex(0.5).labelled(conditionLabel);
+                plate.addAll(ImmutableSet.of(one, condition));
+
+                // outputs
+                DoubleVertex plus = runningTotal.plus(one).labelled(plusLabel);
+                BoolVertex loopAgain = stillLooping.and(condition).labelled(loopLabel);
+                DoubleVertex result = If.isTrue(loopAgain).then(plus).orElse(valueIn).labelled(valueOutLabel);
+                plate.addAll(ImmutableSet.of(plus, loopAgain, result));
+            })
+            .build();
+
+
+        DoubleVertex previousPlus = initialSum;
+        BoolVertex previousLoop = tru;
+        DoubleVertex previousValueOut = initialValue;
+
+        for (Plate plate : plates) {
+            DoubleVertex runningTotal = plate.get(runningTotalLabel);
+            BoolVertex stillLooping = plate.get(stillLoopingLabel);
+            DoubleVertex valueIn = plate.get(valueInLabel);
+
+            DoubleVertex one = plate.get(oneLabel);
+            BoolVertex condition = plate.get(conditionLabel);
+
+            DoubleVertex plus = plate.get(plusLabel);
+            BoolVertex loop = plate.get(loopLabel);
+            DoubleVertex valueOut = plate.get(valueOutLabel);
+
+            assertThat(runningTotal.getParents(), contains(previousPlus));
+            assertThat(stillLooping.getParents(), contains(previousLoop));
+            assertThat(valueIn.getParents(), contains(previousValueOut));
+
+            assertThat(one.getParents(), is(empty()));
+            assertThat(condition, hasParents(contains(allOf(
+                hasNoLabel(),
+                instanceOf(ConstantDoubleVertex.class)
+            ))));
+
+            assertThat(plus.getParents(), containsInAnyOrder(runningTotal, one));
+            assertThat(loop.getParents(), containsInAnyOrder(condition, stillLooping));
+            assertThat(valueOut.getParents(), containsInAnyOrder(loop, valueIn, plus));
+
+            previousPlus = plus;
+            previousLoop = loop;
+            previousValueOut = valueOut;
         }
     }
 

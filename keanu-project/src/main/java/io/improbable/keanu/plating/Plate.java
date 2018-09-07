@@ -18,6 +18,12 @@ public class Plate implements VertexDictionary {
         this.contents = new HashMap<>();
     }
 
+    public <T extends Vertex<?>> void addAll(Collection<T> vertices) {
+        for (T v : vertices) {
+            add(v);
+        }
+    }
+
     public <T extends Vertex<?>> T add(T v) throws PlateException {
         if (v.getLabel() == null) {
             throw new PlateException("Vertex " + v + " has no label");
