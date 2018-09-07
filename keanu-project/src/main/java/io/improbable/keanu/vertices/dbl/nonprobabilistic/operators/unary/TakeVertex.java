@@ -50,9 +50,9 @@ public class TakeVertex extends DoubleUnaryOpVertex {
             int[] newPartialShape = copyLowRankOverHighRank(partialDerivative.getValue().getShape(), inputVertex.getShape());
             DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
             DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial);
-            DoubleTensor mask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
-            DoubleTensor stretchedWithMask = partialBroadcastToHighRank.times(mask);
-            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), stretchedWithMask));
+            DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
+            DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
+            reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), highRankMask));
         }
 
         return reshapedDerivatives;
