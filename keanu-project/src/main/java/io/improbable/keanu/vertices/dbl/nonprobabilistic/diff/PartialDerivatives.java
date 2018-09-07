@@ -244,10 +244,8 @@ public class PartialDerivatives {
         }
 
         if (TensorShape.isScalar(partialOfShape)) {
-
             int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
             int[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
-
             return DoubleTensor.ones(resultShape)
                 .times(multiplierReshaped)
                 .times(partial);

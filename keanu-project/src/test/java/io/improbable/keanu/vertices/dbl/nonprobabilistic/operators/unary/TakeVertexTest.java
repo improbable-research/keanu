@@ -27,8 +27,8 @@ public class TakeVertexTest {
         Assert.assertEquals(N.getValue(0, 0), take.getValue().scalar(), 1e-6);
         Assert.assertArrayEquals(new int[]{1, 1, 1, 4}, takePartial.getShape());
         Assert.assertArrayEquals(new double[]{10, 0, 0, 0}, takePartial.asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new int[]{1, 1, 1, 4}, takePartialReverse.getShape());
-        Assert.assertArrayEquals(new double[]{10, 0, 0, 0}, takePartialReverse.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(takePartial.getShape(), takePartialReverse.getShape());
+        Assert.assertArrayEquals(takePartial.asFlatDoubleArray(), takePartialReverse.asFlatDoubleArray(), 1e-6);
 
         TakeVertex take2 = new TakeVertex(N, 0, 1);
         DoubleTensor takePartial2 = take2.getDualNumber().getPartialDerivatives().withRespectTo(m);
@@ -37,8 +37,8 @@ public class TakeVertexTest {
         Assert.assertEquals(N.getValue(0, 1), take2.getValue().scalar(), 1e-6);
         Assert.assertArrayEquals(new int[]{1, 1, 1, 4}, takePartial2.getShape());
         Assert.assertArrayEquals(new double[]{0, 15, 0, 0}, takePartial2.asFlatDoubleArray(), 1e-6);
-        Assert.assertArrayEquals(new int[]{1, 1, 1, 4}, takePartial2Reverse.getShape());
-        Assert.assertArrayEquals(new double[]{0, 15, 0, 0}, takePartial2Reverse.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(takePartial2.getShape(), takePartial2Reverse.getShape());
+        Assert.assertArrayEquals(takePartial2.asFlatDoubleArray(), takePartial2Reverse.asFlatDoubleArray(), 1e-6);
     }
 
 
