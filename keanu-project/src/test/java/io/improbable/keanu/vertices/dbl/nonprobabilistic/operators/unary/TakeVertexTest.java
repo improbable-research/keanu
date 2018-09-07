@@ -55,16 +55,22 @@ public class TakeVertexTest {
         TakeVertex take = new TakeVertex(N, 0, 0);
 
         DoubleTensor takePartial = take.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m);
 
         Assert.assertArrayEquals(new int[]{1, 1, 2, 2}, takePartial.getShape());
         Assert.assertArrayEquals(new double[]{10, 20, 0, 0}, takePartial.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(takePartial.getShape(), takePartialReverse.getShape());
+        Assert.assertArrayEquals(takePartial.asFlatDoubleArray(), takePartialReverse.asFlatDoubleArray(), 1e-6);
 
         TakeVertex take2 = new TakeVertex(N, 0, 1);
 
         DoubleTensor takePartial2 = take2.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m);
 
         Assert.assertArrayEquals(new int[]{1, 1, 2, 2}, takePartial2.getShape());
         Assert.assertArrayEquals(new double[]{15, 25, 0, 0}, takePartial2.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(takePartial.getShape(), takePartial2Reverse.getShape());
+        Assert.assertArrayEquals(takePartial2.asFlatDoubleArray(), takePartial2Reverse.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
@@ -96,9 +102,12 @@ public class TakeVertexTest {
 
         TakeVertex take = new TakeVertex(y, 0, 0);
         DoubleTensor takeDual = take.getDualNumber().getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor takeDualReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(alpha);
 
         Assert.assertArrayEquals(new int[]{1, 1, 2, 2}, takeDual.getShape());
         Assert.assertArrayEquals(new double[]{56, 92, 103, 174}, takeDual.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(takeDual.getShape(), takeDualReverse.getShape());
+        Assert.assertArrayEquals(takeDual.asFlatDoubleArray(), takeDualReverse.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
