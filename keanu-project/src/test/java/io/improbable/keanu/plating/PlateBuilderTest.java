@@ -2,13 +2,16 @@ package io.improbable.keanu.plating;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -43,6 +46,9 @@ public class PlateBuilderTest {
         new Bean(0),
         new Bean(0)
     );
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void buildPlatesFromCount_Size() throws VertexLabelException {
@@ -124,6 +130,7 @@ public class PlateBuilderTest {
             assertThat(flip.getParents(), contains(commonTheta));
         }
     }
+
     @Test
     public void youCanPutThePlatesIntoABayesNet() throws VertexLabelException {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
@@ -249,4 +256,51 @@ public class PlateBuilderTest {
             previousX = x;
         }
     }
+
+    @Test
+    public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() throws VertexLabelException {
+        expectedException.expect(VertexLabelException.class);
+        expectedException.expectMessage(startsWith("Cannot find proxy mapping for "));
+        VertexLabel realLabel = new VertexLabel("real");
+        VertexLabel fakeLabel = new VertexLabel("fake");
+        Plates plates = new PlateBuilder<Integer>()
+            .withProxyMapping(ImmutableMap.of(realLabel, realLabel))
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(new DoubleProxyVertex(fakeLabel));
+            })
+            .build();
+    }
+
+    @Test
+    public void itThrowsIfTheresAProxyVertexButNoBaseCase() throws VertexLabelException {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("You must provide a base case for the Proxy Vertices - use withInitialState()");
+        VertexLabel realLabel = new VertexLabel("real");
+        Plates plates = new PlateBuilder<Integer>()
+            .withProxyMapping(ImmutableMap.of(realLabel, realLabel))
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(new DoubleProxyVertex(realLabel));
+            })
+            .build();
+    }
+
+    @Test
+    public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() throws VertexLabelException {
+        expectedException.expect(VertexLabelException.class);
+        expectedException.expectMessage("Cannot find VertexLabel :fake");
+        VertexLabel realLabel = new VertexLabel("real");
+        VertexLabel fakeLabel = new VertexLabel("fake");
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(ConstantVertex.of(1.).labelled(realLabel))
+            .withProxyMapping(ImmutableMap.of(realLabel, fakeLabel))
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(new DoubleProxyVertex(realLabel));
+            })
+            .build();
+    }
+
+
 }

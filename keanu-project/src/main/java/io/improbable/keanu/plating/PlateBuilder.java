@@ -1,5 +1,6 @@
 package io.improbable.keanu.plating;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -34,6 +35,7 @@ public class PlateBuilder<T> {
          * Build plates from current factory settings
          *
          * @return Collection of all created plates
+         * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the proxy mapping
          */
         Plates build() throws VertexLabelException;
     }
@@ -167,7 +169,11 @@ public class PlateBuilder<T> {
     }
 
     private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> proxyMapping) throws VertexLabelException {
-        for (Vertex<?> proxy : plate.getProxyVertices()) {
+        Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
+        if (candidateVertices == null && !proxyVertices.isEmpty()) {
+            throw new IllegalArgumentException("You must provide a base case for the Proxy Vertices - use withInitialState()");
+        }
+        for (Vertex<?> proxy : proxyVertices) {
             VertexLabel label = proxyMapping.get(proxy.getLabel());
             if (label == null) {
                 label = proxyMapping.get(proxy.getLabel().dropNamespace());
