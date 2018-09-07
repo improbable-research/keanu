@@ -183,11 +183,12 @@ public class TensorShape {
     }
 
     /**
-     * Writes a lower rank shape over the top of a higher rank shape, starting from the right.
+     * Writes a lower rank shape over a higher rank shape, starting from the right.
      *
-     * e.g: high rank shape = [1, 2, 2, 1]. low rank shape = [1, 4]
+     * e.g: high rank shape = [1, 2, 2, 1]
+     *      low rank shape = [1, 4]
      *
-     * Result after copy = [1. 2, 1, 4]
+     * Result after copy = [1, 2, 1, 4]
      *
      * @param higherRankShape source shape that will get written over
      * @param lowerRankShape  shape to write
