@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
 public class VertexLabel {
     private static final char NAMESPACE_SEPARATOR = '.';
@@ -39,9 +38,7 @@ public class VertexLabel {
 
     @Override
     public String toString() {
-        ArrayList reversedNamespace = new ArrayList(namespace);
-        Collections.reverse(reversedNamespace);
-        String namespaceString = Joiner.on(NAMESPACE_SEPARATOR).join(reversedNamespace);
+        String namespaceString = Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(namespace));
         return String.format("%s%c%s", namespaceString, NAME_PREPENDER, name);
     }
 
