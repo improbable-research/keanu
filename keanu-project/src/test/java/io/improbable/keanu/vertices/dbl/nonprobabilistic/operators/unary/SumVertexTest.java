@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static org.junit.Assert.assertArrayEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -15,22 +16,12 @@ public class SumVertexTest {
 
     @Test
     public void doesSum() {
+        DoubleVertex a = new UniformVertex(new int[]{1, 5}, 0, 10);
+        a.setValue(new double[]{1, 2, 3, 4, 5});
 
-        DoubleVertex in = new UniformVertex(new int[]{1, 5}, 0, 10);
-        in.setValue(new double[]{1, 2, 3, 4, 5});
+        DoubleVertex summed = a.sum();
 
-        DoubleVertex summed = in.sum();
-
-        DoubleTensor wrtIn = summed.getDualNumber().getPartialDerivatives().withRespectTo(in);
-        DoubleTensor expectedWrtIn = DoubleTensor.ones(1, 1, 1, 5);
-
-        assertEquals(1 + 2 + 3 + 4 + 5, summed.lazyEval().scalar(), 1e-5);
-        assertArrayEquals(
-            expectedWrtIn.asFlatDoubleArray(),
-            wrtIn.asFlatDoubleArray(),
-            1e-5
-        );
-        assertArrayEquals(expectedWrtIn.getShape(), wrtIn.getShape());
+        assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar(), 1e-5);
     }
 
     @Test
@@ -45,8 +36,8 @@ public class SumVertexTest {
 
         DoubleTensor expectedDbDa = DoubleTensor.create(new double[]{1, 1, 1, 1, 1}, 1, 1, 1, 5);
 
-        assertEquals(expectedDbDa, dbdaForward);
-        assertEquals(expectedDbDa, dbdaReverse);
+        assertThat(dbdaForward, equalTo(expectedDbDa));
+        assertThat(dbdaReverse, equalTo(expectedDbDa));
     }
 
     @Test
@@ -77,7 +68,7 @@ public class SumVertexTest {
             7, 7, 7
         }, 2, 2, 2, 3);
 
-        assertEquals(dfdaReverse, expectedDfdx);
-        assertEquals(dfdaForward, expectedDfdx);
+        assertThat(dfdaReverse, equalTo(expectedDfdx));
+        assertThat(dfdaForward, equalTo(expectedDfdx));
     }
 }
