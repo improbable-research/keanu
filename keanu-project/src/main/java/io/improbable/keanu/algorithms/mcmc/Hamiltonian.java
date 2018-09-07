@@ -76,7 +76,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentAndObservedVertices());
+        final List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentOrObservedVertices());
 
         final Map<VertexId, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
