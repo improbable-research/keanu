@@ -237,10 +237,14 @@ public class PartialDerivatives {
 
             int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
 
-            return partial.tensorMultiply(multiplierReshaped,
-                TensorShape.dimensionRange(0, partialOfShape.length),
-                TensorShape.dimensionRange(multiplier.getRank(), partial.getRank())
-            ).reshape(TensorShape.concat(multiplier.getShape(), partialWrtShape));
+            int[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
+
+            DoubleTensor result = DoubleTensor.ones(resultShape)
+                .times(increaseRankByAppendingOnesToShape(multiplier, resultShape.length))
+                .times(partial);
+
+            return result;
+
         } else {
             return partial.times(multiplierReshaped);
         }
