@@ -15,19 +15,23 @@ public class VertexLabel {
     private final List<String> namespace;
 
     public VertexLabel(String name, String... namespace) {
+        this(name, ImmutableList.copyOf(namespace));
+    }
+
+    public VertexLabel(String name, List<String> namespace) {
         this.name = name;
         this.namespace = ImmutableList.copyOf(namespace);
     }
 
     public VertexLabel inNamespace(String topLevelNamespace) {
         List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
-        return new VertexLabel(this.name, newNamespace.toArray(new String[0]));
+        return new VertexLabel(this.name, newNamespace);
     }
 
     public VertexLabel removeOuterNamespace() throws VertexLabelException {
         try {
             List<String> reducedNamespace = namespace.subList(0, namespace.size()-1);
-            return new VertexLabel(this.name, reducedNamespace.toArray(new String[0]));
+            return new VertexLabel(this.name, reducedNamespace);
         } catch (IndexOutOfBoundsException e) {
             throw new VertexLabelException("There is no namespace to remove", e);
         }
