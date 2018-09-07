@@ -111,7 +111,7 @@ public class TakeVertexTest {
     }
 
     @Test
-    public void partialsFlowThroughTake() {
+    public void shapeOfPartialCorrectlyPassesThroughTake() {
         DoubleVertex A = new UniformVertex(0, 10);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 

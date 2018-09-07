@@ -13,6 +13,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
+import static io.improbable.keanu.tensor.TensorShape.copyLowRankOverHighRank;
+
 public class TakeVertex extends DoubleUnaryOpVertex {
 
     private final int[] index;
@@ -44,23 +46,15 @@ public class TakeVertex extends DoubleUnaryOpVertex {
         Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor v = partialDerivative.getValue();
-            int[] newPartialShape = updatePartialShapeToMatchInput(partialDerivative.getValue().getShape(), inputVertex.getShape());
-            DoubleTensor zeros = DoubleTensor.zeros(newPartialShape);
-            DoubleTensor stretched = zeros.plus(v);
-            DoubleTensor mask = DoubleTensor.zeros(inputVertex.getShape());
-            mask.setValue(1., index);
-            DoubleTensor stretchedWithMask = stretched.times(mask);
+            DoubleTensor partial = partialDerivative.getValue();
+            int[] newPartialShape = copyLowRankOverHighRank(partialDerivative.getValue().getShape(), inputVertex.getShape());
+            DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
+            DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial);
+            DoubleTensor mask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
+            DoubleTensor stretchedWithMask = partialBroadcastToHighRank.times(mask);
             reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), stretchedWithMask));
         }
 
         return reshapedDerivatives;
-    }
-
-    private int[] updatePartialShapeToMatchInput(int[] wrtSelfShape, int[] inputShape) {
-        int[] partialShape = Arrays.copyOf(wrtSelfShape, wrtSelfShape.length);
-        int ofLength = partialShape.length - inputShape.length;
-        System.arraycopy(inputShape, 0, partialShape, ofLength, partialShape.length - ofLength);
-        return partialShape;
     }
 }

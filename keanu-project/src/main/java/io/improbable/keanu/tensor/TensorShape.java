@@ -182,5 +182,21 @@ public class TensorShape {
         return newShape;
     }
 
+    /**
+     * Writes a lower rank shape over the top of a higher rank shape, starting from the right.
+     *
+     * e.g: high rank shape = [1, 2, 2, 1]. low rank shape = [1, 4]
+     *
+     * Result after copy = [1. 2, 1, 4]
+     *
+     * @return the high rank shape with the lower rank shape inserted on top of it
+     */
+    public static int[] copyLowRankOverHighRank(int[] higherRankShape, int[] lowerRankShape) {
+        int[] partialShape = Arrays.copyOf(higherRankShape, higherRankShape.length);
+        int ofLength = partialShape.length - lowerRankShape.length;
+        System.arraycopy(lowerRankShape, 0, partialShape, ofLength, partialShape.length - ofLength);
+        return partialShape;
+    }
+
 }
 
