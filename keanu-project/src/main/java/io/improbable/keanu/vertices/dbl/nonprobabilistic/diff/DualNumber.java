@@ -156,13 +156,13 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (this.partialDerivatives.isEmpty()) {
             thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
+            thisInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(this.partialDerivatives, that.value, true);
         }
 
         if (that.partialDerivatives.isEmpty()) {
             thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
+            thatInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(that.partialDerivatives, this.value, false);
         }
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
