@@ -330,7 +330,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor matrixInverse() {
-        return duplicate();
+        return new ScalarDoubleTensor(1 / value);
     }
 
     @Override
