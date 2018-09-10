@@ -230,17 +230,18 @@ public class PartialDerivatives {
         }
 
         DoubleTensor multiplierReshaped;
+        int[] partialOfShape;
         if (alongWrtDimensions) {
             multiplierReshaped = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
+            partialOfShape = Arrays.copyOfRange(partial.getShape(), multiplier.getRank(), partial.getRank());
         } else {
             multiplierReshaped = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
+            partialOfShape = Arrays.copyOfRange(partial.getShape(), 0, multiplier.getRank());
         }
 
         if (partial.isScalar()) {
             return multiplierReshaped.times(partial.scalar());
         }
-
-        int[] partialOfShape = Arrays.copyOfRange(partial.getShape(), 0, multiplier.getRank());
 
         if (TensorShape.isScalar(partialOfShape)) {
 

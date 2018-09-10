@@ -1,16 +1,22 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static org.junit.Assert.assertEquals;
 
 public class OptimizerTest {
 
@@ -91,5 +97,36 @@ public class OptimizerTest {
 
         assertEquals(22, maxA, 0.1);
         assertEquals(22, maxB, 0.1);
+    }
+
+    @Test
+    public void gradientOptimizerCanRemoveFitnessCalculationHandler() {
+        GaussianVertex gaussianVertex = new GaussianVertex(0, 1);
+        GradientOptimizer optimizer = GradientOptimizer.of(gaussianVertex.getConnectedGraph());
+        canRemoveFitnessCalculationHandler(optimizer);
+    }
+
+    @Test
+    public void nonGradientOptimizerCanRemoveFitnessCalculationHandler() {
+        GaussianVertex A = new GaussianVertex(0, 1);
+        GaussianVertex B = new GaussianVertex(0, 1);
+        A.plus(B);
+        NonGradientOptimizer optimizer = NonGradientOptimizer.of(A.getConnectedGraph());
+        canRemoveFitnessCalculationHandler(optimizer);
+    }
+
+    private void canRemoveFitnessCalculationHandler(Optimizer optimizer) {
+
+        AtomicBoolean didCallFitness = new AtomicBoolean(false);
+
+        BiConsumer<double[], Double> fitnessHandler = mock(BiConsumer.class);
+
+        optimizer.addFitnessCalculationHandler(fitnessHandler);
+        optimizer.removeFitnessCalculationHandler(fitnessHandler);
+
+        optimizer.maxAPosteriori();
+
+        assertFalse(didCallFitness.get());
+        verifyNoMoreInteractions(fitnessHandler);
     }
 }

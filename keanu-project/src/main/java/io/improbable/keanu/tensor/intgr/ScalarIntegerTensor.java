@@ -59,8 +59,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public void setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, int... index) {
         this.value = value;
+        return this;
     }
 
     @Override

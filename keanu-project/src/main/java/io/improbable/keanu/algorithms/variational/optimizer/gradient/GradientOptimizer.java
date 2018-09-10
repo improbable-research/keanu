@@ -1,11 +1,13 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.vertices.Vertex;
-import lombok.Builder;
-import lombok.Getter;
+import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.function.BiConsumer;
+
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -14,13 +16,13 @@ import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunction;
 import org.apache.commons.math3.optim.nonlinear.scalar.ObjectiveFunctionGradient;
 import org.apache.commons.math3.optim.nonlinear.scalar.gradient.NonLinearConjugateGradientOptimizer;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.BiConsumer;
-
-import static org.apache.commons.math3.optim.nonlinear.scalar.GoalType.MAXIMIZE;
+import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.FitnessFunction;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.util.ProgressBar;
+import io.improbable.keanu.vertices.Vertex;
+import lombok.Builder;
+import lombok.Getter;
 
 @Builder
 public class GradientOptimizer implements Optimizer {
@@ -82,8 +84,12 @@ public class GradientOptimizer implements Optimizer {
     private final List<BiConsumer<double[], double[]>> onGradientCalculations = new ArrayList<>();
     private final List<BiConsumer<double[], Double>> onFitnessCalculations = new ArrayList<>();
 
-    public void onGradientCalculation(BiConsumer<double[], double[]> gradientCalculationHandler) {
+    public void addGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
         this.onGradientCalculations.add(gradientCalculationHandler);
+    }
+
+    public void removeGradientCalculationHandler(BiConsumer<double[], double[]> gradientCalculationHandler) {
+        this.onGradientCalculations.remove(gradientCalculationHandler);
     }
 
     private void handleGradientCalculation(double[] point, double[] gradients) {
@@ -93,8 +99,13 @@ public class GradientOptimizer implements Optimizer {
     }
 
     @Override
-    public void onFitnessCalculation(BiConsumer<double[], Double> fitnessCalculationHandler) {
+    public void addFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
         this.onFitnessCalculations.add(fitnessCalculationHandler);
+    }
+
+    @Override
+    public void removeFitnessCalculationHandler(BiConsumer<double[], Double> fitnessCalculationHandler) {
+        this.onFitnessCalculations.remove(fitnessCalculationHandler);
     }
 
     private void handleFitnessCalculation(double[] point, Double fitness) {
@@ -120,6 +131,8 @@ public class GradientOptimizer implements Optimizer {
     }
 
     private double optimize(List<Vertex> outputVertices) {
+
+        ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 
         bayesianNetwork.cascadeObservations();
 
@@ -156,6 +169,7 @@ public class GradientOptimizer implements Optimizer {
             new InitialGuess(startingPoint)
         );
 
+        progressBar.finish();
         return pointValuePair.getValue();
     }
 
