@@ -226,7 +226,7 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyDiff(DoubleTensor partial, DoubleTensor multiplier, boolean alongWrtDimensions) {
 
         if (multiplier.isScalar()) {
-            return partial.times(multiplier.scalar()).reshape(partial.getShape());
+            return partial.times(multiplier.scalar());
         }
 
         DoubleTensor multiplierReshaped;
@@ -237,7 +237,7 @@ public class PartialDerivatives {
         }
 
         if (partial.isScalar()) {
-            return multiplierReshaped.times(partial.scalar()).reshape(multiplierReshaped.getShape());
+            return multiplierReshaped.times(partial.scalar());
         }
 
         int[] partialOfShape = Arrays.copyOfRange(partial.getShape(), 0, multiplier.getRank());

@@ -18,14 +18,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     private Double value;
     private int[] shape;
 
-    public ScalarDoubleTensor(double value) {
+    private ScalarDoubleTensor(Double value, int[] shape) {
         this.value = value;
-        this.shape = SCALAR_SHAPE;
+        this.shape = shape;
+    }
+
+    public ScalarDoubleTensor(double value) {
+        this(value, SCALAR_SHAPE);
     }
 
     public ScalarDoubleTensor(int[] shape) {
-        this.value = null;
-        this.shape = shape;
+        this(null, shape);
     }
 
     @Override
@@ -49,8 +52,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor duplicate() {
-        return new ScalarDoubleTensor(value);
+    public ScalarDoubleTensor duplicate() {
+        return new ScalarDoubleTensor(value, shape);
     }
 
     @Override
@@ -97,9 +100,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
         }
 
-        ScalarDoubleTensor reshapedScalar = new ScalarDoubleTensor(value);
-        reshapedScalar.shape = newShape;
-        return reshapedScalar;
+        return new ScalarDoubleTensor(value, newShape);
     }
 
     @Override
@@ -119,7 +120,9 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sum(int... overDimensions) {
-        return duplicate();
+        int[] summedShape = new int[this.shape.length - overDimensions.length];
+        Arrays.fill(summedShape, 1);
+        return new ScalarDoubleTensor(value, summedShape);
     }
 
     @Override
@@ -657,7 +660,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (value < 0. && value + 0.5 == (double) value.intValue()) {
             valueToRound -= 1.;
         }
-        value = new Double(Math.round(valueToRound));
+        value = (double) Math.round(valueToRound);
         return this;
     }
 
