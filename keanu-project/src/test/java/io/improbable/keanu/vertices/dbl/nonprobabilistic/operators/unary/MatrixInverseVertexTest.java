@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -84,6 +85,17 @@ public class MatrixInverseVertexTest {
                 multiplied.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
             assertEquals(changeInMultipliedWrtInput.sum(), 0.0, 1e-10);
         }
+    }
+
+    @Test
+    public void scalarTensorsInvertCorrectly() {
+        DoubleTensor oneByOneMatrix = new ScalarDoubleTensor(2.0);
+        DoubleVertex input = new ConstantDoubleVertex(oneByOneMatrix);
+        DoubleVertex inverse = input.matrixInverse();
+
+        inverse.lazyEval();
+
+        assertEquals(0.5, inverse.getValue().scalar(), 1e-6);
     }
 
 }
