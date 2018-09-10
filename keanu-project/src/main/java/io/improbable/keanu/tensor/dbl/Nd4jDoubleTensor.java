@@ -166,7 +166,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor inverse() {
+    public DoubleTensor matrixInverse() {
         return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
     }
 

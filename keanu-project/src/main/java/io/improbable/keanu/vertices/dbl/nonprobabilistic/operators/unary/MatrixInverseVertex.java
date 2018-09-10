@@ -12,7 +12,7 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return value.inverse();
+        return value.matrixInverse();
     }
 
     @Override
