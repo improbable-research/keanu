@@ -27,14 +27,14 @@ public class MatrixInverseVertexTest {
 
     private void shouldReject(DoubleTensor tensor) {
         DoubleVertex inputVertex = new ConstantDoubleVertex(tensor);
-        DoubleVertex invertVertex = new MatrixInverseVertex(inputVertex);
+        DoubleVertex invertVertex = inputVertex.matrixInverse();
     }
 
     @Test
     public void canTakeInverseCorrectly() {
         DoubleTensor matrix = DoubleTensor.arange(1,5).reshape(2, 2);
         DoubleVertex inputVertex = new ConstantDoubleVertex(matrix);
-        DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
+        DoubleVertex inverseVertex = inputVertex.matrixInverse();
 
         inverseVertex.lazyEval();
 
@@ -47,12 +47,12 @@ public class MatrixInverseVertexTest {
     public void canCalculateDualCorrectly() {
         DoubleVertex matrix = new UniformVertex(1.0, 100.0);
         matrix.setValue(DoubleTensor.arange(1, 5).reshape(2, 2));
-        DoubleVertex inverse = new MatrixInverseVertex(matrix);
+        DoubleVertex inverse = matrix.matrixInverse();
 
         inverse.lazyEval();
 
-        DoubleTensor derivative = inverse.getDualNumber().getPartialDerivatives().withRespectTo(matrix);
-        DoubleTensor expectedDerivative = DoubleTensor.create(new double[]{
+        DoubleTensor inverseWrtMatrix = inverse.getDualNumber().getPartialDerivatives().withRespectTo(matrix);
+        DoubleTensor expectedInverseWrtMatrix = DoubleTensor.create(new double[]{
             -4.0, 3.0,
             2.0, -1.5,
             2.0, -1.0,
@@ -64,14 +64,14 @@ public class MatrixInverseVertexTest {
             new int[]{2, 2, 2, 2}
         );
 
-        assertEquals(expectedDerivative, derivative);
+        assertEquals(expectedInverseWrtMatrix, inverseWrtMatrix);
     }
 
     @Test
     public void inverseMultipliedEqualsIdentity() {
         final int NUM_ITERATIONS = 10;
         DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -20.0, 20.0);
-        DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
+        DoubleVertex inverseVertex = inputVertex.matrixInverse();
         DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
 
         for (int i = 0; i < NUM_ITERATIONS; i++) {
