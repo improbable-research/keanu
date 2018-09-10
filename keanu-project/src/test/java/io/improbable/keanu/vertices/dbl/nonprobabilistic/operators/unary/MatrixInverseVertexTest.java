@@ -28,19 +28,17 @@ public class MatrixInverseVertexTest {
     private void shouldReject(DoubleTensor tensor) {
         DoubleVertex inputVertex = new ConstantDoubleVertex(tensor);
         DoubleVertex invertVertex = new MatrixInverseVertex(inputVertex);
-
-        invertVertex.lazyEval();
     }
 
     @Test
     public void canTakeInverseCorrectly() {
-        DoubleTensor matrix = DoubleTensor.create(new double[]{3, 4, 5, 6}, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
         DoubleVertex inputVertex = new ConstantDoubleVertex(matrix);
         DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
 
         inverseVertex.lazyEval();
 
-        DoubleTensor expected = DoubleTensor.create(new double[]{-3, 2, 2.5, -1.5}, 2, 2);
+        DoubleTensor expected = DoubleTensor.create(new double[]{-2, 1, 1.5, -0.5}, 2, 2);
 
         assertEquals(expected, inverseVertex.getValue());
     }
@@ -53,16 +51,26 @@ public class MatrixInverseVertexTest {
 
         inverse.lazyEval();
 
-        DoubleTensor partialD = inverse.getDualNumber().getPartialDerivatives().withRespectTo(matrix);
+        DoubleTensor derivative = inverse.getDualNumber().getPartialDerivatives().withRespectTo(matrix);
+        DoubleTensor expectedDerivative = DoubleTensor.create(new double[]{
+            -4.0, 3.0,
+            2.0, -1.5,
+            2.0, -1.0,
+            -1.0, 0.5,
+            3.0, -2.25,
+            -1.0, 0.75,
+            -1.5, 0.75,
+            0.5, -0.25},
+            new int[]{2,2,2,2}
+        );
 
-        System.out.println(inverse.getValue());
-        System.out.println(partialD);
+        assertEquals(expectedDerivative, derivative);
     }
 
     @Test
     public void inverseMultipliedEqualsIdentity() {
         final int NUM_ITERATIONS = 10;
-        DoubleVertex inputVertex = new UniformVertex(new int[]{3,3}, -20.0, 20.0);
+        DoubleVertex inputVertex = new UniformVertex(new int[]{4,4}, -20.0, 20.0);
         DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
         DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
 
@@ -70,7 +78,7 @@ public class MatrixInverseVertexTest {
             inputVertex.setValue(inputVertex.sample());
             DoubleTensor result = multiplied.eval();
 
-            assertEquals(result, DoubleTensor.eye(3));
+            assertEquals(result, DoubleTensor.eye(4));
 
             DoubleTensor changeInMultipliedWrtInput =
                 multiplied.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);

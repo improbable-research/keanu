@@ -176,8 +176,8 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
             DoubleTensor negatedValue = newValue.unaryMinus();
-            PartialDerivatives newInf = PartialDerivatives.matrixMultiply(this.partialDerivatives, negatedValue, false);
-            newInf = PartialDerivatives.matrixMultiply(newInf, newValue, true);
+            PartialDerivatives newInf = PartialDerivatives.matrixMultiplyAlongOfDimensions(this.partialDerivatives, negatedValue, false);
+            newInf = PartialDerivatives.matrixMultiplyAlongOfDimensions(newInf, newValue, true);
             return new DualNumber(newValue, newInf);
         }
     }
