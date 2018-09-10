@@ -194,7 +194,7 @@ public class TensorShape {
      * @param lowerRankShape  shape to write
      * @return the high rank  shape with the lower rank shape inserted on top of it
      */
-    public static int[] writeLowRankOverHighRankFromTailEnd(int[] higherRankShape, int[] lowerRankShape) {
+    public static int[] copyLowRankOverHighRankFromTailEnd(int[] higherRankShape, int[] lowerRankShape) {
         int[] highRankCopy = Arrays.copyOf(higherRankShape, higherRankShape.length);
         int deltaLength = highRankCopy.length - lowerRankShape.length;
         System.arraycopy(lowerRankShape, 0, highRankCopy, deltaLength, highRankCopy.length - deltaLength);

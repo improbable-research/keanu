@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 import java.util.HashMap;
 import java.util.Map;
 
-import static io.improbable.keanu.tensor.TensorShape.writeLowRankOverHighRankFromTailEnd;
+import static io.improbable.keanu.tensor.TensorShape.copyLowRankOverHighRankFromTailEnd;
 
 public class ReshapeVertex extends DoubleUnaryOpVertex {
 
@@ -33,7 +33,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
         Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            int[] newPartialShape = writeLowRankOverHighRankFromTailEnd(partialDerivative.getValue().getShape(), inputVertex.getShape());
+            int[] newPartialShape = copyLowRankOverHighRankFromTailEnd(partialDerivative.getValue().getShape(), inputVertex.getShape());
             DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
             reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
         }
