@@ -172,23 +172,23 @@ public class DoubleIfVertexTest {
 
     @Test
     public void canExtractDualNumberFromMixedPredicateWithDifferentParentsAndFillInZeroesRankThree() {
-        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false, true}, 3, 3));
+        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(DoubleTensor.arange(0, 9).reshape(3, 3));
+        a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         DoubleVertex b = new UniformVertex(0, 10);
-        b.setValue(DoubleTensor.arange(10, 19).reshape(3, 3));
+        b.setValue(DoubleTensor.arange(10, 18).reshape(2, 2, 2));
 
-        DoubleVertex c = a.matrixMultiply(b);
+        DoubleVertex c = a.times(b);
 
         DoubleVertex d = new UniformVertex(0, 10);
-        d.setValue(DoubleTensor.arange(20, 29).reshape(3, 3));
+        d.setValue(DoubleTensor.arange(20, 28).reshape(2, 2, 2));
 
         DoubleVertex e = new UniformVertex(0, 10);
-        e.setValue(DoubleTensor.arange(30, 39).reshape(3, 3));
+        e.setValue(DoubleTensor.arange(30, 38).reshape(2, 2, 2));
 
-        DoubleVertex f = d.matrixMultiply(e);
+        DoubleVertex f = d.plus(e);
 
         DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
         DoubleTensor dFdd = f.getDualNumber().getPartialDerivatives().withRespectTo(d);
