@@ -60,7 +60,7 @@ public class InverseGammaVertexTest {
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5, aTensor, bTensor, tensorInverseGammaVertex);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

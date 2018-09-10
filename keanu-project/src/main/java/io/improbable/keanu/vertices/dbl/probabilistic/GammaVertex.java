@@ -7,12 +7,15 @@ import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrepend
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -75,10 +78,26 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
         Diffs dlnP = Gamma.withParameters(theta.getValue(), k.getValue()).dLogProb(value);
 
-        return convertDualNumbersToDiff(dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
+        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+        if (withRespectTo.contains(theta)) {
+            dLogProbWrtParameters.put(theta.getId(), dlnP.get(THETA).getValue());
+        }
+
+        if (withRespectTo.contains(k)) {
+            dLogProbWrtParameters.put(k.getId(), dlnP.get(K).getValue());
+        }
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+        }
+
+        return dLogProbWrtParameters;
+
+//        return convertDualNumbersToDiff(dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdtheta,

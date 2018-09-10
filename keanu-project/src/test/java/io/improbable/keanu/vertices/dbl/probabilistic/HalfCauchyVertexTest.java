@@ -73,7 +73,7 @@ public class HalfCauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(scaleTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

@@ -246,7 +246,7 @@ public class ProbabilisticDoubleTensorContract {
 
             expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
-                    scalarVertex.dLogPdf(vector[i])
+                    scalarVertex.dLogPdf(vector[i], scalarVertex)
                 )
             );
         }

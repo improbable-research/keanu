@@ -1,7 +1,10 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import com.google.common.collect.ImmutableList;
 
@@ -24,12 +27,16 @@ public interface Probabilistic<T> extends Observable<T> {
     /**
      * The partial derivatives of the natural log prob.
      *
-     * @param value at a given value
+     * @param atValue at a given value
      * @return the partial derivatives of the log of the probability function at the supplied value.
      * For continuous variables this is called the PDF (probability density function).
      * For discrete variables this is called the PMF (probability mass function).
      */
-    Map<VertexId, DoubleTensor> dLogProb(T value);
+    Map<VertexId, DoubleTensor> dLogProb(T atValue, Set<Vertex> withRespectTo);
+
+    default Map<VertexId, DoubleTensor> dLogProb(T atValue, Vertex... withRespectTo) {
+        return dLogProb(atValue, new HashSet<>(Arrays.asList(withRespectTo)));
+    }
 
     T getValue();
 
@@ -39,8 +46,12 @@ public interface Probabilistic<T> extends Observable<T> {
         return logProb(getValue());
     }
 
-    default Map<VertexId, DoubleTensor> dLogProbAtValue() {
-        return dLogProb(getValue());
+    default Map<VertexId, DoubleTensor> dLogProbAtValue(Set<Vertex> withRespectTo) {
+        return dLogProb(getValue(), withRespectTo);
+    }
+
+    default Map<VertexId, DoubleTensor> dLogProbAtValue(Vertex... withRespectTo) {
+        return dLogProb(getValue(), new HashSet<>(Arrays.asList(withRespectTo)));
     }
 
     static <V extends Vertex & Probabilistic> List<V> keepOnlyProbabilisticVertices(Iterable<? extends Vertex> vertices) {

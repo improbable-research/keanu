@@ -5,11 +5,13 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -57,10 +59,14 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor t) {
-        Diffs diff = StudentT.withParameters(v.getValue()).dLogProb(t);
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor t, Set<Vertex> withRespect) {
         Map<VertexId, DoubleTensor> m = new HashMap<>();
-        m.put(getId(), diff.get(T).getValue());
+
+        if (withRespect.contains(this)) {
+            Diffs diff = StudentT.withParameters(v.getValue()).dLogProb(t);
+            m.put(getId(), diff.get(T).getValue());
+        }
+
         return m;
     }
 

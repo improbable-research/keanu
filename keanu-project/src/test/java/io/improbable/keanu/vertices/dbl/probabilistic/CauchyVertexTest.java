@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,7 @@ public class CauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         CauchyVertex tensorCauchyVertex = new CauchyVertex(locationTensor, scaleTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5, locationTensor, scaleTensor, tensorCauchyVertex);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

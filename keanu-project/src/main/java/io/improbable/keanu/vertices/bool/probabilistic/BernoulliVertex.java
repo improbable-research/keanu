@@ -2,11 +2,12 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -15,7 +16,6 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
@@ -64,21 +64,26 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(BooleanTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(BooleanTensor value, Set<Vertex> withRespectTo) {
 
         if (!(probTrue instanceof Differentiable)) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
         }
 
-        PartialDerivatives probTruePartialDerivatives = ((Differentiable) probTrue).getDualNumber().getPartialDerivatives();
+//        PartialDerivatives probTruePartialDerivatives = ((Differentiable) probTrue).getDualNumber().getPartialDerivatives();
 
-        DoubleTensor dLogPdp = Bernoulli.withParameters(probTrue.getValue()).dLogProb(value);
+        if (withRespectTo.contains(probTrue)) {
+            DoubleTensor dLogPdp = Bernoulli.withParameters(probTrue.getValue()).dLogProb(value);
+            return Collections.singletonMap(probTrue.getId(), dLogPdp);
+        }
 
-        PartialDerivatives partials = probTruePartialDerivatives
-            .multiplyBy(dLogPdp)
-            .sum(true, TensorShape.dimensionRange(0, value.getRank()));
+        return Collections.emptyMap();
 
-        return partials.asMap();
+//        PartialDerivatives partials = probTruePartialDerivatives
+//            .multiplyBy(dLogPdp)
+//            .sum(true, TensorShape.dimensionRange(0, value.getRank()));
+//
+//        return partials.asMap();
     }
 
     @Override

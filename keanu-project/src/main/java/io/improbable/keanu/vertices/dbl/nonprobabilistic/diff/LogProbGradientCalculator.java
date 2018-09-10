@@ -6,33 +6,38 @@ import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 
-public class LogProbGradient {
+public class LogProbGradientCalculator {
 
-    private LogProbGradient() {
+    private final List<? extends Vertex> ofVertices;
+    private final List<? extends Vertex> wrtVertices;
+
+    public LogProbGradientCalculator(List<? extends Vertex> ofVertices, List<? extends Vertex> wrtVertices) {
+        this.ofVertices = ofVertices;
+        this.wrtVertices = wrtVertices;
     }
 
     /**
-     * @param probabilisticVertices vertices to use in LogProb calc
      * @return the partial derivatives with respect to any latents upstream
      */
-    public static Map<VertexId, DoubleTensor> getJointLogProbGradientWrtLatents(List<? extends Probabilistic> probabilisticVertices) {
+    public Map<VertexId, DoubleTensor> getJointLogProbGradientWrtLatents() {
         final Map<VertexId, DoubleTensor> diffOfLogWrt = new HashMap<>();
 
-        for (final Probabilistic probabilisticVertex : probabilisticVertices) {
+        for (final Vertex<?> probabilisticVertex : ofVertices) {
             getLogProbGradientWrtLatents(probabilisticVertex, diffOfLogWrt);
         }
 
         return diffOfLogWrt;
     }
 
-    public static Map<VertexId, DoubleTensor> getLogProbGradientWrtLatents(final Probabilistic probabilisticVertex,
-                                                                       final Map<VertexId, DoubleTensor> diffOfLogProbWrt) {
+    public <T> Map<VertexId, DoubleTensor> getLogProbGradientWrtLatents(final Vertex<T> probabilisticVertex,
+                                                                        final Map<VertexId, DoubleTensor> diffOfLogProbWrt) {
         //dlogProbForProbabilisticVertex is the partial differentials of the natural
         //log of the fitness vertex's probability w.r.t latent vertices. The key of the
         //map is the latent vertex's id.
-        final Map<VertexId, DoubleTensor> dlogProbForProbabilisticVertex = probabilisticVertex.dLogProbAtValue();
+        final Map<VertexId, DoubleTensor> dlogProbForProbabilisticVertex = ((Probabilistic<T>) probabilisticVertex).dLogProbAtValue(probabilisticVertex.getParents());
 
         for (Map.Entry<VertexId, DoubleTensor> partialDiffLogPWrt : dlogProbForProbabilisticVertex.entrySet()) {
             final VertexId wrtLatentVertexId = partialDiffLogPWrt.getKey();
@@ -50,10 +55,6 @@ public class LogProbGradient {
         }
 
         return diffOfLogProbWrt;
-    }
-
-    public static Map<VertexId, DoubleTensor> getLogProbGradientWrtLatents(final Probabilistic probabilisticVertex) {
-        return getLogProbGradientWrtLatents(probabilisticVertex, new HashMap<>());
     }
 
 }

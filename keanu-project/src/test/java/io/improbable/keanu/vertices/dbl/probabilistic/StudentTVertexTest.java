@@ -88,7 +88,7 @@ public class StudentTVertexTest {
 
         for (double t = -4.5; t <= 4.5; t += 0.5) {
             double expected;
-            double actual = studentT.dLogPdf(t).get(studentT.getId()).scalar();
+            double actual = studentT.dLogPdf(t, studentT).get(studentT.getId()).scalar();
             switch (v) {
                 case 1:
                     expected = (-2 * t) / (pow(t, 2) + 1.);

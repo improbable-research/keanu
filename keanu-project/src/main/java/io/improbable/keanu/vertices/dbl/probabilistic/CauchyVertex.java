@@ -7,12 +7,15 @@ import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrepend
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -91,14 +94,31 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
         Diffs dlnP = Cauchy.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
+
+        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+        if (withRespectTo.contains(location)) {
+            dLogProbWrtParameters.put(location.getId(), dlnP.get(L).getValue());
+        }
+
+        if (withRespectTo.contains(scale)) {
+            dLogProbWrtParameters.put(scale.getId(), dlnP.get(S).getValue());
+        }
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+        }
+
+        return dLogProbWrtParameters;
+
+//        return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
-                                                             DoubleTensor dLogPdscale,
-                                                             DoubleTensor dLogPdx) {
+                                                                 DoubleTensor dLogPdscale,
+                                                                 DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputsFromLocation = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlocation);
         PartialDerivatives dLogPdInputsFromScale = scale.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdscale);

@@ -7,7 +7,9 @@ import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrepend
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.dual.Diffs;
@@ -91,9 +93,26 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
         Diffs dlnP = Pareto.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
+
+        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+        if (withRespectTo.contains(location)) {
+            dLogProbWrtParameters.put(location.getId(), dlnP.get(L).getValue());
+        }
+
+        if (withRespectTo.contains(scale)) {
+            dLogProbWrtParameters.put(scale.getId(), dlnP.get(S).getValue());
+        }
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+        }
+
+        return dLogProbWrtParameters;
+
+//        return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdLocation,

@@ -61,7 +61,7 @@ public class ParetoVertexTest {
         scaleTensor.setValue(1.5);
 
         ParetoVertex vertex = new ParetoVertex(locationTensor, scaleTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5, locationTensor, scaleTensor, vertex);
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 
         assertEquals(paretoLogDiff.dPdLocation, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);

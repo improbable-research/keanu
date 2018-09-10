@@ -88,7 +88,7 @@ public class KDEApproximationTest {
             DoubleTensor.scalar(sigma)
         ).dLogProb(xTensor);
 
-        DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor).get(KDE.getId());
+        DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor, KDE).get(KDE.getId());
         DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
@@ -106,7 +106,7 @@ public class KDEApproximationTest {
         KDEVertex KDE = GaussianKDE.approximate(samples);
 
         DoubleTensor x = DoubleTensor.linspace(-1., 1., 100);
-        DoubleTensor approximateDerivative = KDE.dLogPdf(x).get(KDE.getId());
+        DoubleTensor approximateDerivative = KDE.dLogPdf(x, KDE).get(KDE.getId());
         DoubleTensor expectedDerivative = gaussian.dLogProb(x).get(gaussian.getId());
 
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);

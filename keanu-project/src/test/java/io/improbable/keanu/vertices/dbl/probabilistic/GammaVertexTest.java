@@ -63,7 +63,7 @@ public class GammaVertexTest {
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(thetaTensor, kTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5));
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

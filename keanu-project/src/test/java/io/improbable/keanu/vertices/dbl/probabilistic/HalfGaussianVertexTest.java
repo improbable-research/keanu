@@ -73,7 +73,7 @@ public class HalfGaussianVertexTest {
         sigmaTensor.setValue(1.0);
 
         HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(sigmaTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5);
+        Map<VertexId, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, sigmaTensor, tensorGaussianVertex);
 
         PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
 

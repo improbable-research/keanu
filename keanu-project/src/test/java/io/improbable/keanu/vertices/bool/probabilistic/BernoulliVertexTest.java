@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.bool.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.testGradientAcrossMultipleHyperParameterValues;
 
 import java.util.Map;
 
 import org.junit.Rule;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableSet;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
@@ -51,7 +54,7 @@ public class BernoulliVertexTest {
         DoubleVertex C = A.times(B);
         BernoulliVertex D = new BernoulliVertex(C);
 
-        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}));
+        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}), ImmutableSet.of(A, B));
 
         DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.5, (-1.0 / 0.88) * 0.2});
         DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.25, (-1.0 / 0.88) * 0.6});
@@ -129,7 +132,7 @@ public class BernoulliVertexTest {
             true, true
         }, shape);
 
-        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(atValue);
+        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(atValue, ImmutableSet.of(A, B));
 
         DoubleTensor expectedWrtA = atValue.setDoubleIf(
             AValue.reciprocal(),
