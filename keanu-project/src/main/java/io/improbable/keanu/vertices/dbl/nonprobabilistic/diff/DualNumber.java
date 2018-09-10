@@ -169,7 +169,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(newValue, newInf);
     }
 
-    public DualNumber inverse() {
+    public DualNumber matrixInverse() {
         //dc = -A^-1 * da * A^-1
         DoubleTensor newValue = this.value.inverse();
 

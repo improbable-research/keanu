@@ -6,8 +6,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 
 public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
-    public MatrixInverseVertex(DoubleVertex parent) {
-        super(checkInputIsSquareMatrix(parent.getShape()), parent);
+    public MatrixInverseVertex(DoubleVertex inputVertex) {
+        super(checkInputIsSquareMatrix(inputVertex.getShape()), inputVertex);
     }
 
     @Override
@@ -17,7 +17,7 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.inverse();
+        return dualNumber.matrixInverse();
     }
 
     private static int[] checkInputIsSquareMatrix(int[] shape) {
