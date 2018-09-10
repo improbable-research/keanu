@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.math3.util.Pair;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
@@ -75,7 +76,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
         }
 
-        final DoubleTensor concattedValues = dualValues[0].concat(dimension, Arrays.copyOfRange(dualValues, 1, dualValues.length));
+        final DoubleTensor concattedValues = Nd4jDoubleTensor.concat(dimension, dualValues);
         return new DualNumber(concattedValues, concattedDualNumbers);
     }
 
@@ -83,9 +84,8 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {
-            DoubleTensor primaryTensor = partialDerivates.remove(0);
             DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
-            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+            return Nd4jDoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
         }
     }
 

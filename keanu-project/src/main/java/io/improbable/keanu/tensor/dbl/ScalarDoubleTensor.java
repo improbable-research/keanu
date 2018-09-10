@@ -12,6 +12,8 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -26,6 +28,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public ScalarDoubleTensor(int[] shape) {
         this.value = null;
         this.shape = shape;
+    }
+
+    public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+        return Nd4jDoubleTensor.concat(dimension, toConcat);
     }
 
     @Override
@@ -421,11 +427,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
         } else {
             throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
         }
-    }
-
-    @Override
-    public DoubleTensor concat(int dimension, DoubleTensor... those) {
-        return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
     }
 
     @Override

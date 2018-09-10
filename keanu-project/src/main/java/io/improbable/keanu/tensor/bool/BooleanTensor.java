@@ -71,6 +71,4 @@ public interface BooleanTensor extends Tensor<Boolean> {
     @Override
     BooleanTensor slice(int dimension, int index);
 
-    BooleanTensor concat(int dimension, BooleanTensor... those);
-
 }

@@ -25,6 +25,10 @@ public class ScalarIntegerTensor implements IntegerTensor {
         this.shape = shape;
     }
 
+    public static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
+        return Nd4jIntegerTensor.concat(dimension, toConcat);
+    }
+
     @Override
     public int getRank() {
         return shape.length;
@@ -253,11 +257,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
         } else {
             throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
         }
-    }
-
-    @Override
-    public IntegerTensor concat(int dimension, IntegerTensor... those) {
-        return Nd4jIntegerTensor.scalar(value).concat(dimension, those);
     }
 
     @Override

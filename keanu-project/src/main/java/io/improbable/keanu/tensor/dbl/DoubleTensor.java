@@ -199,8 +199,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return slicedTensors;
     }
 
-    DoubleTensor concat(int dimension, DoubleTensor... those);
-
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();

@@ -344,11 +344,11 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
         DoubleTensor y = Nd4jDoubleTensor.create(new double[]{4, 5, 6}, new int[]{1, 3});
 
-        DoubleTensor concatDimensionZero = x.concat(0, y);
+        DoubleTensor concatDimensionZero = Nd4jDoubleTensor.concat(0, x, y);
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatDimensionZero.asFlatDoubleArray(), 1e-6);
 
-        DoubleTensor concatDimensionOne = x.concat(1, y);
+        DoubleTensor concatDimensionOne = Nd4jDoubleTensor.concat(1, x, y);
         DoubleTensor permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0);
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, permuttedConcatDimensionOne.asFlatDoubleArray(), 1e-6);
@@ -356,11 +356,11 @@ public class Nd4jDoubleTensorTest {
         x = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
         y = Nd4jDoubleTensor.create(new double[]{9, 10, 11, 12, 13, 14, 15, 16}, new int[]{2, 2, 2});
 
-        concatDimensionZero = x.concat(0, y);
+        concatDimensionZero = Nd4jDoubleTensor.concat(0, x, y);
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, concatDimensionZero.asFlatDoubleArray(), 1e-6);
 
-        concatDimensionOne = x.concat(1, y);
+        concatDimensionOne = Nd4jDoubleTensor.concat(1, x, y);
         permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0, 2);
 
         double[] sliced = new double[permuttedConcatDimensionOne.asFlatDoubleArray().length / 2];
@@ -742,7 +742,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor B = DoubleTensor.arange(24, 96).reshape(2, 3, 3, 4);
         DoubleTensor C = DoubleTensor.arange(96, 144).reshape(2, 3, 2, 4);
 
-        DoubleTensor D = A.concat(dim, B, C);
+        DoubleTensor D = Nd4jDoubleTensor.concat(dim, A, B, C);
         List<DoubleTensor> splitTensor = D.split(dim, new int[]{1, 4, 6});
 
         DoubleTensor[] concatList = new DoubleTensor[]{A, B, C};
@@ -813,7 +813,7 @@ public class Nd4jDoubleTensorTest {
             previousEndLength = newEndLength;
         }
 
-        DoubleTensor D = toConcat.get(0).concat(concatenatedDimension, toConcat.subList(1, toConcat.size()).toArray(new DoubleTensor[toConcat.size() - 1]));
+        DoubleTensor D = Nd4jDoubleTensor.concat(concatenatedDimension, toConcat.toArray(new DoubleTensor[toConcat.size() - 1]));
         List<DoubleTensor> splitTensor = D.split(concatenatedDimension, splitIndices);
 
         for (int i = 0; i < splitTensor.size(); i++) {

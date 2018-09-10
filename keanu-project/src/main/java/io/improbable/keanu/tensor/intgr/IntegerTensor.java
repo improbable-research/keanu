@@ -125,8 +125,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     @Override
     IntegerTensor slice(int dimension, int index);
 
-    IntegerTensor concat(int dimension, IntegerTensor... those);
-
     // In Place
 
     IntegerTensor minusInPlace(int value);
