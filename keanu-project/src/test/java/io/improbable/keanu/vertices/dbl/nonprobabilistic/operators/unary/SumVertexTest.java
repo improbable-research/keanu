@@ -54,7 +54,7 @@ public class SumVertexTest {
 
         DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a, e);
+        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
@@ -86,7 +86,7 @@ public class SumVertexTest {
 
         DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a, e);
+        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
@@ -112,7 +112,7 @@ public class SumVertexTest {
 
         DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a, e);
+        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
         DoubleTensor expectedDfdx = DoubleTensor.create(new double[]{
