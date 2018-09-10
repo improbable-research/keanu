@@ -49,15 +49,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.zeros(shape, BUFFER_TYPE));
     }
 
-    public static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
-        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
-        for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = unsafeGetNd4J(toConcat[i]).dup();
-        }
-        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
-        return new Nd4jIntegerTensor(concat);
-    }
-
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, int[] shape) {
@@ -586,7 +577,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return tensor.toString();
     }
 
-    private static INDArray unsafeGetNd4J(IntegerTensor that) {
+    static INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar().doubleValue(), BUFFER_TYPE).reshape(that.getShape());
         }

@@ -25,10 +25,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
         this.shape = shape;
     }
 
-    public static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
-        return Nd4jIntegerTensor.concat(dimension, toConcat);
-    }
-
     @Override
     public int getRank() {
         return shape.length;

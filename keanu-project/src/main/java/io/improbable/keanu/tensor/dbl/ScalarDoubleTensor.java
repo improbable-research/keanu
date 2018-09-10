@@ -30,10 +30,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
         this.shape = shape;
     }
 
-    public static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
-        return Nd4jDoubleTensor.concat(dimension, toConcat);
-    }
-
     @Override
     public int getRank() {
         return shape.length;

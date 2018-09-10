@@ -7,6 +7,8 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
@@ -66,6 +68,15 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     static IntegerTensor placeHolder(int[] shape) {
         return new ScalarIntegerTensor(shape);
+    }
+
+    static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
+        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
+        for (int i = 0; i < toConcat.length; i++) {
+            concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
+        }
+        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
+        return new Nd4jIntegerTensor(concat);
     }
 
     @Override

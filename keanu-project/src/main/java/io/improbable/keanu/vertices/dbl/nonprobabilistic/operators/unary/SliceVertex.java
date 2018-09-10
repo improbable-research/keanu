@@ -65,16 +65,16 @@ public class SliceVertex extends DoubleUnaryOpVertex {
 
         if (index == 0) {
             partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return Nd4jDoubleTensor.concat(dimensionOfWrtToExtend, tensor, DoubleTensor.zeros(partialShape));
+            return DoubleTensor.concat(dimensionOfWrtToExtend, tensor, DoubleTensor.zeros(partialShape));
         } else if (index == lengthInSlicedDimension) {
             partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return Nd4jDoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape), tensor);
+            return DoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape), tensor);
         } else {
             int[] zerosBeforeSlice = Arrays.copyOf(partialShape, partialShape.length);
             int[] zerosAfterSlice = Arrays.copyOf(partialShape, partialShape.length);
             zerosBeforeSlice[dimensionOfWrtToExtend] = index;
             zerosAfterSlice[dimensionOfWrtToExtend] = lengthInSlicedDimension - index;
-            return Nd4jDoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(zerosBeforeSlice), tensor, DoubleTensor.zeros(zerosAfterSlice));
+            return DoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(zerosBeforeSlice), tensor, DoubleTensor.zeros(zerosAfterSlice));
         }
     }
 

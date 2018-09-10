@@ -43,7 +43,7 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {
-        return SimpleBooleanTensor.concat(dimension, inputs);
+        return BooleanTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func) {

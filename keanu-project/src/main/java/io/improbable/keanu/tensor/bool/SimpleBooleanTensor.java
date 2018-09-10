@@ -69,24 +69,6 @@ public class SimpleBooleanTensor implements BooleanTensor {
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
-    public static BooleanTensor concat(int dimension, BooleanTensor[] toConcat) {
-        DoubleTensor[] toDoubles = new DoubleTensor[toConcat.length];
-
-        for (int i = 0; i < toConcat.length; i++) {
-            toDoubles[i] = toConcat[i].toDoubleMask();
-        }
-
-        DoubleTensor concat = Nd4jDoubleTensor.concat(dimension, toDoubles);
-        double[] concatFlat = concat.asFlatDoubleArray();
-        boolean[] data = new boolean[concat.asFlatDoubleArray().length];
-
-        for (int i = 0; i < data.length; i++) {
-            data[i] = concatFlat[i] == 1.0;
-        }
-
-        return new SimpleBooleanTensor(data, concat.getShape());
-    }
-
     @Override
     public BooleanTensor reshape(int... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {

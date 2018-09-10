@@ -76,7 +76,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
         }
 
-        final DoubleTensor concattedValues = Nd4jDoubleTensor.concat(dimension, dualValues);
+        final DoubleTensor concattedValues = DoubleTensor.concat(dimension, dualValues);
         return new DualNumber(concattedValues, concattedDualNumbers);
     }
 
@@ -85,7 +85,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             return partialDerivates.get(0);
         } else {
             DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
-            return Nd4jDoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+            return DoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
         }
     }
 

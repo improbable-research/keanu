@@ -90,7 +90,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
-        return Nd4jDoubleTensor.concat(dimension, inputs);
+        return DoubleTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func) {

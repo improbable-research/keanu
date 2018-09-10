@@ -43,7 +43,7 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     }
 
     private IntegerTensor op(IntegerTensor... inputs) {
-        return Nd4jIntegerTensor.concat(dimension, inputs);
+        return IntegerTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<IntegerTensor>, T> func) {
