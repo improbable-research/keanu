@@ -53,7 +53,7 @@ public interface Tensor<T> {
 
     T getValue(int... index);
 
-    void setValue(T value, int... index);
+    Tensor<T> setValue(T value, int... index);
 
     T scalar();
 
