@@ -13,14 +13,14 @@ public class MatrixInverseVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNonSquareInput() {
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 4, 2);
+        DoubleTensor matrix = DoubleTensor.arange(1, 9).reshape(4, 2);
 
         shouldReject(matrix);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNonMatrix() {
-        DoubleTensor tensor = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, 2, 2, 2);
+        DoubleTensor tensor = DoubleTensor.arange(1,9).reshape(2, 2, 2);
 
         shouldReject(tensor);
     }
@@ -32,7 +32,7 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void canTakeInverseCorrectly() {
-        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor matrix = DoubleTensor.arange(1,5).reshape(2, 2);
         DoubleVertex inputVertex = new ConstantDoubleVertex(matrix);
         DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
 
@@ -46,7 +46,7 @@ public class MatrixInverseVertexTest {
     @Test
     public void canCalculateDualCorrectly() {
         DoubleVertex matrix = new UniformVertex(1.0, 100.0);
-        matrix.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+        matrix.setValue(DoubleTensor.arange(1, 5).reshape(2, 2));
         DoubleVertex inverse = new MatrixInverseVertex(matrix);
 
         inverse.lazyEval();
@@ -61,7 +61,7 @@ public class MatrixInverseVertexTest {
             -1.0, 0.75,
             -1.5, 0.75,
             0.5, -0.25},
-            new int[]{2,2,2,2}
+            new int[]{2, 2, 2, 2}
         );
 
         assertEquals(expectedDerivative, derivative);
@@ -70,7 +70,7 @@ public class MatrixInverseVertexTest {
     @Test
     public void inverseMultipliedEqualsIdentity() {
         final int NUM_ITERATIONS = 10;
-        DoubleVertex inputVertex = new UniformVertex(new int[]{4,4}, -20.0, 20.0);
+        DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = new MatrixInverseVertex(inputVertex);
         DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
 
