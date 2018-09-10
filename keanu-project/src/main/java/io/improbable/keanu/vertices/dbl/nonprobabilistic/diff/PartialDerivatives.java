@@ -45,9 +45,10 @@ public class PartialDerivatives {
             DoubleTensor broadcastedTrueMask;
             DoubleTensor broadcastedFalseMask;
             int[] range = TensorShape.dimensionRange(0, thnPartial == null ? elsPartial.getRank() : thnPartial.getRank());
+            int lengthOfWrt = range.length / 2;
             int[] permute = TensorShape.concat(
-                Arrays.copyOfRange(range, range.length - 2, range.length),
-                Arrays.copyOfRange(range, 0, range.length - 2)
+                Arrays.copyOfRange(range, range.length - lengthOfWrt, range.length),
+                Arrays.copyOfRange(range, 0, range.length - lengthOfWrt)
             );
 
             DoubleTensor newPartial;

@@ -171,6 +171,40 @@ public class DoubleIfVertexTest {
     }
 
     @Test
+    public void canExtractDualNumberFromMixedPredicateWithDifferentParentsAndFillInZeroesRankThree() {
+        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false, true}, 3, 3));
+
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.arange(0, 9).reshape(3, 3));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.arange(10, 19).reshape(3, 3));
+
+        DoubleVertex c = a.matrixMultiply(b);
+
+        DoubleVertex d = new UniformVertex(0, 10);
+        d.setValue(DoubleTensor.arange(20, 29).reshape(3, 3));
+
+        DoubleVertex e = new UniformVertex(0, 10);
+        e.setValue(DoubleTensor.arange(30, 39).reshape(3, 3));
+
+        DoubleVertex f = d.matrixMultiply(e);
+
+        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dFdd = f.getDualNumber().getPartialDerivatives().withRespectTo(d);
+
+        DoubleVertex ifVertex = If.isTrue(bool)
+            .then(c)
+            .orElse(f);
+
+        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dIfdD = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(d);
+
+        Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
+        Assert.assertArrayEquals(dFdd.getShape(), dIfdD.getShape());
+    }
+
+    @Test
     public void canExtractValueFromMixedPredicate() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
