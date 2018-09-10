@@ -73,7 +73,7 @@ public class DualNumberTensorTest {
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 
-        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 8, 12, 16}).reshape(1, 1, 2, 2);
+        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{10, 10, 10, 10}).reshape(1, 1, 2, 2);
 
         assertArrayEquals(expectedWrt.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 0.0);
         assertArrayEquals(expectedWrt.getShape(), wrtA.getShape());
