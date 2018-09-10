@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -13,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-import static io.improbable.keanu.tensor.TensorShape.copyLowRankOverHighRank;
+import static io.improbable.keanu.tensor.TensorShape.writeLowRankOverHighRankFromTailEnd;
 
 public class TakeVertex extends DoubleUnaryOpVertex {
 
@@ -47,7 +46,7 @@ public class TakeVertex extends DoubleUnaryOpVertex {
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
-            int[] newPartialShape = copyLowRankOverHighRank(partialDerivative.getValue().getShape(), inputVertex.getShape());
+            int[] newPartialShape = writeLowRankOverHighRankFromTailEnd(partial.getShape(), inputVertex.getShape());
             DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
             DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial);
             DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
