@@ -67,8 +67,9 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public void setValue(T value, int... index) {
+    public GenericTensor<T> setValue(T value, int... index) {
         data[getFlatIndex(shape, stride, index)] = value;
+        return this;
     }
 
     @Override

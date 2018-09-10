@@ -95,6 +95,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     @Override
+    DoubleTensor setValue(Double value, int... index);
+
+    @Override
     DoubleTensor reshape(int... newShape);
 
     DoubleTensor permute(int... rearrange);

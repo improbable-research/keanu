@@ -518,8 +518,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public void setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, int... index) {
         tensor.putScalar(index, value);
+        return this;
     }
 
     @Override

@@ -266,8 +266,9 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public void setValue(Boolean value, int... index) {
+    public BooleanTensor setValue(Boolean value, int... index) {
         data[getFlatIndex(shape, stride, index)] = value;
+        return this;
     }
 
     @Override

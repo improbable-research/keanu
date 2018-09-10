@@ -69,6 +69,9 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     @Override
+    IntegerTensor setValue(Integer value, int... index);
+
+    @Override
     IntegerTensor reshape(int... newShape);
 
     @Override

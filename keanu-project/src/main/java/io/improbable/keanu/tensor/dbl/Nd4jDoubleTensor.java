@@ -121,8 +121,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return tensor.getDouble(index);
     }
 
-    public void setValue(Double value, int... index) {
+    public DoubleTensor setValue(Double value, int... index) {
         tensor.putScalar(index, value);
+        return this;
     }
 
     @Override
