@@ -170,6 +170,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     }
 
     public DualNumber inverse() {
+        //dc = -A^-1 * da * A^-1
         DoubleTensor newValue = this.value.inverse();
 
         if (this.partialDerivatives.isEmpty()) {
