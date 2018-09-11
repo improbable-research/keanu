@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.L;
 import static io.improbable.keanu.distributions.dual.Diffs.S;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -13,14 +12,11 @@ import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Cauchy;
 import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -112,26 +108,6 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
         }
 
         return dLogProbWrtParameters;
-
-//        return convertDualNumbersToDiff(dlnP.get(L).getValue(), dlnP.get(S).getValue(), dlnP.get(X).getValue());
-    }
-
-    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlocation,
-                                                                 DoubleTensor dLogPdscale,
-                                                                 DoubleTensor dLogPdx) {
-
-        PartialDerivatives dLogPdInputsFromLocation = location.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlocation);
-        PartialDerivatives dLogPdInputsFromScale = scale.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdscale);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromLocation.add(dLogPdInputsFromScale);
-
-        if (!this.isObserved()) {
-            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
-                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
-            );
-        }
-
-        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
-        return summed.asMap();
     }
 
     @Override

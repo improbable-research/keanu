@@ -48,7 +48,6 @@ public class FitnessFunctionWithGradient {
 
             setAndCascadePoint(point, wrtVertices);
 
-//            List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(this.ofVertices);
             Map<VertexId, DoubleTensor> diffs = logProbGradient.getJointLogProbGradientWrtLatents();
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, wrtVertices);

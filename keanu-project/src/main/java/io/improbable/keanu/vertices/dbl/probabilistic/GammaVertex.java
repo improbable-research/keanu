@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.K;
 import static io.improbable.keanu.distributions.dual.Diffs.THETA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -13,14 +12,11 @@ import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -96,26 +92,6 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
         }
 
         return dLogProbWrtParameters;
-
-//        return convertDualNumbersToDiff(dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
-    }
-
-    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdtheta,
-                                                                 DoubleTensor dLogPdk,
-                                                                 DoubleTensor dLogPdx) {
-
-        PartialDerivatives dLogPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdtheta);
-        PartialDerivatives dLogPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdk);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromTheta.add(dLogPdInputsFromK);
-
-        if (!this.isObserved()) {
-            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
-                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
-            );
-        }
-
-        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
-        return summed.asMap();
     }
 
     @Override
