@@ -14,6 +14,10 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class ConstantDoubleVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
+    public ConstantDoubleVertex(DoubleVertex vertex) {
+        setValue(vertex.getValue());
+    }
+
     public ConstantDoubleVertex(DoubleTensor constant) {
         setValue(constant);
     }
