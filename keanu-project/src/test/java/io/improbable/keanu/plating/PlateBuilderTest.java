@@ -175,6 +175,10 @@ public class PlateBuilderTest {
     /**
      * This is a Hidden Markov Model -
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     *
+     * ...  -->  X[t-1]  -->  X[t]  --> ...
+     *             |           |
+     *           Y[t-1]       Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromPlatesFromACount() throws VertexLabelException {
@@ -217,6 +221,10 @@ public class PlateBuilderTest {
     /**
      * This is a Hidden Markov Model -
      * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     *
+     * ...  -->  X[t-1]  -->  X[t]  --> ...
+     *             |           |
+     *           Y[t-1]       Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromPlatesFromAnIterator() throws VertexLabelException {
