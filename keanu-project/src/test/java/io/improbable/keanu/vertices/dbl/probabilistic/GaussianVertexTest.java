@@ -17,10 +17,9 @@ import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class GaussianVertexTest {
 
@@ -63,13 +62,11 @@ public class GaussianVertexTest {
         sigmaTensor.setValue(1.0);
 
         GaussianVertex tensorGaussianVertex = new GaussianVertex(muTensor, sigmaTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorGaussianVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorGaussianVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(gaussianLogDiff.dPdmu, actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(gaussianLogDiff.dPdsigma, actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(gaussianLogDiff.dPdx, actual.withRespectTo(tensorGaussianVertex.getId()).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdmu, actualDerivatives.get(muTensor).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdsigma, actualDerivatives.get(sigmaTensor).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdx, actualDerivatives.get(tensorGaussianVertex).scalar(), 1e-5);
     }
 
     @Test

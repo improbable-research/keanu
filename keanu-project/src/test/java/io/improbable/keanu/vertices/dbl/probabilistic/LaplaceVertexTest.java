@@ -17,10 +17,9 @@ import io.improbable.keanu.distributions.gradient.Laplace;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class LaplaceVertexTest {
 
@@ -63,13 +62,11 @@ public class LaplaceVertexTest {
         betaTensor.setValue(1.0);
 
         LaplaceVertex tensorLaplaceVertex = new LaplaceVertex(muTensor, betaTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5, muTensor, betaTensor, tensorLaplaceVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorLaplaceVertex.dLogPdf(0.5, muTensor, betaTensor, tensorLaplaceVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(laplaceLogDiff.dPdmu, actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(laplaceLogDiff.dPdbeta, actual.withRespectTo(betaTensor.getId()).scalar(), 1e-5);
-        assertEquals(laplaceLogDiff.dPdx, actual.withRespectTo(tensorLaplaceVertex.getId()).scalar(), 1e-5);
+        assertEquals(laplaceLogDiff.dPdmu, actualDerivatives.get(muTensor).scalar(), 1e-5);
+        assertEquals(laplaceLogDiff.dPdbeta, actualDerivatives.get(betaTensor).scalar(), 1e-5);
+        assertEquals(laplaceLogDiff.dPdx, actualDerivatives.get(tensorLaplaceVertex).scalar(), 1e-5);
     }
 
     @Test

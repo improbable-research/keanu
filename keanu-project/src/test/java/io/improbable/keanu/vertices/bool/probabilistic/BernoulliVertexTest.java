@@ -17,7 +17,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -54,13 +54,13 @@ public class BernoulliVertexTest {
         DoubleVertex C = A.times(B);
         BernoulliVertex D = new BernoulliVertex(C);
 
-        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}), ImmutableSet.of(A, B));
+        Map<Vertex, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}), ImmutableSet.of(A, B));
 
         DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.5, (-1.0 / 0.88) * 0.2});
         DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.25, (-1.0 / 0.88) * 0.6});
 
-        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
-        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
+        assertEquals(expectedWrtA, dLogPmf.get(A));
+        assertEquals(expectedWrtB, dLogPmf.get(B));
     }
 
     @Test
@@ -132,7 +132,7 @@ public class BernoulliVertexTest {
             true, true
         }, shape);
 
-        Map<VertexId, DoubleTensor> dLogPmf = D.dLogPmf(atValue, ImmutableSet.of(A, B));
+        Map<Vertex, DoubleTensor> dLogPmf = D.dLogPmf(atValue, ImmutableSet.of(A, B));
 
         DoubleTensor expectedWrtA = atValue.setDoubleIf(
             AValue.reciprocal(),
@@ -164,8 +164,8 @@ public class BernoulliVertexTest {
             0.0
         );
 
-        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
-        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
+        assertEquals(expectedWrtA, dLogPmf.get(A));
+        assertEquals(expectedWrtB, dLogPmf.get(B));
     }
 
     @Test

@@ -81,21 +81,21 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Laplace.withParameters(mu.getValue(), beta.getValue()).dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(mu)) {
-            dLogProbWrtParameters.put(mu.getId(), dlnP.get(MU).getValue());
+            dLogProbWrtParameters.put(mu, dlnP.get(MU).getValue());
         }
 
         if (withRespectTo.contains(beta)) {
-            dLogProbWrtParameters.put(beta.getId(), dlnP.get(BETA).getValue());
+            dLogProbWrtParameters.put(beta, dlnP.get(BETA).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;

@@ -14,7 +14,6 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -125,7 +124,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
 
         if (withRespectTo.contains(this)) {
             final DoubleTensor min = xMin.getValue();
@@ -134,7 +133,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
             final DoubleTensor dPdx = distribution.dLogProb(value).get(X).getValue();
             final DoubleTensor density = distribution.logProb(value);
             final DoubleTensor dLogPdx = dPdx.divInPlace(density);
-            return singletonMap(getId(), dLogPdx);
+            return singletonMap(this, dLogPdx);
         }
 
         return Collections.emptyMap();

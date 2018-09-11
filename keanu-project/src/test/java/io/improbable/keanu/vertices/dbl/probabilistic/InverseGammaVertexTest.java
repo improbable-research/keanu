@@ -16,10 +16,9 @@ import io.improbable.keanu.distributions.gradient.InverseGamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class InverseGammaVertexTest {
 
@@ -60,13 +59,11 @@ public class InverseGammaVertexTest {
         bTensor.setValue(1.0);
 
         InverseGammaVertex tensorInverseGammaVertex = new InverseGammaVertex(aTensor, bTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5, aTensor, bTensor, tensorInverseGammaVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorInverseGammaVertex.dLogPdf(0.5, aTensor, bTensor, tensorInverseGammaVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(inverseGammaLogDiff.dPda, actual.withRespectTo(aTensor.getId()).scalar(), 1e-5);
-        assertEquals(inverseGammaLogDiff.dPdb, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
-        assertEquals(inverseGammaLogDiff.dPdx, actual.withRespectTo(tensorInverseGammaVertex.getId()).scalar(), 1e-5);
+        assertEquals(inverseGammaLogDiff.dPda, actualDerivatives.get(aTensor).scalar(), 1e-5);
+        assertEquals(inverseGammaLogDiff.dPdb, actualDerivatives.get(bTensor).scalar(), 1e-5);
+        assertEquals(inverseGammaLogDiff.dPdx, actualDerivatives.get(tensorInverseGammaVertex).scalar(), 1e-5);
     }
 
     @Test

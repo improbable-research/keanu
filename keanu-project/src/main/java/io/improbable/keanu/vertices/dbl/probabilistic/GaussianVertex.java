@@ -95,21 +95,21 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(mu)) {
-            dLogProbWrtParameters.put(mu.getId(), dlnP.get(MU).getValue());
+            dLogProbWrtParameters.put(mu, dlnP.get(MU).getValue());
         }
 
         if (withRespectTo.contains(sigma)) {
-            dLogProbWrtParameters.put(sigma.getId(), dlnP.get(SIGMA).getValue());
+            dLogProbWrtParameters.put(sigma, dlnP.get(SIGMA).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;

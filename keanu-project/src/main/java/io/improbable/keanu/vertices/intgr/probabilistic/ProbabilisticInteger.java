@@ -7,7 +7,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 
 public interface ProbabilisticInteger extends Probabilistic<IntegerTensor> {
     default double logPmf(int value) {
@@ -22,15 +21,15 @@ public interface ProbabilisticInteger extends Probabilistic<IntegerTensor> {
         return logProb(value);
     }
 
-    default Map<VertexId, DoubleTensor> dLogPmf(int value, Set<Vertex> withRespectTo) {
+    default Map<Vertex, DoubleTensor> dLogPmf(int value, Set<Vertex> withRespectTo) {
         return dLogPmf(IntegerTensor.scalar(value), withRespectTo);
     }
 
-    default Map<VertexId, DoubleTensor> dLogPmf(int[] values, Set<Vertex> withRespectTo) {
+    default Map<Vertex, DoubleTensor> dLogPmf(int[] values, Set<Vertex> withRespectTo) {
         return dLogPmf(IntegerTensor.create(values), withRespectTo);
     }
 
-    default Map<VertexId, DoubleTensor> dLogPmf(IntegerTensor value, Set<Vertex> withRespectTo) {
+    default Map<Vertex, DoubleTensor> dLogPmf(IntegerTensor value, Set<Vertex> withRespectTo) {
         return dLogProb(value, withRespectTo);
     }
 }

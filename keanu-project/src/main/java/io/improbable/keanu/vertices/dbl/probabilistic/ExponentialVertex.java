@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.B;
 import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
@@ -71,17 +69,17 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Exponential.withParameters(lambda.getValue()).dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(lambda)) {
-            dLogProbWrtParameters.put(lambda.getId(), dlnP.get(LAMBDA).getValue());
+            dLogProbWrtParameters.put(lambda, dlnP.get(LAMBDA).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;
@@ -90,7 +88,7 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlambda,
-                                                             DoubleTensor dLogPdx) {
+                                                                 DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputs = lambda.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlambda);
 

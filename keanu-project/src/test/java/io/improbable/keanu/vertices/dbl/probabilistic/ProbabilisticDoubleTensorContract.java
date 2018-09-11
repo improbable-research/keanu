@@ -2,6 +2,8 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static java.util.stream.Collectors.counting;
 import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 import static org.junit.Assert.assertEquals;
@@ -24,6 +26,7 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -200,9 +203,9 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<VertexId, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
+        Map<Vertex, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
 
-        double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
+        double actualDiffLnDensity = diffln.get(hyperParameterVertex).scalar();
 
         assertEquals("Diff ln density problem at " + vertexUnderTest.getValue() + " hyper param value " + hyperParameterValue,
             diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
@@ -244,25 +247,32 @@ public class ProbabilisticDoubleTensorContract {
             V scalarVertex = vertexUnderTestSupplier.get();
             scalarVertices.add(scalarVertex);
 
+            Map<VertexId, DoubleTensor> dlogPdfById = scalarVertex.dLogPdf(vector[i], scalarVertex)
+                .entrySet().stream()
+                .collect(toMap(
+                    e -> e.getKey().getId(),
+                    Map.Entry::getValue)
+                );
+
             expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
-                    scalarVertex.dLogPdf(vector[i], scalarVertex)
+                    dlogPdfById
                 )
             );
         }
 
         V tensorVertex = vertexUnderTestSupplier.get();
 
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
             DoubleTensor.create(vector, new int[]{vector.length, 1}),
             tensorVertex
         );
 
-        HashSet<VertexId> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
-        hyperParameterVertices.remove(tensorVertex.getId());
+        HashSet<Vertex> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
+        hyperParameterVertices.remove(tensorVertex);
 
-        for (VertexId id : hyperParameterVertices) {
-            assertEquals(expectedPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
+        for (Vertex vertex : hyperParameterVertices) {
+            assertEquals(expectedPartialDerivatives.withRespectTo(vertex).sum(), actualDerivatives.get(vertex).sum(), 1e-5);
         }
 
         double expected = 0;
@@ -270,7 +280,7 @@ public class ProbabilisticDoubleTensorContract {
             expected += expectedPartialDerivatives.withRespectTo(scalarVertex).scalar();
         }
 
-        double actual = actualDerivatives.get(tensorVertex.getId()).sum();
+        double actual = actualDerivatives.get(tensorVertex).sum();
         assertEquals(expected, actual, 1e-5);
     }
 

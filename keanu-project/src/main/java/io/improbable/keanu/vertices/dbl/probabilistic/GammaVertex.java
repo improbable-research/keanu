@@ -78,21 +78,21 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Gamma.withParameters(theta.getValue(), k.getValue()).dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(theta)) {
-            dLogProbWrtParameters.put(theta.getId(), dlnP.get(THETA).getValue());
+            dLogProbWrtParameters.put(theta, dlnP.get(THETA).getValue());
         }
 
         if (withRespectTo.contains(k)) {
-            dLogProbWrtParameters.put(k.getId(), dlnP.get(K).getValue());
+            dLogProbWrtParameters.put(k, dlnP.get(K).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;

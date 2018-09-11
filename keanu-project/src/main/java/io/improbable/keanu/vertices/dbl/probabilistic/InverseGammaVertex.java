@@ -91,21 +91,21 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = InverseGamma.withParameters(alpha.getValue(), beta.getValue()).dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(alpha)) {
-            dLogProbWrtParameters.put(alpha.getId(), dlnP.get(A).getValue());
+            dLogProbWrtParameters.put(alpha, dlnP.get(A).getValue());
         }
 
         if (withRespectTo.contains(beta)) {
-            dLogProbWrtParameters.put(beta.getId(), dlnP.get(B).getValue());
+            dLogProbWrtParameters.put(beta, dlnP.get(B).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;

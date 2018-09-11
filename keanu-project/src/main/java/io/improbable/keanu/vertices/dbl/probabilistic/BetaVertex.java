@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.B;
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -95,21 +93,21 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = distribution().dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(alpha)) {
-            dLogProbWrtParameters.put(alpha.getId(), dlnP.get(A).getValue());
+            dLogProbWrtParameters.put(alpha, dlnP.get(A).getValue());
         }
 
         if (withRespectTo.contains(beta)) {
-            dLogProbWrtParameters.put(beta.getId(), dlnP.get(B).getValue());
+            dLogProbWrtParameters.put(beta, dlnP.get(B).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;
@@ -118,8 +116,8 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdalpha,
-                                                             DoubleTensor dLogPdbeta,
-                                                             DoubleTensor dLogPdx) {
+                                                                 DoubleTensor dLogPdbeta,
+                                                                 DoubleTensor dLogPdx) {
         PartialDerivatives dLogPdInputsFromAlpha = alpha.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdalpha);
         PartialDerivatives dLogPdInputsFromBeta = beta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdbeta);
         PartialDerivatives dLogPdInputs = dLogPdInputsFromAlpha.add(dLogPdInputsFromBeta);

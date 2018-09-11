@@ -18,10 +18,9 @@ import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ExponentialVertexTest {
 
@@ -69,12 +68,10 @@ public class ExponentialVertexTest {
         bTensor.setValue(2.5);
 
         ExponentialVertex tensorExponentialVertex = new ExponentialVertex(bTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5, bTensor, tensorExponentialVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorExponentialVertex.dLogPdf(1.5, bTensor, tensorExponentialVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(exponentialLogDiff.dPdlambda, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
-        assertEquals(exponentialLogDiff.dPdx, actual.withRespectTo(tensorExponentialVertex.getId()).scalar(), 1e-5);
+        assertEquals(exponentialLogDiff.dPdlambda, actualDerivatives.get(bTensor).scalar(), 1e-5);
+        assertEquals(exponentialLogDiff.dPdx, actualDerivatives.get(tensorExponentialVertex).scalar(), 1e-5);
     }
 
     @Test

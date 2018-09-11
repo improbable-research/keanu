@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,9 @@ import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class HalfGaussianVertexTest {
 
@@ -73,12 +73,10 @@ public class HalfGaussianVertexTest {
         sigmaTensor.setValue(1.0);
 
         HalfGaussianVertex tensorGaussianVertex = new HalfGaussianVertex(sigmaTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, sigmaTensor, tensorGaussianVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorGaussianVertex.dLogPdf(0.5, sigmaTensor, tensorGaussianVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(gaussianLogDiff.dPdsigma, actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(gaussianLogDiff.dPdx, actual.withRespectTo(tensorGaussianVertex.getId()).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdsigma, actualDerivatives.get(sigmaTensor).scalar(), 1e-5);
+        assertEquals(gaussianLogDiff.dPdx, actualDerivatives.get(tensorGaussianVertex).scalar(), 1e-5);
     }
 
     @Test

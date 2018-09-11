@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,7 +17,7 @@ import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -52,7 +53,7 @@ public class HalfCauchyVertexTest {
     public void matchesKnownLogDensityOfVector() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
-        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75)  + 2.0 * Math.log(2.0);
+        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2.0 * Math.log(2.0);
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorHalfCauchyVertex, new double[]{0.25, 0.75}, expectedLogDensity);
     }
@@ -73,12 +74,10 @@ public class HalfCauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(scaleTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(cauchyLogDiff.dPdscale, actual.withRespectTo(scaleTensor.getId()).scalar(), 1e-5);
-        assertEquals(cauchyLogDiff.dPdx, actual.withRespectTo(tensorHalfCauchyVertex.getId()).scalar(), 1e-5);
+        assertEquals(cauchyLogDiff.dPdscale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);
+        assertEquals(cauchyLogDiff.dPdx, actualDerivatives.get(tensorHalfCauchyVertex).scalar(), 1e-5);
     }
 
     @Test

@@ -11,7 +11,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -64,7 +63,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(BooleanTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends Vertex> withRespectTo) {
 
         if (!(probTrue instanceof Differentiable)) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
@@ -74,7 +73,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
 
         if (withRespectTo.contains(probTrue)) {
             DoubleTensor dLogPdp = Bernoulli.withParameters(probTrue.getValue()).dLogProb(value);
-            return Collections.singletonMap(probTrue.getId(), dLogPdp);
+            return Collections.singletonMap(probTrue, dLogPdp);
         }
 
         return Collections.emptyMap();

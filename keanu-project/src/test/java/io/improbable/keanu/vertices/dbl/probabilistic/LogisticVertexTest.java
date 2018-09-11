@@ -16,10 +16,9 @@ import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class LogisticVertexTest {
 
@@ -61,13 +60,11 @@ public class LogisticVertexTest {
         bTensor.setValue(0.5);
 
         LogisticVertex tensorLogisticVertex = new LogisticVertex(aTensor, bTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogPdf(1.5, aTensor, bTensor, tensorLogisticVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorLogisticVertex.dLogPdf(1.5, aTensor, bTensor, tensorLogisticVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(logisticLogDiff.dPda, actual.withRespectTo(aTensor.getId()).scalar(), 1e-5);
-        assertEquals(logisticLogDiff.dPdb, actual.withRespectTo(bTensor.getId()).scalar(), 1e-5);
-        assertEquals(logisticLogDiff.dPdx, actual.withRespectTo(tensorLogisticVertex.getId()).scalar(), 1e-5);
+        assertEquals(logisticLogDiff.dPda, actualDerivatives.get(aTensor).scalar(), 1e-5);
+        assertEquals(logisticLogDiff.dPdb, actualDerivatives.get(bTensor).scalar(), 1e-5);
+        assertEquals(logisticLogDiff.dPdx, actualDerivatives.get(tensorLogisticVertex).scalar(), 1e-5);
     }
 
     @Test

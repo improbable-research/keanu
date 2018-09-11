@@ -93,21 +93,21 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value, Set<Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Pareto.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
 
-        Map<VertexId, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
         if (withRespectTo.contains(location)) {
-            dLogProbWrtParameters.put(location.getId(), dlnP.get(L).getValue());
+            dLogProbWrtParameters.put(location, dlnP.get(L).getValue());
         }
 
         if (withRespectTo.contains(scale)) {
-            dLogProbWrtParameters.put(scale.getId(), dlnP.get(S).getValue());
+            dLogProbWrtParameters.put(scale, dlnP.get(S).getValue());
         }
 
         if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this.getId(), dlnP.get(X).getValue());
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
         }
 
         return dLogProbWrtParameters;
