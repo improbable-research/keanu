@@ -27,7 +27,8 @@ public interface Probabilistic<T> extends Observable<T> {
     /**
      * The partial derivatives of the natural log prob.
      *
-     * @param atValue at a given value
+     * @param atValue       at a given value
+     * @param withRespectTo list of parents to differentiate with respect to
      * @return the partial derivatives of the log of the probability function at the supplied value.
      * For continuous variables this is called the PDF (probability density function).
      * For discrete variables this is called the PMF (probability mass function).
