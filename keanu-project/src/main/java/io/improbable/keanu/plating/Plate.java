@@ -39,7 +39,7 @@ public class Plate implements VertexDictionary {
     }
 
     @Override
-    public <T> Vertex<T> get(VertexLabel label) {
+    public <T, V extends Vertex<T>> V get(VertexLabel label) {
         Vertex<?> vertex = contents.get(label);
         if (vertex == null) {
             vertex = contents.get(scoped(label));
@@ -47,7 +47,7 @@ public class Plate implements VertexDictionary {
         if (vertex == null) {
             throw new IllegalArgumentException("Cannot find VertexLabel " + label);
         }
-        return (Vertex<T>) vertex;
+        return (V) vertex;
     }
 
     public Collection<Vertex<?>> getProxyVertices() {

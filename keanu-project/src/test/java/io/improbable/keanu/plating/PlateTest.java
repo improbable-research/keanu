@@ -43,7 +43,8 @@ public class PlateTest {
 
     @Test
     public void youCanGetAVertexByName() {
-        assertThat(plate.get(VERTEX_LABEL_1), equalTo(vertex));
+        Vertex<?> vertex = plate.get(VERTEX_LABEL_1);
+        assertThat(vertex, equalTo(this.vertex));
     }
 
     @Test

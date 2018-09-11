@@ -12,8 +12,8 @@ public class SimpleVertexDictionary implements VertexDictionary {
     }
 
     @Override
-    public <T> Vertex<T> get(VertexLabel label) {
-        return (Vertex<T>) map.get(label);
+    public <T, V extends Vertex<T>> V get(VertexLabel label) {
+        return (V) map.get(label);
     }
 
     public static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> map) {
