@@ -1,13 +1,19 @@
 package io.improbable.docs;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+
 import java.util.List;
 import java.util.stream.Collectors;
+
+import org.junit.Test;
 
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -78,7 +84,7 @@ public class PlatesExample {
         //now you have access to the "x" from any one of the plates
         DoubleTensor valueForXAtCSVLine1 = plates.asList()
             .get(1) // get plate 1 which is build from csv line 1
-            .<DoubleTensor>get(xLabel) //get the vertex that we labelled "x" in that plate
+            .<DoubleVertex>get(xLabel) //get the vertex that we labelled "x" in that plate
             .getValue(); //get the value from that vertex
 
         //Now run an inference algorithm on vertex m and vertex b and you have linear regression

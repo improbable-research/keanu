@@ -40,7 +40,7 @@ public class Plate implements VertexDictionary {
     }
 
     @Override
-    public <T extends Tensor<?>, V extends Vertex<T>> V get(VertexLabel label) {
+    public <V extends Vertex<? extends Tensor<?>>> V get(VertexLabel label) {
         Vertex<?> vertex = contents.get(label);
         if (vertex == null) {
             vertex = contents.get(scoped(label));
