@@ -1,15 +1,21 @@
 package io.improbable.keanu.plating.loop;
 
 import java.util.Collection;
+import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 import io.improbable.keanu.plating.PlateBuilder;
+import io.improbable.keanu.plating.PlateException;
 import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
@@ -18,73 +24,113 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 
 public class LoopBuilder {
+    private final int maxLoopCount;
     private final Collection<Vertex> initialState;
 
-    LoopBuilder(Vertex... initialState) {
+    <V extends Vertex<?>> LoopBuilder(int maxLoopCount, Collection<V> initialState) {
+        this.maxLoopCount = maxLoopCount;
         this.initialState = ImmutableList.copyOf(initialState);
     }
 
     public LoopBuilder2 apply(Function<DoubleVertex, DoubleVertex> condition) {
-        return new LoopBuilder2(initialState, condition);
+        return new LoopBuilder2(maxLoopCount, initialState, condition);
     }
 
     public class LoopBuilder2 {
         private final Function<DoubleVertex, DoubleVertex> iterationFunction;
+        private final int maxLoopCount;
         private final Collection<Vertex> initialState;
+        private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
+        private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(Collection<Vertex> initialState, Function<DoubleVertex, DoubleVertex> iterationFunction) {
-            this.initialState = initialState;
+        LoopBuilder2(int maxLoopCount, Collection<Vertex> initialState, Function<DoubleVertex, DoubleVertex> iterationFunction) {
+            this.maxLoopCount = maxLoopCount;
+            this.initialState = setInitialState(initialState);
             this.iterationFunction = iterationFunction;
         }
 
+        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) {
+            Vertex valueOutWhenAlwaysTrue = null;
+
+            try {
+                List<Vertex> outputVertices = initialState.stream().filter(v -> v.getLabel().equals(Loop.VALUE_OUT_LABEL)).collect(Collectors.toList());
+                Vertex outputVertex = Iterables.getOnlyElement(outputVertices);
+                valueOutWhenAlwaysTrue = createProxyFor(outputVertex);
+            } catch(NoSuchElementException | NullPointerException e) {
+                throw new PlateException("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL", e);
+            }
+
+            BoolVertex tru = ConstantVertex.of(true).labelled(LOOP_LABEL);
+
+            return ImmutableList.<Vertex>builder()
+                .addAll(initialState)
+                .add(valueOutWhenAlwaysTrue)
+                .add(tru)
+                .build();
+        }
+
+        private <V extends Vertex<?>> V createProxyFor(Vertex vertex) {
+            V proxy;
+            if (vertex instanceof DoubleVertex) {
+                proxy = (V) new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+            } else if (vertex instanceof IntegerVertex) {
+                proxy = (V) new IntegerProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+            } else if (vertex instanceof BoolVertex) {
+                proxy = (V) new BoolProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+            } else {
+                throw new PlateException("Input Vertex must be of type DoubleVertex, IntegerVertex or BoolVertex");
+            }
+            proxy.setParents(vertex);
+            return proxy;
+        }
+
         public Loop whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
-            VertexLabel lambdaInLabel = createVertexLabel("lambdaIn");
-            VertexLabel lambdaOutLabel = createVertexLabel("lambdaOut");
-            VertexLabel loopLabel = createVertexLabel("loop");
-            VertexLabel stillLoopingLabel = createVertexLabel("stillLooping");
-            VertexLabel valueInLabel = createVertexLabel("valueIn");
-            VertexLabel valueOutLabel = createVertexLabel("valueOut");
+            // inputs
+            VertexLabel valueInWhenAlwaysTrueLabel = new VertexLabel("valueInWhenAlwaysTrue");
+            VertexLabel stillLoopingLabel = new VertexLabel("stillLooping");
+            VertexLabel valueInLabel = new VertexLabel("valueIn");
+
+            // intermediate
+            VertexLabel conditionLabel = new VertexLabel("condition");
+
+            // outputs
+            VertexLabel valueOutWhenAlwaysTrueLabel = VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL;
+            VertexLabel loopLabel = LOOP_LABEL;
+            VertexLabel valueOutLabel = Loop.VALUE_OUT_LABEL;
 
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))
                 .withProxyMapping(ImmutableMap.of(
-                    lambdaInLabel, lambdaOutLabel,
+                    valueInWhenAlwaysTrueLabel, valueOutWhenAlwaysTrueLabel,
                     stillLoopingLabel, loopLabel,
                     valueInLabel, valueOutLabel
                 ))
-                .count(100)
+                .count(maxLoopCount)
                 .withFactory((plate) -> {
                     // inputs
-                    DoubleVertex runningTotal = new DoubleProxyVertex(lambdaInLabel);
+                    DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(valueInWhenAlwaysTrueLabel);
                     BoolVertex stillLooping = new BoolProxyVertex(stillLoopingLabel);
                     DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
-                    plate.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
+                    plate.addAll(ImmutableSet.of(valueInWhenAlwaysTrue, stillLooping, valueIn));
 
                     // intermediate
-                    BoolVertex condition = conditionSupplier.get();
+                    BoolVertex condition = conditionSupplier.get().labelled(conditionLabel);
                     plate.add(condition);
 
                     // outputs
-                    DoubleVertex plus = iterationFunction.apply(valueIn);
+                    DoubleVertex iterationResult = iterationFunction.apply(valueInWhenAlwaysTrue).labelled(valueOutWhenAlwaysTrueLabel);
                     BoolVertex loopAgain = stillLooping.and(condition).labelled(loopLabel);
-                    DoubleVertex result = If.isTrue(loopAgain).then(plus).orElse(valueIn).labelled(valueOutLabel);
-                    plate.addAll(ImmutableSet.of(plus, loopAgain, result));
+                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labelled(valueOutLabel);
+                    plate.addAll(ImmutableSet.of(iterationResult, loopAgain, result));
                 })
                 .build();
 
-            return new Loop(plates, maximumLoopLength);
+            return new Loop(plates);
         }
-
-        private VertexLabel createVertexLabel(String loop) {
-            return new VertexLabel(loop, getId());
-        }
-
-        private String getId() {
-            return "Plates_" + hashCode();
-        }
-
     }
 }
