@@ -155,7 +155,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor max(DoubleTensor max);
 
-    DoubleTensor inverse();
+    DoubleTensor matrixInverse();
 
     double max();
 

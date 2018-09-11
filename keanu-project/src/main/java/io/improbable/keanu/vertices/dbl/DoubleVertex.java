@@ -37,6 +37,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleU
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SigmoidVertex;
@@ -62,6 +63,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex matrixMultiply(DoubleVertex that) {
         return new MatrixMultiplicationVertex(this, that);
+    }
+
+    public DoubleVertex matrixInverse() {
+        return new MatrixInverseVertex(this);
     }
 
     public DoubleVertex divideBy(DoubleVertex that) {
