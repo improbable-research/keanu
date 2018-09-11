@@ -281,18 +281,18 @@ public class PlateBuilderTest {
     @Test
     public void youCanCreateALoopFromPlatesFromACount() throws VertexLabelException {
         // inputs
-        VertexLabel plusLabel = new VertexLabel("plus");
         VertexLabel runningTotalLabel = new VertexLabel("runningTotal");
-        VertexLabel valueOutLabel = new VertexLabel("valueOut");
+        VertexLabel stillLoopingLabel = new VertexLabel("stillLooping");
+        VertexLabel valueInLabel = new VertexLabel("valueIn");
 
         // intermediate
         VertexLabel oneLabel = new VertexLabel("one");
         VertexLabel conditionLabel = new VertexLabel("condition");
 
         // outputs
-        VertexLabel valueInLabel = new VertexLabel("valueIn");
+        VertexLabel plusLabel = new VertexLabel("plus");
         VertexLabel loopLabel = new VertexLabel("loop");
-        VertexLabel stillLoopingLabel = new VertexLabel("stillLooping");
+        VertexLabel valueOutLabel = new VertexLabel("valueOut");
 
         // base case
         DoubleVertex initialSum = ConstantVertex.of(0.).labelled(plusLabel);
