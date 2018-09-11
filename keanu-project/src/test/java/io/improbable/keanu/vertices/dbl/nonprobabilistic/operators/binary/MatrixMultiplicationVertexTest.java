@@ -192,7 +192,7 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex y = N.matrixMultiply(beta);
 
         DualNumber yDual = y.getDualNumber();
-        PartialDerivatives dydx = Differentiator.reverseModeAutoDiff(y, new HashSet<>(Arrays.asList(m, alpha, beta)));
+        PartialDerivatives dydx = Differentiator.reverseModeAutoDiff(y, m, alpha, beta);
 
         DoubleTensor dydmForward = yDual.getPartialDerivatives().withRespectTo(m);
         DoubleTensor dydmReverse = dydx.withRespectTo(m);

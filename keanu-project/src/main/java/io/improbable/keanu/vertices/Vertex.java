@@ -235,9 +235,11 @@ public abstract class Vertex<T> implements Observable<T> {
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(this.getId());
         if (this.getLabel() != null) {
-            stringBuilder.append('"').append(this.getLabel()).append('"').append(": ");
+            stringBuilder.append(" (").append(this.getLabel()).append(")");
         }
+        stringBuilder.append(": ");
         stringBuilder.append(this.getClass().getSimpleName());
         stringBuilder.append("(" + getValue() + ")");
         return stringBuilder.toString();

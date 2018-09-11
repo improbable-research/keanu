@@ -112,8 +112,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return tensor.getDouble(index);
     }
 
-    public void setValue(Double value, int... index) {
+    public DoubleTensor setValue(Double value, int... index) {
         tensor.putScalar(index, value);
+        return this;
     }
 
     @Override
@@ -824,7 +825,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         INDArray[] toConcat = new INDArray[those.length + 1];
         toConcat[0] = dup;
         for (int i = 1; i <= those.length; i++) {
-            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+            toConcat[i] = unsafeGetNd4J(those[i - 1]).dup();
         }
         INDArray concat = Nd4j.concat(dimension, toConcat);
         return new Nd4jDoubleTensor(concat);

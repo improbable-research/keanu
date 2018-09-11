@@ -63,9 +63,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public void setValue(Double value, int[] index) {
+    public DoubleTensor setValue(Double value, int[] index) {
         if (index.length == 1 && index[0] == 0) {
             this.value = value;
+            return this;
         } else {
             throw new IndexOutOfBoundsException(ArrayUtils.toString(index) + " out of bounds on scalar");
         }
