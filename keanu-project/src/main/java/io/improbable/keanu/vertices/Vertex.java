@@ -241,7 +241,9 @@ public abstract class Vertex<T> implements Observable<T> {
         }
         stringBuilder.append(": ");
         stringBuilder.append(this.getClass().getSimpleName());
-        stringBuilder.append("(" + getValue() + ")");
+        if (hasValue()) {
+            stringBuilder.append("(" + getValue() + ")");
+        }
         return stringBuilder.toString();
     }
 }
