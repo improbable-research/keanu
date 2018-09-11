@@ -15,14 +15,17 @@ public class ScalarIntegerTensor implements IntegerTensor {
     private Integer value;
     private int[] shape;
 
-    public ScalarIntegerTensor(int value) {
+    private ScalarIntegerTensor(Integer value, int[] shape) {
         this.value = value;
-        this.shape = SCALAR_SHAPE;
+        this.shape = shape;
+    }
+
+    public ScalarIntegerTensor(int value) {
+        this(value, SCALAR_SHAPE);
     }
 
     public ScalarIntegerTensor(int[] shape) {
-        this.value = null;
-        this.shape = shape;
+        this(null, shape);
     }
 
     @Override
@@ -104,7 +107,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        return duplicate();
+        int[] summedShape = new int[this.shape.length - overDimensions.length];
+        Arrays.fill(summedShape, 1);
+        return new ScalarIntegerTensor(value, summedShape);
     }
 
     @Override
