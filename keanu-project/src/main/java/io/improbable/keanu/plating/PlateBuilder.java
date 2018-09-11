@@ -176,7 +176,7 @@ public class PlateBuilder<T> {
         for (Vertex<?> proxy : proxyVertices) {
             VertexLabel label = proxyMapping.get(proxy.getLabel());
             if (label == null) {
-                label = proxyMapping.get(proxy.getLabel().dropNamespace());
+                label = proxyMapping.get(proxy.getLabel().withoutOuterNamespace());
             }
             if (label == null) {
                 throw new VertexLabelException("Cannot find proxy mapping for " + proxy.getLabel());

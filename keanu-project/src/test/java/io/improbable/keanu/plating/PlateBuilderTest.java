@@ -264,6 +264,7 @@ public class PlateBuilderTest {
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         Plates plates = new PlateBuilder<Integer>()
+            .withInitialState()
             .withProxyMapping(ImmutableMap.of(realLabel, realLabel))
             .count(10)
             .withFactory((plate) -> {
@@ -289,7 +290,7 @@ public class PlateBuilderTest {
     @Test
     public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() throws VertexLabelException {
         expectedException.expect(VertexLabelException.class);
-        expectedException.expectMessage("Cannot find VertexLabel :fake");
+        expectedException.expectMessage("Cannot find VertexLabel fake");
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         Plates plates = new PlateBuilder<Integer>()

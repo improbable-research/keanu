@@ -35,7 +35,7 @@ public class Plate implements VertexDictionary {
     }
 
     private VertexLabel scoped(VertexLabel label) {
-        return label.inNamespace(getUniqueName());
+        return label.withExtraNamespace(getUniqueName());
     }
 
     @Override

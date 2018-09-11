@@ -10,7 +10,7 @@ public class VertexLabelTest {
     @Test
     public void byDefaultALabelHasNoNamespace() {
         VertexLabel foo = new VertexLabel("foo");
-        assertThat(foo.toString(), equalTo(":foo"));
+        assertThat(foo.toString(), equalTo("foo"));
     }
 
     @Test
@@ -67,7 +67,7 @@ public class VertexLabelTest {
         String namespace = "namespace";
         String name = "foo";
         VertexLabel foo = new VertexLabel(name);
-        VertexLabel newFoo = foo.inNamespace(namespace);
+        VertexLabel newFoo = foo.withExtraNamespace(namespace);
         assertThat(newFoo, equalTo(new VertexLabel(name, namespace)));
     }
 
@@ -77,8 +77,14 @@ public class VertexLabelTest {
         String outerNamespace = "outer";
         String name = "foo";
         VertexLabel foo = new VertexLabel(name, innerNamespace);
-        VertexLabel newFoo = foo.inNamespace(outerNamespace);
+        VertexLabel newFoo = foo.withExtraNamespace(outerNamespace);
         assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace, outerNamespace)));
+    }
+
+    @Test
+    public void itUsesADotToPrint() {
+        VertexLabel foo = new VertexLabel("foo", "inner", "outer");
+        assertThat(foo.toString(), equalTo("outer.inner.foo"));
     }
 
     @Test
@@ -87,13 +93,13 @@ public class VertexLabelTest {
         String outerNamespace = "outer";
         String name = "foo";
         VertexLabel foo = new VertexLabel(name, innerNamespace, outerNamespace);
-        VertexLabel newFoo = foo.dropNamespace();
+        VertexLabel newFoo = foo.withoutOuterNamespace();
         assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace)));
     }
 
     @Test(expected = VertexLabelException.class)
     public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() throws VertexLabelException {
         VertexLabel foo = new VertexLabel("foo");
-        foo.dropNamespace();
+        foo.withoutOuterNamespace();
     }
 }
