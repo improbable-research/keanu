@@ -56,6 +56,7 @@ public class PlatesExample {
         DoubleVertex m = new GaussianVertex(0, 1);
         DoubleVertex b = new GaussianVertex(0, 1);
         VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel yLabel = new VertexLabel("y");
 
         //Build plates from each line in the csv
         Plates plates = new PlateBuilder<MyData>()
@@ -63,7 +64,7 @@ public class PlatesExample {
             .withFactory((plate, csvMyData) -> {
 
                 ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).labelled(xLabel);
-                DoubleVertex y = m.multiply(x).plus(b);
+                DoubleVertex y = m.multiply(x).plus(b).labelled(yLabel);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);
                 yObserved.observe(csvMyData.y);
