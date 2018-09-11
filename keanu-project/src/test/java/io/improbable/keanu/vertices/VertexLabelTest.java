@@ -10,7 +10,7 @@ public class VertexLabelTest {
     @Test
     public void byDefaultALabelHasNoNamespace() {
         VertexLabel foo = new VertexLabel("foo");
-        assertThat(foo.toString(), equalTo(":foo"));
+        assertThat(foo.toString(), equalTo(".foo"));
     }
 
     @Test
@@ -79,6 +79,12 @@ public class VertexLabelTest {
         VertexLabel foo = new VertexLabel(name, innerNamespace);
         VertexLabel newFoo = foo.inNamespace(outerNamespace);
         assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace, outerNamespace)));
+    }
+
+    @Test
+    public void itUsesADotToPrint() {
+        VertexLabel foo = new VertexLabel("foo", "inner", "outer");
+        assertThat(foo.toString(), equalTo("outer.inner.foo"));
     }
 
     @Test

@@ -9,7 +9,6 @@ import com.google.common.collect.Lists;
 
 public class VertexLabel {
     private static final char NAMESPACE_SEPARATOR = '.';
-    private static final char NAME_PREPENDER = ':';
     private final String name;
     private final List<String> namespace;
 
@@ -39,7 +38,7 @@ public class VertexLabel {
     @Override
     public String toString() {
         String namespaceString = Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(namespace));
-        return String.format("%s%c%s", namespaceString, NAME_PREPENDER, name);
+        return String.format("%s%c%s", namespaceString, NAMESPACE_SEPARATOR, name);
     }
 
     @Override
