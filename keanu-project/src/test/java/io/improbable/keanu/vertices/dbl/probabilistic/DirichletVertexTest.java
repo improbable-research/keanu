@@ -169,7 +169,7 @@ public class DirichletVertexTest {
 
             double diffLnDensityApproxExpected = (lnDensityA2 - lnDensityA1) / (2 * gradientDelta);
 
-            Map<VertexId, DoubleTensor> diffln = dirichlet.dLogProbAtValue();
+            Map<VertexId, DoubleTensor> diffln = dirichlet.dLogProbAtValue(concentrationHyperParam);
 
             double actualDiff = diffln.get(concentrationHyperParam.getId()).getValue(0, 0) + diffln.get(concentrationHyperParam.getId()).getValue(0, 1);
 

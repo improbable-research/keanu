@@ -200,7 +200,7 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<VertexId, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
+        Map<VertexId, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
 
         double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
 
@@ -254,7 +254,8 @@ public class ProbabilisticDoubleTensorContract {
         V tensorVertex = vertexUnderTestSupplier.get();
 
         Map<VertexId, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
-            DoubleTensor.create(vector, new int[]{vector.length, 1})
+            DoubleTensor.create(vector, new int[]{vector.length, 1}),
+            tensorVertex
         );
 
         HashSet<VertexId> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
