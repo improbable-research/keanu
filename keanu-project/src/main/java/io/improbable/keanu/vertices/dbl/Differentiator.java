@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-import static java.util.Collections.singleton;
-
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -22,23 +20,31 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class Differentiator {
 
-    public static Map<VertexId, PartialDerivatives> reverseModeAutoDiff(Set<DoubleVertex> of, Set<DoubleVertex> wrt) {
+    public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, PartialDerivatives dWrtOfVertex, Set<DoubleVertex> wrt) {
 
-        PriorityQueue<DoubleVertex> priorityQueue = new PriorityQueue<>(Comparator.<DoubleVertex, VertexId>comparing(Vertex::getId, Comparator.naturalOrder()).reversed());
-        priorityQueue.addAll(of);
+        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.<Vertex, VertexId>comparing(Vertex::getId, Comparator.naturalOrder()).reversed());
+        priorityQueue.add(ofVertex);
 
-        HashSet<Vertex> alreadyQueued = new HashSet<>(of);
+        HashSet<Vertex> alreadyQueued = new HashSet<>();
+        alreadyQueued.add(ofVertex);
 
         Map<Vertex, PartialDerivatives> dwrtOf = new HashMap<>();
-        of.forEach(v -> dwrtOf.put(v, PartialDerivatives.withRespectToSelf(v.getId(), v.getShape())));
+        dwrtOf.put(ofVertex, dWrtOfVertex);
+
 
         Map<VertexId, PartialDerivatives> wrtOf = new HashMap<>();
 
         while (!priorityQueue.isEmpty()) {
-            DoubleVertex visiting = priorityQueue.poll();
+            //TODO: not safe!
+            DoubleVertex visiting = (DoubleVertex) priorityQueue.poll();
 
             if (wrt.contains(visiting)) {
-                wrtOf.put(visiting.getId(), dwrtOf.get(visiting));
+                if (TensorShape.isScalar(visiting.getShape())) {
+                    int scalarRank = visiting.getShape().length;
+                    wrtOf.put(visiting.getId(), dwrtOf.get(visiting).sum(false, -scalarRank, -1));
+                } else {
+                    wrtOf.put(visiting.getId(), dwrtOf.get(visiting));
+                }
                 continue;
             }
 
@@ -48,14 +54,14 @@ public class Differentiator {
             if (!visiting.isProbabilistic()) {
                 for (Vertex parent : visiting.getParents()) {
                     if (!alreadyQueued.contains(parent) && parent instanceof DoubleVertex) {
-                        priorityQueue.offer((DoubleVertex) parent);
+                        priorityQueue.offer(parent);
                         alreadyQueued.add(parent);
                     }
                 }
             }
         }
 
-        return wrtOfToOfWrt(wrtOf);
+        return wrtOfToOfWrt(wrtOf).get(ofVertex.getId());
     }
 
     private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives, Map<Vertex, PartialDerivatives> dwrtOf) {
@@ -79,12 +85,12 @@ public class Differentiator {
         }
     }
 
-    public static PartialDerivatives reverseModeAutoDiff(DoubleVertex of, Set<DoubleVertex> wrt) {
-        return reverseModeAutoDiff(singleton(of), wrt).get(of.getId());
+    public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, Set<DoubleVertex> wrt) {
+        return reverseModeAutoDiff(ofVertex, PartialDerivatives.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), wrt);
     }
 
-    public static PartialDerivatives reverseModeAutoDiff(DoubleVertex of, DoubleVertex... wrt) {
-        return reverseModeAutoDiff(singleton(of), new HashSet<>(Arrays.asList(wrt))).get(of.getId());
+    public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, DoubleVertex... wrt) {
+        return reverseModeAutoDiff(ofVertex, new HashSet<>(Arrays.asList(wrt)));
     }
 
     /**

@@ -10,15 +10,16 @@ import java.util.Map;
 import org.junit.Rule;
 import org.junit.Test;
 
-import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
@@ -54,27 +55,31 @@ public class BernoulliVertexTest {
         DoubleVertex C = A.times(B);
         BernoulliVertex D = new BernoulliVertex(C);
 
-        Map<Vertex, DoubleTensor> dLogPmf = D.dLogPmf(BooleanTensor.create(new boolean[]{true, false}), ImmutableSet.of(A, B));
+        D.observe(BooleanTensor.create(new boolean[]{true, false}));
+
+        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(ImmutableList.of(D), ImmutableList.of(A, B));
+
+        Map<VertexId, DoubleTensor> dLogPmf = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
         DoubleTensor expectedWrtA = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.5, (-1.0 / 0.88) * 0.2});
         DoubleTensor expectedWrtB = DoubleTensor.create(new double[]{(1.0 / 0.125) * 0.25, (-1.0 / 0.88) * 0.6});
 
-        assertEquals(expectedWrtA, dLogPmf.get(A));
-        assertEquals(expectedWrtB, dLogPmf.get(B));
+        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
+        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
     }
 
     @Test
     public void doesCalculateDiffLogProbWithRespectToHyperParamFiniteElement() {
 
         DoubleVertex A = new GaussianVertex(0, 1);
-        DoubleTensor startA = DoubleTensor.scalar(-5);
-        DoubleTensor endA = DoubleTensor.scalar(5);
+        DoubleTensor startA = DoubleTensor.scalar(0.1);
+        DoubleTensor endA = DoubleTensor.scalar(0.9);
         A.setAndCascade(startA);
 
-        BernoulliVertex D = new BernoulliVertex(A.sigmoid());
+        BernoulliVertex D = new BernoulliVertex(A);
         D.observe(true);
 
-        double increment = 0.15;
+        double increment = 0.1;
         double gradientDelta = 1e-5;
 
         testGradientAcrossMultipleHyperParameterValues(
@@ -132,7 +137,11 @@ public class BernoulliVertexTest {
             true, true
         }, shape);
 
-        Map<Vertex, DoubleTensor> dLogPmf = D.dLogPmf(atValue, ImmutableSet.of(A, B));
+        D.observe(atValue);
+
+        LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(ImmutableList.of(D), ImmutableList.of(A, B));
+
+        Map<VertexId, DoubleTensor> dLogPmf = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
         DoubleTensor expectedWrtA = atValue.setDoubleIf(
             AValue.reciprocal(),
@@ -164,8 +173,8 @@ public class BernoulliVertexTest {
             0.0
         );
 
-        assertEquals(expectedWrtA, dLogPmf.get(A));
-        assertEquals(expectedWrtB, dLogPmf.get(B));
+        assertEquals(expectedWrtA, dLogPmf.get(A.getId()));
+        assertEquals(expectedWrtB, dLogPmf.get(B.getId()));
     }
 
     @Test

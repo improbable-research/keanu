@@ -59,7 +59,9 @@ public class ModelCompositionTest {
         Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
         Map<VertexLabel, Vertex> outputs = ModelComposition.composeModel(
-            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1")));
+            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"))
+        );
+
         gaussOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output1"));
 
         outerNet = new BayesianNetwork(gaussOutputVertex.getConnectedGraph());

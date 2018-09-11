@@ -51,7 +51,7 @@ public interface Probabilistic<T> extends Observable<T> {
     }
 
     default Map<Vertex, DoubleTensor> dLogProbAtValue(Vertex... withRespectTo) {
-        return dLogProb(getValue(), new HashSet<>(Arrays.asList(withRespectTo)));
+        return dLogProb(getValue(), withRespectTo);
     }
 
     static <V extends Vertex & Probabilistic> List<V> keepOnlyProbabilisticVertices(Iterable<? extends Vertex> vertices) {

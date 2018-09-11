@@ -39,9 +39,6 @@ public interface ProbabilisticDouble extends Probabilistic<DoubleTensor> {
     }
 
     default Map<Vertex, DoubleTensor> dLogPdf(DoubleTensor value, Set<Vertex> withRespectTo) {
-        if (withRespectTo.isEmpty()) {
-            throw new IllegalArgumentException("Must take dLogPdf wrt something");
-        }
         return dLogProb(value, withRespectTo);
     }
 

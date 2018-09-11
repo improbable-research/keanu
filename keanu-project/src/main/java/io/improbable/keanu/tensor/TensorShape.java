@@ -184,10 +184,10 @@ public class TensorShape {
 
     /**
      * Writes a lower rank shape over a higher rank shape, starting from the right.
-     *
+     * <p>
      * e.g: high rank shape = [1, 2, 2, 1]
-     *      low rank shape = [1, 4]
-     *
+     * low rank shape = [1, 4]
+     * <p>
      * Result after copy = [1, 2, 1, 4]
      *
      * @param higherRankShape source shape that will get written over
@@ -199,6 +199,13 @@ public class TensorShape {
         int deltaLength = highRankCopy.length - lowerRankShape.length;
         System.arraycopy(lowerRankShape, 0, highRankCopy, deltaLength, highRankCopy.length - deltaLength);
         return highRankCopy;
+    }
+
+    public static int[] prependOnes(int[] originalShape, int numberOfOnesToPrepend) {
+        int[] newShape = new int[originalShape.length + numberOfOnesToPrepend];
+        Arrays.fill(newShape, 1);
+        System.arraycopy(originalShape, 0, newShape, numberOfOnesToPrepend, newShape.length - numberOfOnesToPrepend);
+        return newShape;
     }
 
 }

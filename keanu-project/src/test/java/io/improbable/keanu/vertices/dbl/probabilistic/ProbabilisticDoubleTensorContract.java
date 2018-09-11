@@ -221,16 +221,16 @@ public class ProbabilisticDoubleTensorContract {
     void hasNoGradientWithRespectToItsValueWhenObserved(V vertexUnderTest) {
         DoubleTensor ones = DoubleTensor.ones(vertexUnderTest.getValue().getShape());
         vertexUnderTest.observe(ones);
-        assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest.getId()));
+        assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest));
     }
 
-    public static void matchesKnownLogDensityOfVector(Probabilistic vertexUnderTest, double[] vector, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfVector(Probabilistic<DoubleTensor> vertexUnderTest, double[] vector, double expectedLogDensity) {
 
         double actualDensity = vertexUnderTest.logProb(DoubleTensor.create(vector, vector.length, 1));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static void matchesKnownLogDensityOfScalar(Probabilistic vertexUnderTest, double scalar, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfScalar(Probabilistic<DoubleTensor> vertexUnderTest, double scalar, double expectedLogDensity) {
 
         double actualDensity = vertexUnderTest.logProb(DoubleTensor.scalar(scalar));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
