@@ -22,14 +22,14 @@ public class LogProbGradientCalculator {
     private final Set<? extends Vertex> wrtVertices;
 
     private final Map<Vertex, Set<DoubleVertex>> parentToLatentLookup;
-    private final Map<Vertex, Set<DoubleVertex>> parentsWithNonzeroDiffWrtLatent;
+    private final Map<Vertex, Set<DoubleVertex>> verticesWithNonzeroDiffWrtLatent;
 
     public LogProbGradientCalculator(List<? extends Vertex> logProbOfVerticesList, List<? extends Vertex> wrtVerticesList) {
         this.logProbOfVertices = new HashSet<>(logProbOfVerticesList);
         this.wrtVertices = new HashSet<>(wrtVerticesList);
 
         parentToLatentLookup = getWrtParents(logProbOfVertices);
-        parentsWithNonzeroDiffWrtLatent = getParentsWithNonzeroDiffWrt(logProbOfVertices, parentToLatentLookup);
+        verticesWithNonzeroDiffWrtLatent = getParentsWithNonzeroDiffWrt(logProbOfVertices, parentToLatentLookup);
     }
 
     private Map<Vertex, Set<DoubleVertex>> getParentsWithNonzeroDiffWrt(Set<? extends Vertex> ofVertices, Map<Vertex, Set<DoubleVertex>> parentToWrtVertices) {
@@ -65,7 +65,7 @@ public class LogProbGradientCalculator {
 
                 Set<Vertex> latentAndObservedVertices = upstreamLambdaSection.getLatentAndObservedVertices();
                 Set<DoubleVertex> latentVertices = latentAndObservedVertices.stream()
-                    .filter(v -> !v.isObserved())
+                    .filter(v -> !v.isObserved() && v instanceof DoubleVertex)
                     .map(v -> (DoubleVertex) v)
                     .filter(wrtVertices::contains)
                     .collect(Collectors.toSet());
@@ -87,38 +87,38 @@ public class LogProbGradientCalculator {
         PartialDerivatives diffOfLogWrt = new PartialDerivatives(new HashMap<>());
 
         for (final Vertex<?> ofVertex : logProbOfVertices) {
-            diffOfLogWrt = getLogProbGradientWrtLatents(ofVertex, diffOfLogWrt);
+            diffOfLogWrt = reverseModeLogProbGradientWrtLatents(ofVertex, diffOfLogWrt);
         }
 
         return diffOfLogWrt.asMap();
     }
 
-    public <T> PartialDerivatives getLogProbGradientWrtLatents(final Vertex<T> ofVertex,
-                                                               final PartialDerivatives diffOfLogProbWrt) {
+    public <T> PartialDerivatives reverseModeLogProbGradientWrtLatents(final Vertex<T> ofVertex,
+                                                                       final PartialDerivatives diffOfLogProbWrt) {
 
-
-        Set<DoubleVertex> parentsWithNonzeroDiff = parentsWithNonzeroDiffWrtLatent.get(ofVertex);
-        final Map<Vertex, DoubleTensor> dlogProbOfVertexWrtParents = ((Probabilistic<T>) ofVertex).dLogProbAtValue(parentsWithNonzeroDiff);
+        Set<DoubleVertex> verticesWithNonzeroDiff = verticesWithNonzeroDiffWrtLatent.get(ofVertex);
+        final Map<Vertex, DoubleTensor> dlogProbOfVertexWrtVertices = ((Probabilistic<T>) ofVertex).dLogProbAtValue(verticesWithNonzeroDiff);
 
         PartialDerivatives dOfWrtLatents = new PartialDerivatives(new HashMap<>());
 
-        for (Map.Entry<Vertex, DoubleTensor> diffWrtParent : dlogProbOfVertexWrtParents.entrySet()) {
+        for (Map.Entry<Vertex, DoubleTensor> dlogProbWrtVertex : dlogProbOfVertexWrtVertices.entrySet()) {
 
-            DoubleVertex parent = (DoubleVertex) diffWrtParent.getKey();
-            DoubleTensor dLogProbOfWrtParent = diffWrtParent.getValue().reshape(TensorShape.prependOnes(diffWrtParent.getValue().getShape(), 2));
+            DoubleVertex vertexWithDiff = (DoubleVertex) dlogProbWrtVertex.getKey();
+            DoubleTensor dLogProbOfWrtVertexWithDiff = dlogProbWrtVertex.getValue();
 
-            if (parentToLatentLookup.containsKey(parent) && !parentToLatentLookup.get(parent).isEmpty()) {
+            if (vertexWithDiff.equals(ofVertex)) {
+                dOfWrtLatents.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
+            } else {
 
-                PartialDerivatives dLogProbdParent = new PartialDerivatives(new HashMap<>());
-                dLogProbdParent.putWithRespectTo(parent.getId(), dLogProbOfWrtParent);
+                PartialDerivatives partialWrtVertexWithDiff = new PartialDerivatives(new HashMap<>());
+                int[] shapeOfLogProbWrtVertexWithDiff = TensorShape.prependOnes(dLogProbOfWrtVertexWithDiff.getShape(), 2);
+                partialWrtVertexWithDiff.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff.reshape(shapeOfLogProbWrtVertexWithDiff));
 
                 PartialDerivatives dOfWrtLatentsContributionFromParent = Differentiator
-                    .reverseModeAutoDiff(parent, dLogProbdParent, this.parentToLatentLookup.get(parent))
-                    .sum(true, TensorShape.dimensionRange(0, 2));
+                    .reverseModeAutoDiff(vertexWithDiff, partialWrtVertexWithDiff, this.parentToLatentLookup.get(vertexWithDiff))
+                    .sum(true, 0, 1);
 
                 dOfWrtLatents = dOfWrtLatents.add(dOfWrtLatentsContributionFromParent);
-            } else {
-                dOfWrtLatents.putWithRespectTo(parent.getId(), dLogProbOfWrtParent.sum(TensorShape.dimensionRange(0, 2)));
             }
 
         }
