@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -42,7 +43,7 @@ public class PlatesExample {
      *
      * @param dataFileName - the file containing data in (x,y) format
      */
-    public Plates buildPlates(String dataFileName) {
+    public Plates buildPlates(String dataFileName) throws VertexLabelException {
 
         //Read data from a csv file
         CsvReader csvReader = ReadCsv.fromResources(dataFileName);
