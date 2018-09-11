@@ -36,7 +36,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         final double logCovDet = Math.log(covariance.determinant());
         DoubleTensor xMinusMu = x.minus(mu);
         DoubleTensor xMinusMuT = xMinusMu.transpose();
-        DoubleTensor covInv = covariance.inverse();
+        DoubleTensor covInv = covariance.matrixInverse();
 
         double scalar = mu.isScalar() ?
             covInv.times(xMinusMu).times(xMinusMuT).scalar() :
