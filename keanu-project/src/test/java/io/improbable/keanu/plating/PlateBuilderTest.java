@@ -31,6 +31,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
+import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -298,6 +299,8 @@ public class PlateBuilderTest {
         BoolVertex tru = ConstantVertex.of(true).labelled(loopLabel);
         DoubleVertex initialValue = ConstantVertex.of(0.).labelled(valueOutLabel);
 
+        int maximumLoopLength = 100;
+
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialSum, tru, initialValue)
             .withProxyMapping(ImmutableMap.of(
@@ -305,7 +308,7 @@ public class PlateBuilderTest {
                 stillLoopingLabel, loopLabel,
                 valueInLabel, valueOutLabel
             ))
-            .count(100)
+            .count(maximumLoopLength)
             .withFactory((plate) -> {
                 // inputs
                 DoubleVertex runningTotal = new DoubleProxyVertex(runningTotalLabel);
@@ -361,6 +364,21 @@ public class PlateBuilderTest {
             previousLoop = loop;
             previousValueOut = valueOut;
         }
+
+
+        DoubleVertex output = plates.asList().get(maximumLoopLength - 1).get(valueOutLabel);
+
+        for (int firstFailure : new int[] {0, 1, 2, 10, 99}) {
+            System.out.format("Testing loop that fails after %d steps%n", firstFailure);
+            for (Plate plate : plates) {
+                BoolVertex condition = plate.get(conditionLabel);
+                condition.setAndCascade(true);
+            }
+            BoolVertex condition = plates.asList().get(firstFailure).get(conditionLabel);
+            condition.setAndCascade(false);
+            Double expectedOutput = new Double(firstFailure);
+            assertThat(output, VertexMatchers.hasValue(expectedOutput));
+        }
     }
 
     @Test
@@ -408,6 +426,4 @@ public class PlateBuilderTest {
             })
             .build();
     }
-
-
 }
