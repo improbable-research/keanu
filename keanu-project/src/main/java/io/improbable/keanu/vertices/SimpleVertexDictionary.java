@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.improbable.keanu.tensor.Tensor;
+
 public class SimpleVertexDictionary implements VertexDictionary {
     private final Map<VertexLabel, Vertex<?>> map;
 
@@ -12,7 +14,7 @@ public class SimpleVertexDictionary implements VertexDictionary {
     }
 
     @Override
-    public <T, V extends Vertex<T>> V get(VertexLabel label) {
+    public <T extends Tensor<?>, V extends Vertex<T>> V get(VertexLabel label) {
         return (V) map.get(label);
     }
 

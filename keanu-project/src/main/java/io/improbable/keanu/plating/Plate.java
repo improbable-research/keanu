@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -39,7 +40,7 @@ public class Plate implements VertexDictionary {
     }
 
     @Override
-    public <T, V extends Vertex<T>> V get(VertexLabel label) {
+    public <T extends Tensor<?>, V extends Vertex<T>> V get(VertexLabel label) {
         Vertex<?> vertex = contents.get(label);
         if (vertex == null) {
             vertex = contents.get(scoped(label));
