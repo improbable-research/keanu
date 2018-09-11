@@ -37,8 +37,8 @@ public class VertexLabel {
 
     @Override
     public String toString() {
-        String namespaceString = Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(namespace));
-        return String.format("%s%c%s", namespaceString, NAMESPACE_SEPARATOR, name);
+        ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
+        return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
     }
 
     @Override
