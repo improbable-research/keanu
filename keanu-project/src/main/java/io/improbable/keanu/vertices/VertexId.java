@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.primitives.Ints;
@@ -73,7 +74,7 @@ public class VertexId implements Comparable<VertexId> {
 
     @Override
     public String toString() {
-        return idValues.toString();
+        return Arrays.toString(idValues);
     }
 
     public int getIndentation() {
