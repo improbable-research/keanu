@@ -28,7 +28,7 @@ public class VertexLabel {
 
     public VertexLabel removeOuterNamespace() throws VertexLabelException {
         try {
-            List<String> reducedNamespace = namespace.subList(0, namespace.size()-1);
+            List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
             return new VertexLabel(this.name, reducedNamespace);
         } catch (IndexOutOfBoundsException e) {
             throw new VertexLabelException("There is no namespace to remove", e);
