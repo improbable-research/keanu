@@ -21,12 +21,12 @@ public class VertexLabel {
         this.namespace = ImmutableList.copyOf(namespace);
     }
 
-    public VertexLabel inNamespace(String topLevelNamespace) {
+    public VertexLabel withExtraNamespace(String topLevelNamespace) {
         List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
         return new VertexLabel(this.name, newNamespace);
     }
 
-    public VertexLabel removeOuterNamespace() throws VertexLabelException {
+    public VertexLabel withoutOuterNamespace() throws VertexLabelException {
         try {
             List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
             return new VertexLabel(this.name, reducedNamespace);
