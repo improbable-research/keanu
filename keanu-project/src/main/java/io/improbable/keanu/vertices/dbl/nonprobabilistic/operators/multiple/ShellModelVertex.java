@@ -66,6 +66,7 @@ public class ShellModelVertex extends DoubleVertex implements ModelProcessVertex
     @Override
     public DoubleTensor calculate() {
         run(process(inputs), extractOutput);
+        //TODO: Figure out a nice thing to return
         return DoubleTensor.scalar(0.);
     }
 

@@ -1,28 +1,28 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.hamcrest.MatcherAssert;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Function;
 
 public class ModelInModelTest {
 
     private KeanuRandom random;
-
 
     @Before
     public void setup() {
@@ -41,6 +41,7 @@ public class ModelInModelTest {
         ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
+
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         inputToModel.setAndCascade(10);
@@ -73,7 +74,7 @@ public class ModelInModelTest {
     }
 
     @Test
-    public void modelWorksAsPartOfLargerGraph() {
+    public void modelWorksAsPartOfGradientOptimisation() {
         DoubleVertex inputToModelOne = new GaussianVertex(14.0, 5);
         DoubleVertex inputToModelTwo = new GaussianVertex(14.0, 5);
         DoubleVertex inputToModel = inputToModelOne.plus(inputToModelTwo);
@@ -95,6 +96,37 @@ public class ModelInModelTest {
         NonGradientOptimizer gradientOptimizer = NonGradientOptimizer.of(temperatureReadingTwo.getConnectedGraph());
         gradientOptimizer.maxLikelihood();
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
+    }
+
+    @Test
+    public void modelWorksAsPartOfSampling() {
+        DoubleVertex inputToModel = new GaussianVertex(28.0, 5);
+
+        Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
+        inputs.put(new VertexLabel("Temperature"), inputToModel);
+
+        String command = "./src/test/resources/model.sh {Temperature}";
+
+        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
+        DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
+
+        DoubleVertex temperatureReadingOne = new GaussianVertex(chanceOfRain, 5);
+        DoubleVertex temperatureReadingTwo = new GaussianVertex(humidity, 5);
+        temperatureReadingOne.observe(3.0);
+        temperatureReadingTwo.observe(60.0);
+
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(temperatureReadingOne.getConnectedGraph());
+
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+            bayesianNetwork,
+            inputToModel,
+            750
+        );
+
+        double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
+
+        Assert.assertEquals(30.0, averagePosteriorInput, 0.1);
     }
 
     private Map<VertexLabel, Double> extractOutput(Map<VertexLabel, DoubleVertex> inputs) {
