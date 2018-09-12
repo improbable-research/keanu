@@ -13,7 +13,7 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
 
 /**
- * PlateBuilder allows plates to constructed in steps
+ * PlateBuilder allows plates to be constructed in steps
  *
  * @param <T> The data type provided to user-provided plate
  *            factory function, if building from data
@@ -175,10 +175,7 @@ public class PlateBuilder<T> {
             throw new IllegalArgumentException("You must provide a base case for the Proxy Vertices - use withInitialState()");
         }
         for (Vertex<?> proxy : proxyVertices) {
-            VertexLabel label = proxyMapping.get(proxy.getLabel());
-            if (label == null) {
-                label = proxyMapping.get(proxy.getLabel().withoutOuterNamespace());
-            }
+            VertexLabel label = proxyMapping.get(proxy.getLabel().withoutOuterNamespace());
             if (label == null) {
                 throw new VertexLabelException("Cannot find proxy mapping for " + proxy.getLabel());
             }
