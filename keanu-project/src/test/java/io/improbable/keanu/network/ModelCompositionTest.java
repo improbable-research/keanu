@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -132,8 +133,8 @@ public class ModelCompositionTest {
         Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, gaussOutputVertex);
         Set<Vertex> filteredVertices = new HashSet<>(outerNet.getTopLevelLatentVertices());
 
-        assertEquals(latentOuterVertices.containsAll(filteredVertices), true);
-        assertEquals(filteredVertices.containsAll(latentOuterVertices), true);
+        assertTrue(latentOuterVertices.containsAll(filteredVertices));
+        assertTrue(filteredVertices.containsAll(latentOuterVertices));
     }
 
     private void triggerCompositionWarnings(List<VertexLabel> outputs,
@@ -198,8 +199,8 @@ public class ModelCompositionTest {
         shouldMatch.addPrefix(prefix);
         VertexId shouldNotMatch = new VertexId();
 
-        assertEquals(shouldMatch.prefixMatches(prefix), true);
-        assertEquals(shouldNotMatch.prefixMatches(prefix), false);
+        assertTrue(shouldMatch.prefixMatches(prefix));
+        assertFalse(shouldNotMatch.prefixMatches(prefix));
     }
 
 }

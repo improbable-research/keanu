@@ -22,7 +22,7 @@ public class FitnessFunctionWithGradient {
 
     private final List<? extends Vertex> ofVertices;
     private final List<? extends Vertex<DoubleTensor>> wrtVertices;
-    private final LogProbGradientCalculator logProbGradient;
+    private final LogProbGradientCalculator logProbGradientCalculator;
 
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
@@ -33,7 +33,7 @@ public class FitnessFunctionWithGradient {
                                        BiConsumer<double[], Double> onFitnessCalculation) {
         this.ofVertices = ofVertices;
         this.wrtVertices = wrtVertices;
-        this.logProbGradient = new LogProbGradientCalculator(ofVertices, wrtVertices);
+        this.logProbGradientCalculator = new LogProbGradientCalculator(ofVertices, wrtVertices);
         this.onGradientCalculation = onGradientCalculation;
         this.onFitnessCalculation = onFitnessCalculation;
     }
@@ -48,7 +48,7 @@ public class FitnessFunctionWithGradient {
 
             setAndCascadePoint(point, wrtVertices);
 
-            Map<VertexId, DoubleTensor> diffs = logProbGradient.getJointLogProbGradientWrtLatents();
+            Map<VertexId, DoubleTensor> diffs = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, wrtVertices);
 

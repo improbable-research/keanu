@@ -130,7 +130,7 @@ public class GradientOptimizer implements Optimizer {
         return optimize(bayesianNetwork.getObservedVertices());
     }
 
-    private double optimize(List<? extends Vertex> outputVertices) {
+    private double optimize(List<Vertex> outputVertices) {
 
         ProgressBar progressBar = Optimizer.createFitnessProgressBar(this);
 

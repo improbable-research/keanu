@@ -16,7 +16,7 @@ public class Gaussian implements ContinuousDistribution {
     private final DoubleTensor mu;
     private final DoubleTensor sigma;
 
-    public static Gaussian withParameters(DoubleTensor mu, DoubleTensor sigma) {
+    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
         return new Gaussian(mu, sigma);
     }
 
