@@ -9,7 +9,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -251,7 +250,7 @@ public class PartialDerivatives {
                 return partial.times(multiplierFromLeft);
     }
 
-    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensorpartial, DoubleTensor multiplier){
+    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier){
         int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
         if (TensorShape.isScalar(partialWrtShape)) {
 
