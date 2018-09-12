@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 
+import org.apache.commons.math3.exception.NotStrictlyPositiveException;
 import org.apache.commons.math3.optim.InitialGuess;
 import org.apache.commons.math3.optim.MaxEval;
 import org.apache.commons.math3.optim.PointValuePair;
@@ -156,10 +157,17 @@ public class GradientOptimizer implements Optimizer {
 
         warnIfGradientIsFlat(initialGradient);
 
-        NonLinearConjugateGradientOptimizer optimizer = new NonLinearConjugateGradientOptimizer(
-            updateFormula.apacheMapping,
-            new SimpleValueChecker(relativeThreshold, absoluteThreshold)
-        );
+        NonLinearConjugateGradientOptimizer optimizer;
+
+        try {
+            optimizer = new NonLinearConjugateGradientOptimizer(
+                updateFormula.apacheMapping,
+                new SimpleValueChecker(relativeThreshold, absoluteThreshold)
+            );
+        } catch (NotStrictlyPositiveException e) {
+            translateNSPExceptionToIllegalArgException(e);
+            optimizer = null;
+        }
 
         PointValuePair pointValuePair = optimizer.optimize(
             new MaxEval(maxEvaluations),
@@ -178,5 +186,14 @@ public class GradientOptimizer implements Optimizer {
         if (Math.abs(maxGradient) <= FLAT_GRADIENT) {
             throw new IllegalStateException("The initial gradient is very flat. The largest gradient is " + maxGradient);
         }
+    }
+
+    private static void translateNSPExceptionToIllegalArgException(NotStrictlyPositiveException e) {
+        long bitwiseMinValue = Double.doubleToLongBits(e.getMin().doubleValue());
+        long bitwiseArgumentValue = Double.doubleToLongBits(e.getArgument().doubleValue());
+
+        throw new IllegalArgumentException("Hit a NSP Error.  Min: "
+            + Long.toHexString(bitwiseMinValue)
+            + " Arg: " + Long.toHexString(bitwiseArgumentValue));
     }
 }
