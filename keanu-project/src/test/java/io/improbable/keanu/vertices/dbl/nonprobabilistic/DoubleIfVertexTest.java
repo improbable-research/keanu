@@ -171,7 +171,7 @@ public class DoubleIfVertexTest {
     }
 
     @Test
-    public void canExtractDualNumberFromMixedPredicateWithDifferentParentsAndFillInZeroesRankThree() {
+    public void canExtractDualNumberFromMixedPredicateWithDifferentParentsRankThree() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
