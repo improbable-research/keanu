@@ -27,8 +27,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 
 public class LoopBuilder {
     private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
@@ -89,8 +87,9 @@ public class LoopBuilder {
 
             try {
                 List<Vertex> outputVertices = initialState.stream().filter(v -> Loop.VALUE_OUT_LABEL.equals(v.getLabel())).collect(Collectors.toList());
-                Vertex outputVertex = Iterables.getOnlyElement(outputVertices);
-                valueOutWhenAlwaysTrue = createProxyFor(outputVertex);
+                Vertex<?> outputVertex = Iterables.getOnlyElement(outputVertices);
+                valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+                valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch(NoSuchElementException e) {
                 throw new PlateException("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL", e);
             }
@@ -103,22 +102,7 @@ public class LoopBuilder {
                 .add(tru)
                 .build();
         }
-
-        private <V extends Vertex<?>> V createProxyFor(Vertex vertex) {
-            V proxy;
-            if (vertex instanceof DoubleVertex) {
-                proxy = (V) new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
-            } else if (vertex instanceof IntegerVertex) {
-                proxy = (V) new IntegerProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
-            } else if (vertex instanceof BoolVertex) {
-                proxy = (V) new BoolProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
-            } else {
-                throw new PlateException("Input Vertex must be of type DoubleVertex, IntegerVertex or BoolVertex");
-            }
-            proxy.setParents(vertex);
-            return proxy;
-        }
-
+        
         public Loop whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
             return whilst(plate -> conditionSupplier.get());
         }
