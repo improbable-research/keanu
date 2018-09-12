@@ -30,6 +30,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 public class LoopBuilder {
     private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private final Collection<Vertex> initialState;
+    private boolean throwWhenMaxCountIsReached = true;
 
     <V extends Vertex<?>> LoopBuilder(Collection<V> initialState) {
         this.initialState = ImmutableList.copyOf(initialState);
@@ -40,22 +41,29 @@ public class LoopBuilder {
         return this;
     }
 
+    public LoopBuilder dontThrowWhenMaxCountIsReached() {
+        this.throwWhenMaxCountIsReached = false;
+        return this;
+    }
+
     public LoopBuilder2 apply(Function<DoubleVertex, DoubleVertex> condition) {
-        return new LoopBuilder2(maxLoopCount, initialState, condition);
+        return new LoopBuilder2(maxLoopCount, initialState, condition, throwWhenMaxCountIsReached);
     }
 
     public class LoopBuilder2 {
         private final Function<DoubleVertex, DoubleVertex> iterationFunction;
+        private final boolean throwWhenMaxCountIsReached;
         private final int maxLoopCount;
         private final Collection<Vertex> initialState;
         private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(int maxLoopCount, Collection<Vertex> initialState, Function<DoubleVertex, DoubleVertex> iterationFunction) {
+        LoopBuilder2(int maxLoopCount, Collection<Vertex> initialState, Function<DoubleVertex, DoubleVertex> iterationFunction, boolean throwWhenMaxCountIsReached) {
             this.maxLoopCount = maxLoopCount;
             this.initialState = setInitialState(initialState);
             this.iterationFunction = iterationFunction;
+            this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
         }
 
         private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) {
@@ -134,7 +142,7 @@ public class LoopBuilder {
                 })
                 .build();
 
-            return new Loop(plates);
+            return new Loop(plates, throwWhenMaxCountIsReached);
         }
     }
 }

@@ -64,6 +64,17 @@ public class LoopTest {
     }
 
     @Test
+    public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() throws VertexLabelException {
+        Loop loop = Loop
+            .startingFrom(startValue)
+            .dontThrowWhenMaxCountIsReached()
+            .apply(increment)
+            .whilst(alwaysTrue);
+        loop.getOutput();
+        // does not throw
+    }
+
+    @Test
     public void youCanOverrideTheDefaultMaxLength() throws VertexLabelException {
         int customMaxCount = 5;
         Loop loop = Loop
