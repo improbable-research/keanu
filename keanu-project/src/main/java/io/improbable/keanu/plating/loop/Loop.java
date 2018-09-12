@@ -39,7 +39,7 @@ public class Loop {
     }
 
     public static <V extends Vertex<?>> LoopBuilder startingFrom(Collection<V> initialState) {
-        return new LoopBuilder(DEFAULT_MAX_COUNT, initialState);
+        return new LoopBuilder(initialState);
     }
 
     public <V extends Vertex<? extends Tensor<?>>> V getOutput() {

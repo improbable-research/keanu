@@ -28,12 +28,16 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 
 public class LoopBuilder {
-    private final int maxLoopCount;
+    private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private final Collection<Vertex> initialState;
 
-    <V extends Vertex<?>> LoopBuilder(int maxLoopCount, Collection<V> initialState) {
-        this.maxLoopCount = maxLoopCount;
+    <V extends Vertex<?>> LoopBuilder(Collection<V> initialState) {
         this.initialState = ImmutableList.copyOf(initialState);
+    }
+
+    public LoopBuilder atMost(int maxCount) {
+        this.maxLoopCount = maxCount;
+        return this;
     }
 
     public LoopBuilder2 apply(Function<DoubleVertex, DoubleVertex> condition) {

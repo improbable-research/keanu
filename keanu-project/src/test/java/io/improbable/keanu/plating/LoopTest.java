@@ -22,7 +22,6 @@ import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class LoopTest {
 
@@ -51,6 +50,17 @@ public class LoopTest {
             .apply(increment)
             .whilst(alwaysTrue);
         assertThat(loop.getPlates().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
+    }
+
+    @Test
+    public void youCanOverrideTheDefaultMaxLength() throws VertexLabelException {
+        int customMaxCount = 5;
+        Loop loop = Loop
+            .startingFrom(startValue)
+            .atMost(customMaxCount)
+            .apply(increment)
+            .whilst(alwaysTrue);
+        assertThat(loop.getPlates().size(), equalTo(customMaxCount));
     }
 
     @Test
