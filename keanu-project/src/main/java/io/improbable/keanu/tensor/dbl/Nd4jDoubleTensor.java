@@ -820,18 +820,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor concat(int dimension, DoubleTensor... those) {
-        INDArray dup = tensor.dup();
-        INDArray[] toConcat = new INDArray[those.length + 1];
-        toConcat[0] = dup;
-        for (int i = 1; i <= those.length; i++) {
-            toConcat[i] = unsafeGetNd4J(those[i - 1]).dup();
-        }
-        INDArray concat = Nd4j.concat(dimension, toConcat);
-        return new Nd4jDoubleTensor(concat);
-    }
-
-    @Override
     public DoubleTensor slice(int dimension, int index) {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);
@@ -987,7 +975,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         }
     }
 
-    private INDArray unsafeGetNd4J(DoubleTensor that) {
+    static INDArray unsafeGetNd4J(DoubleTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }

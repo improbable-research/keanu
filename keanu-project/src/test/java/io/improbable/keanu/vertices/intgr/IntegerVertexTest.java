@@ -7,6 +7,10 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.Function;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -144,6 +148,21 @@ public class IntegerVertexTest {
         assertArrayEquals(binomialVertex.getShape(), new int[]{2, 2});
         IntegerVertex reshaped = binomialVertex.reshape(4, 1);
         assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+    }
+
+    @Test
+    public void canConcat() {
+        IntegerVertex A = new UniformIntVertex(0, 1);
+        A.setValue(IntegerTensor.ones(2, 2));
+
+        IntegerVertex B = new UniformIntVertex(0, 1);
+        B.setValue(IntegerTensor.ones(2, 2));
+
+        IntegerVertex concatDimZero = IntegerVertex.concat(0, A, B);
+        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+
+        IntegerVertex concatDimOne = IntegerVertex.concat(1, A, B);
+        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
     }
 
 }

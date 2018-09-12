@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -89,9 +90,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
-        DoubleTensor primary = inputs[0];
-        DoubleTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return primary.concat(dimension, toConcat);
+        return DoubleTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func) {

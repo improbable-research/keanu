@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -64,16 +65,16 @@ public class SliceVertex extends DoubleUnaryOpVertex {
 
         if (index == 0) {
             partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return tensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape));
+            return DoubleTensor.concat(dimensionOfWrtToExtend, tensor, DoubleTensor.zeros(partialShape));
         } else if (index == lengthInSlicedDimension) {
             partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return DoubleTensor.zeros(partialShape).concat(dimensionOfWrtToExtend, tensor);
+            return DoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape), tensor);
         } else {
             int[] zerosBeforeSlice = Arrays.copyOf(partialShape, partialShape.length);
             int[] zerosAfterSlice = Arrays.copyOf(partialShape, partialShape.length);
             zerosBeforeSlice[dimensionOfWrtToExtend] = index;
             zerosAfterSlice[dimensionOfWrtToExtend] = lengthInSlicedDimension - index;
-            return DoubleTensor.zeros(zerosBeforeSlice).concat(dimensionOfWrtToExtend, tensor, DoubleTensor.zeros(zerosAfterSlice));
+            return DoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(zerosBeforeSlice), tensor, DoubleTensor.zeros(zerosAfterSlice));
         }
     }
 
