@@ -3,6 +3,7 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
@@ -49,6 +50,7 @@ public class FitnessFunctionWithGradient {
             Map<VertexId, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, latentVertices);
+            System.out.println("Gradients: " + Arrays.toString(gradients));
 
             if (onGradientCalculation != null) {
                 onGradientCalculation.accept(point, gradients);
@@ -62,6 +64,7 @@ public class FitnessFunctionWithGradient {
         return point -> {
             setAndCascadePoint(point, latentVertices);
             double logOfTotalProbability = ProbabilityCalculator.calculateLogProbFor(vertices);
+            System.out.println("Prob: " + logOfTotalProbability);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);

@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -19,26 +21,24 @@ import java.util.function.Function;
 
 public class ModelInModelTest {
 
-    private DoubleVertex inputToModel;
-    private ModelVertex model;
     private KeanuRandom random;
 
 
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        inputToModel = new ConstantDoubleVertex(25);
+    }
+
+    @Test
+    public void canRunAModelInAModel() {
+        DoubleVertex inputToModel = new ConstantDoubleVertex(25);
 
         Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
         String command = "./src/test/resources/model.sh {Temperature}";
 
-        model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
-    }
-
-    @Test
-    public void canRunAModelInAModel() {
+        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -51,6 +51,14 @@ public class ModelInModelTest {
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
 
+        DoubleVertex inputToModel = new ConstantDoubleVertex(25);
+
+        Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
+        inputs.put(new VertexLabel("Temperature"), inputToModel);
+
+        String command = "./src/test/resources/model.sh {Temperature}";
+
+        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -62,6 +70,31 @@ public class ModelInModelTest {
             double expectedValue = (value * 0.1) * (value * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);
         }
+    }
+
+    @Test
+    public void modelWorksAsPartOfLargerGraph() {
+        DoubleVertex inputToModelOne = new GaussianVertex(14.0, 5);
+        DoubleVertex inputToModelTwo = new GaussianVertex(14.0, 5);
+        DoubleVertex inputToModel = inputToModelOne.plus(inputToModelTwo);
+
+        Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
+        inputs.put(new VertexLabel("Temperature"), inputToModel);
+
+        String command = "./src/test/resources/model.sh {Temperature}";
+
+        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
+        DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
+
+        DoubleVertex temperatureReadingOne = new GaussianVertex(chanceOfRain, 5);
+        DoubleVertex temperatureReadingTwo = new GaussianVertex(humidity, 5);
+        temperatureReadingOne.observe(3.0);
+        temperatureReadingTwo.observe(60.0);
+
+        NonGradientOptimizer gradientOptimizer = NonGradientOptimizer.of(temperatureReadingTwo.getConnectedGraph());
+        gradientOptimizer.maxLikelihood();
+        Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }
 
     private Map<VertexLabel, Double> extractOutput(Map<VertexLabel, DoubleVertex> inputs) {
