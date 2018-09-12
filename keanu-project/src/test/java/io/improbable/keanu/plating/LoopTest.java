@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.instanceOf;
 
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -22,6 +23,7 @@ import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 
 public class LoopTest {
 
@@ -132,6 +134,33 @@ public class LoopTest {
         DoubleVertex output = loop.getOutput();
         assertThat(output, VertexMatchers.hasValue(10.));
 
+    }
+
+    @Test
+    public void youCanAddCustomProxyVariableMappings() throws VertexLabelException {
+        VertexLabel factorInLabel = new VertexLabel("factorIn");
+        VertexLabel factorOutLabel = new VertexLabel("factorOut");
+        DoubleVertex startFactorial = ConstantVertex.of(1.).labelled(Loop.VALUE_OUT_LABEL);
+        DoubleVertex startFactor = ConstantVertex.of(1.).labelled(factorOutLabel);
+
+        BiFunction<Plate, DoubleVertex, DoubleVertex> factorial = (plate, valueIn) -> {
+            DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
+            DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.)).labelled(factorOutLabel);
+            plate.add(factorIn);
+            plate.add(factorOut);
+            return valueIn.times(factorOut);
+        };
+
+        Loop loop = Loop
+            .startingFrom(startFactorial, startFactor)
+            .atMost(5)
+            .dontThrowWhenMaxCountIsReached()
+            .mapping(factorInLabel, factorOutLabel)
+            .apply(factorial)
+            .whilst(alwaysTrue);
+
+        DoubleVertex output = loop.getOutput();
+        assertThat(output, VertexMatchers.hasValue(720.));
     }
 
 
