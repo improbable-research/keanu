@@ -12,6 +12,7 @@ import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
+import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.PlateException;
 import io.improbable.keanu.plating.Plates;
@@ -102,10 +103,14 @@ public class LoopBuilder {
         }
 
         public Loop whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
+            return whilst(plate -> conditionSupplier.get());
+        }
+
+        public Loop whilst(Function<Plate,BoolVertex> conditionFunction) throws VertexLabelException {
             // inputs
             VertexLabel valueInWhenAlwaysTrueLabel = new VertexLabel("valueInWhenAlwaysTrue");
             VertexLabel stillLoopingLabel = Loop.STILL_LOOPING;
-            VertexLabel valueInLabel = new VertexLabel("valueIn");
+            VertexLabel valueInLabel = Loop.VALUE_IN_LABEL;
 
             // intermediate
             VertexLabel conditionLabel = new VertexLabel("condition");
@@ -131,7 +136,7 @@ public class LoopBuilder {
                     plate.addAll(ImmutableSet.of(valueInWhenAlwaysTrue, stillLooping, valueIn));
 
                     // intermediate
-                    BoolVertex condition = conditionSupplier.get().labelled(conditionLabel);
+                    BoolVertex condition = conditionFunction.apply(plate).labelled(conditionLabel);
                     plate.add(condition);
 
                     // outputs
@@ -144,5 +149,6 @@ public class LoopBuilder {
 
             return new Loop(plates, throwWhenMaxCountIsReached);
         }
+
     }
 }

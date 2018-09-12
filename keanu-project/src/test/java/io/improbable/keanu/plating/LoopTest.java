@@ -117,5 +117,22 @@ public class LoopTest {
         }
     }
 
+    @Test
+    public void theConditionCanBeAFunctionOfThePlateVariables() throws VertexLabelException {
+        Function<Plate, BoolVertex> lessThanTen = plate -> {
+            DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
+            return valueIn.lessThan(ConstantVertex.of(10.));
+        };
+
+        Loop loop = Loop
+            .startingFrom(startValue)
+            .apply(increment)
+            .whilst(lessThanTen);
+
+        DoubleVertex output = loop.getOutput();
+        assertThat(output, VertexMatchers.hasValue(10.));
+
+    }
+
 
 }
