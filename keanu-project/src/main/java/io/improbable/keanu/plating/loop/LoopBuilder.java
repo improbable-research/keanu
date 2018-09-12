@@ -29,36 +29,66 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class LoopBuilder {
-    private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private final Collection<Vertex> initialState;
-    private final ImmutableMap.Builder<VertexLabel, VertexLabel> customMappings = ImmutableMap.builder();
+    private ImmutableMap.Builder<VertexLabel, VertexLabel> customMappings = ImmutableMap.builder();
+    private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private boolean throwWhenMaxCountIsReached = true;
-
 
     <V extends Vertex<?>> LoopBuilder(Collection<V> initialState) {
         this.initialState = ImmutableList.copyOf(initialState);
     }
 
+    /**
+     * An optional method to override the default value
+     *
+     * @param maxCount - the max number of times the loop can run
+     * @return self
+     */
     public LoopBuilder atMost(int maxCount) {
         this.maxLoopCount = maxCount;
         return this;
     }
 
+    /**
+     * An optional method to override the default behaviour
+     * If the maximum loop count is exceeded, it will log a warning instead of throwing
+     *
+     * @return self
+     */
     public LoopBuilder dontThrowWhenMaxCountIsReached() {
         this.throwWhenMaxCountIsReached = false;
         return this;
     }
 
+    /**
+     * An optional method to add custom mappings
+     *
+     * @param inputLabel  - the label assigned to the ProxyVertex in frame t
+     * @param outputLabel - the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
+     * @return
+     */
     public LoopBuilder mapping(VertexLabel inputLabel, VertexLabel outputLabel) {
         customMappings.put(inputLabel, outputLabel);
         return this;
     }
 
-    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
+    /**
+     * A mandatory method to specify the condition
+     *
+     * @param conditionSupplier - a lambda that creates and returns a new BoolVertex
+     * @return the next stage builder
+     */
+    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) {
         return whilst(plate -> conditionSupplier.get());
     }
 
-    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
+    /**
+     * A mandatory method to specify the condition
+     *
+     * @param conditionFunction - a lambda that takes the current Plate and creates and returns a new BoolVertex
+     * @return the next stage builder
+     */
+    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) {
         return new LoopBuilder2(maxLoopCount, initialState, conditionFunction, throwWhenMaxCountIsReached, customMappings.build());
     }
 
@@ -103,12 +133,28 @@ public class LoopBuilder {
         }
 
 
+        /**
+         * A mandatory method to specify the iteration step
+         *
+         * @param iterationFunction - a lambda that takes the Proxy input vertex
+         *                          and creates and returns a new output Vertex
+         * @return the fully constructed Loop object
+         * @throws VertexLabelException
+         */
         public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction) throws VertexLabelException {
             return apply((plate, valueIn) -> {
                 return iterationFunction.apply(valueIn);
             });
         }
 
+        /**
+         * A mandatory method to specify the iteration step
+         *
+         * @param iterationFunction - a lambda that takes the current Plate and the Proxy input vertex
+         *                          and creates and returns a new output vertex
+         * @return the fully constructed Loop object
+         * @throws VertexLabelException
+         */
         public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) throws VertexLabelException {
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))

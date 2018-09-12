@@ -16,6 +16,38 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
+/**
+ * A Loop object is a convenient wrapper around some Plates.
+ * See LoopTest.java for examples of how it's used.
+ * The way it works is to unroll the loop up to a maximum size and evaluate it in full
+ * (so it's not very performant)
+ * <p>
+ * The resulting graph structure looks like this.
+ * "base" is the base case, provided by the user
+ * "cond" is the condition (one instance per iteration), provided by the user
+ * "iterate" is the iteration step, provided by the user
+ * "V" is the output of the loop
+ * "L" indicates if it's still looping. This is used to detect the error case in which the loop was too short to complete.
+ * <p>
+ *       cond true base
+ *           \ |   |  \
+ *            AND  | iterate
+ *             |\  |  /|
+ *             | \ | / |
+ *       cond  |  IF   |
+ *           \ |   |\  |
+ *            AND  | iterate
+ *             |\  |  /|
+ *             | \ | / |
+ *       cond  |  IF   |
+ *           \ |   |\  |
+ *            AND  | iterate
+ *             |\  |  /
+ *             | \ | /
+ *             |  IF
+ *             |   |
+ *             L   V
+ */
 public class Loop {
     private Logger log = LoggerFactory.getLogger(this.getClass());
     public static final VertexLabel VALUE_IN_LABEL = new VertexLabel("loop_value_in");
@@ -41,6 +73,14 @@ public class Loop {
         return plates;
     }
 
+    /**
+     * A factory method for creating a loop
+     * It automatically labels the initial state correctly for you.
+     *
+     * @param initialState - a single Vertex that defines the loop's base case.
+     * @param <V>          the input type
+     * @return a builder object
+     */
     public static <V extends Vertex<?>> LoopBuilder startingFrom(V initialState) {
         if (initialState.getLabel() == null) {
             initialState.setLabel(VALUE_OUT_LABEL);
@@ -48,14 +88,33 @@ public class Loop {
         return startingFrom(ImmutableList.of(initialState));
     }
 
+    /**
+     * A factory method for creating a loop
+     *
+     * @param first  - the first Vertex (mandatory)
+     * @param others - other Vertices (optional)
+     * @param <V>    the input type
+     * @return a builder object
+     */
     public static <V extends Vertex<?>> LoopBuilder startingFrom(V first, V... others) {
         return startingFrom(ImmutableList.<V>builder().add(first).add(others).build());
     }
 
+    /**
+     * A factory method for creating a loop
+     *
+     * @param initialState - the collection of vertices that define the loop's base case
+     * @param <V>          the input type
+     * @return a builder object
+     */
     public static <V extends Vertex<?>> LoopBuilder startingFrom(Collection<V> initialState) {
         return new LoopBuilder(initialState);
     }
 
+    /**
+     * @param <V> the output type
+     * @return the output of the Loop (i.e. the output Vertex from the final Plate)
+     */
     public <V extends Vertex<? extends Tensor<?>>> V getOutput() {
         Plate finalPlate = plates.asList().get(plates.size() - 1);
         checkIfMaxCountHasBeenReached(finalPlate);
