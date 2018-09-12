@@ -2,15 +2,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static java.util.Collections.singletonMap;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -39,17 +35,9 @@ public class SumVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        Map<VertexId, DoubleTensor> derivativeOfOutWrtInput = new HashMap<>();
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            VertexId of = entry.getKey();
-            DoubleTensor partialOfWrtSelf = entry.getValue();
+        PartialDerivatives derivativesWrtInput = derivativeOfOutputsWithRespectToSelf
+            .multiplyBy(DoubleTensor.ones(inputVertex.getShape()), true);
 
-            int[] outputShape = Arrays.copyOf(partialOfWrtSelf.getShape(), partialOfWrtSelf.getShape().length - getShape().length);
-            DoubleTensor ones = DoubleTensor.ones(TensorShape.concat(outputShape, inputVertex.getShape()));
-            DoubleTensor partial = ones.times(partialOfWrtSelf);
-            derivativeOfOutWrtInput.put(of, partial);
-        }
-
-        return singletonMap(inputVertex, new PartialDerivatives(derivativeOfOutWrtInput));
+        return singletonMap(inputVertex, derivativesWrtInput);
     }
 }

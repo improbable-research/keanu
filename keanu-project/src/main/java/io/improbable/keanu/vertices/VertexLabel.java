@@ -1,17 +1,44 @@
 package io.improbable.keanu.vertices;
 
+import java.util.List;
 import java.util.Objects;
 
-public class VertexLabel {
-    private final String label;
+import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 
-    public VertexLabel(String label) {
-        this.label = label;
+public class VertexLabel {
+    private static final char NAMESPACE_SEPARATOR = '.';
+    private final String name;
+    private final List<String> namespace;
+
+    public VertexLabel(String name, String... namespace) {
+        this(name, ImmutableList.copyOf(namespace));
+    }
+
+    public VertexLabel(String name, List<String> namespace) {
+        this.name = name;
+        this.namespace = ImmutableList.copyOf(namespace);
+    }
+
+    public VertexLabel withExtraNamespace(String topLevelNamespace) {
+        List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
+        return new VertexLabel(this.name, newNamespace);
+    }
+
+    public VertexLabel withoutOuterNamespace() throws VertexLabelException {
+        try {
+            List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
+            return new VertexLabel(this.name, reducedNamespace);
+        } catch (IndexOutOfBoundsException e) {
+            throw new VertexLabelException("There is no namespace to remove", e);
+        }
     }
 
     @Override
     public String toString() {
-        return label;
+        ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
+        return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
     }
 
     @Override
@@ -19,12 +46,13 @@ public class VertexLabel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VertexLabel that = (VertexLabel) o;
-        return Objects.equals(label, that.label);
+        return Objects.equals(name, that.name) &&
+            Objects.equals(namespace, that.namespace);
     }
 
     @Override
     public int hashCode() {
 
-        return Objects.hash(label);
+        return Objects.hash(name, namespace);
     }
 }
