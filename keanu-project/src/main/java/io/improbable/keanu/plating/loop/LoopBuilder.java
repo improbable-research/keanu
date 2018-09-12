@@ -54,18 +54,16 @@ public class LoopBuilder {
         return this;
     }
 
-    public LoopBuilder2 apply(Function<DoubleVertex, DoubleVertex> iterationFunction) {
-        return apply((plate, valueIn) -> {
-            return iterationFunction.apply(valueIn);
-        });
+    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
+        return whilst(plate -> conditionSupplier.get());
     }
 
-    public LoopBuilder2 apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) {
-        return new LoopBuilder2(maxLoopCount, initialState, iterationFunction, throwWhenMaxCountIsReached, customMappings.build());
+    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
+        return new LoopBuilder2(maxLoopCount, initialState, conditionFunction, throwWhenMaxCountIsReached, customMappings.build());
     }
 
     public class LoopBuilder2 {
-        private final BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction;
+        private final Function<Plate, BoolVertex> conditionFunction;
         private final boolean throwWhenMaxCountIsReached;
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
@@ -75,10 +73,10 @@ public class LoopBuilder {
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(int maxLoopCount, Collection<Vertex> initialState, BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction, boolean throwWhenMaxCountIsReached, Map<VertexLabel, VertexLabel> customMappings) {
+        LoopBuilder2(int maxLoopCount, Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, boolean throwWhenMaxCountIsReached, Map<VertexLabel, VertexLabel> customMappings) {
             this.maxLoopCount = maxLoopCount;
             this.initialState = setInitialState(initialState);
-            this.iterationFunction = iterationFunction;
+            this.conditionFunction = conditionFunction;
             this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
             this.customMappings = customMappings;
         }
@@ -104,11 +102,14 @@ public class LoopBuilder {
                 .build();
         }
 
-        public Loop whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
-            return whilst(plate -> conditionSupplier.get());
+
+        public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction) throws VertexLabelException {
+            return apply((plate, valueIn) -> {
+                return iterationFunction.apply(valueIn);
+            });
         }
 
-        public Loop whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
+        public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) throws VertexLabelException {
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))
                 .withProxyMapping(ImmutableMap.<VertexLabel, VertexLabel>builder()
