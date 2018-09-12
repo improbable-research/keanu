@@ -27,9 +27,9 @@ public class Loop {
 
     /**
      * package-private because it is intended to be created by the LoopBuilder
+     *
      * @param plates
      * @param throwWhenMaxCountIsReached
-     *
      */
     Loop(Plates plates, boolean throwWhenMaxCountIsReached) {
         this.plates = plates;

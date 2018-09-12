@@ -90,7 +90,7 @@ public class LoopBuilder {
                 Vertex<?> outputVertex = Iterables.getOnlyElement(outputVertices);
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
-            } catch(NoSuchElementException e) {
+            } catch (NoSuchElementException e) {
                 throw new PlateException("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL", e);
             }
 
@@ -107,7 +107,7 @@ public class LoopBuilder {
             return whilst(plate -> conditionSupplier.get());
         }
 
-        public Loop whilst(Function<Plate,BoolVertex> conditionFunction) throws VertexLabelException {
+        public Loop whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
             // inputs
             VertexLabel valueInWhenAlwaysTrueLabel = new VertexLabel("valueInWhenAlwaysTrue");
             VertexLabel stillLoopingLabel = Loop.STILL_LOOPING;
