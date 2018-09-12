@@ -104,15 +104,14 @@ public class LoopTest {
             .whilst(flip);
 
         DoubleVertex output = loop.getOutput();
-        VertexLabel conditionLabel = new VertexLabel("condition");
 
         for (int firstFailure : new int[] {0, 1, 2, 10, Loop.DEFAULT_MAX_COUNT - 1}) {
             System.out.format("Testing loop that fails after %d steps%n", firstFailure);
             for (Plate plate : loop.getPlates()) {
-                BoolVertex condition = plate.get(conditionLabel);
+                BoolVertex condition = plate.get(Loop.CONDITION_LABEL);
                 condition.setAndCascade(true);
             }
-            BoolVertex condition = loop.getPlates().asList().get(firstFailure).get(conditionLabel);
+            BoolVertex condition = loop.getPlates().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
             condition.setAndCascade(false);
             Double expectedOutput = new Double(firstFailure);
             assertThat(output, VertexMatchers.hasValue(expectedOutput));

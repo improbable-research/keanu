@@ -20,6 +20,7 @@ public class Loop {
     private Logger log = LoggerFactory.getLogger(this.getClass());
     public static final VertexLabel VALUE_IN_LABEL = new VertexLabel("loop_value_in");
     public static final VertexLabel VALUE_OUT_LABEL = new VertexLabel("loop_value_out");
+    public static final VertexLabel CONDITION_LABEL = new VertexLabel("loop_condition");
     static final VertexLabel STILL_LOOPING = new VertexLabel("stillLooping");
     public static final int DEFAULT_MAX_COUNT = 100;
     private final Plates plates;

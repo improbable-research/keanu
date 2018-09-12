@@ -70,6 +70,7 @@ public class LoopBuilder {
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
         private final Collection<Vertex> initialState;
+        private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_in_when_always_true");
         private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
@@ -102,50 +103,37 @@ public class LoopBuilder {
                 .add(tru)
                 .build();
         }
-        
+
         public Loop whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
             return whilst(plate -> conditionSupplier.get());
         }
 
         public Loop whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
-            // inputs
-            VertexLabel valueInWhenAlwaysTrueLabel = new VertexLabel("valueInWhenAlwaysTrue");
-            VertexLabel stillLoopingLabel = Loop.STILL_LOOPING;
-            VertexLabel valueInLabel = Loop.VALUE_IN_LABEL;
-
-            // intermediate
-            VertexLabel conditionLabel = new VertexLabel("condition");
-
-            // outputs
-            VertexLabel valueOutWhenAlwaysTrueLabel = VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL;
-            VertexLabel loopLabel = LOOP_LABEL;
-            VertexLabel valueOutLabel = Loop.VALUE_OUT_LABEL;
-
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))
                 .withProxyMapping(ImmutableMap.<VertexLabel, VertexLabel>builder()
                     .putAll(customMappings)
-                    .put(valueInWhenAlwaysTrueLabel, valueOutWhenAlwaysTrueLabel)
-                    .put(stillLoopingLabel, loopLabel)
-                    .put(valueInLabel, valueOutLabel)
+                    .put(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL, VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL)
+                    .put(Loop.STILL_LOOPING, LOOP_LABEL)
+                    .put(Loop.VALUE_IN_LABEL, Loop.VALUE_OUT_LABEL)
                     .build()
                 )
                 .count(maxLoopCount)
                 .withFactory((plate) -> {
                     // inputs
-                    DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(valueInWhenAlwaysTrueLabel);
-                    BoolVertex stillLooping = new BoolProxyVertex(stillLoopingLabel);
-                    DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
+                    DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL);
+                    BoolVertex stillLooping = new BoolProxyVertex(Loop.STILL_LOOPING);
+                    DoubleVertex valueIn = new DoubleProxyVertex(Loop.VALUE_IN_LABEL);
                     plate.addAll(ImmutableSet.of(valueInWhenAlwaysTrue, stillLooping, valueIn));
 
                     // intermediate
-                    BoolVertex condition = conditionFunction.apply(plate).labelled(conditionLabel);
+                    BoolVertex condition = conditionFunction.apply(plate).labelled(Loop.CONDITION_LABEL);
                     plate.add(condition);
 
                     // outputs
-                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue).labelled(valueOutWhenAlwaysTrueLabel);
-                    BoolVertex loopAgain = stillLooping.and(condition).labelled(loopLabel);
-                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labelled(valueOutLabel);
+                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue).labelled(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+                    BoolVertex loopAgain = stillLooping.and(condition).labelled(LOOP_LABEL);
+                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labelled(Loop.VALUE_OUT_LABEL);
                     plate.addAll(ImmutableSet.of(iterationResult, loopAgain, result));
                 })
                 .build();
