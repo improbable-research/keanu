@@ -201,12 +201,5 @@ public class TensorShape {
         return highRankCopy;
     }
 
-    public static int[] prependOnes(int[] originalShape, int numberOfOnesToPrepend) {
-        int[] newShape = new int[originalShape.length + numberOfOnesToPrepend];
-        Arrays.fill(newShape, 1);
-        System.arraycopy(originalShape, 0, newShape, numberOfOnesToPrepend, newShape.length - numberOfOnesToPrepend);
-        return newShape;
-    }
-
 }
 
