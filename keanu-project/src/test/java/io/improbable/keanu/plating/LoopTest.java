@@ -14,6 +14,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.plating.loop.Loop;
+import io.improbable.keanu.plating.loop.LoopException;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -36,7 +37,7 @@ public class LoopTest {
     private final Vertex startValue = ConstantVertex.of(0.);
 
     @Test
-    public void youCanGetTheOutputVertex() throws VertexLabelException {
+    public void youCanGetTheOutputVertex() throws VertexLabelException, LoopException {
         Loop loop = Loop
             .startingFrom(startValue)
             .whilst(flip)
@@ -55,8 +56,8 @@ public class LoopTest {
     }
 
     @Test
-    public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() throws VertexLabelException {
-        expectedException.expect(PlateException.class);
+    public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() throws VertexLabelException, LoopException {
+        expectedException.expect(LoopException.class);
         expectedException.expectMessage("Loop has exceeded its max count");
         Loop loop = Loop
             .startingFrom(startValue)
@@ -66,7 +67,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() throws VertexLabelException {
+    public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() throws VertexLabelException, LoopException {
         Loop loop = Loop
             .startingFrom(startValue)
             .dontThrowWhenMaxCountIsReached()
@@ -89,7 +90,7 @@ public class LoopTest {
 
     @Test
     public void itThrowsIfYouPassInMultipleBaseCaseVertexesAndDontLabelTheOutput() throws VertexLabelException {
-        expectedException.expect(PlateException.class);
+        expectedException.expect(VertexLabelException.class);
         expectedException.expectMessage("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL");
         Loop.startingFrom(ConstantVertex.of(0.), ConstantVertex.of(1.))
             .whilst(alwaysTrue)
@@ -97,7 +98,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanLoopUntilAConditionIsTrue() throws VertexLabelException {
+    public void youCanLoopUntilAConditionIsTrue() throws VertexLabelException, LoopException {
         Loop loop = Loop
             .startingFrom(startValue)
             .whilst(flip)
@@ -119,7 +120,7 @@ public class LoopTest {
     }
 
     @Test
-    public void theConditionCanBeAFunctionOfThePlateVariables() throws VertexLabelException {
+    public void theConditionCanBeAFunctionOfThePlateVariables() throws VertexLabelException, LoopException {
         Function<Plate, BoolVertex> lessThanTen = plate -> {
             DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
             return valueIn.lessThan(ConstantVertex.of(10.));
@@ -136,7 +137,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanAddCustomProxyVariableMappings() throws VertexLabelException {
+    public void youCanAddCustomProxyVariableMappings() throws VertexLabelException, LoopException {
         VertexLabel factorInLabel = new VertexLabel("factorIn");
         VertexLabel factorOutLabel = new VertexLabel("factorOut");
         DoubleVertex startFactorial = ConstantVertex.of(1.).labelled(Loop.VALUE_OUT_LABEL);

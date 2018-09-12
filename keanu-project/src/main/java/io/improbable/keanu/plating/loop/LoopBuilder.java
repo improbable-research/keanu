@@ -16,7 +16,6 @@ import com.google.common.collect.Iterables;
 
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
-import io.improbable.keanu.plating.PlateException;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -77,8 +76,9 @@ public class LoopBuilder {
      *
      * @param conditionSupplier - a lambda that creates and returns a new BoolVertex
      * @return the next stage builder
+     * @throws VertexLabelException if the base case has not been properly specified
      */
-    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) {
+    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
         return whilst(plate -> conditionSupplier.get());
     }
 
@@ -87,31 +87,32 @@ public class LoopBuilder {
      *
      * @param conditionFunction - a lambda that takes the current Plate and creates and returns a new BoolVertex
      * @return the next stage builder
+     * @throws VertexLabelException if the base case has not been properly specified
      */
-    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) {
-        return new LoopBuilder2(maxLoopCount, initialState, conditionFunction, throwWhenMaxCountIsReached, customMappings.build());
+    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
+        return new LoopBuilder2(initialState, conditionFunction, customMappings.build(), maxLoopCount, throwWhenMaxCountIsReached);
     }
 
     public class LoopBuilder2 {
+        private final Collection<Vertex> initialState;
         private final Function<Plate, BoolVertex> conditionFunction;
-        private final boolean throwWhenMaxCountIsReached;
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
-        private final Collection<Vertex> initialState;
+        private final boolean throwWhenMaxCountIsReached;
         private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_in_when_always_true");
         private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(int maxLoopCount, Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, boolean throwWhenMaxCountIsReached, Map<VertexLabel, VertexLabel> customMappings) {
-            this.maxLoopCount = maxLoopCount;
+        LoopBuilder2(Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) throws VertexLabelException {
             this.initialState = setInitialState(initialState);
             this.conditionFunction = conditionFunction;
-            this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
             this.customMappings = customMappings;
+            this.maxLoopCount = maxLoopCount;
+            this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
         }
 
-        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) {
+        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) throws VertexLabelException {
             Vertex valueOutWhenAlwaysTrue = null;
 
             try {
@@ -120,7 +121,7 @@ public class LoopBuilder {
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {
-                throw new PlateException("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL", e);
+                throw new VertexLabelException("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL", e);
             }
 
             BoolVertex tru = ConstantVertex.of(true).labelled(LOOP_LABEL);
@@ -131,7 +132,6 @@ public class LoopBuilder {
                 .add(tru)
                 .build();
         }
-
 
         /**
          * A mandatory method to specify the iteration step
@@ -187,6 +187,5 @@ public class LoopBuilder {
 
             return new Loop(plates, throwWhenMaxCountIsReached);
         }
-
     }
 }
