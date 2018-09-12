@@ -12,6 +12,7 @@ import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 
 public class Plate implements VertexDictionary {
+
     private Map<VertexLabel, Vertex<?>> contents;
 
     public Plate() {

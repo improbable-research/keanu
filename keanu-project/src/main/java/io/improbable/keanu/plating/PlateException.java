@@ -7,6 +7,7 @@ package io.improbable.keanu.plating;
  * See https://stackoverflow.com/a/27668305/741789
  */
 public class PlateException extends RuntimeException {
+
     public PlateException(String message) {
         super(message);
     }

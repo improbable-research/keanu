@@ -5,6 +5,7 @@ import java.util.Map;
 import io.improbable.keanu.tensor.Tensor;
 
 public interface VertexDictionary {
+
     <V extends Vertex<? extends Tensor<?>>> V get(VertexLabel label);
 
     static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> map) {

@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import io.improbable.keanu.tensor.Tensor;
 
 public class SimpleVertexDictionary implements VertexDictionary {
+
     private final Map<VertexLabel, Vertex<?>> map;
 
     private SimpleVertexDictionary(Map<VertexLabel, Vertex<?>> map) {

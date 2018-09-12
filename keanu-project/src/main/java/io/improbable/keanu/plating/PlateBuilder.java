@@ -19,6 +19,7 @@ import io.improbable.keanu.vertices.VertexLabelException;
  *            factory function, if building from data
  */
 public class PlateBuilder<T> {
+
     private VertexDictionary initialState;
     private Map<VertexLabel, VertexLabel> proxyMapping = Collections.emptyMap();
 
