@@ -1,16 +1,21 @@
 package io.improbable.keanu.plating.loop;
 
+import java.util.Arrays;
 import java.util.Collection;
 
 import com.google.common.collect.ImmutableList;
 
+import io.improbable.keanu.plating.Plate;
+import io.improbable.keanu.plating.PlateException;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class Loop {
     public static final VertexLabel VALUE_OUT_LABEL = new VertexLabel("loop_value_out");
+    static final VertexLabel STILL_LOOPING = new VertexLabel("stillLooping");
     public static final int DEFAULT_MAX_COUNT = 100;
     private final Plates plates;
 
@@ -43,6 +48,11 @@ public class Loop {
     }
 
     public <V extends Vertex<? extends Tensor<?>>> V getOutput() {
-        return plates.asList().get(plates.size() - 1).get(VALUE_OUT_LABEL);
+        Plate finalPlate = plates.asList().get(plates.size() - 1);
+        BoolVertex stillLooping = finalPlate.get(STILL_LOOPING);
+        if (Arrays.stream(stillLooping.getValue().asFlatArray()).anyMatch(v -> v == true)) {
+            throw new PlateException("Loop has exceeded its max count " + plates.size());
+        }
+        return finalPlate.get(VALUE_OUT_LABEL);
     }
 }

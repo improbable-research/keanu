@@ -96,7 +96,7 @@ public class LoopBuilder {
         public Loop whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
             // inputs
             VertexLabel valueInWhenAlwaysTrueLabel = new VertexLabel("valueInWhenAlwaysTrue");
-            VertexLabel stillLoopingLabel = new VertexLabel("stillLooping");
+            VertexLabel stillLoopingLabel = Loop.STILL_LOOPING;
             VertexLabel valueInLabel = new VertexLabel("valueIn");
 
             // intermediate

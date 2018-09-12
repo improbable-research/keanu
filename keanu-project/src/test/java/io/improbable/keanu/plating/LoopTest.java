@@ -53,6 +53,17 @@ public class LoopTest {
     }
 
     @Test
+    public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() throws VertexLabelException {
+        expectedException.expect(PlateException.class);
+        expectedException.expectMessage("Loop has exceeded its max count");
+        Loop loop = Loop
+            .startingFrom(startValue)
+            .apply(increment)
+            .whilst(alwaysTrue);
+        loop.getOutput();
+    }
+
+    @Test
     public void youCanOverrideTheDefaultMaxLength() throws VertexLabelException {
         int customMaxCount = 5;
         Loop loop = Loop
