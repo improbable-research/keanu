@@ -15,6 +15,7 @@ import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
+import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -79,7 +80,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     public NetworkSamplesGenerator generatePosteriorSamples(final BayesianNetwork bayesianNetwork,
                                                             final List<? extends Vertex> verticesToSampleFrom) {
 
-        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom));
+        return new NetworkSamplesGenerator(setupSampler(bayesianNetwork, verticesToSampleFrom), ProgressBar::new);
     }
 
     private SamplingAlgorithm setupSampler(final BayesianNetwork bayesianNetwork,
@@ -168,7 +169,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
     private static void checkBayesNetInHealthyState(BayesianNetwork bayesNet) {
         bayesNet.cascadeObservations();
-        if (bayesNet.getLatentAndObservedVertices().isEmpty()) {
+        if (bayesNet.getLatentOrObservedVertices().isEmpty()) {
             throw new IllegalArgumentException("Cannot sample from a completely deterministic BayesNet");
         } else if (bayesNet.isInImpossibleState()) {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");

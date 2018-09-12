@@ -80,7 +80,7 @@ public class NUTS implements PosteriorSamplingAlgorithm {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentAndObservedVertices());
+        List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentOrObservedVertices());
 
         final Map<VertexId, List<?>> samples = new HashMap<>();
         addSampleFromCache(samples, takeSample(sampleFromVertices));

@@ -14,12 +14,11 @@ import static org.junit.Assert.assertTrue;
 
 public class NonGradientOptimizerTest {
 
-
     @Test
     public void doesCallOnFitnessHandler() {
         AtomicInteger timesCalled = new AtomicInteger(0);
         NonGradientOptimizer optimizer = NonGradientOptimizer.ofConnectedGraph(new GaussianVertex(new GaussianVertex(0, 1), 1));
-        optimizer.onFitnessCalculation((point, fitness) -> timesCalled.incrementAndGet());
+        optimizer.addFitnessCalculationHandler((point, fitness) -> timesCalled.incrementAndGet());
         optimizer.maxAPosteriori();
         assertTrue(timesCalled.get() > 0);
     }

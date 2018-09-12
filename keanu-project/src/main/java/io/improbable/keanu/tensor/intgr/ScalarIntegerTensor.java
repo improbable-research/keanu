@@ -15,14 +15,17 @@ public class ScalarIntegerTensor implements IntegerTensor {
     private Integer value;
     private int[] shape;
 
-    public ScalarIntegerTensor(int value) {
+    private ScalarIntegerTensor(Integer value, int[] shape) {
         this.value = value;
-        this.shape = SCALAR_SHAPE;
+        this.shape = shape;
+    }
+
+    public ScalarIntegerTensor(int value) {
+        this(value, SCALAR_SHAPE);
     }
 
     public ScalarIntegerTensor(int[] shape) {
-        this.value = null;
-        this.shape = shape;
+        this(null, shape);
     }
 
     @Override
@@ -56,8 +59,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public void setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, int... index) {
         this.value = value;
+        return this;
     }
 
     @Override
@@ -103,7 +107,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        return duplicate();
+        int[] summedShape = new int[this.shape.length - overDimensions.length];
+        Arrays.fill(summedShape, 1);
+        return new ScalarIntegerTensor(value, summedShape);
     }
 
     @Override
@@ -253,11 +259,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
         } else {
             throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
         }
-    }
-
-    @Override
-    public IntegerTensor concat(int dimension, IntegerTensor... those) {
-        return Nd4jIntegerTensor.scalar(value).concat(dimension, those);
     }
 
     @Override

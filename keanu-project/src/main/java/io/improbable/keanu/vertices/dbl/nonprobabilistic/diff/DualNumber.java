@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.math3.util.Pair;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
@@ -75,7 +76,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
         }
 
-        final DoubleTensor concattedValues = dualValues[0].concat(dimension, Arrays.copyOfRange(dualValues, 1, dualValues.length));
+        final DoubleTensor concattedValues = DoubleTensor.concat(dimension, dualValues);
         return new DualNumber(concattedValues, concattedDualNumbers);
     }
 
@@ -83,9 +84,8 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {
-            DoubleTensor primaryTensor = partialDerivates.remove(0);
             DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
-            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+            return DoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
         }
     }
 
@@ -136,14 +136,14 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     public DualNumber add(DualNumber that) {
         // dc = da + db;
         DoubleTensor newValue = this.value.plus(that.value);
-        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives);
+        PartialDerivatives newInf = this.partialDerivatives.add(that.partialDerivatives, newValue.getShape());
         return new DualNumber(newValue, newInf);
     }
 
     public DualNumber subtract(DualNumber that) {
         // dc = da - db;
         DoubleTensor newValue = this.value.minus(that.value);
-        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives);
+        PartialDerivatives newInf = this.partialDerivatives.subtract(that.partialDerivatives, newValue.getShape());
         return new DualNumber(newValue, newInf);
     }
 
@@ -156,17 +156,31 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (this.partialDerivatives.isEmpty()) {
             thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfMultiplied = PartialDerivatives.matrixMultiply(this.partialDerivatives, that.value, true);
+            thisInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(this.partialDerivatives, that.value, true);
         }
 
         if (that.partialDerivatives.isEmpty()) {
             thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
         } else {
-            thatInfMultiplied = PartialDerivatives.matrixMultiply(that.partialDerivatives, this.value, false);
+            thatInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(that.partialDerivatives, this.value, false);
         }
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
         return new DualNumber(newValue, newInf);
+    }
+
+    public DualNumber matrixInverse() {
+        //dc = -A^-1 * da * A^-1
+        DoubleTensor newValue = this.value.matrixInverse();
+
+        if (this.partialDerivatives.isEmpty()) {
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
+        } else {
+            DoubleTensor negatedValue = newValue.unaryMinus();
+            PartialDerivatives newInf = PartialDerivatives.matrixMultiplyAlongOfDimensions(this.partialDerivatives, negatedValue, false);
+            newInf = PartialDerivatives.matrixMultiplyAlongOfDimensions(newInf, newValue, true);
+            return new DualNumber(newValue, newInf);
+        }
     }
 
     public DualNumber multiplyBy(DualNumber that) {
@@ -213,7 +227,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (thisInfMultiplied.isEmpty() && thatInfMultiplied.isEmpty()) {
             newInf = PartialDerivatives.OF_CONSTANT;
         } else {
-            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.times(that.value));
+            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(that.value.pow(2));
         }
 
         return new DualNumber(newValue, newInf);
@@ -356,7 +370,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (this.partialDerivatives.isEmpty()) {
             return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
         } else {
-            DoubleTensor dArcTan = value.powInPlace(2).plusInPlace(1).reciprocalInPlace();
+            DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();
             return new DualNumber(newValue, this.partialDerivatives.multiplyBy(dArcTan));
         }
     }

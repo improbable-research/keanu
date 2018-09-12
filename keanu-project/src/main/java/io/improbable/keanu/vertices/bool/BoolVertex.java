@@ -13,6 +13,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBin
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.AndMultipleVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.BoolConcatenationVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple.OrMultipleVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolReshapeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
@@ -33,6 +34,10 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         if (those.length == 0) return this;
         if (those.length == 1) return new AndBinaryVertex(this, those[0]);
         return new AndMultipleVertex(inputList(those));
+    }
+
+    public static BoolVertex concat(int dimension, BoolVertex... toConcat) {
+        return new BoolConcatenationVertex(dimension, toConcat);
     }
 
     public static final BoolVertex not(Vertex<BooleanTensor> vertex) {

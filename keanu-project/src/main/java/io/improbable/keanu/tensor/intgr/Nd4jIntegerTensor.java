@@ -1,22 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import static java.util.Arrays.copyOf;
-
-import java.util.Arrays;
-import java.util.function.Function;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.conditions.Conditions;
-import org.nd4j.linalg.ops.transforms.Transforms;
-
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
@@ -25,6 +8,18 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.conditions.Conditions;
+import org.nd4j.linalg.ops.transforms.Transforms;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
+import static java.util.Arrays.copyOf;
 
 public class Nd4jIntegerTensor implements IntegerTensor {
 
@@ -280,18 +275,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor concat(int dimension, IntegerTensor... those) {
-        INDArray dup = tensor.dup();
-        INDArray[] toConcat = new INDArray[those.length + 1];
-        toConcat[0] = dup;
-        for (int i = 1; i <= those.length; i++) {
-            toConcat[i] = unsafeGetNd4J(those[i - 1]);
-        }
-        INDArray concat = Nd4j.concat(dimension, toConcat);
-        return new Nd4jIntegerTensor(concat);
-    }
-
-    @Override
     public IntegerTensor minusInPlace(int value) {
         tensor.subi(value);
         return this;
@@ -526,8 +509,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public void setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, int... index) {
         tensor.putScalar(index, value);
+        return this;
     }
 
     @Override
@@ -593,7 +577,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return tensor.toString();
     }
 
-    private INDArray unsafeGetNd4J(IntegerTensor that) {
+    static INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar().doubleValue(), BUFFER_TYPE).reshape(that.getShape());
         }
