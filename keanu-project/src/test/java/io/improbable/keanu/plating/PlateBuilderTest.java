@@ -278,6 +278,12 @@ public class PlateBuilderTest {
         }
     }
 
+    /**
+     * Note that this behaviour is wrapped by the Loop class
+     * See LoopTest.java for example usage
+     *
+     * @throws VertexLabelException
+     */
     @Test
     public void youCanCreateALoopFromPlatesFromACount() throws VertexLabelException {
         // inputs
@@ -368,7 +374,7 @@ public class PlateBuilderTest {
 
         DoubleVertex output = plates.asList().get(maximumLoopLength - 1).get(valueOutLabel);
 
-        for (int firstFailure : new int[] {0, 1, 2, 10, 99}) {
+        for (int firstFailure : new int[]{0, 1, 2, 10, 99}) {
             System.out.format("Testing loop that fails after %d steps%n", firstFailure);
             for (Plate plate : plates) {
                 BoolVertex condition = plate.get(conditionLabel);
