@@ -23,9 +23,6 @@ public class DoubleModelResultVertex extends DoubleVertex implements NonProbabil
 
     @Override
     public DoubleTensor getValue() {
-        if (!hasValue) {
-            model.run();
-        }
         return DoubleTensor.scalar(model.getModelOutputValue(label));
     }
 

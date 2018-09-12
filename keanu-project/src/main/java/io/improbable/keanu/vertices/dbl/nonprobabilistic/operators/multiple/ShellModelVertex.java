@@ -1,52 +1,55 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import com.google.common.util.concurrent.UncheckedExecutionException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleModelResultVertex;
+import org.omg.SendingContext.RunTime;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.io.*;
+import java.util.*;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
-public class ShellModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
+public class ShellModelVertex extends DoubleVertex implements ModelProcessVertex<DoubleTensor> {
 
     private String command;
     private Map<VertexLabel, DoubleVertex> inputs;
     private Map<VertexLabel, Double> outputs;
-    private Function<Process, Map<VertexLabel, Double>> readInputs;
+    private Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput;
 
     public ShellModelVertex(String command,
                             Map<VertexLabel, DoubleVertex> inputs,
                             Map<VertexLabel, Double> outputs,
-                            Function<Process, Map<VertexLabel, Double>> readInputs) {
+                            Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput) {
         this.command = command;
         this.inputs = inputs;
         this.outputs = outputs;
-        this.readInputs = readInputs;
+        this.extractOutput = extractOutput;
         setParents(convertMapToList(inputs));
     }
 
     @Override
-    public Map<VertexLabel, Double> run() {
-        String newCommand = formatCommand();
+    public String process(Map<VertexLabel, DoubleVertex> inputs) {
+        String newCommand = command;
+        for (Map.Entry<VertexLabel, DoubleVertex> input : inputs.entrySet()) {
+            String argument = "{" + input.getKey().toString() + "}";
+            newCommand = newCommand.replaceAll(Pattern.quote(argument), input.getValue().getValue().scalar().toString());
+        }
+        return newCommand;
+    }
+
+    @Override
+    public Map<VertexLabel, Double> run(String process, Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput) {
         try {
-            Process cmd = Runtime.getRuntime().exec(newCommand);
+            Process cmd = Runtime.getRuntime().exec(process);
             cmd.waitFor();
-            outputs = readInputs.apply(cmd);
+            outputs = extractOutput.apply(inputs);
             return outputs;
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (InterruptedException e) {
-            throw new UncheckedExecutionException(e);
+        } catch (IOException | InterruptedException e) {
+            throw new IllegalArgumentException("Failed to run model while executing the process.");
         }
     }
 
@@ -62,7 +65,7 @@ public class ShellModelVertex extends DoubleVertex implements ModelVertex<Double
 
     @Override
     public DoubleTensor calculate() {
-        run();
+        run(process(inputs), extractOutput);
         return null;
     }
 
@@ -73,12 +76,12 @@ public class ShellModelVertex extends DoubleVertex implements ModelVertex<Double
 
     @Override
     public void observe(DoubleTensor value) {
-        throw new UnsupportedOperationException("Cannot observe a Model");
+        throw new UnsupportedOperationException("Observing a Model Vertex is not supported.");
     }
 
     @Override
     public void unobserve() {
-        throw new UnsupportedOperationException("Cannot unobserve a Model");
+        throw new UnsupportedOperationException("Un-observing a Model Vertex is not supported.");
     }
 
     @Override
@@ -97,14 +100,5 @@ public class ShellModelVertex extends DoubleVertex implements ModelVertex<Double
             asList.add(input.getValue());
         }
         return asList;
-    }
-
-    private String formatCommand() {
-        String newCommand = command;
-        for (Map.Entry<VertexLabel, DoubleVertex> input : inputs.entrySet()) {
-            String argument = "{" + input.getKey().toString() + "}";
-            newCommand = newCommand.replaceAll(Pattern.quote(argument), input.getValue().getValue().scalar().toString());
-        }
-        return newCommand;
     }
 }

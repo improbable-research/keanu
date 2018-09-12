@@ -1,16 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
-import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 import java.util.Map;
 import java.util.function.Function;
 
-public interface ModelVertex<T> extends NonProbabilistic<T> {
+public interface ModelLambdaVertex extends ModelVertex {
 
-    Double getModelOutputValue(VertexLabel label);
-
-    DoubleVertex getModelOutputVertex(VertexLabel label);
+    Map<VertexLabel, Double> run(Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> lambda);
 
 }
