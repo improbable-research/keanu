@@ -8,6 +8,8 @@ import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -92,6 +94,15 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     static DoubleTensor placeHolder(int[] shape) {
         return new ScalarDoubleTensor(shape);
+    }
+
+    static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
+        for (int i = 0; i < toConcat.length; i++) {
+            concatAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toConcat[i]).dup();
+        }
+        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
+        return new Nd4jDoubleTensor(concat);
     }
 
     @Override
@@ -201,8 +212,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
         return slicedTensors;
     }
-
-    DoubleTensor concat(int dimension, DoubleTensor... those);
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

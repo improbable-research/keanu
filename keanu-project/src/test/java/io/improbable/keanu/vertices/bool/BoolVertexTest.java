@@ -1,16 +1,5 @@
 package io.improbable.keanu.vertices.bool;
 
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Collections;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
@@ -21,6 +10,13 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.Collections;
+
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+import static org.junit.Assert.*;
 
 public class BoolVertexTest {
 
@@ -223,6 +219,21 @@ public class BoolVertexTest {
         assertArrayEquals(flip.getShape(), new int[]{2, 2});
         BoolVertex reshaped = flip.reshape(4, 1);
         assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+    }
+
+    @Test
+    public void canConcat() {
+        BoolVertex A = new BernoulliVertex(0.5);
+        A.setValue(BooleanTensor.trues(2, 2));
+
+        BoolVertex B = new BernoulliVertex(0.5);
+        B.setValue(BooleanTensor.falses(2, 2));
+
+        BoolVertex concatDimZero = BoolVertex.concat(0, A, A);
+        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+
+        BoolVertex concatDimOne = BoolVertex.concat(1, A, B);
+        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
     }
 
     private double andProbability(double pA, double pB) {
