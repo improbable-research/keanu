@@ -12,6 +12,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.Mock;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -19,56 +22,84 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
+
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class ModelInModelTest {
 
+    @Mock
+    private BufferedReader rainReader;
+
+    @Mock
+    private BufferedReader humidityReader;
+
     private KeanuRandom random;
+    private DoubleVertex inputToModel;
 
     @Before
-    public void setup() {
+    public void setup() throws IOException {
         random = new KeanuRandom(1);
+        rainReader = mock(BufferedReader.class);
+        humidityReader = mock(BufferedReader.class);
+
+        when(rainReader.readLine()).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                double chanceOfRainScalingFactorFromModel = 0.1;
+                return String.valueOf(inputToModel.getValue().scalar() * chanceOfRainScalingFactorFromModel);
+            }
+        });
+
+        when(humidityReader.readLine()).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                double humidityScalingFactorFromModel = 2;
+                return String.valueOf(inputToModel.getValue().scalar() * humidityScalingFactorFromModel);
+            }
+        });
     }
 
     @Test
     public void canRunAModelInAModel() {
-        DoubleVertex inputToModel = new ConstantDoubleVertex(25);
-
+        inputToModel = new ConstantDoubleVertex(25);
         Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "./src/test/resources/model.sh {Temperature}";
+        String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
+        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
 
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
-        inputToModel.setAndCascade(10);
+        double inputValue = 10.0;
+
+        inputToModel.setAndCascade(inputValue);
         Assert.assertEquals(shouldIBringUmbrella.getValue().scalar(), 20.0, 1e-6);
     }
 
     @Test
-    public void modelInsideVertexIsRecalculatedOnEachParentSample() {
+    public void modelInsideVertexIsRecalculatedOnEachParentSample() throws IOException {
         int numSamples = 50;
 
-        DoubleVertex inputToModel = new ConstantDoubleVertex(25);
-
+        inputToModel = new ConstantDoubleVertex(25);
         Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "./src/test/resources/model.sh {Temperature}";
+        String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
+        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
         for (int i = 0; i < numSamples; i++) {
-            double value = inputToModel.sample(random).scalar();
-            inputToModel.setAndCascade(value);
-            //"model" logic
-            double expectedValue = (value * 0.1) * (value * 2);
+            double inputValue = inputToModel.sample(random).scalar();
+            inputToModel.setAndCascade(inputValue);
+            double expectedValue = (inputValue * 0.1) * (inputValue * 2);
             Assert.assertEquals(expectedValue, shouldIBringUmbrella.getValue().scalar(), 1e-6);
         }
     }
@@ -77,14 +108,14 @@ public class ModelInModelTest {
     public void modelWorksAsPartOfGradientOptimisation() {
         DoubleVertex inputToModelOne = new GaussianVertex(14.0, 5);
         DoubleVertex inputToModelTwo = new GaussianVertex(14.0, 5);
-        DoubleVertex inputToModel = inputToModelOne.plus(inputToModelTwo);
+        inputToModel = inputToModelOne.plus(inputToModelTwo);
 
         Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "./src/test/resources/model.sh {Temperature}";
+        String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
+        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -100,19 +131,19 @@ public class ModelInModelTest {
 
     @Test
     public void modelWorksAsPartOfSampling() {
-        DoubleVertex inputToModel = new GaussianVertex(28.0, 5);
+        inputToModel = new GaussianVertex(29.5, 2.5);
 
         Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "./src/test/resources/model.sh {Temperature}";
+        String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ShellModelVertex(command, inputs, Collections.EMPTY_MAP, this::extractOutput);
+        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getModelOutputVertex(new VertexLabel("Humidity"));
 
-        DoubleVertex temperatureReadingOne = new GaussianVertex(chanceOfRain, 5);
-        DoubleVertex temperatureReadingTwo = new GaussianVertex(humidity, 5);
+        DoubleVertex temperatureReadingOne = new GaussianVertex(chanceOfRain, 2);
+        DoubleVertex temperatureReadingTwo = new GaussianVertex(humidity, 2);
         temperatureReadingOne.observe(3.0);
         temperatureReadingTwo.observe(60.0);
 
@@ -121,7 +152,7 @@ public class ModelInModelTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            750
+            125
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
@@ -129,20 +160,24 @@ public class ModelInModelTest {
         Assert.assertEquals(30.0, averagePosteriorInput, 0.1);
     }
 
-    private Map<VertexLabel, Double> extractOutput(Map<VertexLabel, DoubleVertex> inputs) {
+    private String formatCommandForExecution(Map<VertexLabel, DoubleVertex> inputs, String command) {
+        for (Map.Entry<VertexLabel, DoubleVertex> input : inputs.entrySet()) {
+            String argument = "{" + input.getKey().toString() + "}";
+            command = command.replaceAll(Pattern.quote(argument), input.getValue().getValue().scalar().toString());
+        }
+        return command;
+    }
+
+    private Map<VertexLabel, Double> updateValues(Map<VertexLabel, DoubleVertex> inputs) {
         Map<VertexLabel, Double> modelOutput = new HashMap<>();
 
-        try (BufferedReader br = new BufferedReader(new FileReader("src/test/resources/rainOutput.txt"))) {
-            double chanceOfRainResult = Double.parseDouble(br.readLine());
+        try {
+            double chanceOfRainResult = Double.parseDouble(rainReader.readLine());
             modelOutput.put(new VertexLabel("ChanceOfRain"), chanceOfRainResult);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        try (BufferedReader br = new BufferedReader(new FileReader("src/test/resources/humidityOutput.txt"))) {
-            double humidityResult = Double.parseDouble(br.readLine());
+            double humidityResult = Double.parseDouble(humidityReader.readLine());
             modelOutput.put(new VertexLabel("Humidity"), humidityResult);
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
         return modelOutput;
