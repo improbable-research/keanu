@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleModelResultVertex;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -18,15 +18,15 @@ import java.util.stream.Collectors;
 public class ProcessModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private String command;
-    private Map<VertexLabel, DoubleVertex> inputs;
-    private Map<VertexLabel, Double> outputs;
-    private BiFunction<Map<VertexLabel, DoubleVertex>, String, String> commandFormatter;
-    private Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput;
+    private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
+    private Map<VertexLabel, Object> outputs;
+    private BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandFormatter;
+    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput;
 
     public ProcessModelVertex(String command,
-                              Map<VertexLabel, DoubleVertex> inputs,
-                              BiFunction<Map<VertexLabel, DoubleVertex>, String, String> commandFormatter,
-                              Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput) {
+                              Map<VertexLabel, Vertex<? extends Tensor>> inputs,
+                              BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandFormatter,
+                              Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput) {
         this.command = command;
         this.inputs = inputs;
         this.outputs = Collections.EMPTY_MAP;
@@ -43,7 +43,7 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     }
 
     @Override
-    public void run(Map<VertexLabel, DoubleVertex> inputs) {
+    public void run(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         String newCommand = commandFormatter.apply(inputs, command);
         try {
             Process cmd = Runtime.getRuntime().exec(newCommand);
@@ -54,30 +54,35 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     }
 
     @Override
-    public Map<VertexLabel, Double> updateValues(Map<VertexLabel, DoubleVertex> inputs) {
+    public Map<VertexLabel, Object> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         outputs = extractOutput.apply(inputs);
         return outputs;
     }
 
     @Override
-    public Double getModelOutputValue(VertexLabel label) {
-        return outputs.get(label);
+    public Double getDoubleModelOutputValue(VertexLabel label) {
+        return (Double) outputs.get(label);
     }
 
     @Override
-    public DoubleVertex getModelOutputVertex(VertexLabel label) {
-        return new DoubleModelResultVertex(this, label);
+    public Integer getIntegerModelOutputValue(VertexLabel label) {
+        return (Integer) outputs.get(label);
+    }
+
+    @Override
+    public Boolean getBooleanModelOutputValue(VertexLabel label) {
+        return (Boolean) outputs.get(label);
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        for (Map.Entry<VertexLabel, DoubleVertex> input : inputs.entrySet()) {
+        for (Map.Entry<VertexLabel, Vertex<? extends Tensor>> input : inputs.entrySet()) {
             input.getValue().sample();
         }
         return calculate();
     }
 
-    public Map<VertexLabel, Double> setValue(Map<VertexLabel, Double> values) {
+    public Map<VertexLabel, Object> setValue(Map<VertexLabel, Object> values) {
         outputs = values;
         return outputs;
     }

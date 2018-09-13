@@ -1,10 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleModelResultVertex;
 
 import java.util.Collections;
 import java.util.Map;
@@ -14,14 +15,14 @@ import java.util.stream.Collectors;
 
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
-    private Map<VertexLabel, DoubleVertex> inputs;
-    private Map<VertexLabel, Double> outputs;
-    private Consumer<Map<VertexLabel, DoubleVertex>> executor;
-    private Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput;
+    private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
+    private Map<VertexLabel, Object> outputs;
+    private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
+    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput;
 
-    public LambdaModelVertex(Map<VertexLabel, DoubleVertex> inputs,
-                             Consumer<Map<VertexLabel, DoubleVertex>> executor,
-                             Function<Map<VertexLabel, DoubleVertex>, Map<VertexLabel, Double>> extractOutput) {
+    public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
+                             Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
+                             Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput) {
         this.inputs = inputs;
         this.outputs = Collections.EMPTY_MAP;
         this.executor = executor;
@@ -38,31 +39,41 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        for (Map.Entry<VertexLabel, DoubleVertex> input : inputs.entrySet()) {
+        for (Map.Entry<VertexLabel, Vertex<? extends Tensor>> input : inputs.entrySet()) {
             input.getValue().sample();
         }
         return calculate();
     }
 
     @Override
-    public void run(Map<VertexLabel, DoubleVertex> inputs) {
+    public void run(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         executor.accept(inputs);
     }
 
+    public Map<VertexLabel, Object> setValue(Map<VertexLabel, Object> values) {
+        outputs = values;
+        return outputs;
+    }
+
     @Override
-    public Map<VertexLabel, Double> updateValues(Map<VertexLabel, DoubleVertex> inputs) {
+    public Map<VertexLabel, Object> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         outputs = extractOutput.apply(inputs);
         return outputs;
     }
 
     @Override
-    public Double getModelOutputValue(VertexLabel label) {
-        return outputs.get(label);
+    public Double getDoubleModelOutputValue(VertexLabel label) {
+        return (Double) outputs.get(label);
     }
 
     @Override
-    public DoubleVertex getModelOutputVertex(VertexLabel label) {
-        return new DoubleModelResultVertex(this, label);
+    public Integer getIntegerModelOutputValue(VertexLabel label) {
+        return (Integer) outputs.get(label);
+    }
+
+    @Override
+    public Boolean getBooleanModelOutputValue(VertexLabel label) {
+        return (Boolean) outputs.get(label);
     }
 
 }

@@ -5,10 +5,11 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ModelResultVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 import io.improbable.keanu.vertices.Vertex;
 
-public class DoubleModelResultVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public class DoubleModelResultVertex extends DoubleVertex implements ModelResultVertex<DoubleTensor>, NonProbabilistic<DoubleTensor> {
 
     private ModelVertex model;
     private VertexLabel label;
@@ -26,18 +27,18 @@ public class DoubleModelResultVertex extends DoubleVertex implements NonProbabil
         if (!hasValue) {
             model.calculate();
         }
-        return DoubleTensor.scalar(model.getModelOutputValue(label));
+        return DoubleTensor.scalar(model.getDoubleModelOutputValue(label));
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return DoubleTensor.scalar(model.getModelOutputValue(label));
+        return DoubleTensor.scalar(model.getDoubleModelOutputValue(label));
     }
 
     @Override
     public DoubleTensor calculate() {
         hasValue = true;
-        return DoubleTensor.scalar(model.getModelOutputValue(label));
+        return DoubleTensor.scalar(model.getDoubleModelOutputValue(label));
     }
 
 }
