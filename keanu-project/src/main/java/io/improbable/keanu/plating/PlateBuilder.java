@@ -157,13 +157,13 @@ public class PlateBuilder<T> {
         public Plates build() throws VertexLabelException {
             Plates plates = new Plates(this.size);
             Iterator<T> iter = data.getIterator();
-            VertexDictionary previousPlate = initialState;
+            VertexDictionary previousVertices = initialState;
             while (iter.hasNext()) {
                 Plate plate = new Plate();
                 factory.accept(plate, iter.next());
-                connectTransitionVariables(previousPlate, plate, transitionMapping);
+                connectTransitionVariables(previousVertices, plate, transitionMapping);
                 plates.add(plate);
-                previousPlate = plate;
+                previousVertices = plate;
             }
             return plates;
         }
