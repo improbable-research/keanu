@@ -1,16 +1,17 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
+import java.util.ArrayList;
+import java.util.List;
+
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class PoissonVertexTest {
     private final Logger log = LoggerFactory.getLogger(PoissonVertexTest.class);
@@ -41,6 +42,13 @@ public class PoissonVertexTest {
         assertEquals(sd, standardDeviation, epsilon);
     }
 
+    @Test
+    public void largeMuIsSupported() {
+        final double mu = 900.0;
+        PoissonVertex testVertex = new PoissonVertex(mu);
+
+        int sample = testVertex.sample().scalar();
+    }
 
     @Test
     public void logProbForValuesGreaterThanTwenty() {
