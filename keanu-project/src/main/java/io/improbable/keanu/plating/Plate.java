@@ -51,6 +51,8 @@ public class Plate implements VertexDictionary {
     }
 
     public Collection<Vertex<?>> getProxyVertices() {
-        return contents.values().stream().filter(v -> v instanceof ProxyVertex).collect(Collectors.toList());
+        return contents.values().stream()
+            .filter(v -> v instanceof ProxyVertex)
+            .collect(Collectors.toList());
     }
 }
