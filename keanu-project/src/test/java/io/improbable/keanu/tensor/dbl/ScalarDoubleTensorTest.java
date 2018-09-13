@@ -38,7 +38,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForZeros() {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor nonZero = DoubleTensor.scalar(1e-8);
-        TensorValidator validator = new TensorValidator(0.);
+        TensorValidator validator = new TensorValueEqualsValidator(0.);
         assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(true)));
         assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(false)));
     }
@@ -47,7 +47,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForNans() {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
-        TensorValidator validator = new TensorValidator(Double.NaN);
+        TensorValidator validator = new TensorValueEqualsValidator(Double.NaN);
         assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(true)));
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(false)));
     }

@@ -825,7 +825,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void youCanCheckForZeros() {
-        DoubleTensor containsNan = DoubleTensor.create(new double[]{
+        DoubleTensor containsZero = DoubleTensor.create(new double[]{
                 0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
                 Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0},
             4, 2);
@@ -835,7 +835,9 @@ public class Nd4jDoubleTensorTest {
                 false, false, false, true},
             4, 2);
 
-        TensorValidator validator = new TensorValidator(0.);
-        assertThat(validator.check(containsNan), equalTo(expectedMask));
+        TensorValidator validator = new TensorValueEqualsValidator(0.);
+        assertThat(validator.check(containsZero), equalTo(expectedMask));
     }
+
+  
 }
