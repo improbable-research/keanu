@@ -26,7 +26,7 @@ public class VertexLabel {
         return new VertexLabel(this.name, newNamespace);
     }
 
-    public VertexLabel withoutOuterNamespace() throws VertexLabelException {
+    public VertexLabel withoutOuterNamespace() {
         try {
             List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
             return new VertexLabel(this.name, reducedNamespace);

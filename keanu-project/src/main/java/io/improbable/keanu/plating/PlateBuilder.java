@@ -38,7 +38,7 @@ public class PlateBuilder<T> {
          * @return Collection of all created plates
          * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the transition mapping
          */
-        Plates build() throws VertexLabelException;
+        Plates build();
     }
 
     public PlateBuilder<T> withInitialState(Vertex... initialState) {
@@ -154,7 +154,7 @@ public class PlateBuilder<T> {
             this.initialState = initialState;
         }
 
-        public Plates build() throws VertexLabelException {
+        public Plates build() {
             Plates plates = new Plates(this.size);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousVertices = initialState;
@@ -169,7 +169,7 @@ public class PlateBuilder<T> {
         }
     }
 
-    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) throws VertexLabelException {
+    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) {
         Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
         if (candidateVertices == null && !proxyVertices.isEmpty()) {
             throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
@@ -200,7 +200,7 @@ public class PlateBuilder<T> {
         }
 
 
-        public Plates build() throws VertexLabelException {
+        public Plates build() {
             Plates plates = new Plates(count.getCount());
             VertexDictionary previousPlate = initialState;
             for (int i = 0; i < count.getCount(); i++) {

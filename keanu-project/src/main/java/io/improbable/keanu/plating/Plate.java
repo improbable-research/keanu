@@ -19,7 +19,7 @@ public class Plate implements VertexDictionary {
         this.contents = new HashMap<>();
     }
 
-    public <T extends Vertex<?>> T add(T v) throws PlateException {
+    public <T extends Vertex<?>> T add(T v) {
         if (v.getLabel() == null) {
             throw new PlateException("Vertex " + v + " must contain a label in order to be added to a plate");
         }

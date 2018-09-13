@@ -88,7 +88,7 @@ public class VertexLabelTest {
     }
 
     @Test
-    public void youCanDiminishTheNamespace() throws VertexLabelException {
+    public void youCanDiminishTheNamespace() {
         String innerNamespace = "inner";
         String outerNamespace = "outer";
         String name = "foo";
@@ -98,7 +98,7 @@ public class VertexLabelTest {
     }
 
     @Test(expected = VertexLabelException.class)
-    public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() throws VertexLabelException {
+    public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() {
         VertexLabel foo = new VertexLabel("foo");
         foo.withoutOuterNamespace();
     }

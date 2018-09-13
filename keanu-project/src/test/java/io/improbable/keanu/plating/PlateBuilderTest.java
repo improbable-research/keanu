@@ -51,7 +51,7 @@ public class PlateBuilderTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     @Test
-    public void buildPlatesFromCount_Size() throws VertexLabelException {
+    public void buildPlatesFromCount_Size() {
         int n = 100;
         Plates plates = new PlateBuilder()
             .count(n)
@@ -62,7 +62,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void buildPlatesFromCount_PlateContents() throws VertexLabelException {
+    public void buildPlatesFromCount_PlateContents() {
         int n = 100;
         VertexLabel vertexName = new VertexLabel("vertexName");
         Plates plates = new PlateBuilder<>()
@@ -75,7 +75,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void buildPlatesFromData_Size() throws VertexLabelException {
+    public void buildPlatesFromData_Size() {
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
@@ -85,7 +85,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void buildPlatesFromData_Contents() throws VertexLabelException {
+    public void buildPlatesFromData_Contents() {
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
@@ -95,7 +95,7 @@ public class PlateBuilderTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void youCannotAddTheSameLabelTwiceIntoOnePlate() throws VertexLabelException {
+    public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
         new PlateBuilder<Integer>()
             .count(10)
             .withFactory((plate) -> {
@@ -110,7 +110,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() throws VertexLabelException {
+    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
@@ -132,7 +132,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void youCanPutThePlatesIntoABayesNet() throws VertexLabelException {
+    public void youCanPutThePlatesIntoABayesNet() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
@@ -151,7 +151,7 @@ public class PlateBuilderTest {
 
 
     @Test
-    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() throws VertexLabelException {
+    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         VertexLabel label = new VertexLabel("flip");
@@ -181,7 +181,7 @@ public class PlateBuilderTest {
      *           Y[t-1]       Y[t]
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlatesFromACount() throws VertexLabelException {
+    public void youCanCreateATimeSeriesFromPlatesFromACount() {
 
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel xPreviousLabel = new VertexLabel("xPrevious");
@@ -227,7 +227,7 @@ public class PlateBuilderTest {
      *           Y[t-1]       Y[t]
      */
     @Test
-    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() throws VertexLabelException {
+    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
 
         VertexLabel xLabel = new VertexLabel("x");
         VertexLabel xPreviousLabel = new VertexLabel("xPreviousProxy");
@@ -266,7 +266,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() throws VertexLabelException {
+    public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() {
         expectedException.expect(VertexLabelException.class);
         expectedException.expectMessage(startsWith("Cannot find transition mapping for "));
         VertexLabel realLabel = new VertexLabel("real");
@@ -282,7 +282,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void itThrowsIfTheresAProxyVertexButNoBaseCase() throws VertexLabelException {
+    public void itThrowsIfTheresAProxyVertexButNoBaseCase() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("You must provide a base case for the Transition Vertices - use withInitialState()");
         VertexLabel realLabel = new VertexLabel("real");
@@ -296,7 +296,7 @@ public class PlateBuilderTest {
     }
 
     @Test
-    public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() throws VertexLabelException {
+    public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() {
         expectedException.expect(VertexLabelException.class);
         expectedException.expectMessage("Cannot find VertexLabel fake");
         VertexLabel realLabel = new VertexLabel("real");

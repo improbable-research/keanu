@@ -39,7 +39,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void oystersAreInfected() throws VertexLabelException {
+    public void oystersAreInfected() {
         generateSurveyData(50, true, false, false);
 
         int dropCount = 10000;
@@ -51,7 +51,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void lambAndOystersAreInfected() throws VertexLabelException {
+    public void lambAndOystersAreInfected() {
         generateSurveyData(50, true, true, false);
         NetworkSamples samples = sample(15000);
 
@@ -62,7 +62,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void nothingIsInfected() throws VertexLabelException {
+    public void nothingIsInfected() {
         generateSurveyData(50, false, false, false);
         NetworkSamples samples = sample(15000);
 
@@ -79,7 +79,7 @@ public class FoodPoisoningTest {
         return MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(myNet, myNet.getLatentVertices(), n);
     }
 
-    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) throws VertexLabelException {
+    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {
 
         VertexLabel didEatOystersLabel = new VertexLabel("didEatOysters");
         VertexLabel didEatLambLabel = new VertexLabel("didEatLamb");

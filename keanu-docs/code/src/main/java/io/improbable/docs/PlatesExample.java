@@ -45,7 +45,7 @@ public class PlatesExample {
      *
      * @param dataFileName - the file containing data in (x,y) format
      */
-    public Plates buildPlates(String dataFileName) throws VertexLabelException {
+    public Plates buildPlates(String dataFileName) {
 
         //Read data from a csv file
         CsvReader csvReader = ReadCsv.fromResources(dataFileName);
