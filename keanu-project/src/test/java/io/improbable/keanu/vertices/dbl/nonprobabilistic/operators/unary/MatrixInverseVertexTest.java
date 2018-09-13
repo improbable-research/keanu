@@ -12,6 +12,8 @@ import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 public class MatrixInverseVertexTest {
 
+    private static final int NUM_ITERATIONS = 10;
+
     @Test(expected = IllegalArgumentException.class)
     public void rejectsNonSquareInput() {
         DoubleTensor matrix = DoubleTensor.arange(1, 9).reshape(4, 2);
@@ -70,7 +72,6 @@ public class MatrixInverseVertexTest {
 
     @Test
     public void inverseMultipliedEqualsIdentity() {
-        final int NUM_ITERATIONS = 10;
         DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -20.0, 20.0);
         DoubleVertex inverseVertex = inputVertex.matrixInverse();
         DoubleVertex multiplied = inverseVertex.matrixMultiply(inputVertex);
@@ -96,6 +97,38 @@ public class MatrixInverseVertexTest {
         inverse.lazyEval();
 
         assertEquals(0.5, inverse.getValue().scalar(), 1e-6);
+    }
+
+    @Test
+    public void finiteDifferenceMatchesGradient() {
+        final double INCREMENT_AMOUNT = 0.001;
+        DoubleVertex inputVertex = new UniformVertex(new int[]{3, 3}, 1.0, 25.0);
+        DoubleTensor initialInput = inputVertex.sample();
+        inputVertex.setValue(initialInput);
+        DoubleVertex inverted = inputVertex.matrixInverse();
+        inverted.lazyEval();
+
+        DoubleTensor initialInverted = inverted.getValue();
+        DoubleTensor inverseWrtInput = inverted.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+        DoubleTensor incrementTensor = DoubleTensor.zeros(new int[]{3, 3});
+
+        for (int firstDimension = 0; firstDimension < 3; firstDimension++) {
+            for (int secondDimension = 0; secondDimension < 3; secondDimension++) {
+                incrementTensor = incrementTensor.setValue(INCREMENT_AMOUNT,
+                    firstDimension, secondDimension);
+                DoubleTensor newInput = initialInput.plus(incrementTensor);
+                inputVertex.setValue(newInput);
+
+                inverted.lazyEval();
+                DoubleTensor newInverted = inverted.getValue();
+                DoubleTensor differenceInInverted = newInverted.minus(initialInverted);
+
+                DoubleTensor expectedDifference = inverseWrtInput.times(incrementTensor).sum(2, 3);
+                double totalError = expectedDifference.minusInPlace(differenceInInverted).sum();
+
+                assertEquals(0.0, totalError, 1e-6);
+            }
+        }
     }
 
 }
