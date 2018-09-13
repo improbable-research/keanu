@@ -15,6 +15,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorValidator;
+import io.improbable.keanu.tensor.TensorValueEqualsValidator;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class Nd4jDoubleTensorTest {

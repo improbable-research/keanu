@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import io.improbable.keanu.tensor.TensorValidator;
+import io.improbable.keanu.tensor.TensorValueEqualsValidator;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class ScalarDoubleTensorTest {
