@@ -166,7 +166,7 @@ public class GradientOptimizer implements Optimizer {
             );
         } catch (NotStrictlyPositiveException e) {
             translateNSPExceptionToIllegalArgException(e);
-            optimizer = null;
+            throw e;
         }
 
         PointValuePair pointValuePair = optimizer.optimize(
