@@ -3,9 +3,6 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Test;
 import org.slf4j.Logger;
@@ -24,14 +21,11 @@ public class PoissonVertexTest {
         KeanuRandom random = new KeanuRandom(1);
         PoissonVertex testPoissonVertex = new PoissonVertex(mu);
 
-        List<Integer> samples = new ArrayList<>();
+        SummaryStatistics stats = new SummaryStatistics();
         for (int i = 0; i < N; i++) {
             Integer sample = testPoissonVertex.sample(random).scalar();
-            samples.add(sample);
+            stats.addValue(sample);
         }
-
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
 
         double mean = stats.getMean();
         double sd = stats.getStandardDeviation();
