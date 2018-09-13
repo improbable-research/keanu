@@ -192,7 +192,7 @@ public class PlateBuilderTest {
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialX)
-            .withProxyMapping(ImmutableMap.of(xPreviousLabel, xLabel))
+            .withTransitionMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .count(10)
             .withFactory((plate) -> {
                 DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
@@ -238,7 +238,7 @@ public class PlateBuilderTest {
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialX)
-            .withProxyMapping(ImmutableMap.of(xPreviousLabel, xLabel))
+            .withTransitionMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .fromIterator(ys.iterator())
             .withFactory((plate, observedY) -> {
                 DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
@@ -268,12 +268,12 @@ public class PlateBuilderTest {
     @Test
     public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() throws VertexLabelException {
         expectedException.expect(VertexLabelException.class);
-        expectedException.expectMessage(startsWith("Cannot find proxy mapping for "));
+        expectedException.expectMessage(startsWith("Cannot find transition mapping for "));
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState()
-            .withProxyMapping(ImmutableMap.of(realLabel, realLabel))
+            .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
             .count(10)
             .withFactory((plate) -> {
                 plate.add(new DoubleProxyVertex(fakeLabel));
@@ -284,10 +284,10 @@ public class PlateBuilderTest {
     @Test
     public void itThrowsIfTheresAProxyVertexButNoBaseCase() throws VertexLabelException {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("You must provide a base case for the Proxy Vertices - use withInitialState()");
+        expectedException.expectMessage("You must provide a base case for the Transition Vertices - use withInitialState()");
         VertexLabel realLabel = new VertexLabel("real");
         Plates plates = new PlateBuilder<Integer>()
-            .withProxyMapping(ImmutableMap.of(realLabel, realLabel))
+            .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
             .count(10)
             .withFactory((plate) -> {
                 plate.add(new DoubleProxyVertex(realLabel));
@@ -303,7 +303,7 @@ public class PlateBuilderTest {
         VertexLabel fakeLabel = new VertexLabel("fake");
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(ConstantVertex.of(1.).labelledAs(realLabel))
-            .withProxyMapping(ImmutableMap.of(realLabel, fakeLabel))
+            .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
             .count(10)
             .withFactory((plate) -> {
                 plate.add(new DoubleProxyVertex(realLabel));

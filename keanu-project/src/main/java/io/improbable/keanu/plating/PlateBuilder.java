@@ -21,7 +21,7 @@ import io.improbable.keanu.vertices.VertexLabelException;
 public class PlateBuilder<T> {
 
     private VertexDictionary initialState;
-    private Map<VertexLabel, VertexLabel> proxyMapping = Collections.emptyMap();
+    private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
 
     private interface PlateCount {
         int getCount();
@@ -36,7 +36,7 @@ public class PlateBuilder<T> {
          * Build plates from current factory settings
          *
          * @return Collection of all created plates
-         * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the proxy mapping
+         * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the transition mapping
          */
         Plates build() throws VertexLabelException;
     }
@@ -46,8 +46,8 @@ public class PlateBuilder<T> {
         return this;
     }
 
-    public PlateBuilder<T> withProxyMapping(Map<VertexLabel, VertexLabel> proxyMapping) {
-        this.proxyMapping = proxyMapping;
+    public PlateBuilder<T> withTransitionMapping(Map<VertexLabel, VertexLabel> transitionMapping) {
+        this.transitionMapping = transitionMapping;
         return this;
     }
 
@@ -68,7 +68,7 @@ public class PlateBuilder<T> {
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator) {
-        return new FromIterator(iterator, 0, initialState, proxyMapping);
+        return new FromIterator(iterator, 0, initialState, transitionMapping);
     }
 
     /**
@@ -79,7 +79,7 @@ public class PlateBuilder<T> {
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator, int sizeHint) {
-        return new FromIterator(iterator, sizeHint, initialState, proxyMapping);
+        return new FromIterator(iterator, sizeHint, initialState, transitionMapping);
     }
 
     /**
@@ -105,7 +105,7 @@ public class PlateBuilder<T> {
          * @return A builder with count and plate factory set
          */
         public FromCountFactory withFactory(Consumer<Plate> factory) {
-            return new FromCountFactory(factory, this, initialState, proxyMapping);
+            return new FromCountFactory(factory, this, initialState, transitionMapping);
         }
     }
 
@@ -117,7 +117,7 @@ public class PlateBuilder<T> {
         private int size;
         private final VertexDictionary initialState;
 
-        private FromIterator(Iterator<T> iterator, int size, VertexDictionary initialState, Map<VertexLabel, VertexLabel> proxyMapping) {
+        private FromIterator(Iterator<T> iterator, int size, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
             this.iterator = iterator;
             this.size = size;
             this.initialState = initialState;
@@ -161,7 +161,7 @@ public class PlateBuilder<T> {
             while (iter.hasNext()) {
                 Plate plate = new Plate();
                 factory.accept(plate, iter.next());
-                connectProxyVariables(previousPlate, plate, proxyMapping);
+                connectTransitionVariables(previousPlate, plate, transitionMapping);
                 plates.add(plate);
                 previousPlate = plate;
             }
@@ -169,15 +169,15 @@ public class PlateBuilder<T> {
         }
     }
 
-    private void connectProxyVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> proxyMapping) throws VertexLabelException {
+    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) throws VertexLabelException {
         Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
         if (candidateVertices == null && !proxyVertices.isEmpty()) {
-            throw new IllegalArgumentException("You must provide a base case for the Proxy Vertices - use withInitialState()");
+            throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
         }
         for (Vertex<?> proxy : proxyVertices) {
-            VertexLabel label = proxyMapping.get(proxy.getLabel().withoutOuterNamespace());
+            VertexLabel label = transitionMapping.get(proxy.getLabel().withoutOuterNamespace());
             if (label == null) {
-                throw new VertexLabelException("Cannot find proxy mapping for " + proxy.getLabel());
+                throw new VertexLabelException("Cannot find transition mapping for " + proxy.getLabel());
             }
             Vertex<?> parent = candidateVertices.get(label);
             if (parent == null) {
@@ -194,7 +194,7 @@ public class PlateBuilder<T> {
         private Consumer<Plate> factory;
         private PlateCount count;
 
-        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> proxyMapping) {
+        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
             this.factory = factory;
             this.count = count;
         }
@@ -206,7 +206,7 @@ public class PlateBuilder<T> {
             for (int i = 0; i < count.getCount(); i++) {
                 Plate plate = new Plate();
                 factory.accept(plate);
-                connectProxyVariables(previousPlate, plate, proxyMapping);
+                connectTransitionVariables(previousPlate, plate, transitionMapping);
                 plates.add(plate);
                 previousPlate = plate;
             }
