@@ -14,6 +14,7 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.tensor.CustomTensorValidator;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorValidator;
 import io.improbable.keanu.tensor.TensorValueEqualsValidator;
@@ -841,5 +842,20 @@ public class Nd4jDoubleTensorTest {
         assertThat(validator.check(containsZero), equalTo(expectedMask));
     }
 
-  
+    @Test
+    public void youCanCheckForNaNs() {
+        DoubleTensor containsNan = DoubleTensor.create(new double[]{
+                0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
+                Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0},
+            4, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                false, false, false, true,
+                false, false, false, false},
+            4, 2);
+
+//        TensorValidator validator = new TensorValueEqualsValidator(Double.NaN); // fails: ND4J bug?
+        TensorValidator validator = new CustomTensorValidator(x -> x.equals(Double.NaN));
+        assertThat(validator.check(containsNan), equalTo(expectedMask));
+    }
 }
