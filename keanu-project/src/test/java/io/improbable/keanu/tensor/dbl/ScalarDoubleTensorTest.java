@@ -1,8 +1,12 @@
 package io.improbable.keanu.tensor.dbl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class ScalarDoubleTensorTest {
 
@@ -28,5 +32,14 @@ public class ScalarDoubleTensorTest {
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
         double expected = 0.0;
         assertEquals(expected, clampedA.scalar(), 0.0);
+    }
+
+    @Test
+    public void youCanCheckForZeros() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor nonZero = DoubleTensor.scalar(1e-8);
+        TensorValidator validator = new TensorValidator(0.);
+        assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(true)));
+        assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(false)));
     }
 }
