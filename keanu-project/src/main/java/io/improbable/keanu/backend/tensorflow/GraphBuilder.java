@@ -1,13 +1,19 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.ADD;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTANT;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.DIVIDE;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.MATRIX_MULTIPLY;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.MULTIPLY;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.SUBTRACT;
+
+import java.nio.DoubleBuffer;
+
 import org.tensorflow.DataType;
 import org.tensorflow.Graph;
 import org.tensorflow.Output;
 import org.tensorflow.Tensor;
 
-// In the fullness of time, equivalents of the methods of this class should be auto-generated from
-// the OpDefs linked into libtensorflow_jni.so. That would match what is done in other languages
-// like Python, C++ and Go.
 public class GraphBuilder {
 
     private Graph g;
@@ -16,50 +22,70 @@ public class GraphBuilder {
         this.g = g;
     }
 
-    <T> Output<T> div(Output<T> x, Output<T> y) {
-        return binaryOp("Div", x, y);
+    public <T> Output<T> getOutput(String name) {
+        return g.operation(name).output(0);
     }
 
-    <T> Output<T> sub(Output<T> x, Output<T> y) {
-        return binaryOp("Sub", x, y);
-    }
+    public enum OpType {
+        CONSTANT("Const"),
+        DIVIDE("Div"),
+        MULTIPLY("Mul"),
+        SUBTRACT("Sub"),
+        ADD("Add"),
+        MATRIX_MULTIPLY("MatMul");
 
-    <T, U> Output<U> cast(Output<T> value, Class<U> type) {
-        DataType dtype = DataType.fromClass(type);
-        return g.opBuilder("Cast", "Cast")
-            .addInput(value)
-            .setAttr("DstT", dtype)
-            .build()
-            .<U>output(0);
-    }
+        public final String name;
 
-    <T> Output<T> constant(String name, Object value, Class<T> type) {
-        try (Tensor<T> t = Tensor.<T>create(value, type)) {
-            return g.opBuilder("Const", name)
-                .setAttr("dtype", DataType.fromClass(type))
-                .setAttr("value", t)
-                .build()
-                .<T>output(0);
+        OpType(String tensorFlowName) {
+            this.name = tensorFlowName;
         }
     }
 
-    Output<String> constant(String name, byte[] value) {
-        return this.constant(name, value, String.class);
+    <T> Output<T> div(Output<T> x, Output<T> y, String name) {
+        return binaryOp(DIVIDE, name, x, y);
     }
 
-    Output<Integer> constant(String name, int value) {
-        return this.constant(name, value, Integer.class);
+    <T> Output<T> sub(Output<T> left, Output<T> right, String name) {
+        return binaryOp(SUBTRACT, name, left, right);
     }
 
-    Output<Integer> constant(String name, int[] value) {
-        return this.constant(name, value, Integer.class);
+    <T> Output<T> mul(Output<T> left, Output<T> right, String name) {
+        return binaryOp(MULTIPLY, name, left, right);
     }
 
-    Output<Double> constant(String name, double value) {
-        return this.constant(name, value, Double.class);
+    <T> Output<T> add(Output<T> left, Output<T> right, String name) {
+        return binaryOp(ADD, name, left, right);
     }
 
-    private <T> Output<T> binaryOp(String type, Output<T> in1, Output<T> in2) {
-        return g.opBuilder(type, type).addInput(in1).addInput(in2).build().<T>output(0);
+    <T> Output<T> mmul(Output<T> left, Output<T> right, String name) {
+        return binaryOp(MATRIX_MULTIPLY, name, left, right);
+    }
+
+    Output<Double> constant(double value, String name) {
+        try (Tensor<Double> tensor = Tensor.create(value, Double.class)) {
+            return this.constant(name, tensor, Double.class);
+        }
+    }
+
+    Output<Double> constant(double[] value, long[] shape, String name) {
+        try (Tensor<Double> tensor = Tensor.create(shape, DoubleBuffer.wrap(value))) {
+            return this.constant(name, tensor, Double.class);
+        }
+    }
+
+    private <T> Output<T> constant(String name, Tensor<T> tensor, Class<T> type) {
+        return g.opBuilder(CONSTANT.name, name)
+            .setAttr("dtype", DataType.fromClass(type))
+            .setAttr("value", tensor)
+            .build()
+            .output(0);
+    }
+
+    private <T> Output<T> binaryOp(OpType type, Output<T> in1, Output<T> in2) {
+        return g.opBuilder(type.name, type.name).addInput(in1).addInput(in2).build().output(0);
+    }
+
+    private <T> Output<T> binaryOp(OpType type, String name, Output<T> in1, Output<T> in2) {
+        return g.opBuilder(type.name, name).addInput(in1).addInput(in2).build().output(0);
     }
 }
