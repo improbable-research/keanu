@@ -1,10 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static org.junit.Assert.assertEquals;
 
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -13,7 +15,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.nd4j.linalg.factory.Nd4j;
 
 public class ConcatenationVertexTest {
 
@@ -435,6 +436,17 @@ public class ConcatenationVertexTest {
         );
 
         assertEquals(concatPartialForward.withRespectTo(f), concatPartialReverse.withRespectTo(f));
+    }
+
+    @Test
+    public void changesMatchGradient() {
+        DoubleVertex inputA = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputB = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputC = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
+        final double INCREMENT = 10.0;
+        final double DELTA = 1e-10;
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, INCREMENT, DELTA);
     }
 
 }

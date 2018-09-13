@@ -277,8 +277,8 @@ public class MatrixMultiplicationVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputA = new UniformVertex(new int[]{2,5}, -10.0, 10.0);
-        DoubleVertex inputB = new UniformVertex(new int[]{5,4}, -10.0, 10.0);
+        DoubleVertex inputA = new UniformVertex(new int[]{2, 5}, -10.0, 10.0);
+        DoubleVertex inputB = new UniformVertex(new int[]{5, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputA.matrixMultiply(inputB);
         final double INCREMENT = 10;
         final double DELTA = 1e-10;

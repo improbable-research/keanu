@@ -36,8 +36,7 @@ public class TensorTestOperations {
 
         for (int i = 0; i < flatIncrement.size(); i++) {
             flatIncrement.set(i, INCREMENT_AMOUNT);
-            DoubleTensor newInput = initialInput.plus(incrementTensor);
-            inputVertex.setValue(newInput);
+            inputVertex.setValue(initialInput.plus(incrementTensor));
 
             DoubleTensor newOutput = outputVertex.lazyEval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
