@@ -1,8 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
@@ -100,35 +103,13 @@ public class MatrixInverseVertexTest {
     }
 
     @Test
-    public void finiteDifferenceMatchesGradient() {
+    public void inverseDifferenceMatchesGradient() {
         final double INCREMENT_AMOUNT = 0.001;
+        final double DELTA = 1e-6;
         DoubleVertex inputVertex = new UniformVertex(new int[]{3, 3}, 1.0, 25.0);
-        DoubleTensor initialInput = inputVertex.sample();
-        inputVertex.setValue(initialInput);
-        DoubleVertex inverted = inputVertex.matrixInverse();
-        inverted.lazyEval();
+        DoubleVertex invertVertex = inputVertex.matrixInverse();
 
-        DoubleTensor initialInverted = inverted.getValue();
-        DoubleTensor inverseWrtInput = inverted.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-        DoubleTensor incrementTensor = DoubleTensor.zeros(new int[]{3, 3});
-
-        for (int firstDimension = 0; firstDimension < 3; firstDimension++) {
-            for (int secondDimension = 0; secondDimension < 3; secondDimension++) {
-                incrementTensor = incrementTensor.setValue(INCREMENT_AMOUNT,
-                    firstDimension, secondDimension);
-                DoubleTensor newInput = initialInput.plus(incrementTensor);
-                inputVertex.setValue(newInput);
-
-                inverted.lazyEval();
-                DoubleTensor newInverted = inverted.getValue();
-                DoubleTensor differenceInInverted = newInverted.minus(initialInverted);
-
-                DoubleTensor expectedDifference = inverseWrtInput.times(incrementTensor).sum(2, 3);
-                double totalError = expectedDifference.minusInPlace(differenceInInverted).sum();
-
-                assertEquals(0.0, totalError, 1e-6);
-            }
-        }
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), invertVertex, INCREMENT_AMOUNT, DELTA);
     }
 
 }
