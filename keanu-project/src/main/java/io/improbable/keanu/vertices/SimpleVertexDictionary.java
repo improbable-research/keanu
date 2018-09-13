@@ -8,23 +8,23 @@ import io.improbable.keanu.tensor.Tensor;
 
 public class SimpleVertexDictionary implements VertexDictionary {
 
-    private final Map<VertexLabel, Vertex<?>> map;
+    private final Map<VertexLabel, Vertex<?>> dictionary;
 
-    private SimpleVertexDictionary(Map<VertexLabel, Vertex<?>> map) {
-        this.map = map;
+    private SimpleVertexDictionary(Map<VertexLabel, Vertex<?>> dictionary) {
+        this.dictionary = dictionary;
     }
 
     @Override
     public <V extends Vertex<? extends Tensor<?>>> V get(VertexLabel label) {
-        return (V) map.get(label);
+        return (V) dictionary.get(label);
     }
 
-    public static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> map) {
-        return new SimpleVertexDictionary(map);
+    public static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {
+        return new SimpleVertexDictionary(dictionary);
     }
 
     public static VertexDictionary of(Vertex<?>... vertices) {
-        Map<VertexLabel, Vertex<?>> map = Arrays.stream(vertices).collect(Collectors.toMap(Vertex::getLabel, v -> v));
-        return backedBy(map);
+        Map<VertexLabel, Vertex<?>> dictionary = Arrays.stream(vertices).collect(Collectors.toMap(Vertex::getLabel, v -> v));
+        return backedBy(dictionary);
     }
 }
