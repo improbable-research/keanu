@@ -1,10 +1,13 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
@@ -122,4 +125,15 @@ public class SumVertexTest {
         assertThat(dfdaForward, equalTo(expectedDfdx));
         assertThat(dfdaReverse, equalTo(expectedDfdx));
     }
+
+    //@Test - XXX - The sum vertex produces dual numbers with "weird" shape.  Discuss.
+    public void changesMatchGradient() {
+        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex outputVertex = inputVertex.times(3).sum();
+        final double INCREMENT = 10.0;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
+    }
+
 }

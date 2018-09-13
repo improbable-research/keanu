@@ -38,7 +38,7 @@ public class TensorTestOperations {
             flatIncrement.set(i, INCREMENT_AMOUNT);
             inputVertex.setValue(initialInput.plus(incrementTensor));
 
-            DoubleTensor newOutput = outputVertex.lazyEval();
+            DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
             DoubleTensor differenceUsingGradient = outputWrtInput.times(incrementTensor).sum(dimensionsToSumOver);
             checkIndividualErrors(differenceInOutput, differenceUsingGradient, DELTA);

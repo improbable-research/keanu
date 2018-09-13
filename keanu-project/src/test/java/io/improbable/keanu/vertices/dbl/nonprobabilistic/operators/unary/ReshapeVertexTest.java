@@ -1,14 +1,19 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+
+import org.junit.Assert;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
-import org.junit.Test;
 
 public class ReshapeVertexTest {
 
@@ -115,6 +120,16 @@ public class ReshapeVertexTest {
 
         Assert.assertArrayEquals(new int[]{1, 4, 2, 2}, forward.withRespectTo(A).getShape());
         Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void changesMatchGradient() {
+        DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -10.0, 10.0);
+        DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
+        final double INCREMENT = 10.0;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
     }
 
 }
