@@ -30,7 +30,7 @@ import static org.mockito.Mockito.when;
 public class ProcessModelVertexTest {
 
     /*
-    The model we are mimicking here is a python script called model.py.
+    The model we are mimicking here is a python script, model.py.
 
     It takes one input, Temperature, and produces two outputs, Chance of Rain & Humidity. These outputs
     are written to file.

@@ -29,6 +29,13 @@ import static org.mockito.Mockito.when;
 
 public class LambdaModelVertexTest {
 
+    /*
+    The model we are mimicking here is a Java function, modelExecution.
+
+    It takes one input, Temperature, and produces two outputs, Chance of Rain & Humidity. These outputs
+    are written to file.
+     */
+
     @Mock
     private BufferedReader rainReader;
 
