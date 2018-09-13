@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor.dbl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -821,4 +823,19 @@ public class Nd4jDoubleTensorTest {
         }
     }
 
+    @Test
+    public void youCanCheckForZeros() {
+        DoubleTensor containsNan = DoubleTensor.create(new double[]{
+                0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
+                Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0},
+            4, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                true, false, false, false,
+                false, false, false, true},
+            4, 2);
+
+        TensorValidator validator = new TensorValidator(0.);
+        assertThat(validator.check(containsNan), equalTo(expectedMask));
+    }
 }
