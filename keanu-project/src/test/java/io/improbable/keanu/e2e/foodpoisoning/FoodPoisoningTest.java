@@ -88,9 +88,9 @@ public class FoodPoisoningTest {
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
         Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labelledAs(didEatOystersLabel));
-            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labelledAs(didEatLambLabel));
-            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labelledAs(didEatPooLabel));
+            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labeledAs(didEatOystersLabel));
+            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labeledAs(didEatLambLabel));
+            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labeledAs(didEatPooLabel));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -102,10 +102,10 @@ public class FoodPoisoningTest {
             DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
                 .orElse(0.1)
-                .labelledAs(pIllLabel);
+                .labeledAs(pIllLabel);
 
             plate.add(pIll);
-            plate.add(new BernoulliVertex(pIll).labelledAs(isIllLabel));
+            plate.add(new BernoulliVertex(pIll).labeledAs(isIllLabel));
         };
 
         Plates personPlates = new PlateBuilder()
