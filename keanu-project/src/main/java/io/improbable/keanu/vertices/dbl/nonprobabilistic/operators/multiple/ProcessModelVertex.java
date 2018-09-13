@@ -46,7 +46,6 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     public void run(Map<VertexLabel, DoubleVertex> inputs) {
         String newCommand = commandFormatter.apply(inputs, command);
         try {
-            System.out.println("Running");
             Process cmd = Runtime.getRuntime().exec(newCommand);
             cmd.waitFor();
         } catch (IOException | InterruptedException e) {

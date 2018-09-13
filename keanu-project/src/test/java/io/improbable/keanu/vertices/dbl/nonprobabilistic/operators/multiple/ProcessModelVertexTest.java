@@ -27,7 +27,14 @@ import java.util.regex.Pattern;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class ModelInModelTest {
+public class ProcessModelVertexTest {
+
+    /*
+    The model we are mimicking here is a python script called model.py.
+
+    It takes one input, Temperature, and produces two outputs, Chance of Rain & Humidity. These outputs
+    are written to file.
+     */
 
     @Mock
     private BufferedReader rainReader;
@@ -46,7 +53,7 @@ public class ModelInModelTest {
 
         when(rainReader.readLine()).thenAnswer(new Answer<Object>() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
+            public Object answer(InvocationOnMock invocation) {
                 double chanceOfRainScalingFactorFromModel = 0.1;
                 return String.valueOf(inputToModel.getValue().scalar() * chanceOfRainScalingFactorFromModel);
             }
@@ -54,7 +61,7 @@ public class ModelInModelTest {
 
         when(humidityReader.readLine()).thenAnswer(new Answer<Object>() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
+            public Object answer(InvocationOnMock invocation) {
                 double humidityScalingFactorFromModel = 2;
                 return String.valueOf(inputToModel.getValue().scalar() * humidityScalingFactorFromModel);
             }
@@ -131,7 +138,7 @@ public class ModelInModelTest {
 
     @Test
     public void modelWorksAsPartOfSampling() {
-        inputToModel = new GaussianVertex(29.5, 2.5);
+        inputToModel = new GaussianVertex(29, 2);
 
         Map<VertexLabel, DoubleVertex> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
@@ -152,12 +159,12 @@ public class ModelInModelTest {
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            125
+            150
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
 
-        Assert.assertEquals(30.0, averagePosteriorInput, 0.1);
+        Assert.assertEquals((29 * (1 / 3.) + (30 * (2 / 3.))), averagePosteriorInput, 0.1);
     }
 
     private String formatCommandForExecution(Map<VertexLabel, DoubleVertex> inputs, String command) {
