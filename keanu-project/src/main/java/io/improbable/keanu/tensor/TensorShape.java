@@ -11,11 +11,11 @@ public class TensorShape {
     private int[] shape;
 
     public TensorShape(int[] shape) {
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
     }
 
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     public boolean isScalar() {

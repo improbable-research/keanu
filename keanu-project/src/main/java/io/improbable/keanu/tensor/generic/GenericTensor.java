@@ -1,14 +1,15 @@
 package io.improbable.keanu.tensor.generic;
 
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
+import static java.util.Arrays.copyOf;
+
+import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-import static java.util.Arrays.copyOf;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 
 public class GenericTensor<T> implements Tensor<T> {
 
@@ -17,8 +18,8 @@ public class GenericTensor<T> implements Tensor<T> {
     private int[] stride;
 
     public GenericTensor(T[] data, int[] shape) {
-        this.data = data;
-        this.shape = shape;
+        this.data = Arrays.copyOf(data, data.length);
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
 
         if (getLength() != data.length) {
@@ -37,7 +38,7 @@ public class GenericTensor<T> implements Tensor<T> {
      */
     public GenericTensor(int[] shape) {
         this.data = null;
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -48,7 +49,7 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
@@ -175,7 +176,7 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public T[] asFlatArray() {
-        return data;
+        return Arrays.copyOf(data, data.length);
     }
 
     @Override
