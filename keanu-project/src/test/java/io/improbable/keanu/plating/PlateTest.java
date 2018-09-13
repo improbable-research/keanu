@@ -64,7 +64,7 @@ public class PlateTest {
     @Test
     public void itThrowsIfYouAddAVertexWithNoLabel() {
         expectedException.expect(PlateException.class);
-        expectedException.expectMessage(endsWith(" has no label"));
+        expectedException.expectMessage(endsWith(" must contain a label in order to be added to a plate"));
         plate.add(ConstantVertex.of(1.));
     }
 }
