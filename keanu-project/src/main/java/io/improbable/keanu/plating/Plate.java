@@ -42,10 +42,8 @@ public class Plate implements VertexDictionary {
 
     @Override
     public <V extends Vertex<? extends Tensor<?>>> V get(VertexLabel label) {
-        Vertex<?> vertex = contents.get(label);
-        if (vertex == null) {
-            vertex = contents.get(scoped(label));
-        }
+        Vertex<?> vertex = contents.getOrDefault(label, contents.get(scoped(label)));
+
         if (vertex == null) {
             throw new IllegalArgumentException("Cannot find VertexLabel " + label);
         }
