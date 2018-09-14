@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -126,7 +127,8 @@ public class SumVertexTest {
         assertThat(dfdaReverse, equalTo(expectedDfdx));
     }
 
-    //@Test - XXX - The sum vertex produces dual numbers with "weird" shape.  Discuss.
+    @Test
+    @Ignore("Test Currently fails due to tensor shape differences")
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).sum();
