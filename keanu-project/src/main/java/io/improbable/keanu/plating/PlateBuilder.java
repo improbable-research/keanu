@@ -20,6 +20,7 @@ import io.improbable.keanu.vertices.VertexLabelException;
  */
 public class PlateBuilder<T> {
 
+    private static final String PROXY_LABEL_MARKER = "proxy_for";
     private VertexDictionary initialState;
     private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
 
@@ -40,6 +41,11 @@ public class PlateBuilder<T> {
          */
         Plates build();
     }
+
+    public static VertexLabel proxyFor(VertexLabel label) {
+        return label.withExtraNamespace(PROXY_LABEL_MARKER);
+    }
+
 
     public PlateBuilder<T> withInitialState(Vertex... initialState) {
         this.initialState = VertexDictionary.of(initialState);
@@ -175,15 +181,28 @@ public class PlateBuilder<T> {
             throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
         }
         for (Vertex<?> proxy : proxyVertices) {
-            VertexLabel label = transitionMapping.get(proxy.getLabel().withoutOuterNamespace());
-            if (label == null) {
+            VertexLabel proxyLabel = proxy.getLabel().withoutOuterNamespace();
+            VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
+            VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
+
+            if (parentLabel == null) {
                 throw new VertexLabelException("Cannot find transition mapping for " + proxy.getLabel());
             }
-            Vertex<?> parent = candidateVertices.get(label);
+
+            Vertex<?> parent = candidateVertices.get(parentLabel);
             if (parent == null) {
-                throw new VertexLabelException("Cannot find VertexLabel " + label);
+                throw new VertexLabelException("Cannot find VertexLabel " + parentLabel);
             }
             proxy.setParents(parent);
+        }
+    }
+
+    private VertexLabel getDefaultParentLabel(VertexLabel proxyLabel) {
+        String outerNamespace = proxyLabel.getOuterNamespace().orElse(null);
+        if (PROXY_LABEL_MARKER.equals(outerNamespace)) {
+            return proxyLabel.withoutOuterNamespace();
+        } else {
+            return null;
         }
     }
 

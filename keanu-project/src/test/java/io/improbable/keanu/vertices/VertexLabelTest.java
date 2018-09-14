@@ -2,7 +2,10 @@ package io.improbable.keanu.vertices;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -60,6 +63,22 @@ public class VertexLabelTest {
         assertThat(foo1, not(equalTo(foo2)));
         assertThat(foo1.hashCode(), not(equalTo(foo2.hashCode())));
         assertThat(foo1.toString(), equalTo(foo2.toString()));
+    }
+
+    @Test
+    public void youCanGetTheOuterNamespace() {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(name, innerNamespace, outerNamespace);
+        Optional<String> outerNamespace1 = foo.getOuterNamespace();
+        assertThat(outerNamespace1.get(), equalTo(outerNamespace));
+    }
+
+    @Test
+    public void itReturnsEmptyIfYouAskForTheOuterNamespaceButThereIsntOne() {
+        VertexLabel labelWithoutNamespace = new VertexLabel("foo");
+        assertThat(labelWithoutNamespace.getOuterNamespace().isPresent(), is(false));
     }
 
     @Test

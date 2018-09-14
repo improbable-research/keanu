@@ -184,7 +184,7 @@ public class PlateBuilderTest {
     public void youCanCreateATimeSeriesFromPlatesFromACount() {
 
         VertexLabel xLabel = new VertexLabel("x");
-        VertexLabel xPreviousLabel = new VertexLabel("xPrevious");
+        VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labeledAs(xLabel);
@@ -192,7 +192,6 @@ public class PlateBuilderTest {
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialX)
-            .withTransitionMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .count(10)
             .withFactory((plate) -> {
                 DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
@@ -230,7 +229,7 @@ public class PlateBuilderTest {
     public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
 
         VertexLabel xLabel = new VertexLabel("x");
-        VertexLabel xPreviousLabel = new VertexLabel("xPreviousProxy");
+        VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labeledAs(xLabel);
@@ -238,7 +237,6 @@ public class PlateBuilderTest {
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(initialX)
-            .withTransitionMapping(ImmutableMap.of(xPreviousLabel, xLabel))
             .fromIterator(ys.iterator())
             .withFactory((plate, observedY) -> {
                 DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
