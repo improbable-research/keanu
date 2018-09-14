@@ -7,6 +7,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 public class ThrowValueException<T extends Tensor<?>> implements TensorValidationPolicy<T> {
     private final String message;
 
+    // package private - because it's created by the factory method TensorValidationPolicy.throwMessage
     ThrowValueException(String message) {
         this.message = message;
     }

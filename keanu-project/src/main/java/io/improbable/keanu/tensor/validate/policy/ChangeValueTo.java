@@ -8,6 +8,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 public class ChangeValueTo<U, T extends Tensor<U>> implements TensorValidationPolicy<T> {
     private final U value;
 
+    // package private - because it's created by the factory method TensorValidationPolicy.changeValueTo
     ChangeValueTo(U value) {
         this.value = value;
     }
