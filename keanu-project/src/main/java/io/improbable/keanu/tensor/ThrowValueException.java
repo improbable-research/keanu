@@ -13,6 +13,10 @@ public class ThrowValueException implements TensorValidationPolicy {
 
     @Override
     public DoubleTensor handle(DoubleTensor tensor, BooleanTensor result) {
-        throw new KeanuValueException(message, result);
+        if (result.allFalse()) {
+            return tensor;
+        } else {
+            throw new KeanuValueException(message, result);
+        }
     }
 }
