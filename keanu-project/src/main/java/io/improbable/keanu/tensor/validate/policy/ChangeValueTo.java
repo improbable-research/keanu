@@ -6,12 +6,12 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 public class ChangeValueTo implements TensorValidationPolicy {
     private final double value;
 
-    public ChangeValueTo(double value) {
+    ChangeValueTo(double value) {
         this.value = value;
     }
 
     @Override
     public DoubleTensor handle(DoubleTensor tensor, BooleanTensor result) {
-        return tensor.setWithMask(result.toDoubleMask(), value);
+        return tensor.setWithMask(result.not().toDoubleMask(), value);
     }
 }

@@ -833,8 +833,8 @@ public class Nd4jDoubleTensorTest {
             4, 2);
 
         BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
-                true, false, false, false,
-                false, false, false, true},
+                false, true, true, true,
+                true, true, true, false},
             4, 2);
 
         TensorValidator validator = TensorValidator.thatChecksFor(0.);
@@ -849,12 +849,12 @@ public class Nd4jDoubleTensorTest {
             4, 2);
 
         BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
-                false, false, false, true,
-                false, false, false, false},
+                true, true, true, false,
+                true, true, true, true},
             4, 2);
 
 //        TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN); // fails: ND4J bug?
-        TensorValidator validator = TensorValidator.thatExpects(x -> x.equals(Double.NaN));
+        TensorValidator validator = TensorValidator.thatExpects(x -> !x.equals(Double.NaN));
         assertThat(validator.check(containsNan), equalTo(expectedMask));
     }
 
@@ -864,6 +864,15 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
         TensorValidator validator = TensorValidator.thatChecksFor(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValue() {
+        DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
+        DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
+
+        TensorValidator validator = TensorValidator.thatExpects(x -> x > 0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         assertThat(validator.validate(containsZero), equalTo(expectedResult));
     }
 }

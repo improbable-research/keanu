@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.validate.check.CustomTensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueNotEqualsCheck;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
-import io.improbable.keanu.tensor.validate.policy.ThrowValueException;
 
 public class TensorValidator implements TensorValueChecker {
 
@@ -24,7 +23,7 @@ public class TensorValidator implements TensorValueChecker {
     private TensorValidationPolicy validationPolicy;
 
     private TensorValidator(TensorValueChecker valueChecker) {
-        this(valueChecker, new ThrowValueException("Invalid value found"));
+        this(valueChecker, TensorValidationPolicy.throwMessage("Invalid value found"));
     }
 
     private TensorValidator(TensorValueChecker valueChecker, TensorValidationPolicy validationPolicy) {

@@ -41,8 +41,8 @@ public class ScalarDoubleTensorTest {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor nonZero = DoubleTensor.scalar(1e-8);
         TensorValidator validator = TensorValidator.thatChecksFor(0.);
-        assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(true)));
-        assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(true)));
     }
 
     @Test
@@ -50,8 +50,8 @@ public class ScalarDoubleTensorTest {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
         TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN);
-        assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(true)));
-        assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(false)));
+        assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
     }
 
     @Test
@@ -62,5 +62,15 @@ public class ScalarDoubleTensorTest {
         TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN).withPolicy(TensorValidationPolicy.changeValueTo(0.));
         assertThat(validator.validate(nan), equalTo(zero));
         assertThat(validator.validate(notNan), equalTo(notNan));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValue() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor one = DoubleTensor.scalar(1.);
+        DoubleTensor notZero = DoubleTensor.scalar(1e-8);
+        TensorValidator validator = TensorValidator.thatExpects(x -> x > 0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        assertThat(validator.validate(zero), equalTo(notZero));
+        assertThat(validator.validate(one), equalTo(one));
     }
 }

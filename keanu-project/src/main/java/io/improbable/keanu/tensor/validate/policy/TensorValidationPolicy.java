@@ -8,5 +8,9 @@ public interface TensorValidationPolicy {
         return new ChangeValueTo(v);
     }
 
+    static TensorValidationPolicy throwMessage(String message) {
+        return new ThrowValueException(message);
+    }
+
     DoubleTensor handle(DoubleTensor tensor, BooleanTensor result);
 }

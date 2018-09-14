@@ -7,13 +7,13 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 public class ThrowValueException implements TensorValidationPolicy {
     private final String message;
 
-    public ThrowValueException(String message) {
+    ThrowValueException(String message) {
         this.message = message;
     }
 
     @Override
     public DoubleTensor handle(DoubleTensor tensor, BooleanTensor result) {
-        if (result.allFalse()) {
+        if (result.allTrue()) {
             return tensor;
         } else {
             throw new KeanuValueException(message, result);

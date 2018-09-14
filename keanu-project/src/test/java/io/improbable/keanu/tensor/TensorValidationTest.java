@@ -15,7 +15,7 @@ public class TensorValidationTest {
     @Test
     public void youCanCheckTheValueOfATensor() {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
-        BooleanTensor expectedMask = BooleanTensor.create(new boolean[] {false, true, false});
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[] {true, false, true});
 
         TensorValidator validator = TensorValidator.thatChecksFor(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         assertThat(validator.check(containsZero), equalTo(expectedMask));
@@ -47,13 +47,14 @@ public class TensorValidationTest {
 
     @Test
     public void youCanDefineCustomValidators() {
-        DoubleTensor input = DoubleTensor.create(1.0, 0.1, -1.0);
         TensorValidator validator = TensorValidator.thatExpects(v -> v > 0.2);
+        DoubleTensor input = DoubleTensor.create(1.0, 0.1, -1.0);
+        BooleanTensor expectedResult = BooleanTensor.create(new boolean[]{true, false, false});
         try {
             validator.validate(input);
             throw new AssertionError("Expected it to throw KeanuValueException");
         } catch(KeanuValueException e) {
-            assertThat(e.getResult(), equalTo(BooleanTensor.create(new boolean[] {true, false, false})));
+            assertThat(e.getResult(), equalTo(expectedResult));
         }
     }
 }

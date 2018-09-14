@@ -14,6 +14,6 @@ public class TensorValueNotEqualsCheck implements TensorValueChecker {
     @Override
     public BooleanTensor check(DoubleTensor tensor) {
         DoubleTensor testTensor = DoubleTensor.create(value, tensor.getShape());
-        return tensor.elementwiseEquals(testTensor);
+        return tensor.elementwiseEquals(testTensor).not();
     }
 }
