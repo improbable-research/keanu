@@ -7,7 +7,7 @@ import io.improbable.keanu.tensor.validate.TensorValidationPolicy;
 public class TensorValueEqualsValidator implements TensorValidator {
 
     private final Double value;
-    private TensorValidationPolicy policy;
+    private TensorValidationPolicy policy = new ThrowValueException("Invalid value found");
 
     public TensorValueEqualsValidator(Double value) {
         this.value = value;
