@@ -9,6 +9,7 @@ import org.junit.Test;
 import io.improbable.keanu.tensor.TensorValidator;
 import io.improbable.keanu.tensor.TensorValueEqualsValidator;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidationPolicy;
 
 public class ScalarDoubleTensorTest {
 
@@ -52,5 +53,15 @@ public class ScalarDoubleTensorTest {
         TensorValidator validator = new TensorValueEqualsValidator(Double.NaN);
         assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(true)));
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(false)));
+    }
+
+    @Test
+    public void youCanFixAValidationIssueByReplacingTheValue() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        TensorValidator validator = new TensorValueEqualsValidator(Double.NaN).withPolicy(TensorValidationPolicy.changeValueTo(0.));
+        assertThat(validator.validate(nan), equalTo(zero));
+        assertThat(validator.validate(notNan), equalTo(notNan));
     }
 }
