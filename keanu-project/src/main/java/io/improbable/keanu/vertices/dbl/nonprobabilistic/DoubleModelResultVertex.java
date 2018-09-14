@@ -27,18 +27,18 @@ public class DoubleModelResultVertex extends DoubleVertex implements ModelResult
         if (!hasValue) {
             model.calculate();
         }
-        return DoubleTensor.scalar(model.getDoubleModelOutputValue(label));
+        return model.getDoubleModelOutputValue(label);
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return DoubleTensor.scalar(model.getDoubleModelOutputValue(label));
+        return model.getDoubleModelOutputValue(label);
     }
 
     @Override
     public DoubleTensor calculate() {
         hasValue = true;
-        return DoubleTensor.scalar(model.getDoubleModelOutputValue(label));
+        return model.getDoubleModelOutputValue(label);
     }
 
 }

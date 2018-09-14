@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -19,14 +21,14 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
 
     private String command;
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
-    private Map<VertexLabel, Object> outputs;
+    private Map<VertexLabel, Tensor> outputs;
     private BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandFormatter;
-    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput;
+    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
 
     public ProcessModelVertex(String command,
                               Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                               BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandFormatter,
-                              Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput) {
+                              Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput) {
         this.command = command;
         this.inputs = inputs;
         this.outputs = Collections.EMPTY_MAP;
@@ -54,24 +56,24 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     }
 
     @Override
-    public Map<VertexLabel, Object> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         outputs = extractOutput.apply(inputs);
         return outputs;
     }
 
     @Override
-    public Double getDoubleModelOutputValue(VertexLabel label) {
-        return (Double) outputs.get(label);
+    public DoubleTensor getDoubleModelOutputValue(VertexLabel label) {
+        return (DoubleTensor) outputs.get(label);
     }
 
     @Override
-    public Integer getIntegerModelOutputValue(VertexLabel label) {
-        return (Integer) outputs.get(label);
+    public IntegerTensor getIntegerModelOutputValue(VertexLabel label) {
+        return (IntegerTensor) outputs.get(label);
     }
 
     @Override
-    public Boolean getBooleanModelOutputValue(VertexLabel label) {
-        return (Boolean) outputs.get(label);
+    public BooleanTensor getBooleanModelOutputValue(VertexLabel label) {
+        return (BooleanTensor) outputs.get(label);
     }
 
     @Override
@@ -80,11 +82,6 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
             input.getValue().sample();
         }
         return calculate();
-    }
-
-    public Map<VertexLabel, Object> setValue(Map<VertexLabel, Object> values) {
-        outputs = values;
-        return outputs;
     }
 
     @Override

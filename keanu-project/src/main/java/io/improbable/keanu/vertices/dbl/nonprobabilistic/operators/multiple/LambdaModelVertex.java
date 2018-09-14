@@ -1,7 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -16,13 +18,13 @@ import java.util.stream.Collectors;
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
-    private Map<VertexLabel, Object> outputs;
+    private Map<VertexLabel, Tensor> outputs;
     private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
-    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput;
+    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
 
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
-                             Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Object>> extractOutput) {
+                             Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput) {
         this.inputs = inputs;
         this.outputs = Collections.EMPTY_MAP;
         this.executor = executor;
@@ -50,30 +52,25 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
         executor.accept(inputs);
     }
 
-    public Map<VertexLabel, Object> setValue(Map<VertexLabel, Object> values) {
-        outputs = values;
-        return outputs;
-    }
-
     @Override
-    public Map<VertexLabel, Object> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         outputs = extractOutput.apply(inputs);
         return outputs;
     }
 
     @Override
-    public Double getDoubleModelOutputValue(VertexLabel label) {
-        return (Double) outputs.get(label);
+    public DoubleTensor getDoubleModelOutputValue(VertexLabel label) {
+        return (DoubleTensor) outputs.get(label);
     }
 
     @Override
-    public Integer getIntegerModelOutputValue(VertexLabel label) {
-        return (Integer) outputs.get(label);
+    public IntegerTensor getIntegerModelOutputValue(VertexLabel label) {
+        return (IntegerTensor) outputs.get(label);
     }
 
     @Override
-    public Boolean getBooleanModelOutputValue(VertexLabel label) {
-        return (Boolean) outputs.get(label);
+    public BooleanTensor getBooleanModelOutputValue(VertexLabel label) {
+        return (BooleanTensor) outputs.get(label);
     }
 
 }

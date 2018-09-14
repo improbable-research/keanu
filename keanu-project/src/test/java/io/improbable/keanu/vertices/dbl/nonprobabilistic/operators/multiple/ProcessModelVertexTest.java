@@ -5,6 +5,9 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -205,10 +208,10 @@ public class ProcessModelVertexTest {
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(temperatureReadingOne.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig().getPosteriorSamples(
+        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            200
+            250
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
@@ -224,14 +227,14 @@ public class ProcessModelVertexTest {
         return command;
     }
 
-    private Map<VertexLabel, Object> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Object> modelOutput = new HashMap<>();
+    private Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
 
         try {
             double chanceOfRainResult = Double.parseDouble(rainReader.readLine());
-            modelOutput.put(new VertexLabel("ChanceOfRain"), chanceOfRainResult);
+            modelOutput.put(new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
             double humidityResult = Double.parseDouble(humidityReader.readLine());
-            modelOutput.put(new VertexLabel("Humidity"), humidityResult);
+            modelOutput.put(new VertexLabel("Humidity"), DoubleTensor.scalar(humidityResult));
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -239,14 +242,14 @@ public class ProcessModelVertexTest {
         return modelOutput;
     }
 
-    private Map<VertexLabel, Object> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Object> modelOutput = new HashMap<>();
+    private Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
 
         try {
             int chanceOfRainResult = (int) Double.parseDouble(rainReader.readLine());
-            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), chanceOfRainResult);
+            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), IntegerTensor.scalar(chanceOfRainResult));
             boolean humidityResult = Boolean.parseBoolean(humidityReader.readLine());
-            modelOutput.put(new VertexLabel("isSunny"), humidityResult);
+            modelOutput.put(new VertexLabel("isSunny"), BooleanTensor.scalar(humidityResult));
         } catch (IOException e) {
             e.printStackTrace();
         }

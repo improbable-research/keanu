@@ -27,17 +27,17 @@ public class BoolModelResultVertex extends BoolVertex implements ModelResultVert
         if (!hasValue) {
             model.calculate();
         }
-        return BooleanTensor.scalar(model.getBooleanModelOutputValue(label));
+        return model.getBooleanModelOutputValue(label);
     }
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-        return BooleanTensor.scalar(model.getBooleanModelOutputValue(label));
+        return model.getBooleanModelOutputValue(label);
     }
 
     @Override
     public BooleanTensor calculate() {
         hasValue = true;
-        return BooleanTensor.scalar(model.getBooleanModelOutputValue(label));
+        return model.getBooleanModelOutputValue(label);
     }
 }

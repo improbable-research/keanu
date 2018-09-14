@@ -27,17 +27,17 @@ public class IntegerModelResultVertex extends IntegerVertex implements ModelResu
         if (!hasValue) {
             model.calculate();
         }
-        return IntegerTensor.scalar(model.getIntegerModelOutputValue(label));
+        return model.getIntegerModelOutputValue(label);
     }
 
     @Override
     public IntegerTensor sample(KeanuRandom random) {
-        return IntegerTensor.scalar(model.getIntegerModelOutputValue(label));
+        return model.getIntegerModelOutputValue(label);
     }
 
     @Override
     public IntegerTensor calculate() {
         hasValue = true;
-        return IntegerTensor.scalar(model.getIntegerModelOutputValue(label));
+        return model.getIntegerModelOutputValue(label);
     }
 }

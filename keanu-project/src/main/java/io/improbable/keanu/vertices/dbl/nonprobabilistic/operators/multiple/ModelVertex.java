@@ -1,6 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -17,13 +20,13 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
 
     void run(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
 
-    Map<VertexLabel, Object> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
+    Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
 
-    Double getDoubleModelOutputValue(VertexLabel label);
+    DoubleTensor getDoubleModelOutputValue(VertexLabel label);
 
-    Integer getIntegerModelOutputValue(VertexLabel label);
+    IntegerTensor getIntegerModelOutputValue(VertexLabel label);
 
-    Boolean getBooleanModelOutputValue(VertexLabel label);
+    BooleanTensor getBooleanModelOutputValue(VertexLabel label);
 
     default DoubleVertex getDoubleModelOutputVertex(VertexLabel label) {
         return new DoubleModelResultVertex(this, label);
