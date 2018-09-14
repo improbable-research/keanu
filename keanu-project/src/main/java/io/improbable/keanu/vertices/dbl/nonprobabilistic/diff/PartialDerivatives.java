@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static java.util.Collections.singletonMap;
 
 import java.util.Arrays;
@@ -124,7 +125,8 @@ public class PartialDerivatives {
             if (reshape) {
                 summed.put(k, reshapedV);
             } else {
-                summed.put(k, reshapedV.reshape(onesToShape(v.getShape(), overDimensions)));
+                summed.put(k, reshapedV.reshape(
+                    shapeToDesiredRankByPrependingOnes(reshapedV.getShape(), reshapedV.getShape().length + 2)));
             }
         }
 
