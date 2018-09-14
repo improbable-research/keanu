@@ -24,6 +24,8 @@ import java.util.stream.Collectors;
  */
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
+    private static final DoubleTensor MODEL_RETURN_VALUE = DoubleTensor.scalar(0.);
+
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
     private Map<VertexLabel, Tensor> outputs;
     private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
@@ -45,7 +47,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     public DoubleTensor calculate() {
         run(inputs);
         updateValues(inputs);
-        return DoubleTensor.scalar(0.);
+        return MODEL_RETURN_VALUE;
     }
 
     @Override

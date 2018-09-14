@@ -37,6 +37,6 @@ public class IntegerModelResultVertex extends IntegerVertex implements NonProbab
 
     @Override
     public IntegerTensor calculate() {
-        return model.getIntegerModelOutputValue(label);
+        return sample();
     }
 }

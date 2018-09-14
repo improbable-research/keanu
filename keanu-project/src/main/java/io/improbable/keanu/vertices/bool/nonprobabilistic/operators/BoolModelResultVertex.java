@@ -37,6 +37,6 @@ public class BoolModelResultVertex extends BoolVertex implements NonProbabilisti
 
     @Override
     public BooleanTensor calculate() {
-        return model.getBooleanModelOutputValue(label);
+        return sample();
     }
 }

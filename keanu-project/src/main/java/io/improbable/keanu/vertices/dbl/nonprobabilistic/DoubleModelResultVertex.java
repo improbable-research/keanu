@@ -37,7 +37,7 @@ public class DoubleModelResultVertex extends DoubleVertex implements NonProbabil
 
     @Override
     public DoubleTensor calculate() {
-        return model.getDoubleModelOutputValue(label);
+        return sample();
     }
 
 }

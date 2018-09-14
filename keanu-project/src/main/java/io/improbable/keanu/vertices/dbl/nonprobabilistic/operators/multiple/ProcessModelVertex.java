@@ -18,13 +18,15 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * A vertex whose operation is the execution of an external process.
+ * A vertex whose operation is the execution of a process. e.g: a python or shell script.
  *
  * It is able to execute an external process and is able to parse the result.
  *
  * It stores multiple output values and a model result vertex is required to extract a specific value.
  */
 public class ProcessModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
+
+    private static final DoubleTensor MODEL_RETURN_VALUE = DoubleTensor.scalar(0.);
 
     private String command;
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
@@ -50,7 +52,7 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     public DoubleTensor calculate() {
         run(inputs);
         updateValues(inputs);
-        return DoubleTensor.scalar(0.);
+        return MODEL_RETURN_VALUE;
     }
 
     @Override
@@ -61,7 +63,7 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
             cmd.waitFor();
             hasCalculated = true;
         } catch (IOException | InterruptedException e) {
-            throw new IllegalArgumentException("Failed to run model while executing the process.");
+            throw new IllegalArgumentException("Failed during execution of the process. " + e);
         }
     }
 
