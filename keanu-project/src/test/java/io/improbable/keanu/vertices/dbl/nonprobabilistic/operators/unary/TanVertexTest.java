@@ -62,7 +62,7 @@ public class TanVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -1.0, 1.0);
         DoubleVertex outputVertex = inputVertex.div(3).tan();
         final double INCREMENT = 0.0001;
-        final double DELTA = 1e-5;
+        final double DELTA = 1e-6;
 
         finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
     }
