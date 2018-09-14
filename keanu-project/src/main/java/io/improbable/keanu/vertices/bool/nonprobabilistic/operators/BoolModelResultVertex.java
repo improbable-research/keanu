@@ -8,6 +8,9 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 
+/**
+ * A non-probabilistic boolean vertex whose value is extracted from an upstream model vertex.
+ */
 public class BoolModelResultVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     private ModelVertex model;

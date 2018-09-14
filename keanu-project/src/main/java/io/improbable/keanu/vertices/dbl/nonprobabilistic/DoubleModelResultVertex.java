@@ -8,6 +8,9 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 import io.improbable.keanu.vertices.Vertex;
 
+/**
+ * A non-probabilistic double vertex whose value is extracted from an upstream model vertex.
+ */
 public class DoubleModelResultVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     private ModelVertex model;

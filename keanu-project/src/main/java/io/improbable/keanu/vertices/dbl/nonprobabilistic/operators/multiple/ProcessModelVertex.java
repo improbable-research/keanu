@@ -17,6 +17,13 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * A vertex whose operation is the execution of an external process.
+ *
+ * It is able to execute an external process and is able to parse the result.
+ *
+ * It stores multiple output values and a model result vertex is required to extract a specific value.
+ */
 public class ProcessModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private String command;

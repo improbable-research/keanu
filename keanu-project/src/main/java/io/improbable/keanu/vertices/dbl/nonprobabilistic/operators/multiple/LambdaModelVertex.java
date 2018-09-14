@@ -15,6 +15,13 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+/**
+ * A vertex whose operation is the execution of a lambda.
+ *
+ * It is able to execute a lambda and is able to parse the result.
+ *
+ * It stores multiple output values and a model result vertex is required to extract a specific value.
+ */
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
@@ -63,7 +70,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
 
     @Override
     public boolean hasCalculated() {
-        return false;
+        return hasCalculated;
     }
 
     @Override

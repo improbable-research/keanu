@@ -8,6 +8,9 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
+/**
+ * A non-probabilistic integer vertex whose value is extracted from an upstream model vertex.
+ */
 public class IntegerModelResultVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private ModelVertex model;
