@@ -6,12 +6,10 @@ import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class CustomTensorValueChecker<U, T extends Tensor<U>> implements TensorValueChecker<T> {
 
     private final Function<U, Boolean> checkFunction;
-    private TensorValidationPolicy policy = TensorValidationPolicy.throwMessage("Invalid value found");
 
     public CustomTensorValueChecker(Function<U, Boolean> checkFunction) {
         this.checkFunction = checkFunction;
