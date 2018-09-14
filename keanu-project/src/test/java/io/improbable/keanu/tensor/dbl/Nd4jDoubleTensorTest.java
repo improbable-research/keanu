@@ -14,12 +14,10 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import io.improbable.keanu.tensor.CustomTensorValidator;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.TensorValidator;
-import io.improbable.keanu.tensor.TensorValueEqualsValidator;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.validate.TensorValidationPolicy;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jDoubleTensorTest {
 
@@ -839,7 +837,7 @@ public class Nd4jDoubleTensorTest {
                 false, false, false, true},
             4, 2);
 
-        TensorValidator validator = new TensorValueEqualsValidator(0.);
+        TensorValidator validator = TensorValidator.thatChecksFor(0.);
         assertThat(validator.check(containsZero), equalTo(expectedMask));
     }
 
@@ -855,8 +853,8 @@ public class Nd4jDoubleTensorTest {
                 false, false, false, false},
             4, 2);
 
-//        TensorValidator validator = new TensorValueEqualsValidator(Double.NaN); // fails: ND4J bug?
-        TensorValidator validator = new CustomTensorValidator(x -> x.equals(Double.NaN));
+//        TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN); // fails: ND4J bug?
+        TensorValidator validator = TensorValidator.thatExpects(x -> x.equals(Double.NaN));
         assertThat(validator.check(containsNan), equalTo(expectedMask));
     }
 
@@ -865,7 +863,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
-        TensorValidator validator = new TensorValueEqualsValidator(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator validator = TensorValidator.thatChecksFor(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         assertThat(validator.validate(containsZero), equalTo(expectedResult));
     }
 }

@@ -1,4 +1,4 @@
-package io.improbable.keanu.tensor.validate;
+package io.improbable.keanu.tensor.validate.policy;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

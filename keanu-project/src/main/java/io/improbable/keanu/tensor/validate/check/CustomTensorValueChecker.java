@@ -1,19 +1,21 @@
-package io.improbable.keanu.tensor;
+package io.improbable.keanu.tensor.validate.check;
 
 import java.util.function.Function;
 
 import org.nd4j.linalg.util.ArrayUtil;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.validate.TensorValidationPolicy;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import io.improbable.keanu.tensor.validate.policy.ThrowValueException;
 
-public class CustomTensorValidator implements TensorValidator {
+public class CustomTensorValueChecker implements TensorValueChecker {
 
     private final Function<Double, Boolean> checkFunction;
     private TensorValidationPolicy policy = new ThrowValueException("Invalid value found");
 
-    public CustomTensorValidator(Function<Double, Boolean> checkFunction) {
+    public CustomTensorValueChecker(Function<Double, Boolean> checkFunction) {
         this.checkFunction = checkFunction;
     }
 
@@ -26,11 +28,5 @@ public class CustomTensorValidator implements TensorValidator {
             results[i] = checkFunction.apply(flattenedView.get(i));
         }
         return BooleanTensor.create(results, tensor.getShape());
-    }
-
-    @Override
-    public DoubleTensor validate(DoubleTensor tensor) {
-        BooleanTensor result = check(tensor);
-        return policy.handle(tensor, result);
     }
 }
