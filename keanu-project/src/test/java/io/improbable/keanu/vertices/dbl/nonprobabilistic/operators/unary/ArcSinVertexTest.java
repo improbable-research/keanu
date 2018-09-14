@@ -62,7 +62,7 @@ public class ArcSinVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).asin();
         final double INCREMENT = 0.001;
-        final double DELTA = 1e-5;
+        final double DELTA = 1e-4;
 
         finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
     }

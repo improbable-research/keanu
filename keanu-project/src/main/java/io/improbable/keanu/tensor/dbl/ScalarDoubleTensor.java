@@ -12,8 +12,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -482,7 +480,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sqrtInPlace() {
-        return pow(0.5);
+        return powInPlace(0.5);
     }
 
     @Override
