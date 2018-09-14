@@ -201,12 +201,12 @@ public class ProcessModelVertexTest {
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
-        DoubleVertex temperatureReadingOne = new GaussianVertex(chanceOfRain, 2);
-        DoubleVertex temperatureReadingTwo = new GaussianVertex(humidity, 2);
-        temperatureReadingOne.observe(3.0);
-        temperatureReadingTwo.observe(60.0);
+        DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 2);
+        DoubleVertex humidityObservation = new GaussianVertex(humidity, 2);
+        chanceOfRainObservation.observe(3.0);
+        humidityObservation.observe(60.0);
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(temperatureReadingOne.getConnectedGraph());
+        BayesianNetwork bayesianNetwork = new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
             bayesianNetwork,

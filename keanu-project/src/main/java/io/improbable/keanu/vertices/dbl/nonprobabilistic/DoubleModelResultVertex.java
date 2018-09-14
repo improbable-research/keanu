@@ -12,18 +12,16 @@ public class DoubleModelResultVertex extends DoubleVertex implements NonProbabil
 
     private ModelVertex model;
     private VertexLabel label;
-    private boolean hasValue;
 
     public DoubleModelResultVertex(ModelVertex model, VertexLabel label) {
         this.model = model;
         this.label = label;
-        this.hasValue = false;
         setParents((Vertex) model);
     }
 
     @Override
     public DoubleTensor getValue() {
-        if (!hasValue) {
+        if (!model.hasCalculated()) {
             model.calculate();
         }
         return model.getDoubleModelOutputValue(label);
@@ -36,7 +34,6 @@ public class DoubleModelResultVertex extends DoubleVertex implements NonProbabil
 
     @Override
     public DoubleTensor calculate() {
-        hasValue = true;
         return model.getDoubleModelOutputValue(label);
     }
 

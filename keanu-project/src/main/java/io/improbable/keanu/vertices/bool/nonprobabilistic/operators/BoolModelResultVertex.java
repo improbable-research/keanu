@@ -12,18 +12,16 @@ public class BoolModelResultVertex extends BoolVertex implements NonProbabilisti
 
     private ModelVertex model;
     private VertexLabel label;
-    private boolean hasValue;
 
     public BoolModelResultVertex(ModelVertex model, VertexLabel label) {
         this.model = model;
         this.label = label;
-        this.hasValue = false;
         setParents((Vertex) model);
     }
 
     @Override
     public BooleanTensor getValue() {
-        if (!hasValue) {
+        if (!model.hasCalculated()) {
             model.calculate();
         }
         return model.getBooleanModelOutputValue(label);
@@ -36,7 +34,6 @@ public class BoolModelResultVertex extends BoolVertex implements NonProbabilisti
 
     @Override
     public BooleanTensor calculate() {
-        hasValue = true;
         return model.getBooleanModelOutputValue(label);
     }
 }

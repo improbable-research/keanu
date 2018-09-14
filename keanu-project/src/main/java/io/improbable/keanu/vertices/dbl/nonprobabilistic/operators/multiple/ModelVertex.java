@@ -22,6 +22,8 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
 
     Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
 
+    boolean hasCalculated();
+
     DoubleTensor getDoubleModelOutputValue(VertexLabel label);
 
     IntegerTensor getIntegerModelOutputValue(VertexLabel label);

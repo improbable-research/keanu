@@ -24,6 +24,7 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     private Map<VertexLabel, Tensor> outputs;
     private BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandFormatter;
     private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
+    private boolean hasCalculated;
 
     public ProcessModelVertex(String command,
                               Map<VertexLabel, Vertex<? extends Tensor>> inputs,
@@ -34,6 +35,7 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
         this.outputs = Collections.EMPTY_MAP;
         this.commandFormatter = commandFormatter;
         this.extractOutput = extractOutput;
+        this.hasCalculated = false;
         setParents(inputs.entrySet().stream().map(r -> r.getValue()).collect(Collectors.toList()));
     }
 
@@ -50,6 +52,7 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
         try {
             Process cmd = Runtime.getRuntime().exec(newCommand);
             cmd.waitFor();
+            hasCalculated = true;
         } catch (IOException | InterruptedException e) {
             throw new IllegalArgumentException("Failed to run model while executing the process.");
         }
@@ -59,6 +62,11 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         outputs = extractOutput.apply(inputs);
         return outputs;
+    }
+
+    @Override
+    public boolean hasCalculated() {
+        return hasCalculated;
     }
 
     @Override

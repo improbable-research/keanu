@@ -12,18 +12,16 @@ public class IntegerModelResultVertex extends IntegerVertex implements NonProbab
 
     private ModelVertex model;
     private VertexLabel label;
-    private boolean hasValue;
 
     public IntegerModelResultVertex(ModelVertex model, VertexLabel label) {
         this.model = model;
         this.label = label;
-        this.hasValue = false;
         setParents((Vertex) model);
     }
 
     @Override
     public IntegerTensor getValue() {
-        if (!hasValue) {
+        if (!model.hasCalculated()) {
             model.calculate();
         }
         return model.getIntegerModelOutputValue(label);
@@ -36,7 +34,6 @@ public class IntegerModelResultVertex extends IntegerVertex implements NonProbab
 
     @Override
     public IntegerTensor calculate() {
-        hasValue = true;
         return model.getIntegerModelOutputValue(label);
     }
 }

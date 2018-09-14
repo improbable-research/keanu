@@ -50,7 +50,6 @@ public class FitnessFunctionWithGradient {
             Map<VertexId, DoubleTensor> diffs = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, latentVertices);
-            System.out.println("Gradients: " + Arrays.toString(gradients));
 
             if (onGradientCalculation != null) {
                 onGradientCalculation.accept(point, gradients);
@@ -64,7 +63,6 @@ public class FitnessFunctionWithGradient {
         return point -> {
             setAndCascadePoint(point, latentVertices);
             double logOfTotalProbability = ProbabilityCalculator.calculateLogProbFor(vertices);
-            System.out.println("Prob: " + logOfTotalProbability);
 
             if (onFitnessCalculation != null) {
                 onFitnessCalculation.accept(point, logOfTotalProbability);

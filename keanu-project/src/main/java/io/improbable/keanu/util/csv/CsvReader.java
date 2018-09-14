@@ -32,7 +32,7 @@ public class CsvReader {
     }
 
     /**
-     * This will getModelOutputValue the entire csv file and return it as a list.
+     * This will read the entire csv file and return it as a list.
      * Warning: avoid using this for large csv files.
      *
      * @return a list lines that are represented as a list of strings where each

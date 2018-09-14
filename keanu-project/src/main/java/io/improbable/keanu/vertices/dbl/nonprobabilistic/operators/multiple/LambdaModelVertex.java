@@ -21,6 +21,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     private Map<VertexLabel, Tensor> outputs;
     private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
     private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
+    private boolean hasCalculated;
 
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
@@ -29,6 +30,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
         this.outputs = Collections.EMPTY_MAP;
         this.executor = executor;
         this.extractOutput = extractOutput;
+        this.hasCalculated = false;
         setParents(inputs.entrySet().stream().map(r -> r.getValue()).collect(Collectors.toList()));
     }
 
@@ -50,12 +52,18 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     @Override
     public void run(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         executor.accept(inputs);
+        hasCalculated = true;
     }
 
     @Override
     public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         outputs = extractOutput.apply(inputs);
         return outputs;
+    }
+
+    @Override
+    public boolean hasCalculated() {
+        return false;
     }
 
     @Override
