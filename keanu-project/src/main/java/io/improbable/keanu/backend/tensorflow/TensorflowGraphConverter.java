@@ -10,9 +10,11 @@ import java.util.stream.Collectors;
 
 import org.tensorflow.Graph;
 import org.tensorflow.Output;
+import org.tensorflow.op.Scope;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
@@ -21,15 +23,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Divisi
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class TensorflowGraphConverter {
 
-    private static Map<Class<? extends Vertex<?>>, BiConsumer<Vertex<?>, GraphBuilder>> opMappers;
+    private static Map<Class<?>, BiConsumer<Vertex<?>, GraphBuilder>> opMappers;
 
     static {
         opMappers = new HashMap<>();
-        opMappers.put(GaussianVertex.class, TensorflowGraphConverter::createDoubleConstant);
         opMappers.put(ConstantDoubleVertex.class, TensorflowGraphConverter::createDoubleConstant);
         opMappers.put(AdditionVertex.class, TensorflowGraphConverter::createAddition);
         opMappers.put(DifferenceVertex.class, TensorflowGraphConverter::createSubtraction);
@@ -82,6 +82,10 @@ public class TensorflowGraphConverter {
 
     }
 
+    private static void addVariable(Vertex<?> vertex, GraphBuilder graphBuilder) {
+        createDoubleConstant(vertex, graphBuilder);
+    }
+
     private static long[] toLongs(int[] ints) {
         long[] longs = new long[ints.length];
         for (int i = 0; i < ints.length; i++) {
@@ -100,19 +104,25 @@ public class TensorflowGraphConverter {
     public static Graph convert(BayesianNetwork network) {
 
         Graph graph = new Graph();
-        GraphBuilder graphBuilder = new GraphBuilder(graph);
+        Scope scope = new Scope(graph);
+        GraphBuilder graphBuilder = new GraphBuilder(scope);
 
         Set<Vertex> connectedGraph = network.getLatentVertices().get(0).getConnectedGraph();
         List<Vertex> topoSortedGraph = connectedGraph.stream().sorted(Comparator.comparing(Vertex::getId)).collect(Collectors.toList());
 
         for (Vertex visiting : topoSortedGraph) {
-            BiConsumer<Vertex<?>, GraphBuilder> vertexMapper = opMappers.get(visiting.getClass());
 
-            if (vertexMapper == null) {
-                throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported");
+            if (visiting instanceof Probabilistic) {
+                addVariable(visiting, graphBuilder);
+            } else {
+                BiConsumer<Vertex<?>, GraphBuilder> vertexMapper = opMappers.get(visiting.getClass());
+
+                if (vertexMapper == null) {
+                    throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported");
+                }
+
+                vertexMapper.accept(visiting, graphBuilder);
             }
-
-            vertexMapper.accept(visiting, graphBuilder);
         }
 
         return graph;

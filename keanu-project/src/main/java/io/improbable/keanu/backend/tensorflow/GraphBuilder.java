@@ -10,20 +10,20 @@ import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.SUBTRAC
 import java.nio.DoubleBuffer;
 
 import org.tensorflow.DataType;
-import org.tensorflow.Graph;
 import org.tensorflow.Output;
 import org.tensorflow.Tensor;
+import org.tensorflow.op.Scope;
 
 public class GraphBuilder {
 
-    private Graph g;
+    private Scope scope;
 
-    public GraphBuilder(Graph g) {
-        this.g = g;
+    public GraphBuilder(Scope scope) {
+        this.scope = scope;
     }
 
     public <T> Output<T> getOutput(String name) {
-        return g.operation(name).output(0);
+        return scope.graph().operation(name).output(0);
     }
 
     public enum OpType {
@@ -74,7 +74,7 @@ public class GraphBuilder {
     }
 
     private <T> Output<T> constant(String name, Tensor<T> tensor, Class<T> type) {
-        return g.opBuilder(CONSTANT.name, name)
+        return scope.graph().opBuilder(CONSTANT.name, name)
             .setAttr("dtype", DataType.fromClass(type))
             .setAttr("value", tensor)
             .build()
@@ -82,10 +82,10 @@ public class GraphBuilder {
     }
 
     private <T> Output<T> binaryOp(OpType type, Output<T> in1, Output<T> in2) {
-        return g.opBuilder(type.name, type.name).addInput(in1).addInput(in2).build().output(0);
+        return scope.graph().opBuilder(type.name, type.name).addInput(in1).addInput(in2).build().output(0);
     }
 
     private <T> Output<T> binaryOp(OpType type, String name, Output<T> in1, Output<T> in2) {
-        return g.opBuilder(type.name, name).addInput(in1).addInput(in2).build().output(0);
+        return scope.graph().opBuilder(type.name, name).addInput(in1).addInput(in2).build().output(0);
     }
 }

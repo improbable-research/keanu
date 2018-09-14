@@ -16,6 +16,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
 public class TensorflowGraphConverterTest {
 
@@ -61,7 +62,7 @@ public class TensorflowGraphConverterTest {
         DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        DoubleVertex B = new GaussianVertex(new int[]{2, 2}, 1, 1);
+        DoubleVertex B = new UniformVertex(new int[]{2, 2}, 1, 1);
         B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
 
         DoubleVertex C = A.plus(B);
