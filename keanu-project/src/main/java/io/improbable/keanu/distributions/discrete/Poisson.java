@@ -51,6 +51,12 @@ public class Poisson implements DiscreteDistribution {
         int k = 0;
         double p = 1.0;
 
+        /*
+         * Algorithm courtesy of Wikipedia:
+         * https://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
+         *
+         * Designed to introduce mu gradually to avoid numerical stability issues
+         */
         do {
             k++;
             double u = random.nextDoubleNonZero();
