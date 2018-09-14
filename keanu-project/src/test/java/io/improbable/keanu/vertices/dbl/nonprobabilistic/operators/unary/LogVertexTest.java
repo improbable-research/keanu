@@ -54,10 +54,10 @@ public class LogVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, 0.0, 10.0);
+        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, 1.0, 10.0);
         DoubleVertex outputVertex = inputVertex.div(3).log();
         final double INCREMENT = 0.001;
-        final double DELTA = 1e-6;
+        final double DELTA = 1e-5;
 
         finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
     }
