@@ -483,7 +483,7 @@ public class Nd4jIntegerTensorTest {
                 true, false, true},
             3, 2);
 
-        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatChecksFor(0);
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpectsNotToFind(0);
         assertThat(validator.check(containsZero), equalTo(expectedMask));
     }
 
@@ -492,7 +492,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor containsZero = IntegerTensor.create(1, 0, -1);
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
-        TensorValidator validator = TensorValidator.thatChecksFor(-1).withPolicy(TensorValidationPolicy.changeValueTo(0));
+        TensorValidator validator = TensorValidator.thatExpectsNotToFind(-1).withPolicy(TensorValidationPolicy.changeValueTo(0));
         validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }

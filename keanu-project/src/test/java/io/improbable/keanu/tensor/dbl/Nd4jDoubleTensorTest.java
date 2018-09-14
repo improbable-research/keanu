@@ -877,7 +877,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, false},
             4, 2);
 
-        TensorValidator validator = TensorValidator.thatChecksFor(0.);
+        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0.);
         assertThat(validator.check(containsZero), equalTo(expectedMask));
     }
 
@@ -915,7 +915,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
-        TensorValidator validator = TensorValidator.thatChecksFor(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }

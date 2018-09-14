@@ -42,7 +42,7 @@ public class Multinomial implements DiscreteDistribution {
             p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
             "Probabilities must sum to one"
         );
-        TensorValidator.thatChecksFor(0.).validate(p);
+        TensorValidator.thatExpectsNotToFind(0.).validate(p);
 
         numCategories = p.getShape()[0];
         TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
