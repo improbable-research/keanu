@@ -35,6 +35,8 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -310,6 +312,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor logTimes(DoubleTensor y) {
+        return duplicate().logTimesInPlace(y);
+    }
+
+    @Override
     public DoubleTensor sin() {
         return duplicate().sinInPlace();
     }
@@ -469,6 +476,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor logInPlace() {
         Transforms.log(tensor, false);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor logTimesInPlace(DoubleTensor y) {
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatChecksForNaN();
+        validator.check(this);
+        validator.check(y);
+        this.logInPlace().timesInPlace(y);
+        validator.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(this);
         return this;
     }
 

@@ -898,6 +898,19 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void youCanDoYLogXEvenWhenBothAreZero() {
+        DoubleTensor x = DoubleTensor.create(
+            Double.MIN_VALUE, 1e-8, 1., 1e8);
+        DoubleTensor y = x.duplicate();
+        assertThat(x.log().times(y), equalTo(x.logTimes(y)));
+
+        DoubleTensor zeros = DoubleTensor.create(0., -0.);
+
+        assertThat(zeros.logTimes(zeros), hasValue(0., 0.));
+        assertThat(zeros.log().times(zeros), hasValue(Double.NaN, Double.NaN));
+    }
+
+    @Test
     public void youCanFixAValidationIssueByReplacingTheValue() {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);

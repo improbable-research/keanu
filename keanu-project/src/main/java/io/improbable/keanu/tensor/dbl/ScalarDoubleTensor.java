@@ -12,8 +12,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 
 public class ScalarDoubleTensor implements DoubleTensor {
@@ -191,6 +189,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor log() {
         return this.duplicate().logInPlace();
+    }
+
+    @Override
+    public DoubleTensor logTimes(DoubleTensor y) {
+        return this.duplicate().logTimesInPlace(y);
     }
 
     @Override
@@ -490,6 +493,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor logInPlace() {
         value = Math.log(value);
         return this;
+    }
+
+    @Override
+    public DoubleTensor logTimesInPlace(DoubleTensor y) {
+        return logInPlace().timesInPlace(y);
     }
 
     @Override
