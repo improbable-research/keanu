@@ -19,6 +19,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorValidator;
 import io.improbable.keanu.tensor.TensorValueEqualsValidator;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidationPolicy;
 
 public class Nd4jDoubleTensorTest {
 
@@ -857,5 +858,14 @@ public class Nd4jDoubleTensorTest {
 //        TensorValidator validator = new TensorValueEqualsValidator(Double.NaN); // fails: ND4J bug?
         TensorValidator validator = new CustomTensorValidator(x -> x.equals(Double.NaN));
         assertThat(validator.check(containsNan), equalTo(expectedMask));
+    }
+
+    @Test
+    public void youCanFixAValidationIssueByReplacingTheValue() {
+        DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
+        DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
+
+        TensorValidator validator = new TensorValueEqualsValidator(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        assertThat(validator.validate(containsZero), equalTo(expectedResult));
     }
 }

@@ -25,4 +25,9 @@ public class CustomTensorValidator implements TensorValidator {
         }
         return BooleanTensor.create(results, tensor.getShape());
     }
+
+    @Override
+    public DoubleTensor validate(DoubleTensor containsZero) {
+        return null;
+    }
 }
