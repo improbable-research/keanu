@@ -854,8 +854,8 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, true},
             4, 2);
 
-//        TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN); // fails: ND4J bug?
-        TensorValidator validator = TensorValidator.thatExpects(x -> !x.equals(Double.NaN));
+        Function<Double, Boolean> checkFunction = x -> !Double.isNaN(x);
+        TensorValidator validator = TensorValidator.thatExpects(checkFunction);
         assertThat(validator.check(containsNan), equalTo(expectedMask));
     }
 
