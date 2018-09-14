@@ -25,6 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.distributions.discrete.Multinomial;
+import io.improbable.keanu.tensor.KeanuValueException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -40,14 +41,21 @@ public class MultinomialVertexTest {
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheProbabilitiesDontSumToOne() {
         IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0., 0., 0.99, 0.).transpose();
+        DoubleTensor p = DoubleTensor.create(0.1, 0.1, 0.1, 0.1).transpose();
+        Multinomial.withParameters(n, p);
+    }
+
+    @Test(expected = KeanuValueException.class)
+    public void itThrowsIfAnyOfTheProbabilitiesIsZero() {
+        IntegerTensor n = IntegerTensor.scalar(100);
+        DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
         Multinomial.withParameters(n, p);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void itThrowsIfTheParametersAreDifferentShapes() {
         IntegerTensor n = IntegerTensor.create(100, 200);
-        DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).transpose();
         Multinomial.withParameters(n, p);
     }
 
@@ -202,36 +210,27 @@ public class MultinomialVertexTest {
         assertThat(samples, hasShape(4, 2, 2));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
     }
-    
-    @Test
-    public void ifTheresOnlyOneValidChoiceItAlwaysReturnsIt() {
-        IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
-        Multinomial multinomial = Multinomial.withParameters(n, p);
-        IntegerTensor samples = multinomial.sample(new int[]{1, 1}, KeanuRandom.getDefaultRandom());
-        assertThat(samples, hasValue(0, 0, 100, 0));
-    }
 
     @Test
-    public void ifYourRandomReturnsZeroItSamplesFromTheFirstNonZeroCategory() {
+    public void ifYourRandomReturnsZeroItSamplesFromTheFirstCategory() {
         KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
         when(mockRandomAlwaysZero.nextDouble()).thenReturn(0.);
         IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0., 0.5, .5, 0.).transpose();
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
         IntegerTensor samples = multinomial.sample(new int[]{1, 1}, mockRandomAlwaysZero);
-        assertThat(samples, hasValue(0, 100, 0, 0));
+        assertThat(samples, hasValue(100, 0, 0, 0));
     }
 
     @Test
-    public void ifYourRandomReturnsOneItSamplesFromTheLastNonZeroCategory() {
+    public void ifYourRandomReturnsOneItSamplesFromTheLastCategory() {
         KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
         when(mockRandomAlwaysZero.nextDouble()).thenReturn(1.);
         IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0., 0.5, .5, 0.).transpose();
+        DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
         IntegerTensor samples = multinomial.sample(new int[]{1, 1}, mockRandomAlwaysZero);
-        assertThat(samples, hasValue(0, 0, 100, 0));
+        assertThat(samples, hasValue(0, 0, 0, 100));
     }
 
     @Test
