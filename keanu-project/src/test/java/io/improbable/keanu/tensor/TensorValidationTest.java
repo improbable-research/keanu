@@ -43,4 +43,16 @@ public class TensorValidationTest {
         DoubleTensor result = validator.validate(doesntContainZero);
         assertThat(result, sameInstance(doesntContainZero));
     }
+
+    @Test
+    public void youCanDefineCustomValidators() {
+        DoubleTensor input = DoubleTensor.create(1.0, 0.1, -1.0);
+        TensorValidator validator = new CustomTensorValidator(v -> v > 0.2);
+        try {
+            validator.validate(input);
+            throw new AssertionError("Expected it to throw KeanuValueException");
+        } catch(KeanuValueException e) {
+            assertThat(e.getResult(), equalTo(BooleanTensor.create(new boolean[] {true, false, false})));
+        }
+    }
 }
