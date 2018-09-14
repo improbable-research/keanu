@@ -12,10 +12,8 @@ public class ThrowValueException<T extends Tensor<?>> implements TensorValidatio
     }
 
     @Override
-    public T handle(T tensor, BooleanTensor result) {
-        if (result.allTrue()) {
-            return tensor;
-        } else {
+    public void handle(T tensor, BooleanTensor result) {
+        if (!result.allTrue()) {
             throw new KeanuValueException(message, result);
         }
     }

@@ -41,9 +41,9 @@ public class TensorValidator<U, T extends Tensor<U>> implements TensorValueCheck
         return valueChecker.check(tensor);
     }
 
-    public T validate(T containsZero) {
-        BooleanTensor result = check(containsZero);
-        return validationPolicy.handle(containsZero, result);
+    public void validate(T tensor) {
+        BooleanTensor result = check(tensor);
+        validationPolicy.handle(tensor, result);
     }
 
     public TensorValidator withPolicy(TensorValidationPolicy validationPolicy) {

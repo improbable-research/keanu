@@ -493,7 +493,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
         TensorValidator validator = TensorValidator.thatChecksFor(-1).withPolicy(TensorValidationPolicy.changeValueTo(0));
-        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+        validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
     }
 
     @Test
@@ -503,6 +504,7 @@ public class Nd4jIntegerTensorTest {
 
         Function<Integer, Boolean> checkFunction = x -> x >= 0;
         TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
-        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+        validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
     }
 }

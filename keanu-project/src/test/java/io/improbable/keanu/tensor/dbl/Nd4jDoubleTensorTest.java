@@ -903,7 +903,8 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
         TensorValidator validator = TensorValidator.thatChecksFor(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
-        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+        validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
     }
 
     @Test
@@ -913,6 +914,7 @@ public class Nd4jDoubleTensorTest {
 
         Function<Double, Boolean> checkFunction = x -> x > 0.;
         TensorValidator validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
-        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+        validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
     }
 }

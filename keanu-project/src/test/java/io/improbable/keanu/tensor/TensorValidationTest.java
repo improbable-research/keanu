@@ -2,7 +2,6 @@ package io.improbable.keanu.tensor;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.sameInstance;
 
 import java.util.function.Function;
 
@@ -29,7 +28,8 @@ public class TensorValidationTest {
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
         TensorValidator validator = TensorValidator.thatChecksFor(0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
-        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+        validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
     }
 
     @Test(expected = KeanuValueException.class)
@@ -37,14 +37,6 @@ public class TensorValidationTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         TensorValidator validator = TensorValidator.thatChecksFor(0.);
         validator.validate(containsZero);
-    }
-
-    @Test
-    public void itReturnsTheIdenticalTensorIfValidationSucceeds() {
-        DoubleTensor doesntContainZero = DoubleTensor.create(1.0, 0.1, -1.0);
-        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatChecksFor(0.);
-        DoubleTensor result = validator.validate(doesntContainZero);
-        assertThat(result, sameInstance(doesntContainZero));
     }
 
     @Test

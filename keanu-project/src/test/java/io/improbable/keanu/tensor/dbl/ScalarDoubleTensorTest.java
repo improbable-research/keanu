@@ -76,7 +76,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForNans() {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
-        TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN);
+        TensorValidator validator = TensorValidator.thatChecksForNaN();
         assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
     }
@@ -87,18 +87,23 @@ public class ScalarDoubleTensorTest {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
         TensorValidator validator = TensorValidator.thatChecksFor(Double.NaN).withPolicy(TensorValidationPolicy.changeValueTo(0.));
-        assertThat(validator.validate(nan), equalTo(zero));
-        assertThat(validator.validate(notNan), equalTo(notNan));
+        validator.validate(nan);
+        validator.validate(notNan);
+        assertThat(nan, equalTo(zero));
+        assertThat(notNan, equalTo(notNan));
     }
 
     @Test
     public void youCanFixACustomValidationIssueByReplacingTheValue() {
-        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor tensor1 = DoubleTensor.scalar(0.);
+        DoubleTensor tensor2 = DoubleTensor.scalar(1.);
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
         Function<Double, Boolean> checkFunction = x -> x > 0.;
         TensorValidator validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
-        assertThat(validator.validate(zero), equalTo(notZero));
-        assertThat(validator.validate(one), equalTo(one));
+        validator.validate(tensor1);
+        validator.validate(tensor2);
+        assertThat(tensor1, equalTo(notZero));
+        assertThat(tensor2, equalTo(one));
     }
 }

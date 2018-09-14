@@ -13,18 +13,17 @@ public class ChangeValueTo<U, T extends Tensor<U>> implements TensorValidationPo
     }
 
     @Override
-    public T handle(T tensor, BooleanTensor result) {
+    public void handle(T tensor, BooleanTensor result) {
         if (tensor instanceof DoubleTensor) {
             Double value = (Double) this.value;
             DoubleTensor mask = result.not().toDoubleMask();
-            return (T) ((DoubleTensor) tensor).setWithMask(mask, value);
+            ((DoubleTensor) tensor).setWithMaskInPlace(mask, value);
         } else if (tensor instanceof IntegerTensor) {
             Integer value = (Integer) this.value;
             IntegerTensor mask = result.not().toIntegerMask();
-            return (T) ((IntegerTensor) tensor).setWithMask(mask, value);
+            ((IntegerTensor) tensor).setWithMaskInPlace(mask, value);
         } else {
             throw new ClassCastException("Cannot handle tensor of type " + tensor.getClass().getSimpleName());
         }
-
     }
 }
