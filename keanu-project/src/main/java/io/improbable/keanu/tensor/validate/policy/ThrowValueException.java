@@ -1,10 +1,10 @@
 package io.improbable.keanu.tensor.validate.policy;
 
 import io.improbable.keanu.tensor.KeanuValueException;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public class ThrowValueException implements TensorValidationPolicy {
+public class ThrowValueException<T extends Tensor<?>> implements TensorValidationPolicy<T> {
     private final String message;
 
     ThrowValueException(String message) {
@@ -12,7 +12,7 @@ public class ThrowValueException implements TensorValidationPolicy {
     }
 
     @Override
-    public DoubleTensor handle(DoubleTensor tensor, BooleanTensor result) {
+    public T handle(T tensor, BooleanTensor result) {
         if (result.allTrue()) {
             return tensor;
         } else {

@@ -10,6 +10,7 @@ import static junit.framework.TestCase.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -872,7 +873,8 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
 
-        TensorValidator validator = TensorValidator.thatExpects(x -> x > 0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        Function<Double, Boolean> checkFunction = x -> x > 0.;
+        TensorValidator validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         assertThat(validator.validate(containsZero), equalTo(expectedResult));
     }
 }

@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor.validate.check;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public interface TensorValueChecker {
-    BooleanTensor check(DoubleTensor tensor);
+public interface TensorValueChecker<T extends Tensor<?>> {
+    BooleanTensor check(T tensor);
 }

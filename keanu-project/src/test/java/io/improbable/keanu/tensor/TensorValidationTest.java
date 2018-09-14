@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.sameInstance;
 
+import java.util.function.Function;
+
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -40,14 +42,15 @@ public class TensorValidationTest {
     @Test
     public void itReturnsTheIdenticalTensorIfValidationSucceeds() {
         DoubleTensor doesntContainZero = DoubleTensor.create(1.0, 0.1, -1.0);
-        TensorValidator validator = TensorValidator.thatChecksFor(0.);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatChecksFor(0.);
         DoubleTensor result = validator.validate(doesntContainZero);
         assertThat(result, sameInstance(doesntContainZero));
     }
 
     @Test
     public void youCanDefineCustomValidators() {
-        TensorValidator validator = TensorValidator.thatExpects(v -> v > 0.2);
+        Function<Double, Boolean> checkFunction = v -> v > 0.2;
+        TensorValidator validator = TensorValidator.thatExpects(checkFunction);
         DoubleTensor input = DoubleTensor.create(1.0, 0.1, -1.0);
         BooleanTensor expectedResult = BooleanTensor.create(new boolean[]{true, false, false});
         try {

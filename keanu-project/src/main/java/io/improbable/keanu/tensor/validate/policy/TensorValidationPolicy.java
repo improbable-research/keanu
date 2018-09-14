@@ -1,16 +1,17 @@
 package io.improbable.keanu.tensor.validate.policy;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 
-public interface TensorValidationPolicy {
-    static TensorValidationPolicy changeValueTo(double v) {
-        return new ChangeValueTo(v);
+public interface TensorValidationPolicy<T extends Tensor<?>> {
+
+    static <U, T extends Tensor<U>> TensorValidationPolicy<T> changeValueTo(U v) {
+        return new ChangeValueTo<U, T>(v);
     }
 
-    static TensorValidationPolicy throwMessage(String message) {
-        return new ThrowValueException(message);
+    static <T extends Tensor<?>> TensorValidationPolicy<T> throwMessage(String message) {
+        return new ThrowValueException<T>(message);
     }
 
-    DoubleTensor handle(DoubleTensor tensor, BooleanTensor result);
+    T handle(T tensor, BooleanTensor result);
 }

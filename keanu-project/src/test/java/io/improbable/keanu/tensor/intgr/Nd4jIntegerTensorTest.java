@@ -1,11 +1,19 @@
 package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
+import java.util.function.Function;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jIntegerTensorTest {
 
@@ -463,4 +471,38 @@ public class Nd4jIntegerTensorTest {
             tensor.asFlatIntegerArray());
     }
 
+    @Test
+    public void youCanCheckForZeros() {
+        IntegerTensor containsZero = IntegerTensor.create(new int[]{
+                0, -1, Integer.MAX_VALUE,
+                Integer.MIN_VALUE, -0, 1},
+            3, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                false, true, true,
+                true, false, true},
+            3, 2);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatChecksFor(0);
+        assertThat(validator.check(containsZero), equalTo(expectedMask));
+    }
+
+    @Test
+    public void youCanFixAValidationIssueByReplacingTheValue() {
+        IntegerTensor containsZero = IntegerTensor.create(1, 0, -1);
+        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
+
+        TensorValidator validator = TensorValidator.thatChecksFor(-1).withPolicy(TensorValidationPolicy.changeValueTo(0));
+        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValue() {
+        IntegerTensor containsZero = IntegerTensor.create(1, 0, -1);
+        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
+
+        Function<Integer, Boolean> checkFunction = x -> x >= 0;
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
+        assertThat(validator.validate(containsZero), equalTo(expectedResult));
+    }
 }

@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
+import java.util.function.Function;
+
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -69,7 +71,8 @@ public class ScalarDoubleTensorTest {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
-        TensorValidator validator = TensorValidator.thatExpects(x -> x > 0.).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        Function<Double, Boolean> checkFunction = x -> x > 0.;
+        TensorValidator validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         assertThat(validator.validate(zero), equalTo(notZero));
         assertThat(validator.validate(one), equalTo(one));
     }
