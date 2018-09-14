@@ -7,10 +7,12 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,8 +36,11 @@ public class LambdaModelVertexTest {
     /*
     The model we are mimicking here is a Java function, modelExecution.
 
-    It takes one input, Temperature, and produces two outputs, Chance of Rain & Humidity. These outputs
+    It takes one input, Temperature, and produces two outputs of type double, Chance of Rain & Humidity. These outputs
     are written to file.
+
+    It also produces one integer output and one boolean output. Suggested Factor of Suncream and 'is it sunny'. These
+    are also written to file.
      */
 
     @Mock
@@ -43,6 +48,12 @@ public class LambdaModelVertexTest {
 
     @Mock
     private BufferedReader humidityReader;
+
+    @Mock
+    private BufferedReader suggestedFactorSuncream;
+
+    @Mock
+    private BufferedReader isSunnyReader;
 
     private KeanuRandom random;
     private DoubleVertex inputToModel;
@@ -52,6 +63,8 @@ public class LambdaModelVertexTest {
         random = new KeanuRandom(1);
         rainReader = mock(BufferedReader.class);
         humidityReader = mock(BufferedReader.class);
+        suggestedFactorSuncream = mock(BufferedReader.class);
+        isSunnyReader = mock(BufferedReader.class);
 
         when(rainReader.readLine()).thenAnswer(new Answer<Object>() {
             @Override
@@ -66,6 +79,23 @@ public class LambdaModelVertexTest {
             public Object answer(InvocationOnMock invocation) {
                 double humidityScalingFactorFromModel = 2;
                 return String.valueOf(inputToModel.getValue().scalar() * humidityScalingFactorFromModel);
+            }
+        });
+
+        when(suggestedFactorSuncream.readLine()).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                int x = (int) (inputToModel.getValue().scalar() / 10.0);
+                return String.valueOf(x);
+            }
+        });
+
+        when(isSunnyReader.readLine()).thenAnswer(new Answer<Object>() {
+            @Override
+            public Object answer(InvocationOnMock invocation) {
+                double temperature = inputToModel.getValue().scalar();
+                boolean isSunny = temperature > 20.0;
+                return String.valueOf(isSunny);
             }
         });
     }
@@ -87,6 +117,23 @@ public class LambdaModelVertexTest {
 
         inputToModel.setAndCascade(inputValue);
         Assert.assertEquals(shouldIBringUmbrella.getValue().scalar(), 20.0, 1e-6);
+    }
+
+    @Test
+    public void canRunAModelInAModelWithDifferentOutputTypes() {
+        inputToModel = new ConstantDoubleVertex(25);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
+        inputs.put(new VertexLabel("Temperature"), inputToModel);
+
+        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValuesMultipleTypes);
+        IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
+        BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
+
+        double inputValue = 20.0;
+
+        inputToModel.setAndCascade(inputValue);
+        Assert.assertEquals(suggestedFactorSuncream.getValue().scalar(), new Integer(2));
+        Assert.assertEquals(isSunny.getValue().scalar(), false);
     }
 
     @Test
@@ -176,6 +223,21 @@ public class LambdaModelVertexTest {
             modelOutput.put(new VertexLabel("ChanceOfRain"), chanceOfRainResult);
             double humidityResult = Double.parseDouble(humidityReader.readLine());
             modelOutput.put(new VertexLabel("Humidity"), humidityResult);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return modelOutput;
+    }
+
+    private Map<VertexLabel, Object> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+        Map<VertexLabel, Object> modelOutput = new HashMap<>();
+
+        try {
+            int chanceOfRainResult = (int) Double.parseDouble(rainReader.readLine());
+            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), chanceOfRainResult);
+            boolean humidityResult = Boolean.parseBoolean(humidityReader.readLine());
+            modelOutput.put(new VertexLabel("isSunny"), humidityResult);
         } catch (IOException e) {
             e.printStackTrace();
         }
