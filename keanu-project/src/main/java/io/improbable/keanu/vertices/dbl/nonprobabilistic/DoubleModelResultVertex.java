@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ModelResultVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 import io.improbable.keanu.vertices.Vertex;
 
-public class DoubleModelResultVertex extends DoubleVertex implements ModelResultVertex<DoubleTensor>, NonProbabilistic<DoubleTensor> {
+public class DoubleModelResultVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
     private ModelVertex model;
     private VertexLabel label;

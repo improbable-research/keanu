@@ -5,11 +5,10 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.ModelResultVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class IntegerModelResultVertex extends IntegerVertex implements ModelResultVertex<IntegerTensor>, NonProbabilistic<IntegerTensor> {
+public class IntegerModelResultVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
     private ModelVertex model;
     private VertexLabel label;
