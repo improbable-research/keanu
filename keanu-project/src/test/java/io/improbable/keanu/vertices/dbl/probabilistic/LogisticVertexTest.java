@@ -1,7 +1,13 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +17,7 @@ import org.apache.commons.math3.distribution.LogisticDistribution;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
@@ -168,4 +175,18 @@ public class LogisticVertexTest {
         );
     }
 
+    @Test
+    public void ifMuEqualsSAndYouSampleZeroItReturnsZero() {
+        KeanuRandom mockRandomAlwaysZero = mock(KeanuRandom.class);
+        when(mockRandomAlwaysZero.nextDouble(any())).thenAnswer(v -> {
+            int[] shape = v.getArgument(0);
+            return DoubleTensor.create(0., shape);
+        });
+
+        DoubleTensor mu = DoubleTensor.create(1., 2., 3.);
+        DoubleTensor s = DoubleTensor.create(1., 2., 3.);
+        ContinuousDistribution distribution = io.improbable.keanu.distributions.continuous.Logistic.withParameters(mu, s);
+        DoubleTensor sample = distribution.sample(new int[]{1, 3}, mockRandomAlwaysZero);
+        assertThat(sample, hasValue(0., 0., 0.));
+    }
 }
