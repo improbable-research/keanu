@@ -489,22 +489,22 @@ public class Nd4jIntegerTensorTest {
 
     @Test
     public void youCanFixAValidationIssueByReplacingTheValue() {
-        IntegerTensor containsZero = IntegerTensor.create(1, 0, -1);
+        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
         TensorValidator validator = TensorValidator.thatExpectsNotToFind(-1).withPolicy(TensorValidationPolicy.changeValueTo(0));
-        validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        validator.validate(containsMinusOne);
+        assertThat(containsMinusOne, equalTo(expectedResult));
     }
 
     @Test
     public void youCanFixACustomValidationIssueByReplacingTheValue() {
-        IntegerTensor containsZero = IntegerTensor.create(1, 0, -1);
+        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
         Function<Integer, Boolean> checkFunction = x -> x >= 0;
         TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
-        validator.validate(containsZero);
-        assertThat(containsZero, equalTo(expectedResult));
+        validator.validate(containsMinusOne);
+        assertThat(containsMinusOne, equalTo(expectedResult));
     }
 }
