@@ -140,7 +140,7 @@ public class TakeVertexTest {
         Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), reverse.withRespectTo(A).asFlatDoubleArray(), 1e-6);
     }
 
-    //@Test - XXX another weird one with a scalar output
+    @Test // - XXX another weird one with a scalar output
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).take(0, 0 , 0);
