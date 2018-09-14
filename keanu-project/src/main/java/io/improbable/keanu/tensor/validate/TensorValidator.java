@@ -15,6 +15,11 @@ public class TensorValidator<U, T extends Tensor<U>> implements TensorValueCheck
         return new TensorValidator<U, T>(new TensorValueNotEqualsCheck(v));
     }
 
+    public static <T extends Tensor<Double>> TensorValidator<Double, T> thatChecksForNaN() {
+        Function<Double, Boolean> checkFunction = v -> !Double.isNaN(v);
+        return thatExpects(checkFunction);
+    }
+
     public static <U, T extends Tensor<U>> TensorValidator<U, T> thatExpects(Function<U, Boolean> checkFunction) {
         return new TensorValidator<U, T>(new CustomTensorValueChecker<U, T>(checkFunction));
     }

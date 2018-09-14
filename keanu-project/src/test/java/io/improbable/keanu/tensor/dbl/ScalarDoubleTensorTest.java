@@ -4,6 +4,8 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+
 import java.util.function.Function;
 
 import org.junit.Test;
@@ -36,6 +38,29 @@ public class ScalarDoubleTensorTest {
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));
         double expected = 0.0;
         assertEquals(expected, clampedA.scalar(), 0.0);
+    }
+
+
+    @Test
+    public void canTestIfIsNaN() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        assertThat(nan.isNaN(), hasValue(true));
+        assertThat(notNan.isNaN(), hasValue(false));
+    }
+
+    @Test
+    public void canSetWhenNaN() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor mask = DoubleTensor.scalar(1.);
+        assertThat(nan.setWithMaskInPlace(mask, 2.), hasValue(2.));
+    }
+
+    @Test
+    public void canSetToZeroWhenNaN() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor mask = DoubleTensor.scalar(1.);
+        assertThat(nan.setWithMaskInPlace(mask, 0.), hasValue(0.));
     }
 
     @Test

@@ -719,19 +719,21 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
-
+        double trueValue = 1.0;
         if (value == 0.0) {
-            INDArray swapOnesForZeros = maskDup.rsub(1.0);
-            tensor.muli(swapOnesForZeros);
-        } else {
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(maskDup, value, Conditions.equals(1.0))
-            );
-
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
-            );
+            // swap true and false - otherwise the value won't get applied
+            trueValue = 1.0 - trueValue;
+            maskDup.negi().addi(1);
         }
+        double falseValue = 1.0 - trueValue;
+
+        Nd4j.getExecutioner().exec(
+            new CompareAndSet(maskDup, value, Conditions.equals(trueValue))
+        );
+
+        Nd4j.getExecutioner().exec(
+            new CompareAndSet(tensor, maskDup, Conditions.notEquals(falseValue))
+        );
 
         return this;
     }
@@ -933,6 +935,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public BooleanTensor greaterThanOrEqual(double value) {
         return fromMask(tensor.gte(value), copyOf(getShape(), getShape().length));
+    }
+
+    @Override
+    public BooleanTensor isNaN() {
+        return TensorValidator.thatChecksForNaN().check(this).not();
     }
 
     @Override

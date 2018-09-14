@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.ArrayList;
@@ -133,6 +134,44 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    /**
+     * Zero is a special case because it's usually the value that the mask uses to mean "false"
+     */
+    @Test
+
+    public void canSetToZero() {
+        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, 0.0);
+
+        assertArrayEquals(new double[]{0, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canTestIfIsNaN() {
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+        assertThat(matrix.isNaN(), hasValue(false, false, true, false));
+    }
+
+    @Test
+    public void canSetWhenNaN() {
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+
+        DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
+        DoubleTensor result = matrix.setWithMaskInPlace(mask, -2.0);
+
+        assertArrayEquals(new double[]{-2, -2, -2, -2}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canSetToZeroWhenNaN() {
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+
+        DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
+        DoubleTensor result = matrix.setWithMaskInPlace(mask, 0.0);
+
+        assertArrayEquals(new double[]{0, 0, 0, 0}, result.asFlatDoubleArray(), 0.0);
     }
 
     @Test
@@ -854,8 +893,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, true},
             4, 2);
 
-        Function<Double, Boolean> checkFunction = x -> !Double.isNaN(x);
-        TensorValidator validator = TensorValidator.thatExpects(checkFunction);
+        TensorValidator validator = TensorValidator.thatChecksForNaN();
         assertThat(validator.check(containsNan), equalTo(expectedMask));
     }
 
