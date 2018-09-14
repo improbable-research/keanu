@@ -17,7 +17,7 @@ public class PoissonVertexTest {
     public void samplingProducesRealisticMeanAndStandardDeviation() {
         int N = 100000;
         double epsilon = 0.1;
-        Double mu = 10.0;
+        Double mu = 25.0;
         KeanuRandom random = new KeanuRandom(1);
         PoissonVertex testPoissonVertex = new PoissonVertex(mu);
 
@@ -36,11 +36,21 @@ public class PoissonVertexTest {
         assertEquals(sd, standardDeviation, epsilon);
     }
 
+    /*
+     * Certain implementations of Poisson sample generation are susceptible to numerical stability issues.  In certain
+     * cases e ^ (- mu) is calculated and used as a stopping condition in a loop.  With large mu (~800) though the
+     * calculated values bottom out at 0.0 leading to infinite loops.  This test just ensures that we don't hit this
+     * issue.
+     */
     @Test
     public void largeMuIsSupported() {
         final double mu = 900.0;
         PoissonVertex testVertex = new PoissonVertex(mu);
 
+        /*
+         * We don't actually need the output value here - we're simply checking that high mu sample function return in
+         * a timely fashion.
+         */
         int sample = testVertex.sample().scalar();
     }
 
