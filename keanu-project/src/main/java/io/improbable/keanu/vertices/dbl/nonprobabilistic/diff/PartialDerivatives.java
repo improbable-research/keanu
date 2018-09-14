@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.VertexId;
 
 public class PartialDerivatives {
 
-    public static PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
+    public static final PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
 
     public static PartialDerivatives withRespectToSelf(VertexId withRespectTo, int[] shape) {
         return new PartialDerivatives(
