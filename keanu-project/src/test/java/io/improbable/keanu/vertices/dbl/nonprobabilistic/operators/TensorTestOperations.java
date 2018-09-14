@@ -28,7 +28,7 @@ public class TensorTestOperations {
                                                      final double DELTA) {
         DoubleTensor initialInput = inputVertex.getValue();
 
-        DoubleTensor initialOutput = outputVertex.lazyEval();
+        DoubleTensor initialOutput = outputVertex.eval();
         DoubleTensor outputWrtInput = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
         int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
         DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
