@@ -113,22 +113,26 @@ public class TensorflowGraphConverterTest {
     @Test
     public void canRunLogProbabilityOfGaussian() {
 
-        double[] initialA = {1, 2, 3, -2};
-        double[] initialB = {1, 1.5, 2, -1};
+        long n = 20;
+        int[] shape = new int[]{(int) n, (int) n};
+        long[] shapeLong = new long[]{n, n};
 
-        DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
-        A.setValue(DoubleTensor.create(initialA, 2, 2));
+        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        DoubleVertex B = new GaussianVertex(shape, 1, 1);
 
-        DoubleVertex B = new GaussianVertex(new int[]{2, 2}, 1, 1);
-        B.setValue(DoubleTensor.create(initialB, 2, 2));
+        double[] initialA = A.sample().asFlatDoubleArray();
+        double[] initialB = B.sample().asFlatDoubleArray();
+
+        A.setValue(DoubleTensor.create(initialA, shape));
+        B.setValue(DoubleTensor.create(initialB, shape));
 
         A.setLabel(new VertexLabel("A"));
         B.setLabel(new VertexLabel("B"));
 
         DoubleVertex C = A.matrixMultiply(B).matrixMultiply(A).times(0.5).matrixMultiply(B);
 
-        DoubleVertex CObserved = new GaussianVertex(new int[]{2, 2}, C, 2);
-        CObserved.observe(DoubleTensor.create(new double[]{0, 2, -1, -2}, 2, 2));
+        DoubleVertex CObserved = new GaussianVertex(shape, C, 2);
+        CObserved.observe(DoubleTensor.create(initialA, shape));
         BayesianNetwork network = new BayesianNetwork(C.getConnectedGraph());
 
         double[] expectedLogProb = new double[]{network.getLogOfMasterP()};
@@ -146,8 +150,8 @@ public class TensorflowGraphConverterTest {
         List<Double> keanuResults = new ArrayList<>();
         long keanuRunStart = System.currentTimeMillis();
         for (int i = 0; i < runCount; i++) {
-            A.setValue(DoubleTensor.create(aInputs.get(i), 2, 2));
-            B.setValue(DoubleTensor.create(bInputs.get(i), 2, 2));
+            A.setValue(DoubleTensor.create(aInputs.get(i), shape));
+            B.setValue(DoubleTensor.create(bInputs.get(i), shape));
             VertexValuePropagation.cascadeUpdate(A, B);
             keanuResults.add(network.getLogOfMasterP());
         }
@@ -161,16 +165,16 @@ public class TensorflowGraphConverterTest {
         try (Session s = new Session(graph)) {
 
             Map<String, Tensor> inputs = new HashMap<>();
-            inputs.put(A.getLabel().toString(), Tensor.create(new long[]{2, 2}, DoubleBuffer.wrap(initialA)));
-            inputs.put(B.getLabel().toString(), Tensor.create(new long[]{2, 2}, DoubleBuffer.wrap(initialB)));
+            inputs.put(A.getLabel().toString(), Tensor.create(shapeLong, DoubleBuffer.wrap(initialA)));
+            inputs.put(B.getLabel().toString(), Tensor.create(shapeLong, DoubleBuffer.wrap(initialB)));
 
             double[] result = runGraph(s, TensorflowGraphConverter.LOG_PROB_LABEL, inputs);
 
 
             long tensorFlowRunStart = System.currentTimeMillis();
             for (int i = 0; i < runCount; i++) {
-                inputs.put(A.getLabel().toString(), Tensor.create(new long[]{2, 2}, DoubleBuffer.wrap(aInputs.get(i))));
-                inputs.put(B.getLabel().toString(), Tensor.create(new long[]{2, 2}, DoubleBuffer.wrap(bInputs.get(i))));
+                inputs.put(A.getLabel().toString(), Tensor.create(shapeLong, DoubleBuffer.wrap(aInputs.get(i))));
+                inputs.put(B.getLabel().toString(), Tensor.create(shapeLong, DoubleBuffer.wrap(bInputs.get(i))));
 
                 tensorFlowResults.add(runGraph(s, TensorflowGraphConverter.LOG_PROB_LABEL, inputs)[0]);
             }
@@ -179,10 +183,10 @@ public class TensorflowGraphConverterTest {
             System.out.println("Tensorflow runtime: " + tensorFlowRunTime + "ms");
 
             System.out.println(String.format("%3.2f%%", (keanuRunTime / (double) tensorFlowRunTime) * 100));
-            assertArrayEquals(expectedLogProb, result, 1e-5);
+            assertArrayEquals(expectedLogProb, result, 1e-2);
         }
 
-        assertArrayEquals(Doubles.toArray(keanuResults), Doubles.toArray(tensorFlowResults), 1e-10);
+        assertArrayEquals(Doubles.toArray(keanuResults), Doubles.toArray(tensorFlowResults), 1e-2);
     }
 
     private double[] runGraph(Session s, String outputName, Map<String, Tensor> inputs) {
