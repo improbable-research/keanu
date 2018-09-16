@@ -1,6 +1,6 @@
 package io.improbable.keanu.backend;
 
-public interface KeanuGraph {
+public interface ProbabilisticGraph {
 
     double logProb();
 }

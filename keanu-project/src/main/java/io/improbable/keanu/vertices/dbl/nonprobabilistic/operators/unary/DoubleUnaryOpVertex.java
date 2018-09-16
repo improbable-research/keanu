@@ -53,6 +53,10 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
         }
     }
 
+    public DoubleVertex getInputVertex(){
+        return inputVertex;
+    }
+
     protected abstract DoubleTensor op(DoubleTensor value);
 
     protected abstract DualNumber dualOp(DualNumber dualNumber);

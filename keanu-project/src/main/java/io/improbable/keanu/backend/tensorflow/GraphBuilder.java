@@ -5,14 +5,20 @@ import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTAN
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.DIVIDE;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.MATRIX_MULTIPLY;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.MULTIPLY;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_HOLDER;
+import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.POW;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.SUBTRACT;
 
 import java.nio.DoubleBuffer;
+import java.nio.IntBuffer;
 
 import org.tensorflow.DataType;
 import org.tensorflow.Output;
+import org.tensorflow.Shape;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Scope;
+
+import io.improbable.keanu.tensor.TensorShape;
 
 public class GraphBuilder {
 
@@ -28,10 +34,14 @@ public class GraphBuilder {
 
     public enum OpType {
         CONSTANT("Const"),
+        PLACE_HOLDER("Placeholder"),
         DIVIDE("Div"),
         MULTIPLY("Mul"),
         SUBTRACT("Sub"),
         ADD("Add"),
+        LOG("Log"),
+        SUM("Sum"),
+        POW("Pow"),
         MATRIX_MULTIPLY("MatMul");
 
         public final String name;
@@ -61,6 +71,22 @@ public class GraphBuilder {
         return binaryOp(MATRIX_MULTIPLY, name, left, right);
     }
 
+    <T> Output<T> pow(Output<T> base, Output<T> power, String name) {
+        return binaryOp(POW, name, base, power);
+    }
+
+    <T> Output<T> log(Output<T> input, String name) {
+        return unaryOp(OpType.LOG, name, input);
+    }
+
+    <T> Output<T> reduceSum(Output<T> input, String name) {
+
+        int dims = input.shape().numDimensions();
+        Output<Integer> dimRange = constant(TensorShape.dimensionRange(0, dims), new long[]{dims}, name + "_dimRange");
+
+        return binaryOp(OpType.SUM, name, input, dimRange);
+    }
+
     Output<Double> constant(double value, String name) {
         try (Tensor<Double> tensor = Tensor.create(value, Double.class)) {
             return this.constant(name, tensor, Double.class);
@@ -73,6 +99,12 @@ public class GraphBuilder {
         }
     }
 
+    Output<Integer> constant(int[] value, long[] shape, String name) {
+        try (Tensor<Integer> tensor = Tensor.create(shape, IntBuffer.wrap(value))) {
+            return this.constant(name, tensor, Integer.class);
+        }
+    }
+
     private <T> Output<T> constant(String name, Tensor<T> tensor, Class<T> type) {
         return scope.graph().opBuilder(CONSTANT.name, name)
             .setAttr("dtype", DataType.fromClass(type))
@@ -81,11 +113,19 @@ public class GraphBuilder {
             .output(0);
     }
 
-    private <T> Output<T> binaryOp(OpType type, Output<T> in1, Output<T> in2) {
-        return scope.graph().opBuilder(type.name, type.name).addInput(in1).addInput(in2).build().output(0);
+    public <T> Output<T> placeholder(String name, Shape shape, Class<T> type) {
+        return scope.graph().opBuilder(PLACE_HOLDER.name, name)
+            .setAttr("dtype", DataType.fromClass(type))
+            .setAttr("shape", shape)
+            .build()
+            .output(0);
     }
 
-    private <T> Output<T> binaryOp(OpType type, String name, Output<T> in1, Output<T> in2) {
+    private <T, L, R> Output<T> binaryOp(OpType type, String name, Output<L> in1, Output<R> in2) {
         return scope.graph().opBuilder(type.name, name).addInput(in1).addInput(in2).build().output(0);
+    }
+
+    private <T> Output<T> unaryOp(OpType type, String name, Output<T> in1) {
+        return scope.graph().opBuilder(type.name, name).addInput(in1).build().output(0);
     }
 }

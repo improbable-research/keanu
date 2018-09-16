@@ -92,6 +92,15 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
         return logPdfs.sum();
     }
 
+    public DoubleVertex logProbGraph(DoubleVertex x) {
+
+        final DoubleVertex lnSigma = sigma.log();
+        final DoubleVertex xMinusMuSquared = x.minus(mu).pow(2);
+        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigma.pow(2).times(2.0));
+
+        return xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
+    }
+
     @Override
     public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
         Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
@@ -99,8 +108,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdmu,
-                                                             DoubleTensor dLogPdsigma,
-                                                             DoubleTensor dLogPdx) {
+                                                                 DoubleTensor dLogPdsigma,
+                                                                 DoubleTensor dLogPdx) {
 
         PartialDerivatives dLogPdInputsFromMu = mu.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdmu);
         PartialDerivatives dLogPdInputsFromSigma = sigma.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdsigma);
