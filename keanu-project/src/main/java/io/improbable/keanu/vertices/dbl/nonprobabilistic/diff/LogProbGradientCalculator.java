@@ -36,7 +36,7 @@ public class LogProbGradientCalculator {
     }
 
     /**
-     * @return the partial derivatives with respect to a give set of latent vertices
+     * @return the partial derivatives with respect to a given set of latent vertices
      */
     public Map<VertexId, DoubleTensor> getJointLogProbGradientWrtLatents() {
         PartialDerivatives diffOfLogWrt = new PartialDerivatives(new HashMap<>());
@@ -49,13 +49,13 @@ public class LogProbGradientCalculator {
     }
 
     /**
-     * The Vertex::dLogProb method returns a partial derivative of the Log Prob with respect to each parent
-     * and with respect to it's own value. This method finds which one of these partials will be non-zero due to being
-     * connected to a vertex that we are taking the derivative with respect to.
+     * The dLogProb(x) method on Vertex returns a partial derivative of the Log Prob with respect to each
+     * of its arguments and with respect to its value, x. This method searches these partials for any that
+     * are parents of the vertices we are taking the derivative with respect to
      *
      * @param ofVertices          the vertices that the derivative is being calculated "of" with respect to the wrtVertices
      * @param parentToWrtVertices a lookup
-     * @return a lookup map for a given vertex to a set of the wrt vertices that it descends
+     * @return a map for a given vertex to a set of the wrt vertices that it is connected to
      */
     private Map<Vertex, Set<DoubleVertex>> getVerticesWithNonzeroDiffWrt(Set<? extends Vertex<?>> ofVertices, Map<Vertex, Set<DoubleVertex>> parentToWrtVertices) {
         return ofVertices.stream()
@@ -77,11 +77,11 @@ public class LogProbGradientCalculator {
     }
 
     /**
-     * This method finds which one of the vertex's parents are connected to a vertex that we are taking the derivative
-     * with respect to.
+     * This method finds connections between a vertex's parents and any vertices that we are taking the derivative
+     * wrt to
      *
      * @param ofVertices the vertices that the derivative is being calculated "of" with respect to the wrtVertices
-     * @return a lookup map for a given vertex to a set of vertices that are directly connected to the dLogProb result
+     * @return a map for a given vertex to a set of vertices that are directly connected to the dLogProb result
      * of the ofVertices and a vertex that we are finding the gradient with respect to.
      */
     private Map<Vertex, Set<DoubleVertex>> getParentsThatAreConnectedToWrtVertices(Set<? extends Vertex> ofVertices) {
@@ -106,7 +106,6 @@ public class LogProbGradientCalculator {
                     probabilisticParentLookup.put(parent, latentVertices);
                 }
             }
-
         }
 
         return probabilisticParentLookup;
@@ -137,6 +136,7 @@ public class LogProbGradientCalculator {
             DoubleTensor dLogProbOfWrtVertexWithDiff = dlogProbWrtVertex.getValue();
 
             if (vertexWithDiff.equals(ofVertex)) {
+
                 dOfWrtLatentsAccumulated.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
             } else {
 
