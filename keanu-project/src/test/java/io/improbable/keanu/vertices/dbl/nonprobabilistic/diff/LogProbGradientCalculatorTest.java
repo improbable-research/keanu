@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
 
@@ -123,6 +124,40 @@ public class LogProbGradientCalculatorTest {
         DoubleVertex B = A.times(4);
         LogProbGradientCalculator calculator = new LogProbGradientCalculator(ImmutableList.of(B), ImmutableList.of(A));
         calculator.getJointLogProbGradientWrtLatents();
+    }
+
+    @Test
+    public void doesMatchForwardAutodiffWithManyOps() {
+        int[] shape = new int[]{2, 2};
+        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        A.setValue(DoubleTensor.linspace(0.1, 2, 4).reshape(shape));
+        DoubleVertex B = new GaussianVertex(shape, 0, 1);
+        B.setValue(DoubleTensor.linspace(0.2, 1, 4).reshape(shape));
+        DoubleVertex D = A.atan2(B).sigmoid().times(B);
+        DoubleVertex C = A.sin().cos().div(D);
+        DoubleVertex E = C.times(D).pow(A).acos();
+        DoubleVertex G = E.log().tan().asin().atan();
+        DoubleVertex F = D.plus(B).exp();
+        DoubleVertex H = G.plus(F).sum();
+        GaussianVertex J = new GaussianVertex(H, 1);
+        J.observe(0.5);
+
+        LogProbGradientCalculator calculator = new LogProbGradientCalculator(ImmutableList.of(J), ImmutableList.of(A, B));
+        Map<VertexId, DoubleTensor> gradient = calculator.getJointLogProbGradientWrtLatents();
+        DoubleTensor dJLogProbWrtAValue = gradient.get(A.getId());
+        DoubleTensor dJLogProbWrtBValue = gradient.get(B.getId());
+
+        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
+
+        DoubleTensor dHdA = dHForward.withRespectTo(A);
+        DoubleTensor dHdB = dHForward.withRespectTo(B);
+        DoubleTensor dJLogProbWrtH = J.dLogProbAtValue(H).get(H);
+
+        DoubleTensor expectedDJLogProbWrtAValue = dJLogProbWrtH.times(dHdA).sum(0, 1);
+        DoubleTensor expectedDJLogProbWrtBValue = dJLogProbWrtH.times(dHdB).sum(0, 1);
+
+        assertEquals(expectedDJLogProbWrtAValue, dJLogProbWrtAValue);
+        assertEquals(expectedDJLogProbWrtBValue, dJLogProbWrtBValue);
     }
 
 }
