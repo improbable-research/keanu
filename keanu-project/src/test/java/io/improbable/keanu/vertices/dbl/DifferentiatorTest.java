@@ -70,32 +70,31 @@ public class DifferentiatorTest {
     }
 
     @Test
-    public void canReverseAutoDiffOfMultiplicationLogSinAndSumWithSingleOutputWithRespectToMany() {
+    public void reverseAutoDiffMatchesForwardWithSingleOutputWithRespectToMany() {
 
-        DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
-        A.setValue(DoubleTensor.create(3.0, new int[]{2, 2}));
-        DoubleVertex B = new GaussianVertex(new int[]{2, 2}, 0, 1);
-        B.setValue(DoubleTensor.create(5.0, new int[]{2, 2}));
-        DoubleVertex D = A.times(B);
-        DoubleVertex C = A.sin();
-        DoubleVertex E = C.times(D);
-        DoubleVertex G = E.log();
-        DoubleVertex F = D.plus(B);
-        DoubleVertex H = G.plus(F);
+        int[] shape = new int[]{2, 2};
+        DoubleVertex A = new GaussianVertex(shape, 0, 1);
+        A.setValue(DoubleTensor.linspace(0.1, 2, 4).reshape(shape));
+        DoubleVertex B = new GaussianVertex(shape, 0, 1);
+        B.setValue(DoubleTensor.linspace(0.2, 1, 4).reshape(shape));
+        DoubleVertex D = A.atan2(B).sigmoid().times(B);
+        DoubleVertex C = A.sin().cos().div(D);
+        DoubleVertex E = C.times(D).pow(A).acos();
+        DoubleVertex G = E.log().tan().asin().atan();
+        DoubleVertex F = D.plus(B).exp();
+        DoubleVertex H = G.plus(F).sum();
 
-        PartialDerivatives dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
+        PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
+        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
 
-        DoubleTensor dHdA = dH.withRespectTo(A);
-        DoubleTensor dHdB = dH.withRespectTo(B);
+        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
+        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
 
-        DoubleTensor AValue = A.getValue();
-        DoubleTensor BValue = B.getValue();
+        DoubleTensor dHdAForward = dHForward.withRespectTo(A);
+        DoubleTensor dHdBForward = dHForward.withRespectTo(B);
 
-        DoubleTensor expecteddHdA = AValue.reciprocal().plus(AValue.cos().div(AValue.sin())).plus(BValue).reshape(1, 4).diag().reshape(2, 2, 2, 2);
-        DoubleTensor expecteddHdB = BValue.reciprocal().plus(1).plus(AValue).reshape(1, 4).diag().reshape(2, 2, 2, 2);
-
-        assertEquals(expecteddHdA, dHdA);
-        assertEquals(expecteddHdB, dHdB);
+        assertEquals(dHdAReverse, dHdAForward);
+        assertEquals(dHdBReverse, dHdBForward);
     }
 
     @Test

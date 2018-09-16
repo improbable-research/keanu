@@ -141,13 +141,10 @@ public class LogProbGradientCalculator {
             } else {
 
                 PartialDerivatives partialWrtVertexWithDiff = new PartialDerivatives(new HashMap<>());
-                int[] shapeOfLogProbWrtVertexWithDiff = TensorShape.concat(Tensor.SCALAR_SHAPE, dLogProbOfWrtVertexWithDiff.getShape());
-                DoubleTensor reshapedToOfWrtPartialFormat = dLogProbOfWrtVertexWithDiff.reshape(shapeOfLogProbWrtVertexWithDiff);
-                partialWrtVertexWithDiff.putWithRespectTo(vertexWithDiff.getId(), reshapedToOfWrtPartialFormat);
+                partialWrtVertexWithDiff.putWithRespectTo(vertexWithDiff.getId(), dLogProbOfWrtVertexWithDiff);
 
                 PartialDerivatives dOfWrtLatentsContributionFromParent = Differentiator
-                    .reverseModeAutoDiff(vertexWithDiff, partialWrtVertexWithDiff, this.parentToLatentLookup.get(vertexWithDiff))
-                    .sum(true, 0, 1);
+                    .reverseModeAutoDiff(vertexWithDiff, partialWrtVertexWithDiff, this.parentToLatentLookup.get(vertexWithDiff));
 
                 dOfWrtLatentsAccumulated = dOfWrtLatentsAccumulated.add(dOfWrtLatentsContributionFromParent);
             }
