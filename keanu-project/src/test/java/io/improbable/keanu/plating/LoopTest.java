@@ -37,7 +37,7 @@ public class LoopTest {
     private final Vertex startValue = ConstantVertex.of(0.);
 
     @Test
-    public void youCanGetTheOutputVertex() throws VertexLabelException, LoopException {
+    public void youCanGetTheOutputVertex() {
         Loop loop = Loop
             .startingFrom(startValue)
             .whilst(flip)
@@ -47,7 +47,7 @@ public class LoopTest {
     }
 
     @Test
-    public void thereIsADefaultMaxLength() throws VertexLabelException {
+    public void thereIsADefaultMaxLength(){
         Loop loop = Loop
             .startingFrom(startValue)
             .whilst(alwaysTrue)
@@ -56,7 +56,7 @@ public class LoopTest {
     }
 
     @Test
-    public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() throws VertexLabelException, LoopException {
+    public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() {
         expectedException.expect(LoopException.class);
         expectedException.expectMessage("Loop has exceeded its max count");
         Loop loop = Loop
@@ -67,7 +67,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() throws VertexLabelException, LoopException {
+    public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() {
         Loop loop = Loop
             .startingFrom(startValue)
             .dontThrowWhenMaxCountIsReached()
@@ -78,7 +78,7 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanOverrideTheDefaultMaxLength() throws VertexLabelException {
+    public void youCanOverrideTheDefaultMaxLength(){
         int customMaxCount = 5;
         Loop loop = Loop
             .startingFrom(startValue)
@@ -89,16 +89,16 @@ public class LoopTest {
     }
 
     @Test
-    public void itThrowsIfYouPassInMultipleBaseCaseVertexesAndDontLabelTheOutput() throws VertexLabelException {
+    public void itThrowsIfYouPassInMultipleBaseCaseVertexesAndDontLabelTheOutput(){
         expectedException.expect(VertexLabelException.class);
-        expectedException.expectMessage("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL");
+        expectedException.expectMessage("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL");
         Loop.startingFrom(ConstantVertex.of(0.), ConstantVertex.of(1.))
             .whilst(alwaysTrue)
             .apply(increment);
     }
 
     @Test
-    public void youCanLoopUntilAConditionIsTrue() throws VertexLabelException, LoopException {
+    public void youCanLoopUntilAConditionIsTrue() {
         Loop loop = Loop
             .startingFrom(startValue)
             .whilst(flip)
@@ -120,7 +120,7 @@ public class LoopTest {
     }
 
     @Test
-    public void theConditionCanBeAFunctionOfThePlateVariables() throws VertexLabelException, LoopException {
+    public void theConditionCanBeAFunctionOfThePlateVariables() {
         Function<Plate, BoolVertex> lessThanTen = plate -> {
             DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
             return valueIn.lessThan(ConstantVertex.of(10.));
@@ -137,15 +137,15 @@ public class LoopTest {
     }
 
     @Test
-    public void youCanAddCustomProxyVariableMappings() throws VertexLabelException, LoopException {
+    public void youCanAddCustomProxyVariableMappings() {
         VertexLabel factorInLabel = new VertexLabel("factorIn");
         VertexLabel factorOutLabel = new VertexLabel("factorOut");
-        DoubleVertex startFactorial = ConstantVertex.of(1.).labelled(Loop.VALUE_OUT_LABEL);
-        DoubleVertex startFactor = ConstantVertex.of(1.).labelled(factorOutLabel);
+        DoubleVertex startFactorial = ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL);
+        DoubleVertex startFactor = ConstantVertex.of(1.).labeledAs(factorOutLabel);
 
         BiFunction<Plate, DoubleVertex, DoubleVertex> factorial = (plate, valueIn) -> {
             DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
-            DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.)).labelled(factorOutLabel);
+            DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.)).labeledAs(factorOutLabel);
             plate.add(factorIn);
             plate.add(factorOut);
             return valueIn.times(factorOut);

@@ -34,7 +34,7 @@ public abstract class Vertex<T> implements Observable<T> {
         this.label = label;
     }
 
-    public <V extends Vertex<T>> V labelled(VertexLabel vertexName) {
+    public <V extends Vertex<T>> V labeledAs(VertexLabel vertexName) {
         setLabel(vertexName);
         return (V) this;
     }

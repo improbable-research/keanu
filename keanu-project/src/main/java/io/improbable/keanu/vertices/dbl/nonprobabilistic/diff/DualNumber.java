@@ -75,7 +75,7 @@ public class DualNumber implements DoubleOperators<DualNumber> {
             concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
         }
 
-        final DoubleTensor concattedValues = dualValues[0].concat(dimension, Arrays.copyOfRange(dualValues, 1, dualValues.length));
+        final DoubleTensor concattedValues = DoubleTensor.concat(dimension, dualValues);
         return new DualNumber(concattedValues, concattedDualNumbers);
     }
 
@@ -83,9 +83,8 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         if (partialDerivates.size() == 1) {
             return partialDerivates.get(0);
         } else {
-            DoubleTensor primaryTensor = partialDerivates.remove(0);
             DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
-            return primaryTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+            return DoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
         }
     }
 
@@ -167,6 +166,20 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
         PartialDerivatives newInf = thisInfMultiplied.add(thatInfMultiplied);
         return new DualNumber(newValue, newInf);
+    }
+
+    public DualNumber matrixInverse() {
+        //dc = -A^-1 * da * A^-1
+        DoubleTensor newValue = this.value.matrixInverse();
+
+        if (this.partialDerivatives.isEmpty()) {
+            return new DualNumber(newValue, PartialDerivatives.OF_CONSTANT);
+        } else {
+            DoubleTensor negatedValue = newValue.unaryMinus();
+            PartialDerivatives newInf = PartialDerivatives.matrixMultiplyAlongOfDimensions(this.partialDerivatives, negatedValue, false);
+            newInf = PartialDerivatives.matrixMultiplyAlongOfDimensions(newInf, newValue, true);
+            return new DualNumber(newValue, newInf);
+        }
     }
 
     public DualNumber multiplyBy(DualNumber that) {

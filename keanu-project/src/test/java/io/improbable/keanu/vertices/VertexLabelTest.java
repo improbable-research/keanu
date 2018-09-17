@@ -2,7 +2,10 @@ package io.improbable.keanu.vertices;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
+
+import java.util.Optional;
 
 import org.junit.Test;
 
@@ -63,6 +66,22 @@ public class VertexLabelTest {
     }
 
     @Test
+    public void youCanGetTheOuterNamespace() {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(name, innerNamespace, outerNamespace);
+        Optional<String> outerNamespace1 = foo.getOuterNamespace();
+        assertThat(outerNamespace1.get(), equalTo(outerNamespace));
+    }
+
+    @Test
+    public void itReturnsEmptyIfYouAskForTheOuterNamespaceButThereIsntOne() {
+        VertexLabel labelWithoutNamespace = new VertexLabel("foo");
+        assertThat(labelWithoutNamespace.getOuterNamespace().isPresent(), is(false));
+    }
+
+    @Test
     public void youCanSetTheNamespace() {
         String namespace = "namespace";
         String name = "foo";
@@ -88,7 +107,7 @@ public class VertexLabelTest {
     }
 
     @Test
-    public void youCanDiminishTheNamespace() throws VertexLabelException {
+    public void youCanDiminishTheNamespace() {
         String innerNamespace = "inner";
         String outerNamespace = "outer";
         String name = "foo";
@@ -98,7 +117,7 @@ public class VertexLabelTest {
     }
 
     @Test(expected = VertexLabelException.class)
-    public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() throws VertexLabelException {
+    public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() {
         VertexLabel foo = new VertexLabel("foo");
         foo.withoutOuterNamespace();
     }

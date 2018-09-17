@@ -16,7 +16,7 @@ import io.improbable.keanu.vertices.VertexLabelException;
 public class PlatesExampleTest {
 
     @Test
-    public void youCanAccessAVertexByPlateNumberAndVertexName() throws VertexLabelException {
+    public void youCanAccessAVertexByPlateNumberAndVertexName() {
         Plates plates = new PlatesExample().buildPlates("plates_example_data.csv");
         Plate plate1 = plates.asList().get(1);
         Vertex<DoubleTensor> x = plate1.get(new VertexLabel("x"));

@@ -39,7 +39,8 @@ public class PlateTest {
     public void createPlate() throws Exception {
         when(vertex.getLabel()).thenReturn(VERTEX_LABEL_1);
         plate = new Plate();
-        plate.add(vertex);    }
+        plate.add(vertex);
+    }
 
     @Test
     public void youCanGetAVertexByName() {
@@ -61,9 +62,9 @@ public class PlateTest {
     }
 
     @Test
-    public void itThrowsIfYouAddAVertexWithNoLabel()  {
+    public void itThrowsIfYouAddAVertexWithNoLabel() {
         expectedException.expect(PlateException.class);
-        expectedException.expectMessage(endsWith(" has no label"));
+        expectedException.expectMessage(endsWith(" must contain a label in order to be added to a plate"));
         plate.add(ConstantVertex.of(1.));
     }
 }

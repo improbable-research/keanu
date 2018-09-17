@@ -64,7 +64,7 @@ public class LoopBuilder {
      *
      * @param inputLabel  - the label assigned to the ProxyVertex in frame t
      * @param outputLabel - the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
-     * @return
+     * @return self
      */
     public LoopBuilder mapping(VertexLabel inputLabel, VertexLabel outputLabel) {
         customMappings.put(inputLabel, outputLabel);
@@ -76,9 +76,8 @@ public class LoopBuilder {
      *
      * @param conditionSupplier - a lambda that creates and returns a new BoolVertex
      * @return the next stage builder
-     * @throws VertexLabelException if the base case has not been properly specified
      */
-    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) throws VertexLabelException {
+    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier){
         return whilst(plate -> conditionSupplier.get());
     }
 
@@ -87,9 +86,8 @@ public class LoopBuilder {
      *
      * @param conditionFunction - a lambda that takes the current Plate and creates and returns a new BoolVertex
      * @return the next stage builder
-     * @throws VertexLabelException if the base case has not been properly specified
      */
-    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) throws VertexLabelException {
+    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction){
         return new LoopBuilder2(initialState, conditionFunction, customMappings.build(), maxLoopCount, throwWhenMaxCountIsReached);
     }
 
@@ -104,7 +102,7 @@ public class LoopBuilder {
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) throws VertexLabelException {
+        LoopBuilder2(Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached){
             this.initialState = setInitialState(initialState);
             this.conditionFunction = conditionFunction;
             this.customMappings = customMappings;
@@ -112,7 +110,7 @@ public class LoopBuilder {
             this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
         }
 
-        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) throws VertexLabelException {
+        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState){
             Vertex valueOutWhenAlwaysTrue = null;
 
             try {
@@ -121,10 +119,10 @@ public class LoopBuilder {
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {
-                throw new VertexLabelException("You must pass in a base case, i.e. a vertex labelled with Loop.VALUE_OUT_LABEL", e);
+                throw new VertexLabelException("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL", e);
             }
 
-            BoolVertex tru = ConstantVertex.of(true).labelled(LOOP_LABEL);
+            BoolVertex tru = ConstantVertex.of(true).labeledAs(LOOP_LABEL);
 
             return ImmutableList.<Vertex>builder()
                 .addAll(initialState)
@@ -139,9 +137,8 @@ public class LoopBuilder {
          * @param iterationFunction - a lambda that takes the Proxy input vertex
          *                          and creates and returns a new output Vertex
          * @return the fully constructed Loop object
-         * @throws VertexLabelException
          */
-        public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction) throws VertexLabelException {
+        public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction){
             return apply((plate, valueIn) -> {
                 return iterationFunction.apply(valueIn);
             });
@@ -153,12 +150,11 @@ public class LoopBuilder {
          * @param iterationFunction - a lambda that takes the current Plate and the Proxy input vertex
          *                          and creates and returns a new output vertex
          * @return the fully constructed Loop object
-         * @throws VertexLabelException
          */
-        public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) throws VertexLabelException {
+        public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction){
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))
-                .withProxyMapping(ImmutableMap.<VertexLabel, VertexLabel>builder()
+                .withTransitionMapping(ImmutableMap.<VertexLabel, VertexLabel>builder()
                     .putAll(customMappings)
                     .put(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL, VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL)
                     .put(Loop.STILL_LOOPING, LOOP_LABEL)
@@ -174,13 +170,13 @@ public class LoopBuilder {
                     plate.addAll(ImmutableSet.of(valueInWhenAlwaysTrue, stillLooping, valueIn));
 
                     // intermediate
-                    BoolVertex condition = conditionFunction.apply(plate).labelled(Loop.CONDITION_LABEL);
+                    BoolVertex condition = conditionFunction.apply(plate).labeledAs(Loop.CONDITION_LABEL);
                     plate.add(condition);
 
                     // outputs
-                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue).labelled(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
-                    BoolVertex loopAgain = stillLooping.and(condition).labelled(LOOP_LABEL);
-                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labelled(Loop.VALUE_OUT_LABEL);
+                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue).labeledAs(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+                    BoolVertex loopAgain = stillLooping.and(condition).labeledAs(LOOP_LABEL);
+                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labeledAs(Loop.VALUE_OUT_LABEL);
                     plate.addAll(ImmutableSet.of(iterationResult, loopAgain, result));
                 })
                 .build();

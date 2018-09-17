@@ -7,6 +7,7 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class Plates implements Iterable<Plate> {
+
     private List<Plate> containedPlates;
 
     public Plates(int reservedSize) {

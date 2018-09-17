@@ -1,6 +1,6 @@
 package io.improbable.keanu.plating.loop;
 
-public class LoopException extends Exception {
+public class LoopException extends RuntimeException {
     public LoopException(String message) {
         super(message);
     }

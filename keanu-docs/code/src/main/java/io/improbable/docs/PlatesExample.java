@@ -1,21 +1,14 @@
 package io.improbable.docs;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
-
 import java.util.List;
 import java.util.stream.Collectors;
-
-import org.junit.Test;
 
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -49,7 +42,7 @@ public class PlatesExample {
      *
      * @param dataFileName - the file containing data in (x,y) format
      */
-    public Plates buildPlates(String dataFileName) throws VertexLabelException {
+    public Plates buildPlates(String dataFileName) {
 
         //Read data from a csv file
         CsvReader csvReader = ReadCsv.fromResources(dataFileName);
@@ -69,8 +62,8 @@ public class PlatesExample {
             .fromIterator(allMyData.iterator())
             .withFactory((plate, csvMyData) -> {
 
-                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).labelled(xLabel);
-                DoubleVertex y = m.multiply(x).plus(b).labelled(yLabel);
+                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).labeledAs(xLabel);
+                DoubleVertex y = m.multiply(x).plus(b).labeledAs(yLabel);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);
                 yObserved.observe(csvMyData.y);

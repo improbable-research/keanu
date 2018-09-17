@@ -16,7 +16,6 @@ import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -39,7 +38,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void oystersAreInfected() throws VertexLabelException {
+    public void oystersAreInfected() {
         generateSurveyData(50, true, false, false);
 
         int dropCount = 10000;
@@ -51,7 +50,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void lambAndOystersAreInfected() throws VertexLabelException {
+    public void lambAndOystersAreInfected() {
         generateSurveyData(50, true, true, false);
         NetworkSamples samples = sample(15000);
 
@@ -62,7 +61,7 @@ public class FoodPoisoningTest {
     }
 
     @Test
-    public void nothingIsInfected() throws VertexLabelException {
+    public void nothingIsInfected() {
         generateSurveyData(50, false, false, false);
         NetworkSamples samples = sample(15000);
 
@@ -79,7 +78,7 @@ public class FoodPoisoningTest {
         return MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(myNet, myNet.getLatentVertices(), n);
     }
 
-    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) throws VertexLabelException {
+    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {
 
         VertexLabel didEatOystersLabel = new VertexLabel("didEatOysters");
         VertexLabel didEatLambLabel = new VertexLabel("didEatLamb");
@@ -88,9 +87,9 @@ public class FoodPoisoningTest {
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
         Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labelled(didEatOystersLabel));
-            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labelled(didEatLambLabel));
-            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labelled(didEatPooLabel));
+            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labeledAs(didEatOystersLabel));
+            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labeledAs(didEatLambLabel));
+            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labeledAs(didEatPooLabel));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -102,10 +101,10 @@ public class FoodPoisoningTest {
             DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
                 .orElse(0.1)
-                .labelled(pIllLabel);
+                .labeledAs(pIllLabel);
 
             plate.add(pIll);
-            plate.add(new BernoulliVertex(pIll).labelled(isIllLabel));
+            plate.add(new BernoulliVertex(pIll).labeledAs(isIllLabel));
         };
 
         Plates personPlates = new PlateBuilder()

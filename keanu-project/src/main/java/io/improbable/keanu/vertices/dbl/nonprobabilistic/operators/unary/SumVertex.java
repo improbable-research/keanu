@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static java.util.Collections.singletonMap;
+
 import java.util.Map;
 
 import io.improbable.keanu.tensor.Tensor;
@@ -32,7 +34,10 @@ public class SumVertex extends DoubleUnaryOpVertex {
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        //TODO
-        throw new UnsupportedOperationException("Reverse mode autodiff not supported for this operation");
+
+        PartialDerivatives derivativesWrtInput = derivativeOfOutputsWithRespectToSelf
+            .multiplyBy(DoubleTensor.ones(inputVertex.getShape()), true);
+
+        return singletonMap(inputVertex, derivativesWrtInput);
     }
 }
