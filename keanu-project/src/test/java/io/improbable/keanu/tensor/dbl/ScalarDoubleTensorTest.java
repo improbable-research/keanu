@@ -83,6 +83,8 @@ public class ScalarDoubleTensorTest {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
         TensorValidator validator = TensorValidator.NAN_CATCHER;
+        assertThat(nan.isNaN(), equalTo(BooleanTensor.scalar(true)));
+        assertThat(notNan.isNaN(), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
     }

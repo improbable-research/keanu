@@ -752,7 +752,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor isNaN() {
-        return TensorValidator.NAN_CATCHER.check(this).not();
+        return BooleanTensor.scalar(Double.isNaN(value));
     }
 
     @Override

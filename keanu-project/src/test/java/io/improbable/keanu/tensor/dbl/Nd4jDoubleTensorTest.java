@@ -901,6 +901,7 @@ public class Nd4jDoubleTensorTest {
 
         TensorValidator validator = TensorValidator.NAN_FIXER;
         assertThat(validator.check(containsNan), equalTo(expectedMask));
+        assertThat(containsNan.isNaN(), equalTo(expectedMask.not()));
     }
 
     @Test
