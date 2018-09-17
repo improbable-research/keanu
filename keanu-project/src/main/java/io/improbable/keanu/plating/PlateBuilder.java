@@ -37,6 +37,7 @@ public class PlateBuilder<T> {
          * Build plates from current factory settings
          *
          * @return Collection of all created plates
+         * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the transition mapping
          */
         Plates build();
     }
