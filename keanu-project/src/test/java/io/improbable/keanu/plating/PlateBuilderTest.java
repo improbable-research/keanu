@@ -1,13 +1,36 @@
 package io.improbable.keanu.plating;
 
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.startsWith;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
+
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 
 public class PlateBuilderTest {
 
@@ -25,6 +48,9 @@ public class PlateBuilderTest {
         new Bean(0)
     );
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Test
     public void buildPlatesFromCount_Size() {
         int n = 100;
@@ -39,10 +65,10 @@ public class PlateBuilderTest {
     @Test
     public void buildPlatesFromCount_PlateContents() {
         int n = 100;
-        String vertexName = "vertexName";
+        VertexLabel vertexName = new VertexLabel("vertexName");
         Plates plates = new PlateBuilder<>()
             .count(n)
-            .withFactory((plate) -> plate.add(vertexName, new BernoulliVertex(0.5)))
+            .withFactory((plate) -> plate.add(new BernoulliVertex(0.5).labeledAs(vertexName)))
             .build();
         plates.asList().forEach(plate -> {
             assertNotNull(plate.get(vertexName));
@@ -65,6 +91,237 @@ public class PlateBuilderTest {
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
                 assertEquals(0, bean.x);
+            })
+            .build();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
+        new PlateBuilder<Integer>()
+            .count(10)
+            .withFactory((plate) -> {
+                VertexLabel label = new VertexLabel("x");
+                DoubleVertex vertex1 = ConstantVertex.of(1.).labeledAs(label);
+                DoubleVertex vertex2 = ConstantVertex.of(1.).labeledAs(label);
+                plate.add(vertex1);
+                plate.add(vertex2);
+            })
+            .build();
+
+    }
+
+    @Test
+    public void youCanCreateASetOfPlatesWithACommonParameterFromACount() {
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        VertexLabel label = new VertexLabel("flip");
+
+        Plates plates = new PlateBuilder<Bean>()
+            .count(10)
+            .withFactory((plate) -> {
+                BoolVertex flip = new BernoulliVertex(commonTheta).labeledAs(label);
+                flip.observe(false);
+                plate.add(flip);
+            })
+            .build();
+
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> flip = plate.get(label);
+            assertThat(flip.getParents(), contains(commonTheta));
+        }
+    }
+
+    @Test
+    public void youCanPutThePlatesIntoABayesNet() {
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        VertexLabel label = new VertexLabel("flip");
+
+        Plates plates = new PlateBuilder<Bean>()
+            .count(10)
+            .withFactory((plate) -> {
+                BoolVertex flip = new BernoulliVertex(commonTheta).labeledAs(label);
+                flip.observe(false);
+                plate.add(flip);
+            })
+            .build();
+
+        new BayesianNetwork(commonTheta.getConnectedGraph());
+    }
+
+    @Test
+    public void itThrowsIfYouTryToPutTheSameVertexIntoMultiplePlates() {
+        expectedException.expect(PlateException.class);
+        expectedException.expectMessage(containsString("has already been added to Plate_"));
+
+        VertexLabel label = new VertexLabel("theta");
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01).labeledAs(label);
+
+        new PlateBuilder<Bean>()
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(commonTheta);
+            })
+            .build();
+    }
+
+
+    @Test
+    public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() {
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
+
+        VertexLabel label = new VertexLabel("flip");
+
+        Plates plates = new PlateBuilder<Bean>()
+            .fromIterator(ROWS.iterator())
+            .withFactory((plate, bean) -> {
+                BoolVertex flip = new BernoulliVertex(commonTheta).labeledAs(label);
+                flip.observe(false);
+                plate.add(flip);
+            })
+            .build();
+
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> flip = plate.get(label);
+            assertThat(flip.getParents(), contains(commonTheta));
+        }
+    }
+
+    /**
+     * This is a Hidden Markov Model -
+     * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     *
+     * ...  -->  X[t-1]  -->  X[t]  --> ...
+     *             |           |
+     *           Y[t-1]       Y[t]
+     */
+    @Test
+    public void youCanCreateATimeSeriesFromPlatesFromACount() {
+
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
+        VertexLabel yLabel = new VertexLabel("y");
+
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labeledAs(xLabel);
+        List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
+
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(initialX)
+            .count(10)
+            .withFactory((plate) -> {
+                DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
+                DoubleVertex x = new ExponentialVertex(xPrevious).labeledAs(xLabel);
+                IntegerVertex y = new PoissonVertex(x).labeledAs(yLabel);
+                plate.add(xPrevious);
+                plate.add(x);
+                plate.add(y);
+            })
+            .build();
+
+
+        Vertex<DoubleTensor> previousX = initialX;
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> xPreviousProxy = plate.get(xPreviousLabel);
+            Vertex<DoubleTensor> x = plate.get(xLabel);
+            Vertex<DoubleTensor> y = plate.get(yLabel);
+            assertThat(xPreviousProxy.getParents(), contains(previousX));
+            assertThat(x.getParents(), contains(xPreviousProxy));
+            assertThat(y.getParents(), contains(x));
+            previousX = x;
+        }
+    }
+
+    /**
+     * This is a Hidden Markov Model -
+     * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     *
+     * ...  -->  X[t-1]  -->  X[t]  --> ...
+     *             |           |
+     *           Y[t-1]       Y[t]
+     */
+    @Test
+    public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
+
+        VertexLabel xLabel = new VertexLabel("x");
+        VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
+        VertexLabel yLabel = new VertexLabel("y");
+
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labeledAs(xLabel);
+        List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
+
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(initialX)
+            .fromIterator(ys.iterator())
+            .withFactory((plate, observedY) -> {
+                DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
+                DoubleVertex x = new ExponentialVertex(xPreviousProxy).labeledAs(xLabel);
+                IntegerVertex y = new PoissonVertex(x).labeledAs(yLabel);
+                y.observe(observedY);
+                plate.add(xPreviousProxy);
+                plate.add(x);
+                plate.add(y);
+            })
+            .build();
+
+
+        Vertex<DoubleTensor> previousX = initialX;
+
+        for (Plate plate : plates) {
+            Vertex<DoubleTensor> xPreviousProxy = plate.get(xPreviousLabel);
+            Vertex<DoubleTensor> x = plate.get(xLabel);
+            Vertex<DoubleTensor> y = plate.get(yLabel);
+            assertThat(xPreviousProxy.getParents(), contains(previousX));
+            assertThat(x.getParents(), contains(xPreviousProxy));
+            assertThat(y.getParents(), contains(x));
+            previousX = x;
+        }
+    }
+
+    @Test
+    public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() {
+        expectedException.expect(VertexLabelException.class);
+        expectedException.expectMessage(startsWith("Cannot find transition mapping for "));
+        VertexLabel realLabel = new VertexLabel("real");
+        VertexLabel fakeLabel = new VertexLabel("fake");
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState()
+            .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(new DoubleProxyVertex(fakeLabel));
+            })
+            .build();
+    }
+
+    @Test
+    public void itThrowsIfTheresAProxyVertexButNoBaseCase() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("You must provide a base case for the Transition Vertices - use withInitialState()");
+        VertexLabel realLabel = new VertexLabel("real");
+        Plates plates = new PlateBuilder<Integer>()
+            .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(new DoubleProxyVertex(realLabel));
+            })
+            .build();
+    }
+
+    @Test
+    public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() {
+        expectedException.expect(VertexLabelException.class);
+        expectedException.expectMessage("Cannot find VertexLabel fake");
+        VertexLabel realLabel = new VertexLabel("real");
+        VertexLabel fakeLabel = new VertexLabel("fake");
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(ConstantVertex.of(1.).labeledAs(realLabel))
+            .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(new DoubleProxyVertex(realLabel));
             })
             .build();
     }

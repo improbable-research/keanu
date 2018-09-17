@@ -36,7 +36,6 @@ import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -491,7 +490,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         TensorValidator.NAN_CATCHER.validate(this);
         TensorValidator.NAN_CATCHER.validate(y);
         this.logInPlace().timesInPlace(y);
-        TensorValidator.NAN_FIXER.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(this);
+        TensorValidator.NAN_FIXER.validate(this);
         return this;
     }
 

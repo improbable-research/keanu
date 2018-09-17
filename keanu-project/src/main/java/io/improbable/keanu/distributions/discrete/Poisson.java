@@ -46,15 +46,34 @@ public class Poisson implements DiscreteDistribution {
             throw new IllegalArgumentException("Invalid value for mu: " + mu);
         }
 
-        double b = 1.;
-        double stopB = Math.exp(-mu);
-        int i;
+        final double STEP_IN_MU = 500;
+        double muLeft = mu;
+        int k = 0;
+        double p = 1.0;
 
-        for (i = 0; b >= stopB; i++) {
-            b *= random.nextDouble();
-        }
+        /*
+         * Algorithm courtesy of Wikipedia:
+         * https://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
+         *
+         * Designed to introduce mu gradually to avoid numerical stability issues.
+         */
+        do {
+            k++;
+            double u = random.nextDoubleNonZero();
+            p *= u;
 
-        return i - 1;
+            while (p < 1.0 && muLeft > 0.0) {
+                if (muLeft > STEP_IN_MU) {
+                    p *= Math.exp(STEP_IN_MU);
+                    muLeft -= STEP_IN_MU;
+                } else {
+                    p *= Math.exp(muLeft);
+                    muLeft = 0.0;
+                }
+            }
+        } while (p > 1.0);
+
+        return k - 1;
     }
 
     @Override
