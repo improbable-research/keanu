@@ -1,19 +1,13 @@
 package io.improbable.keanu.backend.tensorflow;
 
-import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.junit.Test;
 
-import com.google.common.primitives.Doubles;
-
-import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -109,7 +103,7 @@ public class TensorflowGraphConverterTest {
     }
 
     @Test
-    public void canRunLogProbabilityOfGaussian() {
+    public void canRunLogProbabilityAndGradientLogProbabilityOfGaussian() {
 
         long n = 20;
         int[] shape = new int[]{(int) n, (int) n};
@@ -137,59 +131,18 @@ public class TensorflowGraphConverterTest {
         Map<VertexId, DoubleTensor> keanuGradients = LogProbGradient
             .getJointLogProbGradientWrtLatents(Probabilistic.keepOnlyProbabilisticVertices(network.getLatentOrObservedVertices()));
 
-        DoubleTensor aGradient = keanuGradients.get(A.getId());
-        DoubleTensor bGradient = keanuGradients.get(B.getId());
-
-        int runCount = 1000;
-
-        List<DoubleTensor> aInputs = new ArrayList<>();
-        List<DoubleTensor> bInputs = new ArrayList<>();
-
-        for (int i = 0; i < runCount; i++) {
-            aInputs.add(A.sample());
-            bInputs.add(B.sample());
-        }
-
-        List<Double> keanuResults = new ArrayList<>();
-        long keanuRunStart = System.currentTimeMillis();
-        for (int i = 0; i < runCount; i++) {
-            A.setValue(aInputs.get(i));
-            B.setValue(bInputs.get(i));
-            VertexValuePropagation.cascadeUpdate(A, B);
-            keanuResults.add(network.getLogOfMasterP());
-        }
-
-        long keanuRunTime = System.currentTimeMillis() - keanuRunStart;
-        System.out.println("Keanu runtime: " + keanuRunTime + "ms");
-
         try (ProbabilisticGraph graph = TensorflowGraphConverter.convert(network)) {
 
-            List<Double> tensorFlowResults = new ArrayList<>();
             Map<String, DoubleTensor> inputs = new HashMap<>();
             inputs.put(A.getLabel().toString(), initialA);
             inputs.put(B.getLabel().toString(), initialB);
 
-            double result = graph.logProb(inputs);
-            Map<String, DoubleTensor> gradients = graph.logProbGradients(inputs);
-            assertEquals(aGradient, gradients.get("A"));
-            assertEquals(bGradient, gradients.get("B"));
+            double tensorflowResult = graph.logProb(inputs);
+            Map<String, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
 
-            long tensorFlowRunStart = System.currentTimeMillis();
-            for (int i = 0; i < runCount; i++) {
-                inputs.put(A.getLabel().toString(), aInputs.get(i));
-                inputs.put(B.getLabel().toString(), bInputs.get(i));
-
-                tensorFlowResults.add(graph.logProb(inputs));
-            }
-
-            long tensorFlowRunTime = System.currentTimeMillis() - tensorFlowRunStart;
-
-            System.out.println("Tensorflow runtime: " + tensorFlowRunTime + "ms");
-            System.out.println(String.format("%3.2f%%", (keanuRunTime / (double) tensorFlowRunTime) * 100));
-
-            assertEquals(expectedLogProb, result, 1e-2);
-            assertArrayEquals(Doubles.toArray(keanuResults), Doubles.toArray(tensorFlowResults), 1e-2);
-
+            assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get("A"));
+            assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get("B"));
+            assertEquals(expectedLogProb, tensorflowResult, 1e-2);
         }
 
     }

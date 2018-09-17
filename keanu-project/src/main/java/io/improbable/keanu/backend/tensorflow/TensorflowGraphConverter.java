@@ -108,21 +108,23 @@ public class TensorflowGraphConverter {
 
         if (value instanceof DoubleTensor) {
 
-            //TODO: Nasty conversion here
             int[] shape = ((DoubleTensor) value).getShape();
-            long[] restOfShape = new long[shape.length - 1];
-            for (int i = 1; i < shape.length; i++) {
-                restOfShape[i - 1] = shape[i];
-            }
-
             String tensorflowOpName = getTensorflowOpName(vertex);
 
-            graphBuilder.placeholder(tensorflowOpName, Shape.make(shape[0], restOfShape), Double.class);
+            graphBuilder.placeholder(tensorflowOpName, toShape(shape), Double.class);
 
             return tensorflowOpName;
         }
 
         throw new IllegalArgumentException("Can only convert doubles at the moment");
+    }
+
+    private static Shape toShape(int[] intShape) {
+        long[] restOfShape = new long[intShape.length - 1];
+        for (int i = 1; i < intShape.length; i++) {
+            restOfShape[i - 1] = intShape[i];
+        }
+        return Shape.make(intShape[0], restOfShape);
     }
 
     interface GraphBuilderUnaryOp {
@@ -193,24 +195,13 @@ public class TensorflowGraphConverter {
             }
         }
 
-        Output<?>[] wrt = placeHolderOps.stream()
-            .map(opName -> graph.operation(opName).output(0))
-            .toArray(Output[]::new);
+        Map<String, Output<?>> gradientByInput = addGradients(graph, placeHolderOps);
 
-        Output<?>[] gradientOutputs = graph.addGradients(graph.operation(LOG_PROB).output(0), wrt);
-
-        Map<String, Output<?>> gradientByInput = new HashMap<>();
-        for (int i = 0; i < placeHolderOps.size(); i++) {
-            gradientByInput.put(placeHolderOps.get(i), gradientOutputs[i]);
-        }
-
-        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = new TensorflowProbabilisticGraph(
+        return new TensorflowProbabilisticGraph(
             new Session(graph),
             placeHolderOps,
             gradientByInput
         );
-
-        return tensorflowProbabilisticGraph;
     }
 
     private static void addLogProb(BayesianNetwork network) {
@@ -240,6 +231,22 @@ public class TensorflowGraphConverter {
         if (logProb != null) {
             logProb.setLabel(new VertexLabel(LOG_PROB));
         }
+    }
+
+    private static Map<String, Output<?>> addGradients(Graph graph, List<String> placeHolderOps) {
+
+        Output<?>[] wrt = placeHolderOps.stream()
+            .map(opName -> graph.operation(opName).output(0))
+            .toArray(Output[]::new);
+
+        Output<?>[] gradientOutputs = graph.addGradients(graph.operation(LOG_PROB).output(0), wrt);
+
+        Map<String, Output<?>> gradientByInput = new HashMap<>();
+        for (int i = 0; i < placeHolderOps.size(); i++) {
+            gradientByInput.put(placeHolderOps.get(i), gradientOutputs[i]);
+        }
+
+        return gradientByInput;
     }
 
 }
