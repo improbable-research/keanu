@@ -126,10 +126,8 @@ public class ReshapeVertexTest {
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
-        final double INCREMENT = 10.0;
-        final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
     }
 
 }

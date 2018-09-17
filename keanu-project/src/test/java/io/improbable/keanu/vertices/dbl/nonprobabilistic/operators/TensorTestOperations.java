@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
-import static org.junit.Assert.assertEquals;
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -33,6 +34,7 @@ public class TensorTestOperations {
         int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
         DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
         Tensor.FlattenedView<Double> flatIncrement = incrementTensor.getFlattenedView();
+        Double boxedDelta = DELTA;
 
         for (int i = 0; i < flatIncrement.size(); i++) {
             flatIncrement.set(i, INCREMENT_AMOUNT);
@@ -41,7 +43,7 @@ public class TensorTestOperations {
             DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
             DoubleTensor differenceUsingGradient = outputWrtInput.times(incrementTensor).sum(dimensionsToSumOver);
-            checkIndividualErrors(differenceInOutput, differenceUsingGradient, DELTA);
+            assertThat(differenceUsingGradient, allCloseTo(boxedDelta, differenceInOutput));
         }
     }
 
@@ -56,17 +58,6 @@ public class TensorTestOperations {
         }
 
         return wrtDimensions;
-    }
-
-    private static void checkIndividualErrors(DoubleTensor expected, DoubleTensor actual, double delta) {
-        Tensor.FlattenedView<Double> flatExpected = expected.getFlattenedView();
-        Tensor.FlattenedView<Double> flatActual = actual.getFlattenedView();
-
-        assertEquals(flatExpected.size(), flatActual.size());
-
-        for (int i = 0; i < flatExpected.size(); i++) {
-            assertEquals(flatExpected.get(i), flatActual.get(i), delta);
-        }
     }
 
 }

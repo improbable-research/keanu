@@ -155,9 +155,7 @@ public class SliceVertexTest {
     public void changesMatchGradient() {
         DoubleVertex cube = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         SliceVertex slice = new SliceVertex(cube, 0, 0);
-        final double INCREMENT = 10.0;
-        final double DELTA = 1e-10;
-        finiteDifferenceMatchesGradient(ImmutableList.of(cube), slice, INCREMENT, DELTA);
+        finiteDifferenceMatchesGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
     }
 
 }
