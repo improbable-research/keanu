@@ -34,6 +34,11 @@ public abstract class Vertex<T> implements Observable<T> {
         this.label = label;
     }
 
+    public <V extends Vertex<T>> V labeledAs(VertexLabel vertexName) {
+        setLabel(vertexName);
+        return (V) this;
+    }
+
     public VertexLabel getLabel() {
         return this.label;
     }
@@ -226,4 +231,17 @@ public abstract class Vertex<T> implements Observable<T> {
         return DiscoverGraph.getEntireGraph(this);
     }
 
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(this.getId());
+        if (this.getLabel() != null) {
+            stringBuilder.append(" (").append(this.getLabel()).append(")");
+        }
+        stringBuilder.append(": ");
+        stringBuilder.append(this.getClass().getSimpleName());
+        stringBuilder.append("(" + getValue() + ")");
+        return stringBuilder.toString();
+    }
 }

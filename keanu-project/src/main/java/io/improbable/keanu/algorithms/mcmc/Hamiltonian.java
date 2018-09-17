@@ -10,11 +10,10 @@ import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -76,7 +75,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         bayesNet.cascadeObservations();
 
         final List<Vertex<DoubleTensor>> latentVertices = bayesNet.getContinuousLatentVertices();
-        final List<? extends Probabilistic> probabilisticVertices = Probabilistic.keepOnlyProbabilisticVertices(bayesNet.getLatentOrObservedVertices());
+        final LogProbGradientCalculator logProbGradientCalculator = new LogProbGradientCalculator(bayesNet.getLatentOrObservedVertices(), latentVertices);
 
         final Map<VertexId, List<?>> samples = new HashMap<>();
         addSampleFromVertices(samples, fromVertices);
@@ -85,7 +84,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         cachePosition(latentVertices, position);
         Map<VertexId, DoubleTensor> positionBeforeLeapfrog = new HashMap<>();
 
-        Map<VertexId, DoubleTensor> gradient = LogProbGradient.getJointLogProbGradientWrtLatents(probabilisticVertices);
+        Map<VertexId, DoubleTensor> gradient = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
         Map<VertexId, DoubleTensor> gradientBeforeLeapfrog = new HashMap<>();
 
         final Map<VertexId, DoubleTensor> momentum = new HashMap<>();
@@ -114,7 +113,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
                     gradient,
                     momentum,
                     stepSize,
-                    probabilisticVertices
+                    logProbGradientCalculator
                 );
             }
 
@@ -178,18 +177,18 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
      *
      * @param latentVertices
      * @param position
-     * @param gradient              gradient at current position
-     * @param momentums             current vertex momentums
+     * @param gradient        gradient at current position
+     * @param momentums       current vertex momentums
      * @param stepSize
-     * @param probabilisticVertices all vertices that impact the joint posterior (masterP)
+     * @param logProbGradient calculator of the logProb gradients
      * @return the gradient at the updated position
      */
     private static Map<VertexId, DoubleTensor> leapfrog(final List<Vertex<DoubleTensor>> latentVertices,
-                                                    final Map<VertexId, DoubleTensor> position,
-                                                    final Map<VertexId, DoubleTensor> gradient,
-                                                    final Map<VertexId, DoubleTensor> momentums,
-                                                    final double stepSize,
-                                                    final List<? extends Probabilistic> probabilisticVertices) {
+                                                        final Map<VertexId, DoubleTensor> position,
+                                                        final Map<VertexId, DoubleTensor> gradient,
+                                                        final Map<VertexId, DoubleTensor> momentums,
+                                                        final double stepSize,
+                                                        final LogProbGradientCalculator logProbGradient) {
 
         final double halfTimeStep = stepSize / 2.0;
 
@@ -211,9 +210,7 @@ public class Hamiltonian implements PosteriorSamplingAlgorithm {
         VertexValuePropagation.cascadeUpdate(latentVertices);
 
         //Set `r = `r + (eps/2)dTL(`T)
-        Map<VertexId, DoubleTensor> newGradient = LogProbGradient.getJointLogProbGradientWrtLatents(
-            probabilisticVertices
-        );
+        Map<VertexId, DoubleTensor> newGradient = logProbGradient.getJointLogProbGradientWrtLatents();
 
         for (Map.Entry<VertexId, DoubleTensor> halfTimeStepMomentum : momentumsAtHalfTimeStep.entrySet()) {
             final DoubleTensor updatedMomentum = newGradient.get(halfTimeStepMomentum.getKey()).times(halfTimeStep).plusInPlace(halfTimeStepMomentum.getValue());

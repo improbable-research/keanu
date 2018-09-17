@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -42,9 +43,7 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
     }
 
     protected BooleanTensor op(BooleanTensor... inputs) {
-        BooleanTensor primary = inputs[0];
-        BooleanTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return primary.concat(dimension, toConcat);
+        return BooleanTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<BooleanTensor>, T> func) {

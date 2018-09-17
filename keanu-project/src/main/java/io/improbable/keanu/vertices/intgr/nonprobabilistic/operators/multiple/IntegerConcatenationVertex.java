@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -42,9 +43,7 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     }
 
     private IntegerTensor op(IntegerTensor... inputs) {
-        IntegerTensor primary = inputs[0];
-        IntegerTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return primary.concat(dimension, toConcat);
+        return IntegerTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<IntegerTensor>, T> func) {

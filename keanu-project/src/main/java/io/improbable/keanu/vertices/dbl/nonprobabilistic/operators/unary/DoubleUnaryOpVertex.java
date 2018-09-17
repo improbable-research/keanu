@@ -18,8 +18,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
      *
      * @param inputVertex the input vertex
      */
-    public DoubleUnaryOpVertex(
-        DoubleVertex inputVertex) {
+    public DoubleUnaryOpVertex(DoubleVertex inputVertex) {
         this(inputVertex.getShape(), inputVertex);
     }
 
