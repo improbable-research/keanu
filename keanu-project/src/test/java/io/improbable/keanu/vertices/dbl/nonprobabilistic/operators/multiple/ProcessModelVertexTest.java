@@ -194,7 +194,7 @@ public class ProcessModelVertexTest {
 
     @Test
     public void modelWorksAsPartOfSampling() {
-        inputToModel = new GaussianVertex(29, 2);
+        inputToModel = new GaussianVertex(25, 5);
 
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
@@ -205,8 +205,8 @@ public class ProcessModelVertexTest {
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
-        DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 2);
-        DoubleVertex humidityObservation = new GaussianVertex(humidity, 2);
+        DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 5);
+        DoubleVertex humidityObservation = new GaussianVertex(humidity, 5);
         chanceOfRainObservation.observe(3.0);
         humidityObservation.observe(60.0);
 
@@ -220,7 +220,7 @@ public class ProcessModelVertexTest {
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
 
-        Assert.assertEquals((29 * (1 / 3.) + (30 * (2 / 3.))), averagePosteriorInput, 0.1);
+        Assert.assertEquals(29., averagePosteriorInput, 0.1);
     }
 
     private String formatCommandForExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs, String command) {

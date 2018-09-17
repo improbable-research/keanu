@@ -184,7 +184,7 @@ public class LambdaModelVertexTest {
 
     @Test
     public void modelWorksAsPartOfSampling() {
-        inputToModel = new GaussianVertex(29., 2);
+        inputToModel = new GaussianVertex(25., 5);
 
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
@@ -195,22 +195,22 @@ public class LambdaModelVertexTest {
 
         //My prior belief is the temperature is 29.0.
         //These observations are indicative of a temperature of 30.
-        DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 2);
-        DoubleVertex humidityObservation = new GaussianVertex(humidity, 2);
-        chanceOfRainObservation.observe(3.0);
+        DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 5);
+        DoubleVertex humidityObservation = new GaussianVertex(humidity, 5);
         humidityObservation.observe(60.0);
+        chanceOfRainObservation.observe(3.0);
 
         BayesianNetwork bayesianNetwork = new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
 
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
             bayesianNetwork,
             inputToModel,
-            100000
+            250000
         );
 
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
 
-        Assert.assertEquals((29 * (1 / 3.) + (30 * (2 / 3.))), averagePosteriorInput, 0.1);
+        Assert.assertEquals(29., averagePosteriorInput, 0.1);
     }
 
     private void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
