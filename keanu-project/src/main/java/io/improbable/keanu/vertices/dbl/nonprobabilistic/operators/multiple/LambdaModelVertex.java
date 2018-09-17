@@ -22,7 +22,8 @@ import java.util.stream.Collectors;
  *
  * It stores multiple output values and a model result vertex is required to extract a specific value.
  */
-public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
+public
+class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private static final DoubleTensor MODEL_RETURN_VALUE = DoubleTensor.scalar(0.);
 
@@ -76,18 +77,13 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     }
 
     @Override
-    public DoubleTensor getDoubleModelOutputValue(VertexLabel label) {
-        return (DoubleTensor) outputs.get(label);
+    public <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label) {
+        return (T) outputs.get(label);
     }
 
     @Override
-    public IntegerTensor getIntegerModelOutputValue(VertexLabel label) {
-        return (IntegerTensor) outputs.get(label);
-    }
-
-    @Override
-    public BooleanTensor getBooleanModelOutputValue(VertexLabel label) {
-        return (BooleanTensor) outputs.get(label);
+    public <U, T extends Tensor<U>> T getModelOutputVertex(VertexLabel label) {
+        return null;
     }
 
 }

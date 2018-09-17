@@ -79,18 +79,13 @@ public class ProcessModelVertex extends DoubleVertex implements ModelVertex<Doub
     }
 
     @Override
-    public DoubleTensor getDoubleModelOutputValue(VertexLabel label) {
+    public <U, T extends Tensor<U>> T getModelOutputVertex(VertexLabel label) {
+        return null;
+    }
+
+    @Override
+    public DoubleTensor getModelOutputValue(VertexLabel label) {
         return (DoubleTensor) outputs.get(label);
-    }
-
-    @Override
-    public IntegerTensor getIntegerModelOutputValue(VertexLabel label) {
-        return (IntegerTensor) outputs.get(label);
-    }
-
-    @Override
-    public BooleanTensor getBooleanModelOutputValue(VertexLabel label) {
-        return (BooleanTensor) outputs.get(label);
     }
 
     @Override

@@ -7,37 +7,33 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.model.ModelResult;
+import io.improbable.keanu.vertices.model.ModelResultProvider;
 
 /**
  * A non-probabilistic double vertex whose value is extracted from an upstream model vertex.
  */
-public class DoubleModelResultVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public class DoubleModelResultVertex extends DoubleVertex implements ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor> {
 
-    private ModelVertex model;
-    private VertexLabel label;
+    private final ModelResult<DoubleTensor> delegate;
 
     public DoubleModelResultVertex(ModelVertex model, VertexLabel label) {
-        this.model = model;
-        this.label = label;
+        this.delegate = new ModelResult<>(model, label);
         setParents((Vertex) model);
     }
 
     @Override
-    public DoubleTensor getValue() {
-        if (!model.hasCalculated()) {
-            model.calculate();
-        }
-        return model.getDoubleModelOutputValue(label);
+    public ModelVertex<DoubleTensor> getModel() {
+        return delegate.getModel();
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return model.getDoubleModelOutputValue(label);
+        return delegate.sample(random);
     }
 
     @Override
     public DoubleTensor calculate() {
-        return sample();
+        return delegate.calculate();
     }
-
 }

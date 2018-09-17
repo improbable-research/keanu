@@ -1,42 +1,40 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
+import io.improbable.keanu.vertices.model.ModelResult;
+import io.improbable.keanu.vertices.model.ModelResultProvider;
 
 /**
  * A non-probabilistic boolean vertex whose value is extracted from an upstream model vertex.
  */
-public class BoolModelResultVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public class BoolModelResultVertex extends BoolVertex implements ModelResultProvider<BooleanTensor>, NonProbabilistic<BooleanTensor> {
 
-    private ModelVertex model;
-    private VertexLabel label;
+    private final ModelResult<BooleanTensor> delegate;
 
     public BoolModelResultVertex(ModelVertex model, VertexLabel label) {
-        this.model = model;
-        this.label = label;
+        delegate = new ModelResult<>(model, label);
         setParents((Vertex) model);
     }
 
     @Override
-    public BooleanTensor getValue() {
-        if (!model.hasCalculated()) {
-            model.calculate();
-        }
-        return model.getBooleanModelOutputValue(label);
+    public ModelVertex<BooleanTensor> getModel() {
+        return delegate.getModel();
     }
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-        return model.getBooleanModelOutputValue(label);
+        return delegate.sample(random);
     }
 
     @Override
     public BooleanTensor calculate() {
-        return sample();
+        return delegate.calculate();
     }
 }
