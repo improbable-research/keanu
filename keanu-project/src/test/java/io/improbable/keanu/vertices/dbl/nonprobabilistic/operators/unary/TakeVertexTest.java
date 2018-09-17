@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -140,7 +141,8 @@ public class TakeVertexTest {
         Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), reverse.withRespectTo(A).asFlatDoubleArray(), 1e-6);
     }
 
-    //@Test - XXX another weird one with a scalar output
+    @Test
+    @Ignore("Currently fails due to partial derivative issues")
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).take(0, 0 , 0);
