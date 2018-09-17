@@ -1,4 +1,4 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
+package io.improbable.keanu.vertices.model;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -15,7 +15,7 @@ import java.util.Map;
 
 public interface ModelVertex<T> extends NonProbabilistic<T> {
 
-    void run(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
+    void run();
 
     Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
 

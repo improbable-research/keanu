@@ -16,6 +16,8 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.model.LambdaModelVertex;
+import io.improbable.keanu.vertices.model.ModelVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -24,12 +26,9 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.stubbing.Answer;
 
 import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;

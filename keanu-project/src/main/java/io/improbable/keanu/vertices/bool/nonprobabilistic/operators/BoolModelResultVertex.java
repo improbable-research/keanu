@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
+import io.improbable.keanu.vertices.model.ModelVertex;
 import io.improbable.keanu.vertices.model.ModelResult;
 import io.improbable.keanu.vertices.model.ModelResultProvider;
 

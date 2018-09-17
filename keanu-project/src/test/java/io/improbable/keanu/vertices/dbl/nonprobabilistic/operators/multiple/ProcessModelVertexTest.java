@@ -16,6 +16,8 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.model.ModelVertex;
+import io.improbable.keanu.vertices.model.ProcessModelVertex;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -109,7 +111,8 @@ public class ProcessModelVertexTest {
 
         String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = ProcessModelVertex.create(inputs, command, this::formatCommandForExecution, this::updateValues);
+
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -129,7 +132,8 @@ public class ProcessModelVertexTest {
 
         String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValuesMultipleTypes);
+        ModelVertex model = ProcessModelVertex.create(inputs, command, this::formatCommandForExecution, this::updateValuesMultipleTypes);
+
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
         BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
 
@@ -150,7 +154,7 @@ public class ProcessModelVertexTest {
 
         String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = ProcessModelVertex.create(inputs, command, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -174,7 +178,7 @@ public class ProcessModelVertexTest {
 
         String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = ProcessModelVertex.create(inputs, command, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -197,7 +201,7 @@ public class ProcessModelVertexTest {
 
         String command = "python ./src/test/resources/model.py {Temperature}";
 
-        ModelVertex model = new ProcessModelVertex(command, inputs, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = ProcessModelVertex.create(inputs, command, this::formatCommandForExecution, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 

@@ -1,13 +1,12 @@
-package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
+package io.improbable.keanu.vertices.model;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.model.ModelVertex;
 
 import java.util.Collections;
 import java.util.Map;
@@ -22,8 +21,7 @@ import java.util.stream.Collectors;
  *
  * It stores multiple output values and a model result vertex is required to extract a specific value.
  */
-public
-class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
+public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private static final DoubleTensor MODEL_RETURN_VALUE = DoubleTensor.scalar(0.);
 
@@ -46,21 +44,21 @@ class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor
 
     @Override
     public DoubleTensor calculate() {
-        run(inputs);
+        run();
         updateValues(inputs);
         return MODEL_RETURN_VALUE;
     }
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        for (Map.Entry<VertexLabel, Vertex<? extends Tensor>> input : inputs.entrySet()) {
-            input.getValue().sample();
+        for (Vertex<? extends Tensor> input : inputs.values()) {
+            input.sample();
         }
         return calculate();
     }
 
     @Override
-    public void run(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public void run() {
         executor.accept(inputs);
         hasCalculated = true;
     }
@@ -79,11 +77,6 @@ class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor
     @Override
     public <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label) {
         return (T) outputs.get(label);
-    }
-
-    @Override
-    public <U, T extends Tensor<U>> T getModelOutputVertex(VertexLabel label) {
-        return null;
     }
 
 }

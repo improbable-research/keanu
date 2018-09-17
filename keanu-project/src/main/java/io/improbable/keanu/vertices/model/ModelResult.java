@@ -2,7 +2,6 @@ package io.improbable.keanu.vertices.model;
 
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
 
 public class ModelResult<T> implements ModelResultProvider<T> {
 

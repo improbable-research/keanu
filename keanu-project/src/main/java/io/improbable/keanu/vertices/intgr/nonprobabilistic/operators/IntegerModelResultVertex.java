@@ -5,7 +5,7 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ModelVertex;
+import io.improbable.keanu.vertices.model.ModelVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.model.ModelResult;
 import io.improbable.keanu.vertices.model.ModelResultProvider;
