@@ -1,5 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
+import static io.improbable.keanu.backend.ProbabilisticGraph.LOG_PROB;
+
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -10,9 +13,11 @@ import java.util.function.BiConsumer;
 
 import org.tensorflow.Graph;
 import org.tensorflow.Output;
+import org.tensorflow.Session;
 import org.tensorflow.Shape;
 import org.tensorflow.op.Scope;
 
+import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -33,8 +38,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVert
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class TensorflowGraphConverter {
-
-    public static final String LOG_PROB_LABEL = "..LOG_PROB..";
 
     private static Map<Class<?>, BiConsumer<Vertex<?>, GraphBuilder>> opMappers;
 
@@ -92,14 +95,14 @@ public class TensorflowGraphConverter {
 
         if (value instanceof DoubleTensor) {
             DoubleTensor doubleValue = (DoubleTensor) value;
-            graphBuilder.constant(doubleValue.asFlatDoubleArray(), toLongs(doubleValue.getShape()), getName(vertex));
+            graphBuilder.constant(doubleValue.asFlatDoubleArray(), toLongs(doubleValue.getShape()), getTensorflowOpName(vertex));
         } else {
             throw new IllegalArgumentException("Can only convert doubles at the moment");
         }
 
     }
 
-    private static void createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
+    private static String createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
 
@@ -112,11 +115,14 @@ public class TensorflowGraphConverter {
                 restOfShape[i - 1] = shape[i];
             }
 
-            graphBuilder.placeholder(getName(vertex), Shape.make(shape[0], restOfShape), Double.class);
-        } else {
-            throw new IllegalArgumentException("Can only convert doubles at the moment");
+            String tensorflowOpName = getTensorflowOpName(vertex);
+
+            graphBuilder.placeholder(tensorflowOpName, Shape.make(shape[0], restOfShape), Double.class);
+
+            return tensorflowOpName;
         }
 
+        throw new IllegalArgumentException("Can only convert doubles at the moment");
     }
 
     interface GraphBuilderUnaryOp {
@@ -125,8 +131,8 @@ public class TensorflowGraphConverter {
 
     private static void createUnaryOp(Vertex<?> vertex, GraphBuilder graphBuilder, GraphBuilderUnaryOp op) {
         DoubleUnaryOpVertex unaryOpVertex = (DoubleUnaryOpVertex) vertex;
-        Output<Double> operand = graphBuilder.getOutput(getName(unaryOpVertex.getInputVertex()));
-        op.op(operand, getName(unaryOpVertex));
+        Output<Double> operand = graphBuilder.getOutput(getTensorflowOpName(unaryOpVertex.getInputVertex()));
+        op.op(operand, getTensorflowOpName(unaryOpVertex));
     }
 
     interface GraphBuilderBinaryOp {
@@ -135,9 +141,9 @@ public class TensorflowGraphConverter {
 
     private static void createBinaryOp(Vertex<?> vertex, GraphBuilder graphBuilder, GraphBuilderBinaryOp op) {
         DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
-        Output<Double> leftOperand = graphBuilder.getOutput(getName(binaryOpVertex.getLeft()));
-        Output<Double> rightOperand = graphBuilder.getOutput(getName(binaryOpVertex.getRight()));
-        op.op(leftOperand, rightOperand, getName(binaryOpVertex));
+        Output<Double> leftOperand = graphBuilder.getOutput(getTensorflowOpName(binaryOpVertex.getLeft()));
+        Output<Double> rightOperand = graphBuilder.getOutput(getTensorflowOpName(binaryOpVertex.getRight()));
+        op.op(leftOperand, rightOperand, getTensorflowOpName(binaryOpVertex));
     }
 
     private static long[] toLongs(int[] ints) {
@@ -148,14 +154,13 @@ public class TensorflowGraphConverter {
         return longs;
     }
 
-    private static String getName(Vertex vertex) {
+    private static String getTensorflowOpName(Vertex vertex) {
 
         String name = vertex.getLabel() != null ? vertex.getLabel().toString() : vertex.getId().toString();
-        String cleanName = name.replace("]", "").replace("[", "").replace(",", "_");
-        return cleanName;
+        return name.replace("]", "").replace("[", "").replace(",", "_");
     }
 
-    public static Graph convert(BayesianNetwork network) {
+    public static ProbabilisticGraph convert(BayesianNetwork network) {
 
         addLogProb(network);
 
@@ -167,6 +172,7 @@ public class TensorflowGraphConverter {
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(queuedAlready);
 
+        List<String> placeHolderOps = new ArrayList<>();
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
@@ -174,7 +180,7 @@ public class TensorflowGraphConverter {
                 if (visiting.isObserved()) {
                     createDoubleConstant(visiting, graphBuilder);
                 } else {
-                    createPlaceholder(visiting, graphBuilder);
+                    placeHolderOps.add(createPlaceholder(visiting, graphBuilder));
                 }
             } else {
                 BiConsumer<Vertex<?>, GraphBuilder> vertexMapper = opMappers.get(visiting.getClass());
@@ -187,7 +193,24 @@ public class TensorflowGraphConverter {
             }
         }
 
-        return graph;
+        Output<?>[] wrt = placeHolderOps.stream()
+            .map(opName -> graph.operation(opName).output(0))
+            .toArray(Output[]::new);
+
+        Output<?>[] gradientOutputs = graph.addGradients(graph.operation(LOG_PROB).output(0), wrt);
+
+        Map<String, Output<?>> gradientByInput = new HashMap<>();
+        for (int i = 0; i < placeHolderOps.size(); i++) {
+            gradientByInput.put(placeHolderOps.get(i), gradientOutputs[i]);
+        }
+
+        TensorflowProbabilisticGraph tensorflowProbabilisticGraph = new TensorflowProbabilisticGraph(
+            new Session(graph),
+            placeHolderOps,
+            gradientByInput
+        );
+
+        return tensorflowProbabilisticGraph;
     }
 
     private static void addLogProb(BayesianNetwork network) {
@@ -215,9 +238,8 @@ public class TensorflowGraphConverter {
         }
 
         if (logProb != null) {
-            logProb.setLabel(new VertexLabel(LOG_PROB_LABEL));
+            logProb.setLabel(new VertexLabel(LOG_PROB));
         }
     }
-
 
 }
