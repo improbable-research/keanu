@@ -4,6 +4,7 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatch
 
 import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.NumberTensor;
@@ -11,7 +12,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
@@ -71,7 +71,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(IntegerTensor value) {
+    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
         return Collections.emptyMap();
     }
 
