@@ -11,6 +11,7 @@ import java.util.function.Function;
 
 import org.junit.Test;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
@@ -503,7 +504,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
         Function<Integer, Boolean> checkFunction = x -> x >= 0;
-        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
+        TensorValidator<Integer, Tensor<Integer>> validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
         validator.validate(containsMinusOne);
         assertThat(containsMinusOne, equalTo(expectedResult));
     }

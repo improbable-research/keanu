@@ -11,15 +11,13 @@ import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
 
-    public static final TensorValidator<Double, Tensor<Double>> NAN_VALIDATOR =TensorValidator.thatChecksForNaN();
+    public static final TensorValidator<Double, Tensor<Double>> NAN_CATCHER =TensorValidator.thatExpects(v -> !Double.isNaN(v));
+    public static final TensorValidator<Double, Tensor<Double>> NAN_FIXER =TensorValidator
+        .<Double, Tensor<Double>>thatExpects(v -> !Double.isNaN(v))
+        .<Double, Tensor<Double>>withPolicy(TensorValidationPolicy.changeValueTo(0.));
 
     public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidator<DATATYPE, TENSOR> thatExpectsNotToFind(DATATYPE v) {
         return new TensorValidator<DATATYPE, TENSOR>(new TensorValueNotEqualsCheck(v));
-    }
-
-    public static <TENSOR extends Tensor<Double>> TensorValidator<Double, TENSOR> thatChecksForNaN() {
-        Function<Double, Boolean> checkFunction = v -> !Double.isNaN(v);
-        return thatExpects(checkFunction);
     }
 
     public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidator<DATATYPE, TENSOR> thatExpects(Function<DATATYPE, Boolean> checkFunction) {
@@ -48,7 +46,7 @@ public class TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> implemen
         validationPolicy.handle(tensor, result);
     }
 
-    public TensorValidator withPolicy(TensorValidationPolicy validationPolicy) {
+    public TensorValidator<DATATYPE, TENSOR> withPolicy(TensorValidationPolicy<TENSOR> validationPolicy) {
         this.validationPolicy = validationPolicy;
         return this;
     }

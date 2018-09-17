@@ -8,13 +8,19 @@ import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 
 import java.util.function.Function;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import io.improbable.keanu.tensor.KeanuValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class ScalarDoubleTensorTest {
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void doesClampScalarWithinBounds() {
@@ -76,7 +82,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForNans() {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
-        TensorValidator validator = TensorValidator.thatChecksForNaN();
+        TensorValidator validator = TensorValidator.NAN_CATCHER;
         assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
     }
@@ -96,6 +102,28 @@ public class ScalarDoubleTensorTest {
         assertThat(zero.log().times(zeroTensor), hasValue(Double.NaN, Double.NaN, Double.NaN));
         assertThat(zero.logTimes(zeroTensor), hasValue(0., 0., 0.));
     }
+
+
+    @Test
+    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
+        expectedException.expect(KeanuValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.scalar(1.);
+        DoubleTensor y = DoubleTensor.scalar(Double.NaN);
+        x.logTimes(y);
+    }
+
+    @Test
+    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
+        expectedException.expect(KeanuValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor y = DoubleTensor.scalar(1.);
+        x.logTimes(y);
+    }
+
     @Test
     public void youCanFixAValidationIssueByReplacingTheValue() {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);

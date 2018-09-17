@@ -488,11 +488,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      */
     @Override
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.NAN_VALIDATOR;
-        validator.check(this);
-        validator.check(y);
+        TensorValidator.NAN_CATCHER.validate(this);
+        TensorValidator.NAN_CATCHER.validate(y);
         this.logInPlace().timesInPlace(y);
-        validator.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(this);
+        TensorValidator.NAN_FIXER.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(this);
         return this;
     }
 
@@ -963,7 +962,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor isNaN() {
-        return TensorValidator.thatChecksForNaN().check(this).not();
+        return TensorValidator.NAN_CATCHER.check(this).not();
     }
 
     @Override

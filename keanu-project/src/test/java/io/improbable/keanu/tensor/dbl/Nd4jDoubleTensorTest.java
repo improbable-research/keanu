@@ -14,8 +14,11 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import io.improbable.keanu.tensor.KeanuValueException;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
@@ -29,6 +32,9 @@ public class Nd4jDoubleTensorTest {
     Nd4jDoubleTensor vectorA;
     Nd4jDoubleTensor vectorB;
     Nd4jDoubleTensor rankThreeTensor;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -893,7 +899,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, true},
             4, 2);
 
-        TensorValidator validator = TensorValidator.thatChecksForNaN();
+        TensorValidator validator = TensorValidator.NAN_FIXER;
         assertThat(validator.check(containsNan), equalTo(expectedMask));
     }
 
@@ -908,6 +914,26 @@ public class Nd4jDoubleTensorTest {
 
         assertThat(zeros.logTimes(zeros), hasValue(0., 0.));
         assertThat(zeros.log().times(zeros), hasValue(Double.NaN, Double.NaN));
+    }
+
+    @Test
+    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
+        expectedException.expect(KeanuValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.create(1., 1.);
+        DoubleTensor y = DoubleTensor.create(1., Double.NaN);
+        x.logTimes(y);
+    }
+
+    @Test
+    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
+        expectedException.expect(KeanuValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.create(1., Double.NaN);
+        DoubleTensor y = DoubleTensor.create(1., 1.);
+        x.logTimes(y);
     }
 
     @Test

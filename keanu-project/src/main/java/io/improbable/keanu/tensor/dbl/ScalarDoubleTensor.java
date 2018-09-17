@@ -505,11 +505,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
      */
     @Override
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.NAN_VALIDATOR;
-        validator.check(this);
-        validator.check(y);
+        TensorValidator.NAN_CATCHER.validate(this);
+        TensorValidator.NAN_CATCHER.validate(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);
-        validator.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(result);
+        TensorValidator.NAN_FIXER.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(result);
         return result;
     }
 
@@ -741,7 +740,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor isNaN() {
-        return TensorValidator.thatChecksForNaN().check(this).not();
+        return TensorValidator.NAN_CATCHER.check(this).not();
     }
 
     @Override
