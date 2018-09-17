@@ -55,7 +55,7 @@ public class Poisson implements DiscreteDistribution {
          * Algorithm courtesy of Wikipedia:
          * https://en.wikipedia.org/wiki/Poisson_distribution#Generating_Poisson-distributed_random_variables
          *
-         * Designed to introduce mu gradually to avoid numerical stability issues
+         * Designed to introduce mu gradually to avoid numerical stability issues.
          */
         do {
             k++;

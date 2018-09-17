@@ -48,7 +48,7 @@ public class PoissonVertexTest {
         PoissonVertex testVertex = new PoissonVertex(mu);
 
         /*
-         * We don't actually need the output value here - we're simply checking that high mu sample function return in
+         * We don't actually need the output value here - we're simply checking that high mu sample function returns in
          * a timely fashion.
          */
         int sample = testVertex.sample().scalar();
