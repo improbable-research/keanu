@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.KeanuValueException;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public class ThrowValueException<T extends Tensor<?>> implements TensorValidationPolicy<T> {
+public class ThrowValueException<TENSOR extends Tensor<?>> implements TensorValidationPolicy<TENSOR> {
     private final String message;
 
     // package private - because it's created by the factory method TensorValidationPolicy.throwMessage
@@ -13,7 +13,7 @@ public class ThrowValueException<T extends Tensor<?>> implements TensorValidatio
     }
 
     @Override
-    public void handle(T tensor, BooleanTensor result) {
+    public void handle(TENSOR tensor, BooleanTensor result) {
         if (!result.allTrue()) {
             throw new KeanuValueException(message, result);
         }

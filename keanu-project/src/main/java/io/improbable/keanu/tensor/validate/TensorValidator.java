@@ -9,41 +9,41 @@ import io.improbable.keanu.tensor.validate.check.TensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueNotEqualsCheck;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
-public class TensorValidator<U, T extends Tensor<U>> implements TensorValueChecker<T> {
+public class TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
 
     public static final TensorValidator<Double, Tensor<Double>> NAN_VALIDATOR =TensorValidator.thatChecksForNaN();
 
-    public static <U, T extends Tensor<U>> TensorValidator<U, T> thatExpectsNotToFind(U v) {
-        return new TensorValidator<U, T>(new TensorValueNotEqualsCheck(v));
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidator<DATATYPE, TENSOR> thatExpectsNotToFind(DATATYPE v) {
+        return new TensorValidator<DATATYPE, TENSOR>(new TensorValueNotEqualsCheck(v));
     }
 
-    public static <T extends Tensor<Double>> TensorValidator<Double, T> thatChecksForNaN() {
+    public static <TENSOR extends Tensor<Double>> TensorValidator<Double, TENSOR> thatChecksForNaN() {
         Function<Double, Boolean> checkFunction = v -> !Double.isNaN(v);
         return thatExpects(checkFunction);
     }
 
-    public static <U, T extends Tensor<U>> TensorValidator<U, T> thatExpects(Function<U, Boolean> checkFunction) {
-        return new TensorValidator<U, T>(new CustomTensorValueChecker<U, T>(checkFunction));
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidator<DATATYPE, TENSOR> thatExpects(Function<DATATYPE, Boolean> checkFunction) {
+        return new TensorValidator<DATATYPE, TENSOR>(new CustomTensorValueChecker<DATATYPE, TENSOR>(checkFunction));
     }
 
     private final TensorValueChecker valueChecker;
-    private TensorValidationPolicy<T> validationPolicy;
+    private TensorValidationPolicy<TENSOR> validationPolicy;
 
-    private TensorValidator(TensorValueChecker<T> valueChecker) {
+    private TensorValidator(TensorValueChecker<TENSOR> valueChecker) {
         this(valueChecker, TensorValidationPolicy.throwMessage("Invalid value found"));
     }
 
-    private TensorValidator(TensorValueChecker<T> valueChecker, TensorValidationPolicy<T> validationPolicy) {
+    private TensorValidator(TensorValueChecker<TENSOR> valueChecker, TensorValidationPolicy<TENSOR> validationPolicy) {
         this.valueChecker = valueChecker;
         this.validationPolicy = validationPolicy;
     }
 
     @Override
-    public BooleanTensor check(T tensor) {
+    public BooleanTensor check(TENSOR tensor) {
         return valueChecker.check(tensor);
     }
 
-    public void validate(T tensor) {
+    public void validate(TENSOR tensor) {
         BooleanTensor result = check(tensor);
         validationPolicy.handle(tensor, result);
     }

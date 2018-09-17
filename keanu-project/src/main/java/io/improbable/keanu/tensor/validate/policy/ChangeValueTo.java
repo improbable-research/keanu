@@ -5,16 +5,16 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public class ChangeValueTo<U, T extends Tensor<U>> implements TensorValidationPolicy<T> {
-    private final U value;
+public class ChangeValueTo<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValidationPolicy<TENSOR> {
+    private final DATATYPE value;
 
     // package private - because it's created by the factory method TensorValidationPolicy.changeValueTo
-    ChangeValueTo(U value) {
+    ChangeValueTo(DATATYPE value) {
         this.value = value;
     }
 
     @Override
-    public void handle(T tensor, BooleanTensor result) {
+    public void handle(TENSOR tensor, BooleanTensor result) {
         if (tensor instanceof DoubleTensor) {
             Double value = (Double) this.value;
             DoubleTensor mask = result.not().toDoubleMask();

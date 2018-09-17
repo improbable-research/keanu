@@ -5,16 +5,16 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public class TensorValueNotEqualsCheck<U, T extends Tensor<U>> implements TensorValueChecker<T> {
+public class TensorValueNotEqualsCheck<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
 
-    private final U value;
+    private final DATATYPE value;
 
-    public TensorValueNotEqualsCheck(U value) {
+    public TensorValueNotEqualsCheck(DATATYPE value) {
         this.value = value;
     }
 
     @Override
-    public BooleanTensor check(T tensor) {
+    public BooleanTensor check(TENSOR tensor) {
         if (tensor instanceof DoubleTensor) {
             DoubleTensor testTensor = DoubleTensor.create((Double) value, tensor.getShape());
             return tensor.elementwiseEquals(testTensor).not();

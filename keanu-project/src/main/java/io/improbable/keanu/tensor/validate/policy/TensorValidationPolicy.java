@@ -3,15 +3,15 @@ package io.improbable.keanu.tensor.validate.policy;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public interface TensorValidationPolicy<T extends Tensor<?>> {
+public interface TensorValidationPolicy<TENSOR extends Tensor<?>> {
 
-    static <U, T extends Tensor<U>> TensorValidationPolicy<T> changeValueTo(U v) {
-        return new ChangeValueTo<U, T>(v);
+    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidationPolicy<TENSOR> changeValueTo(DATATYPE v) {
+        return new ChangeValueTo<DATATYPE, TENSOR>(v);
     }
 
-    static <T extends Tensor<?>> TensorValidationPolicy<T> throwMessage(String message) {
-        return new ThrowValueException<T>(message);
+    static <TENSOR extends Tensor<?>> TensorValidationPolicy<TENSOR> throwMessage(String message) {
+        return new ThrowValueException<TENSOR>(message);
     }
 
-    void handle(T tensor, BooleanTensor result);
+    void handle(TENSOR tensor, BooleanTensor result);
 }
