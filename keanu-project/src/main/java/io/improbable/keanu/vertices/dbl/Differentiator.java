@@ -31,7 +31,7 @@ public class Differentiator {
         alreadyQueued.add(ofVertex);
 
         Map<Vertex, PartialDerivatives> dwrtOf = new HashMap<>();
-        collectPartials(singletonMap(ofVertex, dWrtOfVertex), dwrtOf);
+        collectPartials(singletonMap(ofVertex, dWrtOfVertex), dwrtOf, ofVertex.getShape().length);
 
         Map<VertexId, PartialDerivatives> wrtOf = new HashMap<>();
 
@@ -46,7 +46,7 @@ public class Differentiator {
             if (visiting instanceof Differentiable) {
                 Differentiable visitingDifferentiable = ((Differentiable) visiting);
                 Map<Vertex, PartialDerivatives> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
-                collectPartials(partialDerivatives, dwrtOf);
+                collectPartials(partialDerivatives, dwrtOf, visiting.getShape().length);
             }
 
             if (!visiting.isProbabilistic()) {
@@ -62,7 +62,7 @@ public class Differentiator {
         return wrtOfToOfWrt(wrtOf).get(ofVertex.getId());
     }
 
-    private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives, Map<Vertex, PartialDerivatives> dwrtOf) {
+    private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives, Map<Vertex, PartialDerivatives> dwrtOf, int prevRank) {
 
         for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
 
@@ -72,7 +72,7 @@ public class Differentiator {
 
             PartialDerivatives dwrtV;
             if (TensorShape.isScalar(wrtShape)) {
-                dwrtV = partialsOf.sum(false, -wrtShape.length, -1);
+                dwrtV = partialsOf.sum(false, TensorShape.dimensionRange(-prevRank, 0));
             } else {
                 dwrtV = partialsOf;
             }
