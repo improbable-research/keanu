@@ -488,7 +488,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      */
     @Override
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatChecksForNaN();
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.NAN_VALIDATOR;
         validator.check(this);
         validator.check(y);
         this.logInPlace().timesInPlace(y);

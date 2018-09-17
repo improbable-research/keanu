@@ -505,7 +505,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      */
     @Override
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatChecksForNaN();
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.NAN_VALIDATOR;
         validator.check(this);
         validator.check(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);

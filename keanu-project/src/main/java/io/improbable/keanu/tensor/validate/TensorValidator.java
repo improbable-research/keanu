@@ -11,6 +11,8 @@ import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class TensorValidator<U, T extends Tensor<U>> implements TensorValueChecker<T> {
 
+    public static final TensorValidator<Double, Tensor<Double>> NAN_VALIDATOR =TensorValidator.thatChecksForNaN();
+
     public static <U, T extends Tensor<U>> TensorValidator<U, T> thatExpectsNotToFind(U v) {
         return new TensorValidator<U, T>(new TensorValueNotEqualsCheck(v));
     }
