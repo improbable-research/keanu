@@ -97,8 +97,8 @@ public class LoopBuilder {
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
         private final boolean throwWhenMaxCountIsReached;
-        private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_in_when_always_true");
         private final VertexLabel VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL = new VertexLabel("loop_value_out_when_always_true");
+        private final VertexLabel VALUE_IN_WHEN_ALWAYS_TRUE_LABEL = PlateBuilder.proxyFor(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
@@ -154,18 +154,12 @@ public class LoopBuilder {
         public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction){
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))
-                .withTransitionMapping(ImmutableMap.<VertexLabel, VertexLabel>builder()
-                    .putAll(customMappings)
-                    .put(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL, VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL)
-                    .put(Loop.STILL_LOOPING, LOOP_LABEL)
-                    .put(Loop.VALUE_IN_LABEL, Loop.VALUE_OUT_LABEL)
-                    .build()
-                )
+                .withTransitionMapping(customMappings)
                 .count(maxLoopCount)
                 .withFactory((plate) -> {
                     // inputs
                     DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL);
-                    BoolVertex stillLooping = new BoolProxyVertex(Loop.STILL_LOOPING);
+                    BoolVertex stillLooping = new BoolProxyVertex(Loop.STILL_LOOPING_LABEL);
                     DoubleVertex valueIn = new DoubleProxyVertex(Loop.VALUE_IN_LABEL);
                     plate.addAll(ImmutableSet.of(valueInWhenAlwaysTrue, stillLooping, valueIn));
 
