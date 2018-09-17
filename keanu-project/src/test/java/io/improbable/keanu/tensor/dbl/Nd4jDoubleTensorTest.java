@@ -899,7 +899,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, true},
             4, 2);
 
-        TensorValidator validator = TensorValidator.NAN_FIXER;
+        TensorValidator validator = TensorValidator.NAN_CATCHER;
         assertThat(validator.check(containsNan), equalTo(expectedMask));
         assertThat(containsNan.isNaN(), equalTo(expectedMask.not()));
     }
@@ -969,7 +969,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
 
         Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator validator = TensorValidator.thatExpectsElementwise(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }

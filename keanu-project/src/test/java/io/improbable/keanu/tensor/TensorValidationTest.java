@@ -42,7 +42,7 @@ public class TensorValidationTest {
     @Test
     public void youCanDefineCustomValidators() {
         Function<Double, Boolean> checkFunction = v -> v > 0.2;
-        TensorValidator validator = TensorValidator.thatExpects(checkFunction);
+        TensorValidator validator = TensorValidator.thatExpectsElementwise(checkFunction);
         DoubleTensor input = DoubleTensor.create(1.0, 0.1, -1.0);
         BooleanTensor expectedResult = BooleanTensor.create(new boolean[]{true, false, false});
         try {

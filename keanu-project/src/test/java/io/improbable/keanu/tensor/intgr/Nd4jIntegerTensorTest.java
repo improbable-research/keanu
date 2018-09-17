@@ -504,7 +504,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
         Function<Integer, Boolean> checkFunction = x -> x >= 0;
-        TensorValidator<Integer, Tensor<Integer>> validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
+        TensorValidator<Integer, Tensor<Integer>> validator = TensorValidator.thatExpectsElementwise(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(0));
         validator.validate(containsMinusOne);
         assertThat(containsMinusOne, equalTo(expectedResult));
     }

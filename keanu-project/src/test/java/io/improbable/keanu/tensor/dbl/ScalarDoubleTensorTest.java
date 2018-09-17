@@ -152,7 +152,7 @@ public class ScalarDoubleTensorTest {
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
         Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator validator = TensorValidator.thatExpects(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator validator = TensorValidator.thatExpectsElementwise(checkFunction).withPolicy(TensorValidationPolicy.changeValueTo(1e-8));
         validator.validate(tensor1);
         validator.validate(tensor2);
         assertThat(tensor1, equalTo(notZero));
