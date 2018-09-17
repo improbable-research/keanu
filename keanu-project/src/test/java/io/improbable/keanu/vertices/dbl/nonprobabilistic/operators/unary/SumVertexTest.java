@@ -132,10 +132,8 @@ public class SumVertexTest {
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).sum();
-        final double INCREMENT = 10.0;
-        final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
     }
 
 }

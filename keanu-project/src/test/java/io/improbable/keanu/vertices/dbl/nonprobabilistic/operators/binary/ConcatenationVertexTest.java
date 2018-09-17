@@ -444,9 +444,7 @@ public class ConcatenationVertexTest {
         DoubleVertex inputB = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex inputC = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
-        final double INCREMENT = 10.0;
-        final double DELTA = 1e-10;
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10);
     }
 
 }
