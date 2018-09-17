@@ -1,11 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.HashSet;
 
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -271,4 +274,16 @@ public class MatrixMultiplicationVertexTest {
         assertEquals(expectedDydalpha, dydalphaForward);
         assertEquals(expectedDydalpha, dydalphaReverse);
     }
+
+    @Test
+    public void changesMatchGradient() {
+        DoubleVertex inputA = new UniformVertex(new int[]{2, 5}, -10.0, 10.0);
+        DoubleVertex inputB = new UniformVertex(new int[]{5, 4}, -10.0, 10.0);
+        DoubleVertex outputVertex = inputA.matrixMultiply(inputB);
+        final double INCREMENT = 10;
+        final double DELTA = 1e-10;
+
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
+    }
+
 }

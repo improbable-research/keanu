@@ -1,6 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -8,9 +16,6 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Test;
 
 public class SliceVertexTest {
 
@@ -144,6 +149,13 @@ public class SliceVertexTest {
         SliceVertex dimenTwoFace = new SliceVertex(cube, 2, 0);
         Assert.assertArrayEquals(new double[]{1, 3, 5, 7}, dimenTwoFace.getValue().asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(new int[]{2, 2}, dimenTwoFace.getShape());
+    }
+
+    @Test
+    public void changesMatchGradient() {
+        DoubleVertex cube = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        SliceVertex slice = new SliceVertex(cube, 0, 0);
+        finiteDifferenceMatchesGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
     }
 
 }
