@@ -11,7 +11,6 @@ import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
 
 import io.improbable.keanu.plating.Plate;
@@ -161,7 +160,7 @@ public class LoopBuilder {
                     DoubleVertex valueInWhenAlwaysTrue = new DoubleProxyVertex(VALUE_IN_WHEN_ALWAYS_TRUE_LABEL);
                     BoolVertex stillLooping = new BoolProxyVertex(Loop.STILL_LOOPING_LABEL);
                     DoubleVertex valueIn = new DoubleProxyVertex(Loop.VALUE_IN_LABEL);
-                    plate.addAll(ImmutableSet.of(valueInWhenAlwaysTrue, stillLooping, valueIn));
+                    plate.addAll(valueInWhenAlwaysTrue, stillLooping, valueIn);
 
                     // intermediate
                     BoolVertex condition = conditionFunction.apply(plate).labeledAs(Loop.CONDITION_LABEL);
@@ -171,7 +170,7 @@ public class LoopBuilder {
                     DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue).labeledAs(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
                     BoolVertex loopAgain = stillLooping.and(condition).labeledAs(LOOP_LABEL);
                     DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labeledAs(Loop.VALUE_OUT_LABEL);
-                    plate.addAll(ImmutableSet.of(iterationResult, loopAgain, result));
+                    plate.addAll(iterationResult, loopAgain, result);
                 })
                 .build();
 

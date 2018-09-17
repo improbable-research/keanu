@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -20,6 +22,11 @@ public class Plate implements VertexDictionary {
 
     public Plate() {
         this.contents = new HashMap<>();
+    }
+
+
+    public <T extends Vertex<?>> void addAll(T... vertices) {
+        addAll(ImmutableList.copyOf(vertices));
     }
 
     public <T extends Vertex<?>> void addAll(Collection<T> vertices) {
