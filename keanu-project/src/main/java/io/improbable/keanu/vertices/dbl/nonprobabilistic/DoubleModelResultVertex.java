@@ -33,7 +33,7 @@ public class DoubleModelResultVertex extends DoubleVertex implements ModelResult
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return delegate.calculate();
+    public void calculate() {
+        setValue(delegate.calculate());
     }
 }

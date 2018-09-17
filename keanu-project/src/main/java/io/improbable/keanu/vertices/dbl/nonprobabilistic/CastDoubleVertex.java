@@ -26,8 +26,8 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return inputVertex.getValue().toDouble();
+    public void calculate() {
+        setValue(inputVertex.getValue().toDouble());
     }
 
     @Override

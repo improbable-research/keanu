@@ -28,7 +28,6 @@ public class ConstantBoolVertex extends BoolVertex implements NonProbabilistic<B
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return getValue();
+    public void calculate() {
     }
 }

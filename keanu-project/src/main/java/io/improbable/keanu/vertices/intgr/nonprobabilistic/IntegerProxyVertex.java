@@ -30,8 +30,8 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return getParent().getValue();
+    public void calculate() {
+        setValue(getParent().getValue());
     }
 
     @Override

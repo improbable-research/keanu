@@ -32,8 +32,8 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return op(extractFromInputs(BooleanTensor.class, Vertex::getValue));
+    public void calculate() {
+        setValue(op(extractFromInputs(BooleanTensor.class, Vertex::getValue)));
     }
 
     @Override

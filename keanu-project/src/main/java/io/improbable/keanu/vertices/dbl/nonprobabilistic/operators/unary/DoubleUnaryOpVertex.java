@@ -41,8 +41,8 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return op(inputVertex.getValue());
+    public void calculate() {
+        setValue(op(inputVertex.getValue()));
     }
 
     @Override

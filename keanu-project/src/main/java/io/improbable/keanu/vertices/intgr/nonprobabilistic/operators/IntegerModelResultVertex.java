@@ -33,7 +33,7 @@ public class IntegerModelResultVertex extends IntegerVertex implements ModelResu
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return delegate.calculate();
+    public void calculate() {
+        setValue(delegate.calculate());
     }
 }

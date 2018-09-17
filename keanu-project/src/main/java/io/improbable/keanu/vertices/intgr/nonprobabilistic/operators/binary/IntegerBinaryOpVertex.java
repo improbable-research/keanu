@@ -43,8 +43,8 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return op(a.getValue(), b.getValue());
+    public void calculate() {
+         setValue(op(a.getValue(), b.getValue()));
     }
 
     protected abstract IntegerTensor op(IntegerTensor l, IntegerTensor r);

@@ -6,7 +6,6 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.model.ModelVertex;
 
 import java.util.Collections;
 import java.util.Map;
@@ -23,13 +22,11 @@ import java.util.stream.Collectors;
  */
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
-    private static final DoubleTensor MODEL_RETURN_VALUE = DoubleTensor.scalar(0.);
-
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
     private Map<VertexLabel, Tensor> outputs;
     private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
     private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
-    private boolean hasCalculated;
+    private boolean hasValue;
 
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
@@ -38,15 +35,19 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
         this.outputs = Collections.EMPTY_MAP;
         this.executor = executor;
         this.extractOutput = extractOutput;
-        this.hasCalculated = false;
+        this.hasValue = false;
         setParents(inputs.entrySet().stream().map(r -> r.getValue()).collect(Collectors.toList()));
     }
 
     @Override
-    public DoubleTensor calculate() {
+    public void calculate() {
         run();
         updateValues(inputs);
-        return MODEL_RETURN_VALUE;
+    }
+
+    @Override
+    public boolean hasValue() {
+        return hasValue;
     }
 
     @Override
@@ -54,13 +55,14 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
         for (Vertex<? extends Tensor> input : inputs.values()) {
             input.sample();
         }
-        return calculate();
+        calculate();
+        return DoubleTensor.scalar(0.0);
     }
 
     @Override
     public void run() {
         executor.accept(inputs);
-        hasCalculated = true;
+        hasValue = true;
     }
 
     @Override
@@ -71,7 +73,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
 
     @Override
     public boolean hasCalculated() {
-        return hasCalculated;
+        return hasValue;
     }
 
     @Override

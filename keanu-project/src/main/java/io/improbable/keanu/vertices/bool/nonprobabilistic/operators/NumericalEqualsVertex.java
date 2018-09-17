@@ -32,8 +32,8 @@ public class NumericalEqualsVertex extends BoolVertex implements NonProbabilisti
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return op(a.getValue(), b.getValue(), epsilon.getValue());
+    public void calculate() {
+        setValue(op(a.getValue(), b.getValue(), epsilon.getValue()));
     }
 
     private BooleanTensor op(NumberTensor a, NumberTensor b, NumberTensor epsilon) {

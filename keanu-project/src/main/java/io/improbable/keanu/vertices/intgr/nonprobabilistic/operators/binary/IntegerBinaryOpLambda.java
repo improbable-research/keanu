@@ -38,7 +38,7 @@ public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonPro
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return op.apply(left.getValue(), right.getValue());
+    public void calculate() {
+        setValue(op.apply(left.getValue(), right.getValue()));
     }
 }

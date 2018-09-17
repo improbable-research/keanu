@@ -27,8 +27,8 @@ public abstract class BoolUnaryOpVertex<T extends Tensor> extends BoolVertex imp
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return op(a.getValue());
+    public void calculate() {
+         setValue(op(a.getValue()));
     }
 
     protected abstract BooleanTensor op(T value);

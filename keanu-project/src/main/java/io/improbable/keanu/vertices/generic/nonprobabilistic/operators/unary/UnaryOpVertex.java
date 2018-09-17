@@ -20,8 +20,8 @@ public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonP
     }
 
     @Override
-    public OUT calculate() {
-        return op(inputVertex.getValue());
+    public void calculate() {
+        setValue(op(inputVertex.getValue()));
     }
 
     protected abstract OUT op(IN a);

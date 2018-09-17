@@ -21,7 +21,7 @@ public class ProcessModelVertex {
                 Process cmd = Runtime.getRuntime().exec(newCommand);
                 cmd.waitFor();
             } catch (IOException | InterruptedException e) {
-                throw new IllegalArgumentException("Failed during execution of the process. " + e);
+                throw new RuntimeException("Failed during execution of the process. " + e);
             }
         }, updateValues);
     }

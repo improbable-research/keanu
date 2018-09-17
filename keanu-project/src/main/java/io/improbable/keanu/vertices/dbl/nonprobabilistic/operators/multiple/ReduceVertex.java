@@ -92,8 +92,8 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return applyReduce(Vertex::getValue);
+    public void calculate() {
+        setValue(applyReduce(Vertex::getValue));
     }
 
     private DoubleTensor applyReduce(Function<Vertex<DoubleTensor>, DoubleTensor> mapper) {

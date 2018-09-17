@@ -33,7 +33,7 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return op(predicate.getValue(), thn.getValue(), els.getValue());
+    public void calculate() {
+        setValue(op(predicate.getValue(), thn.getValue(), els.getValue()));
     }
 }

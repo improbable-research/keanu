@@ -38,10 +38,10 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
     }
 
     @Override
-    public DoubleTensor calculate() {
+    public void calculate() {
         final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
-        return vertex == null ? defaultResult.getValue() : vertex.getValue();
+        setValue(vertex == null ? defaultResult.getValue() : vertex.getValue());
     }
 
     @Override

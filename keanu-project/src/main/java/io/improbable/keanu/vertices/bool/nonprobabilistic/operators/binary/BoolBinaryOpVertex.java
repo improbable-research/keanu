@@ -36,8 +36,8 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return op(a.getValue(), b.getValue());
+    public void calculate() {
+        setValue(op(a.getValue(), b.getValue()));
     }
 
     protected abstract BooleanTensor op(A l, B r);

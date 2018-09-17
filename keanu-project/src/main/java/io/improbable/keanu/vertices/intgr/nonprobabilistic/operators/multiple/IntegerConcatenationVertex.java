@@ -32,8 +32,8 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     }
 
     @Override
-    public IntegerTensor calculate() {
-        return op(extractFromInputs(IntegerTensor.class, Vertex::getValue));
+    public void calculate() {
+        setValue(op(extractFromInputs(IntegerTensor.class, Vertex::getValue)));
     }
 
     @Override

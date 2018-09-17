@@ -52,8 +52,8 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return op.apply(inputVertex.getValue());
+    public void calculate() {
+        setValue(op.apply(inputVertex.getValue()));
     }
 
     @Override

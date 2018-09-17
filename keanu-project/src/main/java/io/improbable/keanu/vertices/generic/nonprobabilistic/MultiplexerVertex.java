@@ -35,8 +35,8 @@ public class MultiplexerVertex<T> extends Vertex<T> implements NonProbabilistic<
     }
 
     @Override
-    public T calculate() {
+    public void calculate() {
         Vertex<T> selector = getSelector();
-        return selector.getValue();
+        setValue(selector.getValue());
     }
 }

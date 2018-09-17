@@ -21,8 +21,8 @@ public abstract class BinaryOpVertex<A, B, C> extends Vertex<C> implements NonPr
     }
 
     @Override
-    public C calculate() {
-        return op(a.getValue(), b.getValue());
+    public void calculate() {
+        setValue(op(a.getValue(), b.getValue()));
     }
 
     protected abstract C op(A a, B b);

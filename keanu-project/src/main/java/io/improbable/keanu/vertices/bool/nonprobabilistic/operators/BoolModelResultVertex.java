@@ -33,7 +33,7 @@ public class BoolModelResultVertex extends BoolVertex implements ModelResultProv
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return delegate.calculate();
+    public void calculate() {
+        setValue(delegate.calculate());
     }
 }

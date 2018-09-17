@@ -21,8 +21,8 @@ public class CastBoolVertex extends BoolVertex implements NonProbabilistic<Boole
     }
 
     @Override
-    public BooleanTensor calculate() {
-        return inputVertex.getValue();
+    public void calculate() {
+        setValue(inputVertex.getValue());
     }
 
 }

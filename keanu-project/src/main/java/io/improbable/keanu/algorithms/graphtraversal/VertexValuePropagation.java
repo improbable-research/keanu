@@ -150,7 +150,7 @@ public class VertexValuePropagation {
             }
         } else {
             if (!vertex.isObserved()) {
-                vertex.setValue(((NonProbabilistic<T>) vertex).calculate());
+                ((NonProbabilistic<T>) vertex).calculate();
             }
         }
     }

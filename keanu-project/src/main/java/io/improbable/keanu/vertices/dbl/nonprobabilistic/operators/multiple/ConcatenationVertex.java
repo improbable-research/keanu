@@ -84,8 +84,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public DoubleTensor calculate() {
-        return op(extractFromInputs(DoubleTensor.class, Vertex::getValue));
+    public void calculate() {
+        setValue(op(extractFromInputs(DoubleTensor.class, Vertex::getValue)));
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
