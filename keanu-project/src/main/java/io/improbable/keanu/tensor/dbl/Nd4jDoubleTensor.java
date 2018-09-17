@@ -479,6 +479,13 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return this;
     }
 
+    /**
+     * This is identical to log().times(y), except that it changes NaN results to 0.
+     * This is important when calculating 0log0, which should return 0
+     * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
+     * @param y The tensor value to multiply by
+     * @return the log of this tensor multiplied by y
+     */
     @Override
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
         TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatChecksForNaN();
