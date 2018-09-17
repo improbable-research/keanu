@@ -10,8 +10,6 @@ import java.util.stream.Collectors;
 import com.google.common.base.Preconditions;
 
 import io.improbable.keanu.network.LambdaSection;
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -98,7 +96,7 @@ public class LogProbGradientCalculator {
 
                 Set<Vertex> latentAndObservedVertices = upstreamLambdaSection.getLatentAndObservedVertices();
                 Set<DoubleVertex> latentVertices = latentAndObservedVertices.stream()
-                    .filter(this::isLatentDoubleVertex)
+                    .filter(this::isLatentDoubleVertexAndInWrtTo)
                     .map(v -> (DoubleVertex) v)
                     .collect(Collectors.toSet());
 
@@ -111,12 +109,12 @@ public class LogProbGradientCalculator {
         return probabilisticParentLookup;
     }
 
-    private boolean isLatentDoubleVertex(Vertex v) {
+    private boolean isLatentDoubleVertexAndInWrtTo(Vertex v) {
         return !v.isObserved() && wrtVertices.contains(v) && v instanceof DoubleVertex;
     }
 
     /**
-     * @param ofVertex starting point for reverse mode autodiff
+     * @param ofVertex the vertex we are taking the derivative of
      * @return partial derivatives of the "ofVertex" wrt to any "this.wrtVertices" that it descends.
      */
     private PartialDerivatives reverseModeLogProbGradientWrtLatents(final Vertex ofVertex) {
