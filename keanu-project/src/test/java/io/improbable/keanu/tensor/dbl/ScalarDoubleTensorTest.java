@@ -87,6 +87,13 @@ public class ScalarDoubleTensorTest {
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
     }
 
+    @Test
+    public void youCanReplaceNaNs() {
+        DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
+        DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
+        assertThat(nan.replaceNaN(0.), hasValue(0.));
+        assertThat(notNan.replaceNaN(0.), hasValue(Double.NEGATIVE_INFINITY));
+    }
 
     @Test
     public void youCanDoYLogXEvenWhenBothAreZero() {

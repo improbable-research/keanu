@@ -385,6 +385,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor replaceNaN(double value) {
+        return duplicate().replaceNaNInPlace(value);
+    }
+
+    @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
         return duplicate().clampInPlace(min, max);
     }
@@ -691,6 +696,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardizeInPlace() {
         throw new IllegalStateException("Cannot standardize a scalar");
+    }
+
+    @Override
+    public DoubleTensor replaceNaNInPlace(double newValue) {
+        if (Double.isNaN(this.value)) {
+            this.value = newValue;
+        }
+        return this;
     }
 
     @Override

@@ -904,6 +904,22 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void youCanReplaceNaNs() {
+        double[] input = {
+            0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
+            Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0};
+
+        Double[] expectedOutput = {
+            0.0, -1.0, -Double.NEGATIVE_INFINITY, 0.0,
+            Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0};
+
+        DoubleTensor containsNan = DoubleTensor.create(input,
+            4, 2);
+
+        assertThat(containsNan.replaceNaN(0.), hasValue(expectedOutput));
+    }
+
+    @Test
     public void youCanDoYLogXEvenWhenBothAreZero() {
         DoubleTensor x = DoubleTensor.create(
             Double.MIN_VALUE, 1e-8, 1., 1e8);

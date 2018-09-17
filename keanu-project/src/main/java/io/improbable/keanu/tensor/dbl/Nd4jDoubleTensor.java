@@ -15,6 +15,7 @@ import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.ReplaceNans;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
@@ -234,6 +235,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardize() {
         return duplicate().standardizeInPlace();
+    }
+
+    @Override
+    public DoubleTensor replaceNaN(double value) {
+        return duplicate().replaceNaNInPlace(value);
     }
 
     @Override
@@ -962,6 +968,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public BooleanTensor isNaN() {
         return TensorValidator.NAN_CATCHER.check(this).not();
+    }
+
+    @Override
+    public DoubleTensor replaceNaNInPlace(double value) {
+        Nd4j.getExecutioner().exec(new ReplaceNans(tensor, value));
+        return this;
     }
 
     @Override

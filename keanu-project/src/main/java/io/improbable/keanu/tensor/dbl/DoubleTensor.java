@@ -185,6 +185,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor standardize();
 
+    DoubleTensor replaceNaN(double value);
+
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
     DoubleTensor ceil();
@@ -269,6 +271,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor sigmoidInPlace();
 
     DoubleTensor standardizeInPlace();
+
+    DoubleTensor replaceNaNInPlace(double value);
 
     DoubleTensor setAllInPlace(double value);
 
