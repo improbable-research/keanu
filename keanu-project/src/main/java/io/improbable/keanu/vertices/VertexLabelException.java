@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices;
 
-public class VertexLabelException extends Exception {
+public class VertexLabelException extends RuntimeException {
 
     public VertexLabelException(String message) {
         super(message);

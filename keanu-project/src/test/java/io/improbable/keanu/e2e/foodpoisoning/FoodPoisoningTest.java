@@ -1,24 +1,27 @@
 package io.improbable.keanu.e2e.foodpoisoning;
 
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
+import java.util.function.Consumer;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.function.Consumer;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 
 public class FoodPoisoningTest {
 
@@ -78,10 +81,16 @@ public class FoodPoisoningTest {
 
     public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {
 
+        VertexLabel didEatOystersLabel = new VertexLabel("didEatOysters");
+        VertexLabel didEatLambLabel = new VertexLabel("didEatLamb");
+        VertexLabel didEatPooLabel = new VertexLabel("didEatPoo");
+        VertexLabel isIllLabel = new VertexLabel("isIll");
+        VertexLabel pIllLabel = new VertexLabel("pIll");
+
         Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add("didEatOysters", new BernoulliVertex(0.4));
-            BernoulliVertex didEatLamb = plate.add("didEatLamb", new BernoulliVertex(0.4));
-            BernoulliVertex didEatPoo = plate.add("didEatPoo", new BernoulliVertex(0.4));
+            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labeledAs(didEatOystersLabel));
+            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labeledAs(didEatLambLabel));
+            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labeledAs(didEatPooLabel));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -92,10 +101,11 @@ public class FoodPoisoningTest {
 
             DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
-                .orElse(0.1);
+                .orElse(0.1)
+                .labeledAs(pIllLabel);
 
-            plate.add("pIll", pIll);
-            plate.add("isIll", new BernoulliVertex(pIll));
+            plate.add(pIll);
+            plate.add(new BernoulliVertex(pIll).labeledAs(isIllLabel));
         };
 
         Plates personPlates = new PlateBuilder()
@@ -109,11 +119,11 @@ public class FoodPoisoningTest {
 
         sample(10000);
 
-        personPlates.asList().forEach(plate -> {
-            plate.get("didEatOysters").observeOwnValue();
-            plate.get("didEatLamb").observeOwnValue();
-            plate.get("didEatPoo").observeOwnValue();
-            plate.get("isIll").observeOwnValue();
+        personPlates.forEach(plate -> {
+            plate.get(didEatOystersLabel).observeOwnValue();
+            plate.get(didEatLambLabel).observeOwnValue();
+            plate.get(didEatPooLabel).observeOwnValue();
+            plate.get(isIllLabel).observeOwnValue();
         });
 
         infectedOysters.unobserve();
