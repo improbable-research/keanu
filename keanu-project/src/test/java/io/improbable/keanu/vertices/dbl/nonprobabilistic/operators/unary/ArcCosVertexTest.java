@@ -59,7 +59,7 @@ public class ArcCosVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -0.25, 0.25);
         DoubleVertex outputVertex = inputVertex.times(3).acos();
         final double INCREMENT = 0.001;
         final double DELTA = 1e-4;
