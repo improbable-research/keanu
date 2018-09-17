@@ -2,6 +2,7 @@ package io.improbable.keanu.plating;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -147,6 +148,22 @@ public class PlateBuilderTest {
             .build();
 
         new BayesianNetwork(commonTheta.getConnectedGraph());
+    }
+
+    @Test
+    public void itThrowsIfYouTryToPutTheSameVertexIntoMultiplePlates() {
+        expectedException.expect(PlateException.class);
+        expectedException.expectMessage(containsString("has already been added to Plate_"));
+
+        VertexLabel label = new VertexLabel("theta");
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01).labeledAs(label);
+
+        new PlateBuilder<Bean>()
+            .count(10)
+            .withFactory((plate) -> {
+                plate.add(commonTheta);
+            })
+            .build();
     }
 
 

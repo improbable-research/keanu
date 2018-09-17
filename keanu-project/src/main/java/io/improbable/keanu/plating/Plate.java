@@ -3,6 +3,7 @@ package io.improbable.keanu.plating;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import io.improbable.keanu.vertices.ProxyVertex;
@@ -12,6 +13,9 @@ import io.improbable.keanu.vertices.VertexLabel;
 
 public class Plate implements VertexDictionary {
 
+    private static final String NAME_PREFIX = "Plate_";
+    private static Pattern NAME_REGEX = Pattern.compile(NAME_PREFIX + "-?[\\d]+$");
+
     private Map<VertexLabel, Vertex<?>> contents;
 
     public Plate() {
@@ -19,10 +23,15 @@ public class Plate implements VertexDictionary {
     }
 
     public <T extends Vertex<?>> T add(T v) {
-        if (v.getLabel() == null) {
+        VertexLabel label = v.getLabel();
+        if (label == null) {
             throw new PlateException("Vertex " + v + " must contain a label in order to be added to a plate");
         }
-        VertexLabel label = scoped(v.getLabel());
+        String outerNamespace = label.getOuterNamespace().orElse("");
+        if (NAME_REGEX.matcher(outerNamespace).matches()) {
+            throw new PlateException("Vertex " + v + " has already been added to " + outerNamespace);
+        }
+        label = scoped(label);
         if (contents.containsKey(label)) {
             throw new IllegalArgumentException("Key " + label + " already exists");
         }
@@ -32,7 +41,7 @@ public class Plate implements VertexDictionary {
     }
 
     private String getUniqueName() {
-        return "Plate_" + this.hashCode();
+        return NAME_PREFIX + this.hashCode();
     }
 
     private VertexLabel scoped(VertexLabel label) {
