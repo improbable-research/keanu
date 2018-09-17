@@ -13,6 +13,7 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -497,7 +498,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
-        return logInPlace().timesInPlace(y);
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatChecksForNaN();
+        validator.check(this);
+        validator.check(y);
+        DoubleTensor result = this.logInPlace().timesInPlace(y);
+        validator.withPolicy(TensorValidationPolicy.changeValueTo(0.)).validate(result);
+        return result;
     }
 
     @Override

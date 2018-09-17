@@ -81,6 +81,21 @@ public class ScalarDoubleTensorTest {
         assertThat(validator.check(notNan), equalTo(BooleanTensor.scalar(true)));
     }
 
+
+    @Test
+    public void youCanDoYLogXEvenWhenBothAreZero() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        assertThat(zero.logTimes(zero), hasValue(0.));
+        assertThat(zero.log().times(zero), hasValue(Double.NaN));
+    }
+
+    @Test
+    public void youCanDoTensorYLogXEvenWhenBothAreZero() {
+        DoubleTensor zero = DoubleTensor.scalar(0.);
+        DoubleTensor zeroTensor = DoubleTensor.create(0., 0., 0.);
+        assertThat(zero.log().times(zeroTensor), hasValue(Double.NaN, Double.NaN, Double.NaN));
+        assertThat(zero.logTimes(zeroTensor), hasValue(0., 0., 0.));
+    }
     @Test
     public void youCanFixAValidationIssueByReplacingTheValue() {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
