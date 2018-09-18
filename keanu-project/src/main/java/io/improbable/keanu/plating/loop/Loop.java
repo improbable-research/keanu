@@ -62,8 +62,8 @@ public class Loop {
     /**
      * package-private because it is intended to be created by the LoopBuilder
      *
-     * @param plates
-     * @param throwWhenMaxCountIsReached
+     * @param plates the set of plates, one for each iteration in the loop
+     * @param throwWhenMaxCountIsReached - optionally disable throwing and log a warning instead
      */
     Loop(Plates plates, boolean throwWhenMaxCountIsReached) {
         this.plates = plates;
