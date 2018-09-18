@@ -42,7 +42,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(derivativeOfSigmoidWrtInput));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(derivativeOfSigmoidWrtInput, true));
         return partials;
     }
 
