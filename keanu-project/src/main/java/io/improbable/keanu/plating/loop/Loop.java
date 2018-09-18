@@ -19,7 +19,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 /**
  * A Loop object is a convenient wrapper around some Plates.
  * See LoopTest.java for examples of how it's used.
- * The way it works is to unroll the loop up to a maximum size and evaluate it in full
+ * The way it works is to unroll the loop to a given maximum size and evaluate it in full
  * (so it's not very performant)
  * <p>
  * The resulting graph structure looks like this.
