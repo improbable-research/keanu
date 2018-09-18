@@ -148,7 +148,7 @@ public class TakeVertexTest {
         DoubleVertex inputC = new UniformVertex(new int[]{2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputA.times(10.0).times(inputB).take(0, 1, 2).plus(inputC);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, 10.0, 1e-10);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, 10.0, 1e-10, true);
     }
 
 }

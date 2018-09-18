@@ -15,9 +15,11 @@ public class TensorTestOperations {
     public static void finiteDifferenceMatchesGradient(List<DoubleVertex> inputVertices,
                                                        DoubleVertex outputVertex,
                                                        final double INCREMENT_AMOUNT,
-                                                       final double DELTA) {
+                                                       final double DELTA,
+                                                       final boolean DO_REVERSE) {
         setInitialConditions(inputVertices);
-        inputVertices.forEach(v -> runGradientTestOnSingleInput(v, outputVertex, INCREMENT_AMOUNT, DELTA));
+        inputVertices.forEach(v ->
+            runGradientTestOnSingleInput(v, outputVertex, INCREMENT_AMOUNT, DELTA, DO_REVERSE));
     }
 
     private static void setInitialConditions(List<DoubleVertex> inputVertices) {
@@ -27,16 +29,21 @@ public class TensorTestOperations {
     private static void runGradientTestOnSingleInput(DoubleVertex inputVertex,
                                                      DoubleVertex outputVertex,
                                                      final double INCREMENT_AMOUNT,
-                                                     final double DELTA) {
+                                                     final double DELTA,
+                                                     final boolean DO_REVERSE) {
         DoubleTensor initialInput = inputVertex.getValue();
 
+        Double boxedDelta = DELTA;
         DoubleTensor initialOutput = outputVertex.eval();
         DoubleTensor outputWrtInput = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-        DoubleTensor reverseDifferential =
-            Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
 
-        Double boxedDelta = DELTA;
-        assertThat(reverseDifferential, allCloseTo(boxedDelta, outputWrtInput));
+        if (DO_REVERSE) {
+            DoubleTensor reverseDifferential =
+                Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+
+            assertThat(reverseDifferential, allCloseTo(boxedDelta, outputWrtInput));
+        }
+
         int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
         DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
         Tensor.FlattenedView<Double> flatIncrement = incrementTensor.getFlattenedView();
