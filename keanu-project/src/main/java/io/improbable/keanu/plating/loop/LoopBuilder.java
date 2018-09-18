@@ -110,7 +110,7 @@ public class LoopBuilder {
         }
 
         private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) {
-            Vertex valueOutWhenAlwaysTrue = null;
+            Vertex valueOutWhenAlwaysTrue;
 
             try {
                 List<Vertex> outputVertices = initialState.stream().filter(v -> Loop.VALUE_OUT_LABEL.equals(v.getLabel())).collect(Collectors.toList());
