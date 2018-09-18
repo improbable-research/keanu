@@ -8,7 +8,7 @@ import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 public class TensorCheckAndRespondValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValidator<DATATYPE, TENSOR> {
 
     private final TensorValueChecker valueChecker;
-    private TensorValidationPolicy<TENSOR> validationPolicy;
+    private final TensorValidationPolicy<TENSOR> validationPolicy;
 
     TensorCheckAndRespondValidator(TensorValueChecker<TENSOR> valueChecker) {
         this(valueChecker, TensorValidationPolicy.throwMessage("Invalid value found"));
@@ -27,10 +27,5 @@ public class TensorCheckAndRespondValidator<DATATYPE, TENSOR extends Tensor<DATA
     public void validate(TENSOR tensor) {
         BooleanTensor result = check(tensor);
         validationPolicy.handle(tensor, result);
-    }
-
-    public TensorCheckAndRespondValidator<DATATYPE, TENSOR> withPolicy(TensorValidationPolicy<TENSOR> validationPolicy) {
-        this.validationPolicy = validationPolicy;
-        return this;
     }
 }
