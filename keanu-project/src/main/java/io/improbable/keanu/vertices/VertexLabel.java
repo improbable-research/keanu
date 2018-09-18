@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
@@ -26,7 +27,7 @@ public class VertexLabel {
         return new VertexLabel(this.name, newNamespace);
     }
 
-    public VertexLabel withoutOuterNamespace() throws VertexLabelException {
+    public VertexLabel withoutOuterNamespace() {
         try {
             List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
             return new VertexLabel(this.name, reducedNamespace);
@@ -54,5 +55,13 @@ public class VertexLabel {
     public int hashCode() {
 
         return Objects.hash(name, namespace);
+    }
+
+    public Optional<String> getOuterNamespace() {
+        try {
+            return Optional.of(namespace.get(namespace.size() - 1));
+        } catch(IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
     }
 }

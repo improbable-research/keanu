@@ -1,15 +1,17 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
-import io.improbable.keanu.util.csv.pojo.CsvProperty;
-import io.improbable.keanu.util.csv.pojo.byrow.RowsAsObjectParser;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.stream.Collectors.toList;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
 
 public class ObjectParserWithPublicFieldTest {
 
@@ -93,9 +95,17 @@ public class ObjectParserWithPublicFieldTest {
 
         @Override
         public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
             TestPOJOWithPublicFieldsClass that = (TestPOJOWithPublicFieldsClass) o;
-            if (id != that.id) return false;
-            return myName.equals(that.myName);
+            return id == that.id &&
+                Objects.equals(myName, that.myName);
+        }
+
+        @Override
+        public int hashCode() {
+
+            return Objects.hash(myName, id);
         }
     }
 

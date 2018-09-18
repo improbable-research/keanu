@@ -1,6 +1,7 @@
 package io.improbable.keanu.network;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
@@ -59,8 +60,10 @@ public class ModelCompositionTest {
         Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
         Map<VertexLabel, Vertex> outputs = ModelComposition.composeModel(
-            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1")));
-        gaussOutputVertex = (DoubleVertex)outputs.get(new VertexLabel("Output1"));
+            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"))
+        );
+
+        gaussOutputVertex = (DoubleVertex) outputs.get(new VertexLabel("Output1"));
 
         outerNet = new BayesianNetwork(gaussOutputVertex.getConnectedGraph());
     }
@@ -99,7 +102,7 @@ public class ModelCompositionTest {
 
     @Test
     public void idOrderingStillImpliesTopologicalOrdering() {
-        for (Vertex v: outerNet.getVertices()) {
+        for (Vertex v : outerNet.getVertices()) {
             Set<Vertex> parentSet = v.getParents();
             for (Vertex parent : parentSet) {
                 assertTrue(v.getId().compareTo(parent.getId()) > 0);
@@ -130,8 +133,8 @@ public class ModelCompositionTest {
         Set<Vertex> latentOuterVertices = ImmutableSet.of(trueLocation, gaussOutputVertex);
         Set<Vertex> filteredVertices = new HashSet<>(outerNet.getTopLevelLatentVertices());
 
-        assertEquals(latentOuterVertices.containsAll(filteredVertices), true);
-        assertEquals(filteredVertices.containsAll(latentOuterVertices), true);
+        assertTrue(latentOuterVertices.containsAll(filteredVertices));
+        assertTrue(filteredVertices.containsAll(latentOuterVertices));
     }
 
     private void triggerCompositionWarnings(List<VertexLabel> outputs,
@@ -196,8 +199,8 @@ public class ModelCompositionTest {
         shouldMatch.addPrefix(prefix);
         VertexId shouldNotMatch = new VertexId();
 
-        assertEquals(shouldMatch.prefixMatches(prefix), true);
-        assertEquals(shouldNotMatch.prefixMatches(prefix), false);
+        assertTrue(shouldMatch.prefixMatches(prefix));
+        assertFalse(shouldNotMatch.prefixMatches(prefix));
     }
 
 }

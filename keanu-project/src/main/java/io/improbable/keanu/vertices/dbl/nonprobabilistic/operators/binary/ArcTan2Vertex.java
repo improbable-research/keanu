@@ -14,40 +14,40 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     /**
      * Calculates the signed angle, in radians, between the positive x-axis and a ray to the point (x, y) from the origin
      *
-     * @param left  x coordinate
-     * @param right y coordinate
+     * @param x x coordinate
+     * @param y y coordinate
      */
-    public ArcTan2Vertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right);
+    public ArcTan2Vertex(DoubleVertex x, DoubleVertex y) {
+        super(x, y);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.atan2(r);
+    protected DoubleTensor op(DoubleTensor x, DoubleTensor y) {
+        return x.atan2(y);
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber a, DualNumber b) {
-        DoubleTensor denominator = ((b.getValue().pow(2)).plusInPlace((a.getValue().pow(2))));
+    protected DualNumber dualOp(DualNumber x, DualNumber y) {
+        DoubleTensor denominator = ((y.getValue().pow(2)).plusInPlace((x.getValue().pow(2))));
 
-        PartialDerivatives thisInfA = a.getPartialDerivatives().multiplyBy(b.getValue().div(denominator));
-        PartialDerivatives thisInfB = b.getPartialDerivatives().multiplyBy((a.getValue().div(denominator)).unaryMinusInPlace());
-        PartialDerivatives newInf = thisInfA.add(thisInfB);
-        return new DualNumber(a.getValue().atan2(b.getValue()), newInf);
+        PartialDerivatives thisInfX = x.getPartialDerivatives().multiplyBy((y.getValue().div(denominator)).unaryMinusInPlace());
+        PartialDerivatives thisInfY = y.getPartialDerivatives().multiplyBy(x.getValue().div(denominator));
+        PartialDerivatives newInf = thisInfX.add(thisInfY);
+        return new DualNumber(x.getValue().atan2(y.getValue()), newInf);
     }
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        DoubleTensor leftValue = left.getValue();
-        DoubleTensor rightValue = right.getValue();
+        DoubleTensor xValue = left.getValue();
+        DoubleTensor yValue = right.getValue();
 
-        DoubleTensor denominator = rightValue.pow(2).plusInPlace(leftValue.pow(2));
-        DoubleTensor dOutWrtLeft = rightValue.divInPlace(denominator);
-        DoubleTensor dOutWrtRight = leftValue.div(denominator).unaryMinusInPlace();
+        DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
+        DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
+        DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtX, true));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtY, true));
         return partials;
     }
 }

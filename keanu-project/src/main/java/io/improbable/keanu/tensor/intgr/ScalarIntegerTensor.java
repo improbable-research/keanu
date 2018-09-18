@@ -35,7 +35,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
