@@ -1,7 +1,6 @@
 package io.improbable.keanu.plating.loop;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
@@ -113,12 +112,13 @@ public class LoopBuilder {
             Vertex valueOutWhenAlwaysTrue;
 
             try {
-                List<Vertex> outputVertices = initialState.stream().filter(v -> Loop.VALUE_OUT_LABEL.equals(v.getLabel())).collect(Collectors.toList());
-                Vertex<?> outputVertex = Iterables.getOnlyElement(outputVertices);
+                Vertex<?> outputVertex = Iterables.getOnlyElement(initialState.stream().filter(v -> Loop.VALUE_OUT_LABEL.equals(v.getLabel())).collect(Collectors.toList()));
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {
                 throw new VertexLabelException("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL", e);
+            } catch (IllegalArgumentException e) {
+                throw new VertexLabelException("You must pass in only one vertex labeled as Loop.VALUE_OUT_LABEL", e);
             }
 
             BoolVertex tru = ConstantVertex.of(true).labeledAs(LOOP_LABEL);
