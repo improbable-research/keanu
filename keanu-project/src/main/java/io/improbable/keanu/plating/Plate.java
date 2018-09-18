@@ -24,7 +24,6 @@ public class Plate implements VertexDictionary {
         this.contents = new HashMap<>();
     }
 
-
     public <T extends Vertex<?>> void addAll(T... vertices) {
         addAll(ImmutableList.copyOf(vertices));
     }

@@ -76,7 +76,7 @@ public class LoopBuilder {
      * @param conditionSupplier - a lambda that creates and returns a new BoolVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier){
+    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) {
         return whilst(plate -> conditionSupplier.get());
     }
 
@@ -86,7 +86,7 @@ public class LoopBuilder {
      * @param conditionFunction - a lambda that takes the current Plate and creates and returns a new BoolVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction){
+    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) {
         return new LoopBuilder2(initialState, conditionFunction, customMappings.build(), maxLoopCount, throwWhenMaxCountIsReached);
     }
 
@@ -101,7 +101,7 @@ public class LoopBuilder {
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached){
+        LoopBuilder2(Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
             this.initialState = setInitialState(initialState);
             this.conditionFunction = conditionFunction;
             this.customMappings = customMappings;
@@ -109,7 +109,7 @@ public class LoopBuilder {
             this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
         }
 
-        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState){
+        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) {
             Vertex valueOutWhenAlwaysTrue = null;
 
             try {
@@ -137,7 +137,7 @@ public class LoopBuilder {
          *                          and creates and returns a new output Vertex
          * @return the fully constructed Loop object
          */
-        public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction){
+        public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction) {
             return apply((plate, valueIn) -> {
                 return iterationFunction.apply(valueIn);
             });
@@ -150,7 +150,7 @@ public class LoopBuilder {
          *                          and creates and returns a new output vertex
          * @return the fully constructed Loop object
          */
-        public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction){
+        public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) {
             Plates plates = new PlateBuilder<Integer>()
                 .withInitialState(initialState.toArray(new Vertex[0]))
                 .withTransitionMapping(customMappings)
