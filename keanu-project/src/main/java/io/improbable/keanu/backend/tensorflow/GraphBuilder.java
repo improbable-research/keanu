@@ -44,10 +44,22 @@ public class GraphBuilder {
         POW("Pow"),
         MATRIX_MULTIPLY("MatMul");
 
-        public final String name;
+        public final String opName;
 
-        OpType(String tensorFlowName) {
-            this.name = tensorFlowName;
+        OpType(String opName) {
+            this.opName = opName;
+        }
+    }
+
+    public enum AttrName {
+        DTYPE("dtype"),
+        VALUE("value"),
+        SHAPE("shape");
+
+        public final String attrName;
+
+        AttrName(String attrName) {
+            this.attrName = attrName;
         }
     }
 
@@ -106,26 +118,26 @@ public class GraphBuilder {
     }
 
     private <T> Output<T> constant(String name, Tensor<T> tensor, Class<T> type) {
-        return scope.graph().opBuilder(CONSTANT.name, name)
-            .setAttr("dtype", DataType.fromClass(type))
-            .setAttr("value", tensor)
+        return scope.graph().opBuilder(CONSTANT.opName, name)
+            .setAttr(AttrName.DTYPE.attrName, DataType.fromClass(type))
+            .setAttr(AttrName.VALUE.attrName, tensor)
             .build()
             .output(0);
     }
 
     public <T> Output<T> placeholder(String name, Shape shape, Class<T> type) {
-        return scope.graph().opBuilder(PLACE_HOLDER.name, name)
-            .setAttr("dtype", DataType.fromClass(type))
-            .setAttr("shape", shape)
+        return scope.graph().opBuilder(PLACE_HOLDER.opName, name)
+            .setAttr(AttrName.DTYPE.attrName, DataType.fromClass(type))
+            .setAttr(AttrName.SHAPE.attrName, shape)
             .build()
             .output(0);
     }
 
     private <T, L, R> Output<T> binaryOp(OpType type, String name, Output<L> in1, Output<R> in2) {
-        return scope.graph().opBuilder(type.name, name).addInput(in1).addInput(in2).build().output(0);
+        return scope.graph().opBuilder(type.opName, name).addInput(in1).addInput(in2).build().output(0);
     }
 
     private <T> Output<T> unaryOp(OpType type, String name, Output<T> in1) {
-        return scope.graph().opBuilder(type.name, name).addInput(in1).build().output(0);
+        return scope.graph().opBuilder(type.opName, name).addInput(in1).build().output(0);
     }
 }
