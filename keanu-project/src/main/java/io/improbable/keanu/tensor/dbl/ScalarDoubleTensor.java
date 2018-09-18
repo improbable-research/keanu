@@ -38,7 +38,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
