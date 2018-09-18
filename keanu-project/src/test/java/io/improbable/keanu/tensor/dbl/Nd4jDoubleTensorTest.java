@@ -883,8 +883,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, false},
             4, 2);
 
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatExpectsNotToFind(0.);
-        assertThat(validator.check(containsZero), equalTo(expectedMask));
+        assertThat(TensorValidator.ZERO_CATCHER.check(containsZero), equalTo(expectedMask));
     }
 
     @Test

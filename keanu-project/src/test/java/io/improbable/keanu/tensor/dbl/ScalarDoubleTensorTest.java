@@ -74,7 +74,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForZeros() {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor nonZero = DoubleTensor.scalar(1e-8);
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatExpectsNotToFind(0.);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.ZERO_CATCHER;
         assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(true)));
     }

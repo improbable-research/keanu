@@ -17,8 +17,7 @@ public class TensorValidationTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         BooleanTensor expectedMask = BooleanTensor.create(new boolean[] {true, false, true});
 
-        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0.);
-        assertThat(validator.check(containsZero), equalTo(expectedMask));
+        assertThat(TensorValidator.ZERO_CATCHER.check(containsZero), equalTo(expectedMask));
     }
 
     @Test
@@ -34,8 +33,7 @@ public class TensorValidationTest {
     @Test(expected = KeanuValueException.class)
     public void byDefaultItThrowsIfValidationFails() {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
-        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0.);
-        validator.validate(containsZero);
+        TensorValidator.ZERO_CATCHER.validate(containsZero);
     }
 
     @Test
