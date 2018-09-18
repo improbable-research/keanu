@@ -24,8 +24,8 @@ public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> {
         return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck(v));
     }
 
-    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidator thatExpectsNotToFind(DATATYPE v, TensorValidationPolicy<TENSOR> validationPolicy) {
-        return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck(v), validationPolicy);
+    static <DATATYPE> TensorValidator<DATATYPE, ? extends Tensor<DATATYPE>> thatReplaces(DATATYPE oldValue, DATATYPE newValue) {
+        return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck(oldValue), TensorValidationPolicy.changeValueTo(newValue));
     }
 
     static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatExpects(Function<TENSOR, BooleanTensor> checkFunction) {

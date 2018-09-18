@@ -10,7 +10,6 @@ import org.junit.Test;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class TensorValidationTest {
     @Test
@@ -27,7 +26,7 @@ public class TensorValidationTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
-        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0., TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator validator = TensorValidator.thatReplaces(0., 1e-8);
         validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }
