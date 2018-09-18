@@ -495,9 +495,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor logTimesInPlace(DoubleTensor y) {
         TensorValidator.NAN_CATCHER.validate(this);
         TensorValidator.NAN_CATCHER.validate(y);
-        this.logInPlace().timesInPlace(y);
-        TensorValidator.NAN_FIXER.validate(this);
-        return this;
+        DoubleTensor result = this.logInPlace().timesInPlace(y);
+        TensorValidator.NAN_FIXER.validate(result);
+        return result;
     }
 
     @Override
