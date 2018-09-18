@@ -14,9 +14,9 @@ public class ProgressBar {
 
     private static PrintStream defaultPrintStream = System.out;
 
-
     /**
      * Override the default print stream globally
+     *
      * @param printStream The new printStream object to use for all ProgressBars that don't declare one
      */
     public static void setDefaultPrintStream(PrintStream printStream) {
