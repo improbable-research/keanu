@@ -138,9 +138,7 @@ public class LoopBuilder {
          * @return the fully constructed Loop object
          */
         public Loop apply(Function<DoubleVertex, DoubleVertex> iterationFunction) {
-            return apply((plate, valueIn) -> {
-                return iterationFunction.apply(valueIn);
-            });
+            return apply((plate, valueIn) -> iterationFunction.apply(valueIn));
         }
 
         /**
