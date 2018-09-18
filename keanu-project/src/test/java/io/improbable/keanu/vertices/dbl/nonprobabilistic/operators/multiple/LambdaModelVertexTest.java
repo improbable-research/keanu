@@ -18,6 +18,7 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.model.LambdaModelVertex;
 import io.improbable.keanu.vertices.model.ModelVertex;
+import org.bytedeco.javacpp.annotation.Const;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -119,6 +120,28 @@ public class LambdaModelVertexTest {
 
         inputToModel.setAndCascade(inputValue);
         Assert.assertEquals(shouldIBringUmbrella.getValue().scalar(), 20.0, 1e-6);
+    }
+
+    @Test
+    public void canRunEvalOnTheOutputsToRecalculateTheModel() {
+        inputToModel = new ConstantDoubleVertex(25);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
+        inputs.put(new VertexLabel("Temperature"), inputToModel);
+
+
+        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValues);
+        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
+
+        DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
+
+        inputToModel.setValue(10.0);
+        shouldIBringUmbrella.eval();
+        Assert.assertEquals(20.0, shouldIBringUmbrella.getValue().scalar(), 1e-6);
+
+        inputToModel.setValue(20.0);
+        shouldIBringUmbrella.eval();
+        Assert.assertEquals(80.0, shouldIBringUmbrella.getValue().scalar(), 1e-6);
     }
 
     @Test
