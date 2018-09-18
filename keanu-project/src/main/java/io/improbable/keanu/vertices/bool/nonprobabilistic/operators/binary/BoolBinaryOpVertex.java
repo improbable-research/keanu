@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 
+import com.sun.org.apache.xpath.internal.operations.Bool;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -36,8 +37,8 @@ public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> ext
     }
 
     @Override
-    public void calculate() {
-        setValue(op(a.getValue(), b.getValue()));
+    public BooleanTensor calculate() {
+        return op(a.getValue(), b.getValue());
     }
 
     protected abstract BooleanTensor op(A l, B r);

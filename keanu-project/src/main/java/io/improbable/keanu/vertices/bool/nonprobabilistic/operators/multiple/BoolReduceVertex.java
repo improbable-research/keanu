@@ -41,8 +41,8 @@ public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<Boo
     }
 
     @Override
-    public void calculate() {
-        setValue(applyReduce(Vertex::getValue));
+    public BooleanTensor calculate() {
+        return applyReduce(Vertex::getValue);
     }
 
     private BooleanTensor applyReduce(Function<Vertex<BooleanTensor>, BooleanTensor> mapper) {

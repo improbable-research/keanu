@@ -26,6 +26,7 @@ public class ConstantIntegerVertex extends IntegerVertex implements NonProbabili
     }
 
     @Override
-    public void calculate() {
+    public IntegerTensor calculate() {
+        return getValue();
     }
 }

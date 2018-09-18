@@ -33,10 +33,10 @@ public class CPTVertex<OUT extends Tensor> extends Vertex<OUT> implements NonPro
     }
 
     @Override
-    public void calculate() {
+    public OUT calculate() {
         final CPTCondition condition = CPTCondition.from(inputs, v -> v.getValue().scalar());
         Vertex<OUT> vertex = conditions.get(condition);
-        setValue(vertex == null ? defaultResult.getValue() : vertex.getValue());
+        return vertex == null ? defaultResult.getValue() : vertex.getValue();
     }
 
 }

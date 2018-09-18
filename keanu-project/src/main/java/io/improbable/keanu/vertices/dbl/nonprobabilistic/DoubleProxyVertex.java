@@ -36,8 +36,8 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
     }
 
     @Override
-    public void calculate() {
-        setValue(getParent().getValue());
+    public DoubleTensor calculate() {
+        return getParent().getValue();
     }
 
     @Override

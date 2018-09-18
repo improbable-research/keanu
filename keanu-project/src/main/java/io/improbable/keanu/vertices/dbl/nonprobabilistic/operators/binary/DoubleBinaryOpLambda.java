@@ -59,8 +59,8 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
     }
 
     @Override
-    public void calculate() {
-        setValue(op.apply(left.getValue(), right.getValue()));
+    public DoubleTensor calculate() {
+        return op.apply(left.getValue(), right.getValue());
     }
 
     @Override

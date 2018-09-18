@@ -42,7 +42,7 @@ public class ConstantDoubleVertex extends DoubleVertex implements Differentiable
     }
 
     @Override
-    public void calculate() {
-
+    public DoubleTensor calculate() {
+        return getValue();
     }
 }

@@ -40,9 +40,10 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     }
 
     @Override
-    public void calculate() {
+    public DoubleTensor calculate() {
         run();
         updateValues(inputs);
+        return DoubleTensor.scalar(0.0);
     }
 
     @Override

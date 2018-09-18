@@ -40,8 +40,8 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     @Override
-    public void calculate() {
-        setValue(op(predicate.getValue(), thn.getValue(), els.getValue()));
+    public DoubleTensor calculate() {
+        return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {

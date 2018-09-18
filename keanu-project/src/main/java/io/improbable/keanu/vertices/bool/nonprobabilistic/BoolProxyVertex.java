@@ -30,8 +30,8 @@ public class BoolProxyVertex extends BoolVertex implements ProxyVertex<BoolVerte
     }
 
     @Override
-    public void calculate() {
-        setValue(getParent().getValue());
+    public BooleanTensor calculate() {
+        return getParent().getValue();
     }
 
     @Override

@@ -16,7 +16,7 @@ public class ConstantGenericVertex<T> extends Vertex<T> implements NonProbabilis
     }
 
     @Override
-    public void calculate() {
-        setValue(getValue());
+    public T calculate() {
+        return getValue();
     }
 }

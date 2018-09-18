@@ -33,7 +33,7 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
     }
 
     @Override
-    public void calculate() {
-        setValue(op(predicate.getValue(), thn.getValue(), els.getValue()));
+    public Tensor<T> calculate() {
+        return op(predicate.getValue(), thn.getValue(), els.getValue());
     }
 }

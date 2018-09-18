@@ -49,8 +49,8 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
     }
 
     @Override
-    public void calculate() {
-        setValue(op(left.getValue(), right.getValue()));
+    public DoubleTensor calculate() {
+        return op(left.getValue(), right.getValue());
     }
 
     public DoubleVertex getLeft() {
