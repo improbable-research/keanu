@@ -39,7 +39,7 @@ public class LoopBuilder {
     /**
      * An optional method to override the default value
      *
-     * @param maxCount - the max number of times the loop can run
+     * @param maxCount the max number of times the loop can run
      * @return self
      */
     public LoopBuilder atMost(int maxCount) {
@@ -61,8 +61,8 @@ public class LoopBuilder {
     /**
      * An optional method to add custom mappings
      *
-     * @param inputLabel  - the label assigned to the ProxyVertex in frame t
-     * @param outputLabel - the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
+     * @param inputLabel  the label assigned to the ProxyVertex in frame t
+     * @param outputLabel the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
      * @return self
      */
     public LoopBuilder mapping(VertexLabel inputLabel, VertexLabel outputLabel) {
@@ -73,7 +73,7 @@ public class LoopBuilder {
     /**
      * A mandatory method to specify the condition
      *
-     * @param conditionSupplier - a lambda that creates and returns a new BoolVertex
+     * @param conditionSupplier a lambda that creates and returns a new BoolVertex
      * @return the next stage builder
      */
     public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) {
@@ -83,7 +83,7 @@ public class LoopBuilder {
     /**
      * A mandatory method to specify the condition
      *
-     * @param conditionFunction - a lambda that takes the current Plate and creates and returns a new BoolVertex
+     * @param conditionFunction a lambda that takes the current Plate and creates and returns a new BoolVertex
      * @return the next stage builder
      */
     public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) {
@@ -133,7 +133,7 @@ public class LoopBuilder {
         /**
          * A mandatory method to specify the iteration step
          *
-         * @param iterationFunction - a lambda that takes the Proxy input vertex
+         * @param iterationFunction a lambda that takes the Proxy input vertex
          *                          and creates and returns a new output Vertex
          * @return the fully constructed Loop object
          */
@@ -146,7 +146,7 @@ public class LoopBuilder {
         /**
          * A mandatory method to specify the iteration step
          *
-         * @param iterationFunction - a lambda that takes the current Plate and the Proxy input vertex
+         * @param iterationFunction a lambda that takes the current Plate and the Proxy input vertex
          *                          and creates and returns a new output vertex
          * @return the fully constructed Loop object
          */

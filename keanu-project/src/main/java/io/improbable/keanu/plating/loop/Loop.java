@@ -63,7 +63,7 @@ public class Loop {
      * package-private because it is intended to be created by the LoopBuilder
      *
      * @param plates the set of plates, one for each iteration in the loop
-     * @param throwWhenMaxCountIsReached - optionally disable throwing and log a warning instead
+     * @param throwWhenMaxCountIsReached optionally disable throwing and log a warning instead
      */
     Loop(Plates plates, boolean throwWhenMaxCountIsReached) {
         this.plates = plates;
@@ -78,7 +78,7 @@ public class Loop {
      * A factory method for creating a loop
      * It automatically labels the initial state correctly for you.
      *
-     * @param initialState - a single Vertex that defines the loop's base case.
+     * @param initialState a single Vertex that defines the loop's base case.
      * @param <V>          the input type
      * @return a builder object
      */
@@ -92,8 +92,8 @@ public class Loop {
     /**
      * A factory method for creating a loop
      *
-     * @param first  - the first Vertex (mandatory)
-     * @param others - other Vertices (optional)
+     * @param first  the first Vertex (mandatory)
+     * @param others other Vertices (optional)
      * @param <V>    the input type
      * @return a builder object
      */
@@ -104,7 +104,7 @@ public class Loop {
     /**
      * A factory method for creating a loop
      *
-     * @param initialState - the collection of vertices that define the loop's base case
+     * @param initialState the collection of vertices that define the loop's base case
      * @param <V>          the input type
      * @return a builder object
      */
