@@ -401,16 +401,17 @@ public class DualNumber implements DoubleOperators<DualNumber> {
 
     public DualNumber take(int... index) {
         Map<VertexId, DoubleTensor> dualsAtIndex = new HashMap<>();
+        DoubleTensor newValue = DoubleTensor.scalar(this.value.getValue(index));
 
         for (Map.Entry<VertexId, DoubleTensor> entry : this.partialDerivatives.asMap().entrySet()) {
             DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
-            int desiredRank = atIndexTensor.getShape().length + 2;
+            int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
             int[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
             atIndexTensor = atIndexTensor.reshape(paddedShape);
             dualsAtIndex.put(entry.getKey(), atIndexTensor);
         }
 
-        return new DualNumber(DoubleTensor.scalar(this.value.getValue(index)), dualsAtIndex);
+        return new DualNumber(newValue, dualsAtIndex);
     }
 
     private DoubleTensor takeFromPartial(DoubleTensor from, int... indices) {

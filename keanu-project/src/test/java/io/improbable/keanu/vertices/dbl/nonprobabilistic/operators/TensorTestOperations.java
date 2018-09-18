@@ -7,6 +7,7 @@ import java.util.List;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class TensorTestOperations {
@@ -31,10 +32,14 @@ public class TensorTestOperations {
 
         DoubleTensor initialOutput = outputVertex.eval();
         DoubleTensor outputWrtInput = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+        DoubleTensor reverseDifferential =
+            Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+
+        Double boxedDelta = DELTA;
+        assertThat(reverseDifferential, allCloseTo(boxedDelta, outputWrtInput));
         int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
         DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
         Tensor.FlattenedView<Double> flatIncrement = incrementTensor.getFlattenedView();
-        Double boxedDelta = DELTA;
 
         for (int i = 0; i < flatIncrement.size(); i++) {
             flatIncrement.set(i, INCREMENT_AMOUNT);
