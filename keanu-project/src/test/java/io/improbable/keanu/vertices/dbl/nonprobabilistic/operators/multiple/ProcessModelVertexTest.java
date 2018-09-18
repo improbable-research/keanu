@@ -16,6 +16,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.model.LambdaModelVertex;
 import io.improbable.keanu.vertices.model.ModelVertex;
 import io.improbable.keanu.vertices.model.ProcessModelVertex;
 import org.junit.Assert;
@@ -122,6 +123,31 @@ public class ProcessModelVertexTest {
 
         inputToModel.setAndCascade(inputValue);
         Assert.assertEquals(shouldIBringUmbrella.getValue().scalar(), 20.0, 1e-6);
+    }
+
+    @Test
+    public void canRunEvalOnTheOutputsToRecalculateTheModel() {
+        inputToModel = new ConstantDoubleVertex(25);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
+        inputs.put(new VertexLabel("Temperature"), inputToModel);
+
+
+        String command = "python ./src/test/resources/model.py {Temperature}";
+
+        ModelVertex model = ProcessModelVertex.create(inputs, command, this::formatCommandForExecution, this::updateValues);
+        
+        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
+
+        DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
+
+        inputToModel.setValue(10.0);
+        shouldIBringUmbrella.eval();
+        Assert.assertEquals(20.0, shouldIBringUmbrella.getValue().scalar(), 1e-6);
+
+        inputToModel.setValue(20.0);
+        shouldIBringUmbrella.eval();
+        Assert.assertEquals(80.0, shouldIBringUmbrella.getValue().scalar(), 1e-6);
     }
 
     @Test
