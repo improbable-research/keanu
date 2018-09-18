@@ -7,12 +7,11 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.check.CustomElementwiseTensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.CustomTensorValueChecker;
+import io.improbable.keanu.tensor.validate.check.TensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueNotEqualsCheck;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
-public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> {
-
-    BooleanTensor check(TENSOR tensor);
+public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> extends TensorValueChecker<TENSOR> {
 
     void validate(TENSOR tensor);
 
@@ -21,11 +20,11 @@ public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> {
     TensorValidator<Double, DoubleTensor> NAN_FIXER = new NaNFixingTensorValidator(0.0);
 
     static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatExpectsNotToFind(DATATYPE v) {
-        return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck(v));
+        return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck<>(v));
     }
 
-    static <DATATYPE> TensorValidator<DATATYPE, ? extends Tensor<DATATYPE>> thatReplaces(DATATYPE oldValue, DATATYPE newValue) {
-        return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck(oldValue), TensorValidationPolicy.changeValueTo(newValue));
+    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidator<DATATYPE, TENSOR> thatReplaces(DATATYPE oldValue, DATATYPE newValue) {
+        return new TensorCheckAndRespondValidator<>(new TensorValueNotEqualsCheck<>(oldValue), TensorValidationPolicy.changeValueTo(newValue));
     }
 
     static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatExpects(Function<TENSOR, BooleanTensor> checkFunction) {

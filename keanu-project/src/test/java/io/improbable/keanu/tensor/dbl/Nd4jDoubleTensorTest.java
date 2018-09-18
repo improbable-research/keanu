@@ -883,7 +883,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, false},
             4, 2);
 
-        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0.);
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatExpectsNotToFind(0.);
         assertThat(validator.check(containsZero), equalTo(expectedMask));
     }
 
@@ -899,7 +899,7 @@ public class Nd4jDoubleTensorTest {
                 true, true, true, true},
             4, 2);
 
-        TensorValidator validator = TensorValidator.NAN_CATCHER;
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.NAN_CATCHER;
         assertThat(validator.check(containsNan), equalTo(expectedMask));
         assertThat(containsNan.isNaN(), equalTo(expectedMask.not()));
     }
@@ -958,7 +958,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
 
-        TensorValidator validator = TensorValidator.thatReplaces(0., 1e-8);
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatReplaces(0., 1e-8);
         validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }

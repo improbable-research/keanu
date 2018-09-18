@@ -13,6 +13,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.KeanuValueException;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
@@ -73,7 +74,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForZeros() {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor nonZero = DoubleTensor.scalar(1e-8);
-        TensorValidator validator = TensorValidator.thatExpectsNotToFind(0.);
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatExpectsNotToFind(0.);
         assertThat(validator.check(zero), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(nonZero), equalTo(BooleanTensor.scalar(true)));
     }
@@ -82,7 +83,7 @@ public class ScalarDoubleTensorTest {
     public void youCanCheckForNans() {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
-        TensorValidator validator = TensorValidator.NAN_CATCHER;
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.NAN_CATCHER;
         assertThat(nan.isNaN(), equalTo(BooleanTensor.scalar(true)));
         assertThat(notNan.isNaN(), equalTo(BooleanTensor.scalar(false)));
         assertThat(validator.check(nan), equalTo(BooleanTensor.scalar(false)));
@@ -138,7 +139,7 @@ public class ScalarDoubleTensorTest {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
-        TensorValidator validator = TensorValidator.thatReplaces(Double.NaN, 0.);
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatReplaces(Double.NaN, 0.);
         validator.validate(nan);
         validator.validate(notNan);
         assertThat(nan, equalTo(zero));
@@ -152,7 +153,7 @@ public class ScalarDoubleTensorTest {
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
         Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator validator = TensorValidator.thatFixesElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatFixesElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
         validator.validate(tensor1);
         validator.validate(tensor2);
         assertThat(tensor1, equalTo(notZero));
