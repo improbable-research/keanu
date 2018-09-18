@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -21,6 +23,8 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class ProgressBarTest {
 
@@ -138,6 +142,27 @@ public class ProgressBarTest {
 
         verify(finishHandler).run();
         verifyNoMoreInteractions(finishHandler);
+    }
+
+    @Test
+    public void youCanOverrideTheDefaultPrintStream() {
+        PrintStream mockStream = mock(PrintStream.class);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                System.out.println(invocation.getArgument(0).toString());
+                return null;
+            }
+        }).when(mockStream).print(anyString());
+
+        ProgressBar.setDefaultPrintStream(mockStream);
+        ProgressBar.enable();
+        ProgressBar progressBar = new ProgressBar();
+        progressBar.progress();
+        verify(mockStream).print("\r|Keanu|");
+        verifyNoMoreInteractions(mockStream);
+        progressBar.finish();
+        verify(mockStream).print("\r\\Keanu/");
     }
 
 }

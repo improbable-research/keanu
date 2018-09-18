@@ -12,7 +12,16 @@ import java.util.concurrent.atomic.AtomicReference;
 
 public class ProgressBar {
 
-    private static final PrintStream DEFAULT_PRINT_STREAM = System.out;
+    private static PrintStream defaultPrintStream = System.out;
+
+
+    /**
+     * Override the default print stream globally
+     * @param printStream The new printStream object to use for all ProgressBars that don't declare one
+     */
+    public static void setDefaultPrintStream(PrintStream printStream) {
+        ProgressBar.defaultPrintStream = printStream;
+    }
 
     /**
      * Disables all progress bars globally
@@ -66,7 +75,7 @@ public class ProgressBar {
     }
 
     public ProgressBar() {
-        this(DEFAULT_PRINT_STREAM, getDefaultScheduledExecutorService());
+        this(defaultPrintStream, getDefaultScheduledExecutorService());
     }
 
     public void progress() {
