@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.check.CustomElementwiseTensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.CustomTensorValueChecker;
 import io.improbable.keanu.tensor.validate.check.TensorValueNotEqualsCheck;
-import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> {
 
@@ -17,9 +16,7 @@ public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> {
     void validate(TENSOR tensor);
 
     TensorValidator<Double, DoubleTensor> NAN_CATCHER = TensorValidator.thatExpects(t -> t.isNaN().not());
-    TensorValidator<Double, Tensor<Double>> NAN_FIXER = TensorValidator
-        .<Double, Tensor<Double>>thatExpectsElementwise(v -> !Double.isNaN(v))
-        .<Double, Tensor<Double>>withPolicy(TensorValidationPolicy.changeValueTo(0.));
+    TensorValidator<Double, DoubleTensor> NAN_FIXER = new NaNFixingTensorValidator(0.0);
 
     public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatExpectsNotToFind(DATATYPE v) {
         return new TensorCheckAndRespondValidator<DATATYPE, TENSOR>(new TensorValueNotEqualsCheck(v));
