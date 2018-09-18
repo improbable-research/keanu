@@ -11,7 +11,6 @@ import static junit.framework.TestCase.assertTrue;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -19,6 +18,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.KeanuValueException;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
@@ -968,8 +968,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
 
-        Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator validator = TensorValidator.thatExpectsElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
         validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }

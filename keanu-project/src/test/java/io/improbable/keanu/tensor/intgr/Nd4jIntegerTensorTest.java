@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
-import java.util.function.Function;
 
 import org.junit.Test;
 
@@ -503,8 +502,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
         IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
 
-        Function<Integer, Boolean> checkFunction = x -> x >= 0;
-        TensorValidator<Integer, Tensor<Integer>> validator = TensorValidator.thatExpectsElementwise(checkFunction, TensorValidationPolicy.changeValueTo(0));
+        TensorValidator<Integer, Tensor<Integer>> validator = TensorValidator.thatFixesElementwise(x -> x >= 0, TensorValidationPolicy.changeValueTo(0));
         validator.validate(containsMinusOne);
         assertThat(containsMinusOne, equalTo(expectedResult));
     }

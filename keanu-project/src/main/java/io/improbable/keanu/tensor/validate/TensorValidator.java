@@ -36,7 +36,7 @@ public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> {
         return new TensorCheckAndRespondValidator<>(new CustomElementwiseTensorValueChecker<>(checkFunction));
     }
 
-    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatExpectsElementwise(Function<DATATYPE, Boolean> checkFunction, TensorValidationPolicy<TENSOR> validationPolicy) {
+    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatFixesElementwise(Function<DATATYPE, Boolean> checkFunction, TensorValidationPolicy<TENSOR> validationPolicy) {
         return new TensorCheckAndRespondValidator<>(new CustomElementwiseTensorValueChecker<>(checkFunction), validationPolicy);
     }
 }
