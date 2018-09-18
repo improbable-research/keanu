@@ -69,7 +69,7 @@ public class LoopTest {
     public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() {
         Loop loop = Loop
             .startingFrom(startValue)
-            .dontThrowWhenMaxCountIsReached()
+            .doNotThrowWhenMaxCountIsReached()
             .whilst(alwaysTrue)
             .apply(increment);
         loop.getOutput();
@@ -162,7 +162,7 @@ public class LoopTest {
         Loop loop = Loop
             .startingFrom(startFactorial, startFactor)
             .atMost(5)
-            .dontThrowWhenMaxCountIsReached()
+            .doNotThrowWhenMaxCountIsReached()
             .mapping(factorInLabel, factorOutLabel)
             .whilst(alwaysTrue)
             .apply(factorial);

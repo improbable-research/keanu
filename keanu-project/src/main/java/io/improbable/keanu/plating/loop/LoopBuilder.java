@@ -52,7 +52,7 @@ public class LoopBuilder {
      *
      * @return self
      */
-    public LoopBuilder dontThrowWhenMaxCountIsReached() {
+    public LoopBuilder doNotThrowWhenMaxCountIsReached() {
         this.throwWhenMaxCountIsReached = false;
         return this;
     }
