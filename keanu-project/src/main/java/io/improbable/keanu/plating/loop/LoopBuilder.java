@@ -150,7 +150,7 @@ public class LoopBuilder {
          */
         public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) {
             Plates plates = new PlateBuilder<Integer>()
-                .withInitialState(initialState.toArray(new Vertex[0]))
+                .withInitialState(initialState.stream().toArray(Vertex[]::new))
                 .withTransitionMapping(customMappings)
                 .count(maxLoopCount)
                 .withFactory((plate) -> {
