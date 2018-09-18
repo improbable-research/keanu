@@ -41,7 +41,7 @@ public class LoopBuilder {
      * @param maxCount the max number of times the loop can run
      * @return self
      */
-    public LoopBuilder atMost(int maxCount) {
+    public LoopBuilder withMaxIterations(int maxCount) {
         this.maxLoopCount = maxCount;
         return this;
     }

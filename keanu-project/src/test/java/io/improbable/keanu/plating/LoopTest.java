@@ -81,7 +81,7 @@ public class LoopTest {
         int customMaxCount = 5;
         Loop loop = Loop
             .startingFrom(startValue)
-            .atMost(customMaxCount)
+            .withMaxIterations(customMaxCount)
             .whilst(alwaysTrue)
             .apply(increment);
         assertThat(loop.getPlates().size(), equalTo(customMaxCount));
@@ -161,7 +161,7 @@ public class LoopTest {
 
         Loop loop = Loop
             .startingFrom(startFactorial, startFactor)
-            .atMost(5)
+            .withMaxIterations(5)
             .doNotThrowWhenMaxCountIsReached()
             .mapping(factorInLabel, factorOutLabel)
             .whilst(alwaysTrue)
