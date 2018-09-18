@@ -30,9 +30,7 @@ public class Plate implements VertexDictionary {
     }
 
     public <T extends Vertex<?>> void addAll(Collection<T> vertices) {
-        for (T v : vertices) {
-            add(v);
-        }
+        vertices.forEach(v -> add(v));
     }
 
     public <T extends Vertex<?>> T add(T v) {
