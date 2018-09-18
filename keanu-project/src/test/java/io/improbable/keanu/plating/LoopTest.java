@@ -15,7 +15,6 @@ import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.plating.loop.Loop;
 import io.improbable.keanu.plating.loop.LoopException;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -42,7 +41,7 @@ public class LoopTest {
             .startingFrom(startValue)
             .whilst(flip)
             .apply(increment);
-        Vertex<? extends Tensor<?>> output = loop.getOutput();
+        Vertex<?> output = loop.getOutput();
         assertThat(output, instanceOf(DoubleVertex.class));
     }
 

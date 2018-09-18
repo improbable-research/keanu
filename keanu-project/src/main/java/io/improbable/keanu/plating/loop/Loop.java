@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -117,7 +116,7 @@ public class Loop {
      * @return the output of the Loop (i.e. the output Vertex from the final Plate)
      * @throws LoopException if the loop was too short and hit its maximum unrolled size
      */
-    public <V extends Vertex<? extends Tensor<?>>> V getOutput() throws LoopException {
+    public <V extends Vertex<?>> V getOutput() throws LoopException {
         Plate finalPlate = plates.asList().get(plates.size() - 1);
         checkIfMaxCountHasBeenReached(finalPlate);
         return finalPlate.get(VALUE_OUT_LABEL);
