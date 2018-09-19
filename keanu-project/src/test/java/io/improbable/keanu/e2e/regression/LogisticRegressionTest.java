@@ -8,51 +8,52 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Before;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
 
 public class LogisticRegressionTest {
 
-    private static final int nFeatures = 3;
-    private static final double[] sigma = new double[] {1.0, 1.0, 1.0};
-    private static final DoubleTensor trueWeights = DoubleTensor.create(new double[] {0.5, -3.0, 1.5}, new int[] {3, 1});
-    private static final Double trueIntercept = 5.0;
-    private static final int nSamplesTrain = 1000;
-    private static final int nSamplesTest = 100;
+    private static final int numFeatures = 3;
+    private static final double[] sigmas = new double[] {1.0, 1.0, 1.0};
 
-    private DoubleTensor xTrain = generateX(nSamplesTrain);
+    private static final DoubleTensor trueWeights = DoubleTensor.create(new double[] {0.5, -3.0, 1.5}, 3, 1);
+    private static final double trueIntercept = 5.0;
+
+    private static final int numSamplesForTraining = 1000;
+    private static final int numSamplesForTesting = 100;
+
+    private DoubleTensor xTrain = generateX(numSamplesForTraining);
     private DoubleTensor yTrain = generateY(xTrain);
-    private DoubleTensor xTest = generateX(nSamplesTest);
+    private DoubleTensor xTest = generateX(numSamplesForTesting);
     private DoubleTensor yTest = generateY(xTest);
 
     @Test
     public void testLogisticRegression() {
         LogisticRegression model = new LogisticRegression(xTrain, yTrain);
-        model.fit();
-        checkPredictions(model, 0.9, 0.85);
+        model = model.fit();
+        checkPredictedValuesAreAccurate(model, 0.9, 0.85);
     }
 
     @Test
     public void testRegularizedLogisticRegression() {
         LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5.0);
-        regularizedModel.fit();
-        checkPredictions(regularizedModel, 0.9, 0.85);
+        regularizedModel = regularizedModel.fit();
+        checkPredictedValuesAreAccurate(regularizedModel, 0.9, 0.85);
     }
 
-    private void checkPredictions(LogisticRegression model, double thresholdTrain, double thresholdTest) {
-        DoubleTensor yHatTrain = model.predict(xTrain).round();
-        DoubleTensor yHatTest = model.predict(xTest).round();
-        assertAccurate(yHatTrain, yTrain, thresholdTrain);
-        assertAccurate(yHatTest, yTest, thresholdTest);
+    private void checkPredictedValuesAreAccurate(LogisticRegression model, double thresholdTrain, double thresholdTest) {
+        DoubleTensor predictedYTrain = model.predict(xTrain).round();
+        DoubleTensor predictedYTest = model.predict(xTest).round();
+        assertYValuesArePredicted(predictedYTrain, yTrain, thresholdTrain);
+        assertYValuesArePredicted(predictedYTest, yTest, thresholdTest);
     }
 
     private static DoubleTensor generateX(int nSamples) {
-        DoubleVertex xVertex = new GaussianVertex(new int[] {nSamples, 1}, 0.0, sigma[0]);
-        for (int i = 1; i < nFeatures; i++) {
+        DoubleVertex xVertex = new GaussianVertex(new int[] {nSamples, 1}, 0.0, sigmas[0]);
+        for (int i = 1; i < numFeatures; i++) {
             xVertex = new ConcatenationVertex(
-                1, xVertex, new GaussianVertex(new int[] {nSamples, 1}, 0.0, sigma[i])
+                1, xVertex, new GaussianVertex(new int[] {nSamples, 1}, 0.0, sigmas[i])
             );
         }
         return xVertex.sample();
@@ -67,12 +68,11 @@ public class LogisticRegressionTest {
         return DoubleTensor.create(outcome, probabilities.getShape());
     }
 
-    private void assertAccurate(DoubleTensor yHat, DoubleTensor y, double threshold) {
-        double accuracy = 1.0 - yHat.minus(y).abs().average();
+    private void assertYValuesArePredicted(DoubleTensor predictedYValues, DoubleTensor y, double threshold) {
+        double accuracy = 1.0 - predictedYValues.minus(y).abs().average();
         assertTrue(
             String.format("Observed accuracy %.2f is below the required threshold %.2f", accuracy, threshold),
             accuracy >= threshold
         );
-        System.out.println(String.format("Observed accuracy was %.2f", accuracy));
     }
 }
