@@ -66,7 +66,6 @@ public class FoodPoisoningTest {
         generateSurveyData(50, false, false, false);
         NetworkSamples samples = sample(15000);
 
-        int dropCount = 10000;
         assertEquals(0.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
@@ -88,9 +87,9 @@ public class FoodPoisoningTest {
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
         Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labeledAs(didEatOystersLabel));
-            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labeledAs(didEatLambLabel));
-            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labeledAs(didEatPooLabel));
+            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).setLabel(didEatOystersLabel));
+            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).setLabel(didEatLambLabel));
+            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).setLabel(didEatPooLabel));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -102,10 +101,10 @@ public class FoodPoisoningTest {
             DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
                 .orElse(0.1)
-                .labeledAs(pIllLabel);
+                .setLabel(pIllLabel);
 
             plate.add(pIll);
-            plate.add(new BernoulliVertex(pIll).labeledAs(isIllLabel));
+            plate.add(new BernoulliVertex(pIll).setLabel(isIllLabel));
         };
 
         Plates personPlates = new PlateBuilder()

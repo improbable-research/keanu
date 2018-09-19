@@ -34,9 +34,9 @@ public class LinearRegression implements LinearModel {
 
     @Override
     public LinearRegression fit() {
-        DoubleVertex weights = new GaussianVertex(0.0, sigmaOnPrior).setLabel(WEIGHTS_LABEL);
+        DoubleVertex weights = new GaussianVertex(new int[]{1, x.getShape()[0]}, 0.0, sigmaOnPrior).setLabel(WEIGHTS_LABEL);
         DoubleVertex intercept = new GaussianVertex(0.0, sigmaOnPrior).setLabel(INTERCEPT_LABEL);
-        DoubleVertex xMu = weights.multiply(ConstantVertex.of(x));
+        DoubleVertex xMu = weights.getValue().isScalar() ? weights.times(ConstantVertex.of(x)) : weights.matrixMultiply(ConstantVertex.of(x));
         DoubleVertex yVertex = new GaussianVertex(xMu.plus(intercept), sigmaOnPrior);
         yVertex.observe(y);
 
@@ -67,5 +67,9 @@ public class LinearRegression implements LinearModel {
 
     public BayesianNetwork getNet() {
         return net;
+    }
+
+    public double getWeight(int index) {
+        return ((DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL)).getValue(0, index);
     }
 }

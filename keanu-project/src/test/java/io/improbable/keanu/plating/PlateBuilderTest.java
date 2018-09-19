@@ -68,7 +68,7 @@ public class PlateBuilderTest {
         VertexLabel vertexName = new VertexLabel("vertexName");
         Plates plates = new PlateBuilder<>()
             .count(n)
-            .withFactory((plate) -> plate.add(new BernoulliVertex(0.5).labeledAs(vertexName)))
+            .withFactory((plate) -> plate.add(new BernoulliVertex(0.5).setLabel(vertexName)))
             .build();
         plates.asList().forEach(plate -> {
             assertNotNull(plate.get(vertexName));
@@ -101,8 +101,8 @@ public class PlateBuilderTest {
             .count(10)
             .withFactory((plate) -> {
                 VertexLabel label = new VertexLabel("x");
-                DoubleVertex vertex1 = ConstantVertex.of(1.).labeledAs(label);
-                DoubleVertex vertex2 = ConstantVertex.of(1.).labeledAs(label);
+                DoubleVertex vertex1 = ConstantVertex.of(1.).setLabel(label);
+                DoubleVertex vertex2 = ConstantVertex.of(1.).setLabel(label);
                 plate.add(vertex1);
                 plate.add(vertex2);
             })
@@ -119,7 +119,7 @@ public class PlateBuilderTest {
         Plates plates = new PlateBuilder<Bean>()
             .count(10)
             .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta).labeledAs(label);
+                BoolVertex flip = new BernoulliVertex(commonTheta).setLabel(label);
                 flip.observe(false);
                 plate.add(flip);
             })
@@ -141,7 +141,7 @@ public class PlateBuilderTest {
         Plates plates = new PlateBuilder<Bean>()
             .count(10)
             .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta).labeledAs(label);
+                BoolVertex flip = new BernoulliVertex(commonTheta).setLabel(label);
                 flip.observe(false);
                 plate.add(flip);
             })
@@ -156,7 +156,7 @@ public class PlateBuilderTest {
         expectedException.expectMessage(containsString("has already been added to Plate_"));
 
         VertexLabel label = new VertexLabel("theta");
-        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01).labeledAs(label);
+        GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01).setLabel(label);
 
         new PlateBuilder<Bean>()
             .count(10)
@@ -176,7 +176,7 @@ public class PlateBuilderTest {
         Plates plates = new PlateBuilder<Bean>()
             .fromIterator(ROWS.iterator())
             .withFactory((plate, bean) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta).labeledAs(label);
+                BoolVertex flip = new BernoulliVertex(commonTheta).setLabel(label);
                 flip.observe(false);
                 plate.add(flip);
             })
@@ -204,7 +204,7 @@ public class PlateBuilderTest {
         VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labeledAs(xLabel);
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).setLabel(xLabel);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Plates plates = new PlateBuilder<Integer>()
@@ -212,8 +212,8 @@ public class PlateBuilderTest {
             .count(10)
             .withFactory((plate) -> {
                 DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
-                DoubleVertex x = new ExponentialVertex(xPrevious).labeledAs(xLabel);
-                IntegerVertex y = new PoissonVertex(x).labeledAs(yLabel);
+                DoubleVertex x = new ExponentialVertex(xPrevious).setLabel(xLabel);
+                IntegerVertex y = new PoissonVertex(x).setLabel(yLabel);
                 plate.add(xPrevious);
                 plate.add(x);
                 plate.add(y);
@@ -249,7 +249,7 @@ public class PlateBuilderTest {
         VertexLabel xPreviousLabel = PlateBuilder.proxyFor(xLabel);
         VertexLabel yLabel = new VertexLabel("y");
 
-        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).labeledAs(xLabel);
+        Vertex<DoubleTensor> initialX = ConstantVertex.of(1.).setLabel(xLabel);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
         Plates plates = new PlateBuilder<Integer>()
@@ -257,8 +257,8 @@ public class PlateBuilderTest {
             .fromIterator(ys.iterator())
             .withFactory((plate, observedY) -> {
                 DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
-                DoubleVertex x = new ExponentialVertex(xPreviousProxy).labeledAs(xLabel);
-                IntegerVertex y = new PoissonVertex(x).labeledAs(yLabel);
+                DoubleVertex x = new ExponentialVertex(xPreviousProxy).setLabel(xLabel);
+                IntegerVertex y = new PoissonVertex(x).setLabel(yLabel);
                 y.observe(observedY);
                 plate.add(xPreviousProxy);
                 plate.add(x);
@@ -317,7 +317,7 @@ public class PlateBuilderTest {
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(ConstantVertex.of(1.).labeledAs(realLabel))
+            .withInitialState(ConstantVertex.of(1.).setLabel(realLabel))
             .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
             .count(10)
             .withFactory((plate) -> {
