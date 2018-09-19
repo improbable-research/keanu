@@ -21,6 +21,7 @@ public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic
     }
 
     @Override
-    public IntegerTensor calculate() { return inputVertex.getValue();
+    public IntegerTensor calculate() {
+        return inputVertex.getValue();
     }
 }
