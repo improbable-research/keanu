@@ -2,12 +2,7 @@ package io.improbable.keanu.algorithms.mcmc;
 
 import static io.improbable.keanu.algorithms.mcmc.proposal.MHStepVariableSelector.SINGLE_VARIABLE_SELECTOR;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.Arrays;
+import java.util.*;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.PosteriorSamplingAlgorithm;
@@ -81,7 +76,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
     public NetworkSamples getPosteriorSamples(BayesianNetwork bayesianNetwork,
                                               Vertex vertexToSampleFrom,
                                               int sampleCount) {
-        return generatePosteriorSamples(bayesianNetwork, Arrays.asList(vertexToSampleFrom))
+        return generatePosteriorSamples(bayesianNetwork, Collections.singletonList(vertexToSampleFrom))
             .generate(sampleCount);
     }
 
