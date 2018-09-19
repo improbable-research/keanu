@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -36,20 +35,27 @@ public class LogisticRegression implements LinearModel {
         this.priorMu = DEFAULT_MU;
         this.priorSigma = DEFAULT_SIGMA;
         this.regularization = regularization;
+        construct();
     }
 
     public LogisticRegression(DoubleTensor x, DoubleTensor y) {
         this(x, y, DEFAULT_REGULARIZATION);
     }
 
-    public LogisticRegression fit() {
-        BooleanTensor observedOutcomes = y.greaterThan(0.5);
+    @Override
+    public BayesianNetwork construct() {
         DoubleVertex probabilities = computeProbabilities(x);
         probabilities.setLabel(PROBABILITIES_LABEL);
         BernoulliVertex outcomes = new BernoulliVertex(probabilities);
         outcomes.setLabel(OUTCOMES_LABEL);
-        outcomes.observe(observedOutcomes);
         net = new BayesianNetwork(outcomes.getConnectedGraph());
+        return net;
+    }
+
+    @Override
+    public LogisticRegression fit() {
+        BooleanTensor observedOutcomes = y.greaterThan(0.5);
+        net.getVertexByLabel(OUTCOMES_LABEL).observe(observedOutcomes);
         GradientOptimizer optimizer = GradientOptimizer.of(net);
         optimizer.maxAPosteriori();
         isFit = true;
@@ -100,4 +106,5 @@ public class LogisticRegression implements LinearModel {
     public double getWeight(int index) {
         return ((DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL)).getValue(0, index);
     }
+
 }

@@ -30,10 +30,11 @@ public class LinearRegression implements LinearModel {
         this.isFit = false;
         this.net = null;
         this.sigmaOnPrior = sigmaOnPrior;
+        construct();
     }
 
     @Override
-    public LinearRegression fit() {
+    public BayesianNetwork construct() {
         DoubleVertex weights = new GaussianVertex(new int[]{1, x.getShape()[0]}, 0.0, sigmaOnPrior).setLabel(WEIGHTS_LABEL);
         DoubleVertex intercept = new GaussianVertex(0.0, sigmaOnPrior).setLabel(INTERCEPT_LABEL);
         DoubleVertex xMu = weights.getValue().isScalar() ? weights.times(ConstantVertex.of(x)) : weights.matrixMultiply(ConstantVertex.of(x));
@@ -41,6 +42,11 @@ public class LinearRegression implements LinearModel {
         yVertex.observe(y);
 
         net = new BayesianNetwork(yVertex.getConnectedGraph());
+        return net;
+    }
+
+    @Override
+    public LinearRegression fit() {
         GradientOptimizer optimizer = GradientOptimizer.of(net);
         optimizer.maxLikelihood();
         isFit = true;
@@ -72,4 +78,5 @@ public class LinearRegression implements LinearModel {
     public double getWeight(int index) {
         return ((DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL)).getValue(0, index);
     }
+
 }
