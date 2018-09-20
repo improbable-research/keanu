@@ -5,17 +5,21 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeC
 import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
 
@@ -48,6 +52,34 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> splitPartials = new HashMap<>();
+
+        int currentSplitIndex = 0;
+        int[] splitIndices = new int[input.length];
+
+        for (int i = 0; i < input.length; i++) {
+            splitIndices[i] = currentSplitIndex + input[i].getShape()[dimension];
+            currentSplitIndex = splitIndices[i];
+            splitPartials.put(input[i], new PartialDerivatives(new HashMap<>()));
+        }
+
+        int wrtDimensionToSliceOn = input[0].getShape().length + dimension;
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+            DoubleTensor partial = entry.getValue();
+
+            List<DoubleTensor> splitPartial = partial.split(wrtDimensionToSliceOn, splitIndices);
+
+            for (int i = 0; i < splitPartial.size(); i++) {
+                splitPartials.get(input[i]).putWithRespectTo(entry.getKey(), splitPartial.get(i));
+            }
+
+        }
+
+        return splitPartials;
+    }
+
+    @Override
     public DoubleTensor sample(KeanuRandom random) {
         return op(extractFromInputs(DoubleTensor.class, Vertex::sample));
     }
@@ -58,9 +90,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     protected DoubleTensor op(DoubleTensor... inputs) {
-        DoubleTensor primary = inputs[0];
-        DoubleTensor[] toConcat = Arrays.copyOfRange(inputs, 1, inputs.length);
-        return primary.concat(dimension, toConcat);
+        return DoubleTensor.concat(dimension, inputs);
     }
 
     private <T> T[] extractFromInputs(Class<T> clazz, Function<Vertex<DoubleTensor>, T> func) {

@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +17,9 @@ import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class CauchyVertexTest {
 
@@ -62,13 +62,11 @@ public class CauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         CauchyVertex tensorCauchyVertex = new CauchyVertex(locationTensor, scaleTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorCauchyVertex.dLogPdf(0.5, locationTensor, scaleTensor, tensorCauchyVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(cauchyLogDiff.dPdlocation, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);
-        assertEquals(cauchyLogDiff.dPdscale, actual.withRespectTo(scaleTensor.getId()).scalar(), 1e-5);
-        assertEquals(cauchyLogDiff.dPdx, actual.withRespectTo(tensorCauchyVertex.getId()).scalar(), 1e-5);
+        assertEquals(cauchyLogDiff.dPdlocation, actualDerivatives.get(locationTensor).scalar(), 1e-5);
+        assertEquals(cauchyLogDiff.dPdscale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);
+        assertEquals(cauchyLogDiff.dPdx, actualDerivatives.get(tensorCauchyVertex).scalar(), 1e-5);
     }
 
     @Test

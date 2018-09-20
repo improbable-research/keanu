@@ -7,11 +7,11 @@ public class DiscretePoint {
     private final Object[] point;
 
     public DiscretePoint(Object[] point) {
-        this.point = point;
+        this.point = Arrays.copyOf(point, point.length);
     }
 
     public Object[] getPoint() {
-        return point;
+        return Arrays.copyOf(point, point.length);
     }
 
     @Override

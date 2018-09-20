@@ -1,17 +1,21 @@
 package io.improbable.keanu.tensor;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
+
+import com.google.common.primitives.Ints;
 
 public class TensorShape {
 
     private int[] shape;
 
     public TensorShape(int[] shape) {
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
     }
 
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     public boolean isScalar() {
@@ -70,9 +74,9 @@ public class TensorShape {
     }
 
     /**
-     * @param shape shape to find the index for
+     * @param shape  shape to find the index for
      * @param stride stride to find the index for
-     * @param index the index in each dimension
+     * @param index  the index in each dimension
      * @return the flat index from a N dimensional index
      */
     public static int getFlatIndex(int[] shape, int[] stride, int... index) {
@@ -92,9 +96,9 @@ public class TensorShape {
 
     /**
      * This method can be interpreted as the opposite to getFlatIndex.
-
-     * @param shape the shape to find the index of
-     * @param stride the stride to find the index of
+     *
+     * @param shape     the shape to find the index of
+     * @param stride    the stride to find the index of
      * @param flatIndex the index to f
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */
@@ -141,6 +145,13 @@ public class TensorShape {
         return dims;
     }
 
+    public static int[] slideDimension(int from, int to, int[] shape) {
+        List<Integer> shapeList = new ArrayList<>(Ints.asList(shape));
+        Integer dimLength = shapeList.remove(from);
+        shapeList.add(to, dimLength);
+        return Ints.toArray(shapeList);
+    }
+
     public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
     }
@@ -169,6 +180,25 @@ public class TensorShape {
         int[] newShape = Arrays.copyOf(shape, shape.length);
         newShape[dimension] = 1;
         return newShape;
+    }
+
+    /**
+     * Writes a lower rank shape over a higher rank shape, starting from the right.
+     * <p>
+     * e.g: high rank shape = [1, 2, 2, 1]
+     * low rank shape = [1, 4]
+     * <p>
+     * Result after copy = [1, 2, 1, 4]
+     *
+     * @param higherRankShape source shape that will get written over
+     * @param lowerRankShape  shape to write
+     * @return the high rank  shape with the lower rank shape inserted on top of it
+     */
+    public static int[] copyLowRankOverHighRankFromTailEnd(int[] higherRankShape, int[] lowerRankShape) {
+        int[] highRankCopy = Arrays.copyOf(higherRankShape, higherRankShape.length);
+        int deltaLength = highRankCopy.length - lowerRankShape.length;
+        System.arraycopy(lowerRankShape, 0, highRankCopy, deltaLength, highRankCopy.length - deltaLength);
+        return highRankCopy;
     }
 
 }

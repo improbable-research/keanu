@@ -1,10 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorsAndScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoScalars;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwoScalarVertexValues;
+
 import org.junit.Test;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class MultiplicationVertexTest {
 
@@ -57,6 +63,17 @@ public class MultiplicationVertexTest {
             2,
             DoubleTensor.eye(4).times(2).reshape(1, 4, 1, 4),
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4, 1, 1),
+            DoubleVertex::multiply
+        );
+    }
+
+    @Test
+    public void calculatesDualNumberofAScalarAndVectorsMultiplied() {
+        calculatesDualNumberOfAScalarAndVector(
+            2,
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}).reshape(1, 4, 1, 1),
+            DoubleTensor.eye(4).timesInPlace(2).reshape(1, 4, 1, 4),
             DoubleVertex::multiply
         );
     }

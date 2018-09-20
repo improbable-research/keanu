@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
 
 public class DualNumberTensorTest {
 
@@ -67,16 +70,17 @@ public class DualNumberTensorTest {
         DoubleVertex A = new UniformVertex(new int[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
-        DoubleVertex prod = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
+        DoubleVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        DualNumber dualNumber = prod.getDualNumber();
+        DualNumber dualNumber = B.getDualNumber();
 
         DoubleTensor wrtA = dualNumber.getPartialDerivatives().withRespectTo(A);
 
-        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 8, 12, 16}).reshape(1, 1, 2, 2);
+        //B = 1*(a00 + a01 + a10 + a11) + 2*(a00 + a01 + a10 + a11)+ 3*(a00 + a01 + a10 + a11)+ 4*(a00 + a01 + a10 + a11)
+        //dBda00 = 1 + 2 + 3 + 4 = 10
+        DoubleTensor expectedWrt = DoubleTensor.create(new double[]{10, 10, 10, 10}).reshape(1, 1, 2, 2);
 
-        assertArrayEquals(expectedWrt.asFlatDoubleArray(), wrtA.asFlatDoubleArray(), 0.0);
-        assertArrayEquals(expectedWrt.getShape(), wrtA.getShape());
+        assertThat(wrtA, equalTo(expectedWrt));
     }
 
 }

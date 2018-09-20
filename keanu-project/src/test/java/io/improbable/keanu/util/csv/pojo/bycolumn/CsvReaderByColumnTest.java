@@ -1,14 +1,17 @@
 package io.improbable.keanu.util.csv.pojo.bycolumn;
 
+import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
+import static org.junit.Assert.assertArrayEquals;
+
+import java.util.Arrays;
+
+import org.junit.Test;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
-import org.junit.Test;
-
-import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
-import static org.junit.Assert.assertArrayEquals;
 
 public class CsvReaderByColumnTest {
 
@@ -89,15 +92,15 @@ public class CsvReaderByColumnTest {
         private boolean[] c;
 
         public void setA(int[] a) {
-            this.a = a;
+            this.a = Arrays.copyOf(a, a.length);
         }
 
         public void setB(Double[] b) {
-            this.b = b;
+            this.b = Arrays.copyOf(b, b.length);
         }
 
         public void setC(boolean[] c) {
-            this.c = c;
+            this.c = Arrays.copyOf(c, c.length);
         }
     }
 
@@ -108,17 +111,17 @@ public class CsvReaderByColumnTest {
 
         @CsvProperty("a")
         public void setSomeThing(int[] a) {
-            this.a = a;
+            this.a = Arrays.copyOf(a, a.length);
         }
 
         @CsvProperty("b")
         public void setSomethingElse(double[] b) {
-            this.b = b;
+            this.b = Arrays.copyOf(b, b.length);
         }
 
         @CsvProperty("c")
         public void setSomeBooleans(Boolean[] c) {
-            this.c = c;
+            this.c = Arrays.copyOf(c, c.length);
         }
     }
 
