@@ -11,6 +11,8 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
+import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
+import static io.improbable.keanu.vertices.VertexMatchers.hasLabel;
 import static io.improbable.keanu.vertices.VertexMatchers.hasNoLabel;
 import static io.improbable.keanu.vertices.VertexMatchers.hasParents;
 
@@ -24,6 +26,7 @@ import org.junit.rules.ExpectedException;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -108,6 +111,30 @@ public class PlateBuilderTest {
             .build();
     }
 
+    @Test
+    public void ifAVertexIsLabeledThatIsWhatsUsedToReferToItInThePlate() {
+        VertexLabel label = new VertexLabel("label");
+
+        Vertex<?> startVertex = ConstantVertex.of(1.).labeledAs(label);
+
+        Plates plates = new PlateBuilder<Integer>()
+            .withInitialState(startVertex)
+            .withTransitionMapping(ImmutableMap.of(label, label))
+            .count(10)
+            .withFactory((plate) -> {
+                DoubleVertex intermediateVertex = new DoubleProxyVertex(label);
+                plate.add(intermediateVertex);
+            })
+            .build();
+
+        for (Plate plate : plates) {
+            Vertex<?> vertex = plate.get(label);
+            assertThat(vertex, hasLabel(hasUnqualifiedName(label.getUnqualifiedName())));
+            Vertex<?> parent = Iterables.getOnlyElement(vertex.getParents());
+            assertThat(parent, hasLabel(hasUnqualifiedName(label.getUnqualifiedName())));
+        }
+    }
+
     @Test(expected = IllegalArgumentException.class)
     public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
         new PlateBuilder<Integer>()
@@ -120,7 +147,6 @@ public class PlateBuilderTest {
                 plate.add(label, vertex2);
             })
             .build();
-
     }
 
     @Test
