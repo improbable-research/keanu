@@ -32,13 +32,14 @@ public class ProgressBarTest {
     private AtomicReference<Runnable> progressUpdateCall;
     private ProgressBar progressBar;
     private ByteArrayOutputStream byteArrayOutputStream;
+    private ScheduledExecutorService scheduler;
 
     @Before
     public void setup() throws UnsupportedEncodingException {
 
         byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(byteArrayOutputStream, true, "UTF-8");
-        ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
+        scheduler = mock(ScheduledExecutorService.class);
 
         progressUpdateCall = new AtomicReference<>(null);
 
@@ -158,11 +159,10 @@ public class ProgressBarTest {
 
         ProgressBar.setDefaultPrintStream(mockStream);
         ProgressBar.enable();
-        ProgressBar progressBar = new ProgressBar();
+        ProgressBar progressBar = new ProgressBar(scheduler);
         progressBar.progress();
-        verify(mockStream, atLeastOnce()).print(anyString());
         progressBar.finish();
-        verify(mockStream, atLeastOnce()).print(anyString());
+        verify(mockStream, atLeastOnce()).print("\r|Keanu|");
     }
 
     @After

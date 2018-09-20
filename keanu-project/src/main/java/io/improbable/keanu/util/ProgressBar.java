@@ -74,6 +74,10 @@ public class ProgressBar {
         this(printStream, getDefaultScheduledExecutorService());
     }
 
+    public ProgressBar(ScheduledExecutorService scheduler) {
+        this(defaultPrintStream, scheduler);
+    }
+
     public ProgressBar() {
         this(defaultPrintStream, getDefaultScheduledExecutorService());
     }
