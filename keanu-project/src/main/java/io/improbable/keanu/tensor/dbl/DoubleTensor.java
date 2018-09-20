@@ -146,6 +146,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor log();
 
+    DoubleTensor logGamma();
+
     DoubleTensor sin();
 
     DoubleTensor cos();
@@ -230,6 +232,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor sqrtInPlace();
 
     DoubleTensor logInPlace();
+
+    DoubleTensor logGammaInPlace();
 
     DoubleTensor sinInPlace();
 

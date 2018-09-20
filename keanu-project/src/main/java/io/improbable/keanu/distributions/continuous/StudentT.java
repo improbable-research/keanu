@@ -51,8 +51,8 @@ public class StudentT implements ContinuousDistribution {
         DoubleTensor vAsDouble = v.toDouble();
         DoubleTensor halfVPlusOne = vAsDouble.plus(1).divInPlace(2);
 
-        DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.apply(Gamma::logGamma);
-        DoubleTensor logGammaHalfV = vAsDouble.div(2).applyInPlace(Gamma::logGamma);
+        DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.logGamma();
+        DoubleTensor logGammaHalfV = vAsDouble.div(2).logGammaInPlace();
         DoubleTensor halfLogV = vAsDouble.log().divInPlace(2);
 
         return logGammaHalfVPlusOne

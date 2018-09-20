@@ -37,8 +37,8 @@ public class Dirichlet implements ContinuousDistribution {
             throw new IllegalArgumentException("Sum of values to calculate Dirichlet likelihood for must equal 1");
         }
         final double sumConcentrationLogged = concentration.minus(1.).timesInPlace(x.log()).sum();
-        final double sumLogGammaConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::gamma).logInPlace().sum();
-        final double logGammaSumConcentration = Math.log(org.apache.commons.math3.special.Gamma.gamma(concentration.sum()));
+        final double sumLogGammaConcentration = concentration.logGamma().sum();
+        final double logGammaSumConcentration = org.apache.commons.math3.special.Gamma.logGamma(concentration.sum());
         return DoubleTensor.scalar(sumConcentrationLogged - sumLogGammaConcentration + logGammaSumConcentration);
     }
 
