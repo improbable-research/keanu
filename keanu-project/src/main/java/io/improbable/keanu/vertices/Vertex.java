@@ -29,6 +29,7 @@ public abstract class Vertex<T> implements Observable<T> {
     /**
      * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
      * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
+     * @param <V> vertex type
      * @return this
      */
     public <V extends Vertex<T>> V setLabel(VertexLabel label) {
