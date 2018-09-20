@@ -74,11 +74,6 @@ public class Plate implements VertexDictionary {
     }
 
     @Override
-    public VertexDictionary getAllVertices() {
-        return VertexDictionary.backedBy(ImmutableMap.copyOf(contents));
-    }
-
-    @Override
     public VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
         return SimpleVertexDictionary.backedBy(contents, extraEntries);
     }

@@ -33,11 +33,6 @@ public class SimpleVertexDictionary implements VertexDictionary {
         return SimpleVertexDictionary.backedBy(dictionary, extraEntries);
     }
 
-    @Override
-    public VertexDictionary getAllVertices() {
-        return VertexDictionary.backedBy(ImmutableMap.copyOf(dictionary));
-    }
-
     public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {
         return new SimpleVertexDictionary(dictionary);
     }

@@ -8,8 +8,6 @@ public interface VertexDictionary {
 
     VertexDictionary withExtraEntries(Map<VertexLabel,Vertex<?>> extraEntries);
 
-    VertexDictionary getAllVertices();
-
     static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> map) {
         return SimpleVertexDictionary.backedBy(map);
     }

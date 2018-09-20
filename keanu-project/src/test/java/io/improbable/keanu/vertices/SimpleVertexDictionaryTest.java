@@ -34,28 +34,11 @@ public class SimpleVertexDictionaryTest {
     }
 
     @Test
-    public void youCanGetAllTheVerticesAsANewDictionary() {
-        VertexDictionary dictionary2 = dictionary.getAllVertices();
-        assertThat(dictionary2.get(label1), sameInstance(vertex1));
-        assertThat(dictionary2.get(label2), sameInstance(vertex2));
-    }
-
-    @Test
     public void ifYouChangeTheUnderlyingMapItChangesTheDictionary() {
         VertexLabel label3 = new VertexLabel("label3");
         Vertex<?> vertex3 = mock(Vertex.class);
         map.put(label3, vertex3);
         assertThat(dictionary.get(label3), sameInstance(vertex3));
-    }
-
-    @Test
-    public void whenYouGetAllVerticesItsADefensiveCopy() {
-        VertexDictionary dictionary2 = dictionary.getAllVertices();
-        assertThat(dictionary2.get(label1), sameInstance(vertex1));
-        assertThat(dictionary2.get(label2), sameInstance(vertex2));
-        VertexLabel label3 = new VertexLabel("label3");
-        map.put(label3, mock(Vertex.class));
-        assertThat(dictionary2.get(label3), is(nullValue()));
     }
 
     @Test
