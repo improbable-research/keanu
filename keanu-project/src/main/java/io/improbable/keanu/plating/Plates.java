@@ -31,4 +31,12 @@ public class Plates implements Iterable<Plate> {
     public Iterator<Plate> iterator() {
         return containedPlates.iterator();
     }
+
+    public Plate getLastPlate() {
+        try {
+            return this.asList().get(this.size() - 1);
+        } catch (ArrayIndexOutOfBoundsException e) {
+            throw new PlateException("Plates is empty!", e);
+        }
+    }
 }

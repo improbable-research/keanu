@@ -116,7 +116,7 @@ public class Loop {
      * @throws LoopException if the loop was too short and hit its maximum unrolled size
      */
     public <V extends Vertex<?>> V getOutput() throws LoopException {
-        Plate finalPlate = plates.asList().get(plates.size() - 1);
+        Plate finalPlate = plates.getLastPlate();
         checkIfMaxCountHasBeenReached(finalPlate);
         return finalPlate.get(VALUE_OUT_LABEL);
     }
