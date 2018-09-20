@@ -7,10 +7,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 
 import io.improbable.keanu.vertices.ProxyVertex;
-import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -32,6 +30,10 @@ public class Plate implements VertexDictionary {
 
     public <T extends Vertex<?>> void addAll(Collection<T> vertices) {
         vertices.forEach(v -> add(v));
+    }
+
+    public <T extends Vertex<?>> void addAll(Map<VertexLabel, T> vertices) {
+        vertices.entrySet().forEach(v -> add(v.getKey(), v.getValue()));
     }
 
     public <T extends Vertex<?>> T add(T v) {
@@ -74,8 +76,11 @@ public class Plate implements VertexDictionary {
     }
 
     @Override
-    public VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
-        return SimpleVertexDictionary.backedBy(contents, extraEntries);
+    public Plate withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+        Plate plate = new Plate();
+        plate.addAll(contents);
+        plate.addAll(extraEntries);
+        return plate;
     }
 
     public Collection<Vertex<?>> getProxyVertices() {
