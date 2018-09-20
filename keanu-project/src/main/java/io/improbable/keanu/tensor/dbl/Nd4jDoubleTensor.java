@@ -849,7 +849,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * )
      */
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
 
         int[] shape = getShape();
         if (dimension < 0 || dimension >= shape.length) {

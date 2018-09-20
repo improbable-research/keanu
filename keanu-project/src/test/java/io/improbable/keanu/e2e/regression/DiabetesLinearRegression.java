@@ -9,8 +9,12 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
+import org.nd4j.linalg.api.ops.impl.layers.Linear;
+
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html
@@ -49,7 +53,7 @@ public class DiabetesLinearRegression {
     }
 
     @Test
-    public void doesLinearRegressionWithAPI() {
+    public void doesLinearRegressionOnBMIAsModel() {
         Data data = ReadCsv
             .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
             .asVectorizedColumnsDefinedBy(Data.class)
@@ -57,8 +61,32 @@ public class DiabetesLinearRegression {
 
         LinearRegression regression = new LinearRegression(data.bmi, data.y);
         regression.fit();
-        assertEquals(938.2378, regression.getWeights().getValue().scalar(), 0.01);
+        assertEquals(938.2378, regression.getWeight(0), 0.01);
         assertEquals(152.9189, regression.getIntercept().getValue().scalar(), 0.01);
+    }
+
+    @Test
+    public void canPredictFutureValuesWithLinearRegression() {
+        Data data = ReadCsv
+            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
+            .asVectorizedColumnsDefinedBy(Data.class)
+            .load(true);
+
+        int sizeOfTestData = 100;
+
+        List<DoubleTensor> splitXData = data.bmi.split(1, (int) data.bmi.getLength() - sizeOfTestData, (int) data.bmi.getLength() - 1);
+        DoubleTensor xTrainingData = splitXData.get(0);
+        DoubleTensor xTestData = splitXData.get(1);
+
+        List<DoubleTensor> splitYData = data.y.split(1, (int) data.y.getLength() - sizeOfTestData, (int) data.bmi.getLength() - 1);
+        DoubleTensor yTrainingData = splitYData.get(0);
+        DoubleTensor yTestData = splitYData.get(1);
+
+        LinearRegression regression = new LinearRegression(xTrainingData, yTrainingData);
+        regression.fit();
+
+        double accuracyOnTestData = regression.score(xTestData, yTestData);
+        assertTrue(accuracyOnTestData < 1 && accuracyOnTestData > 0);
     }
 
 }

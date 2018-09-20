@@ -62,6 +62,17 @@ public class LogisticRegression implements LinearModel {
         return this;
     }
 
+    @Override
+    public DoubleTensor predict(DoubleTensor x) throws IllegalStateException {
+        if (isFit) {
+            DoubleVertex weights = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
+            DoubleVertex intercept = (DoubleVertex) net.getVertexByLabel(INTERCEPT_LABEL);
+            return x.matrixMultiply(weights.getValue()).plus(intercept.getValue()).sigmoid();
+        } else {
+            throw new RuntimeException("The model must be fit before attempting to predict.");
+        }
+    }
+
     private DoubleVertex computeProbabilities(DoubleTensor x) {
         double[] sigma = new double[x.getShape()[1]];
         for (int i = 0; i < x.getShape()[1]; i++) {
@@ -79,16 +90,6 @@ public class LogisticRegression implements LinearModel {
 
         ConstantDoubleVertex xVertex = new ConstantDoubleVertex(x);
         return xVertex.matrixMultiply(weights).plus(intercept).sigmoid();
-    }
-
-    public DoubleTensor predict(DoubleTensor x) throws IllegalStateException {
-        if (isFit) {
-            DoubleVertex weights = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
-            DoubleVertex intercept = (DoubleVertex) net.getVertexByLabel(INTERCEPT_LABEL);
-            return x.matrixMultiply(weights.getValue()).plus(intercept.getValue()).sigmoid();
-        } else {
-            return null;
-        }
     }
 
     public DoubleVertex getWeights() {
