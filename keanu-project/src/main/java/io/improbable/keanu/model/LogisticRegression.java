@@ -4,6 +4,7 @@ import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOpt
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -52,6 +53,24 @@ public class LogisticRegression implements LinearModel {
         return net;
     }
 
+    private DoubleVertex computeProbabilities(DoubleTensor x) {
+        int numFeatures = x.getShape()[0];
+        double[] sigma = new double[numFeatures];
+        for (int i = 0; i < numFeatures; i++) {
+            DoubleTensor xColumn = x.slice(0, i);
+            sigma[i] = priorSigma / xColumn.abs().average() / regularization;
+        }
+        DoubleVertex intercept = new GaussianVertex(priorMu, priorSigma);
+        intercept.setLabel(INTERCEPT_LABEL);
+        DoubleVertex weights = new GaussianVertex(priorMu, ConstantVertex.of(sigma));
+        weights.setLabel(WEIGHTS_LABEL);
+
+        ConstantDoubleVertex xVertex = ConstantVertex.of(x);
+        return weights.getValue().isScalar() ?
+            weights.times(xVertex).plus(intercept).sigmoid() :
+            weights.matrixMultiply(xVertex).plus(intercept).sigmoid();
+    }
+
     @Override
     public LogisticRegression fit() {
         BooleanTensor observedOutcomes = y.greaterThan(0.5);
@@ -63,33 +82,14 @@ public class LogisticRegression implements LinearModel {
     }
 
     @Override
-    public DoubleTensor predict(DoubleTensor x) throws IllegalStateException {
+    public DoubleTensor predict(DoubleTensor x) {
         if (isFit) {
             DoubleVertex weights = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
             DoubleVertex intercept = (DoubleVertex) net.getVertexByLabel(INTERCEPT_LABEL);
-            return x.matrixMultiply(weights.getValue()).plus(intercept.getValue()).sigmoid();
+            return weights.matrixMultiply(ConstantVertex.of(x)).plus(intercept).getValue().sigmoid();
         } else {
             throw new RuntimeException("The model must be fit before attempting to predict.");
         }
-    }
-
-    private DoubleVertex computeProbabilities(DoubleTensor x) {
-        double[] sigma = new double[x.getShape()[1]];
-        for (int i = 0; i < x.getShape()[1]; i++) {
-            DoubleTensor column = x.slice(1, i);
-            sigma[i] = priorSigma / column.abs().average() / regularization;
-        }
-        DoubleVertex intercept = new GaussianVertex(priorMu, priorSigma);
-        intercept.setLabel(INTERCEPT_LABEL);
-        DoubleVertex weights = new GaussianVertex(
-            priorMu,
-            new ConstantDoubleVertex(DoubleTensor.create(sigma, new int[]{x.getShape()[1], 1}))
-        );
-        weights.setLabel(WEIGHTS_LABEL);
-        weights.setValue(weights.sample());
-
-        ConstantDoubleVertex xVertex = new ConstantDoubleVertex(x);
-        return xVertex.matrixMultiply(weights).plus(intercept).sigmoid();
     }
 
     public DoubleVertex getWeights() {
