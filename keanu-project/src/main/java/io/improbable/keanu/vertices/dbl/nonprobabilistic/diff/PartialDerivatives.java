@@ -108,24 +108,24 @@ public class PartialDerivatives {
      * There is the option to reshape to a lower rank tensor where the summation has caused a
      * dimension to go to length 1.
      *
-     * @param reshape        Returns the sum and drops the summed over dimensions (now length one)
-     *                       in the shape if true. Returns a same ranked tensor but with a shape
-     *                       that has ones for the dimensions summed over.
+     * @param summingAllOfDimensions If True, this means we're summing all of the Of dimensions.
+     *                               In this case, we drop the summed over dimensions from the shape and replace them
+     *                               with a 1x1 (as the Ofs can't disappear completely)
      * @param overDimensions The dimensions to sum over. Dimensions are counted from zero
      * @return The summed partial derivatives over given dimensions
      */
-    public PartialDerivatives sum(boolean reshape, int... overDimensions) {
+    public PartialDerivatives sum(boolean summingAllOfDimensions, int... overDimensions) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
             DoubleTensor reshapedV = v.sum(overDimensions);
-            if (reshape) {
+            if (summingAllOfDimensions) {
+                int[] newShape = TensorShape.concat(new int[]{1, 1}, reshapedV.getShape());
+                reshapedV = reshapedV.reshape(newShape);
                 summed.put(k, reshapedV);
             } else {
-                //summed.put(k, reshapedV.reshape(
-                //    shapeToDesiredRankByPrependingOnes(reshapedV.getShape(), reshapedV.getShape().length + 2)));
                 summed.put(k, reshapedV.reshape(onesToShape(v.getShape(), overDimensions)));
             }
         }
