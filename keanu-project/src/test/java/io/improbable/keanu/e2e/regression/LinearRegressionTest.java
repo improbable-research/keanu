@@ -63,6 +63,28 @@ public class LinearRegressionTest {
     }
 
     @Test
+    public void linearRegression1FactorTensorVariationalMAPAsModel() {
+
+        // Generate data
+        int N = 100000;
+        double expectedM = 3.0;
+        double expectedB = 20.0;
+
+        DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
+        DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
+        DoubleTensor xData = xGenerator.sample(random);
+        xGenerator.setAndCascade(xData);
+        DoubleTensor yData = yGenerator.sample(random);
+
+        LinearRegression regression = new LinearRegression(xData, yData);
+        regression.fit();
+
+        assertEquals(expectedM, regression.getWeight(0), 0.05);
+        assertEquals(expectedB, regression.getIntercept().getValue().scalar(), 0.05);
+    }
+
+    @Test
     public void linearRegressionTwoFactorTensorVariationalMAP() {
 
         // Generate data
@@ -83,7 +105,6 @@ public class LinearRegressionTest {
         x2Generator.setAndCascade(x2Data);
         DoubleTensor yData = yGenerator.sample(random);
 
-        // Linear Regression
         DoubleVertex w1 = new GaussianVertex(0.0, 10.0);
         DoubleVertex w2 = new GaussianVertex(0.0, 10.0);
         DoubleVertex b = new GaussianVertex(0.0, 10.0);
@@ -104,7 +125,7 @@ public class LinearRegressionTest {
     }
 
     @Test
-    public void linearRegressionTwoFactorTensorVariationalMAPWithAPI() {
+    public void linearRegressionTwoFactorTensorVariationalMAPAsModel() {
 
         // Generate data
         int N = 100000;
@@ -113,23 +134,20 @@ public class LinearRegressionTest {
         double expectedB = 20.0;
 
         DoubleVertex x1Generator = new UniformVertex(new int[]{1, N}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 0, 100);
+        DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 50, 100);
         DoubleVertex yGenerator = new GaussianVertex(
             x1Generator.multiply(expectedW1).plus(x2Generator.multiply(expectedW2)).plus(expectedB),
             1.0
         );
-
         DoubleTensor x1Data = x1Generator.sample(random);
         x1Generator.setAndCascade(x1Data);
         DoubleTensor x2Data = x1Generator.sample(random);
         x2Generator.setAndCascade(x2Data);
         DoubleTensor yData = yGenerator.sample(random);
 
-        DoubleTensor xData = DoubleTensor.concat(0, x1Data, x2Data);
-        LinearRegression regression = new LinearRegression(xData, yData, 10.0);
+        LinearRegression regression = new LinearRegression(DoubleTensor.concat(0, x1Data, x2Data), yData);
         regression.fit();
 
-        log.info("W1 = " + regression.getWeight(0) + " W2 = " + regression.getWeight(1) + ", B = " + regression.getIntercept().getValue().scalar());
         assertEquals(expectedW1, regression.getWeight(0), 0.05);
         assertEquals(expectedW2, regression.getWeight(1), 0.05);
         assertEquals(expectedB, regression.getIntercept().getValue().scalar(), 0.05);
@@ -180,6 +198,38 @@ public class LinearRegressionTest {
 
         for (int i = 0; i < featureCount; i++) {
             assertEquals(expectedWeights[i], weights[i].getValue().scalar(), 0.05);
+        }
+    }
+
+    @Test
+    public void linearRegressionManyFactorTensorVariationalMAPAsModel() {
+
+        // Generate data
+        int N = 1000;
+        int featureCount = 40;
+
+        double[] expectedWeights = new double[featureCount];
+        double expectedB = 20.0;
+        DoubleVertex[] xGenerators = new DoubleVertex[featureCount];
+        DoubleTensor[] xData = new DoubleTensor[featureCount];
+        DoubleVertex yGeneratorMu = ConstantVertex.of(0.0);
+        for (int i = 0; i < expectedWeights.length; i++) {
+            expectedWeights[i] = random.nextDouble() * 100 + 20;
+            xGenerators[i] = new UniformVertex(new int[]{1, N}, 0, 10000);
+            xData[i] = xGenerators[i].sample(random);
+            xGenerators[i].setValue(xData[i]);
+            yGeneratorMu = yGeneratorMu.plus(xGenerators[i].multiply(expectedWeights[i]));
+        }
+
+        yGeneratorMu = yGeneratorMu.plus(expectedB);
+        DoubleVertex yGenerator = new GaussianVertex(yGeneratorMu, 1.0);
+        DoubleTensor yData = yGenerator.sample(random);
+
+        LinearRegression regression = new LinearRegression(DoubleTensor.concat(0, xData),  yData);
+        regression.fit();
+
+        for (int i = 0; i < featureCount; i++) {
+            assertEquals(expectedWeights[i], regression.getWeight(i), 0.05);
         }
     }
 
