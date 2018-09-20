@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
 
 import com.google.common.collect.Iterables;
@@ -9,12 +10,13 @@ import com.google.common.collect.Iterables;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<DoubleVertex>, NonProbabilistic<DoubleTensor> {
 
@@ -61,6 +63,11 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         return dualNumbers.get(getParent());
+    }
+
+    @Override
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        return Collections.singletonMap(getParent(), derivativeOfOutputsWithRespectToSelf);
     }
 
 }

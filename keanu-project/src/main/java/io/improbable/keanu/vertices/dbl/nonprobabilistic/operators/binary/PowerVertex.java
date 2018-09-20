@@ -39,8 +39,8 @@ public class PowerVertex extends DoubleBinaryOpVertex {
         DoubleTensor leftPowRight = getValue();
         DoubleTensor dOutWrtLeft = rightValue.div(leftValue).timesInPlace(leftPowRight);
         DoubleTensor dOutWrtRight = leftPowRight.times(leftValue.log());
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight));
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft, true));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight, true));
         return partials;
     }
 

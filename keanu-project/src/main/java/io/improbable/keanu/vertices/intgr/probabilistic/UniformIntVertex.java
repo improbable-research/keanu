@@ -4,13 +4,13 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
@@ -81,7 +81,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(IntegerTensor value) {
+    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
         throw new UnsupportedOperationException();
     }
 

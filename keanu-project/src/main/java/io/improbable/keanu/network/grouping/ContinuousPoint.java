@@ -1,5 +1,7 @@
 package io.improbable.keanu.network.grouping;
 
+import java.util.Arrays;
+
 import org.apache.commons.math3.ml.clustering.Clusterable;
 
 public class ContinuousPoint implements Clusterable {
@@ -7,11 +9,11 @@ public class ContinuousPoint implements Clusterable {
     private final double[] point;
 
     public ContinuousPoint(double[] point) {
-        this.point = point;
+        this.point = Arrays.copyOf(point, point.length);
     }
 
     @Override
     public double[] getPoint() {
-        return point;
+        return Arrays.copyOf(point, point.length);
     }
 }

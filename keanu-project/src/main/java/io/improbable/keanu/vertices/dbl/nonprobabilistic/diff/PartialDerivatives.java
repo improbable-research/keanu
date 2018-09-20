@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.VertexId;
 
 public class PartialDerivatives {
 
-    public static PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
+    public static final PartialDerivatives OF_CONSTANT = new PartialDerivatives(Collections.emptyMap());
 
     public static PartialDerivatives withRespectToSelf(VertexId withRespectTo, int[] shape) {
         return new PartialDerivatives(
@@ -244,13 +244,14 @@ public class PartialDerivatives {
             int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
             int[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
 
-            return DoubleTensor.ones(resultShape).times(partial)
-                .times(multiplierFromLeft);
+            return DoubleTensor.ones(resultShape).times(partial).times(multiplierFromLeft);
         }
-                return partial.times(multiplierFromLeft);
+
+        return partial.times(multiplierFromLeft);
     }
 
-    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier){
+    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier) {
+
         int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
         if (TensorShape.isScalar(partialWrtShape)) {
 

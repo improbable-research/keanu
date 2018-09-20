@@ -11,11 +11,11 @@ public class TensorShape {
     private int[] shape;
 
     public TensorShape(int[] shape) {
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
     }
 
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     public boolean isScalar() {
@@ -184,10 +184,10 @@ public class TensorShape {
 
     /**
      * Writes a lower rank shape over a higher rank shape, starting from the right.
-     *
+     * <p>
      * e.g: high rank shape = [1, 2, 2, 1]
-     *      low rank shape = [1, 4]
-     *
+     * low rank shape = [1, 4]
+     * <p>
      * Result after copy = [1, 2, 1, 4]
      *
      * @param higherRankShape source shape that will get written over

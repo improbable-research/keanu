@@ -166,7 +166,7 @@ public class BayesianNetwork {
 
     public boolean isInImpossibleState() {
         double logOfMasterP = getLogOfMasterP();
-        return logOfMasterP == Double.NEGATIVE_INFINITY || logOfMasterP == Double.NaN;
+        return logOfMasterP == Double.NEGATIVE_INFINITY || Double.isNaN(logOfMasterP);
     }
 
     public static void setFromSampleAndCascade(List<? extends Vertex> vertices) {
