@@ -165,4 +165,8 @@ public class ProgressBarTest {
         verify(mockStream, atLeastOnce()).print(anyString());
     }
 
+    @After
+    public void tearDown() throws Exception {
+        ProgressBar.setDefaultPrintStream(System.out);
+    }
 }
