@@ -10,6 +10,7 @@ import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 
 import io.improbable.keanu.vertices.ProxyVertex;
+import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -75,6 +76,11 @@ public class Plate implements VertexDictionary {
     @Override
     public VertexDictionary getAllVertices() {
         return VertexDictionary.backedBy(ImmutableMap.copyOf(contents));
+    }
+
+    @Override
+    public VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+        return SimpleVertexDictionary.backedBy(contents, extraEntries);
     }
 
     public Collection<Vertex<?>> getProxyVertices() {

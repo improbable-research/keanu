@@ -29,12 +29,25 @@ public class SimpleVertexDictionary implements VertexDictionary {
     }
 
     @Override
+    public VertexDictionary withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+        return SimpleVertexDictionary.backedBy(dictionary, extraEntries);
+    }
+
+    @Override
     public VertexDictionary getAllVertices() {
         return VertexDictionary.backedBy(ImmutableMap.copyOf(dictionary));
     }
 
     public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {
         return new SimpleVertexDictionary(dictionary);
+    }
+
+    public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?>> first, Map<VertexLabel, Vertex<?>> second) {
+        return SimpleVertexDictionary.backedBy(
+            ImmutableMap.<VertexLabel, Vertex<?>>builder()
+                .putAll(first)
+                .putAll(second)
+                .build());
     }
 
     public static SimpleVertexDictionary of(Vertex<?>... vertices) {

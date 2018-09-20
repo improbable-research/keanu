@@ -68,6 +68,16 @@ public class SimpleVertexDictionaryTest {
         assertThat(combinedDictionary.get(label1), sameInstance(vertex1));
         assertThat(combinedDictionary.get(label2), sameInstance(vertex2));
         assertThat(combinedDictionary.get(label3), sameInstance(vertex3));
+    }
 
+    @Test
+    public void youCanAddExtraEntriesAndGetANewDictionary() {
+        VertexLabel label3 = new VertexLabel("label3");
+        Vertex<?> vertex3 = mock(Vertex.class);
+        VertexDictionary newDictionary = dictionary.withExtraEntries(ImmutableMap.of(label3, vertex3));
+
+        assertThat(newDictionary.get(label1), sameInstance(vertex1));
+        assertThat(newDictionary.get(label2), sameInstance(vertex2));
+        assertThat(newDictionary.get(label3), sameInstance(vertex3));
     }
 }
