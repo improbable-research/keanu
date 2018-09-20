@@ -7,6 +7,8 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableMap;
+
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -47,8 +49,12 @@ public class PlateBuilder<T> {
     }
 
 
-    public PlateBuilder<T> withInitialState(Vertex<?> initialState) {
-        return withInitialState(VertexDictionary.of(initialState));
+    public PlateBuilder<T> withInitialState(Vertex<?> vertex) {
+        return withInitialState(VertexDictionary.of(vertex));
+    }
+
+    public PlateBuilder<T> withInitialState(VertexLabel label, Vertex<?> vertex) {
+        return withInitialState(VertexDictionary.backedBy(ImmutableMap.of(label, vertex)));
     }
 
     public PlateBuilder<T> withInitialState(VertexDictionary initialState) {

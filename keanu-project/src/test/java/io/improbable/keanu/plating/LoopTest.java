@@ -160,14 +160,14 @@ public class LoopTest {
     public void youCanAddCustomProxyVariableMappings() {
         VertexLabel factorInLabel = new VertexLabel("factorIn");
         VertexLabel factorOutLabel = new VertexLabel("factorOut");
-        DoubleVertex startFactorial = ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL);
+        DoubleVertex startFactorial = ConstantVertex.of(1.);
         DoubleVertex startFactor = ConstantVertex.of(1.).labeledAs(factorOutLabel);
 
         BiFunction<Plate, DoubleVertex, DoubleVertex> factorial = (plate, valueIn) -> {
             DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
-            DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.)).labeledAs(factorOutLabel);
+            DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.));
             plate.add(factorIn);
-            plate.add(factorOut);
+            plate.add(factorOutLabel, factorOut);
             return valueIn.times(factorOut);
         };
 

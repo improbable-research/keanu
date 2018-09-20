@@ -158,9 +158,9 @@ public class LoopBuilder {
                     plate.add(Loop.CONDITION_LABEL, condition);
 
                     // outputs
-                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue).labeledAs(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
-                    BoolVertex loopAgain = stillLooping.and(condition).labeledAs(LOOP_LABEL);
-                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn).labeledAs(Loop.VALUE_OUT_LABEL);
+                    DoubleVertex iterationResult = iterationFunction.apply(plate, valueInWhenAlwaysTrue);
+                    BoolVertex loopAgain = stillLooping.and(condition);
+                    DoubleVertex result = If.isTrue(loopAgain).then(iterationResult).orElse(valueIn);
                     plate.add(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL, iterationResult);
                     plate.add(LOOP_LABEL, loopAgain);
                     plate.add(Loop.VALUE_OUT_LABEL, result);

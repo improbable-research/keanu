@@ -62,15 +62,15 @@ public class PlatesExample {
             .fromIterator(allMyData.iterator())
             .withFactory((plate, csvMyData) -> {
 
-                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).labeledAs(xLabel);
-                DoubleVertex y = m.multiply(x).plus(b).labeledAs(yLabel);
+                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x);
+                DoubleVertex y = m.multiply(x).plus(b);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);
                 yObserved.observe(csvMyData.y);
 
                 // this labels the x and y vertex for later use
-                plate.add(x);
-                plate.add(y);
+                plate.add(xLabel, x);
+                plate.add(yLabel, y);
             })
             .build();
 
