@@ -395,8 +395,10 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     }
 
     public DualNumber slice(int dimension, int index) {
-        PartialDerivatives slicedPartialDerivatives = this.partialDerivatives.slice(dimension, index);
-        return new DualNumber(value.slice(dimension, index), slicedPartialDerivatives);
+        DoubleTensor newValue = value.slice(dimension, index);
+        boolean needReshape = newValue.getRank() == value.getRank();
+        PartialDerivatives slicedPartialDerivatives = this.partialDerivatives.slice(dimension, index, needReshape);
+        return new DualNumber(newValue, slicedPartialDerivatives);
     }
 
     public DualNumber take(int... index) {

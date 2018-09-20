@@ -376,14 +376,22 @@ public class PartialDerivatives {
         return new PartialDerivatives(reshapedDerivatives);
     }
 
-    public PartialDerivatives slice(int dimension, int index) {
+    public PartialDerivatives slice(int dimension, int index, boolean reshape) {
         Map<VertexId, DoubleTensor> slicedDerivatives = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
             int[] partialDerivativeShape = partialDerivative.getValue().getShape();
             partialDerivativeShape[dimension] = 1;
             DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
-            slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
+
+            /*
+             * This reshape is designed to deal with the case that we've sliced a rank 2 tensor.  Due to the way our
+             * tensor implementation works slicing a rank 2 still gives you a rank two back, whereas obviously the
+             * partial will be rank > 2 and thus the new rank will be smaller than we'd want.
+             */
+            if (reshape) {
+                slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
+            }
             slicedDerivatives.put(partialDerivative.getKey(), slicedPartialDerivative);
         }
 
