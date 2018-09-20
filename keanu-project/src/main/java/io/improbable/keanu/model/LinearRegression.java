@@ -19,7 +19,7 @@ public class LinearRegression implements LinearModel {
     private DoubleTensor x;
     private DoubleTensor y;
     private BayesianNetwork net;
-    private boolean isFit;
+    private boolean isFit = false;
     private double sigmaOnPrior;
 
     public LinearRegression(DoubleTensor x, DoubleTensor y) {
@@ -29,8 +29,6 @@ public class LinearRegression implements LinearModel {
     public LinearRegression(DoubleTensor x, DoubleTensor y, double sigmaOnPrior) {
         this.x = x;
         this.y = y;
-        this.isFit = false;
-        this.net = null;
         this.sigmaOnPrior = sigmaOnPrior;
         construct();
     }
@@ -80,7 +78,8 @@ public class LinearRegression implements LinearModel {
     }
 
     public double getWeight(int index) {
-        return ((DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL)).getValue(0, index);
+        DoubleVertex weight = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
+        return weight.getValue().isScalar() ? weight.getValue().scalar() : weight.getValue(0, index);
     }
 
 }

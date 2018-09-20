@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
-import org.nd4j.linalg.api.ops.impl.layers.Linear;
 
 import java.util.List;
 

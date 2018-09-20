@@ -26,7 +26,7 @@ public class LogisticRegression implements LinearModel {
     private BayesianNetwork net;
     private double priorMu;
     private double priorSigma;
-    private boolean isFit;
+    private boolean isFit = false;
     private double regularization;
 
 
