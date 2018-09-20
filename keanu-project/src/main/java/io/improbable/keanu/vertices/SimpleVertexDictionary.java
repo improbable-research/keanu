@@ -14,6 +14,15 @@ public class SimpleVertexDictionary implements VertexDictionary {
         this.dictionary = dictionary;
     }
 
+    public static SimpleVertexDictionary combine(SimpleVertexDictionary dictionary, SimpleVertexDictionary dictionary2) {
+        ImmutableMap<VertexLabel, Vertex<?>> combinedDictionary = ImmutableMap.<VertexLabel, Vertex<?>>builder()
+            .putAll(dictionary.dictionary)
+            .putAll(dictionary2.dictionary)
+            .build();
+
+        return SimpleVertexDictionary.backedBy(combinedDictionary);
+    }
+
     @Override
     public <V extends Vertex<?>> V get(VertexLabel label) {
         return (V) dictionary.get(label);
@@ -24,11 +33,11 @@ public class SimpleVertexDictionary implements VertexDictionary {
         return VertexDictionary.backedBy(ImmutableMap.copyOf(dictionary));
     }
 
-    public static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {
+    public static SimpleVertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {
         return new SimpleVertexDictionary(dictionary);
     }
 
-    public static VertexDictionary of(Vertex<?>... vertices) {
+    public static SimpleVertexDictionary of(Vertex<?>... vertices) {
         Map<VertexLabel, Vertex<?>> dictionary = Arrays.stream(vertices).collect(Collectors.toMap(Vertex::getLabel, v -> v));
         return backedBy(dictionary);
     }

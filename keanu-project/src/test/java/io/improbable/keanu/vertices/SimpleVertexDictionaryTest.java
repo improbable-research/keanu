@@ -11,6 +11,7 @@ import java.util.Map;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
 public class SimpleVertexDictionaryTest {
@@ -21,7 +22,7 @@ public class SimpleVertexDictionaryTest {
     VertexLabel label2 = new VertexLabel("label 2");
 
     Map<VertexLabel, Vertex<?>> map;
-    VertexDictionary dictionary;
+    SimpleVertexDictionary dictionary;
 
     @Before
     public void setUp() throws Exception {
@@ -55,5 +56,18 @@ public class SimpleVertexDictionaryTest {
         VertexLabel label3 = new VertexLabel("label3");
         map.put(label3, mock(Vertex.class));
         assertThat(dictionary2.get(label3), is(nullValue()));
+    }
+
+    @Test
+    public void youCanCombineTwoVertexDictionaries() {
+        VertexLabel label3 = new VertexLabel("label3");
+        Vertex<?> vertex3 = mock(Vertex.class);
+        SimpleVertexDictionary dictionary2 = SimpleVertexDictionary.backedBy(ImmutableMap.of(label3, vertex3));
+
+        VertexDictionary combinedDictionary = SimpleVertexDictionary.combine(dictionary, dictionary2);
+        assertThat(combinedDictionary.get(label1), sameInstance(vertex1));
+        assertThat(combinedDictionary.get(label2), sameInstance(vertex2));
+        assertThat(combinedDictionary.get(label3), sameInstance(vertex3));
+
     }
 }
