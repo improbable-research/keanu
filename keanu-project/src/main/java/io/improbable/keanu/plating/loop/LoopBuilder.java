@@ -57,12 +57,12 @@ public class LoopBuilder {
     /**
      * An optional method to add custom mappings
      *
-     * @param inputLabel  the label assigned to the ProxyVertex in frame t
-     * @param outputLabel the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
+     * @param proxyLabel  the label assigned to the ProxyVertex in frame t
+     * @param proxysParentLabel the label assigned to a Vertex in frame t-1 which will become the ProxyVertex's parent
      * @return self
      */
-    public LoopBuilder mapping(VertexLabel inputLabel, VertexLabel outputLabel) {
-        customMappings.put(inputLabel, outputLabel);
+    public LoopBuilder mapping(VertexLabel proxyLabel, VertexLabel proxysParentLabel) {
+        customMappings.put(proxyLabel, proxysParentLabel);
         return this;
     }
 
