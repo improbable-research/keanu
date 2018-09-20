@@ -193,7 +193,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor logGamma() {
-        return duplicate().logInPlace();
+        return duplicate().logGammaInPlace();
     }
 
     @Override

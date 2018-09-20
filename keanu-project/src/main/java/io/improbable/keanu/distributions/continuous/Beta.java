@@ -51,7 +51,7 @@ public class Beta implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor lnGammaAlpha = alpha.logGamma();
         final DoubleTensor lnGammaBeta = beta.logGamma();
-        final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).logGamma();
+        final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).logGammaInPlace();
         final DoubleTensor alphaMinusOneTimesLnX = x.log().timesInPlace(alpha.minus(1));
         final DoubleTensor betaMinusOneTimesOneMinusXLn = x.unaryMinus().plusInPlace(1).logInPlace().timesInPlace(beta.minus(1));
 
