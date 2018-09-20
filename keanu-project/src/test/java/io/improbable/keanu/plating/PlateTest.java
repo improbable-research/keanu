@@ -30,22 +30,33 @@ public class PlateTest {
     public ExpectedException expectedException = ExpectedException.none();
 
     public static final VertexLabel VERTEX_LABEL_1 = new VertexLabel("foo");
+    public static final VertexLabel VERTEX_LABEL_2 = new VertexLabel("bar");
     private Plate plate;
 
     @Mock
-    private Vertex<?> vertex;
+    private Vertex<?> vertex1;
+
+    @Mock
+    private Vertex<?> vertex2;
 
     @Before
     public void createPlate() throws Exception {
-        when(vertex.getLabel()).thenReturn(VERTEX_LABEL_1);
+        when(vertex1.getLabel()).thenReturn(VERTEX_LABEL_1);
         plate = new Plate();
-        plate.add(vertex);
+        plate.add(vertex1);
+        plate.add(VERTEX_LABEL_2, vertex2);
     }
 
     @Test
     public void youCanGetAVertexByName() {
         Vertex<?> vertex = plate.get(VERTEX_LABEL_1);
-        assertThat(vertex, equalTo(this.vertex));
+        assertThat(vertex, equalTo(this.vertex1));
+    }
+
+    @Test
+    public void unlabelledVerticesCanAlsoBeGotIfYouKnowTheLabelToUse() {
+        Vertex<?> vertex = plate.get(VERTEX_LABEL_2);
+        assertThat(vertex, equalTo(this.vertex2));
     }
 
     @Test

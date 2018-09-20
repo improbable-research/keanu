@@ -33,7 +33,10 @@ public class Plate implements VertexDictionary {
     }
 
     public <T extends Vertex<?>> T add(T v) {
-        VertexLabel label = v.getLabel();
+        return add(v.getLabel(), v);
+    }
+
+    public <T extends Vertex<?>> T add(VertexLabel label, T v) {
         if (label == null) {
             throw new PlateException("Vertex " + v + " must contain a label in order to be added to a plate");
         }
