@@ -13,6 +13,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.loop.Loop;
 import io.improbable.keanu.plating.loop.LoopException;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -115,6 +116,27 @@ public class LoopTest {
             Double expectedOutput = new Double(firstFailure);
             assertThat(output, VertexMatchers.hasValue(expectedOutput));
         }
+    }
+
+    @Test
+    public void youCanChainTwoLoopsTogetherInABayesNet() {
+        Loop loop = Loop
+            .startingFrom(startValue)
+            .doNotThrowWhenMaxCountIsReached()
+            .whilst(alwaysTrue)
+            .apply(increment);
+
+        Vertex<?> outputFromFirstLoop = loop.getOutput();
+
+        Loop loop2 = Loop
+            .startingFrom((Vertex<?>) loop.getOutput())
+            .doNotThrowWhenMaxCountIsReached()
+            .whilst(alwaysTrue)
+            .apply(increment);
+
+        Vertex<?> output = loop2.getOutput();
+
+        new BayesianNetwork(output.getConnectedGraph());
     }
 
     @Test
