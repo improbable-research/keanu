@@ -36,6 +36,18 @@ public class VertexLabel {
         }
     }
 
+    public Optional<String> getOuterNamespace() {
+        try {
+            return Optional.of(namespace.get(namespace.size() - 1));
+        } catch(IndexOutOfBoundsException e) {
+            return Optional.empty();
+        }
+    }
+
+    public String getUnqualifiedName() {
+        return name;
+    }
+
     @Override
     public String toString() {
         ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
@@ -55,13 +67,5 @@ public class VertexLabel {
     public int hashCode() {
 
         return Objects.hash(name, namespace);
-    }
-
-    public Optional<String> getOuterNamespace() {
-        try {
-            return Optional.of(namespace.get(namespace.size() - 1));
-        } catch(IndexOutOfBoundsException e) {
-            return Optional.empty();
-        }
     }
 }
