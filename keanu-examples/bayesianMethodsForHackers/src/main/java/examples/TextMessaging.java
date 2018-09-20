@@ -32,8 +32,8 @@ public class TextMessaging {
         double avgTexts = (double) data.numberOfMessages.sum() / numberOfDays;
         double alpha = 1 / avgTexts;
 
-        ExponentialVertex earlyRate = new ExponentialVertex(0.0, alpha);
-        ExponentialVertex lateRate = new ExponentialVertex(0.0, alpha);
+        ExponentialVertex earlyRate = new ExponentialVertex(alpha);
+        ExponentialVertex lateRate = new ExponentialVertex(alpha);
         UniformIntVertex switchPoint = new UniformIntVertex(0, numberOfDays);
 
         IntegerVertex days = ConstantVertex.of(data.day);

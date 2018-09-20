@@ -109,7 +109,7 @@ public abstract class Writer {
         return header;
     }
 
-    public Writer withHeader(String[] h) {
+    public Writer withHeader(String... h) {
         header = Arrays.copyOf(h, h.length);
         withHeaderEnabled(true);
         return this;
