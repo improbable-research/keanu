@@ -128,7 +128,7 @@ public class Loop {
             if (throwWhenMaxCountIsReached) {
                 throw new LoopException(errorMessage);
             } else {
-                log.warn(errorMessage);
+                log.info(errorMessage);
             }
         }
     }
