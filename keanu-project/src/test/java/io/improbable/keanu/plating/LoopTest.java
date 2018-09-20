@@ -39,7 +39,7 @@ public class LoopTest {
     @Test
     public void youCanGetTheOutputVertex() {
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .whilst(flip)
             .apply(increment);
         Vertex<?> output = loop.getOutput();
@@ -49,7 +49,7 @@ public class LoopTest {
     @Test
     public void thereIsADefaultMaxLength(){
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .whilst(alwaysTrue)
             .apply(increment);
         assertThat(loop.getPlates().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
@@ -60,7 +60,7 @@ public class LoopTest {
         expectedException.expect(LoopException.class);
         expectedException.expectMessage("Loop has exceeded its max count");
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .whilst(alwaysTrue)
             .apply(increment);
         loop.getOutput();
@@ -69,7 +69,7 @@ public class LoopTest {
     @Test
     public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() {
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .doNotThrowWhenMaxCountIsReached()
             .whilst(alwaysTrue)
             .apply(increment);
@@ -81,7 +81,7 @@ public class LoopTest {
     public void youCanOverrideTheDefaultMaxLength(){
         int customMaxCount = 5;
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .withMaxIterations(customMaxCount)
             .whilst(alwaysTrue)
             .apply(increment);
@@ -92,7 +92,7 @@ public class LoopTest {
     public void itThrowsIfYouPassInMultipleOutputVertices(){
         expectedException.expect(VertexLabelException.class);
         expectedException.expectMessage("Duplicate label found in base case");
-        Loop.startingFrom(ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
+        Loop.withInitialConditions(ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
             .whilst(alwaysTrue)
             .apply(increment);
     }
@@ -100,7 +100,7 @@ public class LoopTest {
     @Test
     public void youCanLoopUntilAConditionIsTrue() {
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .whilst(flip)
             .apply(increment);
 
@@ -121,7 +121,7 @@ public class LoopTest {
     @Test
     public void youCanChainTwoLoopsTogetherInABayesNet() {
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .doNotThrowWhenMaxCountIsReached()
             .whilst(alwaysTrue)
             .apply(increment);
@@ -129,7 +129,7 @@ public class LoopTest {
         Vertex<?> outputFromFirstLoop = loop.getOutput();
 
         Loop loop2 = Loop
-            .startingFrom((Vertex<?>) loop.getOutput())
+            .withInitialConditions((Vertex<?>) loop.getOutput())
             .doNotThrowWhenMaxCountIsReached()
             .whilst(alwaysTrue)
             .apply(increment);
@@ -147,7 +147,7 @@ public class LoopTest {
         };
 
         Loop loop = Loop
-            .startingFrom(startValue)
+            .withInitialConditions(startValue)
             .whilst(lessThanTen)
             .apply(increment);
 
@@ -172,7 +172,7 @@ public class LoopTest {
         };
 
         Loop loop = Loop
-            .startingFrom(startFactorial, startFactor)
+            .withInitialConditions(startFactorial, startFactor)
             .withMaxIterations(5)
             .doNotThrowWhenMaxCountIsReached()
             .mapping(factorInLabel, factorOutLabel)

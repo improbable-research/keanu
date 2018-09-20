@@ -83,9 +83,9 @@ public class Loop {
      * @param <V>    the input type
      * @return a builder object
      */
-    public static <V extends Vertex<?>> LoopBuilder startingFrom(V first, V... others) {
+    public static <V extends Vertex<?>> LoopBuilder withInitialConditions(V first, V... others) {
         Map<VertexLabel, Vertex<?>> map = buildMapForBaseCase(first, others);
-        return startingFrom(SimpleVertexDictionary.backedBy(map));
+        return withInitialConditions(SimpleVertexDictionary.backedBy(map));
     }
 
     /**
@@ -94,7 +94,7 @@ public class Loop {
      * @param initialState the collection of vertices that define the loop's base case
      * @return a builder object
      */
-    public static LoopBuilder startingFrom(VertexDictionary initialState) {
+    public static LoopBuilder withInitialConditions(VertexDictionary initialState) {
         return new LoopBuilder(initialState);
     }
 
