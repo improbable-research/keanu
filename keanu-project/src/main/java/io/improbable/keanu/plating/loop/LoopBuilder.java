@@ -72,8 +72,8 @@ public class LoopBuilder {
      * @param conditionSupplier a lambda that creates and returns a new BoolVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 whilst(Supplier<BoolVertex> conditionSupplier) {
-        return whilst(plate -> conditionSupplier.get());
+    public LoopBuilder2 iterateWhile(Supplier<BoolVertex> conditionSupplier) {
+        return iterateWhile(plate -> conditionSupplier.get());
     }
 
     /**
@@ -82,7 +82,7 @@ public class LoopBuilder {
      * @param conditionFunction a lambda that takes the current Plate and creates and returns a new BoolVertex
      * @return the next stage builder
      */
-    public LoopBuilder2 whilst(Function<Plate, BoolVertex> conditionFunction) {
+    public LoopBuilder2 iterateWhile(Function<Plate, BoolVertex> conditionFunction) {
         return new LoopBuilder2(initialState, conditionFunction, customMappings.build(), maxLoopCount, throwWhenMaxCountIsReached);
     }
 

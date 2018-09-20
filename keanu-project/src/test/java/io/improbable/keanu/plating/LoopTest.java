@@ -40,7 +40,7 @@ public class LoopTest {
     public void youCanGetTheOutputVertex() {
         Loop loop = Loop
             .withInitialConditions(startValue)
-            .whilst(flip)
+            .iterateWhile(flip)
             .apply(increment);
         Vertex<?> output = loop.getOutput();
         assertThat(output, instanceOf(DoubleVertex.class));
@@ -50,7 +50,7 @@ public class LoopTest {
     public void thereIsADefaultMaxLength(){
         Loop loop = Loop
             .withInitialConditions(startValue)
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
         assertThat(loop.getPlates().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
     }
@@ -61,7 +61,7 @@ public class LoopTest {
         expectedException.expectMessage("Loop has exceeded its max count");
         Loop loop = Loop
             .withInitialConditions(startValue)
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
         loop.getOutput();
     }
@@ -71,7 +71,7 @@ public class LoopTest {
         Loop loop = Loop
             .withInitialConditions(startValue)
             .doNotThrowWhenMaxCountIsReached()
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
         loop.getOutput();
         // does not throw
@@ -83,7 +83,7 @@ public class LoopTest {
         Loop loop = Loop
             .withInitialConditions(startValue)
             .withMaxIterations(customMaxCount)
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
         assertThat(loop.getPlates().size(), equalTo(customMaxCount));
     }
@@ -93,7 +93,7 @@ public class LoopTest {
         expectedException.expect(VertexLabelException.class);
         expectedException.expectMessage("Duplicate label found in base case");
         Loop.withInitialConditions(ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
     }
 
@@ -101,7 +101,7 @@ public class LoopTest {
     public void youCanLoopUntilAConditionIsTrue() {
         Loop loop = Loop
             .withInitialConditions(startValue)
-            .whilst(flip)
+            .iterateWhile(flip)
             .apply(increment);
 
         DoubleVertex output = loop.getOutput();
@@ -123,7 +123,7 @@ public class LoopTest {
         Loop loop = Loop
             .withInitialConditions(startValue)
             .doNotThrowWhenMaxCountIsReached()
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
 
         Vertex<?> outputFromFirstLoop = loop.getOutput();
@@ -131,7 +131,7 @@ public class LoopTest {
         Loop loop2 = Loop
             .withInitialConditions((Vertex<?>) loop.getOutput())
             .doNotThrowWhenMaxCountIsReached()
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(increment);
 
         Vertex<?> output = loop2.getOutput();
@@ -148,7 +148,7 @@ public class LoopTest {
 
         Loop loop = Loop
             .withInitialConditions(startValue)
-            .whilst(lessThanTen)
+            .iterateWhile(lessThanTen)
             .apply(increment);
 
         DoubleVertex output = loop.getOutput();
@@ -176,7 +176,7 @@ public class LoopTest {
             .withMaxIterations(5)
             .doNotThrowWhenMaxCountIsReached()
             .mapping(factorInLabel, factorOutLabel)
-            .whilst(alwaysTrue)
+            .iterateWhile(alwaysTrue)
             .apply(factorial);
 
         DoubleVertex output = loop.getOutput();
