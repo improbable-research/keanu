@@ -1,6 +1,5 @@
 package io.improbable.keanu.plating.loop;
 
-import java.util.Arrays;
 import java.util.Collection;
 
 import org.slf4j.Logger;
@@ -124,7 +123,7 @@ public class Loop {
 
     private void checkIfMaxCountHasBeenReached(Plate plate) throws LoopException {
         BoolVertex stillLooping = plate.get(STILL_LOOPING_LABEL);
-        if (Arrays.stream(stillLooping.getValue().asFlatArray()).anyMatch(v -> v == true)) {
+        if (!stillLooping.getValue().allFalse()) {
             String errorMessage = "Loop has exceeded its max count " + plates.size();
             if (throwWhenMaxCountIsReached) {
                 throw new LoopException(errorMessage);
