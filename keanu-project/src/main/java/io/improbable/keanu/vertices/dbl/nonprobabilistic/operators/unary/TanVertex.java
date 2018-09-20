@@ -36,7 +36,7 @@ public class TanVertex extends DoubleUnaryOpVertex {
         DoubleTensor dTandInput = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dTandInput));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dTandInput, true));
         return partials;
     }
 }

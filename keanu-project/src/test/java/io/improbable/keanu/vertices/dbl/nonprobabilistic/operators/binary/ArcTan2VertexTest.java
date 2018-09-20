@@ -26,16 +26,16 @@ public class ArcTan2VertexTest {
 
     @Test
     public void calculatesDualNumberOfTwoScalarsTan2() {
-        double a = 0.5;
-        double b = Math.sqrt(3) / 2.0;
-        double wrtA = b / (Math.pow(b, 2) + Math.pow(0.5, 2));
-        double wrtB = -0.5 / (Math.pow(b, 2) + Math.pow(0.5, 2));
+        double x = 0.5;
+        double y = Math.sqrt(3) / 2.0;
+        double wrtX = -y / (Math.pow(y, 2) + Math.pow(x, 2));
+        double wrtY = x / (Math.pow(y, 2) + Math.pow(x, 2));
 
         calculatesDualNumberOfTwoScalars(
-            a,
-            b,
-            wrtA,
-            wrtB,
+            x,
+            y,
+            wrtX,
+            wrtY,
             DoubleVertex::atan2
         );
     }
@@ -55,8 +55,8 @@ public class ArcTan2VertexTest {
         calculatesDualNumberOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
-            DoubleTensor.create(new double[]{2. / (1 + 4), 3. / (4 + 9), 4. / (9. + 16), 5. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
-            DoubleTensor.create(new double[]{-1. / (1 + 4), -2. / (4 + 9), -3. / (9 + 16), -4. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{-2. / (1 + 4), -3. / (4 + 9), -4. / (9. + 16), -5. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{1. / (1 + 4), 2. / (4 + 9), 3. / (9 + 16), 4. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
             DoubleVertex::atan2
         );
     }
@@ -66,8 +66,8 @@ public class ArcTan2VertexTest {
         calculatesDualNumberOfAVectorsAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
-            DoubleTensor.create(new double[]{2. / (1. + 4.), 2. / (4. + 4.), 2. / (9. + 4.), 2. / (16. + 4.)}).diag().reshape(1, 4, 1, 4),
-            DoubleTensor.create(new double[]{-1. / (1. + 4.), -2. / (4. + 4.), -3. / (9. + 4.), -4. / (16. + 4.)}).reshape(1, 4, 1, 1),
+            DoubleTensor.create(new double[]{-2. / (1. + 4.), -2. / (4. + 4.), -2. / (9. + 4.), -2. / (16. + 4.)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{1. / (1. + 4.), 2. / (4. + 4.), 3. / (9. + 4.), 4. / (16. + 4.)}).reshape(1, 4, 1, 1),
             DoubleVertex::atan2
         );
     }
@@ -77,8 +77,8 @@ public class ArcTan2VertexTest {
         calculatesDualNumberOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
-            DoubleTensor.create(new double[]{1. / (4. + 1.), 2. / (4. + 4.), 3. / (4. + 9.), 4. / (4. + 16.)}).reshape(1, 4, 1, 1),
-            DoubleTensor.create(new double[]{-2. / (4. + 1.), -2. / (4. + 4.), -2. / (4. + 9.), -2. / (4. + 16.)}).diag().reshape(1, 4, 1, 4),
+            DoubleTensor.create(new double[]{-1. / (4. + 1.), -2. / (4. + 4.), -3. / (4. + 9.), -4. / (4. + 16.)}).reshape(1, 4, 1, 1),
+            DoubleTensor.create(new double[]{2. / (4. + 1.), 2. / (4. + 4.), 2. / (4. + 9.), 2. / (4. + 16.)}).diag().reshape(1, 4, 1, 4),
             DoubleVertex::atan2
         );
     }

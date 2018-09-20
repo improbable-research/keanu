@@ -10,7 +10,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.apache.commons.math3.util.Pair;
 
 import io.improbable.keanu.kotlin.DoubleOperators;

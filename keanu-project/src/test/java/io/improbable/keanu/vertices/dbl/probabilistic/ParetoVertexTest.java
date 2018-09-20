@@ -17,11 +17,10 @@ import io.improbable.keanu.distributions.gradient.Pareto;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ParetoVertexTest {
 
@@ -61,12 +60,11 @@ public class ParetoVertexTest {
         scaleTensor.setValue(1.5);
 
         ParetoVertex vertex = new ParetoVertex(locationTensor, scaleTensor);
-        Map<VertexId, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5);
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
+        Map<Vertex, DoubleTensor> actualDerivatives = vertex.dLogPdf(2.5, locationTensor, scaleTensor, vertex);
 
-        assertEquals(paretoLogDiff.dPdLocation, actual.withRespectTo(locationTensor.getId()).scalar(), 1e-5);
-        assertEquals(paretoLogDiff.dPdScale, actual.withRespectTo(scaleTensor.getId()).scalar(), 1e-5);
-        assertEquals(paretoLogDiff.dPdX, actual.withRespectTo(vertex.getId()).scalar(), 1e-5);
+        assertEquals(paretoLogDiff.dPdLocation, actualDerivatives.get(locationTensor).scalar(), 1e-5);
+        assertEquals(paretoLogDiff.dPdScale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);
+        assertEquals(paretoLogDiff.dPdX, actualDerivatives.get(vertex).scalar(), 1e-5);
     }
 
     @Test

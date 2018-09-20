@@ -3,21 +3,20 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.K;
 import static io.improbable.keanu.distributions.dual.Diffs.THETA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -75,28 +74,24 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<VertexId, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Gamma.withParameters(theta.getValue(), k.getValue()).dLogProb(value);
 
-        return convertDualNumbersToDiff(dlnP.get(THETA).getValue(), dlnP.get(K).getValue(), dlnP.get(X).getValue());
-    }
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
-    private Map<VertexId, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdtheta,
-                                                                 DoubleTensor dLogPdk,
-                                                                 DoubleTensor dLogPdx) {
-
-        PartialDerivatives dLogPdInputsFromTheta = theta.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdtheta);
-        PartialDerivatives dLogPdInputsFromK = k.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdk);
-        PartialDerivatives dLogPdInputs = dLogPdInputsFromTheta.add(dLogPdInputsFromK);
-
-        if (!this.isObserved()) {
-            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
-                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
-            );
+        if (withRespectTo.contains(theta)) {
+            dLogProbWrtParameters.put(theta, dlnP.get(THETA).getValue());
         }
 
-        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
-        return summed.asMap();
+        if (withRespectTo.contains(k)) {
+            dLogProbWrtParameters.put(k, dlnP.get(K).getValue());
+        }
+
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
+        }
+
+        return dLogProbWrtParameters;
     }
 
     @Override
