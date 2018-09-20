@@ -7,6 +7,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -69,6 +70,11 @@ public class Plate implements VertexDictionary {
             throw new IllegalArgumentException("Cannot find VertexLabel " + label);
         }
         return (V) vertex;
+    }
+
+    @Override
+    public VertexDictionary getAllVertices() {
+        return VertexDictionary.backedBy(ImmutableMap.copyOf(contents));
     }
 
     public Collection<Vertex<?>> getProxyVertices() {

@@ -4,6 +4,8 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableMap;
+
 public class SimpleVertexDictionary implements VertexDictionary {
 
     private final Map<VertexLabel, Vertex<?>> dictionary;
@@ -15,6 +17,11 @@ public class SimpleVertexDictionary implements VertexDictionary {
     @Override
     public <V extends Vertex<?>> V get(VertexLabel label) {
         return (V) dictionary.get(label);
+    }
+
+    @Override
+    public VertexDictionary getAllVertices() {
+        return VertexDictionary.backedBy(ImmutableMap.copyOf(dictionary));
     }
 
     public static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> dictionary) {

@@ -6,6 +6,8 @@ public interface VertexDictionary {
 
     <V extends Vertex<?>> V get(VertexLabel label);
 
+    VertexDictionary getAllVertices();
+
     static VertexDictionary backedBy(Map<VertexLabel, Vertex<?>> map) {
         return SimpleVertexDictionary.backedBy(map);
     }
