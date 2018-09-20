@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -9,6 +10,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -45,4 +47,14 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     private DoubleTensor op(BooleanTensor predicate, DoubleTensor thn, DoubleTensor els) {
         return predicate.setDoubleIf(thn, els);
     }
+
+    @Override
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        BooleanTensor predicateValue = predicate.getValue();
+        partials.put(thn, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.toDoubleMask(), true));
+        partials.put(els, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.not().toDoubleMask(), true));
+        return partials;
+    }
+
 }

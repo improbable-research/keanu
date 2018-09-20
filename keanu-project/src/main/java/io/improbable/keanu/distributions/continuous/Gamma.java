@@ -5,7 +5,6 @@ import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.K;
 import static io.improbable.keanu.distributions.dual.Diffs.THETA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;

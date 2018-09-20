@@ -1,14 +1,15 @@
 package io.improbable.keanu.util.csv;
 
-import com.opencsv.CSVWriter;
-import com.opencsv.ICSVWriter;
-
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+
+import com.opencsv.CSVWriter;
+import com.opencsv.ICSVWriter;
 
 public abstract class Writer {
 
@@ -100,7 +101,7 @@ public abstract class Writer {
         return file;
     }
 
-    String[] createHeader(int size, String headerStyle, Function<Integer, Integer> func) {
+    String[] createHeader(int size, String headerStyle, Function<Integer, String> func) {
         String[] header = new String[size];
         for (int i = 0; i < size; i++) {
             header[i] = String.format(headerStyle, func.apply(i));
@@ -109,7 +110,7 @@ public abstract class Writer {
     }
 
     public Writer withHeader(String[] h) {
-        header = h;
+        header = Arrays.copyOf(h, h.length);
         withHeaderEnabled(true);
         return this;
     }

@@ -3,7 +3,7 @@ package io.improbable.keanu.algorithms.variational;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 import org.junit.Rule;
@@ -32,10 +32,9 @@ public class KDEApproximationTest {
     public DoubleVertexSamples generateGaussianSamples(double mu, double sigma, int nSamples) {
         DoubleVertex gaussian = new GaussianVertex(mu, sigma);
         BayesianNetwork network = new BayesianNetwork(gaussian.getConnectedGraph());
-        DoubleVertexSamples samples = MetropolisHastings.withDefaultConfig()
-            .getPosteriorSamples(network, Arrays.asList(gaussian), nSamples)
+        return MetropolisHastings.withDefaultConfig()
+            .getPosteriorSamples(network, Collections.singletonList(gaussian), nSamples)
             .getDoubleTensorSamples(gaussian);
-        return samples;
     }
 
     public static void isCloseMostOfTheTime(DoubleTensor expected, DoubleTensor approximated, double correctPercentage, double delta) {
@@ -59,7 +58,7 @@ public class KDEApproximationTest {
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 100000);
 
-        KDEVertex KDE = new GaussianKDE().approximate(samples);
+        KDEVertex KDE = GaussianKDE.approximate(samples);
 
         DoubleTensor x = DoubleTensor.linspace(-3., 3., 100);
         DoubleTensor gaussianLogPdf = Gaussian.withParameters(
@@ -81,7 +80,7 @@ public class KDEApproximationTest {
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 1000000);
 
-        KDEVertex KDE = new GaussianKDE().approximate(samples);
+        KDEVertex KDE = GaussianKDE.approximate(samples);
 
         DoubleTensor xTensor = DoubleTensor.linspace(-1. + mu, 1. + mu, 10);
         Diffs diffLog = Gaussian.withParameters(
@@ -89,7 +88,7 @@ public class KDEApproximationTest {
             DoubleTensor.scalar(sigma)
         ).dLogProb(xTensor);
 
-        DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor).get(KDE.getId());
+        DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor, KDE).get(KDE);
         DoubleTensor expectedDerivative = diffLog.get(Diffs.X).getValue();
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
@@ -104,11 +103,11 @@ public class KDEApproximationTest {
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 100000);
         GaussianVertex gaussian = new GaussianVertex(mu, sigma);
 
-        KDEVertex KDE = new GaussianKDE().approximate(samples);
+        KDEVertex KDE = GaussianKDE.approximate(samples);
 
         DoubleTensor x = DoubleTensor.linspace(-1., 1., 100);
-        DoubleTensor approximateDerivative = KDE.dLogPdf(x).get(KDE.getId());
-        DoubleTensor expectedDerivative = gaussian.dLogProb(x).get(gaussian.getId());
+        DoubleTensor approximateDerivative = KDE.dLogPdf(x, KDE).get(KDE);
+        DoubleTensor expectedDerivative = gaussian.dLogProb(x, gaussian).get(gaussian);
 
         isCloseMostOfTheTime(expectedDerivative, approximateDerivative, correctPercentage, DELTA);
     }
@@ -120,7 +119,7 @@ public class KDEApproximationTest {
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 10000);
 
-        KDEVertex KDE = new GaussianKDE().approximate(samples);
+        KDEVertex KDE = GaussianKDE.approximate(samples);
 
         double from = -3;
         double to = 3;
@@ -138,8 +137,8 @@ public class KDEApproximationTest {
 
         DoubleVertexSamples samples = generateGaussianSamples(mu, sigma, 10000);
 
-        KDEVertex KDE = new GaussianKDE().approximate(samples);
-        KDEVertex resampledKDE = new GaussianKDE().approximate(samples);
+        KDEVertex KDE = GaussianKDE.approximate(samples);
+        KDEVertex resampledKDE = GaussianKDE.approximate(samples);
 
         int nSamples = 1000;
         resampledKDE.resample(nSamples, KeanuRandom.getDefaultRandom());
@@ -149,10 +148,10 @@ public class KDEApproximationTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void handlingNonScalarSamplesTest() {
-        List<DoubleTensor> badSamplesList = Arrays.asList(DoubleTensor.create(new double[]{1, 2, 3}));
+        List<DoubleTensor> badSamplesList = Collections.singletonList(DoubleTensor.create(new double[]{1, 2, 3}));
 
         DoubleVertexSamples badSamples = new DoubleVertexSamples(badSamplesList);
-        KDEVertex KDE = new GaussianKDE().approximate(badSamples);
+        KDEVertex KDE = GaussianKDE.approximate(badSamples);
         throw new AssertionError("approximate did not throw a IllegalArgumentException!");
     }
 }

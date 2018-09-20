@@ -17,9 +17,9 @@ import io.improbable.keanu.distributions.gradient.LogNormal;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class LogNormalVertexTest {
     private static final double DELTA = 0.0001;
@@ -61,13 +61,11 @@ public class LogNormalVertexTest {
         sigmaTensor.setValue(1.0);
 
         LogNormalVertex tensorLogNormalVertex = new LogNormalVertex(muTensor, sigmaTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5);
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorLogNormalVertex.dLogPdf(0.5, muTensor, sigmaTensor, tensorLogNormalVertex);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(logNormalLogDiff.dPdmu, actual.withRespectTo(muTensor.getId()).scalar(), 1e-5);
-        assertEquals(logNormalLogDiff.dPdsigma, actual.withRespectTo(sigmaTensor.getId()).scalar(), 1e-5);
-        assertEquals(logNormalLogDiff.dPdx, actual.withRespectTo(tensorLogNormalVertex.getId()).scalar(), 1e-5);
+        assertEquals(logNormalLogDiff.dPdmu, actualDerivatives.get(muTensor).scalar(), 1e-5);
+        assertEquals(logNormalLogDiff.dPdsigma, actualDerivatives.get(sigmaTensor).scalar(), 1e-5);
+        assertEquals(logNormalLogDiff.dPdx, actualDerivatives.get(tensorLogNormalVertex).scalar(), 1e-5);
     }
 
     @Test

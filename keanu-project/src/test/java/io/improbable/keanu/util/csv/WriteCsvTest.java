@@ -1,20 +1,26 @@
 package io.improbable.keanu.util.csv;
 
+import static org.junit.Assert.assertTrue;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-
-import static org.junit.Assert.assertTrue;
 
 public class WriteCsvTest {
 
@@ -49,10 +55,10 @@ public class WriteCsvTest {
         scalarTensors.addAll(Arrays.asList(c1, c2));
         integerColumnTensors.addAll(Arrays.asList(i1, i2));
 
-        Map<Long, List<DoubleTensor>> networkSamples = new HashMap<>();
+        Map<VertexId, List<DoubleTensor>> networkSamples = new HashMap<>();
         networkSamples.put(g1.getId(), Arrays.asList(g1.getValue(), g1.times(2).getValue()));
         networkSamples.put(g2.getId(), Arrays.asList(g2.getValue(), g2.times(2).getValue()));
-        samples = new NetworkSamples(networkSamples, 2);
+        samples = new NetworkSamples(networkSamples, new ArrayList<>(), 2);
     }
 
     @Test
@@ -78,8 +84,8 @@ public class WriteCsvTest {
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
 
-        long firstId = rowTensors.get(0).getId();
-        long secondId = rowTensors.get(1).getId();
+        VertexId firstId = rowTensors.get(0).getId();
+        VertexId secondId = rowTensors.get(1).getId();
 
         assertTrue(lines.size() == 2);
         assertTrue(reader.getHeader().equals(Arrays.asList(
@@ -140,8 +146,8 @@ public class WriteCsvTest {
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
 
-        long firstId = columnTensors.get(0).getId();
-        long secondId = columnTensors.get(1).getId();
+        VertexId firstId = columnTensors.get(0).getId();
+        VertexId secondId = columnTensors.get(1).getId();
 
         assertTrue(lines.size() == 5);
         assertTrue(reader.getHeader().equals(Arrays.asList("{" + firstId + "}", "{" + secondId + "}")));
@@ -209,8 +215,8 @@ public class WriteCsvTest {
         CsvReader reader = ReadCsv.fromFile(file).expectHeader(true);
         List<List<String>> lines = reader.readLines();
 
-        long firstId = scalarTensors.get(0).getId();
-        long secondId = scalarTensors.get(1).getId();
+        VertexId firstId = scalarTensors.get(0).getId();
+        VertexId secondId = scalarTensors.get(1).getId();
 
         assertTrue(lines.size() == 1);
         assertTrue(reader.getHeader().equals(Arrays.asList("{" + firstId + "}", "{" + secondId + "}")));

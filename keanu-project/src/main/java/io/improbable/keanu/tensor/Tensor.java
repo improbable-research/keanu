@@ -13,7 +13,10 @@ public interface Tensor<T> {
 
     static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
         if (!a.hasSameShapeAs(b)) {
-            throw new IllegalArgumentException("Cannot compare tensors of different shapes");
+            throw new IllegalArgumentException(
+                String.format("Cannot compare tensors of different shapes %s and %s",
+                    Arrays.toString(a.getShape()), Arrays.toString(b.getShape()))
+            );
         }
 
         Object[] aArray = a.asFlatArray();
@@ -50,7 +53,7 @@ public interface Tensor<T> {
 
     T getValue(int... index);
 
-    void setValue(T value, int... index);
+    Tensor<T> setValue(T value, int... index);
 
     T scalar();
 

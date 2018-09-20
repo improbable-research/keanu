@@ -2,10 +2,18 @@ package io.improbable.keanu.tensor.dbl;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
+import static junit.framework.TestCase.assertTrue;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class Nd4jDoubleTensorTest {
 
@@ -187,40 +195,74 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void canSetAllValues(){
+    public void canSuperBroadcast() {
+        DoubleTensor x = Nd4jDoubleTensor.zeros(new int[]{2, 2, 2, 2});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{1, 0, 1, 0}, new int[]{2, 2});
+
+        DoubleTensor diff = x.plus(y);
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0
+        }, new int[]{2, 2, 2, 2});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canSuperBroadcastInPlace() {
+        DoubleTensor x = Nd4jDoubleTensor.zeros(new int[]{2, 2, 2, 2});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{1, 0, 1, 0}, new int[]{2, 2});
+
+        DoubleTensor diff = x.plusInPlace(y);
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0,
+            1, 0, 1, 0
+        }, new int[]{2, 2, 2, 2});
+
+        assertEquals(expected, diff);
+    }
+
+    @Test
+    public void canSetAllValues() {
         DoubleTensor rank5 = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
         }, new int[]{2, 2, 2, 2, 2});
         rank5.setAllInPlace(0.0);
-        assertAllValuesAre(rank5,0.0);
+        assertAllValuesAre(rank5, 0.0);
         rank5.setAllInPlace(0.8);
-        assertAllValuesAre(rank5,0.8);
+        assertAllValuesAre(rank5, 0.8);
     }
 
     @Test
-    public void canEqualsWithEpsilon(){
+    public void canEqualsWithEpsilon() {
         double[] aData = new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3};
         double[] bData = new double[aData.length];
-        for ( int i =0;i<aData.length;i++){
-            if ( i%2 == 0 ) {
+        for (int i = 0; i < aData.length; i++) {
+            if (i % 2 == 0) {
                 bData[i] = aData[i] + 0.4;
-            }else{
+            } else {
                 bData[i] = aData[i] - 0.4;
             }
         }
         double[] cData = bData.clone();
-        cData[0] = cData[0]-1.0;
+        cData[0] = cData[0] - 1.0;
 
         DoubleTensor a = DoubleTensor.create(aData, new int[]{2, 2, 2, 2, 2});
         DoubleTensor b = DoubleTensor.create(bData, new int[]{2, 2, 2, 2, 2});
         DoubleTensor c = DoubleTensor.create(cData, new int[]{2, 2, 2, 2, 2});
-        assertTrue("equals with epsilon should be true",a.equalsWithinEpsilon(b,0.5));
-        assertTrue("equals with epsilon should be true (inverted order)",b.equalsWithinEpsilon(a,0.5));
-        assertTrue("equals with epsilon should be not true (max delta is 0.4)",!a.equalsWithinEpsilon(b,0.2));
-        assertTrue("equals with epsilon should be not true (max delta is 1.0)",!a.equalsWithinEpsilon(c,0.5));
+        assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5));
+        assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5));
+        assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2));
+        assertTrue("equals with epsilon should be not true (max delta is 1.0)", !a.equalsWithinEpsilon(c, 0.5));
     }
 
     @Test
@@ -232,8 +274,8 @@ public class Nd4jDoubleTensorTest {
     }
 
     private void assertAllValuesAre(DoubleTensor tensor, double v) {
-        for( double element : tensor.asFlatList() ){
-            assertEquals( element , v , 0.01);
+        for (double element : tensor.asFlatList()) {
+            assertEquals(element, v, 0.01);
         }
     }
 
@@ -298,6 +340,39 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void canPermute() {
+        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{4, 5, 6}, new int[]{1, 3});
+
+        DoubleTensor concatDimensionZero = DoubleTensor.concat(0, x, y);
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatDimensionZero.asFlatDoubleArray(), 1e-6);
+
+        DoubleTensor concatDimensionOne = DoubleTensor.concat(1, x, y);
+        DoubleTensor permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0);
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, permuttedConcatDimensionOne.asFlatDoubleArray(), 1e-6);
+
+        x = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+        y = Nd4jDoubleTensor.create(new double[]{9, 10, 11, 12, 13, 14, 15, 16}, new int[]{2, 2, 2});
+
+        concatDimensionZero = DoubleTensor.concat(0, x, y);
+
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16}, concatDimensionZero.asFlatDoubleArray(), 1e-6);
+
+        concatDimensionOne = DoubleTensor.concat(1, x, y);
+        permuttedConcatDimensionOne = concatDimensionOne.permute(1, 0, 2);
+
+        double[] sliced = new double[permuttedConcatDimensionOne.asFlatDoubleArray().length / 2];
+        for (int i = 0; i < permuttedConcatDimensionOne.asFlatDoubleArray().length / 2; i++) {
+            sliced[i] = permuttedConcatDimensionOne.asFlatDoubleArray()[i];
+        }
+
+        DoubleTensor answer = DoubleTensor.create(sliced, x.getShape()).permute(1, 0, 2);
+        assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, answer.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
     public void canLinSpace() {
         DoubleTensor actual = DoubleTensor.linspace(0, 10, 5);
         DoubleTensor expected = DoubleTensor.create(new double[]{0, 2.5, 5.0, 7.5, 10.0});
@@ -330,6 +405,41 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor actual = DoubleTensor.arange(3, 7, 1.5);
         DoubleTensor expected = DoubleTensor.create(new double[]{3.0, 4.5, 6.0});
         assertEquals(expected, actual);
+    }
+
+    @Test
+    public void canTensorMultiplyWithVectorAndRank4() {
+        DoubleTensor a = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 1, 3, 1});
+        DoubleTensor b = Nd4jDoubleTensor.create(new double[]{
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8,
+            5, 2, 3, 7, 8
+        }, new int[]{1, 3, 1, 5});
+
+        DoubleTensor c = a.tensorMultiply(b, new int[]{2, 3}, new int[]{1, 0});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            30, 12, 18, 42, 48
+        }, new int[]{1, 1, 1, 5});
+
+        assertEquals(expected, c);
+    }
+
+    @Test
+    public void canTensorMultiplyWithNumpyExample() {
+        DoubleTensor a = DoubleTensor.arange(0, 60).reshape(3, 4, 5);
+        DoubleTensor b = DoubleTensor.arange(0, 24.).reshape(4, 3, 2);
+        DoubleTensor c = a.tensorMultiply(b, new int[]{1, 0}, new int[]{0, 1});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            4400., 4730.,
+            4532., 4874.,
+            4664., 5018.,
+            4796., 5162.,
+            4928., 5306.
+        }, new int[]{5, 2});
+
+        assertEquals(expected, c);
     }
 
     @Test
@@ -366,7 +476,37 @@ public class Nd4jDoubleTensorTest {
     }
 
     private void assertTimesInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
-        left.timesInPlace(right);
+        left = left.timesInPlace(right);
+        assertEquals(left, expected);
+    }
+
+    private void assertPlusOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        DoubleTensor actual = left.plus(right);
+        assertEquals(actual, expected);
+    }
+
+    private void assertPlusInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        left = left.plusInPlace(right);
+        assertEquals(left, expected);
+    }
+
+    private void assertDivideOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        DoubleTensor actual = left.div(right);
+        assertEquals(actual, expected);
+    }
+
+    private void assertDivideInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        left = left.divInPlace(right);
+        assertEquals(left, expected);
+    }
+
+    private void assertMinusOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        DoubleTensor actual = left.minus(right);
+        assertEquals(actual, expected);
+    }
+
+    private void assertMinusInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
+        left = left.minusInPlace(right);
         assertEquals(left, expected);
     }
 
@@ -386,7 +526,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarMinusInPlaceTensorBehavesSameAsMinus() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
 
         assertArrayEquals(scalar.minus(tensor).asFlatDoubleArray(), scalar.minusInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
@@ -394,7 +534,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarPlusInPlaceTensorBehavesSameAsPlus() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
 
         assertArrayEquals(scalar.plus(tensor).asFlatDoubleArray(), scalar.plusInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
@@ -402,7 +542,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarTimesInPlaceTensorBehavesSameAsTimes() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
 
         assertArrayEquals(scalar.times(tensor).asFlatDoubleArray(), scalar.timesInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
@@ -410,40 +550,275 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarDivInPlaceTensorBehavesSameAsDiv() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[] {1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
 
         assertArrayEquals(scalar.div(tensor).asFlatDoubleArray(), scalar.divInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorMinusInPlaceLargerTensorBehavesSameAsMinus() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.minus(largerTensor).asFlatDoubleArray(), smallerTensor.minusInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorPlusInPlaceLargerTensorBehavesSameAsPlus() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.plus(largerTensor).asFlatDoubleArray(), smallerTensor.plusInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimes() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.times(largerTensor).asFlatDoubleArray(), smallerTensor.timesInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
+    public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimess() {
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
+
+        assertArrayEquals(largerTensor.times(smallerTensor).asFlatDoubleArray(), largerTensor.timesInPlace(smallerTensor).asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
     public void smallerTensorDivInPlaceLargerTensorBehavesSameAsDiv() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[] {2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[] {2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.div(largerTensor).asFlatDoubleArray(), smallerTensor.divInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
+
+    @Test
+    public void doesCompareGreaterThanOrEqualScalarTensor() {
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new int[]{2, 2});
+        BooleanTensor result = matrix.greaterThanOrEqual(Nd4jDoubleTensor.scalar(3.));
+        Boolean[] expected = new Boolean[]{false, false, true, true};
+        assertArrayEquals(expected, result.asFlatArray());
+    }
+
+
+    @Test
+    public void canBroadcastMultiplyDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+
+        assertTimesOperationEquals(rank4, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastMultiplyDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.ones(4, 2, 2, 2);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+
+        assertTimesOperationEquals(matrix, rank4, expected);
+        assertTimesInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canBroadcastPlusDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+        assertPlusOperationEquals(rank4, matrix, expected);
+        assertPlusInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastPlusDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.zeros(new int[]{4, 2, 2, 2});
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+            1, 2, 3, 4, 1, 2, 3, 4,
+        }, new int[]{4, 2, 2, 2});
+
+        assertPlusOperationEquals(matrix, rank4, expected);
+        assertPlusInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canBroadcastDivideDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(10.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+        }, new int[]{4, 2, 2, 2});
+
+        assertDivideOperationEquals(rank4, matrix, expected);
+        assertDivideInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastDivideDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(10.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+            10, 5, 2, 1, 10, 5, 2, 1,
+        }, new int[]{4, 2, 2, 2});
+
+        assertDivideOperationEquals(matrix, rank4, expected);
+        assertDivideInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canBroadcastMinusDifferentRankedTensorsBigToSmall() {
+        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(5.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            4, 3, 2, 1, 4, 3, 2, 1,
+            4, 3, 2, 1, 4, 3, 2, 1,
+            4, 3, 2, 1, 4, 3, 2, 1,
+            4, 3, 2, 1, 4, 3, 2, 1
+        }, new int[]{4, 2, 2, 2});
+
+        assertMinusOperationEquals(rank4, matrix, expected);
+        assertMinusInPlaceOperationEquals(rank4, matrix, expected);
+    }
+
+    @Test
+    public void canBroadcastMinusDifferentRankedTensorsSmallToBig() {
+        DoubleTensor rank4 = DoubleTensor.ones(new int[]{4, 2, 2, 2}).times(5.);
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
+            4, 3, 2, 1, 4, 3, 2, 1,
+            4, 3, 2, 1, 4, 3, 2, 1,
+            4, 3, 2, 1, 4, 3, 2, 1,
+            4, 3, 2, 1, 4, 3, 2, 1
+        }, new int[]{4, 2, 2, 2});
+
+        assertMinusOperationEquals(matrix, rank4, expected);
+        assertMinusInPlaceOperationEquals(matrix, rank4, expected);
+    }
+
+    @Test
+    public void canSplit() {
+
+        int dim = 2;
+        DoubleTensor A = DoubleTensor.arange(0, 24).reshape(2, 3, 1, 4);
+        DoubleTensor B = DoubleTensor.arange(24, 96).reshape(2, 3, 3, 4);
+        DoubleTensor C = DoubleTensor.arange(96, 144).reshape(2, 3, 2, 4);
+
+        DoubleTensor D = DoubleTensor.concat(dim, A, B, C);
+        List<DoubleTensor> splitTensor = D.split(dim, new int[]{1, 4, 6});
+
+        DoubleTensor[] concatList = new DoubleTensor[]{A, B, C};
+        for (int i = 0; i < splitTensor.size(); i++) {
+            assertEquals(concatList[i], splitTensor.get(i));
+        }
+
+    }
+
+    @Test
+    public void canSplitHighRank() {
+        assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 2, 6}, 1);
+    }
+
+    @Test
+    public void canSplitEndDimension() {
+        assertCanSplit(new int[]{2, 3, 4, 5}, new int[]{3, 4, 2}, 3);
+    }
+
+    @Test
+    public void canSplitFirstDimension() {
+        assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 4, 2, 6, 9, 2}, 0);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnZeroLengthSplit() {
+        DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
+        A.split(0, new int[]{0});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnNegativeDimensionSplit() {
+        DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
+        A.split(-1, new int[]{1, 5});
+    }
+
+    @Test
+    public void doesSatisfyJavaDocExample() {
+        DoubleTensor A = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3}, 2, 6);
+
+        List<DoubleTensor> actual = A.split(1, new int[]{1, 3, 6});
+
+        DoubleTensor expected0 = DoubleTensor.create(new double[]{1, 7}, 1, 2);
+        DoubleTensor expected1 = DoubleTensor.create(new double[]{2, 3, 8, 9}, 2, 2);
+        DoubleTensor expected2 = DoubleTensor.create(new double[]{4, 5, 6, 1, 2, 3}, 2, 3);
+
+        assertEquals(expected0, actual.get(0));
+        assertEquals(expected1, actual.get(1));
+        assertEquals(expected2, actual.get(2));
+    }
+
+    private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
+
+        int[] splitIndices = new int[concatenatedIndices.length];
+        List<DoubleTensor> toConcat = new ArrayList<>();
+
+        long previousEndLength = 0;
+        int splitPosition = 0;
+        for (int i = 0; i < concatenatedIndices.length; i++) {
+            int[] shape = Arrays.copyOf(baseShape, baseShape.length);
+            shape[concatenatedDimension] = concatenatedIndices[i];
+
+            splitIndices[i] = splitPosition + concatenatedIndices[i];
+            splitPosition = splitIndices[i];
+
+            long newEndLength = previousEndLength + TensorShape.getLength(shape);
+            toConcat.add(DoubleTensor.arange(previousEndLength, newEndLength).reshape(shape));
+            previousEndLength = newEndLength;
+        }
+
+        DoubleTensor D = DoubleTensor.concat(concatenatedDimension, toConcat.toArray(new DoubleTensor[toConcat.size() - 1]));
+        List<DoubleTensor> splitTensor = D.split(concatenatedDimension, splitIndices);
+
+        for (int i = 0; i < splitTensor.size(); i++) {
+            assertEquals(toConcat.get(i), splitTensor.get(i));
+        }
+    }
+
 }

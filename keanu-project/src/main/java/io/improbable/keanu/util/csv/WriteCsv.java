@@ -4,7 +4,6 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**

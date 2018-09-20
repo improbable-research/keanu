@@ -36,7 +36,7 @@ public class VertexValuePropagation {
      */
     public static void cascadeUpdate(Collection<? extends Vertex> cascadeFrom) {
 
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparingLong(Vertex::getId));
+        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(cascadeFrom);
 
         HashSet<Vertex> alreadyQueued = new HashSet<>(cascadeFrom);

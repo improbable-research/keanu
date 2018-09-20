@@ -13,6 +13,7 @@ import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.network.SimpleNetworkState;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import lombok.Builder;
 import lombok.Getter;
@@ -83,7 +84,7 @@ public class SimulatedAnnealing {
             throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
         }
 
-        Map<Long, ?> maxSamplesByVertex = new HashMap<>();
+        Map<VertexId, ?> maxSamplesByVertex = new HashMap<>();
         List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
         double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
@@ -117,12 +118,12 @@ public class SimulatedAnnealing {
         return new SimpleNetworkState(maxSamplesByVertex);
     }
 
-    private static void setSamplesAsMax(Map<Long, ?> samples, List<? extends Vertex> fromVertices) {
+    private static void setSamplesAsMax(Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {
         fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
     }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<Long, ?> samples) {
-        ((Map<Long, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<VertexId, ?> samples) {
+        ((Map<VertexId, ? super T>) samples).put(vertex.getId(), vertex.getValue());
     }
 
     /**

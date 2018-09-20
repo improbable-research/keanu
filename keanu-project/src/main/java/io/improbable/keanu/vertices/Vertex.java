@@ -5,7 +5,6 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Optional;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicLong;
 
 import com.google.common.collect.ImmutableSet;
 
@@ -16,9 +15,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class Vertex<T> implements Observable<T> {
 
-    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
-
-    private long uuid = ID_GENERATOR.getAndIncrement();
+    private final VertexId id = new VertexId();
     private Set<Vertex> children = Collections.emptySet();
     private Set<Vertex> parents = Collections.emptySet();
     private T value;
@@ -35,6 +32,11 @@ public abstract class Vertex<T> implements Observable<T> {
      */
     public void setLabel(VertexLabel label) {
         this.label = label;
+    }
+
+    public <V extends Vertex<T>> V labeledAs(VertexLabel vertexName) {
+        setLabel(vertexName);
+        return (V) this;
     }
 
     public VertexLabel getLabel() {
@@ -172,8 +174,12 @@ public abstract class Vertex<T> implements Observable<T> {
         return observation.getObservedValue();
     }
 
-    public long getId() {
-        return uuid;
+    public VertexId getId() {
+        return id;
+    }
+
+    public int getIndentation() {
+        return id.getIndentation();
     }
 
     public Set<Vertex> getChildren() {
@@ -213,16 +219,29 @@ public abstract class Vertex<T> implements Observable<T> {
 
         Vertex<?> vertex = (Vertex<?>) o;
 
-        return uuid == vertex.uuid;
+        return this.id.equals(vertex.id);
     }
 
     @Override
     public int hashCode() {
-        return (int) (uuid ^ (uuid >>> 32));
+        return id.hashCode();
     }
 
     public Set<Vertex> getConnectedGraph() {
         return DiscoverGraph.getEntireGraph(this);
     }
 
+
+    @Override
+    public String toString() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(this.getId());
+        if (this.getLabel() != null) {
+            stringBuilder.append(" (").append(this.getLabel()).append(")");
+        }
+        stringBuilder.append(": ");
+        stringBuilder.append(this.getClass().getSimpleName());
+        stringBuilder.append("(" + getValue() + ")");
+        return stringBuilder.toString();
+    }
 }

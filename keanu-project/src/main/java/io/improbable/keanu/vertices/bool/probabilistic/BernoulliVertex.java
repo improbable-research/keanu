@@ -2,11 +2,12 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -14,7 +15,6 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
@@ -63,21 +63,18 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(BooleanTensor value) {
+    public Map<Vertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends Vertex> withRespectTo) {
 
         if (!(probTrue instanceof Differentiable)) {
             throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
         }
 
-        PartialDerivatives probTruePartialDerivatives = ((Differentiable) probTrue).getDualNumber().getPartialDerivatives();
+        if (withRespectTo.contains(probTrue)) {
+            DoubleTensor dLogPdp = Bernoulli.withParameters(probTrue.getValue()).dLogProb(value);
+            return Collections.singletonMap(probTrue, dLogPdp);
+        }
 
-        DoubleTensor dLogPdp = Bernoulli.withParameters(probTrue.getValue()).dLogProb(value);
-
-        PartialDerivatives partials = probTruePartialDerivatives
-            .multiplyBy(dLogPdp)
-            .sum(true, TensorShape.dimensionRange(0, value.getRank()));
-
-        return partials.asMap();
+        return Collections.emptyMap();
     }
 
     @Override

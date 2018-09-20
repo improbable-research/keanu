@@ -38,4 +38,26 @@ public class DifferenceVertexTest {
             DoubleVertex::minus
         );
     }
+
+    @Test
+    public void calculatesDualNumberOfAVectorsAndScalarSubtracted() {
+        calculatesDualNumberOfAVectorsAndScalar(
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            2,
+            DoubleTensor.eye(4).reshape(1, 4, 1, 4),
+            DoubleTensor.ones(1, 4, 1, 1).unaryMinus(),
+            DoubleVertex::minus
+        );
+    }
+
+    @Test
+    public void calculatesDualNumberofAScalarAndVectorSubtracted() {
+        calculatesDualNumberOfAScalarAndVector(
+            2,
+            DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
+            DoubleTensor.ones(1, 4, 1, 1),
+            DoubleTensor.eye(4).reshape(1, 4, 1, 4).unaryMinus(),
+            DoubleVertex::minus
+        );
+    }
 }

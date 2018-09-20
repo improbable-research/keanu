@@ -1,16 +1,21 @@
 package io.improbable.keanu.algorithms;
 
+import static java.util.stream.Collectors.toMap;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.intgr.IntegerTensorVertexSamples;
-
-import java.util.*;
-import java.util.function.Function;
-
-import static java.util.stream.Collectors.toMap;
 
 /**
  * An immutable collection of network samples. A network sample is a collection
@@ -18,11 +23,13 @@ import static java.util.stream.Collectors.toMap;
  */
 public class NetworkSamples {
 
-    private final Map<Long, ? extends List> samplesByVertex;
+    private final Map<VertexId, ? extends List> samplesByVertex;
+    private final List<Double> logOfMasterPForEachSample;
     private final int size;
 
-    public NetworkSamples(Map<Long, ? extends List> samplesByVertex, int size) {
+    public NetworkSamples(Map<VertexId, ? extends List> samplesByVertex, List<Double> logOfMasterPForEachSample, int size) {
         this.samplesByVertex = samplesByVertex;
+        this.logOfMasterPForEachSample = logOfMasterPForEachSample;
         this.size = size;
     }
 
@@ -34,7 +41,7 @@ public class NetworkSamples {
         return get(vertex.getId());
     }
 
-    public <T> VertexSamples<T> get(long vertexId) {
+    public <T> VertexSamples<T> get(VertexId vertexId) {
         return new VertexSamples<>((List<T>) samplesByVertex.get(vertexId));
     }
 
@@ -42,7 +49,7 @@ public class NetworkSamples {
         return getDoubleTensorSamples(vertex.getId());
     }
 
-    public DoubleVertexSamples getDoubleTensorSamples(long vertexId) {
+    public DoubleVertexSamples getDoubleTensorSamples(VertexId vertexId) {
         return new DoubleVertexSamples(samplesByVertex.get(vertexId));
     }
 
@@ -50,39 +57,41 @@ public class NetworkSamples {
         return getIntegerTensorSamples(vertex.getId());
     }
 
-    public IntegerTensorVertexSamples getIntegerTensorSamples(long vertexId) {
+    public IntegerTensorVertexSamples getIntegerTensorSamples(VertexId vertexId) {
         return new IntegerTensorVertexSamples(samplesByVertex.get(vertexId));
     }
 
     public NetworkSamples drop(int dropCount) {
 
-        final Map<Long, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
+        final Map<VertexId, List<?>> withSamplesDropped = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
                 e -> e.getValue().subList(dropCount, size))
             );
+        final List<Double> withLogProbsDropped = logOfMasterPForEachSample.subList(dropCount, size);
 
-        return new NetworkSamples(withSamplesDropped, size - dropCount);
+        return new NetworkSamples(withSamplesDropped, withLogProbsDropped, size - dropCount);
     }
 
     public NetworkSamples downSample(final int downSampleInterval) {
 
-        final Map<Long, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
+        final Map<VertexId, List<?>> withSamplesDownSampled = samplesByVertex.entrySet().parallelStream()
             .collect(toMap(
                 Map.Entry::getKey,
-                e -> downSample(e.getValue(), downSampleInterval)
+                e -> downSample((List<?>) e.getValue(), downSampleInterval)
                 )
             );
+        final List<Double> withLogProbsDownSampled = downSample(logOfMasterPForEachSample, downSampleInterval);
 
-        return new NetworkSamples(withSamplesDownSampled, size / downSampleInterval);
+        return new NetworkSamples(withSamplesDownSampled, withLogProbsDownSampled, size / downSampleInterval);
     }
 
-    private static List<?> downSample(final List<?> samples, final int downSampleInterval) {
+    private static <T> List<T> downSample(final List<T> samples, final int downSampleInterval) {
 
-        List<Object> downSampled = new ArrayList<>();
+        List<T> downSampled = new ArrayList<>();
         int i = 0;
 
-        for (Object sample : samples) {
+        for (T sample : samples) {
             if (i % downSampleInterval == 0) {
                 downSampled.add(sample);
             }
@@ -101,6 +110,14 @@ public class NetworkSamples {
         return (double) trueCount / networkStates.size();
     }
 
+    public NetworkState getNetworkState(int sample) {
+        return new SamplesBackedNetworkState(samplesByVertex, sample);
+    }
+
+    public double getLogOfMasterP(int sample) {
+        return logOfMasterPForEachSample.get(sample);
+    }
+
     public List<NetworkState> toNetworkStates() {
         List<NetworkState> states = new ArrayList<>(size);
         for (int i = 0; i < size; i++) {
@@ -111,10 +128,10 @@ public class NetworkSamples {
 
     private static class SamplesBackedNetworkState implements NetworkState {
 
-        private final Map<Long, ? extends List> samplesByVertex;
+        private final Map<VertexId, ? extends List> samplesByVertex;
         private final int index;
 
-        public SamplesBackedNetworkState(Map<Long, ? extends List> samplesByVertex, int index) {
+        public SamplesBackedNetworkState(Map<VertexId, ? extends List> samplesByVertex, int index) {
             this.samplesByVertex = samplesByVertex;
             this.index = index;
         }
@@ -125,12 +142,12 @@ public class NetworkSamples {
         }
 
         @Override
-        public <T> T get(long vertexId) {
+        public <T> T get(VertexId vertexId) {
             return ((List<T>) samplesByVertex.get(vertexId)).get(index);
         }
 
         @Override
-        public Set<Long> getVertexIds() {
+        public Set<VertexId> getVertexIds() {
             return new HashSet<>(samplesByVertex.keySet());
         }
     }

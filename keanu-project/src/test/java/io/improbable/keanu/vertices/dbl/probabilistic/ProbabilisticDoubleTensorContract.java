@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import com.google.common.collect.ImmutableList;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
-import org.apache.commons.math3.util.Pair;
+import static java.util.stream.Collectors.counting;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.toMap;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,13 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
 
-import static java.util.stream.Collectors.counting;
-import static java.util.stream.Collectors.groupingBy;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
+import org.apache.commons.math3.util.Pair;
+
+import com.google.common.collect.ImmutableList;
+
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ProbabilisticDoubleTensorContract {
 
@@ -197,9 +203,9 @@ public class ProbabilisticDoubleTensorContract {
 
         hyperParameterVertex.setAndCascade(hyperParameterValue);
 
-        Map<Long, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue();
+        Map<Vertex, DoubleTensor> diffln = vertexUnderTest.dLogProbAtValue(hyperParameterVertex);
 
-        double actualDiffLnDensity = diffln.get(hyperParameterVertex.getId()).scalar();
+        double actualDiffLnDensity = diffln.get(hyperParameterVertex).scalar();
 
         assertEquals("Diff ln density problem at " + vertexUnderTest.getValue() + " hyper param value " + hyperParameterValue,
             diffLnDensityApproxExpected, actualDiffLnDensity, 0.1);
@@ -215,16 +221,16 @@ public class ProbabilisticDoubleTensorContract {
     void hasNoGradientWithRespectToItsValueWhenObserved(V vertexUnderTest) {
         DoubleTensor ones = DoubleTensor.ones(vertexUnderTest.getValue().getShape());
         vertexUnderTest.observe(ones);
-        assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest.getId()));
+        assertNull(vertexUnderTest.dLogProb(ones).get(vertexUnderTest));
     }
 
-    public static void matchesKnownLogDensityOfVector(Probabilistic vertexUnderTest, double[] vector, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfVector(Probabilistic<DoubleTensor> vertexUnderTest, double[] vector, double expectedLogDensity) {
 
         double actualDensity = vertexUnderTest.logProb(DoubleTensor.create(vector, vector.length, 1));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
     }
 
-    public static void matchesKnownLogDensityOfScalar(Probabilistic vertexUnderTest, double scalar, double expectedLogDensity) {
+    public static void matchesKnownLogDensityOfScalar(Probabilistic<DoubleTensor> vertexUnderTest, double scalar, double expectedLogDensity) {
 
         double actualDensity = vertexUnderTest.logProb(DoubleTensor.scalar(scalar));
         assertEquals(expectedLogDensity, actualDensity, 1e-5);
@@ -241,24 +247,32 @@ public class ProbabilisticDoubleTensorContract {
             V scalarVertex = vertexUnderTestSupplier.get();
             scalarVertices.add(scalarVertex);
 
+            Map<VertexId, DoubleTensor> dlogPdfById = scalarVertex.dLogPdf(vector[i], scalarVertex)
+                .entrySet().stream()
+                .collect(toMap(
+                    e -> e.getKey().getId(),
+                    Map.Entry::getValue)
+                );
+
             expectedPartialDerivatives = expectedPartialDerivatives.add(
                 new PartialDerivatives(
-                    scalarVertex.dLogPdf(vector[i])
+                    dlogPdfById
                 )
             );
         }
 
         V tensorVertex = vertexUnderTestSupplier.get();
 
-        Map<Long, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
-            DoubleTensor.create(vector, new int[]{vector.length, 1})
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
+            DoubleTensor.create(vector, new int[]{vector.length, 1}),
+            tensorVertex
         );
 
-        HashSet<Long> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
-        hyperParameterVertices.remove(tensorVertex.getId());
+        HashSet<Vertex> hyperParameterVertices = new HashSet<>(actualDerivatives.keySet());
+        hyperParameterVertices.remove(tensorVertex);
 
-        for (Long id : hyperParameterVertices) {
-            assertEquals(expectedPartialDerivatives.withRespectTo(id).sum(), actualDerivatives.get(id).sum(), 1e-5);
+        for (Vertex vertex : hyperParameterVertices) {
+            assertEquals(expectedPartialDerivatives.withRespectTo(vertex).sum(), actualDerivatives.get(vertex).sum(), 1e-5);
         }
 
         double expected = 0;
@@ -266,7 +280,7 @@ public class ProbabilisticDoubleTensorContract {
             expected += expectedPartialDerivatives.withRespectTo(scalarVertex).scalar();
         }
 
-        double actual = actualDerivatives.get(tensorVertex.getId()).sum();
+        double actual = actualDerivatives.get(tensorVertex).sum();
         assertEquals(expected, actual, 1e-5);
     }
 

@@ -17,9 +17,9 @@ import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class GammaVertexTest {
 
@@ -62,13 +62,11 @@ public class GammaVertexTest {
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(thetaTensor, kTensor);
-        Map<Long, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5));
+        Map<Vertex, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
 
-        PartialDerivatives actual = new PartialDerivatives(actualDerivatives);
-
-        assertEquals(gammaLogDiff.dPdtheta, actual.withRespectTo(thetaTensor.getId()).scalar(), 1e-5);
-        assertEquals(gammaLogDiff.dPdk, actual.withRespectTo(kTensor.getId()).scalar(), 1e-5);
-        assertEquals(gammaLogDiff.dPdx, actual.withRespectTo(tensorGamma.getId()).scalar(), 1e-5);
+        assertEquals(gammaLogDiff.dPdtheta, actualDerivatives.get(thetaTensor).scalar(), 1e-5);
+        assertEquals(gammaLogDiff.dPdk, actualDerivatives.get(kTensor).scalar(), 1e-5);
+        assertEquals(gammaLogDiff.dPdx, actualDerivatives.get(tensorGamma).scalar(), 1e-5);
     }
 
     @Test

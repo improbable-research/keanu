@@ -36,7 +36,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public SimpleBooleanTensor(boolean[] data, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -54,7 +54,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      */
     public SimpleBooleanTensor(int[] shape) {
         this.data = null;
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -65,7 +65,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public SimpleBooleanTensor(boolean constant, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -223,33 +223,13 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor concat(int dimension, BooleanTensor... those) {
-        DoubleTensor[] toDoubles = new DoubleTensor[those.length];
-        DoubleTensor primary = this.toDoubleMask();
-
-        for (int i = 0; i < those.length; i++) {
-            toDoubles[i] = those[i].toDoubleMask();
-        }
-
-        DoubleTensor concat = primary.concat(dimension, toDoubles);
-        double[] concatFlat = concat.asFlatDoubleArray();
-        boolean[] data = new boolean[concat.asFlatDoubleArray().length];
-
-        for (int i = 0; i < data.length; i++) {
-            data[i] = concatFlat[i] == 1.0;
-        }
-
-        return new SimpleBooleanTensor(data, concat.getShape());
-    }
-
-    @Override
     public int getRank() {
         return shape.length;
     }
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
@@ -268,8 +248,9 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public void setValue(Boolean value, int... index) {
+    public BooleanTensor setValue(Boolean value, int... index) {
         data[getFlatIndex(shape, stride, index)] = value;
+        return this;
     }
 
     @Override

@@ -4,7 +4,9 @@ import static java.util.Arrays.copyOf;
 
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -19,6 +21,8 @@ import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.INDArrayIndex;
+import org.nd4j.linalg.indexing.NDArrayIndex;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
@@ -61,16 +65,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     public static Nd4jDoubleTensor linspace(double start, double end, int numberOfPoints) {
-        return new Nd4jDoubleTensor(Nd4j.linspace(start, end, numberOfPoints));
+        return new Nd4jDoubleTensor(TypedINDArrayFactory.linspace(start, end, numberOfPoints, BUFFER_TYPE));
     }
 
     public static Nd4jDoubleTensor arange(double start, double end) {
-        return new Nd4jDoubleTensor(Nd4j.arange(start, end));
+        return new Nd4jDoubleTensor(TypedINDArrayFactory.arange(start, end, BUFFER_TYPE));
     }
 
     public static Nd4jDoubleTensor arange(double start, double end, double stepSize) {
         double stepCount = Math.ceil((end - start) / stepSize);
-        INDArray arangeWithStep = Nd4j.arange(0, stepCount).muli(stepSize).addi(start);
+        INDArray arangeWithStep = TypedINDArrayFactory.arange(0, stepCount, BUFFER_TYPE).muli(stepSize).addi(start);
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
@@ -108,8 +112,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return tensor.getDouble(index);
     }
 
-    public void setValue(Double value, int... index) {
+    public DoubleTensor setValue(Double value, int... index) {
         tensor.putScalar(index, value);
+        return this;
     }
 
     @Override
@@ -161,7 +166,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor inverse() {
+    public DoubleTensor matrixInverse() {
         return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
     }
 
@@ -538,12 +543,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.minus(that);
         } else {
-            INDArrayShim.subi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.subi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
 
-     /**
+    /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
      * Otherwise return <i>this</i>.
@@ -555,12 +563,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.plus(that);
         } else {
-            INDArrayShim.addi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.addi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
 
-     /**
+    /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
      * Otherwise return <i>this</i>.
@@ -572,12 +583,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.times(that);
         } else {
-            INDArrayShim.muli(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.muli(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
 
-     /**
+    /**
      * @param that Right operand.
      * @return A new DoubleTensor instance only if <i>this</i> has a length of 1 and right operand has a length greater than 1.
      * Otherwise return <i>this</i>.
@@ -589,7 +603,10 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         } else if (this.isScalar()) {
             return this.div(that);
         } else {
-            INDArrayShim.divi(tensor, unsafeGetNd4J(that), tensor);
+            INDArray result = INDArrayShim.divi(tensor, unsafeGetNd4J(that));
+            if (result != tensor) {
+                return new Nd4jDoubleTensor(result);
+            }
         }
         return this;
     }
@@ -809,16 +826,61 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(slice);
     }
 
+    /**
+     * @param dimension      the dimension to slice on
+     * @param splitAtIndices the indices that the dimension to slice on should be slice on
+     * @return pieces of the tensor slice in the order specified by splitAtIndices. To get
+     * pieces that encompasses the entire tensor, the last index in the splitAtIndices must
+     * be the length of the dimension being slice on.
+     * <p>
+     * e.g A =
+     * [
+     * 1, 2, 3, 4, 5, 6
+     * 7, 8, 9, 1, 2, 3
+     * ]
+     * <p>
+     * A.slice(0, [1]) gives List([1, 2, 3, 4, 5, 6])
+     * A.slice(0, [1, 2]) gives List([1, 2, 3, 4, 5, 6], [7, 8, 9, 1, 2, 3]
+     * <p>
+     * A.slice(1, [1, 3, 6]) gives
+     * List(
+     * [1, [2, 3  , [4, 5, 6,
+     * 7]  8, 9]    1, 2, 3]
+     * )
+     */
     @Override
-    public DoubleTensor concat(int dimension, DoubleTensor... those) {
-        INDArray dup = tensor.dup();
-        INDArray[] toConcat = new INDArray[those.length + 1];
-        toConcat[0] = dup;
-        for (int i = 1; i <= those.length; i++) {
-            toConcat[i] = unsafeGetNd4J(those[i - 1]);
+    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+
+        int[] shape = getShape();
+        if (dimension < 0 || dimension >= shape.length) {
+            throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
         }
-        INDArray concat = Nd4j.concat(dimension, toConcat);
-        return new Nd4jDoubleTensor(concat);
+
+        Nd4j.getCompressor().autoDecompress(tensor);
+
+        List<DoubleTensor> splits = new ArrayList<>();
+        int previousSplitIndex = 0;
+        for (int i = 0; i < splitAtIndices.length; i++) {
+
+            INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
+
+            if (previousSplitIndex == splitAtIndices[i]) {
+                throw new IllegalArgumentException("Invalid index to split on " + splitAtIndices[i] + " at dimension " + dimension + " for tensor of shape " + Arrays.toString(shape));
+            }
+
+            indices[dimension] = NDArrayIndex.interval(previousSplitIndex, splitAtIndices[i]);
+            previousSplitIndex = splitAtIndices[i];
+
+            for (int j = 0; j < tensor.rank(); j++) {
+                if (j != dimension) {
+                    indices[j] = NDArrayIndex.all();
+                }
+            }
+
+            splits.add(new Nd4jDoubleTensor(tensor.get(indices)));
+        }
+
+        return splits;
     }
 
     // Comparisons
@@ -892,7 +954,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         INDArray mask;
         if (value.isScalar()) {
-            mask = tensor.gt(value.scalar());
+            mask = tensor.gte(value.scalar());
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();
@@ -913,7 +975,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         }
     }
 
-    private INDArray unsafeGetNd4J(DoubleTensor that) {
+    static INDArray unsafeGetNd4J(DoubleTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }

@@ -1,11 +1,15 @@
 package io.improbable.keanu.tensor.dbl;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -33,7 +37,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor create(double[] values) {
+    static DoubleTensor create(double... values) {
         return create(values, 1, values.length);
     }
 
@@ -53,7 +57,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor zeros(int[] shape) {
+    static DoubleTensor zeros(int... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
@@ -91,6 +95,18 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     static DoubleTensor placeHolder(int[] shape) {
         return new ScalarDoubleTensor(shape);
     }
+
+    static DoubleTensor concat(int dimension, DoubleTensor... toConcat) {
+        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
+        for (int i = 0; i < toConcat.length; i++) {
+            concatAsINDArray[i] = Nd4jDoubleTensor.unsafeGetNd4J(toConcat[i]).dup();
+        }
+        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
+        return new Nd4jDoubleTensor(concat);
+    }
+
+    @Override
+    DoubleTensor setValue(Double value, int... index);
 
     @Override
     DoubleTensor reshape(int... newShape);
@@ -150,7 +166,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor max(DoubleTensor max);
 
-    DoubleTensor inverse();
+    DoubleTensor matrixInverse();
 
     double max();
 
@@ -185,7 +201,17 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     @Override
     DoubleTensor slice(int dimension, int index);
 
-    DoubleTensor concat(int dimension, DoubleTensor... those);
+    List<DoubleTensor> split(int dimension, int[] splitAtIndices);
+
+    default List<DoubleTensor> sliceAlongDimension(int dimension, int indexStart, int indexEnd) {
+        List<DoubleTensor> slicedTensors = new ArrayList<>();
+
+        for (int i = indexStart; i < indexEnd; i++) {
+            slicedTensors.add(slice(dimension, i));
+        }
+
+        return slicedTensors;
+    }
 
     //In place Ops and Transforms. These mutate the source vertex (i.e. this).
 

@@ -1,6 +1,8 @@
 package io.improbable.keanu.tensor.dbl;
 
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
@@ -16,14 +18,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     private Double value;
     private int[] shape;
 
-    public ScalarDoubleTensor(double value) {
+    private ScalarDoubleTensor(Double value, int[] shape) {
         this.value = value;
-        this.shape = SCALAR_SHAPE;
+        this.shape = shape;
+    }
+
+    public ScalarDoubleTensor(double value) {
+        this(value, SCALAR_SHAPE);
     }
 
     public ScalarDoubleTensor(int[] shape) {
-        this.value = null;
-        this.shape = shape;
+        this(null, shape);
     }
 
     @Override
@@ -33,7 +38,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
@@ -47,8 +52,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor duplicate() {
-        return new ScalarDoubleTensor(value);
+    public ScalarDoubleTensor duplicate() {
+        return new ScalarDoubleTensor(value, shape);
     }
 
     @Override
@@ -61,9 +66,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public void setValue(Double value, int[] index) {
+    public DoubleTensor setValue(Double value, int[] index) {
         if (index.length == 1 && index[0] == 0) {
             this.value = value;
+            return this;
         } else {
             throw new IndexOutOfBoundsException(ArrayUtils.toString(index) + " out of bounds on scalar");
         }
@@ -95,9 +101,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
         }
 
-        ScalarDoubleTensor reshapedScalar = new ScalarDoubleTensor(value);
-        reshapedScalar.shape = newShape;
-        return reshapedScalar;
+        return new ScalarDoubleTensor(value, newShape);
     }
 
     @Override
@@ -117,7 +121,9 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sum(int... overDimensions) {
-        return duplicate();
+        int[] summedShape = new int[this.shape.length - overDimensions.length];
+        Arrays.fill(summedShape, 1);
+        return new ScalarDoubleTensor(value, summedShape);
     }
 
     @Override
@@ -326,8 +332,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor inverse() {
-        return duplicate();
+    public DoubleTensor matrixInverse() {
+        return new ScalarDoubleTensor(1 / value);
     }
 
     @Override
@@ -422,8 +428,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor concat(int dimension, DoubleTensor... those) {
-        return Nd4jDoubleTensor.scalar(value).concat(dimension, those);
+    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+        return Collections.singletonList(this);
     }
 
     @Override
@@ -474,7 +480,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor sqrtInPlace() {
-        return pow(0.5);
+        return powInPlace(0.5);
     }
 
     @Override
@@ -650,7 +656,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (value < 0. && value + 0.5 == (double) value.intValue()) {
             valueToRound -= 1.;
         }
-        value = new Double(Math.round(valueToRound));
+        value = (double) Math.round(valueToRound);
         return this;
     }
 

@@ -6,11 +6,14 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.Collections;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -121,15 +124,19 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
-        final DoubleTensor min = xMin.getValue();
-        final DoubleTensor max = xMax.getValue();
-        ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
-        final DoubleTensor dPdx = distribution.dLogProb(value).get(X).getValue();
-        final DoubleTensor density = distribution.logProb(value);
-        final DoubleTensor dLogPdx = dPdx.divInPlace(density);
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
 
-        return singletonMap(getId(), dLogPdx);
+        if (withRespectTo.contains(this)) {
+            final DoubleTensor min = xMin.getValue();
+            final DoubleTensor max = xMax.getValue();
+            ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
+            final DoubleTensor dPdx = distribution.dLogProb(value).get(X).getValue();
+            final DoubleTensor density = distribution.logProb(value);
+            final DoubleTensor dLogPdx = dPdx.divInPlace(density);
+            return singletonMap(this, dLogPdx);
+        }
+
+        return Collections.emptyMap();
     }
 
     @Override

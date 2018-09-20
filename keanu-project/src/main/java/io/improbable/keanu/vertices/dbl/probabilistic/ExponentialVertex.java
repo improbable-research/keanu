@@ -2,20 +2,20 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
-import static io.improbable.keanu.tensor.TensorShape.shapeToDesiredRankByPrependingOnes;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Exponential;
 import io.improbable.keanu.distributions.dual.Diffs;
-import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -65,24 +65,20 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     }
 
     @Override
-    public Map<Long, DoubleTensor> dLogProb(DoubleTensor value) {
+    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Exponential.withParameters(lambda.getValue()).dLogProb(value);
-        return convertDualNumbersToDiff(dlnP.get(LAMBDA).getValue(), dlnP.get(X).getValue());
-    }
 
-    private Map<Long, DoubleTensor> convertDualNumbersToDiff(DoubleTensor dLogPdlambda,
-                                                             DoubleTensor dLogPdx) {
+        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
-        PartialDerivatives dLogPdInputs = lambda.getDualNumber().getPartialDerivatives().multiplyBy(dLogPdlambda);
-
-        if (!this.isObserved()) {
-            dLogPdInputs.putWithRespectTo(getId(), dLogPdx.reshape(
-                shapeToDesiredRankByPrependingOnes(dLogPdx.getShape(), dLogPdx.getRank() + getValue().getRank()))
-            );
+        if (withRespectTo.contains(lambda)) {
+            dLogProbWrtParameters.put(lambda, dlnP.get(LAMBDA).getValue());
         }
 
-        PartialDerivatives summed = dLogPdInputs.sum(true, TensorShape.dimensionRange(0, getShape().length));
-        return summed.asMap();
+        if (withRespectTo.contains(this)) {
+            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
+        }
+
+        return dLogProbWrtParameters;
     }
 
     @Override

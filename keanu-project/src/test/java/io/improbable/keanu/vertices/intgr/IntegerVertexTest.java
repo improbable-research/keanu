@@ -7,10 +7,15 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.Function;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Before;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
@@ -89,6 +94,16 @@ public class IntegerVertexTest {
     }
 
     @Test
+    public void canObserveTensor() {
+        IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
+        IntegerTensor observation = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        binomialVertex.observe(observation);
+        assertArrayEquals(observation.asFlatIntegerArray(), binomialVertex.getValue().asFlatIntegerArray());
+        assertArrayEquals(observation.getShape(), binomialVertex.getShape());
+
+    }
+
+    @Test
     public void canSetAndCascadeArrayOfValues() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
         int[] values = new int[]{1, 2, 3};
@@ -124,6 +139,30 @@ public class IntegerVertexTest {
         int[] values = new int[]{1, 2, 3};
         binomialVertex.setValue(values);
         assertEquals(1, (long) binomialVertex.take(0, 0).getValue().scalar());
+    }
+
+    @Test
+    public void canReshape() {
+        IntegerVertex binomialVertex = new BinomialVertex(0, 1);
+        binomialVertex.setAndCascade(IntegerTensor.ones(2, 2));
+        assertArrayEquals(binomialVertex.getShape(), new int[]{2, 2});
+        IntegerVertex reshaped = binomialVertex.reshape(4, 1);
+        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+    }
+
+    @Test
+    public void canConcat() {
+        IntegerVertex A = new UniformIntVertex(0, 1);
+        A.setValue(IntegerTensor.ones(2, 2));
+
+        IntegerVertex B = new UniformIntVertex(0, 1);
+        B.setValue(IntegerTensor.ones(2, 2));
+
+        IntegerVertex concatDimZero = IntegerVertex.concat(0, A, B);
+        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+
+        IntegerVertex concatDimOne = IntegerVertex.concat(1, A, B);
+        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
     }
 
 }
