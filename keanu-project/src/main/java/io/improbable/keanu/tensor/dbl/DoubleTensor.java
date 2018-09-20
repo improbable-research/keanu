@@ -147,7 +147,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor log();
 
-    DoubleTensor logTimes(DoubleTensor y);
+    DoubleTensor safeLogTimes(DoubleTensor y);
 
     DoubleTensor sin();
 
@@ -236,7 +236,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor logInPlace();
 
-    DoubleTensor logTimesInPlace(DoubleTensor y);
+    DoubleTensor safeLogTimesInPlace(DoubleTensor y);
 
     DoubleTensor sinInPlace();
 

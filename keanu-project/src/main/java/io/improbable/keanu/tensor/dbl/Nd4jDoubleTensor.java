@@ -317,8 +317,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor logTimes(DoubleTensor y) {
-        return duplicate().logTimesInPlace(y);
+    public DoubleTensor safeLogTimes(DoubleTensor y) {
+        return duplicate().safeLogTimesInPlace(y);
     }
 
     @Override
@@ -492,7 +492,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * @return the log of this tensor multiplied by y
      */
     @Override
-    public DoubleTensor logTimesInPlace(DoubleTensor y) {
+    public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
         TensorValidator.NAN_CATCHER.validate(this);
         TensorValidator.NAN_CATCHER.validate(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);

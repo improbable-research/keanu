@@ -924,11 +924,11 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor x = DoubleTensor.create(
             Double.MIN_VALUE, 1e-8, 1., 1e8);
         DoubleTensor y = x.duplicate();
-        assertThat(x.log().times(y), equalTo(x.logTimes(y)));
+        assertThat(x.log().times(y), equalTo(x.safeLogTimes(y)));
 
         DoubleTensor zeros = DoubleTensor.create(0., -0.);
 
-        assertThat(zeros.logTimes(zeros), hasValue(0., 0.));
+        assertThat(zeros.safeLogTimes(zeros), hasValue(0., 0.));
         assertThat(zeros.log().times(zeros), hasValue(Double.NaN, Double.NaN));
     }
 
@@ -939,7 +939,7 @@ public class Nd4jDoubleTensorTest {
 
         DoubleTensor x = DoubleTensor.create(1., 1.);
         DoubleTensor y = DoubleTensor.create(1., Double.NaN);
-        x.logTimes(y);
+        x.safeLogTimes(y);
     }
 
     @Test
@@ -949,7 +949,7 @@ public class Nd4jDoubleTensorTest {
 
         DoubleTensor x = DoubleTensor.create(1., Double.NaN);
         DoubleTensor y = DoubleTensor.create(1., 1.);
-        x.logTimes(y);
+        x.safeLogTimes(y);
     }
 
     @Test

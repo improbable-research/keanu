@@ -101,7 +101,7 @@ public class ScalarDoubleTensorTest {
     @Test
     public void youCanDoYLogXEvenWhenBothAreZero() {
         DoubleTensor zero = DoubleTensor.scalar(0.);
-        assertThat(zero.logTimes(zero), hasValue(0.));
+        assertThat(zero.safeLogTimes(zero), hasValue(0.));
         assertThat(zero.log().times(zero), hasValue(Double.NaN));
     }
 
@@ -110,7 +110,7 @@ public class ScalarDoubleTensorTest {
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor zeroTensor = DoubleTensor.create(0., 0., 0.);
         assertThat(zero.log().times(zeroTensor), hasValue(Double.NaN, Double.NaN, Double.NaN));
-        assertThat(zero.logTimes(zeroTensor), hasValue(0., 0., 0.));
+        assertThat(zero.safeLogTimes(zeroTensor), hasValue(0., 0., 0.));
     }
 
 
@@ -121,7 +121,7 @@ public class ScalarDoubleTensorTest {
 
         DoubleTensor x = DoubleTensor.scalar(1.);
         DoubleTensor y = DoubleTensor.scalar(Double.NaN);
-        x.logTimes(y);
+        x.safeLogTimes(y);
     }
 
     @Test
@@ -131,7 +131,7 @@ public class ScalarDoubleTensorTest {
 
         DoubleTensor x = DoubleTensor.scalar(Double.NaN);
         DoubleTensor y = DoubleTensor.scalar(1.);
-        x.logTimes(y);
+        x.safeLogTimes(y);
     }
 
     @Test

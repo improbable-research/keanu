@@ -192,8 +192,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor logTimes(DoubleTensor y) {
-        return this.duplicate().logTimesInPlace(y);
+    public DoubleTensor safeLogTimes(DoubleTensor y) {
+        return this.duplicate().safeLogTimesInPlace(y);
     }
 
     @Override
@@ -508,7 +508,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      * @return the log of this tensor multiplied by y
      */
     @Override
-    public DoubleTensor logTimesInPlace(DoubleTensor y) {
+    public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
         TensorValidator.NAN_CATCHER.validate(this);
         TensorValidator.NAN_CATCHER.validate(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);
