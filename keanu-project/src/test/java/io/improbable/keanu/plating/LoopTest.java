@@ -115,7 +115,6 @@ public class LoopTest {
         DoubleVertex output = loop.getOutput();
 
         for (int firstFailure : new int[]{0, 1, 2, 10, Loop.DEFAULT_MAX_COUNT - 1}) {
-            System.out.format("Testing loop that fails after %d steps%n", firstFailure);
             for (Plate plate : loop.getPlates()) {
                 BoolVertex condition = plate.get(Loop.CONDITION_LABEL);
                 condition.setAndCascade(true);

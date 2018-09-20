@@ -388,7 +388,6 @@ public class PlateBuilderTest {
         DoubleVertex output = plates.asList().get(maximumLoopLength - 1).get(valueOutLabel);
 
         for (int firstFailure : new int[]{0, 1, 2, 10, 99}) {
-            System.out.format("Testing loop that fails after %d steps%n", firstFailure);
             for (Plate plate : plates) {
                 BoolVertex condition = plate.get(conditionLabel);
                 condition.setAndCascade(true);
