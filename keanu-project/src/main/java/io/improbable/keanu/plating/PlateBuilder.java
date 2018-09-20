@@ -1,16 +1,29 @@
 package io.improbable.keanu.plating;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
+
 /**
- * PlateBuilder allows plates to constructed in steps
+ * PlateBuilder allows plates to be constructed in steps
  *
  * @param <T> The data type provided to user-provided plate
  *            factory function, if building from data
  */
 public class PlateBuilder<T> {
+
+    private static final String PROXY_LABEL_MARKER = "proxy_for";
+    private VertexDictionary initialState;
+    private Map<VertexLabel, VertexLabel> transitionMapping = Collections.emptyMap();
+
     private interface PlateCount {
         int getCount();
     }
@@ -24,8 +37,24 @@ public class PlateBuilder<T> {
          * Build plates from current factory settings
          *
          * @return Collection of all created plates
+         * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the transition mapping
          */
         Plates build();
+    }
+
+    public static VertexLabel proxyFor(VertexLabel label) {
+        return label.withExtraNamespace(PROXY_LABEL_MARKER);
+    }
+
+
+    public PlateBuilder<T> withInitialState(Vertex... initialState) {
+        this.initialState = VertexDictionary.of(initialState);
+        return this;
+    }
+
+    public PlateBuilder<T> withTransitionMapping(Map<VertexLabel, VertexLabel> transitionMapping) {
+        this.transitionMapping = transitionMapping;
+        return this;
     }
 
     /**
@@ -35,7 +64,7 @@ public class PlateBuilder<T> {
      * @return A builder with count set
      */
     public FromCount count(int count) {
-        return new FromCount(count);
+        return new FromCount(count, initialState);
     }
 
     /**
@@ -45,7 +74,7 @@ public class PlateBuilder<T> {
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator) {
-        return new FromIterator(iterator, 0);
+        return new FromIterator(iterator, 0, initialState, transitionMapping);
     }
 
     /**
@@ -56,17 +85,19 @@ public class PlateBuilder<T> {
      * @return A builder with data set
      */
     public FromIterator fromIterator(Iterator<T> iterator, int sizeHint) {
-        return new FromIterator(iterator, sizeHint);
+        return new FromIterator(iterator, sizeHint, initialState, transitionMapping);
     }
 
     /**
      * An intermediate builder, with a set count
      */
     public class FromCount implements PlateCount {
-        private int count;
+        private final int count;
+        private final VertexDictionary initialState;
 
-        public FromCount(int count) {
+        public FromCount(int count, VertexDictionary initialState) {
             this.count = count;
+            this.initialState = initialState;
         }
 
         public int getCount() {
@@ -80,7 +111,7 @@ public class PlateBuilder<T> {
          * @return A builder with count and plate factory set
          */
         public FromCountFactory withFactory(Consumer<Plate> factory) {
-            return new FromCountFactory(factory, this);
+            return new FromCountFactory(factory, this, initialState, transitionMapping);
         }
     }
 
@@ -90,10 +121,12 @@ public class PlateBuilder<T> {
     public class FromIterator implements PlateData<T> {
         private Iterator<T> iterator;
         private int size;
+        private final VertexDictionary initialState;
 
-        private FromIterator(Iterator<T> iterator, int size) {
+        private FromIterator(Iterator<T> iterator, int size, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
             this.iterator = iterator;
             this.size = size;
+            this.initialState = initialState;
         }
 
         public Iterator<T> getIterator() {
@@ -107,7 +140,7 @@ public class PlateBuilder<T> {
          * @return A builder with data and plate factory set
          */
         public FromDataFactory withFactory(BiConsumer<Plate, T> factory) {
-            return new FromDataFactory(factory, this, size);
+            return new FromDataFactory(factory, this, size, initialState);
         }
     }
 
@@ -118,22 +151,58 @@ public class PlateBuilder<T> {
         private BiConsumer<Plate, T> factory;
         private PlateData<T> data;
         private int size;
+        private final VertexDictionary initialState;
 
-        private FromDataFactory(BiConsumer<Plate, T> factory, PlateData<T> data, int size) {
+        private FromDataFactory(BiConsumer<Plate, T> factory, PlateData<T> data, int size, VertexDictionary initialState) {
             this.factory = factory;
             this.data = data;
             this.size = size;
+            this.initialState = initialState;
         }
 
         public Plates build() {
             Plates plates = new Plates(this.size);
             Iterator<T> iter = data.getIterator();
+            VertexDictionary previousVertices = initialState;
             while (iter.hasNext()) {
                 Plate plate = new Plate();
                 factory.accept(plate, iter.next());
+                connectTransitionVariables(previousVertices, plate, transitionMapping);
                 plates.add(plate);
+                previousVertices = plate;
             }
             return plates;
+        }
+    }
+
+    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) {
+        Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
+        if (candidateVertices == null && !proxyVertices.isEmpty()) {
+            throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
+        }
+        for (Vertex<?> proxy : proxyVertices) {
+            VertexLabel proxyLabel = proxy.getLabel().withoutOuterNamespace();
+            VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
+            VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
+
+            if (parentLabel == null) {
+                throw new VertexLabelException("Cannot find transition mapping for " + proxy.getLabel());
+            }
+
+            Vertex<?> parent = candidateVertices.get(parentLabel);
+            if (parent == null) {
+                throw new VertexLabelException("Cannot find VertexLabel " + parentLabel);
+            }
+            proxy.setParents(parent);
+        }
+    }
+
+    private VertexLabel getDefaultParentLabel(VertexLabel proxyLabel) {
+        String outerNamespace = proxyLabel.getOuterNamespace().orElse(null);
+        if (PROXY_LABEL_MARKER.equals(outerNamespace)) {
+            return proxyLabel.withoutOuterNamespace();
+        } else {
+            return null;
         }
     }
 
@@ -144,7 +213,7 @@ public class PlateBuilder<T> {
         private Consumer<Plate> factory;
         private PlateCount count;
 
-        private FromCountFactory(Consumer<Plate> factory, PlateCount count) {
+        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
             this.factory = factory;
             this.count = count;
         }
@@ -152,10 +221,13 @@ public class PlateBuilder<T> {
 
         public Plates build() {
             Plates plates = new Plates(count.getCount());
+            VertexDictionary previousPlate = initialState;
             for (int i = 0; i < count.getCount(); i++) {
                 Plate plate = new Plate();
                 factory.accept(plate);
+                connectTransitionVariables(previousPlate, plate, transitionMapping);
                 plates.add(plate);
+                previousPlate = plate;
             }
             return plates;
         }

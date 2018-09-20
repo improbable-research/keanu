@@ -40,7 +40,7 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
             .unaryMinusInPlace();
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dSelfWrtInput));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dSelfWrtInput, true));
 
         return partials;
     }

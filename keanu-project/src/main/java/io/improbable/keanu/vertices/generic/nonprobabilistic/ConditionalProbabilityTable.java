@@ -1,15 +1,17 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
-
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ConditionalProbabilityTable {
 
@@ -35,7 +37,7 @@ public class ConditionalProbabilityTable {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
-            return new CPTWhenRawBuilder(condition, inputs);
+            return new CPTWhenRawBuilder(ImmutableList.copyOf(condition), inputs);
         }
     }
 
@@ -44,7 +46,7 @@ public class ConditionalProbabilityTable {
         private final CPTCondition condition;
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
 
-        public CPTWhenRawBuilder(Boolean[] condition, List<Vertex<? extends Tensor<Boolean>>> inputs) {
+        public CPTWhenRawBuilder(List<Boolean> condition, List<Vertex<? extends Tensor<Boolean>>> inputs) {
             this.condition = new CPTCondition(condition);
             this.inputs = inputs;
         }
@@ -79,7 +81,7 @@ public class ConditionalProbabilityTable {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
-            return new DoubleCPTWhenBuilder(new CPTCondition(condition), this);
+            return new DoubleCPTWhenBuilder(new CPTCondition(ImmutableList.copyOf(condition)), this);
         }
 
         public DoubleCPTVertex orDefault(DoubleVertex defaultResult) {
@@ -124,7 +126,7 @@ public class ConditionalProbabilityTable {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
-            return new CPTWhenBuilder<>(new CPTCondition(condition), this);
+            return new CPTWhenBuilder<>(new CPTCondition(ImmutableList.copyOf(condition)), this);
         }
 
         public CPTVertex<OUT> orDefault(Vertex<OUT> defaultResult) {
