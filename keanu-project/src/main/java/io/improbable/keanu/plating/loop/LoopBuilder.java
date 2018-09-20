@@ -1,22 +1,19 @@
 package io.improbable.keanu.plating.loop;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
-import java.util.stream.Collectors;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Iterables;
 
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -26,13 +23,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 
 public class LoopBuilder {
-    private final Collection<Vertex> initialState;
+    private final VertexDictionary initialState;
     private ImmutableMap.Builder<VertexLabel, VertexLabel> customMappings = ImmutableMap.builder();
     private int maxLoopCount = Loop.DEFAULT_MAX_COUNT;
     private boolean throwWhenMaxCountIsReached = true;
 
-    <V extends Vertex<?>> LoopBuilder(Collection<V> initialState) {
-        this.initialState = ImmutableList.copyOf(initialState);
+    <V extends Vertex<?>> LoopBuilder(VertexDictionary initialState) {
+        this.initialState = initialState;
     }
 
     /**
@@ -90,7 +87,7 @@ public class LoopBuilder {
     }
 
     public class LoopBuilder2 {
-        private final Collection<Vertex> initialState;
+        private final VertexDictionary initialState;
         private final Function<Plate, BoolVertex> conditionFunction;
         private final Map<VertexLabel, VertexLabel> customMappings;
         private final int maxLoopCount;
@@ -100,7 +97,7 @@ public class LoopBuilder {
         private final VertexLabel LOOP_LABEL = new VertexLabel("loop");
 
 
-        LoopBuilder2(Collection<Vertex> initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
+        LoopBuilder2(VertexDictionary initialState, Function<Plate, BoolVertex> conditionFunction, Map<VertexLabel, VertexLabel> customMappings, int maxLoopCount, boolean throwWhenMaxCountIsReached) {
             this.initialState = setInitialState(initialState);
             this.conditionFunction = conditionFunction;
             this.customMappings = customMappings;
@@ -108,12 +105,12 @@ public class LoopBuilder {
             this.throwWhenMaxCountIsReached = throwWhenMaxCountIsReached;
         }
 
-        private ImmutableList<Vertex> setInitialState(Collection<Vertex> initialState) {
+        private VertexDictionary setInitialState(VertexDictionary initialState) {
             Vertex valueOutWhenAlwaysTrue;
 
             try {
-                Vertex<?> outputVertex = Iterables.getOnlyElement(initialState.stream().filter(v -> Loop.VALUE_OUT_LABEL.equals(v.getLabel())).collect(Collectors.toList()));
-                valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL);
+                Vertex<?> outputVertex = initialState.get(Loop.VALUE_OUT_LABEL);
+                valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL.withExtraNamespace("Loop_" + this.hashCode()));
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {
                 throw new VertexLabelException("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL", e);
@@ -121,13 +118,9 @@ public class LoopBuilder {
                 throw new VertexLabelException("You must pass in only one vertex labeled as Loop.VALUE_OUT_LABEL", e);
             }
 
-            BoolVertex tru = ConstantVertex.of(true).labeledAs(LOOP_LABEL);
-
-            return ImmutableList.<Vertex>builder()
-                .addAll(initialState)
-                .add(valueOutWhenAlwaysTrue)
-                .add(tru)
-                .build();
+            return initialState.withExtraEntries(ImmutableMap.of(
+                VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL, valueOutWhenAlwaysTrue,
+                LOOP_LABEL, ConstantVertex.of(true)));
         }
 
         /**
@@ -150,7 +143,7 @@ public class LoopBuilder {
          */
         public Loop apply(BiFunction<Plate, DoubleVertex, DoubleVertex> iterationFunction) {
             Plates plates = new PlateBuilder<Integer>()
-                .withInitialState(initialState.stream().toArray(Vertex[]::new))
+                .withInitialState(initialState)
                 .withTransitionMapping(customMappings)
                 .count(maxLoopCount)
                 .withFactory((plate) -> {

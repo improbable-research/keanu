@@ -29,6 +29,7 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.VertexLabelException;
@@ -321,7 +322,7 @@ public class PlateBuilderTest {
         int maximumLoopLength = 100;
 
         Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(initialSum, tru, initialValue)
+            .withInitialState(SimpleVertexDictionary.of(initialSum, tru, initialValue))
             .withTransitionMapping(ImmutableMap.of(
                 runningTotalLabel, plusLabel,
                 stillLoopingLabel, loopLabel,
@@ -406,7 +407,7 @@ public class PlateBuilderTest {
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         Plates plates = new PlateBuilder<Integer>()
-            .withInitialState()
+            .withInitialState(SimpleVertexDictionary.of())
             .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
             .count(10)
             .withFactory((plate) -> {
@@ -435,8 +436,9 @@ public class PlateBuilderTest {
         expectedException.expectMessage("Cannot find VertexLabel fake");
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
+        DoubleVertex initialState = ConstantVertex.of(1.).labeledAs(realLabel);
         Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(ConstantVertex.of(1.).labeledAs(realLabel))
+            .withInitialState(initialState)
             .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
             .count(10)
             .withFactory((plate) -> {

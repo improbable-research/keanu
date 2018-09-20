@@ -88,18 +88,9 @@ public class LoopTest {
     }
 
     @Test
-    public void itThrowsIfYouPassInMultipleBaseCaseVertexesAndDontLabelTheOutput(){
-        expectedException.expect(VertexLabelException.class);
-        expectedException.expectMessage("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL");
-        Loop.startingFrom(ConstantVertex.of(0.), ConstantVertex.of(1.))
-            .whilst(alwaysTrue)
-            .apply(increment);
-    }
-
-    @Test
     public void itThrowsIfYouPassInMultipleOutputVertices(){
         expectedException.expect(VertexLabelException.class);
-        expectedException.expectMessage("You must pass in only one vertex labeled as Loop.VALUE_OUT_LABEL");
+        expectedException.expectMessage("Duplicate label found in base case");
         Loop.startingFrom(ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
             .whilst(alwaysTrue)
             .apply(increment);

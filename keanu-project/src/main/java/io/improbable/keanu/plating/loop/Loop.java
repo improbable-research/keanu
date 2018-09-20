@@ -1,17 +1,20 @@
 package io.improbable.keanu.plating.loop;
 
-import java.util.Collection;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableMap;
 
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
+import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 /**
@@ -60,7 +63,7 @@ public class Loop {
     /**
      * package-private because it is intended to be created by the LoopBuilder
      *
-     * @param plates the set of plates, one for each iteration in the loop
+     * @param plates                     the set of plates, one for each iteration in the loop
      * @param throwWhenMaxCountIsReached optionally disable throwing and log a warning instead
      */
     Loop(Plates plates, boolean throwWhenMaxCountIsReached) {
@@ -74,21 +77,6 @@ public class Loop {
 
     /**
      * A factory method for creating a loop
-     * It automatically labels the initial state correctly for you.
-     *
-     * @param initialState a single Vertex that defines the loop's base case.
-     * @param <V>          the input type
-     * @return a builder object
-     */
-    public static <V extends Vertex<?>> LoopBuilder startingFrom(V initialState) {
-        if (initialState.getLabel() == null) {
-            initialState.setLabel(VALUE_OUT_LABEL);
-        }
-        return startingFrom(ImmutableList.of(initialState));
-    }
-
-    /**
-     * A factory method for creating a loop
      *
      * @param first  the first Vertex (mandatory)
      * @param others other Vertices (optional)
@@ -96,18 +84,35 @@ public class Loop {
      * @return a builder object
      */
     public static <V extends Vertex<?>> LoopBuilder startingFrom(V first, V... others) {
-        return startingFrom(ImmutableList.<V>builder().add(first).add(others).build());
+        Map<VertexLabel, Vertex<?>> map = buildMapForBaseCase(first, others);
+        return startingFrom(SimpleVertexDictionary.backedBy(map));
     }
 
     /**
      * A factory method for creating a loop
      *
      * @param initialState the collection of vertices that define the loop's base case
-     * @param <V>          the input type
      * @return a builder object
      */
-    public static <V extends Vertex<?>> LoopBuilder startingFrom(Collection<V> initialState) {
+    public static LoopBuilder startingFrom(VertexDictionary initialState) {
         return new LoopBuilder(initialState);
+    }
+
+    private static <V extends Vertex<?>> Map<VertexLabel, Vertex<?>> buildMapForBaseCase(V first, V[] others) {
+        ImmutableMap.Builder<VertexLabel, Vertex<?>> baseCaseMap = ImmutableMap.builder();
+        baseCaseMap.put(VALUE_OUT_LABEL, first);
+        for (V vertex : others) {
+            VertexLabel label = vertex.getLabel();
+            if (label == null) {
+                label = new VertexLabel(String.format("base_case_vertex_%d", vertex.hashCode()));
+            }
+            baseCaseMap.put(label, vertex);
+        }
+        try {
+            return baseCaseMap.build();
+        } catch (IllegalArgumentException e) {
+            throw new VertexLabelException("Duplicate label found in base case");
+        }
     }
 
     /**

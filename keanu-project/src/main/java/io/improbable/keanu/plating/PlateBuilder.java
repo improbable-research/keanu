@@ -47,8 +47,12 @@ public class PlateBuilder<T> {
     }
 
 
-    public PlateBuilder<T> withInitialState(Vertex... initialState) {
-        this.initialState = VertexDictionary.of(initialState);
+    public PlateBuilder<T> withInitialState(Vertex<?> initialState) {
+        return withInitialState(VertexDictionary.of(initialState));
+    }
+
+    public PlateBuilder<T> withInitialState(VertexDictionary initialState) {
+        this.initialState = initialState;
         return this;
     }
 
