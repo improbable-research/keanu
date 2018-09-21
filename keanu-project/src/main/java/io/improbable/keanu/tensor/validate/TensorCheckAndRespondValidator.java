@@ -24,8 +24,8 @@ public class TensorCheckAndRespondValidator<DATATYPE, TENSOR extends Tensor<DATA
         return valueChecker.check(tensor);
     }
 
-    public void validate(TENSOR tensor) {
+    public TENSOR validate(TENSOR tensor) {
         BooleanTensor result = check(tensor);
-        validationPolicy.handle(tensor, result);
+        return validationPolicy.handle(tensor, result);
     }
 }

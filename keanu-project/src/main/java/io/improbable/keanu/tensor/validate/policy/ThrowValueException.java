@@ -13,9 +13,10 @@ public class ThrowValueException<TENSOR extends Tensor<?>> implements TensorVali
     }
 
     @Override
-    public void handle(TENSOR tensor, BooleanTensor result) {
+    public TENSOR handle(TENSOR tensor, BooleanTensor result) {
         if (!result.allTrue()) {
             throw new KeanuValueException(message, result);
         }
+        return tensor;
     }
 }

@@ -512,8 +512,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         TensorValidator.NAN_CATCHER.validate(this);
         TensorValidator.NAN_CATCHER.validate(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);
-        TensorValidator.NAN_FIXER.validate(result);
-        return result;
+        return TensorValidator.NAN_FIXER.validate(result);
     }
 
     @Override

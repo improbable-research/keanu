@@ -13,7 +13,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.KeanuValueException;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
@@ -139,9 +138,9 @@ public class ScalarDoubleTensorTest {
         DoubleTensor nan = DoubleTensor.scalar(Double.NaN);
         DoubleTensor zero = DoubleTensor.scalar(0.);
         DoubleTensor notNan = DoubleTensor.scalar(Double.NEGATIVE_INFINITY);
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatReplaces(Double.NaN, 0.);
-        validator.validate(nan);
-        validator.validate(notNan);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(Double.NaN, 0.);
+        nan = validator.validate(nan);
+        notNan = validator.validate(notNan);
         assertThat(nan, equalTo(zero));
         assertThat(notNan, equalTo(notNan));
     }
@@ -153,9 +152,9 @@ public class ScalarDoubleTensorTest {
         DoubleTensor one = DoubleTensor.scalar(1.);
         DoubleTensor notZero = DoubleTensor.scalar(1e-8);
         Function<Double, Boolean> checkFunction = x -> x > 0.;
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatFixesElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
-        validator.validate(tensor1);
-        validator.validate(tensor2);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(checkFunction, TensorValidationPolicy.changeValueTo(1e-8));
+        tensor1 = validator.validate(tensor1);
+        tensor2 = validator.validate(tensor2);
         assertThat(tensor1, equalTo(notZero));
         assertThat(tensor2, equalTo(one));
     }

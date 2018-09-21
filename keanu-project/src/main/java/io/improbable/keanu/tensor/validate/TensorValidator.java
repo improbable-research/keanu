@@ -13,7 +13,7 @@ import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> extends TensorValueChecker<TENSOR> {
 
-    void validate(TENSOR tensor);
+    TENSOR validate(TENSOR tensor);
 
     TensorValidator<Double, DoubleTensor> ZERO_CATCHER = TensorValidator.thatExpectsNotToFind(0.);
     TensorValidator<Double, DoubleTensor> NAN_CATCHER = TensorValidator.thatExpects(t -> t.isNaN().not());

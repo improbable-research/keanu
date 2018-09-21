@@ -30,6 +30,26 @@ public class TensorValidationTest {
         assertThat(containsZero, equalTo(expectedResult));
     }
 
+    @Test
+    public void youCanChangeTheValueOfAScalar() {
+        DoubleTensor containsZero = DoubleTensor.create(0.0);
+        DoubleTensor expectedResult = DoubleTensor.create(1e-8);
+
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(0., 1e-8);
+        containsZero = validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
+    }
+
+    @Test
+    public void ifTheValueIsScalarButThe() {
+        DoubleTensor containsZero = DoubleTensor.create(0.0);
+        DoubleTensor expectedResult = DoubleTensor.create(1e-8);
+
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatReplaces(0., 1e-8);
+        containsZero = validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
+    }
+
     @Test(expected = KeanuValueException.class)
     public void byDefaultItThrowsIfValidationFails() {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);

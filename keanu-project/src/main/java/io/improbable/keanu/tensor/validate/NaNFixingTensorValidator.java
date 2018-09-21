@@ -17,7 +17,7 @@ public class NaNFixingTensorValidator implements TensorValidator<Double, DoubleT
     }
 
     @Override
-    public void validate(DoubleTensor tensor) {
-        tensor.replaceNaNInPlace(replacementValue);
+    public DoubleTensor validate(final DoubleTensor tensor) {
+        return tensor.replaceNaN(replacementValue);
     }
 }

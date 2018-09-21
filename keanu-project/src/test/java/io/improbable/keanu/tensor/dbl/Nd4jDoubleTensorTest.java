@@ -967,8 +967,8 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
 
-        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
-        validator.validate(containsZero);
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
+        containsZero = validator.validate(containsZero);
         assertThat(containsZero, equalTo(expectedResult));
     }
 }

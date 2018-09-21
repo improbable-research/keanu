@@ -14,17 +14,18 @@ public class ChangeValueTo<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements
     }
 
     @Override
-    public void handle(TENSOR tensor, BooleanTensor result) {
+    public TENSOR handle(TENSOR tensor, BooleanTensor result) {
         if (tensor instanceof DoubleTensor) {
             Double value = (Double) this.value;
             DoubleTensor mask = result.not().toDoubleMask();
-            ((DoubleTensor) tensor).setWithMaskInPlace(mask, value);
+            tensor = (TENSOR) ((DoubleTensor) tensor).setWithMask(mask, value);
         } else if (tensor instanceof IntegerTensor) {
             Integer value = (Integer) this.value;
             IntegerTensor mask = result.not().toIntegerMask();
-            ((IntegerTensor) tensor).setWithMaskInPlace(mask, value);
+            tensor = (TENSOR) ((IntegerTensor) tensor).setWithMask(mask, value);
         } else {
             throw new ClassCastException("Cannot handle tensor of type " + tensor.getClass().getSimpleName());
         }
+        return tensor;
     }
 }

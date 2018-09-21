@@ -13,5 +13,5 @@ public interface TensorValidationPolicy<TENSOR extends Tensor<?>> {
         return new ThrowValueException<>(message);
     }
 
-    void handle(TENSOR tensor, BooleanTensor result);
+    TENSOR handle(TENSOR tensor, BooleanTensor result);
 }
