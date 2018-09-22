@@ -254,10 +254,18 @@ public class PartialDerivatives {
 
     private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier) {
 
+        /*
+         * The extractWrtShape function fails when the rank of the multiplier is greater than that of the partial
+         * (eg when doing reverse with a sum Vertex).
+         */
         int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
         if (TensorShape.isScalar(partialWrtShape)) {
-
-            int[] partialOfShape = extractOfShape(partial.getShape(), multiplier.getRank());
+            int[] partialOfShape;
+            if (partialWrtShape.length == 1) {
+                partialOfShape = new int[]{1, 1};
+            } else {
+                partialOfShape = extractOfShape(partial.getShape(), multiplier.getRank());
+            }
             int[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
             return DoubleTensor.ones(resultShape).times(partial).times(multiplier);
         }
