@@ -5,7 +5,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.util.csv.WriteCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -24,13 +23,17 @@ public class TextMessaging {
 
     public static TextMessagingResults run() {
 
-        TextMessagingData data = ReadCsv.fromResources("text_messaging_data.csv")
+        final TextMessagingData data = ReadCsv.fromResources("text_messaging_data.csv")
             .asVectorizedColumnsDefinedBy(TextMessagingData.class)
             .load();
 
-        int numberOfDays = (int) data.numberOfMessages.getLength();
-        double avgTexts = (double) data.numberOfMessages.sum() / numberOfDays;
-        double alpha = 1 / avgTexts;
+        final int numberOfDays = (int) data.numberOfMessages.getLength();
+        // These hyperparameters differ from the alpha used in the example book
+        // This is because the sampling algorithm of choice uses the prior distribution
+        // as its proposal distribution. The suggested parameters were too wide, resulting
+        // in bad proposals and by extension bad samples.
+        // When it is easier to decouple the prior from the proposal distribution, we should revisit this
+        final double alpha = 10;
 
         ExponentialVertex earlyRate = new ExponentialVertex(alpha);
         ExponentialVertex lateRate = new ExponentialVertex(alpha);
@@ -44,28 +47,31 @@ public class TextMessaging {
         PoissonVertex textsForDay = new PoissonVertex(rateForDay);
         textsForDay.observe(data.numberOfMessages);
 
-        BayesianNetwork net = new BayesianNetwork(switchPoint.getConnectedGraph());
+        BayesianNetwork net = new BayesianNetwork(textsForDay.getConnectedGraph());
+        net.probeForNonZeroProbability(1000);
 
-        int numSamples = 50000;
+        final int numSamples = 50000;
         NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(net, net.getLatentVertices(), numSamples)
             .drop(numSamples / 10)
             .downSample(net.getLatentVertices().size());
 
-        int mostProbableSwitchPoint = posteriorSamples.getIntegerTensorSamples(switchPoint).getScalarMode();
-
-        WriteCsv.asSamples(posteriorSamples, switchPoint)
-            .withHeader("switchpoint")
-            .toFile("switchpoitsamples.csv");
-
-        return new TextMessagingResults(mostProbableSwitchPoint);
+        return new TextMessagingResults(
+            posteriorSamples.getIntegerTensorSamples(switchPoint).getScalarMode(),
+            posteriorSamples.getDoubleTensorSamples(earlyRate).getMode().scalar(),
+            posteriorSamples.getDoubleTensorSamples(lateRate).getMode().scalar()
+        );
     }
 
     public static class TextMessagingResults {
-        public int switchPointMode;
+        public final int switchPointMode;
+        public final double earlyRateMode;
+        public final double lateRateMode;
 
-        TextMessagingResults(int switchPointMode) {
+        TextMessagingResults(int switchPointMode, double earlyRateMode, double lateRateMode) {
             this.switchPointMode = switchPointMode;
+            this.earlyRateMode = earlyRateMode;
+            this.lateRateMode = lateRateMode;
         }
     }
 
