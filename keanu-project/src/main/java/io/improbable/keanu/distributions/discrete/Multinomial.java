@@ -136,8 +136,8 @@ public class Multinomial implements DiscreteDistribution {
             String.format("Inputs %s cannot be negative", k)
         );
 
-        DoubleTensor gammaN = n.plus(1).toDouble().applyInPlace(Gamma::logGamma);
-        DoubleTensor gammaKs = k.plus(1).toDouble().applyInPlace(Gamma::logGamma).sum(0);
+        DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
+        DoubleTensor gammaKs = k.plus(1).toDouble().logGammaInPlace().sum(0);
         DoubleTensor kLogP = p.log().timesInPlace(k.toDouble()).sum(0);
         return kLogP.plusInPlace(gammaN).minusInPlace(gammaKs);
     }

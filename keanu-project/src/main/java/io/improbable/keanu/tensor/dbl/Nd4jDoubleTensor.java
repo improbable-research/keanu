@@ -480,8 +480,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor logGammaInPlace() {
-        applyInPlace(Gamma::logGamma);
-        return this;
+        return applyInPlace(Gamma::logGamma);
     }
 
     @Override

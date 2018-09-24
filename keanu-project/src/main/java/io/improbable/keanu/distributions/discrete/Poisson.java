@@ -79,7 +79,7 @@ public class Poisson implements DiscreteDistribution {
     public DoubleTensor logProb(IntegerTensor k) {
 
         DoubleTensor kDouble = k.toDouble();
-        DoubleTensor logFactorialK = kDouble.plus(1).applyInPlace(Gamma::logGamma);
+        DoubleTensor logFactorialK = kDouble.plus(1).logGammaInPlace();
 
         return kDouble.times(mu.log()).minusInPlace(mu).minusInPlace(logFactorialK);
     }
