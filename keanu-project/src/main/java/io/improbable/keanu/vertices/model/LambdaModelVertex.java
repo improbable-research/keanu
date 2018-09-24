@@ -15,13 +15,6 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-/**
- * A vertex whose operation is the execution of a lambda.
- *
- * It is able to execute a lambda and is able to parse the result.
- *
- * It stores multiple output values and a model result vertex is required to extract a specific value.
- */
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
@@ -30,32 +23,45 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput;
     private boolean hasValue;
 
+    /**
+     * A vertex whose operation is the execution of a lambda.
+     * It is able to execute a lambda and is able to parse the result.
+     * It stores multiple output values and a model result vertex is required to extract a specific value.
+     *
+     * @param inputs input vertices to the model
+     * @param executor the operation to perform
+     * @param updateValues a function to extract the output values (once the operation has been performed) and update
+     *                      the models output values.
+     */
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
-                             Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput) {
+                             Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
         this.inputs = inputs;
         this.outputs = Collections.emptyMap();
         this.executor = executor;
-        this.extractOutput = extractOutput;
+        this.extractOutput = updateValues;
         this.hasValue = false;
         setParents(inputs.values());
     }
 
     /**
+     *
      * A vertex whose operation is the execution of a command line process.
-     *
      * It is able to execute this process and parse the result.
-     *
      * It stores multiple output values and a model result vertex is required to extract a specific value.
+     *
+     * @param inputs input vertices to the model
+     * @param command the command to execute
+     * @param updateValues a function to extract the output values (once the operation has been performed) and update
+     *                      the models output values.
+     * @return a process model vertex
      */
     public static LambdaModelVertex createFromProcess(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                                            String command,
-                                           BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandForExecution,
                                            Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
         return new LambdaModelVertex(inputs, i -> {
-            String newCommand = commandForExecution.apply(inputs, command);
             try {
-                Process cmd = Runtime.getRuntime().exec(newCommand);
+                Process cmd = Runtime.getRuntime().exec(command);
                 cmd.waitFor();
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException("Failed during execution of the process. " + e);

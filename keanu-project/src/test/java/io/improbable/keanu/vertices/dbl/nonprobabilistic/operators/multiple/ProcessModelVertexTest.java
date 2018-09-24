@@ -56,9 +56,9 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "python ./src/test/resources/model.py {Temperature}";
+        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
 
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -78,10 +78,9 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
+        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        String command = "python ./src/test/resources/model.py {Temperature}";
-
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
         
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -104,9 +103,9 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "python ./src/test/resources/model.py {Temperature}";
+        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::formatCommandForExecution, this::updateValuesMultipleTypes);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValuesMultipleTypes);
 
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
         BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
@@ -119,16 +118,16 @@ public class ProcessModelVertexTest {
     }
 
     @Test
-    public void modelInsideVertexIsRecalculatedOnEachParentSample() throws IOException {
+    public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
         inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "python ./src/test/resources/model.py {Temperature}";
+        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -151,9 +150,9 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "python ./src/test/resources/model.py {Temperature}";
+        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -175,9 +174,9 @@ public class ProcessModelVertexTest {
         Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
         inputs.put(new VertexLabel("Temperature"), inputToModel);
 
-        String command = "python ./src/test/resources/model.py {Temperature}";
+        String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::formatCommandForExecution, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
