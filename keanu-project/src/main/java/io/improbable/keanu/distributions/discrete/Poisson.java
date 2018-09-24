@@ -1,6 +1,5 @@
 package io.improbable.keanu.distributions.discrete;
 
-import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;

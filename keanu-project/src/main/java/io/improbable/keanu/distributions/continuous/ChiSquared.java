@@ -1,7 +1,5 @@
 package io.improbable.keanu.distributions.continuous;
 
-import org.apache.commons.math3.special.Gamma;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

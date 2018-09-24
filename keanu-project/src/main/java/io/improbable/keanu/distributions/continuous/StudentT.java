@@ -5,8 +5,6 @@ import static java.lang.Math.log;
 
 import static io.improbable.keanu.distributions.dual.Diffs.T;
 
-import org.apache.commons.math3.special.Gamma;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -28,8 +26,8 @@ public class StudentT implements ContinuousDistribution {
      * ARL-TR-2168 March 2000
      * 5.1.23 page 36
      *
-     * @param v      Degrees of Freedom
-     * @return       a new ContinuousDistribution object
+     * @param v Degrees of Freedom
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(IntegerTensor v) {
         return new StudentT(v);

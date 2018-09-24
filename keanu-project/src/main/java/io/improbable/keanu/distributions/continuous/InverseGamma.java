@@ -4,8 +4,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.B;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
-import org.apache.commons.math3.special.Gamma;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
