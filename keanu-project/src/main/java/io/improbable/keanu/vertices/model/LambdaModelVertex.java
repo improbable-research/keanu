@@ -45,7 +45,6 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     }
 
     /**
-     *
      * A vertex whose operation is the execution of a command line process.
      * It is able to execute this process and parse the result.
      * It stores multiple output values and a model result vertex is required to extract a specific value.
