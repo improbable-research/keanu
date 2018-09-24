@@ -116,7 +116,7 @@ public class Gamma implements ContinuousDistribution {
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdx = k.minus(1.).divInPlace(x).minusInPlace(theta.reciprocal());
         final DoubleTensor dLogPdtheta = theta.times(k).plusInPlace(x.unaryMinus()).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.digamma());
 
         return new Diffs()
             .put(THETA, dLogPdtheta)

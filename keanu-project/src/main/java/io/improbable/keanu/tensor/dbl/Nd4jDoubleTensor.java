@@ -316,6 +316,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor digamma() {
+        return duplicate().digammaInPlace();
+    }
+
+    @Override
     public DoubleTensor sin() {
         return duplicate().sinInPlace();
     }
@@ -481,6 +486,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor logGammaInPlace() {
         return applyInPlace(Gamma::logGamma);
+    }
+
+    @Override
+    public DoubleTensor digammaInPlace() {
+        return applyInPlace(Gamma::digamma);
     }
 
     @Override

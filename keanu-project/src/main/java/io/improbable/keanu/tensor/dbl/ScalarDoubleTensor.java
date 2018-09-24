@@ -197,6 +197,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor digamma() {
+        return duplicate().digammaInPlace();
+    }
+
+    @Override
     public DoubleTensor sin() {
         return this.duplicate().sinInPlace();
     }
@@ -498,6 +503,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor logGammaInPlace() {
         value = Gamma.logGamma(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor digammaInPlace() {
+        value = Gamma.digamma(value);
         return this;
     }
 
