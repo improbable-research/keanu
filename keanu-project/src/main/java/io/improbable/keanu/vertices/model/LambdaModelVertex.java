@@ -7,8 +7,10 @@ import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
+import java.io.IOException;
 import java.util.Collections;
 import java.util.Map;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -32,11 +34,33 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
                              Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> extractOutput) {
         this.inputs = inputs;
-        this.outputs = Collections.EMPTY_MAP;
+        this.outputs = Collections.emptyMap();
         this.executor = executor;
         this.extractOutput = extractOutput;
         this.hasValue = false;
-        setParents(inputs.entrySet().stream().map(r -> r.getValue()).collect(Collectors.toList()));
+        setParents(inputs.values());
+    }
+
+    /**
+     * A vertex whose operation is the execution of a command line process.
+     *
+     * It is able to execute this process and parse the result.
+     *
+     * It stores multiple output values and a model result vertex is required to extract a specific value.
+     */
+    public static LambdaModelVertex createFromProcess(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
+                                           String command,
+                                           BiFunction<Map<VertexLabel, Vertex<? extends Tensor>>, String, String> commandForExecution,
+                                           Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+        return new LambdaModelVertex(inputs, i -> {
+            String newCommand = commandForExecution.apply(inputs, command);
+            try {
+                Process cmd = Runtime.getRuntime().exec(newCommand);
+                cmd.waitFor();
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException("Failed during execution of the process. " + e);
+            }
+        }, updateValues);
     }
 
     @Override
@@ -74,7 +98,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
 
     @Override
     public boolean hasCalculated() {
-        return hasValue;
+        return hasValue();
     }
 
     @Override

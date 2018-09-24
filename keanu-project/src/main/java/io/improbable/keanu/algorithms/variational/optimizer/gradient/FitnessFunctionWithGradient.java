@@ -4,7 +4,6 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
