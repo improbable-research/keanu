@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
@@ -18,12 +19,10 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.model.LambdaModelVertex;
 import io.improbable.keanu.vertices.model.ModelVertex;
-import org.apache.commons.io.FileUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
@@ -41,23 +40,22 @@ public class LambdaModelVertexTest {
      */
 
     private KeanuRandom random;
-    private DoubleVertex inputToModel = new ConstantDoubleVertex(50.);
+    private DoubleVertex inputToModel;
     private SimpleWeatherModel weatherModel;
 
     @Before
     public void mockFilesToReadModelOutput() throws IOException {
         random = new KeanuRandom(1);
         weatherModel = new SimpleWeatherModel(inputToModel);
+        inputToModel = new ConstantDoubleVertex(25.);
     }
 
     @Test
     public void canRunAModelInAModel() {
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValues);
+        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -71,12 +69,10 @@ public class LambdaModelVertexTest {
 
     @Test
     public void canRunEvalOnTheOutputsToRecalculateTheModel() {
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValues);
+        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -93,12 +89,10 @@ public class LambdaModelVertexTest {
 
     @Test
     public void canRunAModelInAModelWithDifferentOutputTypes() {
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValuesMultipleTypes);
+        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValuesMultipleTypes);
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
         BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
 
@@ -112,12 +106,10 @@ public class LambdaModelVertexTest {
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValues);
+        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -137,10 +129,9 @@ public class LambdaModelVertexTest {
         inputToModel = inputToModelOne.plus(inputToModelTwo);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValues);
+        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -159,10 +150,9 @@ public class LambdaModelVertexTest {
         inputToModel = new GaussianVertex(25., 5);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, this::modelExecution, this::updateValues);
+        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -184,48 +174,6 @@ public class LambdaModelVertexTest {
         double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
 
         Assert.assertEquals(29., averagePosteriorInput, 0.1);
-    }
-
-    private void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        double temperature = inputs.get(new VertexLabel("Temperature")).getValue().asFlatDoubleArray()[0];
-        try {
-            double chanceOfRain = weatherModel.blackBoxRainModel(temperature);
-            double humidity = weatherModel.blackBoxHumidityModel(temperature);
-            FileUtils.writeStringToFile(File.createTempFile("chanceOfRainResults", "csv"), String.valueOf(chanceOfRain));
-            FileUtils.writeStringToFile(File.createTempFile("humidityResults", "csv"), String.valueOf(humidity));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
-
-        try {
-            double chanceOfRainResult = Double.parseDouble(weatherModel.getRainReader().readLine());
-            modelOutput.put(new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
-            double humidityResult = Double.parseDouble(weatherModel.getHumidityReader().readLine());
-            modelOutput.put(new VertexLabel("Humidity"), DoubleTensor.scalar(humidityResult));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return modelOutput;
-    }
-
-    private Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
-
-        try {
-            int chanceOfRainResult = (int) Double.parseDouble(weatherModel.getSuggestedFactorSuncreamReader().readLine());
-            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), IntegerTensor.scalar(chanceOfRainResult));
-            boolean humidityResult = Boolean.parseBoolean(weatherModel.getIsSunnyReader().readLine());
-            modelOutput.put(new VertexLabel("isSunny"), BooleanTensor.scalar(humidityResult));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return modelOutput;
     }
 
 }

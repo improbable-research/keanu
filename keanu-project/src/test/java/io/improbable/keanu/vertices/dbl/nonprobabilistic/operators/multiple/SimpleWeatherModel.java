@@ -1,9 +1,19 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import org.apache.commons.io.FileUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -40,23 +50,65 @@ public class SimpleWeatherModel {
         );
     }
 
+    public void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+        double temperature = inputs.get(new VertexLabel("Temperature")).getValue().asFlatDoubleArray()[0];
+        try {
+            double chanceOfRain = blackBoxRainModel(temperature);
+            double humidity = blackBoxHumidityModel(temperature);
+            FileUtils.writeStringToFile(File.createTempFile("chanceOfRainResults", "csv"), String.valueOf(chanceOfRain));
+            FileUtils.writeStringToFile(File.createTempFile("humidityResults", "csv"), String.valueOf(humidity));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
+
+        try {
+            double chanceOfRainResult = Double.parseDouble(getRainReader().readLine());
+            modelOutput.put(new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
+            double humidityResult = Double.parseDouble(getHumidityReader().readLine());
+            modelOutput.put(new VertexLabel("Humidity"), DoubleTensor.scalar(humidityResult));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return modelOutput;
+    }
+
+    public Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
+
+        try {
+            int chanceOfRainResult = (int) Double.parseDouble(getSuggestedFactorSuncreamReader().readLine());
+            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), IntegerTensor.scalar(chanceOfRainResult));
+            boolean humidityResult = Boolean.parseBoolean(getIsSunnyReader().readLine());
+            modelOutput.put(new VertexLabel("isSunny"), BooleanTensor.scalar(humidityResult));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return modelOutput;
+    }
+
     public void setInputToModel(DoubleVertex inputValue) {
         this.inputToModel = inputValue;
     }
 
-    public double blackBoxRainModel(double temperature) {
+    private double blackBoxRainModel(double temperature) {
         return temperature * 0.1;
     }
 
-    public double blackBoxHumidityModel(double temperature) {
+    private double blackBoxHumidityModel(double temperature) {
         return temperature * 2;
     }
 
-    public int blackBoxSunCreamModel(double temperature) {
+    private int blackBoxSunCreamModel(double temperature) {
         return (int) (temperature / 10.0);
     }
 
-    public boolean blackBoxIsSunnyModel(double temperature) {
+    private boolean blackBoxIsSunnyModel(double temperature) {
         return temperature > 20.0;
     }
 

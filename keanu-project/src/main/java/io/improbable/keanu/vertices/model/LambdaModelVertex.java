@@ -85,8 +85,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
         for (Vertex<? extends Tensor> input : inputs.values()) {
             input.sample();
         }
-        calculate();
-        return DoubleTensor.scalar(0.0);
+        return calculate();
     }
 
     @Override

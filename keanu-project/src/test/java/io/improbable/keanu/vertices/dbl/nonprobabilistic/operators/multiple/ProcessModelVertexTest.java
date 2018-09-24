@@ -1,13 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -23,7 +21,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -47,18 +44,16 @@ public class ProcessModelVertexTest {
     public void mockFilesToReadModelOutputFrom() throws IOException {
         random = new KeanuRandom(1);
         weatherModel = new SimpleWeatherModel(inputToModel);
+        inputToModel = new ConstantDoubleVertex(25.0);
     }
 
     @Test
     public void canRunAModelInAModel() {
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
 
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -73,14 +68,11 @@ public class ProcessModelVertexTest {
 
     @Test
     public void canRunEvalOnTheOutputsToRecalculateTheModel() {
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
         
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
@@ -98,14 +90,11 @@ public class ProcessModelVertexTest {
 
     @Test
     public void canRunAModelInAModelWithDifferentOutputTypes() {
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValuesMultipleTypes);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValuesMultipleTypes);
 
         IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
         BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
@@ -120,14 +109,12 @@ public class ProcessModelVertexTest {
     @Test
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
-        inputToModel = new ConstantDoubleVertex(25);
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -147,12 +134,10 @@ public class ProcessModelVertexTest {
         inputToModel = inputToModelOne.plus(inputToModelTwo);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
-
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
 
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -170,13 +155,11 @@ public class ProcessModelVertexTest {
     public void modelWorksAsPartOfSampling() {
         inputToModel = new GaussianVertex(25, 5);
         weatherModel.setInputToModel(inputToModel);
-
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = new HashMap<>();
-        inputs.put(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
         String command = formatCommandForExecution(inputs, "python ./src/test/resources/model.py {Temperature}");
-
-        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, this::updateValues);
+        ModelVertex model = LambdaModelVertex.createFromProcess(inputs, command, weatherModel::updateValues);
+        
         DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
@@ -204,36 +187,6 @@ public class ProcessModelVertexTest {
             command = command.replaceAll(Pattern.quote(argument), input.getValue().getValue().scalar().toString());
         }
         return command;
-    }
-
-    private Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
-
-        try {
-            double chanceOfRainResult = Double.parseDouble(weatherModel.getRainReader().readLine());
-            modelOutput.put(new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
-            double humidityResult = Double.parseDouble(weatherModel.getHumidityReader().readLine());
-            modelOutput.put(new VertexLabel("Humidity"), DoubleTensor.scalar(humidityResult));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return modelOutput;
-    }
-
-    private Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
-
-        try {
-            int chanceOfRainResult = (int) Double.parseDouble(weatherModel.getSuggestedFactorSuncreamReader().readLine());
-            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), IntegerTensor.scalar(chanceOfRainResult));
-            boolean humidityResult = Boolean.parseBoolean(weatherModel.getIsSunnyReader().readLine());
-            modelOutput.put(new VertexLabel("isSunny"), BooleanTensor.scalar(humidityResult));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return modelOutput;
     }
 
 }
