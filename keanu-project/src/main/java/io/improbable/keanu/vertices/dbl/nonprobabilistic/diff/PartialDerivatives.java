@@ -105,8 +105,6 @@ public class PartialDerivatives {
 
     /**
      * This will sum partial derivatives that are represented as tensors over given dimensions.
-     * There is the option to reshape to a lower rank tensor where the summation has caused a
-     * dimension to go to length 1.
      *
      * @param summingAllOfDimensions If True, this means we're summing all of the Of dimensions.
      *                               In this case, we drop the summed over dimensions from the shape and replace them
@@ -124,10 +122,11 @@ public class PartialDerivatives {
             if (summingAllOfDimensions) {
                 int[] newShape = TensorShape.concat(new int[]{1, 1}, reshapedV.getShape());
                 reshapedV = reshapedV.reshape(newShape);
-                summed.put(k, reshapedV);
             } else {
-                summed.put(k, reshapedV.reshape(onesToShape(v.getShape(), overDimensions)));
+                reshapedV = reshapedV.reshape(onesToShape(v.getShape(), overDimensions));
             }
+
+            summed.put(k, reshapedV);
         }
 
         return new PartialDerivatives(summed);
