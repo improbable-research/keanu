@@ -23,6 +23,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+    private final Gaussian distribution;
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -39,6 +40,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
         this.mu = mu;
         this.sigma = sigma;
+        distribution = Gaussian.withParameters(mu, sigma);
         setParents(mu, sigma);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
@@ -82,17 +84,14 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
     @Override
     public double logProb(DoubleTensor value) {
 
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor sigmaValues = sigma.getValue();
-
-        DoubleTensor logPdfs = Gaussian.withParameters(muValues, sigmaValues).logProb(value);
+        DoubleTensor logPdfs = distribution.logProb(value);
 
         return logPdfs.sum();
     }
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
+        Diffs dlnP = distribution.dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
@@ -113,7 +112,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
+        return distribution.sample(getShape(), random);
     }
 
     @Override
