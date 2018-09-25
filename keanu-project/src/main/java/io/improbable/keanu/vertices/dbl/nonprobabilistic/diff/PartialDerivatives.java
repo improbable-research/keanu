@@ -210,11 +210,7 @@ public class PartialDerivatives {
         return fixedShape;
     }
 
-    public PartialDerivatives multiplyBy(DoubleTensor multiplier) {
-        return multiplyBy(multiplier, false);
-    }
-
-    public PartialDerivatives multiplyBy(DoubleTensor multiplier, boolean alongWrtDimensions) {
+    public PartialDerivatives multiplyAlongOfDimensions(DoubleTensor multiplier, int[] ofShape) {
         Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
@@ -224,10 +220,8 @@ public class PartialDerivatives {
 
             if (multiplier.isScalar()) {
                 result = partial.times(multiplier.scalar());
-            } else if (alongWrtDimensions) {
-                result = elementWiseMultiplyAlongWrt(partial, multiplier);
             } else {
-                result = elementWiseMultiplyAlongOf(partial, multiplier);
+                result = elementWiseMultiplyAlongOf(partial, multiplier, ofShape);
             }
 
             multiplied.put(k, result);
@@ -236,14 +230,35 @@ public class PartialDerivatives {
         return new PartialDerivatives(multiplied);
     }
 
-    private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier) {
+    public PartialDerivatives multiplyAlongWrtDimensions(DoubleTensor multiplier, int[] wrtShape) {
+        Map<VertexId, DoubleTensor> multiplied = new HashMap<>();
 
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
+            DoubleTensor partial = entry.getValue();
+            DoubleTensor result;
+
+            if (multiplier.isScalar()) {
+                result = partial.times(multiplier.scalar());
+            } else {
+                result = elementWiseMultiplyAlongWrt(partial, multiplier, wrtShape);
+            }
+
+            multiplied.put(k, result);
+        }
+
+        return new PartialDerivatives(multiplied);
+    }
+
+    private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, int[] ofShape) {
+
+        //Check this out
         DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
 
-        int[] partialOfShape = extractOfShape(partial.getShape(), multiplier.getRank());
+        int[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
         if (TensorShape.isScalar(partialOfShape)) {
 
-            int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
+            int[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
             int[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
 
             return DoubleTensor.ones(resultShape).times(partial).times(multiplierFromLeft);
@@ -252,20 +267,11 @@ public class PartialDerivatives {
         return partial.times(multiplierFromLeft);
     }
 
-    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier) {
+    private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier, int[] wrtShape) {
 
-        /*
-         * The extractWrtShape function fails when the rank of the multiplier is greater than that of the partial
-         * (eg when doing reverse with a sum Vertex).
-         */
-        int[] partialWrtShape = extractWrtShape(partial.getShape(), multiplier.getRank());
+        int[] partialWrtShape = extractWrtShape(partial.getShape(), partial.getRank() - wrtShape.length);
         if (TensorShape.isScalar(partialWrtShape)) {
-            int[] partialOfShape;
-            if (partialWrtShape.length == 1) {
-                partialOfShape = new int[]{1, 1};
-            } else {
-                partialOfShape = extractOfShape(partial.getShape(), multiplier.getRank());
-            }
+            int[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
             int[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
             return DoubleTensor.ones(resultShape).times(partial).times(multiplier);
         }
@@ -346,6 +352,8 @@ public class PartialDerivatives {
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor partial = entry.getValue();
+
+            //Is this broken too?
             DoubleTensor v = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
             divided.put(k, v);
         }

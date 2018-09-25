@@ -30,8 +30,10 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     protected DualNumber dualOp(DualNumber x, DualNumber y) {
         DoubleTensor denominator = ((y.getValue().pow(2)).plusInPlace((x.getValue().pow(2))));
 
-        PartialDerivatives thisInfX = x.getPartialDerivatives().multiplyBy((y.getValue().div(denominator)).unaryMinusInPlace());
-        PartialDerivatives thisInfY = y.getPartialDerivatives().multiplyBy(x.getValue().div(denominator));
+        PartialDerivatives thisInfX = x.getPartialDerivatives()
+            .multiplyAlongOfDimensions((y.getValue().div(denominator)).unaryMinusInPlace(), x.getValue().getShape());
+        PartialDerivatives thisInfY = y.getPartialDerivatives()
+            .multiplyAlongOfDimensions(x.getValue().div(denominator), y.getValue().getShape());
         PartialDerivatives newInf = thisInfX.add(thisInfY);
         return new DualNumber(x.getValue().atan2(y.getValue()), newInf);
     }
@@ -46,8 +48,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtX, true));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtY, true));
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape()));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape()));
         return partials;
     }
 }
