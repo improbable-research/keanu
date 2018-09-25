@@ -54,7 +54,7 @@ public class Binomial implements DiscreteDistribution {
         DoubleTensor nDouble = n.toDouble();
         DoubleTensor kLogP = kDouble.times(p.log());
         DoubleTensor logOneMinusP = p.unaryMinus().plusInPlace(1.0).logInPlace();
-        DoubleTensor nMinusKLogOneMinusP = nDouble.minus(kDouble).timesInPlace(logOneMinusP);
+        DoubleTensor nMinusKLogOneMinusP = nDouble.minusInPlace(kDouble).timesInPlace(logOneMinusP);
 
         return logBinomialCoefficient.plusInPlace(kLogP).plusInPlace(nMinusKLogOneMinusP);
     }
@@ -65,7 +65,7 @@ public class Binomial implements DiscreteDistribution {
         DoubleTensor kDouble = k.toDouble();
         DoubleTensor logNFactorial = nDouble.plus(1.0).logGammaInPlace();
         DoubleTensor logKFactorial = kDouble.plus(1.0).logGammaInPlace();
-        DoubleTensor logNMinusKFactorial = nDouble.minus(kDouble).plusInPlace(1.0).logGammaInPlace();
+        DoubleTensor logNMinusKFactorial = nDouble.minusInPlace(kDouble).plusInPlace(1.0).logGammaInPlace();
 
         return logNFactorial.minusInPlace(logKFactorial).minusInPlace(logNMinusKFactorial);
     }

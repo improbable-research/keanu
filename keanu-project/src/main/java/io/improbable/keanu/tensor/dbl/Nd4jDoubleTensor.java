@@ -1038,12 +1038,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor toDouble() {
-        return this;
+        return duplicate();
     }
 
     @Override
     public IntegerTensor toInteger() {
-        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, false));
+        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, true));
     }
 
     private BooleanTensor fromMask(INDArray mask, int[] shape) {

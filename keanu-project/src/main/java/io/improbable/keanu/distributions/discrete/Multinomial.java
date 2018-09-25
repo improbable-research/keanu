@@ -72,8 +72,8 @@ public class Multinomial implements DiscreteDistribution {
      * which I need to convert to a tensor of shape [k, a, b]
      * by doing a slice in the highest dimension and then concatenating again
      *
-     * @param shape   - the desired shape, not including the probabilities dimension
-     * @param samples - the flat array of samples
+     * @param shape   the desired shape, not including the probabilities dimension
+     * @param samples the flat array of samples
      * @return
      */
     private IntegerTensor constructSampleTensor(int[] shape, int[] samples) {
