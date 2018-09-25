@@ -15,6 +15,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
     private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
@@ -74,7 +75,7 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
      * This vertex stores multiple values in a key value pair of label to result.
      * As a result it should never be asked for its value directly.
      * Use a ModelResultVertex to extract a value from this vertex by label.
-
+     *
      * @return a placeholder value
      */
     @Override
