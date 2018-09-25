@@ -12,6 +12,10 @@ import org.junit.Test;
 
 import java.util.List;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.both;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -85,7 +89,7 @@ public class DiabetesLinearRegression {
         regression.fit();
 
         double accuracyOnTestData = regression.score(xTestData, yTestData);
-        assertTrue(accuracyOnTestData < 1 && accuracyOnTestData > 0);
+        assertThat(accuracyOnTestData, both(greaterThan(0.)).and(lessThan(1.)));
     }
 
 }

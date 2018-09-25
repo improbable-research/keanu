@@ -21,26 +21,35 @@ public class LogisticRegression implements LinearModel {
     private static final VertexLabel PROBABILITIES_LABEL = new VertexLabel("probabilities");
     private static final VertexLabel OUTCOMES_LABEL = new VertexLabel("outcomes");
 
-    private DoubleTensor x;
-    private DoubleTensor y;
+    private final DoubleTensor x;
+    private final DoubleTensor y;
+    private final double priorMu;
+    private final double priorSigma;
+    private final double regularization;
+
     private BayesianNetwork net;
-    private double priorMu;
-    private double priorSigma;
     private boolean isFit = false;
-    private double regularization;
 
 
-    public LogisticRegression(DoubleTensor x, DoubleTensor y, double regularization) {
+    public LogisticRegression(DoubleTensor x, DoubleTensor y, double regularization, double priorMu, double priorSigma) {
         this.x = x;
         this.y = y;
-        this.priorMu = DEFAULT_MU;
-        this.priorSigma = DEFAULT_SIGMA;
+        this.priorMu = priorMu;
+        this.priorSigma = priorSigma;
         this.regularization = regularization;
-        construct();
+        this.net = construct();
     }
 
     public LogisticRegression(DoubleTensor x, DoubleTensor y) {
-        this(x, y, DEFAULT_REGULARIZATION);
+        this(x, y, DEFAULT_REGULARIZATION, DEFAULT_MU, DEFAULT_SIGMA);
+    }
+
+    public LogisticRegression(DoubleTensor x, DoubleTensor y, double regularization) {
+        this(x, y, regularization, DEFAULT_MU, DEFAULT_SIGMA);
+    }
+
+    public LogisticRegression(DoubleTensor x, DoubleTensor y, double priorMu, double priorSigma) {
+        this(x, y, DEFAULT_REGULARIZATION, priorMu, priorSigma);
     }
 
     @Override
@@ -49,8 +58,7 @@ public class LogisticRegression implements LinearModel {
         probabilities.setLabel(PROBABILITIES_LABEL);
         BernoulliVertex outcomes = new BernoulliVertex(probabilities);
         outcomes.setLabel(OUTCOMES_LABEL);
-        net = new BayesianNetwork(outcomes.getConnectedGraph());
-        return net;
+        return new BayesianNetwork(outcomes.getConnectedGraph());
     }
 
     private DoubleVertex computeProbabilities(DoubleTensor x) {

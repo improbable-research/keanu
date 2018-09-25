@@ -27,25 +27,48 @@ public class LinearRegressionTest {
 
     private KeanuRandom random;
 
+    private DoubleTensor xData;
+    private DoubleTensor yData;
+
+    private DoubleTensor x1Data;
+    private DoubleTensor x2Data;
+    private DoubleTensor yMultipleData;
+    private int N = 100000;
+    private double expectedW1 = 3.0;
+    private double expectedW2 = 7.0;
+    private double expectedB = 20.0;
+
+
     @Before
-    public void setup() {
+    public void setupRegressionData() {
+        DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex mu = xGenerator.multiply(expectedW1).plus(expectedB);
+        DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
+        xData = xGenerator.sample(random);
+        xGenerator.setAndCascade(xData);
+        yData = yGenerator.sample(random);
+    }
+
+    @Before
+    public void setupMultipleWeightRegressionData() {
         random = new KeanuRandom(1);
+
+        DoubleVertex x1Generator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 50, 100);
+        DoubleVertex yGenerator = new GaussianVertex(
+            x1Generator.multiply(expectedW1).plus(x2Generator.multiply(expectedW2)).plus(expectedB),
+            1.0
+        );
+
+        x1Data = x1Generator.sample(random);
+        x1Generator.setAndCascade(x1Data);
+        x2Data = x1Generator.sample(random);
+        x2Generator.setAndCascade(x2Data);
+        yMultipleData = yGenerator.sample(random);
     }
 
     @Test
     public void linearRegression1FactorTensorVariationalMAP() {
-
-        // Generate data
-        int N = 100000;
-        double expectedM = 3.0;
-        double expectedB = 20.0;
-
-        DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
-        DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
-        DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
-        DoubleTensor xData = xGenerator.sample(random);
-        xGenerator.setAndCascade(xData);
-        DoubleTensor yData = yGenerator.sample(random);
 
         // Linear Regression
         DoubleVertex m = new GaussianVertex(0.0, 10.0);
@@ -65,11 +88,6 @@ public class LinearRegressionTest {
     @Test
     public void linearRegression1FactorTensorVariationalMAPAsModel() {
 
-        // Generate data
-        int N = 100000;
-        double expectedM = 3.0;
-        double expectedB = 20.0;
-
         DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
         DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
         DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
@@ -87,8 +105,6 @@ public class LinearRegressionTest {
     @Test
     public void linearRegressionTwoFactorTensorVariationalMAP() {
 
-        // Generate data
-        int N = 100000;
         double expectedW1 = 3.0;
         double expectedW2 = 7.0;
         double expectedB = 20.0;

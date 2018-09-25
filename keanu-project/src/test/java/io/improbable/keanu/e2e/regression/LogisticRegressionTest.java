@@ -57,7 +57,6 @@ public class LogisticRegressionTest {
         LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5.0);
         regularizedModel = regularizedModel.fit();
         double score = regularizedModel.score(xTest, yTest);
-        System.out.println(score);
         assertTrue(score > 0.3);
     }
 

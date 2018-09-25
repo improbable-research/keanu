@@ -10,9 +10,9 @@ public interface LinearModel extends Model {
 
     default double score(DoubleTensor x, DoubleTensor yTrue) {
         DoubleTensor yPredicted = predict(x);
-        double u = (yTrue.minus(yPredicted).pow(2.)).sum();
-        double v = ((yTrue.minus(yTrue.average())).pow(2.)).sum();
-        return 1 - (u / v);
+        double residualSumOfSquares = (yTrue.minus(yPredicted).pow(2.)).sum();
+        double totalSumOfSquares = ((yTrue.minus(yTrue.average())).pow(2.)).sum();
+        return 1 - (residualSumOfSquares / totalSumOfSquares);
     }
 
 }
