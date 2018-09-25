@@ -69,18 +69,18 @@ public class LinearRegressionTest {
     public void linearRegression1FactorTensorVariationalMAP() {
 
         // Linear Regression
-        DoubleVertex m = new GaussianVertex(0.0, 10.0);
-        DoubleVertex b = new GaussianVertex(0.0, 10.0);
+        DoubleVertex weight = new GaussianVertex(0.0, 10.0);
+        DoubleVertex intercept = new GaussianVertex(0.0, 10.0);
         DoubleVertex x = ConstantVertex.of(xData);
-        DoubleVertex y = new GaussianVertex(x.multiply(m).plus(b), 5.0);
+        DoubleVertex y = new GaussianVertex(x.multiply(weight).plus(intercept), 5.0);
         y.observe(yData);
 
-        Optimizer optimizer = Optimizer.of(m.getConnectedGraph());
+        Optimizer optimizer = Optimizer.of(weight.getConnectedGraph());
         optimizer.maxLikelihood();
 
-        log.info("M = " + m.getValue().scalar() + ", B = " + b.getValue().scalar());
-        assertEquals(expectedW1, m.getValue().scalar(), 0.05);
-        assertEquals(expectedB, b.getValue().scalar(), 0.05);
+        log.info("M = " + weight.getValue().scalar() + ", B = " + intercept.getValue().scalar());
+        assertEquals(expectedW1, weight.getValue().scalar(), 0.05);
+        assertEquals(expectedB, intercept.getValue().scalar(), 0.05);
     }
 
     @Test

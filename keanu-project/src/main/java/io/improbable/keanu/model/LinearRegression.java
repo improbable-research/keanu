@@ -8,6 +8,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.bytedeco.javacpp.annotation.Const;
 
 import java.util.Arrays;
 
@@ -80,7 +81,9 @@ public class LinearRegression implements LinearModel {
         if (isFit) {
             DoubleVertex weights = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
             DoubleVertex intercept = (DoubleVertex) net.getVertexByLabel(INTERCEPT_LABEL);
-            return weights.matrixMultiply(ConstantVertex.of(x)).plus(intercept).getValue();
+            return weights.getValue().isScalar() ?
+                weights.times(ConstantVertex.of(x)).plus(intercept).getValue() :
+                weights.matrixMultiply(ConstantVertex.of(x)).plus(intercept).getValue();
         } else {
             throw new RuntimeException("The model must be fit before attempting to predict.");
         }

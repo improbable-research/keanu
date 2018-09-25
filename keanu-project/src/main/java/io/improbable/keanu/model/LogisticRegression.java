@@ -12,7 +12,6 @@ public class LogisticRegression implements LinearModel {
     private static final double DEFAULT_SIGMA = 2.0;
     private static final double DEFAULT_REGULARIZATION = 1;
     private static final VertexLabel WEIGHTS_LABEL = new VertexLabel("weights");
-    private static final VertexLabel INTERCEPT_LABEL = new VertexLabel("intercept");
     private static final VertexLabel Y_OBSERVATION_LABEL = new VertexLabel("y");
 
     private final DoubleTensor y;
@@ -75,14 +74,6 @@ public class LogisticRegression implements LinearModel {
 
     public DoubleVertex getWeights() {
         return (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
-    }
-
-    public DoubleVertex getIntercept() {
-        return (DoubleVertex) net.getVertexByLabel(INTERCEPT_LABEL);
-    }
-
-    public BayesianNetwork getNet() {
-        return net;
     }
 
     public double getWeight(int index) {

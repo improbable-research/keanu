@@ -14,6 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import static junit.framework.TestCase.assertTrue;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 public class LogisticRegressionTest {
 
@@ -26,8 +27,8 @@ public class LogisticRegressionTest {
     private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[] {0.5, -3.0, 1.5}, 1, 3);
     private static final double TRUE_INTERCEPT = 5.0;
 
-    private static final int NUM_SAMPLES_TRAINING = 1000;
-    private static final int NUM_SAMPLES_TESTING = 100;
+    private static final int NUM_SAMPLES_TRAINING = 1250;
+    private static final int NUM_SAMPLES_TESTING = 200;
 
     private DoubleTensor xTrain;
     private DoubleTensor yTrain;
@@ -50,14 +51,22 @@ public class LogisticRegressionTest {
         model = model.fit();
         double score = model.score(xTest, yTest);
         assertTrue(score > 0.3);
+        assertWeightsAreCalculated(model.getWeights());
     }
 
     @Test
     public void testRegularizedLogisticRegression() {
-        LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5.0);
+        LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5);
         regularizedModel = regularizedModel.fit();
         double score = regularizedModel.score(xTest, yTest);
         assertTrue(score > 0.3);
+        assertWeightsAreCalculated(regularizedModel.getWeights());
+    }
+
+    @Test(expected = RuntimeException.class)
+    public void predictionFailsIfModelIsNotFit() {
+        LogisticRegression model = new LogisticRegression(xTrain, yTrain);
+        model.predict(xTest);
     }
 
     private DoubleTensor generateX(int nSamples) {
@@ -73,5 +82,9 @@ public class LogisticRegressionTest {
         BoolVertex yVertex = new BernoulliVertex(ConstantVertex.of(probabilities));
         double[] outcome = yVertex.sample(random).asFlatList().stream().mapToDouble(d -> d ? 1.0 : 0.0).toArray();
         return DoubleTensor.create(outcome, probabilities.getShape());
+    }
+
+    private void assertWeightsAreCalculated(DoubleVertex weights) {
+        assertTrue(weights.getValue().equalsWithinEpsilon(TRUE_WEIGHTS, 0.5));
     }
 }
