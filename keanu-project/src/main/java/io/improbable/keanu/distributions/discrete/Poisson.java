@@ -1,7 +1,5 @@
 package io.improbable.keanu.distributions.discrete;
 
-import static org.apache.commons.math3.util.CombinatoricsUtils.factorial;
-
 import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.distributions.DiscreteDistribution;
@@ -78,27 +76,10 @@ public class Poisson implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
-        Tensor.FlattenedView<Double> muFlattenedView = mu.getFlattenedView();
-        Tensor.FlattenedView<Integer> kFlattenedView = k.getFlattenedView();
 
-        double[] result = new double[(int) k.getLength()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = Math.log(pmf(muFlattenedView.getOrScalar(i), kFlattenedView.getOrScalar(i)));
-        }
+        DoubleTensor kDouble = k.toDouble();
+        DoubleTensor logFactorialK = kDouble.plus(1).logGammaInPlace();
 
-        return DoubleTensor.create(result, k.getShape());
-    }
-
-    private static double pmf(double mu, int k) {
-        if (k >= 0 && k < 20) {
-            return (Math.pow(mu, k) / factorial(k)) * Math.exp(-mu);
-        } else if (k >= 20) {
-            double sumOfFactorial = 0;
-            for (int i = 1; i <= k; i++) {
-                sumOfFactorial += Math.log(i);
-            }
-            return Math.exp((k * Math.log(mu)) - sumOfFactorial - mu);
-        }
-        return 0;
+        return kDouble.timesInPlace(mu.log()).minusInPlace(mu).minusInPlace(logFactorialK);
     }
 }

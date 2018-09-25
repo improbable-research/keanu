@@ -24,9 +24,9 @@ public class Gamma implements ContinuousDistribution {
     private final DoubleTensor k;
 
     /**
-     * @param theta  scale
-     * @param k      shape
-     * @return       a new ContinuousDistribution object
+     * @param theta scale
+     * @param k     shape
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor theta, DoubleTensor k) {
         return new Gamma(theta, k);
@@ -92,8 +92,8 @@ public class Gamma implements ContinuousDistribution {
     }
 
     /**
-     * @param lambda   shape
-     * @param random   source of randomness
+     * @param lambda shape
+     * @param random source of randomness
      * @return a random number from the Exponential distribution
      */
     private static double exponentialSample(double lambda, KeanuRandom random) {
@@ -105,23 +105,23 @@ public class Gamma implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor minusXOverTheta = x.div(theta).unaryMinusInPlace();
+        final DoubleTensor xOverTheta = x.div(theta);
         final DoubleTensor kLnTheta = k.times(theta.log());
-        final DoubleTensor xPowKMinus1 = x.pow(k.minus(1));
-        final DoubleTensor lnXToKMinus1 = (xPowKMinus1.divInPlace(k.apply(org.apache.commons.math3.special.Gamma::gamma))).logInPlace();
-        return minusXOverTheta.minusInPlace(kLnTheta).plusInPlace(lnXToKMinus1);
+        final DoubleTensor kMinus1LogX = k.minus(1).timesInPlace(x.log());
+        final DoubleTensor lgammaK = k.logGamma();
+        return kMinus1LogX.minusInPlace(lgammaK).minusInPlace(xOverTheta).minusInPlace(kLnTheta);
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdx = k.minus(1.).divInPlace(x).minusInPlace(theta.reciprocal());
         final DoubleTensor dLogPdtheta = theta.times(k).plusInPlace(x.unaryMinus()).divInPlace(theta.pow(2.)).unaryMinusInPlace();
-        final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.apply(org.apache.commons.math3.special.Gamma::digamma));
+        final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.digamma());
 
         return new Diffs()
-        .put(THETA, dLogPdtheta)
-        .put(K, dLogPdk)
-        .put(X, dLogPdx);
+            .put(THETA, dLogPdtheta)
+            .put(K, dLogPdk)
+            .put(X, dLogPdx);
     }
 
 }
