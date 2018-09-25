@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.util.ArrayUtil;
 
 import com.google.common.base.Preconditions;
@@ -29,12 +28,11 @@ public class Multinomial implements DiscreteDistribution {
     }
 
     /**
-     * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
-     * Generalisation of the Binomial distribution to variables with more than 2 possible values
-     *
      * @param n The number of draws from the variable
      * @param p The probability of observing each of the k values (which sum to 1)
      *          p is a Tensor whose first dimension must be of size k
+     * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
+     * Generalisation of the Binomial distribution to variables with more than 2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p) {
         Preconditions.checkArgument(
@@ -73,8 +71,9 @@ public class Multinomial implements DiscreteDistribution {
      * then I've now got a tensor of shape [a, b, k]
      * which I need to convert to a tensor of shape [k, a, b]
      * by doing a slice in the highest dimension and then concatenating again
-     * @param shape - the desired shape, not including the probabilities dimension
-     * @param samples - the flat array of samples
+     *
+     * @param shape   the desired shape, not including the probabilities dimension
+     * @param samples the flat array of samples
      * @return
      */
     private IntegerTensor constructSampleTensor(int[] shape, int[] samples) {
@@ -83,7 +82,7 @@ public class Multinomial implements DiscreteDistribution {
             outputShape = ArrayUtils.remove(outputShape, 0);
         }
         IntegerTensor abkTensor = IntegerTensor.create(samples, ArrayUtils.add(outputShape, numCategories));
-        int[] kabArray = new int[] {};
+        int[] kabArray = new int[]{};
         for (int category = 0; category < numCategories; category++) {
             IntegerTensor abTensor = abkTensor.slice(outputShape.length, category);
             kabArray = ArrayUtils.addAll(kabArray, abTensor.asFlatIntegerArray());
@@ -115,7 +114,7 @@ public class Multinomial implements DiscreteDistribution {
                 break;
             }
         }
-        return index-1;
+        return index - 1;
     }
 
     @Override
@@ -136,8 +135,8 @@ public class Multinomial implements DiscreteDistribution {
             String.format("Inputs %s cannot be negative", k)
         );
 
-        DoubleTensor gammaN = n.plus(1).toDouble().applyInPlace(Gamma::logGamma);
-        DoubleTensor gammaKs = k.plus(1).toDouble().applyInPlace(Gamma::logGamma).sum(0);
+        DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
+        DoubleTensor gammaKs = k.plus(1).toDouble().logGammaInPlace().sum(0);
         DoubleTensor kLogP = p.log().timesInPlace(k.toDouble()).sum(0);
         return kLogP.plusInPlace(gammaN).minusInPlace(gammaKs);
     }

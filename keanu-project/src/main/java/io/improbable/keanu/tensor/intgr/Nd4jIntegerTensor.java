@@ -480,7 +480,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor toInteger() {
-        return this;
+        return duplicate();
     }
 
     @Override

@@ -4,8 +4,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.A;
 import static io.improbable.keanu.distributions.dual.Diffs.B;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
-import org.apache.commons.math3.special.Gamma;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -49,9 +47,9 @@ public class Beta implements ContinuousDistribution {
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
-        final DoubleTensor lnGammaAlpha = alpha.apply(Gamma::logGamma);
-        final DoubleTensor lnGammaBeta = beta.apply(Gamma::logGamma);
-        final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).applyInPlace(Gamma::logGamma);
+        final DoubleTensor lnGammaAlpha = alpha.logGamma();
+        final DoubleTensor lnGammaBeta = beta.logGamma();
+        final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).logGammaInPlace();
         final DoubleTensor alphaMinusOneTimesLnX = x.log().timesInPlace(alpha.minus(1));
         final DoubleTensor betaMinusOneTimesOneMinusXLn = x.unaryMinus().plusInPlace(1).logInPlace().timesInPlace(beta.minus(1));
 
@@ -63,12 +61,12 @@ public class Beta implements ContinuousDistribution {
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
-        final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).applyInPlace(Gamma::digamma);
+        final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).digammaInPlace();
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
 
         final DoubleTensor dLogPdx = alphaMinusOneDivX.minusInPlace(oneMinusX.reciprocal().timesInPlace(beta.minus(1)));
-        final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.apply(Gamma::digamma)));
-        final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.apply(Gamma::digamma)));
+        final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.digamma()));
+        final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.digamma()));
 
         return new Diffs()
             .put(A, dLogPda)

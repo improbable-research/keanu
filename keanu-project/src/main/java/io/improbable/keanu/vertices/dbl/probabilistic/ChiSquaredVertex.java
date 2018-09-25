@@ -45,8 +45,8 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      *
      * @param k the number of degrees of freedom
      */
-    public ChiSquaredVertex(IntegerTensor k) {
-        this(k.getShape(), new ConstantIntegerVertex(k));
+    public ChiSquaredVertex(IntegerVertex k) {
+        this(k.getShape(), k);
     }
 
     public ChiSquaredVertex(int k) {
