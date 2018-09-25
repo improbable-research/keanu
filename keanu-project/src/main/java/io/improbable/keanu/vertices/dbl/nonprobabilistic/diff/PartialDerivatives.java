@@ -393,11 +393,12 @@ public class PartialDerivatives {
             DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
 
             /*
-             * This reshape is designed to deal with the case that we've sliced a rank 2 tensor.  Due to the way our
-             * tensor implementation works slicing a rank 2 still gives you a rank two back, whereas obviously the
-             * partial will be rank > 2 and thus the new rank of the partial will be smaller than we'd want:
-             * eg If I slice a 3x3x3 I end up with a 3x3 and our partials would go from 3x3x3x3x3x3 to 3x3x3x3x3
-             * Whereas a 2x2 after slicing will be 2x1 and our partials would go from 2x2x2x2 to 2x1x2x2
+             * Due to the way our tensor implementation works, slicing a rank 2 tensor gives us a rank two back, whereas
+             * slicing a higher rank tensor gives you a (rank - 1) tensor back.  This causes problems for rank 2 tensors
+             * where the shape of the "of" will go from, say, 3x3 to 3x1 whereas the partial will go from 3x3x3x3 to
+             * 3x3x3 instead of 3x1x3x3.  This reshape deals with this case.  Only needed for rank two inputs as higher
+             * ranks correctly resolve (eg 3x3x3 will have a 3x3x3x3x3x3 and after slicing will be a 3x3 and a partial
+             * of 3x3x3x3x3.
              */
             if (reshape) {
                 slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
