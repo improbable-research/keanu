@@ -120,6 +120,18 @@ public class TensorShapeValidation {
         return concatShape;
     }
 
+
+
+    public static void checkShapesCanBeMatrixMultiplied(int[] left, int[] right) {
+        if (left.length != 2 || right.length != 2) {
+            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
+        }
+
+        if (left[1] != right[0]) {
+            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
+        }
+    }
+
     public static void checkIndexIsValid(int[] shape, int... index) {
         if (shape.length != index.length) {
             throw new IllegalArgumentException(
@@ -136,6 +148,5 @@ public class TensorShapeValidation {
 
         }
     }
-
 
 }

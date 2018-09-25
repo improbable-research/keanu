@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -58,14 +58,7 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     private static int[] getResultingShape(int[] left, int[] right) {
-        if (left.length != 2 || right.length != 2) {
-            throw new IllegalArgumentException("Matrix multiply must be used on matrices");
-        }
-
-        if (left[1] != right[0]) {
-            throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
-        }
-
+        TensorShapeValidation.checkShapesCanBeMatrixMultiplied(left, right);
         return new int[]{left[0], right[1]};
     }
 }

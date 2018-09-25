@@ -1,5 +1,16 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
+import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
+
+import org.apache.commons.math3.distribution.NormalDistribution;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -7,23 +18,13 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.distribution.NormalDistribution;
-import org.apache.commons.math3.util.Pair;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.HashMap;
-import java.util.Map;
-
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethodMultiVariate;
-import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.sampleUnivariateMethodMatchesLogProbMethod;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-import static org.junit.Assert.assertEquals;
 
 public class MultivariateGaussianTest {
 
     KeanuRandom random;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -118,8 +119,20 @@ public class MultivariateGaussianTest {
         sampleMethodMatchesLogProbMethodMultiVariate(mvg, from, to, bucketSize, 0.01, 100000, random, bucketSize * bucketSize, false);
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test
+    public void dimensionOfMuMustMatchThatOfSigma() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Can not multiply matrices of shapes [2, 2] X [3, 1]");
+        DoubleTensor mu = new Nd4jDoubleTensor(new double[]{0, 0, 0}, new int[]{3, 1});
+        DoubleTensor sigma = new Nd4jDoubleTensor(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+
+        MultivariateGaussian.withParameters(mu, sigma);
+    }
+
+    @Test
     public void whenYouSampleYouMustMatchMusShape() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("Matrix multiply must be used on matrices");
         DoubleTensor mu = new Nd4jDoubleTensor(new double[]{0, 0}, new int[]{2, 1});
         DoubleTensor sigma = new Nd4jDoubleTensor(new double[]{1}, new int[]{1});
 

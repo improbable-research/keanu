@@ -15,6 +15,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
         return new MultivariateGaussian(mu, covariance);
     }
     private MultivariateGaussian(DoubleTensor mu, DoubleTensor covariance) {
+        TensorShapeValidation.checkShapesCanBeMatrixMultiplied(covariance.getShape(), mu.getShape());
         this.mu = mu;
         this.covariance = covariance;
     }
