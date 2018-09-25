@@ -1,15 +1,17 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
-import io.improbable.keanu.util.csv.pojo.CsvProperty;
-import io.improbable.keanu.util.csv.pojo.byrow.RowsAsObjectParser;
-import org.junit.Before;
-import org.junit.Test;
+import static java.util.stream.Collectors.toList;
+
+import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
+
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
 
 public class ObjectParserWithSetterMethodTest {
 
@@ -80,14 +82,18 @@ public class ObjectParserWithSetterMethodTest {
         public boolean equals(Object o) {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
-
             TestPOJOWithSettersClass that = (TestPOJOWithSettersClass) o;
+            return myInt == that.myInt &&
+                Float.compare(that.someFloat, someFloat) == 0 &&
+                myBoolean == that.myBoolean &&
+                Objects.equals(myString, that.myString) &&
+                Objects.equals(myDouble, that.myDouble);
+        }
 
-            if (myInt != that.myInt) return false;
-            if (myBoolean != that.myBoolean) return false;
-            if (Float.compare(that.someFloat, someFloat) != 0) return false;
-            if (!myString.equals(that.myString)) return false;
-            return myDouble.equals(that.myDouble);
+        @Override
+        public int hashCode() {
+
+            return Objects.hash(myString, myInt, myDouble, someFloat, myBoolean);
         }
     }
 }

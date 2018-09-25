@@ -44,7 +44,7 @@ public class FitnessFunction {
     }
 
     public static boolean isValidInitialFitness(double fitnessValue) {
-        return fitnessValue == Double.NEGATIVE_INFINITY || fitnessValue == Double.NaN;
+        return fitnessValue == Double.NEGATIVE_INFINITY || Double.isNaN(fitnessValue);
     }
 
 }

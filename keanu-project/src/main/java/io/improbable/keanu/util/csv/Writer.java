@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UncheckedIOException;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -109,7 +110,7 @@ public abstract class Writer {
     }
 
     public Writer withHeader(String[] h) {
-        header = h;
+        header = Arrays.copyOf(h, h.length);
         withHeaderEnabled(true);
         return this;
     }
