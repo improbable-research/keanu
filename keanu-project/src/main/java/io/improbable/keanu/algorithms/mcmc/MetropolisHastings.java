@@ -99,7 +99,7 @@ public class MetropolisHastings implements PosteriorSamplingAlgorithm {
 
         MetropolisHastingsStep mhStep = new MetropolisHastingsStep(
             latentVertices,
-            DEFAULT_PROPOSAL_DISTRIBUTION,
+            proposalDistribution,
             useCacheOnRejection,
             random
         );
