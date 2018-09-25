@@ -48,7 +48,17 @@ public class CovarianceTest {
     }
 
     @Test
+    public void theMatrixMustBeSymmetric() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("The covariance matrix must be symmetric");
+
+        new Covariance(DoubleTensor.arange(0., 4.).reshape(2, 2), new VertexId(), new VertexId());
+    }
+
+    @Test
     public void youCanGetASubsetOfTheCovarianceMatrix() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("The covariance matrix must be symmetric");
         VertexId id1 = new VertexId();
         VertexId id2 = new VertexId();
         VertexId id3 = new VertexId();

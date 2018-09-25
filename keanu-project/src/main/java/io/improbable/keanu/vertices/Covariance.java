@@ -19,9 +19,23 @@ public class Covariance {
             throw new IllegalArgumentException("The covariance matrix must be square");
         } else if (vertexIds.length != shape[0]) {
             throw new IllegalArgumentException("You must pass in " + shape[0] + " VertexIds, to match the dimension of the matrix");
+        } else if (!isSymmetric(matrix)) {
+            throw new IllegalArgumentException("The covariance matrix must be symmetric");
         }
         this.matrix = matrix.duplicate();
         this.vertexIds = ImmutableList.copyOf(vertexIds);
+    }
+
+    private boolean isSymmetric(DoubleTensor matrix) {
+        int dimension = matrix.getShape()[0];
+        for (int i = 0; i < dimension; i++) {
+            for (int j = 0; j < dimension; j++) {
+                if (!matrix.getValue(i, j).equals( matrix.getValue(j, i))) {
+                    return false;
+                }
+            }
+        }
+        return true;
     }
 
     public DoubleTensor asTensor() {
