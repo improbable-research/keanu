@@ -1,13 +1,15 @@
 package io.improbable.keanu.vertices;
 
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.junit.Assert.assertThat;
 
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 public class CovarianceTest {
 
@@ -73,5 +75,14 @@ public class CovarianceTest {
         DoubleTensor matrix = DoubleTensor.arange(1., 10.).reshape(3, 3);
         Covariance covariance = new Covariance(matrix, id1, id2, id3);
         assertThat(covariance.getSubMatrix(id1, id3), equalTo(DoubleTensor.create(1., 3., 7., 9.).reshape(2, 2)));
+    }
+
+    @Test
+    public void ifTheSubMatrixIs1x1ItReturnsAScalar() {
+        VertexId id1 = new VertexId();
+        VertexId id2 = new VertexId();
+        Covariance covariance = new Covariance(DoubleTensor.eye(2), id1, id2);
+
+        assertThat(covariance.getSubMatrix(id1), instanceOf(ScalarDoubleTensor.class));
     }
 }

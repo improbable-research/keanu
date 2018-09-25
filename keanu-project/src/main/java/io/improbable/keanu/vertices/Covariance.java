@@ -8,6 +8,7 @@ import org.nd4j.linalg.api.blas.BlasException;
 import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 public class Covariance {
     private final DoubleTensor matrix;
@@ -53,7 +54,11 @@ public class Covariance {
         int[] indices = getIndicesOf(subset);
         DoubleTensor subMatrix = getSubMatrix(matrix, indices, 0);
         subMatrix = getSubMatrix(subMatrix, indices, 1);
-        return subMatrix;
+        if (subMatrix.isScalar()) {
+            return new ScalarDoubleTensor(subMatrix.getValue(0));
+        } else {
+            return subMatrix;
+        }
     }
 
     private DoubleTensor getSubMatrix(DoubleTensor original, int[] indices, int dimension) {
