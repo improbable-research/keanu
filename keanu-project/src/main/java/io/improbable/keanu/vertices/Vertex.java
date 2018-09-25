@@ -41,6 +41,11 @@ public abstract class Vertex<T> implements Observable<T> {
         return this.label;
     }
 
+    public <V extends Vertex<T>> V removeLabel() {
+        this.label = null;
+        return (V) this;
+    }
+
     /**
      * @param random source of randomness
      * @return a sample from the vertex's distribution. For non-probabilistic vertices,
