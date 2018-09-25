@@ -5,6 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.within;
 
 public class ChallengerDisasterTest {
 
@@ -22,7 +23,7 @@ public class ChallengerDisasterTest {
         System.out.println("mapBeta " + posteriors.mapBeta);
 
         // assert
-        assertThat(posteriors.mapBeta).isBetween(0.1, 0.4);
-        assertThat(posteriors.mapAlpha).isBetween(-25.0, -5.0);
+        assertThat(posteriors.mapBeta).isCloseTo(0.25, within(0.15));
+        assertThat(posteriors.mapAlpha).isCloseTo(-15d, within(5d));
     }
 }

@@ -18,17 +18,20 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  */
 public class ChallengerDisaster {
     public static ChallengerPosteriors run() {
-
         ChallengerData data = ReadCsv.fromResources("challenger_data.csv")
             .asVectorizedColumnsDefinedBy(ChallengerData.class)
             .load();
 
-        double tau = 0.001;
-        double sigma = Math.sqrt(1.0 / tau);
-        GaussianVertex beta = new GaussianVertex(0, sigma);
-        beta.setValue(0);
-        GaussianVertex alpha = new GaussianVertex(0, sigma);
-        alpha.setValue(0);
+        // These hyperparameters differ from the alpha used in the example book
+        // This is because the sampling algorithm of choice uses the prior distribution
+        // as its proposal distribution. The suggested parameters were too wide, resulting
+        // in bad proposals and by extension bad samples.
+        // When it is easier to decouple the prior from the proposal distribution, we should revisit this
+        final double betaSigma = convertTauToSigma(0.01);
+        final double alphaSigma = convertTauToSigma(0.005);
+
+        GaussianVertex alpha = new GaussianVertex(0, alphaSigma);
+        GaussianVertex beta = new GaussianVertex(0, betaSigma);
 
         DoubleVertex temps = new ConstantDoubleVertex(data.temps);
         DoubleVertex logisticOutput = createLogisticFunction(beta, alpha, temps);
@@ -37,14 +40,9 @@ public class ChallengerDisaster {
         defect.observe(data.oRingFailure);
 
         BayesianNetwork net = new BayesianNetwork(defect.getConnectedGraph());
-        net.probeForNonZeroProbability(10000);
+        net.probeForNonZeroProbability(1000);
 
-//        SimulatedAnnealing.withDefaultConfig().getMaxAPosteriori(net, 10000);
-
-        System.out.println("Start Alpha " + alpha.getValue(0));
-        System.out.println("Start Beta " + beta.getValue(0));
-
-        int sampleCount = 120000;
+        final int sampleCount = 120000;
         NetworkSamples networkSamples = MetropolisHastings.withDefaultConfig()
             .getPosteriorSamples(net, net.getLatentVertices(), sampleCount)
             .drop(sampleCount / 10).downSample(net.getLatentVertices().size());
@@ -54,6 +52,10 @@ public class ChallengerDisaster {
         cp.mapBeta = networkSamples.getDoubleTensorSamples(beta).getAverages().scalar();
 
         return cp;
+    }
+
+    private static double convertTauToSigma(double tau) {
+        return Math.sqrt(1.0 / tau);
     }
 
     private static DoubleVertex createLogisticFunction(GaussianVertex beta, GaussianVertex alpha, DoubleVertex temp) {

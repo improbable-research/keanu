@@ -141,7 +141,7 @@ public abstract class Vertex<T> implements Observable<T> {
      * This marks the vertex's value as being observed and unchangeable.
      * <p>
      * Non-probabilistic vertices of continuous types (integer, double) are prohibited
-     * from being observed due to it's negative impact on inference algorithms. Non-probabilistic
+     * from being observed due to its negative impact on inference algorithms. Non-probabilistic
      * booleans are allowed to be observed as well as user defined types.
      *
      * @param value the value to be observed
