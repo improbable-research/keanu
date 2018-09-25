@@ -58,20 +58,20 @@ public class TextMessaging {
 
         return new TextMessagingResults(
             posteriorSamples.getIntegerTensorSamples(switchPoint).getScalarMode(),
-            posteriorSamples.getDoubleTensorSamples(earlyRate).getMode().scalar(),
+            posteriorSamples.getDoubleTensorSamples(earlyRate).getAverages().scalar(),
             posteriorSamples.getDoubleTensorSamples(lateRate).getMode().scalar()
         );
     }
 
     public static class TextMessagingResults {
         public final int switchPointMode;
-        public final double earlyRateMode;
-        public final double lateRateMode;
+        public final double earlyRateMean;
+        public final double lateRateMean;
 
-        TextMessagingResults(int switchPointMode, double earlyRateMode, double lateRateMode) {
+        TextMessagingResults(int switchPointMode, double earlyRateMean, double lateRateMean) {
             this.switchPointMode = switchPointMode;
-            this.earlyRateMode = earlyRateMode;
-            this.lateRateMode = lateRateMode;
+            this.earlyRateMean = earlyRateMean;
+            this.lateRateMean = lateRateMean;
         }
     }
 

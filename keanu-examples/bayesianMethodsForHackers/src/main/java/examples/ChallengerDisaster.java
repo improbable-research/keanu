@@ -27,8 +27,8 @@ public class ChallengerDisaster {
         // as its proposal distribution. The suggested parameters were too wide, resulting
         // in bad proposals and by extension bad samples.
         // When it is easier to decouple the prior from the proposal distribution, we should revisit this
-        final double betaSigma = tauToSigma(0.01);
-        final double alphaSigma = tauToSigma(0.005);
+        final double betaSigma = convertTauToSigma(0.01);
+        final double alphaSigma = convertTauToSigma(0.005);
 
         GaussianVertex alpha = new GaussianVertex(0, alphaSigma);
         GaussianVertex beta = new GaussianVertex(0, betaSigma);
@@ -54,7 +54,7 @@ public class ChallengerDisaster {
         return cp;
     }
 
-    private static double tauToSigma(double tau) {
+    private static double convertTauToSigma(double tau) {
         return Math.sqrt(1.0 / tau);
     }
 
