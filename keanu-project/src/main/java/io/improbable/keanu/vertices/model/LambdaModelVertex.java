@@ -26,12 +26,13 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     /**
      * A vertex whose operation is the execution of a lambda.
      * It is able to execute a lambda and is able to parse the result.
-     * It stores multiple output values and a model result vertex is required to extract a specific value.
+     * It stores multiple output values in a map.
+     * Use a ModelResultVertex to extract a value by label from this vertex.
      *
-     * @param inputs input vertices to the model
-     * @param executor the operation to perform
+     * @param inputs       input vertices to the model
+     * @param executor     the operation to perform
      * @param updateValues a function to extract the output values (once the operation has been performed) and update
-     *                      the models output values.
+     *                     the models output values.
      */
     public LambdaModelVertex(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
                              Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
@@ -47,17 +48,18 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
     /**
      * A vertex whose operation is the execution of a command line process.
      * It is able to execute this process and parse the result.
-     * It stores multiple output values and a model result vertex is required to extract a specific value.
+     * It stores multiple output values in a map.
+     * Use a ModelResultVertex to extract a value by label from this vertex.
      *
-     * @param inputs input vertices to the model
-     * @param command the command to execute
+     * @param inputs       input vertices to the model
+     * @param command      the command to execute
      * @param updateValues a function to extract the output values (once the operation has been performed) and update
-     *                      the models output values.
+     *                     the models output values.
      * @return a process model vertex
      */
     public static LambdaModelVertex createFromProcess(Map<VertexLabel, Vertex<? extends Tensor>> inputs,
-                                           String command,
-                                           Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+                                                      String command,
+                                                      Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
         return new LambdaModelVertex(inputs, i -> {
             try {
                 Process cmd = Runtime.getRuntime().exec(command);
@@ -68,6 +70,13 @@ public class LambdaModelVertex extends DoubleVertex implements ModelVertex<Doubl
         }, updateValues);
     }
 
+    /**
+     * This vertex stores multiple values in a key value pair of label to result.
+     * As a result it should never be asked for its value directly.
+     * Use a ModelResultVertex to extract a value from this vertex by label.
+
+     * @return a placeholder value
+     */
     @Override
     public DoubleTensor calculate() {
         run();
