@@ -56,6 +56,14 @@ public class CovarianceTest {
     }
 
     @Test
+    public void theMatrixMustBePositiveSemidefinite() {
+        expectedException.expect(IllegalArgumentException.class);
+        expectedException.expectMessage("The covariance matrix must be positive semi-definite");
+
+        new Covariance(DoubleTensor.zeros(2, 2), new VertexId(), new VertexId());
+    }
+
+    @Test
     public void youCanGetASubsetOfTheCovarianceMatrix() {
         expectedException.expect(IllegalArgumentException.class);
         expectedException.expectMessage("The covariance matrix must be symmetric");

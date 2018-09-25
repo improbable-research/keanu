@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices;
 import java.util.Collections;
 import java.util.List;
 
+import org.nd4j.linalg.api.blas.BlasException;
+
 import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -21,6 +23,11 @@ public class Covariance {
             throw new IllegalArgumentException("You must pass in " + shape[0] + " VertexIds, to match the dimension of the matrix");
         } else if (!isSymmetric(matrix)) {
             throw new IllegalArgumentException("The covariance matrix must be symmetric");
+        }
+        try {
+            matrix.choleskyDecomposition();
+        } catch (BlasException e) {
+            throw new IllegalArgumentException("The covariance matrix must be positive semi-definite", e);
         }
         this.matrix = matrix.duplicate();
         this.vertexIds = ImmutableList.copyOf(vertexIds);
