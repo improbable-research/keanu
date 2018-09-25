@@ -1,10 +1,12 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import io.improbable.keanu.vertices.Vertex;
-
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
+import io.improbable.keanu.vertices.Vertex;
 
 public class Proposal {
 
@@ -31,6 +33,10 @@ public class Proposal {
 
     public Set<Vertex> getVerticesWithProposal() {
         return perVertexProposalTo.keySet();
+    }
+
+    public List<Vertex> getVerticesInOrder() {
+        return TopologicalSort.sort(getVerticesWithProposal());
     }
 
     public void apply() {

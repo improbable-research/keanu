@@ -11,7 +11,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     private final DoubleTensor mu;
     private final DoubleTensor covariance;
 
-    public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor covariance) {
+    public static MultivariateGaussian withParameters(DoubleTensor mu, DoubleTensor covariance) {
         return new MultivariateGaussian(mu, covariance);
     }
     private MultivariateGaussian(DoubleTensor mu, DoubleTensor covariance) {
