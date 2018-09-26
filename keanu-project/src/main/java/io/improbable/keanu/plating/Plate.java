@@ -42,11 +42,11 @@ public class Plate implements VertexDictionary {
 
     public <T extends Vertex<?>> T add(VertexLabel label, T v) {
         if (label == null) {
-            throw new PlateException("Vertex " + v + " must contain a label in order to be added to a plate");
+            throw new PlateConstructionException("Vertex " + v + " must contain a label in order to be added to a plate");
         }
         String outerNamespace = label.getOuterNamespace().orElse("");
         if (NAME_REGEX.matcher(outerNamespace).matches()) {
-            throw new PlateException("Vertex " + v + " has already been added to " + outerNamespace);
+            throw new PlateConstructionException("Vertex " + v + " has already been added to " + outerNamespace);
         }
         label = scoped(label);
         if (contents.containsKey(label)) {

@@ -21,7 +21,7 @@ public class PlatesTest {
         assertThat(plates.getLastPlate(), sameInstance(lastPlate));
     }
 
-    @Test(expected = PlateException.class)
+    @Test(expected = PlateConstructionException.class)
     public void itThrowsIfYouAskForTheLastPlateButThereIsNone() {
         new Plates(10).getLastPlate();
     }

@@ -36,7 +36,7 @@ public class Plates implements Iterable<Plate> {
         try {
             return this.asList().get(this.size() - 1);
         } catch (ArrayIndexOutOfBoundsException e) {
-            throw new PlateException("Plates is empty!", e);
+            throw new PlateConstructionException("Plates is empty!", e);
         }
     }
 }
