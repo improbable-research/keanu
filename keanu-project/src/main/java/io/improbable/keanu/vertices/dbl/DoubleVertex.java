@@ -37,6 +37,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
@@ -128,6 +129,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex log() {
         return new LogVertex(this);
+    }
+
+    public DoubleVertex logGamma() {
+        return new LogGammaVertex(this);
     }
 
     public DoubleVertex sigmoid() {
