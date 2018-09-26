@@ -127,7 +127,7 @@ public class VertexLabelTest {
         assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace)));
     }
 
-    @Test(expected = VertexLabelException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() {
         VertexLabel foo = new VertexLabel("foo");
         foo.withoutOuterNamespace();

@@ -34,7 +34,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
@@ -436,7 +435,7 @@ public class PlateBuilderTest {
 
     @Test
     public void itThrowsIfTheresAProxyVertexThatItDoesntKnowHowToMap() {
-        expectedException.expect(VertexLabelException.class);
+        expectedException.expect(PlateConstructionException.class);
         expectedException.expectMessage(startsWith("Cannot find transition mapping for "));
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
@@ -466,7 +465,7 @@ public class PlateBuilderTest {
 
     @Test
     public void itThrowsIfTheresAnUnknownLabelInTheProxyMapping() {
-        expectedException.expect(VertexLabelException.class);
+        expectedException.expect(PlateConstructionException.class);
         expectedException.expectMessage("Cannot find VertexLabel fake");
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");

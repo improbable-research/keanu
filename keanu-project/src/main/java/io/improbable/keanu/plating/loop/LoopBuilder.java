@@ -15,7 +15,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -113,9 +112,9 @@ public class LoopBuilder {
                 valueOutWhenAlwaysTrue = new DoubleProxyVertex(VALUE_OUT_WHEN_ALWAYS_TRUE_LABEL.withExtraNamespace("Loop_" + this.hashCode()));
                 valueOutWhenAlwaysTrue.setParents(outputVertex);
             } catch (NoSuchElementException e) {
-                throw new VertexLabelException("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL", e);
+                throw new LoopConstructionException("You must pass in a base case, i.e. a vertex labeled as Loop.VALUE_OUT_LABEL", e);
             } catch (IllegalArgumentException e) {
-                throw new VertexLabelException("You must pass in only one vertex labeled as Loop.VALUE_OUT_LABEL", e);
+                throw new LoopConstructionException("You must pass in only one vertex labeled as Loop.VALUE_OUT_LABEL", e);
             }
 
             return initialState.withExtraEntries(ImmutableMap.of(

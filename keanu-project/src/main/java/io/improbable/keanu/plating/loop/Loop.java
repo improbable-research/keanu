@@ -14,7 +14,6 @@ import io.improbable.keanu.vertices.SimpleVertexDictionary;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 
 /**
@@ -111,7 +110,7 @@ public class Loop {
         try {
             return baseCaseMap.build();
         } catch (IllegalArgumentException e) {
-            throw new VertexLabelException("Duplicate label found in base case");
+            throw new LoopConstructionException("Duplicate label found in base case");
         }
     }
 

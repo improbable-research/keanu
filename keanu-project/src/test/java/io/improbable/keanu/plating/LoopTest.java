@@ -15,11 +15,11 @@ import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.loop.Loop;
+import io.improbable.keanu.plating.loop.LoopConstructionException;
 import io.improbable.keanu.plating.loop.LoopDidNotTerminateException;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
@@ -90,7 +90,7 @@ public class LoopTest {
 
     @Test
     public void itThrowsIfYouPassInMultipleOutputVertices(){
-        expectedException.expect(VertexLabelException.class);
+        expectedException.expect(LoopConstructionException.class);
         expectedException.expectMessage("Duplicate label found in base case");
         Loop.withInitialConditions(ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL), ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
             .iterateWhile(alwaysTrue)
