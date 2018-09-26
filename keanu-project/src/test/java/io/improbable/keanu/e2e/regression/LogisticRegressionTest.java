@@ -1,6 +1,7 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
+import io.improbable.keanu.distributions.gradient.Logistic;
 import io.improbable.keanu.model.LogisticRegression;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -56,8 +57,13 @@ public class LogisticRegressionTest {
 
     @Test
     public void testRegularizedLogisticRegression() {
-        LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5);
+        LogisticRegression unregularizedModel = new LogisticRegression(xTrain, yTrain);
+        unregularizedModel = unregularizedModel.fit();
+
+        LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5.);
         regularizedModel = regularizedModel.fit();
+
+        assertRegularizedWeightsAreSmaller(unregularizedModel.getWeights(), regularizedModel.getWeights());
         double score = regularizedModel.score(xTest, yTest);
         assertTrue(score > 0.3);
         assertWeightsAreCalculated(regularizedModel.getWeights());
@@ -86,5 +92,9 @@ public class LogisticRegressionTest {
 
     private void assertWeightsAreCalculated(DoubleVertex weights) {
         assertTrue(weights.getValue().equalsWithinEpsilon(TRUE_WEIGHTS, 0.5));
+    }
+
+    private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
+        assertTrue(regularizedWeights.getValue().abs().lessThanOrEqual(unregularizedWeights.getValue().abs()).allTrue());
     }
 }
