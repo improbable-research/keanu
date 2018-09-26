@@ -7,10 +7,11 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
+import com.google.common.collect.ImmutableMap;
+
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 
 /**
  * PlateBuilder allows plates to be constructed in steps
@@ -37,7 +38,7 @@ public class PlateBuilder<T> {
          * Build plates from current factory settings
          *
          * @return Collection of all created plates
-         * @throws VertexLabelException which can occur e.g. if the labels don't marry up in the transition mapping
+         * @throws PlateConstructionException which can occur e.g. if the labels don't marry up in the transition mapping
          */
         Plates build();
     }
@@ -47,8 +48,16 @@ public class PlateBuilder<T> {
     }
 
 
-    public PlateBuilder<T> withInitialState(Vertex... initialState) {
-        this.initialState = VertexDictionary.of(initialState);
+    public PlateBuilder<T> withInitialState(Vertex<?> vertex) {
+        return withInitialState(VertexDictionary.of(vertex));
+    }
+
+    public PlateBuilder<T> withInitialState(VertexLabel label, Vertex<?> vertex) {
+        return withInitialState(VertexDictionary.backedBy(ImmutableMap.of(label, vertex)));
+    }
+
+    public PlateBuilder<T> withInitialState(VertexDictionary initialState) {
+        this.initialState = initialState;
         return this;
     }
 
@@ -160,7 +169,7 @@ public class PlateBuilder<T> {
             this.initialState = initialState;
         }
 
-        public Plates build() {
+        public Plates build() throws PlateConstructionException {
             Plates plates = new Plates(this.size);
             Iterator<T> iter = data.getIterator();
             VertexDictionary previousVertices = initialState;
@@ -175,7 +184,7 @@ public class PlateBuilder<T> {
         }
     }
 
-    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) {
+    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) throws PlateConstructionException {
         Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
         if (candidateVertices == null && !proxyVertices.isEmpty()) {
             throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
@@ -186,12 +195,12 @@ public class PlateBuilder<T> {
             VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
 
             if (parentLabel == null) {
-                throw new VertexLabelException("Cannot find transition mapping for " + proxy.getLabel());
+                throw new PlateConstructionException("Cannot find transition mapping for " + proxy.getLabel());
             }
 
             Vertex<?> parent = candidateVertices.get(parentLabel);
             if (parent == null) {
-                throw new VertexLabelException("Cannot find VertexLabel " + parentLabel);
+                throw new PlateConstructionException("Cannot find VertexLabel " + parentLabel);
             }
             proxy.setParents(parent);
         }
@@ -219,7 +228,7 @@ public class PlateBuilder<T> {
         }
 
 
-        public Plates build() {
+        public Plates build() throws PlateConstructionException {
             Plates plates = new Plates(count.getCount());
             VertexDictionary previousPlate = initialState;
             for (int i = 0; i < count.getCount(); i++) {

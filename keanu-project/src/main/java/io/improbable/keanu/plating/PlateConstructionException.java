@@ -6,13 +6,13 @@ package io.improbable.keanu.plating;
  * And checked exceptions in a lambda must be caught, which leads to ugly code
  * See https://stackoverflow.com/a/27668305/741789
  */
-public class PlateException extends RuntimeException {
+public class PlateConstructionException extends RuntimeException {
 
-    public PlateException(String message) {
+    public PlateConstructionException(String message) {
         super(message);
     }
 
-    public PlateException(String message, Throwable cause) {
+    public PlateConstructionException(String message, Throwable cause) {
         super(message, cause);
     }
 }

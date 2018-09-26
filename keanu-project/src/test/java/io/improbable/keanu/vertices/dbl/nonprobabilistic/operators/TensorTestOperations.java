@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.number.IsCloseTo.closeTo;
 
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+
 import java.util.List;
 
 import io.improbable.keanu.tensor.TensorShape;
