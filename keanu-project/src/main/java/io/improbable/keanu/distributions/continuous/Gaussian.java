@@ -1,9 +1,5 @@
 package io.improbable.keanu.distributions.continuous;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
-
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.network.KeanuComputationalGraph;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -15,6 +11,11 @@ public class Gaussian {
 
     public static final double SQRT_2PI = Math.sqrt(Math.PI * 2);
     public static final double LN_SQRT_2PI = Math.log(SQRT_2PI);
+
+    private static final String X = "x";
+    private static final String MU = "mu";
+    private static final String SIGMA = "sigma";
+    private static final String LOG_PROB = "logProb";
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -35,10 +36,10 @@ public class Gaussian {
         ConstantDoubleVertex sigmaInput = new ConstantDoubleVertex(0);
         DoubleVertex logProbOutput = logProbGraph(xInput, muInput, sigmaInput);
 
-        logProb.addInput("x", xInput);
-        logProb.addInput("mu", muInput);
-        logProb.addInput("sigma", sigmaInput);
-        logProb.addOutput("logProb", logProbOutput);
+        logProb.addInput(X, xInput);
+        logProb.addInput(MU, muInput);
+        logProb.addInput(SIGMA, sigmaInput);
+        logProb.addOutput(LOG_PROB, logProbOutput);
     }
 
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
@@ -52,10 +53,10 @@ public class Gaussian {
         DoubleTensor sigmaValue = sigma.getValue();
 
         return logProb
-            .setInput("x", x)
-            .setInput("mu", muValue)
-            .setInput("sigma", sigmaValue)
-            .calculate("logProb");
+            .setInput(X, x)
+            .setInput(MU, muValue)
+            .setInput(SIGMA, sigmaValue)
+            .calculate(LOG_PROB);
 
 
 //        final DoubleTensor lnSigma = sigmaValue.log();
@@ -87,9 +88,9 @@ public class Gaussian {
             .minusInPlace(sigmaValue.reciprocal());
 
         return new Diffs()
-            .put(MU, dLogPdmu)
-            .put(SIGMA, dLogPdsigma)
-            .put(X, dLogPdx);
+            .put(Diffs.MU, dLogPdmu)
+            .put(Diffs.SIGMA, dLogPdsigma)
+            .put(Diffs.X, dLogPdx);
     }
 
 }
