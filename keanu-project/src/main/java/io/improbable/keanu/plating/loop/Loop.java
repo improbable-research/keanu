@@ -118,20 +118,20 @@ public class Loop {
     /**
      * @param <V> the output type
      * @return the output of the Loop (i.e. the output Vertex from the final Plate)
-     * @throws LoopException if the loop was too short and hit its maximum unrolled size
+     * @throws LoopDidNotTerminateException if the loop was too short and hit its maximum unrolled size
      */
-    public <V extends Vertex<?>> V getOutput() throws LoopException {
+    public <V extends Vertex<?>> V getOutput() throws LoopDidNotTerminateException {
         Plate finalPlate = plates.getLastPlate();
         checkIfMaxCountHasBeenReached(finalPlate);
         return finalPlate.get(VALUE_OUT_LABEL);
     }
 
-    private void checkIfMaxCountHasBeenReached(Plate plate) throws LoopException {
+    private void checkIfMaxCountHasBeenReached(Plate plate) throws LoopDidNotTerminateException {
         BoolVertex stillLooping = plate.get(STILL_LOOPING_LABEL);
         if (!stillLooping.getValue().allFalse()) {
             String errorMessage = "Loop has exceeded its max count " + plates.size();
             if (throwWhenMaxCountIsReached) {
-                throw new LoopException(errorMessage);
+                throw new LoopDidNotTerminateException(errorMessage);
             } else {
                 log.info(errorMessage);
             }

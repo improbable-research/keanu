@@ -15,7 +15,7 @@ import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.plating.loop.Loop;
-import io.improbable.keanu.plating.loop.LoopException;
+import io.improbable.keanu.plating.loop.LoopDidNotTerminateException;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
@@ -57,7 +57,7 @@ public class LoopTest {
 
     @Test
     public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() {
-        expectedException.expect(LoopException.class);
+        expectedException.expect(LoopDidNotTerminateException.class);
         expectedException.expectMessage("Loop has exceeded its max count");
         Loop loop = Loop
             .withInitialConditions(startValue)
