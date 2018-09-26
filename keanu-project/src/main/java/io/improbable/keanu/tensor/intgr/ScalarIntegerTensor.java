@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
@@ -404,32 +405,40 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor min(IntegerTensor min) {
-        return null;
+        return duplicate().minInPlace(min);
     }
 
     @Override
     public IntegerTensor max(IntegerTensor max) {
-        return null;
+        return duplicate().minInPlace(max);
     }
 
     @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
-        return null;
+        if (min.isScalar()) {
+            return new ScalarIntegerTensor(Math.min(value, min.scalar()));
+        } else {
+            return min.minInPlace(this.duplicate());
+        }
     }
 
     @Override
     public IntegerTensor maxInPlace(IntegerTensor max) {
-        return null;
+        if (max.isScalar()) {
+            return new ScalarIntegerTensor(Math.min(value, max.scalar()));
+        } else {
+            return max.minInPlace(this.duplicate());
+        }
     }
 
     @Override
     public int min() {
-        return 0;
+        return value;
     }
 
     @Override
     public int max() {
-        return 0;
+        return value;
     }
 
     @Override
