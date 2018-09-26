@@ -3,7 +3,8 @@ package io.improbable.keanu.algorithms.mcmc.proposal;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Function;
-import java.util.stream.Stream;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.algorithms.graphtraversal.TopologicalSort;
 import io.improbable.keanu.distributions.continuous.MultivariateGaussian;
@@ -68,11 +69,12 @@ public class MultivariateGaussianProposalDistribution implements ProposalDistrib
         return createMultivariateValues(proposal.getVerticesInOrder(), proposal::getProposalTo);
     }
 
-    private DoubleTensor createMultivariateValues(List<Vertex> vertices, Function<Vertex<DoubleTensor>, DoubleTensor> getProposal) {
-        Stream<DoubleTensor> doubleTensorStream = vertices.<DoubleTensor>stream()
-            .map(getProposal::apply);
-        DoubleTensor[] fromValue = doubleTensorStream
-            .toArray(DoubleTensor[]::new);
-        return DoubleTensor.concat(1, fromValue);
+    private DoubleTensor createMultivariateValues(List<Vertex> vertices, Function<Vertex<DoubleTensor>, DoubleTensor> valueGetter) {
+        ImmutableList.Builder<DoubleTensor> builder = ImmutableList.builder();
+        for (Vertex vertex : vertices) {
+            builder.add(valueGetter.apply(vertex));
+        }
+        ImmutableList<DoubleTensor> values = builder.build();
+        return DoubleTensor.concat(0, values.toArray(new DoubleTensor[0]));
     }
 }
