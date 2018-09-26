@@ -6,6 +6,8 @@ import java.util.Map;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
+import com.google.common.collect.ImmutableList;
+
 import io.improbable.keanu.vertices.ProxyVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexDictionary;
@@ -22,14 +24,29 @@ public class Plate implements VertexDictionary {
         this.contents = new HashMap<>();
     }
 
+    public <T extends Vertex<?>> void addAll(T... vertices) {
+        addAll(ImmutableList.copyOf(vertices));
+    }
+
+    public <T extends Vertex<?>> void addAll(Collection<T> vertices) {
+        vertices.forEach(v -> add(v));
+    }
+
+    public <T extends Vertex<?>> void addAll(Map<VertexLabel, T> vertices) {
+        vertices.entrySet().forEach(v -> add(v.getKey(), v.getValue()));
+    }
+
     public <T extends Vertex<?>> T add(T v) {
-        VertexLabel label = v.getLabel();
+        return add(v.getLabel(), v);
+    }
+
+    public <T extends Vertex<?>> T add(VertexLabel label, T v) {
         if (label == null) {
-            throw new PlateException("Vertex " + v + " must contain a label in order to be added to a plate");
+            throw new PlateConstructionException("Vertex " + v + " must contain a label in order to be added to a plate");
         }
         String outerNamespace = label.getOuterNamespace().orElse("");
         if (NAME_REGEX.matcher(outerNamespace).matches()) {
-            throw new PlateException("Vertex " + v + " has already been added to " + outerNamespace);
+            throw new PlateConstructionException("Vertex " + v + " has already been added to " + outerNamespace);
         }
         label = scoped(label);
         if (contents.containsKey(label)) {
@@ -56,6 +73,14 @@ public class Plate implements VertexDictionary {
             throw new IllegalArgumentException("Cannot find VertexLabel " + label);
         }
         return (V) vertex;
+    }
+
+    @Override
+    public Plate withExtraEntries(Map<VertexLabel, Vertex<?>> extraEntries) {
+        Plate plate = new Plate();
+        plate.addAll(contents);
+        plate.addAll(extraEntries);
+        return plate;
     }
 
     public Collection<Vertex<?>> getProxyVertices() {
