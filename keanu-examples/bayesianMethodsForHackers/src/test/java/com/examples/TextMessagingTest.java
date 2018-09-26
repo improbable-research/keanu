@@ -1,7 +1,7 @@
-package examples;
+package com.examples;
 
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.assertj.core.data.Offset;
+
 import org.junit.Before;
 import org.junit.Test;
 
