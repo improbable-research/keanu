@@ -33,10 +33,9 @@ public class Plates implements Iterable<Plate> {
     }
 
     public Plate getLastPlate() {
-        try {
-            return this.asList().get(this.size() - 1);
-        } catch (ArrayIndexOutOfBoundsException e) {
-            throw new PlateConstructionException("Plates is empty!", e);
+        if (containedPlates.isEmpty()) {
+            throw new PlateConstructionException("Plates is empty!");
         }
+        return this.asList().get(this.size() - 1);
     }
 }
