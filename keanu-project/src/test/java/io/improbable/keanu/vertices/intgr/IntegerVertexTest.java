@@ -166,7 +166,7 @@ public class IntegerVertexTest {
     }
 
     @Test
-    public void canFindMaxAndMax() {
+    public void canFindMinAndMax() {
         IntegerVertex A = ConstantVertex.of(1, 2, 3, 4);
         IntegerVertex B = ConstantVertex.of(2, 4, 1, 5);
 
