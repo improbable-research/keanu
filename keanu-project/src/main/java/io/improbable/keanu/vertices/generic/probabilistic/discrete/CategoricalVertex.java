@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
 import io.improbable.keanu.distributions.discrete.Categorical;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Probabilistic;
@@ -9,7 +10,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
-import org.nd4j.linalg.util.ArrayUtil;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -26,7 +26,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     public static <T> CategoricalVertex<T> of(DirichletVertex vertex, List<T> categories) {
-        final int length = ArrayUtil.prod(vertex.getShape());
+        final int length = (int) TensorShape.getLength(vertex.getShape());
         if (length != categories.size()) {
             throw new IllegalArgumentException("Categories must have length of vertex's size");
         }
@@ -40,7 +40,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     public static CategoricalVertex<Integer> of(DirichletVertex vertex) {
-        final int categoriesCount = ArrayUtil.prod(vertex.getShape());
+        final int categoriesCount = (int) TensorShape.getLength(vertex.getShape());
         final IntStream categories = IntStream.range(0, categoriesCount);
         final List<Integer> categoriesList = categories.boxed().collect(Collectors.toList());
         return CategoricalVertex.of(vertex, categoriesList);
