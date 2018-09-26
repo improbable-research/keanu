@@ -32,10 +32,10 @@ public class NetworkSnapshot {
      */
     public void apply() {
         for (Vertex v : values.keySet()) {
-            v.unobserve();
             if (observed.contains(v)) {
                 v.observe(values.get(v));
             } else {
+                v.unobserve();
                 v.setValue(values.get(v));
             }
 
