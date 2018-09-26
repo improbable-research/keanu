@@ -69,7 +69,6 @@ public class LinearRegression implements LinearModel {
 
     public LinearRegression fit(Tensor y) {
         net.getVertexByLabel(Y_OBSERVATION_LABEL).observe(y);
-        net.probeForNonZeroProbability(100);
         GradientOptimizer optimizer = GradientOptimizer.of(net);
         optimizer.maxAPosteriori();
         isFit = true;
