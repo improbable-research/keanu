@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static org.junit.Assert.assertEquals;
+
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -30,6 +31,20 @@ public class MatrixMultiplicationVertexTest {
         DoubleTensor mmulResult = mmul.lazyEval();
 
         DoubleTensor expected = DoubleTensor.create(new double[]{14, 20, 30, 44}, 2, 2);
+
+        assertEquals(expected, mmulResult);
+    }
+
+    @Test
+    public void canDoMatrixTimesVector() {
+        DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2);
+        DoubleTensor vector = DoubleTensor.create(new double[]{5, 7}, 2, 1);
+
+        MatrixMultiplicationVertex mmul = new MatrixMultiplicationVertex(ConstantVertex.of(matrix), ConstantVertex.of(vector));
+
+        DoubleTensor mmulResult = mmul.lazyEval();
+
+        DoubleTensor expected = DoubleTensor.create(new double[]{5 + 14, 15 + 28}, 2, 1);
 
         assertEquals(expected, mmulResult);
     }

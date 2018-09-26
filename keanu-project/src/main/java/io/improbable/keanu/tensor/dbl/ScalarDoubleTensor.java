@@ -431,11 +431,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor slice(int dimension, int index) {
-        if (dimension == 0 && index == 0) {
-            return duplicate();
-        } else {
-            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+        if (dimension == 0 || dimension == 1) {
+            if (index == 0) {
+                return duplicate();
+            }
         }
+        throw new IllegalStateException("Slice is only valid for dimension == 0 or 1 and index == 0 in a scalar");
     }
 
     @Override
