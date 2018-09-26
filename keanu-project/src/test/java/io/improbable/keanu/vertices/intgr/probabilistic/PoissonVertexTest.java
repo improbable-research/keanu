@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 import org.apache.commons.math3.distribution.PoissonDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
@@ -63,11 +64,14 @@ public class PoissonVertexTest {
 
         PoissonVertex poissonVertex = new PoissonVertex(mu);
 
-        double logProb = poissonVertex.logPmf(19);
-        double logProbThreshold = poissonVertex.logPmf(20);
-        double logProbAboveThreshold = poissonVertex.logPmf(21);
+        double logProb19 = poissonVertex.logPmf(19);
+        double logProb20 = poissonVertex.logPmf(20);
+        double logProb100 = poissonVertex.logPmf(100);
 
-        assertTrue(logProbAboveThreshold > logProbThreshold && logProbThreshold > logProb);
+        PoissonDistribution distribution = new PoissonDistribution(25);
+        assertThat(logProb19, closeTo(distribution.logProbability(19), 1e-6));
+        assertThat(logProb20, closeTo(distribution.logProbability(20), 1e-6));
+        assertThat(logProb100, closeTo(distribution.logProbability(100), 1e-6));
     }
 
     @Test

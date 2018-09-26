@@ -1,12 +1,12 @@
 package io.improbable.keanu.distributions.discrete;
 
+import org.nd4j.linalg.util.ArrayUtil;
+
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.apache.commons.math3.distribution.BinomialDistribution;
-import org.nd4j.linalg.util.ArrayUtil;
 
 public class Binomial implements DiscreteDistribution {
 
@@ -48,21 +48,25 @@ public class Binomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
+        DoubleTensor logBinomialCoefficient = getLogBinomialCoefficient(k, n);
 
-        Tensor.FlattenedView<Double> pWrapped = p.getFlattenedView();
-        Tensor.FlattenedView<Integer> nWrapped = n.getFlattenedView();
-        Tensor.FlattenedView<Integer> kWrapped = k.getFlattenedView();
+        DoubleTensor kDouble = k.toDouble();
+        DoubleTensor nDouble = n.toDouble();
+        DoubleTensor kLogP = kDouble.times(p.log());
+        DoubleTensor logOneMinusP = p.unaryMinus().plusInPlace(1.0).logInPlace();
+        DoubleTensor nMinusKLogOneMinusP = nDouble.minusInPlace(kDouble).timesInPlace(logOneMinusP);
 
-        double[] logPmf = new double[(int) k.getLength()];
-        for (int i = 0; i < logPmf.length; i++) {
-            logPmf[i] = logPmf(kWrapped.getOrScalar(i), pWrapped.getOrScalar(i), nWrapped.getOrScalar(i));
-        }
-
-        return DoubleTensor.create(logPmf, k.getShape());
+        return logBinomialCoefficient.plusInPlace(kLogP).plusInPlace(nMinusKLogOneMinusP);
     }
 
-    private static double logPmf(int k, double p, int n) {
-        BinomialDistribution distribution = new BinomialDistribution(n, p);
-        return distribution.logProbability(k);
+    private static DoubleTensor getLogBinomialCoefficient(IntegerTensor k, IntegerTensor n) {
+
+        DoubleTensor nDouble = n.toDouble();
+        DoubleTensor kDouble = k.toDouble();
+        DoubleTensor logNFactorial = nDouble.plus(1.0).logGammaInPlace();
+        DoubleTensor logKFactorial = kDouble.plus(1.0).logGammaInPlace();
+        DoubleTensor logNMinusKFactorial = nDouble.minusInPlace(kDouble).plusInPlace(1.0).logGammaInPlace();
+
+        return logNFactorial.minusInPlace(logKFactorial).minusInPlace(logNMinusKFactorial);
     }
 }

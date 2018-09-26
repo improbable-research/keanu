@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 
 import java.util.List;
 
@@ -30,7 +31,8 @@ public class TensorTestOperations {
         DoubleTensor initialInput = inputVertex.getValue();
 
         DoubleTensor initialOutput = outputVertex.eval();
-        DoubleTensor outputWrtInput = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+        DoubleTensor outputWrtInputForward = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+
         int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
         DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
         Tensor.FlattenedView<Double> flatIncrement = incrementTensor.getFlattenedView();
@@ -42,7 +44,7 @@ public class TensorTestOperations {
 
             DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
-            DoubleTensor differenceUsingGradient = outputWrtInput.times(incrementTensor).sum(dimensionsToSumOver);
+            DoubleTensor differenceUsingGradient = outputWrtInputForward.times(incrementTensor).sum(dimensionsToSumOver);
             assertThat(differenceUsingGradient, allCloseTo(boxedDelta, differenceInOutput));
         }
     }

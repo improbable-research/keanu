@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 
 import io.improbable.keanu.tensor.Tensor;
@@ -188,6 +189,16 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor log() {
         return this.duplicate().logInPlace();
+    }
+
+    @Override
+    public DoubleTensor logGamma() {
+        return duplicate().logGammaInPlace();
+    }
+
+    @Override
+    public DoubleTensor digamma() {
+        return duplicate().digammaInPlace();
     }
 
     @Override
@@ -486,6 +497,18 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor logInPlace() {
         value = Math.log(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor logGammaInPlace() {
+        value = Gamma.logGamma(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor digammaInPlace() {
+        value = Gamma.digamma(value);
         return this;
     }
 
