@@ -85,7 +85,7 @@ public class DivisionVertexTest {
     @Test
     public void changesMatchGradient() {
         DoubleVertex A = new UniformVertex(new int[]{2, 2, 2}, 1.0, 10.0);
-        DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, 1.0, 10.0);
+        DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, 100.0, 150.0);
         DoubleVertex C = A.div(B).times(A);
 
         finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 0.001, 1e-5, true);
