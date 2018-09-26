@@ -427,7 +427,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (max.isScalar()) {
             return new ScalarIntegerTensor(Math.min(value, max.scalar()));
         } else {
-            return max.minInPlace(this.duplicate());
+            return max.maxInPlace(this.duplicate());
         }
     }
 

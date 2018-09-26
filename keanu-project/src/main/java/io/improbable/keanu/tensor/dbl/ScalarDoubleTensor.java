@@ -628,7 +628,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (max.isScalar()) {
             value = Math.max(value, max.scalar());
         } else {
-            return DoubleTensor.create(value, shape).maxInPlace(max);
+            return max.maxInPlace(this);
         }
         return this;
     }
