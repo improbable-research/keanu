@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 
 import java.util.List;
 

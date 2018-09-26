@@ -11,6 +11,11 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class LogGammaVertex extends DoubleUnaryOpVertex {
 
+    /**
+     * Returns the log of the gamma of the inputVertex
+     *
+     * @param inputVertex the vertex
+     */
     public LogGammaVertex(DoubleVertex inputVertex) {
         super(inputVertex);
     }
