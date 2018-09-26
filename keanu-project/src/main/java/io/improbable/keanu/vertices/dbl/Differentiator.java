@@ -75,7 +75,7 @@ public class Differentiator {
 
             PartialDerivatives dwrtV;
             if (TensorShape.isScalar(wrtShape)) {
-                dwrtV = partialsOf.sum(false, TensorShape.dimensionRange(-prevRank, 0));
+                dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-prevRank, 0));
             } else {
                 dwrtV = partialsOf;
             }

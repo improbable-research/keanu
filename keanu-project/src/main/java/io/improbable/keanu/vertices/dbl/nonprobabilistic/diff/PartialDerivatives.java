@@ -132,6 +132,38 @@ public class PartialDerivatives {
         return new PartialDerivatives(summed);
     }
 
+    public PartialDerivatives sumOverOfDimensions(int... ofDimensions) {
+        Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
+
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
+            DoubleTensor v = entry.getValue();
+            DoubleTensor summedV = v.sum(ofDimensions);
+            int[] newShape = TensorShape.concat(new int[]{1, 1}, summedV.getShape());
+            summedV = summedV.reshape(newShape);
+
+            summed.put(k, summedV);
+        }
+
+        return new PartialDerivatives(summed);
+    }
+
+    public PartialDerivatives sumOverWrtDimensions(int... wrtDimensions) {
+        Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
+
+        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
+            VertexId k = entry.getKey();
+            DoubleTensor v = entry.getValue();
+            DoubleTensor summedV = v.sum(wrtDimensions);
+            int[] newShape = TensorShape.concat(summedV.getShape(), new int[]{1, 1});
+            summedV = summedV.reshape(newShape);
+
+            summed.put(k, summedV);
+        }
+
+        return new PartialDerivatives(summed);
+    }
+
     public PartialDerivatives add(PartialDerivatives toAdd) {
         return add(toAdd, null);
     }
