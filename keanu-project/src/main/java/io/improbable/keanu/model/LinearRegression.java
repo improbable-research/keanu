@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.bytedeco.javacpp.annotation.Const;
 
 import java.util.Arrays;
 
@@ -24,7 +23,7 @@ public class LinearRegression implements LinearModel {
     private final DoubleTensor y;
     private final double priorOnSigma;
     private final double priorOnMu;
-    private final double[] priorOnWeights;
+    private final double[] priorOnSigmaForWeights;
 
     private BayesianNetwork net;
     private boolean isFit = false;
@@ -37,12 +36,12 @@ public class LinearRegression implements LinearModel {
         this(x, y, priorOnMu, priorOnSigma, fillPriorOnWeights(x, priorOnSigma));
     }
 
-    public LinearRegression(DoubleTensor x, DoubleTensor y, double priorOnMu, double priorOnSigma, double[] priorOnWeights) {
+    public LinearRegression(DoubleTensor x, DoubleTensor y, double priorOnMu, double priorOnSigma, double... priorOnSigmaForWeights) {
         this.x = x;
         this.y = y;
         this.priorOnSigma = priorOnSigma;
         this.priorOnMu = priorOnMu;
-        this.priorOnWeights = priorOnWeights;
+        this.priorOnSigmaForWeights = priorOnSigmaForWeights;
         this.net = construct();
     }
 
@@ -56,7 +55,7 @@ public class LinearRegression implements LinearModel {
     public BayesianNetwork construct() {
         int numberOfFeatures = x.getShape()[0];
         int[] shapeOfWeights = new int[]{1, numberOfFeatures};
-        DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnWeights)).reshape(shapeOfWeights).setLabel(WEIGHTS_LABEL);
+        DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).reshape(shapeOfWeights).setLabel(WEIGHTS_LABEL);
         DoubleVertex intercept = new GaussianVertex(priorOnMu, priorOnSigma).setLabel(INTERCEPT_LABEL);
         DoubleVertex xMu = weights.getValue().isScalar() ? weights.times(ConstantVertex.of(x)) : weights.matrixMultiply(ConstantVertex.of(x));
         DoubleVertex yVertex = new GaussianVertex(xMu.plus(intercept), priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
@@ -70,6 +69,7 @@ public class LinearRegression implements LinearModel {
 
     public LinearRegression fit(Tensor y) {
         net.getVertexByLabel(Y_OBSERVATION_LABEL).observe(y);
+        net.probeForNonZeroProbability(100);
         GradientOptimizer optimizer = GradientOptimizer.of(net);
         optimizer.maxAPosteriori();
         isFit = true;

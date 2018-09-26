@@ -62,10 +62,10 @@ public class DiabetesLinearRegression {
             .asVectorizedColumnsDefinedBy(Data.class)
             .load(true);
 
-        LinearRegression regression = new LinearRegression(data.bmi, data.y);
+        LinearRegression regression = new LinearRegression(data.bmi, data.y, 0.0, 2.0, 100);
         regression.fit();
-        assertEquals(938.2378, regression.getWeight(0), 0.01);
-        assertEquals(152.9189, regression.getIntercept().getValue().scalar(), 0.01);
+        assertEquals(938.2378, regression.getWeight(0), 0.5);
+        assertEquals(152.9189, regression.getIntercept().getValue().scalar(), 0.5);
     }
 
     @Test
