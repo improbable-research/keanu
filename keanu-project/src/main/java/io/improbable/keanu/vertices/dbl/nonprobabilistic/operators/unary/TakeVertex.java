@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,8 +12,6 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import static io.improbable.keanu.tensor.TensorShape.copyLowRankOverHighRankFromTailEnd;
 
 public class TakeVertex extends DoubleUnaryOpVertex {
 
@@ -46,7 +45,10 @@ public class TakeVertex extends DoubleUnaryOpVertex {
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
-            int[] newPartialShape = copyLowRankOverHighRankFromTailEnd(partial.getShape(), inputVertex.getShape());
+            int[] newPartialShape = TensorShape.concat(
+                TensorShape.selectDimensions(0, partial.getRank() - getShape().length - 1, partial.getShape()),
+                inputVertex.getShape()
+            );
             DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
             DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial);
             DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
