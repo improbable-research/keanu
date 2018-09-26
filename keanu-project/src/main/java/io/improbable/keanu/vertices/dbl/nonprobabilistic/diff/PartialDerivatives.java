@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -109,7 +110,7 @@ public class PartialDerivatives {
      * @param summingAllOfDimensions If True, this means we're summing all of the Of dimensions.
      *                               In this case, we drop the summed over dimensions from the shape and replace them
      *                               with a 1x1 (as the Ofs can't disappear completely)
-     * @param overDimensions The dimensions to sum over. Dimensions are counted from zero
+     * @param overDimensions         The dimensions to sum over. Dimensions are counted from zero
      * @return The summed partial derivatives over given dimensions
      */
     public PartialDerivatives sum(boolean summingAllOfDimensions, int... overDimensions) {
@@ -139,7 +140,7 @@ public class PartialDerivatives {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
             DoubleTensor summedV = v.sum(ofDimensions);
-            int[] newShape = TensorShape.concat(new int[]{1, 1}, summedV.getShape());
+            int[] newShape = TensorShape.concat(Tensor.SCALAR_SHAPE, summedV.getShape());
             summedV = summedV.reshape(newShape);
 
             summed.put(k, summedV);
@@ -155,7 +156,7 @@ public class PartialDerivatives {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
             DoubleTensor summedV = v.sum(wrtDimensions);
-            int[] newShape = TensorShape.concat(summedV.getShape(), new int[]{1, 1});
+            int[] newShape = TensorShape.concat(summedV.getShape(), Tensor.SCALAR_SHAPE);
             summedV = summedV.reshape(newShape);
 
             summed.put(k, summedV);
@@ -283,18 +284,19 @@ public class PartialDerivatives {
 
     private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, int[] ofShape) {
 
-        //Check this out
-        DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
-
         int[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
         if (TensorShape.isScalar(partialOfShape)) {
 
             int[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
             int[] resultShape = TensorShape.concat(multiplier.getShape(), partialWrtShape);
 
-            return DoubleTensor.ones(resultShape).times(partial).times(multiplierFromLeft);
+            DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, resultShape.length);
+            DoubleTensor appropriateShapePartial = increaseRankByPrependingOnesToShape(partial, resultShape.length);
+
+            return DoubleTensor.ones(resultShape).times(appropriateShapePartial).times(multiplierFromLeft);
         }
 
+        DoubleTensor multiplierFromLeft = increaseRankByAppendingOnesToShape(multiplier, partial.getRank());
         return partial.times(multiplierFromLeft);
     }
 
@@ -304,10 +306,15 @@ public class PartialDerivatives {
         if (TensorShape.isScalar(partialWrtShape)) {
             int[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
             int[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
-            return DoubleTensor.ones(resultShape).times(partial).times(multiplier);
+
+            DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, resultShape.length);
+            DoubleTensor appropriateShapePartial = increaseRankByAppendingOnesToShape(partial, resultShape.length);
+
+            return DoubleTensor.ones(resultShape).times(appropriateShapePartial).times(multiplierFromRight);
         }
 
-        return partial.times(multiplier);
+        DoubleTensor multiplierFromRight = increaseRankByPrependingOnesToShape(multiplier, partial.getRank());
+        return partial.times(multiplierFromRight);
     }
 
     public static PartialDerivatives matrixMultiplyAlongOfDimensions(PartialDerivatives partials, DoubleTensor multiplier, boolean partialIsLeft) {
@@ -482,4 +489,9 @@ public class PartialDerivatives {
         );
     }
 
+    private static DoubleTensor increaseRankByPrependingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {
+        return lowRankTensor.reshape(
+            TensorShape.shapeToDesiredRankByPrependingOnes(lowRankTensor.getShape(), desiredRank)
+        );
+    }
 }

@@ -1,11 +1,11 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
-import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.number.IsCloseTo.closeTo;
 
 import java.util.List;
 
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -14,62 +14,79 @@ public class TensorTestOperations {
 
     public static void finiteDifferenceMatchesGradient(List<DoubleVertex> inputVertices,
                                                        DoubleVertex outputVertex,
-                                                       final double INCREMENT_AMOUNT,
-                                                       final double DELTA,
-                                                       final boolean DO_REVERSE) {
-        setInitialConditions(inputVertices);
-        inputVertices.forEach(v ->
-            runGradientTestOnSingleInput(v, outputVertex, INCREMENT_AMOUNT, DELTA, DO_REVERSE));
+                                                       final double incrementAmount,
+                                                       final double delta,
+                                                       final boolean doReverse) {
+
+        finiteDifferenceMatchesForwardModeGradient(inputVertices, outputVertex, incrementAmount, delta);
+        if (doReverse) {
+            finiteDifferenceMatchesReverseModeGradient(inputVertices, outputVertex, incrementAmount, delta);
+        }
     }
 
-    private static void setInitialConditions(List<DoubleVertex> inputVertices) {
-        inputVertices.forEach(v -> v.setValue(v.sample()));
+    public static void finiteDifferenceMatchesForwardModeGradient(List<DoubleVertex> inputVertices,
+                                                                  DoubleVertex outputVertex,
+                                                                  final double incrementAmount,
+                                                                  final double delta) {
+        inputVertices.forEach(v ->
+            runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, true));
+    }
+
+    public static void finiteDifferenceMatchesReverseModeGradient(List<DoubleVertex> inputVertices,
+                                                                  DoubleVertex outputVertex,
+                                                                  final double incrementAmount,
+                                                                  final double delta) {
+        inputVertices.forEach(v ->
+            runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, false));
     }
 
     private static void runGradientTestOnSingleInput(DoubleVertex inputVertex,
                                                      DoubleVertex outputVertex,
-                                                     final double INCREMENT_AMOUNT,
-                                                     final double DELTA,
-                                                     final boolean DO_REVERSE) {
+                                                     final double incrementAmount,
+                                                     final Double delta,
+                                                     final boolean forwardMode) {
+
         DoubleTensor initialInput = inputVertex.getValue();
-
-        Double boxedDelta = DELTA;
         DoubleTensor initialOutput = outputVertex.eval();
-        DoubleTensor outputWrtInput = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+        DoubleTensor outputWrtInput = dOutputWrtInput(outputVertex, inputVertex, forwardMode);
 
-        if (DO_REVERSE) {
-            DoubleTensor reverseDifferential =
-                Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+        long inputLength = TensorShape.getLength(inputVertex.getShape());
+        int[] inputStride = TensorShape.getRowFirstStride(inputVertex.getShape());
 
-            assertThat(reverseDifferential, allCloseTo(boxedDelta, outputWrtInput));
-        }
+        long outputLength = TensorShape.getLength(outputVertex.getShape());
+        int[] outputStride = TensorShape.getRowFirstStride(outputVertex.getShape());
 
-        int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
-        DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
-        Tensor.FlattenedView<Double> flatIncrement = incrementTensor.getFlattenedView();
+        for (int i = 0; i < inputLength; i++) {
 
-        for (int i = 0; i < flatIncrement.size(); i++) {
-            flatIncrement.set(i, INCREMENT_AMOUNT);
+            int[] inputIndex = TensorShape.getShapeIndices(inputVertex.getShape(), inputStride, i);
+            DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
+            incrementTensor.setValue(incrementAmount, inputIndex);
+
             inputVertex.setValue(initialInput.plus(incrementTensor));
 
             DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
-            DoubleTensor differenceUsingGradient = outputWrtInput.times(incrementTensor).sum(dimensionsToSumOver);
-            assertThat(differenceUsingGradient, allCloseTo(boxedDelta, differenceInOutput));
+
+            for (int j = 0; j < outputLength; j++) {
+
+                int[] outputIndex = TensorShape.getShapeIndices(outputVertex.getShape(), outputStride, j);
+
+                Double dOutputAtIndexWrtInputAtIndex = outputWrtInput.getValue(TensorShape.concat(outputIndex, inputIndex));
+                Double diffAtOutputIndexByGradient = dOutputAtIndexWrtInputAtIndex * incrementAmount;
+                Double diffAtOutputIndex = differenceInOutput.getValue(outputIndex);
+
+                assertThat(diffAtOutputIndexByGradient, closeTo(diffAtOutputIndex, delta));
+            }
         }
     }
 
-    private static int[] getWrtDimensions(DoubleVertex wrtVertex,
-                                          DoubleVertex ofVertex) {
-        int wrtRank = wrtVertex.getShape().length;
-        int ofRank = ofVertex.getShape().length;
-        int[] wrtDimensions = new int[wrtRank];
+    private static DoubleTensor dOutputWrtInput(DoubleVertex outputVertex, DoubleVertex inputVertex, boolean forwardMode) {
 
-        for (int i = 0; i < wrtRank; i++) {
-            wrtDimensions[i] = ofRank + i;
+        if (forwardMode) {
+            return outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+        } else {
+            return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
         }
-
-        return wrtDimensions;
     }
 
 }
