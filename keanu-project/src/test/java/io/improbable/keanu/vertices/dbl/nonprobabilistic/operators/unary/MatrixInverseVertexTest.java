@@ -108,7 +108,7 @@ public class MatrixInverseVertexTest {
         DoubleVertex invertVertex = inputVertex.matrixInverse();
 
         finiteDifferenceMatchesGradient(
-            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-6, false);
+            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5, false);
     }
 
 }
