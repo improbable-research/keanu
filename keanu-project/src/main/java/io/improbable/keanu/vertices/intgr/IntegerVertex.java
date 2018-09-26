@@ -86,6 +86,14 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSumVertex(this);
     }
 
+    public IntegerVertex min(IntegerVertex that) {
+        return new IntegerMinVertex(this, that);
+    }
+
+    public IntegerVertex max(IntegerVertex that) {
+        return new IntegerMaxVertex(this, that);
+    }
+
     public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }

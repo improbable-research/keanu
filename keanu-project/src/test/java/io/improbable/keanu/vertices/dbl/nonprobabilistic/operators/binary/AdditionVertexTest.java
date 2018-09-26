@@ -52,7 +52,7 @@ public class AdditionVertexTest {
 
     @Test
     public void calculatesDualNumberOfAVectorsAndScalarAdded() {
-        calculatesDualNumberOfAVectorsAndScalar(
+        calculatesDualNumberOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.eye(4).reshape(1, 4, 1, 4),

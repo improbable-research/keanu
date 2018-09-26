@@ -260,7 +260,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor maxInPlace(DoubleTensor max);
 
-    DoubleTensor minInPlace(DoubleTensor max);
+    DoubleTensor  minInPlace(DoubleTensor max);
 
     DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 

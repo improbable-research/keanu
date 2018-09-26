@@ -403,6 +403,36 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor min(IntegerTensor min) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor max(IntegerTensor max) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor minInPlace(IntegerTensor min) {
+        return null;
+    }
+
+    @Override
+    public IntegerTensor maxInPlace(IntegerTensor max) {
+        return null;
+    }
+
+    @Override
+    public int min() {
+        return 0;
+    }
+
+    @Override
+    public int max() {
+        return 0;
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor that) {
         if (that.isScalar()) {
             return greaterThan(that.scalar());

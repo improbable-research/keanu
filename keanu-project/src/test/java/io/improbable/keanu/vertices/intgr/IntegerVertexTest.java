@@ -165,4 +165,16 @@ public class IntegerVertexTest {
         assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
     }
 
+    @Test
+    public void canFindMaxAndMax() {
+        IntegerVertex A = ConstantVertex.of(1, 2, 3, 4);
+        IntegerVertex B = ConstantVertex.of(2, 4, 1, 5);
+
+        IntegerVertex min = A.min(B);
+        IntegerVertex max = A.max(B);
+
+        assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
+        assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
+    }
+
 }

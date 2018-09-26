@@ -463,4 +463,25 @@ public class Nd4jIntegerTensorTest {
             tensor.asFlatIntegerArray());
     }
 
+    @Test
+    public void canFindScalarMinAndMax() {
+        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(2, 2);
+        int min = a.min();
+        int max = a.max();
+        assertEquals(2, min);
+        assertEquals(5, max);
+    }
+
+    @Test
+    public void canFindElementWiseMinAndMax() {
+        IntegerTensor a = IntegerTensor.create(1, 2, 3, 4).reshape(1, 4);
+        IntegerTensor b = IntegerTensor.create(2, 3, 1, 5).reshape(1, 4);
+
+        IntegerTensor min = a.min(b);
+        IntegerTensor max = a.max(b);
+
+        assertArrayEquals(new int[]{1, 2, 1, 4}, min.asFlatIntegerArray());
+        assertArrayEquals(new int[]{2, 3, 3, 5}, max.asFlatIntegerArray());
+    }
+
 }

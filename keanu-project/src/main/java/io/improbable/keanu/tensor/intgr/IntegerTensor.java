@@ -161,4 +161,16 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     BooleanTensor greaterThanOrEqual(int value);
 
+    IntegerTensor min(IntegerTensor min);
+
+    IntegerTensor max(IntegerTensor max);
+
+    IntegerTensor minInPlace(IntegerTensor min);
+
+    IntegerTensor maxInPlace(IntegerTensor max);
+
+    int min();
+
+    int max();
+
 }
