@@ -32,13 +32,18 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
         }
 
         final int categoriesCount = categories.size();
-
-        return new CategoricalVertex<>(IntStream.range(0, categoriesCount).boxed().collect(toMap(categories::get, i -> new TakeVertex(vertex, 0, i))));
+        final IntStream categoriesIndices = IntStream.range(0, categoriesCount);
+        final Map<T, DoubleVertex> selectableValues =
+            categoriesIndices.boxed().collect(toMap(categories::get,
+                index -> new TakeVertex(vertex, 0, index)));
+        return new CategoricalVertex<>(selectableValues);
     }
 
     public static CategoricalVertex<Integer> of(DirichletVertex vertex) {
-        final int categoriseCount = ArrayUtil.prod(vertex.getShape());
-        return CategoricalVertex.of(vertex, IntStream.range(0, categoriseCount).boxed().collect(Collectors.toList()));
+        final int categoriesCount = ArrayUtil.prod(vertex.getShape());
+        final IntStream categories = IntStream.range(0, categoriesCount);
+        final List<Integer> categoriesList = categories.boxed().collect(Collectors.toList());
+        return CategoricalVertex.of(vertex, categoriesList);
     }
 
     private static <T> Map<T, DoubleVertex> defensiveCopy(Map<T, Double> selectableValues) {
@@ -60,13 +65,15 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
 
     @Override
     public T sample(KeanuRandom random) {
-        Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
+        Categorical<T> categorical =
+            Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.sample(getShape(), random);
     }
 
     @Override
     public double logProb(T value) {
-        Categorical<T> categorical = Categorical.withParameters(selectableValuesMappedToDoubleTensor());
+        Categorical<T> categorical =
+            Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.logProb(value).sum();
     }
 
@@ -76,7 +83,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     private Map<T, DoubleTensor> selectableValuesMappedToDoubleTensor() {
-        return selectableValues.entrySet().stream()
-            .collect(toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
+        return selectableValues.entrySet().stream().collect(toMap(Map.Entry::getKey,
+            e -> e.getValue().getValue()));
     }
 }
