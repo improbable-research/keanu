@@ -28,12 +28,20 @@ public class VertexLabel {
     }
 
     public VertexLabel withoutOuterNamespace() {
+        List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
+        return new VertexLabel(this.name, reducedNamespace);
+    }
+
+    public Optional<String> getOuterNamespace() {
         try {
-            List<String> reducedNamespace = namespace.subList(0, namespace.size() - 1);
-            return new VertexLabel(this.name, reducedNamespace);
-        } catch (IndexOutOfBoundsException e) {
-            throw new VertexLabelException("There is no namespace to remove", e);
+            return Optional.of(namespace.get(namespace.size() - 1));
+        } catch(IndexOutOfBoundsException e) {
+            return Optional.empty();
         }
+    }
+
+    public String getUnqualifiedName() {
+        return name;
     }
 
     @Override
@@ -55,13 +63,5 @@ public class VertexLabel {
     public int hashCode() {
 
         return Objects.hash(name, namespace);
-    }
-
-    public Optional<String> getOuterNamespace() {
-        try {
-            return Optional.of(namespace.get(namespace.size() - 1));
-        } catch(IndexOutOfBoundsException e) {
-            return Optional.empty();
-        }
     }
 }
