@@ -1,12 +1,5 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
-import static java.util.stream.Collectors.toMap;
-
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -14,6 +7,15 @@ import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
+import org.nd4j.linalg.util.ArrayUtil;
+
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
+
+import static java.util.stream.Collectors.toMap;
 
 public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> {
 
@@ -21,6 +23,22 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
 
     public static <T> CategoricalVertex<T> of(Map<T, Double> selectableValues) {
         return new CategoricalVertex<>(defensiveCopy(selectableValues));
+    }
+
+    public static <T> CategoricalVertex<T> of(DirichletVertex vertex, List<T> categories) {
+        final int length = ArrayUtil.prod(vertex.getShape());
+        if (length != categories.size()) {
+            throw new IllegalArgumentException("Categories must have length of vertex's size");
+        }
+
+        final int categoriesCount = categories.size();
+
+        return new CategoricalVertex<>(IntStream.range(0, categoriesCount).boxed().collect(toMap(categories::get, i -> new TakeVertex(vertex, 0, i))));
+    }
+
+    public static CategoricalVertex<Integer> of(DirichletVertex vertex) {
+        final int categoriseCount = ArrayUtil.prod(vertex.getShape());
+        return CategoricalVertex.of(vertex, IntStream.range(0, categoriseCount).boxed().collect(Collectors.toList()));
     }
 
     private static <T> Map<T, DoubleVertex> defensiveCopy(Map<T, Double> selectableValues) {
