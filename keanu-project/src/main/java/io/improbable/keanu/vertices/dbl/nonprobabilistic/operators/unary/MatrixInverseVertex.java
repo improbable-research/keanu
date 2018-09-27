@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -26,7 +27,17 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        DoubleTensor parentValue = getValue();
+        DoubleTensor negativeValue = getValue().unaryMinus();
+
+        PartialDerivatives newPartials =
+            PartialDerivatives.matrixMultiplyAlongWrtDimensions(derivativeOfOutputsWithRespectToSelf, negativeValue, false);
+        newPartials = PartialDerivatives.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
+
+        partials.put(inputVertex, newPartials);
+
+        return partials;
     }
 
     private static int[] checkInputIsSquareMatrix(int[] shape) {
