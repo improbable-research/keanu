@@ -14,6 +14,8 @@ import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.NetworkSamples;
+import io.improbable.keanu.algorithms.mcmc.proposal.GaussianProposalDistribution;
+import io.improbable.keanu.algorithms.mcmc.proposal.ProposalDistribution;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -165,6 +167,40 @@ public class MetropolisHastingsTest {
         double postProbTrue = posteriorSamples.get(A).probability(v -> v.scalar());
 
         assertEquals(0.0, postProbTrue, 0.01);
+    }
+
+    @Test
+    public void youCanUseAGaussianProposal() {
+
+        DoubleVertex A = new GaussianVertex(20.0, 1.0);
+        DoubleVertex B = new GaussianVertex(20.0, 1.0);
+
+        A.setValue(20.0);
+        B.setValue(20.0);
+
+        DoubleVertex Cobserved = new GaussianVertex(A.plus(B), 1.0);
+
+        Cobserved.observe(46.0);
+
+        BayesianNetwork bayesNet = new BayesianNetwork(Arrays.asList(A, B, Cobserved));
+        bayesNet.probeForNonZeroProbability(100);
+
+        ProposalDistribution proposalDistribution = new GaussianProposalDistribution(DoubleTensor.scalar(1.));
+        MetropolisHastings metropolisHastings = MetropolisHastings.builder()
+            .proposalDistribution(proposalDistribution)
+            .build();
+
+        NetworkSamples posteriorSamples =  metropolisHastings.getPosteriorSamples(
+            bayesNet,
+            Arrays.asList(A, B),
+            10000
+        );
+
+        double averagePosteriorA = posteriorSamples.getDoubleTensorSamples(A).getAverages().scalar();
+        double averagePosteriorB = posteriorSamples.getDoubleTensorSamples(B).getAverages().scalar();
+
+        double actual = averagePosteriorA + averagePosteriorB;
+        assertEquals(44.0, actual, 0.1);
     }
 
     @Test
