@@ -40,16 +40,7 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     public static CategoricalVertex<Integer> of(DirichletVertex vertex) {
-        final long categoriesCountLong = TensorShape.getLength(vertex.getShape());
-
-        // This should never happen in practice, but the number of categories must be an int
-        // as they get stored in a Collection, which can only have the size of an int.
-        if (categoriesCountLong > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Number of categories cannot exceed size of an integer");
-        }
-
-        // We cast to an int so we can expose a more predictable key type (Integer)
-        final int categoriesCount = (int) categoriesCountLong;
+        final int categoriesCount = Math.toIntExact(TensorShape.getLength(vertex.getShape()));
         final IntStream categories = IntStream.range(0, categoriesCount);
         final List<Integer> categoriesList = categories.boxed().collect(Collectors.toList());
         return CategoricalVertex.of(vertex, categoriesList);
