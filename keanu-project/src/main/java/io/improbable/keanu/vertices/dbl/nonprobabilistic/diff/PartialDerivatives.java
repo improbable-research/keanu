@@ -104,35 +104,6 @@ public class PartialDerivatives {
         derivativeWithRespectTo.put(id, value);
     }
 
-    /**
-     * This will sum partial derivatives that are represented as tensors over given dimensions.
-     *
-     * @param summingAllOfDimensions If True, this means we're summing all of the Of dimensions.
-     *                               In this case, we drop the summed over dimensions from the shape and replace them
-     *                               with a 1x1 (as the Ofs can't disappear completely)
-     * @param overDimensions         The dimensions to sum over. Dimensions are counted from zero
-     * @return The summed partial derivatives over given dimensions
-     */
-    public PartialDerivatives sum(boolean summingAllOfDimensions, int... overDimensions) {
-        Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
-
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
-            VertexId k = entry.getKey();
-            DoubleTensor v = entry.getValue();
-            DoubleTensor reshapedV = v.sum(overDimensions);
-            if (summingAllOfDimensions) {
-                int[] newShape = TensorShape.concat(new int[]{1, 1}, reshapedV.getShape());
-                reshapedV = reshapedV.reshape(newShape);
-            } else {
-                reshapedV = reshapedV.reshape(onesToShape(v.getShape(), overDimensions));
-            }
-
-            summed.put(k, reshapedV);
-        }
-
-        return new PartialDerivatives(summed);
-    }
-
     public PartialDerivatives sumOverOfDimensions(int... ofDimensions) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
@@ -391,7 +362,6 @@ public class PartialDerivatives {
             VertexId k = entry.getKey();
             DoubleTensor partial = entry.getValue();
 
-            //Is this broken too?
             DoubleTensor v = partial.div(increaseRankByAppendingOnesToShape(divisor, partial.getRank()));
             divided.put(k, v);
         }
