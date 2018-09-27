@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardModeGradient;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorsAndScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
@@ -89,7 +88,6 @@ public class AdditionVertexTest {
         DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex C = A.plus(B);
 
-        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10);
-        finiteDifferenceMatchesForwardModeGradient(ImmutableList.of(A, B), C, 10.0, 1e-10);
+        finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10, true);
     }
 }

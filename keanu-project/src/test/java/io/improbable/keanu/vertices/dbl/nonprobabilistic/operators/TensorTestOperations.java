@@ -1,9 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.number.IsCloseTo.closeTo;
-
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -17,78 +15,53 @@ public class TensorTestOperations {
     public static void finiteDifferenceMatchesGradient(List<DoubleVertex> inputVertices,
                                                        DoubleVertex outputVertex,
                                                        final double incrementAmount,
-                                                       final double delta,
+                                                       final Double delta,
                                                        final boolean doReverse) {
-
-        finiteDifferenceMatchesForwardModeGradient(inputVertices, outputVertex, incrementAmount, delta);
-        if (doReverse) {
-            finiteDifferenceMatchesReverseModeGradient(inputVertices, outputVertex, incrementAmount, delta);
-        }
-    }
-
-    public static void finiteDifferenceMatchesForwardModeGradient(List<DoubleVertex> inputVertices,
-                                                                  DoubleVertex outputVertex,
-                                                                  final double incrementAmount,
-                                                                  final double delta) {
-        inputVertices.forEach(v ->
-            runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, true));
-    }
-
-    public static void finiteDifferenceMatchesReverseModeGradient(List<DoubleVertex> inputVertices,
-                                                                  DoubleVertex outputVertex,
-                                                                  final double incrementAmount,
-                                                                  final double delta) {
-        inputVertices.forEach(v ->
-            runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, false));
+        inputVertices.forEach(v -> runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, doReverse));
     }
 
     private static void runGradientTestOnSingleInput(DoubleVertex inputVertex,
                                                      DoubleVertex outputVertex,
                                                      final double incrementAmount,
                                                      final Double delta,
-                                                     final boolean forwardMode) {
-
+                                                     final boolean doReverse) {
         DoubleTensor initialInput = inputVertex.getValue();
+
         DoubleTensor initialOutput = outputVertex.eval();
-        DoubleTensor outputWrtInput = dOutputWrtInput(outputVertex, inputVertex, forwardMode);
+        DoubleTensor outputWrtInputForward =
+            outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
 
-        long inputLength = TensorShape.getLength(inputVertex.getShape());
-        int[] inputStride = TensorShape.getRowFirstStride(inputVertex.getShape());
+        if (doReverse) {
+            DoubleTensor outputWrtInputReverse =
+                Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+            assertThat(outputWrtInputForward, allCloseTo(delta, outputWrtInputReverse));
+        }
 
-        long outputLength = TensorShape.getLength(outputVertex.getShape());
-        int[] outputStride = TensorShape.getRowFirstStride(outputVertex.getShape());
+        int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
 
-        for (int i = 0; i < inputLength; i++) {
-
-            int[] inputIndex = TensorShape.getShapeIndices(inputVertex.getShape(), inputStride, i);
+        for (int i = 0; i < TensorShape.getLength(inputVertex.getShape()); i++) {
             DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
-            incrementTensor.setValue(incrementAmount, inputIndex);
-
+            incrementTensor.getFlattenedView().set(i, incrementAmount);
             inputVertex.setValue(initialInput.plus(incrementTensor));
 
             DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
-
-            for (int j = 0; j < outputLength; j++) {
-
-                int[] outputIndex = TensorShape.getShapeIndices(outputVertex.getShape(), outputStride, j);
-
-                Double dOutputAtIndexWrtInputAtIndex = outputWrtInput.getValue(TensorShape.concat(outputIndex, inputIndex));
-                Double diffAtOutputIndexByGradient = dOutputAtIndexWrtInputAtIndex * incrementAmount;
-                Double diffAtOutputIndex = differenceInOutput.getValue(outputIndex);
-
-                assertThat(diffAtOutputIndexByGradient, closeTo(diffAtOutputIndex, delta));
-            }
+            DoubleTensor differenceUsingGradient = outputWrtInputForward.times(incrementTensor).sum(dimensionsToSumOver);
+            assertThat(differenceUsingGradient, allCloseTo(delta, differenceInOutput));
         }
     }
 
-    private static DoubleTensor dOutputWrtInput(DoubleVertex outputVertex, DoubleVertex inputVertex, boolean forwardMode) {
+    private static int[] getWrtDimensions(DoubleVertex wrtVertex,
+                                          DoubleVertex ofVertex) {
+        int wrtRank = wrtVertex.getShape().length;
+        int ofRank = ofVertex.getShape().length;
+        int[] wrtDimensions = new int[wrtRank];
 
-        if (forwardMode) {
-            return outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-        } else {
-            return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+        for (int i = 0; i < wrtRank; i++) {
+            wrtDimensions[i] = ofRank + i;
         }
+
+        return wrtDimensions;
     }
 
 }
