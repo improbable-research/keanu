@@ -11,11 +11,10 @@ import org.junit.Test;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradient;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class TensorflowGraphConverterTest {
@@ -128,8 +127,12 @@ public class TensorflowGraphConverterTest {
 
         double expectedLogProb = network.getLogOfMasterP();
 
-        Map<VertexId, DoubleTensor> keanuGradients = LogProbGradient
-            .getJointLogProbGradientWrtLatents(Probabilistic.keepOnlyProbabilisticVertices(network.getLatentOrObservedVertices()));
+        LogProbGradientCalculator calculator = new LogProbGradientCalculator(
+            network.getLatentOrObservedVertices(),
+            network.getContinuousLatentVertices()
+        );
+
+        Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
 
         try (ProbabilisticGraph graph = TensorflowGraphConverter.convert(network)) {
 

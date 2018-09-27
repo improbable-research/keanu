@@ -13,6 +13,7 @@ import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
 
 import org.tensorflow.DataType;
+import org.tensorflow.Operation;
 import org.tensorflow.Output;
 import org.tensorflow.Shape;
 import org.tensorflow.Tensor;
@@ -29,12 +30,18 @@ public class GraphBuilder {
     }
 
     public <T> Output<T> getOutput(String name) {
-        return scope.graph().operation(name).output(0);
+
+        Operation operation = scope.graph().operation(name);
+        if (operation == null) {
+            return null;
+        }
+        return operation.output(0);
     }
 
     public enum OpType {
         CONSTANT("Const"),
         PLACE_HOLDER("Placeholder"),
+        NO_OP("NoOp"),
         DIVIDE("Div"),
         MULTIPLY("Mul"),
         SUBTRACT("Sub"),

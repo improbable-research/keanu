@@ -5,11 +5,12 @@ import static io.improbable.keanu.backend.ProbabilisticGraph.LOG_PROB;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.function.BiConsumer;
+import java.util.stream.Collectors;
 
 import org.tensorflow.Graph;
 import org.tensorflow.Output;
@@ -20,10 +21,8 @@ import org.tensorflow.op.Scope;
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
@@ -39,7 +38,11 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class TensorflowGraphConverter {
 
-    private static Map<Class<?>, BiConsumer<Vertex<?>, GraphBuilder>> opMappers;
+    interface OpMapper {
+        Output<?> apply(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder);
+    }
+
+    private static Map<Class<?>, OpMapper> opMappers;
 
     static {
         opMappers = new HashMap<>();
@@ -57,52 +60,52 @@ public class TensorflowGraphConverter {
         opMappers.put(SumVertex.class, TensorflowGraphConverter::createSum);
     }
 
-    private static void createSum(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createUnaryOp(vertex, graphBuilder, graphBuilder::reduceSum);
+    private static Output<?> createSum(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createUnaryOp(vertex, lookup, graphBuilder::reduceSum);
     }
 
-    private static void createLog(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createUnaryOp(vertex, graphBuilder, graphBuilder::log);
+    private static Output<?> createLog(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createUnaryOp(vertex, lookup, graphBuilder::log);
     }
 
-    private static void createAddition(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createBinaryOp(vertex, graphBuilder, graphBuilder::add);
+    private static Output<?> createAddition(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createBinaryOp(vertex, lookup, graphBuilder::add);
     }
 
-    private static void createSubtraction(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createBinaryOp(vertex, graphBuilder, graphBuilder::sub);
+    private static Output<?> createSubtraction(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createBinaryOp(vertex, lookup, graphBuilder::sub);
     }
 
-    private static void createMultiplication(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createBinaryOp(vertex, graphBuilder, graphBuilder::mul);
+    private static Output<?> createMultiplication(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createBinaryOp(vertex, lookup, graphBuilder::mul);
     }
 
-    private static void createDivision(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createBinaryOp(vertex, graphBuilder, graphBuilder::div);
+    private static Output<?> createDivision(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createBinaryOp(vertex, lookup, graphBuilder::div);
     }
 
-    private static void createMatrixMultiplication(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createBinaryOp(vertex, graphBuilder, graphBuilder::mmul);
+    private static Output<?> createMatrixMultiplication(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createBinaryOp(vertex, lookup, graphBuilder::mmul);
     }
 
-    private static void createPow(Vertex<?> vertex, GraphBuilder graphBuilder) {
-        createBinaryOp(vertex, graphBuilder, graphBuilder::pow);
+    private static Output<?> createPow(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        return createBinaryOp(vertex, lookup, graphBuilder::pow);
     }
 
-    private static void createDoubleConstant(Vertex<?> vertex, GraphBuilder graphBuilder) {
+    private static Output<Double> createDoubleConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
 
         if (value instanceof DoubleTensor) {
             DoubleTensor doubleValue = (DoubleTensor) value;
-            graphBuilder.constant(doubleValue.asFlatDoubleArray(), toLongs(doubleValue.getShape()), getTensorflowOpName(vertex));
+            return graphBuilder.constant(doubleValue.asFlatDoubleArray(), toLongs(doubleValue.getShape()), getTensorflowOpName(vertex));
         } else {
             throw new IllegalArgumentException("Can only convert doubles at the moment");
         }
 
     }
 
-    private static String createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
+    private static Output<?> createPlaceholder(Vertex<?> vertex, GraphBuilder graphBuilder) {
 
         Object value = vertex.getValue();
 
@@ -111,9 +114,7 @@ public class TensorflowGraphConverter {
             int[] shape = ((DoubleTensor) value).getShape();
             String tensorflowOpName = getTensorflowOpName(vertex);
 
-            graphBuilder.placeholder(tensorflowOpName, toShape(shape), Double.class);
-
-            return tensorflowOpName;
+            return graphBuilder.placeholder(tensorflowOpName, toShape(shape), Double.class);
         }
 
         throw new IllegalArgumentException("Can only convert doubles at the moment");
@@ -128,24 +129,26 @@ public class TensorflowGraphConverter {
     }
 
     interface GraphBuilderUnaryOp {
-        void op(Output<Double> operand, String name);
+        Output<?> apply(Output<Double> operand, String name);
     }
 
-    private static void createUnaryOp(Vertex<?> vertex, GraphBuilder graphBuilder, GraphBuilderUnaryOp op) {
+    private static Output<?> createUnaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderUnaryOp op) {
         DoubleUnaryOpVertex unaryOpVertex = (DoubleUnaryOpVertex) vertex;
-        Output<Double> operand = graphBuilder.getOutput(getTensorflowOpName(unaryOpVertex.getInputVertex()));
-        op.op(operand, getTensorflowOpName(unaryOpVertex));
+
+        Output<Double> operand = (Output<Double>) lookup.get(unaryOpVertex.getInputVertex());
+
+        return op.apply(operand, getTensorflowOpName(unaryOpVertex));
     }
 
     interface GraphBuilderBinaryOp {
-        void op(Output<Double> leftOperand, Output<Double> rightOperand, String name);
+        Output<?> apply(Output<Double> leftOperand, Output<Double> rightOperand, String name);
     }
 
-    private static void createBinaryOp(Vertex<?> vertex, GraphBuilder graphBuilder, GraphBuilderBinaryOp op) {
+    private static Output<?> createBinaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderBinaryOp op) {
         DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
-        Output<Double> leftOperand = graphBuilder.getOutput(getTensorflowOpName(binaryOpVertex.getLeft()));
-        Output<Double> rightOperand = graphBuilder.getOutput(getTensorflowOpName(binaryOpVertex.getRight()));
-        op.op(leftOperand, rightOperand, getTensorflowOpName(binaryOpVertex));
+        Output<Double> leftOperand = (Output<Double>) lookup.get(binaryOpVertex.getLeft());
+        Output<Double> rightOperand = (Output<Double>) lookup.get(binaryOpVertex.getRight());
+        return op.apply(leftOperand, rightOperand, getTensorflowOpName(binaryOpVertex));
     }
 
     private static long[] toLongs(int[] ints) {
@@ -164,7 +167,7 @@ public class TensorflowGraphConverter {
 
     public static ProbabilisticGraph convert(BayesianNetwork network) {
 
-        addLogProb(network);
+//        addLogProb(network);
 
         Graph graph = new Graph();
         Scope scope = new Scope(graph);
@@ -174,25 +177,42 @@ public class TensorflowGraphConverter {
         PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(queuedAlready);
 
+        Map<Vertex<?>, Output<?>> lookup = new HashMap<>();
         List<String> placeHolderOps = new ArrayList<>();
+        List<Output<Double>> logProbOps = new ArrayList<>();
+
         Vertex visiting;
         while ((visiting = priorityQueue.poll()) != null) {
 
-            if (visiting instanceof Probabilistic) {
+            if (visiting instanceof GaussianVertex) {
                 if (visiting.isObserved()) {
-                    createDoubleConstant(visiting, graphBuilder);
+                    lookup.put(visiting, createDoubleConstant(visiting, lookup, graphBuilder));
                 } else {
-                    placeHolderOps.add(createPlaceholder(visiting, graphBuilder));
+                    Output<?> tfVisiting = createPlaceholder(visiting, graphBuilder);
+                    lookup.put(visiting, tfVisiting);
+                    placeHolderOps.add(tfVisiting.op().name());
                 }
+
+                Output<Double> logProbFromVisiting = addLogProbFrom((GaussianVertex) visiting, lookup, graphBuilder);
+                logProbOps.add(logProbFromVisiting);
+
             } else {
-                BiConsumer<Vertex<?>, GraphBuilder> vertexMapper = opMappers.get(visiting.getClass());
+                OpMapper vertexMapper = opMappers.get(visiting.getClass());
 
                 if (vertexMapper == null) {
                     throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported");
                 }
 
-                vertexMapper.accept(visiting, graphBuilder);
+                lookup.put(visiting, vertexMapper.apply(visiting, lookup, graphBuilder));
             }
+        }
+
+        Output<Double> totalLogProb = logProbOps.get(0);
+        for (int i = 1; i < logProbOps.size(); i++) {
+
+            Output<Double> logProbContrib = logProbOps.get(i);
+            String name = i == logProbOps.size() - 1 ? LOG_PROB : "logProb" + i;
+            totalLogProb = graphBuilder.add(totalLogProb, logProbContrib, name);
         }
 
         Map<String, Output<?>> gradientByInput = addGradients(graph, placeHolderOps);
@@ -204,34 +224,67 @@ public class TensorflowGraphConverter {
         );
     }
 
-    private static void addLogProb(BayesianNetwork network) {
+    private static Output<Double> addLogProbFrom(GaussianVertex vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
 
-        List<Vertex> latentOrObservedVertices = network.getLatentOrObservedVertices();
+        LogProbGraph logProbGraph = vertex.logProbGraph();
+        Map<Vertex<?>, Vertex<?>> inputs = logProbGraph.getInputs();
 
-        DoubleVertex logProb = null;
-        for (Vertex v : latentOrObservedVertices) {
+        //setup graph connection
+        for (Map.Entry<Vertex<?>, Vertex<?>> input : inputs.entrySet()) {
+            lookup.put(input.getValue(), lookup.get(input.getKey()));
+        }
 
-            if (v instanceof Probabilistic) {
-                if (v instanceof GaussianVertex) {
-                    GaussianVertex gaussianVertex = ((GaussianVertex) v);
+        List<Vertex<?>> topoSortedVertices = ((Set<Vertex<?>>) logProbGraph.getLogProbOutput().getConnectedGraph()).stream()
+            .sorted(Comparator.comparing(Vertex::getId))
+            .collect(Collectors.toList());
 
-                    DoubleVertex logProbGraph = gaussianVertex.logProbGraph(gaussianVertex);
+        HashSet<Vertex<?>> logProbInputs = new HashSet<>(inputs.values());
 
-                    if (logProb == null) {
-                        logProb = logProbGraph;
-                    } else {
-                        logProb = logProb.plus(logProbGraph);
-                    }
-                } else {
-                    throw new IllegalArgumentException("Only supports log prob of Gaussian distributions");
+        for (Vertex<?> visiting : topoSortedVertices) {
+
+            if (!logProbInputs.contains(visiting)) {
+
+                OpMapper vertexMapper = opMappers.get(visiting.getClass());
+
+                if (vertexMapper == null) {
+                    throw new IllegalArgumentException("Vertex type " + visiting.getClass() + " not supported");
                 }
+
+                lookup.put(visiting, vertexMapper.apply(visiting, lookup, graphBuilder));
             }
         }
 
-        if (logProb != null) {
-            logProb.setLabel(new VertexLabel(LOG_PROB));
-        }
+        return (Output<Double>) lookup.get(logProbGraph.getLogProbOutput());
     }
+
+//    private static void addLogProb(BayesianNetwork network) {
+//
+//        List<Vertex> latentOrObservedVertices = network.getLatentOrObservedVertices();
+//
+//        DoubleVertex logProb = null;
+//        for (Vertex v : latentOrObservedVertices) {
+//
+//            if (v instanceof Probabilistic) {
+//                if (v instanceof GaussianVertex) {
+//                    GaussianVertex gaussianVertex = ((GaussianVertex) v);
+//
+//                    DoubleVertex logProbGraph = gaussianVertex.logProbGraph(gaussianVertex);
+//
+//                    if (logProb == null) {
+//                        logProb = logProbGraph;
+//                    } else {
+//                        logProb = logProb.plus(logProbGraph);
+//                    }
+//                } else {
+//                    throw new IllegalArgumentException("Only supports log prob of Gaussian distributions");
+//                }
+//            }
+//        }
+//
+//        if (logProb != null) {
+//            logProb.setLabel(new VertexLabel(LOG_PROB));
+//        }
+//    }
 
     private static Map<String, Output<?>> addGradients(Graph graph, List<String> placeHolderOps) {
 

@@ -13,6 +13,7 @@ import java.util.Set;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -90,13 +91,22 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
         return logPdfs.sum();
     }
 
-    public DoubleVertex logProbGraph(DoubleVertex x) {
+    public LogProbGraph logProbGraph() {
 
-        final DoubleVertex lnSigma = sigma.log();
-        final DoubleVertex xMinusMuSquared = x.minus(mu).pow(2);
-        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigma.pow(2).times(2.0));
+        final ConstantDoubleVertex xInput = new ConstantDoubleVertex(0);
+        final ConstantDoubleVertex muInput = new ConstantDoubleVertex(0);
+        final ConstantDoubleVertex sigmaInput = new ConstantDoubleVertex(0);
 
-        return xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
+        final DoubleVertex lnSigma = sigmaInput.log();
+        final DoubleVertex xMinusMuSquared = xInput.minus(muInput).pow(2);
+        final DoubleVertex xMinusMuSquaredOver2Variance = xMinusMuSquared.div(sigmaInput.pow(2).times(2.0));
+
+        final DoubleVertex logProbOutput = xMinusMuSquaredOver2Variance.plus(lnSigma).plus(Gaussian.LN_SQRT_2PI).unaryMinus().sum();
+
+        return new LogProbGraph(logProbOutput)
+            .addInput(this, xInput)
+            .addInput(mu, muInput)
+            .addInput(sigma, sigmaInput);
     }
 
     @Override
