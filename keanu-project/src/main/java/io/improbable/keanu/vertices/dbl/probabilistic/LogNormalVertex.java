@@ -22,7 +22,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    private final LogNormal distribution;
+    private LogNormal logNormal;
 
     /**
      * One mu or s or both driving an arbitrarily shaped tensor of LogNormal
@@ -39,7 +39,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
 
         this.mu = mu;
         this.sigma = sigma;
-        this.distribution = LogNormal.withParameters(mu, sigma);
+        this.logNormal = LogNormal.withParameters(this, mu, sigma);
         setParents(mu, sigma);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
@@ -74,13 +74,17 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
 
     @Override
     public double logProb(DoubleTensor value) {
-        DoubleTensor logPdfs = distribution.logProb(value);
+        DoubleTensor muValues = mu.getValue();
+        DoubleTensor sigmaValues = sigma.getValue();
+
+        DoubleTensor logPdfs = logNormal.logProb(value);
+
         return logPdfs.sum();
     }
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = distribution.dLogProb(value);
+        Diffs dlnP = logNormal.dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
@@ -101,6 +105,6 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return distribution.sample(getShape(), random);
+        return logNormal.sample(getShape(), random);
     }
 }

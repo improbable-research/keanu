@@ -63,6 +63,7 @@ public class KDEApproximationTest {
 
         DoubleTensor x = DoubleTensor.linspace(-3., 3., 100);
         DoubleTensor gaussianLogPdf = Gaussian.withParameters(
+            ConstantVertex.of(x),
             ConstantVertex.of(mu),
             ConstantVertex.of(sigma)
         ).logProb(x);
@@ -85,6 +86,7 @@ public class KDEApproximationTest {
 
         DoubleTensor xTensor = DoubleTensor.linspace(-1. + mu, 1. + mu, 10);
         Diffs diffLog = Gaussian.withParameters(
+            ConstantVertex.of(xTensor),
             ConstantVertex.of(mu),
             ConstantVertex.of(sigma)
         ).dLogProb(xTensor);

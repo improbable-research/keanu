@@ -13,6 +13,7 @@ import java.util.Set;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -40,7 +41,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
         this.mu = mu;
         this.sigma = sigma;
-        distribution = Gaussian.withParameters(mu, sigma);
+        distribution = Gaussian.withParameters(this, mu, sigma);
         setParents(mu, sigma);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
@@ -83,10 +84,11 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
     @Override
     public double logProb(DoubleTensor value) {
+        return distribution.logProb(value).sum();
+    }
 
-        DoubleTensor logPdfs = distribution.logProb(value);
-
-        return logPdfs.sum();
+    public LogProbGraph logProbGraph() {
+        return distribution.logProbGraph();
     }
 
     @Override
