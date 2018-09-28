@@ -1,6 +1,5 @@
 package io.improbable.keanu.model;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -15,18 +14,15 @@ public class LinearRegression implements LinearModel {
 
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SIGMA = 2.0;
-    private static final VertexLabel WEIGHTS_LABEL = new VertexLabel("weights");
     private static final VertexLabel INTERCEPT_LABEL = new VertexLabel("intercept");
-    private static final VertexLabel Y_OBSERVATION_LABEL = new VertexLabel("y");
 
-    private final DoubleTensor x;
-    private final DoubleTensor y;
     private final double priorOnSigma;
     private final double priorOnMu;
     private final double[] priorOnSigmaForWeights;
 
     private BayesianNetwork net;
-    private boolean isFit = false;
+    private DoubleTensor x;
+    private DoubleTensor y;
 
     public LinearRegression(DoubleTensor x, DoubleTensor y) {
         this(x, y, DEFAULT_MU, DEFAULT_SIGMA);
@@ -54,38 +50,15 @@ public class LinearRegression implements LinearModel {
     @Override
     public BayesianNetwork construct() {
         int numberOfFeatures = x.getShape()[0];
-        int[] shapeOfWeights = new int[]{1, numberOfFeatures};
-        DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).reshape(shapeOfWeights).setLabel(WEIGHTS_LABEL);
+        int[] weightShape = new int[]{1, numberOfFeatures};
+        DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).reshape(weightShape).setLabel(WEIGHTS_LABEL);
         DoubleVertex intercept = new GaussianVertex(priorOnMu, priorOnSigma).setLabel(INTERCEPT_LABEL);
-        DoubleVertex xMu = weights.getValue().isScalar() ? weights.times(ConstantVertex.of(x)) : weights.matrixMultiply(ConstantVertex.of(x));
-        DoubleVertex yVertex = new GaussianVertex(xMu.plus(intercept), priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
-        return new BayesianNetwork(yVertex.getConnectedGraph());
-    }
-
-    @Override
-    public LinearRegression fit() {
-        return fit(y);
-    }
-
-    public LinearRegression fit(Tensor y) {
-        net.getVertexByLabel(Y_OBSERVATION_LABEL).observe(y);
-        GradientOptimizer optimizer = GradientOptimizer.of(net);
-        optimizer.maxAPosteriori();
-        isFit = true;
-        return this;
-    }
-
-    @Override
-    public DoubleTensor predict(DoubleTensor x) {
-        if (isFit) {
-            DoubleVertex weights = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
-            DoubleVertex intercept = (DoubleVertex) net.getVertexByLabel(INTERCEPT_LABEL);
-            return weights.getValue().isScalar() ?
-                weights.times(ConstantVertex.of(x)).plus(intercept).getValue() :
-                weights.matrixMultiply(ConstantVertex.of(x)).plus(intercept).getValue();
-        } else {
-            throw new RuntimeException("The model must be fit before attempting to predict.");
-        }
+        DoubleVertex xVertex = ConstantVertex.of(x).setLabel(X_LABEL);
+        DoubleVertex yVertex = weights.getValue().isScalar() ?
+            weights.times(xVertex).plus(intercept).setLabel(Y_LABEL) :
+            weights.matrixMultiply(xVertex).plus(intercept).setLabel(Y_LABEL);
+        DoubleVertex yVertexProbabilistic = new GaussianVertex(yVertex, priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
+        return new BayesianNetwork(yVertexProbabilistic.getConnectedGraph());
     }
 
     public DoubleVertex getWeights() {

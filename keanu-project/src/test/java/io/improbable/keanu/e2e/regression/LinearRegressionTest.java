@@ -196,7 +196,7 @@ public class LinearRegressionTest {
         DoubleVertex yGenerator = new GaussianVertex(yGeneratorMu, 1.0);
         DoubleTensor yData = yGenerator.sample(random);
 
-        LinearRegression regression = new LinearRegression(DoubleTensor.concat(0, xData),  yData);
+        LinearRegression regression = new LinearRegression(DoubleTensor.concat(0, xData), yData);
         regression.fit();
 
         for (int i = 0; i < featureCount; i++) {

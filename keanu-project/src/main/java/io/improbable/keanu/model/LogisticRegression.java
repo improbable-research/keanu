@@ -1,43 +1,46 @@
 package io.improbable.keanu.model;
 
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 
 public class LogisticRegression implements LinearModel {
 
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SIGMA = 2.0;
     private static final double DEFAULT_REGULARIZATION = 1;
-    private static final VertexLabel WEIGHTS_LABEL = new VertexLabel("weights");
-    private static final VertexLabel Y_OBSERVATION_LABEL = new VertexLabel("y");
 
-    private final DoubleTensor y;
     private final double priorSigma;
     private final double regularization;
     private final LinearRegression regression;
     private final BayesianNetwork net;
 
-    public LogisticRegression(DoubleTensor x, DoubleTensor y, double regularization, double priorMu, double priorSigma) {
-        this.y = y;
+    public LogisticRegression(DoubleTensor x, BooleanTensor y, double regularization, double priorMu, double priorSigma) {
         this.priorSigma = priorSigma;
         this.regularization = regularization;
-        this.regression = new LinearRegression(x, y, priorMu, priorSigma, regularizeSigma(x));
+        this.regression = new LinearRegression(x, y.toDoubleMask(), priorMu, priorSigma, regularizeSigma(x));
         this.net = construct();
         this.regression.setNet(net);
     }
 
-    public LogisticRegression(DoubleTensor x, DoubleTensor y) {
+    public LogisticRegression(DoubleTensor x, BooleanTensor y) {
         this(x, y, DEFAULT_REGULARIZATION, DEFAULT_MU, DEFAULT_SIGMA);
     }
 
-    public LogisticRegression(DoubleTensor x, DoubleTensor y, double regularization) {
+    public LogisticRegression(DoubleTensor x, BooleanTensor y, double regularization) {
         this(x, y, regularization, DEFAULT_MU, DEFAULT_SIGMA);
     }
 
-    public LogisticRegression(DoubleTensor x, DoubleTensor y, double priorMu, double priorSigma) {
+    public LogisticRegression(DoubleTensor x, BooleanTensor y, double priorMu, double priorSigma) {
         this(x, y, DEFAULT_REGULARIZATION, priorMu, priorSigma);
     }
 
@@ -45,10 +48,10 @@ public class LogisticRegression implements LinearModel {
     public BayesianNetwork construct() {
         BayesianNetwork linearNetwork = regression.getNet();
         DoubleVertex probabilities = (DoubleVertex) linearNetwork.getVertexByLabel(Y_OBSERVATION_LABEL).removeLabel();
-        DoubleVertex yVertex = probabilities.sigmoid();
-        BernoulliVertex outcomes = new BernoulliVertex(yVertex);
-        outcomes.setLabel(Y_OBSERVATION_LABEL);
-        return new BayesianNetwork(outcomes.getConnectedGraph());
+        DoubleVertex sigmoid = probabilities.sigmoid();
+        BernoulliVertex outcome = new BernoulliVertex(sigmoid);
+        outcome.setLabel(Y_OBSERVATION_LABEL);
+        return new BayesianNetwork(probabilities.getConnectedGraph());
     }
 
     private double[] regularizeSigma(DoubleTensor x) {
@@ -62,14 +65,13 @@ public class LogisticRegression implements LinearModel {
     }
 
     @Override
-    public LogisticRegression fit() {
-        regression.fit(y.greaterThan(0.5));
-        return this;
+    public BayesianNetwork getNet() {
+        return net;
     }
 
     @Override
-    public DoubleTensor predict(DoubleTensor x) {
-        return regression.predict(x).sigmoid();
+    public boolean isFit() {
+        return true;
     }
 
     public DoubleVertex getWeights() {
