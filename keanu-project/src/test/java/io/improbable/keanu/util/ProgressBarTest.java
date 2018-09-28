@@ -5,6 +5,9 @@ import static org.hamcrest.Matchers.containsString;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -21,19 +24,22 @@ import java.util.concurrent.atomic.AtomicReference;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 
 public class ProgressBarTest {
 
     private AtomicReference<Runnable> progressUpdateCall;
     private ProgressBar progressBar;
     private ByteArrayOutputStream byteArrayOutputStream;
+    private ScheduledExecutorService scheduler;
 
     @Before
     public void setup() throws UnsupportedEncodingException {
 
         byteArrayOutputStream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(byteArrayOutputStream, true, "UTF-8");
-        ScheduledExecutorService scheduler = mock(ScheduledExecutorService.class);
+        scheduler = mock(ScheduledExecutorService.class);
 
         progressUpdateCall = new AtomicReference<>(null);
 
@@ -140,4 +146,27 @@ public class ProgressBarTest {
         verifyNoMoreInteractions(finishHandler);
     }
 
+    @Test
+    public void youCanOverrideTheDefaultPrintStream() {
+        PrintStream mockStream = mock(PrintStream.class);
+        doAnswer(new Answer() {
+            @Override
+            public Object answer(InvocationOnMock invocation) throws Throwable {
+                System.out.println(invocation.getArgument(0).toString());
+                return null;
+            }
+        }).when(mockStream).print(anyString());
+
+        ProgressBar.setDefaultPrintStream(mockStream);
+        ProgressBar.enable();
+        ProgressBar progressBar = new ProgressBar(scheduler);
+        progressBar.progress();
+        progressBar.finish();
+        verify(mockStream, atLeastOnce()).print("\r|Keanu|");
+    }
+
+    @After
+    public void tearDown() throws Exception {
+        ProgressBar.setDefaultPrintStream(System.out);
+    }
 }

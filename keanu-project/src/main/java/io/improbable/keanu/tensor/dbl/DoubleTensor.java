@@ -149,6 +149,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor safeLogTimes(DoubleTensor y);
 
+    DoubleTensor logGamma();
+
+    DoubleTensor digamma();
+
     DoubleTensor sin();
 
     DoubleTensor cos();
@@ -237,6 +241,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor logInPlace();
 
     DoubleTensor safeLogTimesInPlace(DoubleTensor y);
+
+    DoubleTensor logGammaInPlace();
+
+    DoubleTensor digammaInPlace();
 
     DoubleTensor sinInPlace();
 

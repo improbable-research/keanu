@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.function.Function;
 
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.special.Gamma;
 import org.apache.commons.math3.util.FastMath;
 
 import io.improbable.keanu.tensor.Tensor;
@@ -39,7 +40,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
@@ -194,6 +195,16 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor safeLogTimes(DoubleTensor y) {
         return this.duplicate().safeLogTimesInPlace(y);
+    }
+
+    @Override
+    public DoubleTensor logGamma() {
+        return duplicate().logGammaInPlace();
+    }
+
+    @Override
+    public DoubleTensor digamma() {
+        return duplicate().digammaInPlace();
     }
 
     @Override
@@ -504,6 +515,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
      * This is identical to log().times(y), except that it changes NaN results to 0.
      * This is important when calculating 0log0, which should return 0
      * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
+     *
      * @param y The tensor value to multiply by
      * @return the log of this tensor multiplied by y
      */
@@ -513,6 +525,18 @@ public class ScalarDoubleTensor implements DoubleTensor {
         TensorValidator.NAN_CATCHER.validate(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);
         return TensorValidator.NAN_FIXER.validate(result);
+    }
+
+    @Override
+    public DoubleTensor logGammaInPlace() {
+        value = Gamma.logGamma(value);
+        return this;
+    }
+
+    @Override
+    public DoubleTensor digammaInPlace() {
+        value = Gamma.digamma(value);
+        return this;
     }
 
     @Override

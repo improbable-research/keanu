@@ -13,6 +13,7 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.math3.linear.Array2DRowRealMatrix;
 import org.apache.commons.math3.linear.LUDecomposition;
 import org.apache.commons.math3.linear.RealMatrix;
+import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.impl.transforms.ReplaceNans;
@@ -322,6 +323,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor logGamma() {
+        return duplicate().logGammaInPlace();
+    }
+
+    @Override
+    public DoubleTensor digamma() {
+        return duplicate().digammaInPlace();
+    }
+
+    @Override
     public DoubleTensor sin() {
         return duplicate().sinInPlace();
     }
@@ -497,6 +508,16 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         TensorValidator.NAN_CATCHER.validate(y);
         DoubleTensor result = this.logInPlace().timesInPlace(y);
         return TensorValidator.NAN_FIXER.validate(result);
+    }
+
+    @Override
+    public DoubleTensor logGammaInPlace() {
+        return applyInPlace(Gamma::logGamma);
+    }
+
+    @Override
+    public DoubleTensor digammaInPlace() {
+        return applyInPlace(Gamma::digamma);
     }
 
     @Override
@@ -1057,12 +1078,12 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor toDouble() {
-        return this;
+        return duplicate();
     }
 
     @Override
     public IntegerTensor toInteger() {
-        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, false));
+        return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, true));
     }
 
     private BooleanTensor fromMask(INDArray mask, int[] shape) {

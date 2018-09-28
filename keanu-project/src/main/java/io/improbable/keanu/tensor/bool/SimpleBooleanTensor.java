@@ -36,7 +36,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public SimpleBooleanTensor(boolean[] data, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -54,7 +54,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      */
     public SimpleBooleanTensor(int[] shape) {
         this.data = null;
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -65,7 +65,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public SimpleBooleanTensor(boolean constant, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);
-        this.shape = shape;
+        this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
@@ -229,7 +229,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public int[] getShape() {
-        return shape;
+        return Arrays.copyOf(shape, shape.length);
     }
 
     @Override
