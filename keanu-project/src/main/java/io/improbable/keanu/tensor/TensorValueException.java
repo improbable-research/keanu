@@ -2,10 +2,10 @@ package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 
-public class KeanuValueException extends RuntimeException {
+public class TensorValueException extends RuntimeException {
     private final BooleanTensor result;
 
-    public KeanuValueException(String message, BooleanTensor result) {
+    public TensorValueException(String message, BooleanTensor result) {
         super(message);
         this.result = result;
     }

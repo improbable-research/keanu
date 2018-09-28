@@ -50,7 +50,7 @@ public class TensorValidationTest {
         assertThat(containsZero, equalTo(expectedResult));
     }
 
-    @Test(expected = KeanuValueException.class)
+    @Test(expected = TensorValueException.class)
     public void byDefaultItThrowsIfValidationFails() {
         DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
         TensorValidator.ZERO_CATCHER.validate(containsZero);
@@ -64,8 +64,8 @@ public class TensorValidationTest {
         BooleanTensor expectedResult = BooleanTensor.create(new boolean[]{true, false, false});
         try {
             validator.validate(input);
-            throw new AssertionError("Expected it to throw KeanuValueException");
-        } catch(KeanuValueException e) {
+            throw new AssertionError("Expected it to throw TensorValueException");
+        } catch(TensorValueException e) {
             assertThat(e.getResult(), equalTo(expectedResult));
         }
     }

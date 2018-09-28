@@ -14,7 +14,7 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import io.improbable.keanu.tensor.KeanuValueException;
+import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
@@ -130,7 +130,7 @@ public class ScalarDoubleTensorTest {
 
     @Test
     public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
-        expectedException.expect(KeanuValueException.class);
+        expectedException.expect(TensorValueException.class);
         expectedException.expectMessage("Invalid value found");
 
         DoubleTensor x = DoubleTensor.scalar(1.);
@@ -140,7 +140,7 @@ public class ScalarDoubleTensorTest {
 
     @Test
     public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
-        expectedException.expect(KeanuValueException.class);
+        expectedException.expect(TensorValueException.class);
         expectedException.expectMessage("Invalid value found");
 
         DoubleTensor x = DoubleTensor.scalar(Double.NaN);

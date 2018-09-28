@@ -25,7 +25,7 @@ import com.google.common.collect.ImmutableMap;
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.distributions.discrete.Multinomial;
-import io.improbable.keanu.tensor.KeanuValueException;
+import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -45,7 +45,7 @@ public class MultinomialVertexTest {
         Multinomial.withParameters(n, p);
     }
 
-    @Test(expected = KeanuValueException.class)
+    @Test(expected = TensorValueException.class)
     public void itThrowsIfAnyOfTheProbabilitiesIsZero() {
         IntegerTensor n = IntegerTensor.scalar(100);
         DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
