@@ -13,7 +13,7 @@ public class NaNFixingTensorValidator implements TensorValidator<Double, DoubleT
 
     @Override
     public BooleanTensor check(DoubleTensor tensor) {
-        return tensor.isNaN().not();
+        return tensor.notNaN();
     }
 
     @Override

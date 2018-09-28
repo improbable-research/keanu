@@ -16,7 +16,7 @@ public interface TensorValidator<DATATYPE, TENSOR extends Tensor<DATATYPE>> exte
     TENSOR validate(TENSOR tensor);
 
     TensorValidator<Double, DoubleTensor> ZERO_CATCHER = TensorValidator.thatExpectsNotToFind(0.);
-    DebugTensorValidator<Double, DoubleTensor> NAN_CATCHER = new DebugTensorValidator<>(TensorValidator.thatExpects(t -> t.isNaN().not()));
+    DebugTensorValidator<Double, DoubleTensor> NAN_CATCHER = new DebugTensorValidator<>(TensorValidator.thatExpects(t -> t.notNaN()));
     DebugTensorValidator<Double, DoubleTensor> NAN_FIXER = new DebugTensorValidator<>(new NaNFixingTensorValidator(0.0));
 
     static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorCheckAndRespondValidator<DATATYPE, TENSOR> thatExpectsNotToFind(DATATYPE v) {

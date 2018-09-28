@@ -285,6 +285,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     BooleanTensor greaterThanOrEqual(double value);
 
-    BooleanTensor isNaN();
+    BooleanTensor notNaN();
+
+    default BooleanTensor isNaN() { return notNaN().not(); }
 
 }

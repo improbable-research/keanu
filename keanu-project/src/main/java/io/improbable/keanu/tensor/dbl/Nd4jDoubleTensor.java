@@ -965,8 +965,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public BooleanTensor isNaN() {
-        return this.elementwiseEquals(this).not();
+    public BooleanTensor notNaN() {
+        return this.elementwiseEquals(this);
     }
 
     @Override
