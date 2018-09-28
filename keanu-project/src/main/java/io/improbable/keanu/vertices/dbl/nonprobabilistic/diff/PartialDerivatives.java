@@ -400,6 +400,19 @@ public class PartialDerivatives {
         return new PartialDerivatives(reshapedDerivatives);
     }
 
+    /**
+     * Slice the partials along dimension at a specified index.
+     *
+     * @param dimension dimension to slice along
+     * @param index     index to slice at
+     * @param reshape   Due to the way our tensor implementation works, slicing a rank 2 tensor gives us a rank two back, whereas
+     *                  slicing a higher rank tensor gives you a (rank - 1) tensor back.  This causes problems for rank 2 tensors
+     *                  where the shape of the "of" will go from, say, 3x3 to 3x1 whereas the partial will go from 3x3x3x3 to
+     *                  3x3x3 instead of 3x1x3x3.  This reshape deals with this case.  Only needed for rank two inputs as higher
+     *                  ranks correctly resolve (eg 3x3x3 will have a 3x3x3x3x3x3 and after slicing will be a 3x3 and a partial
+     *                  of 3x3x3x3x3.
+     * @return the sliced partials
+     */
     public PartialDerivatives slice(int dimension, int index, boolean reshape) {
         Map<VertexId, DoubleTensor> slicedDerivatives = new HashMap<>();
 
@@ -408,14 +421,6 @@ public class PartialDerivatives {
             partialDerivativeShape[dimension] = 1;
             DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
 
-            /*
-             * Due to the way our tensor implementation works, slicing a rank 2 tensor gives us a rank two back, whereas
-             * slicing a higher rank tensor gives you a (rank - 1) tensor back.  This causes problems for rank 2 tensors
-             * where the shape of the "of" will go from, say, 3x3 to 3x1 whereas the partial will go from 3x3x3x3 to
-             * 3x3x3 instead of 3x1x3x3.  This reshape deals with this case.  Only needed for rank two inputs as higher
-             * ranks correctly resolve (eg 3x3x3 will have a 3x3x3x3x3x3 and after slicing will be a 3x3 and a partial
-             * of 3x3x3x3x3.
-             */
             if (reshape) {
                 slicedPartialDerivative = slicedPartialDerivative.reshape(partialDerivativeShape);
             }

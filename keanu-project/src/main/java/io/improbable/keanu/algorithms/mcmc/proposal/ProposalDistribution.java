@@ -12,7 +12,7 @@ public interface ProposalDistribution {
         return new PriorProposalDistribution();
     }
 
-    Proposal getProposal(Set<Vertex> vertices, KeanuRandom random);
+    Proposal getProposal(Set<? extends Vertex> vertices, KeanuRandom random);
 
     <T> double logProb(Probabilistic<T> vertex, T ofValue, T givenValue);
 
