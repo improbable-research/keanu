@@ -11,7 +11,6 @@ import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.nd4j.linalg.ops.transforms.Transforms;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -184,10 +183,6 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     double min();
 
-    DoubleTensor minInPlace(DoubleTensor min);
-
-    DoubleTensor maxInPlace(DoubleTensor max);
-
     double average();
 
     double standardDeviation();
@@ -266,6 +261,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor acosInPlace();
 
     DoubleTensor expInPlace();
+
+    DoubleTensor minInPlace(DoubleTensor min);
+
+    DoubleTensor maxInPlace(DoubleTensor max);
 
     DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 

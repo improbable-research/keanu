@@ -817,6 +817,26 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void canFindMinFromScalarToTensorInPlace() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        a.minInPlace(b);
+
+        assertArrayEquals(new double[]{3, 3, 3, 2}, a.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindMaxFromScalarToTensorInPlace() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        a.maxInPlace(b);
+
+        assertArrayEquals(new double[]{5, 4, 3, 3}, a.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
     public void canFindElementWiseMinAndMax() {
         DoubleTensor a = DoubleTensor.create(1., 2., 3., 4.).reshape(1, 4);
         DoubleTensor b = DoubleTensor.create(2., 3., 1., 4.).reshape(1, 4);
