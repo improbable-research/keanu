@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
@@ -8,6 +7,7 @@ import java.util.function.Function;
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -279,6 +279,24 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return getValue().getValue(index);
     }
 
+    public DoubleTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
+        if (!TensorShape.isScalar(this.getShape())) {
+            throw new IllegalArgumentException("Vertex to sample must be scalar");
+        }
+
+        final int length = Math.toIntExact(TensorShape.getLength(shape));
+        final double[] samples = new double[length];
+        for (int i = 0; i < length; i += 1) {
+            samples[i] = this.sample(random).scalar();
+        }
+
+        return DoubleTensor.create(samples, shape);
+    }
+
+    public DoubleTensor sampleScalarValuesAsTensor(int[] shape) {
+        return sampleScalarValuesAsTensor(shape, KeanuRandom.getDefaultRandom());
+    }
+
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
         if (isObserved()) {
@@ -295,4 +313,5 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
             PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
         );
     }
+
 }

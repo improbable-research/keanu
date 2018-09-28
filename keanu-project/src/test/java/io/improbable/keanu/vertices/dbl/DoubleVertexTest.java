@@ -1,13 +1,16 @@
 package io.improbable.keanu.vertices.dbl;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import org.junit.Test;
-
-import static org.junit.Assert.assertArrayEquals;
-import static org.junit.Assert.assertEquals;
 
 public class DoubleVertexTest {
 
@@ -89,4 +92,32 @@ public class DoubleVertexTest {
         DoubleVertex concatDimOne = DoubleVertex.concat(1, A, B);
         assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
     }
+
+    @Test
+    public void sampleScalarsAsTensorFillsGivenShapeWithSamples() {
+        DoubleVertex vertex = new DoubleVertex() {
+            double sampledValue = 0;
+
+            @Override
+            public DoubleTensor sample(KeanuRandom random) {
+                sampledValue += 1;
+                return DoubleTensor.scalar(sampledValue);
+            }
+        };
+
+        final int[] shape = new int[]{2, 2, 2};
+        final DoubleTensor expected = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8},
+            shape);
+        final DoubleTensor actual = vertex.sampleScalarValuesAsTensor(shape);
+
+        assertThat(actual, TensorMatchers.isEqualTo(expected));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void sampleScalarsAsTensorFailsForNonScalars() {
+        DoubleVertex vertex = new GaussianVertex(new int[]{2, 2}, 0, 1);
+
+        vertex.sampleScalarValuesAsTensor(new int[]{2, 2});
+    }
+
 }

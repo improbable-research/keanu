@@ -1,19 +1,35 @@
 package io.improbable.keanu.vertices.intgr;
 
+import java.util.function.Function;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.*;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.*;
-
-import java.util.function.Function;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 
 public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
 
@@ -185,6 +201,24 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
 
     public int getValue(int... index) {
         return getValue().getValue(index);
+    }
+
+    public IntegerTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
+        if (!TensorShape.isScalar(this.getShape())) {
+            throw new IllegalArgumentException("Vertex to sample must be scalar");
+        }
+
+        final int length = Math.toIntExact(TensorShape.getLength(shape));
+        final int[] samples = new int[length];
+        for (int i = 0; i < length; i += 1) {
+            samples[i] = this.sample(random).scalar();
+        }
+
+        return IntegerTensor.create(samples, shape);
+    }
+
+    public IntegerTensor sampleScalarValuesAsTensor(int[] shape) {
+        return sampleScalarValuesAsTensor(shape, KeanuRandom.getDefaultRandom());
     }
 
 }

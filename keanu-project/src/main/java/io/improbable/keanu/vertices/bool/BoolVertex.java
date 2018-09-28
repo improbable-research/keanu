@@ -6,6 +6,7 @@ import java.util.List;
 import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
@@ -19,6 +20,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolRe
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
@@ -91,6 +93,24 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         return getValue().getValue(index);
     }
 
+    public BooleanTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
+        if (!TensorShape.isScalar(this.getShape())) {
+            throw new IllegalArgumentException("Vertex to sample must be scalar");
+        }
+
+        final int length = Math.toIntExact(TensorShape.getLength(shape));
+        final boolean[] samples = new boolean[length];
+        for (int i = 0; i < length; i += 1) {
+            samples[i] = this.sample(random).scalar();
+        }
+
+        return BooleanTensor.create(samples, shape);
+    }
+
+    public BooleanTensor sampleScalarValuesAsTensor(int[] shape) {
+        return sampleScalarValuesAsTensor(shape, KeanuRandom.getDefaultRandom());
+    }
+
     public BoolVertex take(int... index) {
         return new BoolTakeVertex(this, index);
     }
@@ -98,6 +118,5 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
     public BoolVertex reshape(int... proposedShape) {
         return new BoolReshapeVertex(this, proposedShape);
     }
-
 
 }

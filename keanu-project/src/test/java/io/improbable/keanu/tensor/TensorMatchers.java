@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
+import org.hamcrest.Matchers;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 
@@ -119,6 +120,10 @@ public class TensorMatchers {
 
     public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
         return hasValue(other.asFlatArray());
+    }
+
+    public static <T> Matcher<Tensor<T>> isEqualTo(Tensor<T> other) {
+        return Matchers.<Tensor<T>>both(hasShape(other.getShape())).and(elementwiseEqualTo(other));
     }
 
 
