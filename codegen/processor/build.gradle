@@ -1,18 +1,8 @@
 plugins {
-    id 'java'
     id 'application'
 }
 
-group = 'improbable'
 mainClassName = 'processor.Runner'
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
 
 dependencies {
     compile 'org.reflections:reflections:0.9.11'

@@ -10,23 +10,12 @@ buildscript {
 
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
-    id 'java'
     id 'maven'
 }
 
-apply plugin: 'java'
 apply plugin: 'jacoco'
 
-group = 'io.improbable'
 archivesBaseName = "keanu"
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
 
 dependencies {
 

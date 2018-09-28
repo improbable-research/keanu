@@ -1,17 +1,22 @@
-
 plugins {
-    id 'java'
     id 'com.palantir.git-version' version '0.11.0'
     id 'com.github.johnrengelman.shadow' version '2.0.2'
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
 allprojects {
     version gitVersion()
+
+    apply plugin: "java"
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    group = "io.improbable"
 }
 
 dependencies {
