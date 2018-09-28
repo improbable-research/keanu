@@ -104,6 +104,13 @@ public class PartialDerivatives {
         derivativeWithRespectTo.put(id, value);
     }
 
+    /**
+     * This will sum partial derivatives that are represented as tensors over given dimensions.
+     * The dimensions that are summed over will be reshaped to a scalar shape of 1x1.
+     *
+     * @param ofDimensions dimensions to sum over (should be first n dimensions)
+     * @return summed and reshaped partials
+     */
     public PartialDerivatives sumOverOfDimensions(int... ofDimensions) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
@@ -120,6 +127,13 @@ public class PartialDerivatives {
         return new PartialDerivatives(summed);
     }
 
+    /**
+     * This will sum partial derivatives that are represented as tensors over given dimensions.
+     * The dimensions that are summed over will be reshaped to a scalar shape of 1x1.
+     *
+     * @param wrtDimensions dimensions to sum over (should be last n dimensions)
+     * @return summed and reshaped partials
+     */
     public PartialDerivatives sumOverWrtDimensions(int... wrtDimensions) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
@@ -444,18 +458,6 @@ public class PartialDerivatives {
 
     private int[] extractOfShape(int[] partialDerivativeShape, int rankOfSource) {
         return Arrays.copyOfRange(partialDerivativeShape, 0, rankOfSource);
-    }
-
-    private static int[] onesToShape(int[] shape, int[] onesDimensions) {
-
-        int[] shapeWithOnes = Arrays.copyOf(shape, shape.length);
-
-        for (int onesDimension : onesDimensions) {
-            int resolvedDimension = onesDimension >= 0 ? onesDimension : shape.length + onesDimension;
-            shapeWithOnes[resolvedDimension] = 1;
-        }
-
-        return shapeWithOnes;
     }
 
     private static DoubleTensor increaseRankByAppendingOnesToShape(DoubleTensor lowRankTensor, int desiredRank) {

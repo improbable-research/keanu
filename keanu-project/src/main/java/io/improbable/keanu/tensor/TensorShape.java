@@ -146,6 +146,10 @@ public class TensorShape {
     }
 
     public static int[] selectDimensions(int from, int to, int[] shape) {
+        if (from > to) {
+            throw new IllegalArgumentException("to dimension must be less than from");
+        }
+
         int[] newShape = new int[to - from + 1];
 
         for (int i = 0; i < (to - from + 1); i++) {
