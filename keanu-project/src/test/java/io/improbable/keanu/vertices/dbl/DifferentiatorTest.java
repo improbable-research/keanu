@@ -1,9 +1,11 @@
 package io.improbable.keanu.vertices.dbl;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
 
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
 
 import io.improbable.keanu.tensor.TensorShape;
@@ -103,12 +105,12 @@ public class DifferentiatorTest {
 
         int[] shape = new int[]{2, 2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
-        A.setValue(DoubleTensor.linspace(0.1, 2, (int)TensorShape.getLength(shape)).reshape(shape));
+        A.setValue(DoubleTensor.linspace(0.1, 2, (int) TensorShape.getLength(shape)).reshape(shape));
         DoubleVertex B = new GaussianVertex(shape, 0, 1);
-        B.setValue(DoubleTensor.linspace(0.2, 1, (int)TensorShape.getLength(shape)).reshape(shape));
+        B.setValue(DoubleTensor.linspace(0.2, 1, (int) TensorShape.getLength(shape)).reshape(shape));
 
         DoubleVertex C = new GaussianVertex(shape, 0, 1);
-        C.setValue(DoubleTensor.linspace(0.2, 0.8, (int)TensorShape.getLength(shape)).reshape(shape));
+        C.setValue(DoubleTensor.linspace(0.2, 0.8, (int) TensorShape.getLength(shape)).reshape(shape));
 
         DoubleVertex D = A.atan2(B).sigmoid().times(B);
         DoubleVertex J = A.sin().cos().div(D);
@@ -117,20 +119,7 @@ public class DifferentiatorTest {
         DoubleVertex F = D.plus(B).exp();
         DoubleVertex H = G.plus(F).sum().times(A).sum().times(C);
 
-        PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B, C));
-        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
-
-        DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
-        DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
-        DoubleTensor dHdCReverse = dHReverse.withRespectTo(C);
-
-        DoubleTensor dHdAForward = dHForward.withRespectTo(A);
-        DoubleTensor dHdBForward = dHForward.withRespectTo(B);
-        DoubleTensor dHdCForward = dHForward.withRespectTo(C);
-
-        assertEquals(dHdAReverse, dHdAForward);
-        assertEquals(dHdBReverse, dHdBForward);
-        assertEquals(dHdCReverse, dHdCForward);
+        finiteDifferenceMatchesGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3,  true);
     }
 
     @Test

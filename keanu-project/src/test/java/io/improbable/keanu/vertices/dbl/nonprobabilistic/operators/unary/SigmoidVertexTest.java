@@ -71,7 +71,7 @@ public class SigmoidVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).sigmoid();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-6);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-6, true);
     }
 
 }

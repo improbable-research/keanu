@@ -32,8 +32,10 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         DoubleTensor rightValue = right.getValue();
         DoubleTensor dOutWrtLeft = rightValue.reciprocal();
         DoubleTensor dOutWrtRight = leftValue.div(rightValue.pow(2.0)).unaryMinusInPlace();
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft, true));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight, true));
+        partials.put(left, derivativeOfOutputsWithRespectToSelf
+            .multiplyAlongWrtDimensions(dOutWrtLeft, this.getShape()));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf
+            .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape()));
         return partials;
     }
 

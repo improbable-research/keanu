@@ -62,7 +62,7 @@ public class ArcTanVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -2.0, 2.0);
         DoubleVertex outputVertex = inputVertex.times(2).atan();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4, true);
     }
 
 }
