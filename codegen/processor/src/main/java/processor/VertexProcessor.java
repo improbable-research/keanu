@@ -52,11 +52,11 @@ class VertexProcessor {
 
         for (Constructor constructor : constructors) {
             String str = String.valueOf(index);
-            String javaKlass = constructor.getDeclaringClass().getSimpleName();
+            String javaClass = constructor.getDeclaringClass().getSimpleName();
 
             input.put("package" + str, constructor.getDeclaringClass().getCanonicalName());
-            input.put("klass" + str, javaKlass);
-            input.put("py_klass" + str, javaKlass.replaceAll("Vertex$", ""));
+            input.put("class" + str, javaClass);
+            input.put("py_class" + str, javaClass.replaceAll("Vertex$", ""));
 
             index++;
         }

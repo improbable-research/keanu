@@ -14,6 +14,6 @@ k = KeanuContext().jvm_view()
 
 java_import(k, "${.vars["package" + n]}")
 
-def ${.vars["py_klass" + n]}(*args) -> k.${.vars["klass" + n]}:
-    return Vertex(k.${.vars["klass" + n]}, args)
+def ${.vars["py_class" + n]}(*args) -> k.${.vars["class" + n]}:
+    return Vertex(k.${.vars["class" + n]}, args)
 </@repeat>
