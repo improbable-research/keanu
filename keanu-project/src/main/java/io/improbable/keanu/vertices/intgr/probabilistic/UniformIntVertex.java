@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import annotation.BindVertex;
+import annotation.ExportVertexToPythonBindings;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -52,7 +52,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
         this(shape, new ConstantIntegerVertex(min), max);
     }
 
-    @BindVertex
+    @ExportVertexToPythonBindings
     public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
         this(checkHasSingleNonScalarShapeOrAllScalar(min.getShape(), max.getShape()), min, max);
     }
