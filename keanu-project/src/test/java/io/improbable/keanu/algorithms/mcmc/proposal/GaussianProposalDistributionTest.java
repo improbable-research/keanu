@@ -4,7 +4,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
-import org.apache.commons.math3.stat.correlation.Covariance;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +41,7 @@ public class GaussianProposalDistributionTest {
     }
 
     @Before
-    public void setUpMocks() throws Exception {
+    public void setUpProposal() throws Exception {
         when(vertex1.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(0)));
         when(vertex2.getValue()).thenReturn(DoubleTensor.scalar(currentState.getValue(1)));
 
