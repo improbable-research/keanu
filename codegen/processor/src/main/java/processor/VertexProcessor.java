@@ -1,6 +1,6 @@
 package processor;
 
-import annotation.BindVertex;
+import annotation.ExportVertexToPythonBindings;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
@@ -44,21 +44,21 @@ class VertexProcessor {
             .setUrls(ClasspathHelper.forPackage("io.improbable.keanu"))
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
 
-        Set<Constructor> classes = reflections.getConstructorsAnnotatedWith(BindVertex.class);
+        Set<Constructor> constructors = reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class);
 
         Map<String, Object> input = new HashMap<>();
-        input.put("size", classes.size());
-        int i = 1;
+        input.put("size", constructors.size());
+        int index = 1;
 
-        for (Constructor constructor : classes) {
-            String str = String.valueOf(i);
+        for (Constructor constructor : constructors) {
+            String str = String.valueOf(index);
             String javaKlass = constructor.getDeclaringClass().getSimpleName();
 
             input.put("package" + str, constructor.getDeclaringClass().getCanonicalName());
             input.put("klass" + str, javaKlass);
-            input.put("py_klass" + str, javaKlass.replace("Vertex", ""));
+            input.put("py_klass" + str, javaKlass.replaceAll("Vertex$", ""));
 
-            i++;
+            index++;
         }
         vertexTemplate.process(input, fileWriter);
     }

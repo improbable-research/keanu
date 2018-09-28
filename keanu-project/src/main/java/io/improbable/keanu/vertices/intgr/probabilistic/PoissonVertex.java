@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import annotation.BindVertex;
+import annotation.ExportVertexToPythonBindings;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 import java.util.Collections;
@@ -50,7 +50,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      *
      * @param mu mu with same shape as desired Poisson tensor or scalar
      */
-    @BindVertex
+    @ExportVertexToPythonBindings
     public PoissonVertex(DoubleVertex mu) {
         this(mu.getShape(), mu);
     }
