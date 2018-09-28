@@ -28,14 +28,16 @@ public class LogGammaVertex extends DoubleUnaryOpVertex {
     @Override
     protected DualNumber dualOp(DualNumber dualNumber) {
         DoubleTensor logGammaOfInput = op(dualNumber.getValue());
-        PartialDerivatives dLogGamma = dualNumber.getPartialDerivatives().multiplyBy(inputVertex.getValue().digamma());
+        PartialDerivatives dLogGamma = dualNumber.getPartialDerivatives()
+            .multiplyAlongOfDimensions(inputVertex.getValue().digamma(), getShape());
         return new DualNumber(logGammaOfInput, dLogGamma);
     }
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        PartialDerivatives dOutputsWrtInputVertex = derivativeOfOutputsWithRespectToSelf.multiplyBy(inputVertex.getValue().digamma(), true);
+        PartialDerivatives dOutputsWrtInputVertex =
+            derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(inputVertex.getValue().digamma(), getShape());
         partials.put(inputVertex, dOutputsWrtInputVertex);
         return partials;
     }

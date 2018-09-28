@@ -33,7 +33,8 @@ public class LogVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(inputVertex.getValue().reciprocal(), true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf
+            .multiplyAlongWrtDimensions(inputVertex.getValue().reciprocal(), this.getShape()));
         return partials;
     }
 }
