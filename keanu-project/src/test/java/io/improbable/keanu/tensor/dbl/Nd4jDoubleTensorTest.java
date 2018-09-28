@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -44,6 +45,18 @@ public class Nd4jDoubleTensorTest {
         vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
         rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+    }
+
+    @Before
+    public void enableDebugModeForNaNChecking() throws Exception {
+        TensorValidator.NAN_CATCHER.enable();
+        TensorValidator.NAN_FIXER.enable();
+    }
+
+    @After
+    public void disableDebugModeForNaNChecking() throws Exception {
+        TensorValidator.NAN_CATCHER.disable();
+        TensorValidator.NAN_FIXER.disable();
     }
 
     @Test

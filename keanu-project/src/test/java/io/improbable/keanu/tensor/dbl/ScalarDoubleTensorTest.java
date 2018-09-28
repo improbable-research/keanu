@@ -8,6 +8,8 @@ import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 
 import java.util.function.Function;
 
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -21,6 +23,19 @@ public class ScalarDoubleTensorTest {
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
+
+
+    @Before
+    public void enableDebugModeForNaNChecking() throws Exception {
+        TensorValidator.NAN_CATCHER.enable();
+        TensorValidator.NAN_FIXER.enable();
+    }
+
+    @After
+    public void disableDebugModeForNaNChecking() throws Exception {
+        TensorValidator.NAN_CATCHER.disable();
+        TensorValidator.NAN_FIXER.disable();
+    }
 
     @Test
     public void doesClampScalarWithinBounds() {
