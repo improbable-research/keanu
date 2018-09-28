@@ -16,9 +16,11 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 class VertexProcessor {
 
@@ -44,7 +46,8 @@ class VertexProcessor {
             .setUrls(ClasspathHelper.forPackage("io.improbable.keanu"))
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
 
-        Set<Constructor> constructors = reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class);
+        List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
+        constructors.sort(Comparator.comparing(Constructor::getName));
 
         Map<String, Object> input = new HashMap<>();
         input.put("size", constructors.size());
