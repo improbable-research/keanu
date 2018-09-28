@@ -33,7 +33,8 @@ public class SinVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(inputVertex.getValue().cos(), true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf
+            .multiplyAlongWrtDimensions(inputVertex.getValue().cos(), this.getShape()));
         return partials;
     }
 }

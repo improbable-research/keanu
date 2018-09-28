@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.diff;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Map;
@@ -113,7 +114,8 @@ public class LogProbGradientCalculatorTest {
         double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
-        assertThat(dBLogProbWrtAValue, equalTo(DoubleTensor.scalar(expectedDLogProbWrtA)));
+        assertArrayEquals(new int[]{1, 1, 1, 1}, dBLogProbWrtAValue.getShape());
+        assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtCValue, equalTo(expectedDLogProbWrtC));
     }
 
