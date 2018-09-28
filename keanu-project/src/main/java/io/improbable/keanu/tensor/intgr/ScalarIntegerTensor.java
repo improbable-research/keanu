@@ -404,30 +404,20 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor min(IntegerTensor min) {
-        return duplicate().minInPlace(min);
-    }
-
-    @Override
-    public IntegerTensor max(IntegerTensor max) {
-        return duplicate().minInPlace(max);
-    }
-
-    @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
         if (min.isScalar()) {
             return new ScalarIntegerTensor(Math.min(value, min.scalar()));
         } else {
-            return min.minInPlace(this.duplicate());
+            return min.duplicate().minInPlace(this);
         }
     }
 
     @Override
     public IntegerTensor maxInPlace(IntegerTensor max) {
         if (max.isScalar()) {
-            return new ScalarIntegerTensor(Math.min(value, max.scalar()));
+            return new ScalarIntegerTensor(Math.max(value, max.scalar()));
         } else {
-            return max.maxInPlace(this.duplicate());
+            return max.duplicate().maxInPlace(this);
         }
     }
 

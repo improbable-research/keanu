@@ -17,6 +17,6 @@ public class IntegerMaxVertex extends IntegerBinaryOpVertex {
 
     @Override
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-        return l.max(r);
+        return IntegerTensor.max(l, r);
     }
 }

@@ -48,6 +48,14 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new ConcatenationVertex(dimension, toConcat);
     }
 
+    public static DoubleVertex min(DoubleVertex a, DoubleVertex b) {
+        return new MinVertex(a, b);
+    }
+
+    public static DoubleVertex max(DoubleVertex a, DoubleVertex b) {
+        return new MaxVertex(a, b);
+    }
+
     public DoubleVertex minus(DoubleVertex that) {
         return new DifferenceVertex(this, that);
     }
@@ -113,14 +121,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex round() {
         return new RoundVertex(this);
-    }
-
-    public DoubleVertex min(DoubleVertex that) {
-        return new MinVertex(this, that);
-    }
-
-    public DoubleVertex max(DoubleVertex that) {
-        return new MaxVertex(this, that);
     }
 
     @Override

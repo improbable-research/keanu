@@ -18,7 +18,7 @@ public class MaxVertex extends DoubleBinaryOpVertex {
 
     @Override
     protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.max(r);
+        return DoubleTensor.max(l, r);
     }
 
     @Override

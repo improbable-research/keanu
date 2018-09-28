@@ -18,7 +18,7 @@ public class MinVertex extends DoubleBinaryOpVertex {
 
     @Override
     protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.min(r);
+        return DoubleTensor.min(l, r);
     }
 
     @Override

@@ -7,6 +7,7 @@ import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
@@ -77,6 +78,14 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
         INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
         return new Nd4jIntegerTensor(concat);
+    }
+
+    static IntegerTensor min(IntegerTensor a, IntegerTensor b) {
+        return a.duplicate().minInPlace(b);
+    }
+
+    static IntegerTensor max(IntegerTensor a, IntegerTensor b) {
+        return a.duplicate().maxInPlace(b);
     }
 
     @Override
@@ -160,10 +169,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     BooleanTensor greaterThan(int value);
 
     BooleanTensor greaterThanOrEqual(int value);
-
-    IntegerTensor min(IntegerTensor min);
-
-    IntegerTensor max(IntegerTensor max);
 
     IntegerTensor minInPlace(IntegerTensor min);
 

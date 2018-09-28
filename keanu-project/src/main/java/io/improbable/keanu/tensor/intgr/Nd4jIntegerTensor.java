@@ -440,16 +440,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor min(IntegerTensor min) {
-        return duplicate().minInPlace(min);
-    }
-
-    @Override
-    public IntegerTensor max(IntegerTensor max) {
-        return duplicate().maxInPlace(max);
-    }
-
-    @Override
     public IntegerTensor minInPlace(IntegerTensor min) {
         if (min.isScalar()) {
             Transforms.min(tensor, min.scalar(), false);

@@ -17,7 +17,7 @@ public class IntegerMinVertex extends IntegerBinaryOpVertex {
 
     @Override
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
-        return l.min(r);
+        return IntegerTensor.min(l, r);
     }
 
 }

@@ -338,11 +338,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor max(DoubleTensor max) {
-        return duplicate().maxInPlace(max);
-    }
-
-    @Override
     public DoubleTensor matrixInverse() {
         return new ScalarDoubleTensor(1 / value);
     }
@@ -350,11 +345,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public double max() {
         return value;
-    }
-
-    @Override
-    public DoubleTensor min(DoubleTensor min) {
-        return duplicate().minInPlace(min);
     }
 
     @Override
@@ -623,12 +613,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return apply(function);
     }
 
-    @Override
     public DoubleTensor maxInPlace(DoubleTensor max) {
         if (max.isScalar()) {
             value = Math.max(value, max.scalar());
         } else {
-            return max.maxInPlace(this);
+            return max.duplicate().maxInPlace(this);
         }
         return this;
     }
@@ -638,7 +627,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (min.isScalar()) {
             value = Math.min(value, min.scalar());
         } else {
-            return min.minInPlace(this);
+            return min.duplicate().minInPlace(this);
         }
         return this;
     }
