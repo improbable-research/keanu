@@ -2,6 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import java.util.Map;
 
+import annotation.BindVertex;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
@@ -15,6 +16,7 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
 
     private final Vertex<? extends NumberTensor> inputVertex;
 
+    @BindVertex
     public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);

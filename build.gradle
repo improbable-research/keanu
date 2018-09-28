@@ -1,6 +1,8 @@
 
 plugins {
+    id 'java'
     id 'com.palantir.git-version' version '0.11.0'
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
 }
 
 repositories {
@@ -13,5 +15,10 @@ allprojects {
 }
 
 dependencies {
+    compile project(":keanu-project")
+}
 
+shadowJar {
+    destinationDir = file("$rootDir/keanu-python")
+    archiveName = "keanu-python-all.jar"
 }

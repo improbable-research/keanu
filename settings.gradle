@@ -1,3 +1,5 @@
 include 'keanu-project',
+        'codegen:annotation',
+        'codegen:processor',
         'keanu-docs:code',
         'keanu-examples:coalMiningDisasters'

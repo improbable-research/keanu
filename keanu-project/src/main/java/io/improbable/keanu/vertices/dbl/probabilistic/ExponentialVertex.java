@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import annotation.BindVertex;
 import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
@@ -46,6 +47,7 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
      *
      * @param lambda the lambda of the Exponential with either the same shape as specified for this vertex or scalar
      */
+    @BindVertex
     public ExponentialVertex(DoubleVertex lambda) {
         this(checkHasSingleNonScalarShapeOrAllScalar(lambda.getShape()), lambda);
     }

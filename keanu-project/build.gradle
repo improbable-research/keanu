@@ -36,6 +36,7 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
     compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.10'
+    compile project(':codegen:annotation')
 
     //testing
     testCompile 'junit:junit:4.12'
