@@ -9,6 +9,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.PlaceHolderDoubleVertex;
 
 public class Gaussian {
@@ -19,6 +20,10 @@ public class Gaussian {
     private final DoubleVertex x;
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
+
+    public static Gaussian withParameters(DoubleTensor mu, DoubleTensor sigma) {
+        return new Gaussian(new ConstantDoubleVertex(0), new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
+    }
 
     public static Gaussian withParameters(DoubleVertex x, DoubleVertex mu, DoubleVertex sigma) {
         return new Gaussian(x, mu, sigma);

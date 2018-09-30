@@ -231,6 +231,7 @@ public abstract class Vertex<T> implements Observable<T> {
         return DiscoverGraph.getEntireGraph(this);
     }
 
+
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
