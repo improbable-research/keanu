@@ -155,6 +155,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor log();
 
+    DoubleTensor safeLogTimes(DoubleTensor y);
+
     DoubleTensor logGamma();
 
     DoubleTensor digamma();
@@ -190,6 +192,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
 
     DoubleTensor standardize();
+
+    DoubleTensor replaceNaN(double value);
 
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
@@ -240,6 +244,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor logInPlace();
 
+    DoubleTensor safeLogTimesInPlace(DoubleTensor y);
+
     DoubleTensor logGammaInPlace();
 
     DoubleTensor digammaInPlace();
@@ -278,6 +284,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor standardizeInPlace();
 
+    DoubleTensor replaceNaNInPlace(double value);
+
     DoubleTensor setAllInPlace(double value);
 
     // Comparisons
@@ -289,5 +297,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     BooleanTensor greaterThanOrEqual(double value);
 
+    BooleanTensor notNaN();
+
+    default BooleanTensor isNaN() { return notNaN().not(); }
 
 }

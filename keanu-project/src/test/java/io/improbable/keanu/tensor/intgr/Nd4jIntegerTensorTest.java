@@ -1,11 +1,19 @@
 package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jIntegerTensorTest {
 
@@ -496,4 +504,39 @@ public class Nd4jIntegerTensorTest {
         assertArrayEquals(new int[]{2, 3, 3, 4}, max.asFlatIntegerArray());
     }
 
+    @Test
+    public void youCanCheckForZeros() {
+        IntegerTensor containsZero = IntegerTensor.create(new int[]{
+                0, -1, Integer.MAX_VALUE,
+                Integer.MIN_VALUE, -0, 1},
+            3, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                false, true, true,
+                true, false, true},
+            3, 2);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpectsNotToFind(0);
+        assertThat(validator.check(containsZero), equalTo(expectedMask));
+    }
+
+    @Test
+    public void youCanFixAValidationIssueByReplacingTheValue() {
+        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
+        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatReplaces(-1, 0);
+        containsMinusOne = validator.validate(containsMinusOne);
+        assertThat(containsMinusOne, equalTo(expectedResult));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValue() {
+        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
+        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatFixesElementwise(x -> x >= 0, TensorValidationPolicy.changeValueTo(0));
+        containsMinusOne = validator.validate(containsMinusOne);
+        assertThat(containsMinusOne, equalTo(expectedResult));
+    }
 }

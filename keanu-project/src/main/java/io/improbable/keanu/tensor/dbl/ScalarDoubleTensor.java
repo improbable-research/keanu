@@ -13,6 +13,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -189,6 +190,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor log() {
         return this.duplicate().logInPlace();
+    }
+
+    @Override
+    public DoubleTensor safeLogTimes(DoubleTensor y) {
+        return this.duplicate().safeLogTimesInPlace(y);
     }
 
     @Override
@@ -376,6 +382,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor replaceNaN(double value) {
+        return duplicate().replaceNaNInPlace(value);
+    }
+
+    @Override
     public DoubleTensor clamp(DoubleTensor min, DoubleTensor max) {
         return duplicate().clampInPlace(min, max);
     }
@@ -484,6 +495,22 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor logInPlace() {
         value = Math.log(value);
         return this;
+    }
+
+    /**
+     * This is identical to log().times(y), except that it changes NaN results to 0.
+     * This is important when calculating 0log0, which should return 0
+     * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
+     *
+     * @param y The tensor value to multiply by
+     * @return the log of this tensor multiplied by y
+     */
+    @Override
+    public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
+        TensorValidator.NAN_CATCHER.validate(this);
+        TensorValidator.NAN_CATCHER.validate(y);
+        DoubleTensor result = this.logInPlace().timesInPlace(y);
+        return TensorValidator.NAN_FIXER.validate(result);
     }
 
     @Override
@@ -680,6 +707,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public DoubleTensor replaceNaNInPlace(double newValue) {
+        if (Double.isNaN(this.value)) {
+            this.value = newValue;
+        }
+        return this;
+    }
+
+    @Override
     public DoubleTensor setAllInPlace(double value) {
         this.value = value;
         return this;
@@ -721,6 +756,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public BooleanTensor greaterThanOrEqual(double value) {
         return BooleanTensor.scalar(this.value >= value);
+    }
+
+    @Override
+    public BooleanTensor notNaN() {
+        return BooleanTensor.scalar(!Double.isNaN(value));
     }
 
     @Override
