@@ -108,7 +108,7 @@ public class If {
 
     private static void assertShapesMatchOrAreScalar(int[] thnShape, int[] elsShape, int[] predicateShape) {
         if (!Arrays.equals(thnShape, elsShape)
-            || !TensorShape.isScalar(predicateShape) && !(TensorShape.isScalar(thnShape) && TensorShape.isScalar(elsShape))) {
+            || (!TensorShape.isScalar(predicateShape) && !Arrays.equals(predicateShape, thnShape))) {
             throw new IllegalArgumentException("The shape of the then and else condition must match. The predicate should either match or be scalar.");
         }
     }
