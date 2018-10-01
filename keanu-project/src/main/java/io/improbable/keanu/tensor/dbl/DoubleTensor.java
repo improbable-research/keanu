@@ -106,6 +106,14 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new Nd4jDoubleTensor(concat);
     }
 
+    static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
+        return a.duplicate().minInPlace(b);
+    }
+
+    static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
+        return a.duplicate().maxInPlace(b);
+    }
+
     @Override
     DoubleTensor setValue(Double value, int... index);
 
@@ -171,13 +179,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor exp();
 
-    DoubleTensor max(DoubleTensor max);
-
     DoubleTensor matrixInverse();
 
     double max();
-
-    DoubleTensor min(DoubleTensor min);
 
     double min();
 
@@ -264,9 +268,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor expInPlace();
 
-    DoubleTensor maxInPlace(DoubleTensor max);
+    DoubleTensor minInPlace(DoubleTensor min);
 
-    DoubleTensor minInPlace(DoubleTensor max);
+    DoubleTensor maxInPlace(DoubleTensor max);
 
     DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 

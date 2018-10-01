@@ -164,11 +164,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor max(DoubleTensor max) {
-        return duplicate().maxInPlace(max);
-    }
-
-    @Override
     public DoubleTensor matrixInverse() {
         return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
     }
@@ -176,11 +171,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public double max() {
         return tensor.maxNumber().doubleValue();
-    }
-
-    @Override
-    public DoubleTensor min(DoubleTensor min) {
-        return duplicate().minInPlace(min);
     }
 
     @Override
@@ -806,11 +796,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minInPlace(DoubleTensor max) {
-        if (max.isScalar()) {
-            Transforms.min(tensor, max.scalar(), false);
+    public DoubleTensor minInPlace(DoubleTensor min) {
+        if (min.isScalar()) {
+            Transforms.min(tensor, min.scalar(), false);
         } else {
-            Transforms.min(tensor, unsafeGetNd4J(max), false);
+            Transforms.min(tensor, unsafeGetNd4J(min), false);
         }
         return this;
     }

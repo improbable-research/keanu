@@ -440,6 +440,36 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor minInPlace(IntegerTensor min) {
+        if (min.isScalar()) {
+            Transforms.min(tensor, min.scalar(), false);
+        } else {
+            Transforms.min(tensor, unsafeGetNd4J(min), false);
+        }
+        return this;
+    }
+
+    @Override
+    public IntegerTensor maxInPlace(IntegerTensor max) {
+        if (max.isScalar()) {
+            Transforms.max(tensor, max.scalar(), false);
+        } else {
+            Transforms.max(tensor, unsafeGetNd4J(max), false);
+        }
+        return this;
+    }
+
+    @Override
+    public int min() {
+        return tensor.minNumber().intValue();
+    }
+
+    @Override
+    public int max() {
+        return tensor.maxNumber().intValue();
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor value) {
 
         INDArray mask;
