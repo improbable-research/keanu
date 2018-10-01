@@ -1,13 +1,10 @@
 package io.improbable.keanu.vertices.dbl;
 
-import java.util.List;
-import java.util.Map;
-
-import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+
+import java.util.Map;
 
 public interface Differentiable {
 

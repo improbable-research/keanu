@@ -29,50 +29,6 @@ public class PartialDerivatives {
         );
     }
 
-    public static PartialDerivatives ifThenElse(BooleanTensor predicate, PartialDerivatives thn, PartialDerivatives els) {
-        DoubleTensor trueMask = predicate.toDoubleMask();
-        DoubleTensor falseMask = predicate.not().toDoubleMask();
-
-        Map<VertexId, DoubleTensor> thenPartials = thn.derivativeWithRespectTo;
-        Map<VertexId, DoubleTensor> elsePartials = els.derivativeWithRespectTo;
-        Set<VertexId> wrtUnion = new HashSet<>();
-        wrtUnion.addAll(thenPartials.keySet());
-        wrtUnion.addAll(elsePartials.keySet());
-
-        Map<VertexId, DoubleTensor> mixedPartials = new HashMap<>();
-        for (VertexId wrt : wrtUnion) {
-            DoubleTensor thnPartial = thenPartials.get(wrt);
-            DoubleTensor elsPartial = elsePartials.get(wrt);
-            DoubleTensor broadcastedTrueMask;
-            DoubleTensor broadcastedFalseMask;
-            int[] range = TensorShape.dimensionRange(0, thnPartial == null ? elsPartial.getRank() : thnPartial.getRank());
-            int lengthOfWrt = range.length / 2;
-            int[] permute = TensorShape.concat(
-                Arrays.copyOfRange(range, range.length - lengthOfWrt, range.length),
-                Arrays.copyOfRange(range, 0, range.length - lengthOfWrt)
-            );
-
-            DoubleTensor newPartial;
-            if (thnPartial == null) {
-                broadcastedFalseMask = DoubleTensor.zeros(elsPartial.getShape()).plusInPlace(falseMask).permute(permute);
-                newPartial = broadcastedFalseMask.timesInPlace(elsPartial);
-            } else if (elsPartial == null) {
-                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask).permute(permute);
-                newPartial = broadcastedTrueMask.timesInPlace(thnPartial);
-            } else {
-                broadcastedFalseMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(falseMask).permute(permute);
-                broadcastedTrueMask = DoubleTensor.zeros(thnPartial.getShape()).plusInPlace(trueMask).permute(permute);
-
-                newPartial = broadcastedTrueMask.timesInPlace(thnPartial)
-                    .plusInPlace(broadcastedFalseMask.timesInPlace(elsPartial));
-            }
-
-            mixedPartials.put(wrt, newPartial);
-        }
-
-        return new PartialDerivatives(mixedPartials);
-    }
-
     private Map<VertexId, DoubleTensor> derivativeWithRespectTo;
 
     public PartialDerivatives(VertexId id, DoubleTensor derivativeWithRespectTo) {

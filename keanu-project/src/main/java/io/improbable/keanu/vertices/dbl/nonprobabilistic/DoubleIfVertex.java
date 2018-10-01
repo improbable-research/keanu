@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -36,7 +37,7 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
+        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els), getShape());
     }
 
     @Override

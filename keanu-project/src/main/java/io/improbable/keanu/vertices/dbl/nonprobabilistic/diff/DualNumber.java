@@ -30,14 +30,15 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         return new DualNumber(value, PartialDerivatives.withRespectToSelf(withRespectTo, value.getShape()));
     }
 
-    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els) {
+    public static DualNumber ifThenElse(BooleanTensor predicate, DualNumber thn, DualNumber els, int[] ofShape) {
         if (predicate.allTrue()) {
             return new DualNumber(thn.value, thn.getPartialDerivatives());
         } else if (predicate.allFalse()) {
             return new DualNumber(els.value, els.getPartialDerivatives());
         } else {
-            PartialDerivatives mixedPartials = PartialDerivatives.ifThenElse(predicate, thn.getPartialDerivatives(), els.getPartialDerivatives());
-            return new DualNumber(predicate.setDoubleIf(thn.value, els.value), mixedPartials);
+            PartialDerivatives ifPartial = thn.getPartialDerivatives().multiplyAlongOfDimensions(predicate.toDoubleMask(), ofShape)
+                .add(els.getPartialDerivatives().multiplyAlongOfDimensions(predicate.not().toDoubleMask(), ofShape));
+            return new DualNumber(predicate.setDoubleIf(thn.value, els.value), ifPartial);
         }
     }
 

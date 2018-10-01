@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -42,6 +43,33 @@ public class DoubleIfVertexTest {
 
         Assert.assertArrayEquals(dCda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dCdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
+
+        Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
+        Assert.assertArrayEquals(dCdb.getShape(), dIfdB.getShape());
+    }
+
+    @Test
+    public void canExtractDualNumberFromTruePredicateDifferentRankOf() {
+        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
+
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.scalar(5.0));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+
+        DoubleVertex c = a.times(b);
+        DoubleVertex d = b.div(a);
+
+        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dCdb = c.getDualNumber().getPartialDerivatives().withRespectTo(b);
+
+        DoubleVertex ifVertex = If.isTrue(bool)
+            .then(c)
+            .orElse(d);
+
+        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dIfdB = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(b);
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
         Assert.assertArrayEquals(dCdb.getShape(), dIfdB.getShape());
