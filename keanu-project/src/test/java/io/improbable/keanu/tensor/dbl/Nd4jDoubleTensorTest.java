@@ -9,6 +9,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -792,6 +793,59 @@ public class Nd4jDoubleTensorTest {
         assertEquals(expected0, actual.get(0));
         assertEquals(expected1, actual.get(1));
         assertEquals(expected2, actual.get(2));
+    }
+
+    @Test
+    public void canFindScalarMinAndMax() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(2, 2);
+        double min = a.min();
+        double max = a.max();
+        assertEquals(2., min, 1e-6);
+        assertEquals(5., max, 1e-6);
+    }
+
+    @Test
+    public void canFindMinAndMaxFromScalarToTensor() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        DoubleTensor min = DoubleTensor.min(a, b);
+        DoubleTensor max = DoubleTensor.max(a, b);
+
+        assertArrayEquals(new double[]{3, 3, 3, 2}, min.asFlatDoubleArray(), 1e-6);
+        assertArrayEquals(new double[]{5, 4, 3, 3}, max.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindMinFromScalarToTensorInPlace() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        a.minInPlace(b);
+
+        assertArrayEquals(new double[]{3, 3, 3, 2}, a.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindMaxFromScalarToTensorInPlace() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        a.maxInPlace(b);
+
+        assertArrayEquals(new double[]{5, 4, 3, 3}, a.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindElementWiseMinAndMax() {
+        DoubleTensor a = DoubleTensor.create(1., 2., 3., 4.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(2., 3., 1., 4.).reshape(1, 4);
+
+        DoubleTensor min = DoubleTensor.min(a, b);
+        DoubleTensor max = DoubleTensor.max(a, b);
+
+        assertArrayEquals(new double[]{1, 2, 1, 4}, min.asFlatDoubleArray(), 1e-6);
+        assertArrayEquals(new double[]{2, 3, 3, 4}, max.asFlatDoubleArray(), 1e-6);
     }
 
     private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
