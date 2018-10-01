@@ -63,7 +63,7 @@ public class If {
         }
 
         public Vertex<Tensor<T>> orElse(Vertex<? extends Tensor<T>> els) {
-            assertPredicateIsScalarOrMatchesShapeOfThenAndElse(thn.getShape(), els.getShape(), predicate.getShape());
+            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
             return new IfVertex<>(els.getShape(), predicate, thn, els);
         }
     }
@@ -80,7 +80,7 @@ public class If {
         }
 
         public BoolVertex orElse(Vertex<? extends BooleanTensor> els) {
-            assertPredicateIsScalarOrMatchesShapeOfThenAndElse(thn.getShape(), els.getShape(), predicate.getShape());
+            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
             return new BooleanIfVertex(els.getShape(), predicate, thn, els);
         }
     }
@@ -97,7 +97,7 @@ public class If {
         }
 
         public DoubleVertex orElse(Vertex<? extends DoubleTensor> els) {
-            assertPredicateIsScalarOrMatchesShapeOfThenAndElse(thn.getShape(), els.getShape(), predicate.getShape());
+            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
             return new DoubleIfVertex(els.getShape(), predicate, thn, els);
         }
 
@@ -106,10 +106,9 @@ public class If {
         }
     }
 
-    private static void assertPredicateIsScalarOrMatchesShapeOfThenAndElse(int[] thnShape, int[] elsShape, int[] predicateShape) {
+    private static void assertShapesMatchOrAreScalar(int[] thnShape, int[] elsShape, int[] predicateShape) {
         if (!Arrays.equals(thnShape, elsShape)
-            || !TensorShape.isScalar(predicateShape)
-                && (!Arrays.equals(predicateShape, thnShape) || !Arrays.equals(predicateShape, elsShape))) {
+            || !TensorShape.isScalar(predicateShape) && !(TensorShape.isScalar(thnShape) && TensorShape.isScalar(elsShape))) {
             throw new IllegalArgumentException("The shape of the then and else condition must match. The predicate should either match or be scalar.");
         }
     }
