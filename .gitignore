@@ -7,3 +7,6 @@ nbproject
 build
 /out
 keanu-python/keanu/keanu-python-all.jar
+keanu.egg-info
+Pipfile.lock
+keanu-python/tests/__pycache__
