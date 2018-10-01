@@ -5,7 +5,6 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
@@ -30,15 +29,15 @@ public class SumVertexTest {
 
     @Test
     public void doesSumSimpleAutoDiff() {
-        DoubleVertex a = new UniformVertex(new int[]{1, 5}, 0, 10);
-        a.setValue(new double[]{1, 2, 3, 4, 5});
+        DoubleVertex a = new UniformVertex(new int[]{2, 2, 2}, 0, 10);
+        a.setValue(a.sample());
 
         DoubleVertex b = a.sum();
 
         DoubleTensor dbdaForward = b.getDualNumber().getPartialDerivatives().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
-        DoubleTensor expectedDbDa = DoubleTensor.create(new double[]{1, 1, 1, 1, 1}, 1, 1, 1, 5);
+        DoubleTensor expectedDbDa = DoubleTensor.ones(new int[]{1, 1, 2, 2, 2});
 
         assertThat(dbdaForward, equalTo(expectedDbDa));
         assertThat(dbdaReverse, equalTo(expectedDbDa));
@@ -128,12 +127,12 @@ public class SumVertexTest {
     }
 
     @Test
-    @Ignore("Test Currently fails due to tensor shape differences")
     public void changesMatchGradient() {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex outputVertex = inputVertex.times(3).sum();
+        inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+        DoubleVertex outputVertex = inputVertex.sum().times(inputVertex);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-10, true);
     }
 
 }

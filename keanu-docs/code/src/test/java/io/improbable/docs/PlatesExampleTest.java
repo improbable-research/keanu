@@ -11,7 +11,6 @@ import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 
 public class PlatesExampleTest {
 

@@ -36,7 +36,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
         PartialDerivatives derivativesWrtInput = derivativeOfOutputsWithRespectToSelf
-            .multiplyBy(DoubleTensor.ones(inputVertex.getShape()), true);
+            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), this.getShape());
 
         return singletonMap(inputVertex, derivativesWrtInput);
     }

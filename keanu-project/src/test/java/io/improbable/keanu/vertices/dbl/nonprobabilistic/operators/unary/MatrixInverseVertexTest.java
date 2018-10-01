@@ -9,6 +9,7 @@ import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -58,6 +59,8 @@ public class MatrixInverseVertexTest {
         inverse.lazyEval();
 
         DoubleTensor inverseWrtMatrix = inverse.getDualNumber().getPartialDerivatives().withRespectTo(matrix);
+        DoubleTensor reverseInverseWrtMatrix = Differentiator.reverseModeAutoDiff(inverse, matrix).withRespectTo(matrix);
+
         DoubleTensor expectedInverseWrtMatrix = DoubleTensor.create(new double[]{
             -4.0, 3.0,
             2.0, -1.5,
@@ -71,6 +74,7 @@ public class MatrixInverseVertexTest {
         );
 
         assertEquals(expectedInverseWrtMatrix, inverseWrtMatrix);
+        assertEquals(expectedInverseWrtMatrix, reverseInverseWrtMatrix);
     }
 
     @Test
@@ -87,7 +91,10 @@ public class MatrixInverseVertexTest {
 
             DoubleTensor changeInMultipliedWrtInput =
                 multiplied.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-            assertEquals(changeInMultipliedWrtInput.sum(), 0.0, 1e-10);
+            DoubleTensor reverseOutputWrtInput =
+                Differentiator.reverseModeAutoDiff(multiplied, inputVertex).withRespectTo(inputVertex);
+            assertEquals(changeInMultipliedWrtInput.pow(2.0).sum(), 0.0, 1e-10);
+            assertEquals(reverseOutputWrtInput.pow(2.0).sum(), 0.0, 1e-10);
         }
     }
 
@@ -107,7 +114,8 @@ public class MatrixInverseVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{3, 3}, 1.0, 25.0);
         DoubleVertex invertVertex = inputVertex.matrixInverse();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-6);
+        finiteDifferenceMatchesGradient(
+            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5, true);
     }
 
 }
