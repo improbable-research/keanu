@@ -30,18 +30,16 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
         throw new UnsupportedOperationException();
     }
 
+    /**
+     * Implemented according to https://www.cs.ox.ac.uk/files/723/NA-08-01.pdf
+     *
+     * @param derivativeOfOutputsWithRespectToSelf derivative of outputs with respect to self
+     * @return derivative of outputs with respect to inputs
+     */
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        // As this is the inverse, this will fail if the matrixDeterminant is zero
         DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
-        // Reverse mode auto diff of matrix matrixDeterminant: https://www.cs.ox.ac.uk/files/723/NA-08-01.pdf
-        // Using variables from the paper
-        // Abar = derivativeOfOutputsWithRespectToInputs (what we want)
-        // A = inputVertex
-        // C = det(inputVertex)
-        // Cbar = derivativeOfOutputsWithRespectToSelf
-        // Abar_i,j = C * Cbar_i,j * inverse(transpose(A))
         PartialDerivatives derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf
             .multiplyBy(inputVertex.getValue().determinant())
             .multiplyAlongWrtDimensions(inverseTranspose, this.inputVertex.getShape());

@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.stream.IntStream;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,27 +45,29 @@ public class MatrixDeterminantVertexTest {
     }
 
     @Test
-    public void canOptimiseOutOfTheBoxEvenWithRiskOfSingularMatrices() {
-        // The standard method for calculating the gradient of the determinant fails when the matrixDeterminant is 0.
-        // Regardless, the gradient is defined when the matrixDeterminant is 0.
-        // We run the optimizer many times to create some confidence that we won't run into problems in a real-world
-        // use-case.
-        final int runCount = 100;
-        IntStream.range(0, runCount).forEach(i -> {
-            int[] shape = new int[]{2, 2};
-            DoubleVertex input = new GaussianVertex(shape, Math.random() * 2 - 4, Math.random() * 2 + 0.1);
-            DoubleVertex determinant = input.matrixDeterminant();
-            DoubleVertex output = new GaussianVertex(determinant, 1);
-            output.observe(new double[]{2.0, 2.4});
-            BayesianNetwork net = new BayesianNetwork(output.getConnectedGraph());
+    public void canOptimiseOutOfTheBox() {
+        assertOptimizerWorks(2);
+    }
 
-            Optimizer.of(net).maxLikelihood();
-            Assert.assertEquals(input.getValue().determinant(), 2.2, 0.1);
-        });
+    @Test
+    public void canOptimiseOutOfTheBoxStartingAtZero() {
+        assertOptimizerWorks(0);
     }
 
     private void assertReverseAutoDiffMatches(DoubleVertex output, DoubleVertex input, DoubleTensor expectedDerivative) {
         final DoubleTensor derivative = Differentiator.reverseModeAutoDiff(output, input).withRespectTo(input);
         Assert.assertThat(derivative, TensorMatchers.elementwiseEqualTo(expectedDerivative));
+    }
+
+    private void assertOptimizerWorks(double inputGaussianMu) {
+        final int[] shape = new int[]{2, 2};
+        final DoubleVertex input = new GaussianVertex(shape, inputGaussianMu, 5);
+        final DoubleVertex determinant = input.matrixDeterminant();
+        final DoubleVertex output = new GaussianVertex(determinant, 1);
+        output.observe(new double[]{2.0, 2.4});
+        final BayesianNetwork net = new BayesianNetwork(output.getConnectedGraph());
+
+        Optimizer.of(net).maxLikelihood();
+        Assert.assertEquals(input.getValue().determinant(), 2.2, 0.1);
     }
 }
