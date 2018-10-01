@@ -24,6 +24,6 @@ dependencies {
 }
 
 shadowJar {
-    destinationDir = file("$rootDir/keanu-python")
+    destinationDir = file("$rootDir/keanu-python/keanu")
     archiveName = "keanu-python-all.jar"
 }
