@@ -46,10 +46,15 @@ public class MultinomialVertexTest {
     }
 
     @Test(expected = TensorValueException.class)
-    public void itThrowsIfAnyOfTheProbabilitiesIsZero() {
-        IntegerTensor n = IntegerTensor.scalar(100);
-        DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
-        Multinomial.withParameters(n, p);
+    public void inDebugModeItThrowsIfAnyOfTheProbabilitiesIsZero() {
+        try {
+            Multinomial.CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.enable();
+            IntegerTensor n = IntegerTensor.scalar(100);
+            DoubleTensor p = DoubleTensor.create(0., 0., 1., 0.).transpose();
+            Multinomial.withParameters(n, p);
+        } finally {
+            Multinomial.CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.disable();
+        }
     }
 
     @Test(expected = IllegalArgumentException.class)

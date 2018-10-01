@@ -14,12 +14,14 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 
 public class Multinomial implements DiscreteDistribution {
 
+    public static final DebugTensorValidator CATEGORY_PROBABILITIES_CANNOT_BE_ZERO = new DebugTensorValidator<>(TensorValidator.ZERO_CATCHER);
     private final IntegerTensor n;
     private final DoubleTensor p;
     private final int numCategories;
@@ -40,7 +42,7 @@ public class Multinomial implements DiscreteDistribution {
             p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
             "Probabilities must sum to one"
         );
-        TensorValidator.ZERO_CATCHER.validate(p);
+        CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
         numCategories = p.getShape()[0];
         TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
