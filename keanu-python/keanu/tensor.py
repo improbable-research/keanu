@@ -23,7 +23,7 @@ class Const(JavaObjectWrapper):
         np_tensor = t if isinstance(t, np.ndarray) else np.array([t])
 
         ctor = self._infer_vertex_from_np_tensor(np_tensor)
-        tensor = _Tensor(np_tensor)
+        tensor = Tensor(np_tensor)
 
         super(Const, self).__init__(ctor, tensor.unwrap())
 
@@ -42,14 +42,14 @@ class Const(JavaObjectWrapper):
             return k.ConstantGenericVertex
 
 
-class _Tensor(JavaObjectWrapper):
+class Tensor(JavaObjectWrapper):
     def __init__(self, t):
         np_tensor = t if isinstance(t, np.ndarray) else np.array([t])
 
         values = context.to_java_array(np_tensor.flatten().tolist())
         shape = context.to_java_array(np_tensor.shape)
 
-        super(_Tensor, self).__init__(self._infer_tensor_from_np_tensor(np_tensor), values, shape)
+        super(Tensor, self).__init__(self._infer_tensor_from_np_tensor(np_tensor), values, shape)
 
     @staticmethod
     def _infer_tensor_from_np_tensor(np_tensor):

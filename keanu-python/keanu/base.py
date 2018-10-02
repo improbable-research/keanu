@@ -37,8 +37,8 @@ class Vertex(JavaObjectWrapper, VertexOps):
         super(Vertex, self).__init__(ctor, *(self._parse_args(*args)))
 
     def observe(self, v):
-        from keanu.tensor import _Tensor
-        self.unwrap().observe(_Tensor(v).unwrap())
+        from keanu.tensor import Tensor
+        self.unwrap().observe(Tensor(v).unwrap())
 
     def _parse_args(self, args):
         return list(map(self._parse_arg, args))

@@ -8,7 +8,7 @@ def test_coalmining():
     start_year, end_year = (data.index.min(), data.index.max())
 
     with kn.Model() as m:
-        m.switchpoint = kn.UniformInt(int(start_year), int(end_year) + 1)
+        m.switchpoint = kn.UniformInt(start_year, end_year + 1)
 
         m.early_rate = kn.Exponential(np.array([[1.0, 1.0], [1.0, 1.0]]))
         m.late_rate = kn.Exponential(1.0)
