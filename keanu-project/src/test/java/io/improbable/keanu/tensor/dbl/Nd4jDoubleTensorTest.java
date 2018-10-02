@@ -27,6 +27,9 @@ import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jDoubleTensorTest {
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor scalarA;
@@ -191,6 +194,28 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor result = matrix.setWithMaskInPlace(mask, 0.0);
 
         assertArrayEquals(new double[]{0, 0, 0, 0}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
+        DoubleTensor tensor = Nd4jDoubleTensor.create(new double[] {1., 2., 3., 4.}, new int[] {2, 2});
+        DoubleTensor mask = Nd4jDoubleTensor.scalar(1.);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2.0);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
+        DoubleTensor tensor = Nd4jDoubleTensor.scalar(3);
+        DoubleTensor mask = Nd4jDoubleTensor.create(new double[] {1., 1., 1., 1.}, new int[] {2, 2});
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2.0);
     }
 
     @Test
