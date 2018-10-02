@@ -14,7 +14,7 @@ public interface BooleanTensor extends Tensor<Boolean> {
         return new SimpleBooleanTensor(values, shape);
     }
 
-    static BooleanTensor create(boolean[] values) {
+    static BooleanTensor create(boolean... values) {
         return create(values, 1, values.length);
     }
 

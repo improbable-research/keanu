@@ -9,7 +9,6 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
@@ -470,6 +469,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     @Override
     public FlattenedView<Integer> getFlattenedView() {
         return new SimpleIntegerFlattenedView(value);
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(Integer value) {
+        return BooleanTensor.create(this.scalar().equals(value));
     }
 
     private static class SimpleIntegerFlattenedView implements FlattenedView<Integer> {

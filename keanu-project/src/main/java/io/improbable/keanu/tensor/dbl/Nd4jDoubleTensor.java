@@ -1026,6 +1026,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         }
     }
 
+    @Override
+    public BooleanTensor elementwiseEquals(Double value) {
+        return fromMask(tensor.eq(value), copyOf(getShape(), getShape().length));
+    }
+
     static INDArray unsafeGetNd4J(DoubleTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());

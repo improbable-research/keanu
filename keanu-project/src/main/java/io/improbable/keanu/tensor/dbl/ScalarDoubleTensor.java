@@ -786,6 +786,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return new SimpleDoubleFlattenedView(value);
     }
 
+    @Override
+    public BooleanTensor elementwiseEquals(Double value) {
+        return BooleanTensor.create(this.scalar().equals(value));
+    }
+
     private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
 
         private double value;

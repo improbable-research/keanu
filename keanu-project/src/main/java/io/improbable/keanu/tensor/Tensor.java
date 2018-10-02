@@ -121,4 +121,6 @@ public interface Tensor<T> {
         return elementwiseEquals(this, that);
     }
 
+    BooleanTensor elementwiseEquals(T value);
+
 }

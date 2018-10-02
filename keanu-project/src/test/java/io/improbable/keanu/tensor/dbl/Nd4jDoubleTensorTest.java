@@ -304,6 +304,17 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void canElementwiseEqualsAScalarValue() {
+        double value = 42.0;
+        double otherValue = 42.1;
+        DoubleTensor allTheSame = DoubleTensor.create(value, new int[] {2, 3});
+        DoubleTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
+
+        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
+    }
+
+    @Test
     public void canEqualsWithEpsilon() {
         double[] aData = new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
