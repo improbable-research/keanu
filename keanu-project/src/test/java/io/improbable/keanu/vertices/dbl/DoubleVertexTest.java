@@ -95,7 +95,7 @@ public class DoubleVertexTest {
 
     @Test
     public void sampleScalarsAsTensorFillsGivenShapeWithSamples() {
-        DoubleVertex vertex = new DoubleVertex() {
+        final DoubleVertex vertex = new DoubleVertex() {
             double sampledValue = 0;
 
             @Override
@@ -115,7 +115,7 @@ public class DoubleVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void sampleScalarsAsTensorFailsForNonScalars() {
-        DoubleVertex vertex = new GaussianVertex(new int[]{2, 2}, 0, 1);
+        final DoubleVertex vertex = new GaussianVertex(new int[]{2, 2}, 0, 1);
 
         vertex.sampleScalarValuesAsTensor(new int[]{2, 2});
     }

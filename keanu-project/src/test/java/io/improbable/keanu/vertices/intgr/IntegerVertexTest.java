@@ -179,7 +179,7 @@ public class IntegerVertexTest {
 
     @Test
     public void sampleScalarsAsTensorFillsGivenShapeWithSamples() {
-        IntegerVertex vertex = new IntegerVertex() {
+        final IntegerVertex vertex = new IntegerVertex() {
             int sampledValue = 0;
 
             @Override
@@ -199,7 +199,7 @@ public class IntegerVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void sampleScalarsAsTensorFailsForNonScalars() {
-        IntegerVertex vertex = new BinomialVertex(new int[]{2, 2}, 0.5, 10);
+        final IntegerVertex vertex = new BinomialVertex(new int[]{2, 2}, 0.5, 10);
 
         vertex.sampleScalarValuesAsTensor(new int[]{2, 2});
     }

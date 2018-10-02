@@ -245,7 +245,7 @@ public class BoolVertexTest {
 
     @Test
     public void sampleScalarsAsTensorFillsGivenShapeWithSamples() {
-        BoolVertex vertex = new BoolVertex() {
+        final BoolVertex vertex = new BoolVertex() {
             boolean sampledValue = false;
 
             @Override
@@ -265,7 +265,7 @@ public class BoolVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void sampleScalarsAsTensorFailsForNonScalars() {
-        BoolVertex vertex = new BernoulliVertex(new int[]{2, 2}, 0.5);
+        final BoolVertex vertex = new BernoulliVertex(new int[]{2, 2}, 0.5);
 
         vertex.sampleScalarValuesAsTensor(new int[]{2, 2});
     }
