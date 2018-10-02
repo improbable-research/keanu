@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import static java.util.Arrays.copyOf;
 
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -7,6 +8,7 @@ import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -17,7 +19,7 @@ public class GenericTensor<T> implements Tensor<T> {
     private int[] shape;
     private int[] stride;
 
-    public GenericTensor(T[] data, int[] shape) {
+    public GenericTensor(T[] data, int... shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -36,7 +38,7 @@ public class GenericTensor<T> implements Tensor<T> {
     /**
      * @param shape placeholder shape
      */
-    public GenericTensor(int[] shape) {
+    public GenericTensor(int... shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -71,6 +73,35 @@ public class GenericTensor<T> implements Tensor<T> {
     public GenericTensor<T> setValue(T value, int... index) {
         data[getFlatIndex(shape, stride, index)] = value;
         return this;
+    }
+
+    public boolean isNull() {
+        return this.data == null;
+    }
+
+    public GenericTensor<T> setWithMaskInPlace(DoubleTensor mask, T value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
+
+        if (data == null) {
+            data = (T[]) new Object[(int) this.getLength()];
+        }
+
+        double[] flatArray = mask.asFlatDoubleArray();
+        for (int i = 0; i < flatArray.length; i++) {
+            if (flatArray[i] == 1.) {
+                data[i] = value;
+            }
+        }
+
+        return this;
+    }
+
+    public DoubleTensor equalsMask(T value) {
+        return DoubleTensor.create(
+            Arrays.stream(data).mapToDouble(d -> Objects.equals(value, d) ? 1. : 0.).toArray(),
+            this.shape);
     }
 
     @Override

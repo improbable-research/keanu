@@ -3,10 +3,12 @@ package io.improbable.keanu.distributions.discrete;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.Distribution;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Categorical<T> implements Distribution<T> {
+public class Categorical<T> implements Distribution<GenericTensor<T>> {
 
     private final Map<T, DoubleTensor> selectableValues;
 
@@ -18,44 +20,51 @@ public class Categorical<T> implements Distribution<T> {
         this.selectableValues = selectableValues;
     }
 
-    public T sample(int[] shape, KeanuRandom random) {
-        double sumOfProbabilities = getSumOfProbabilities();
-        double p = random.nextDouble();
-        double sum = 0;
-
-        if (sumOfProbabilities == 0.0) {
+    public GenericTensor<T> sample(int[] shape, KeanuRandom random) {
+        DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
+        if (!sumOfProbabilities.lessThanOrEqual(0.).allFalse()) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
 
-        T value = null;
+        double p = random.nextDouble();
+        DoubleTensor sum = DoubleTensor.zeros(shape);
+        GenericTensor<T> value = new GenericTensor<>(shape);
+
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
-            sum += entry.getValue().scalar() / sumOfProbabilities;
-            if (p < sum) {
-                value = entry.getKey();
+            sum.plusInPlace(entry.getValue().div(sumOfProbabilities));
+
+            BooleanTensor mask = sum.greaterThan(p);
+            value.setWithMaskInPlace(mask.toDoubleMask(), entry.getKey());
+
+            if (mask.allTrue()) {
                 break;
             }
         }
-        if (value == null) {
-            T[] values = (T[]) selectableValues.keySet().toArray();
-            value = values[values.length - 1];
+
+        if (value.isNull()) {
+            value = new GenericTensor<>((T[]) selectableValues.keySet().toArray(), shape);
         }
 
         return value;
     }
 
-    public DoubleTensor logProb(T x) {
-        double sumOfProbabilities = getSumOfProbabilities();
-        if (sumOfProbabilities == 0.0) {
+    public DoubleTensor logProb(GenericTensor<T> x) {
+        DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
+        if (!sumOfProbabilities.lessThanOrEqual(0.).allFalse()) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
-        final double probability = selectableValues.get(x).scalar() / sumOfProbabilities;
-        return DoubleTensor.scalar(Math.log(probability));
+
+        DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
+        for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
+            logProb.plusInPlace(x.equalsMask(entry.getKey()).timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
+        }
+        return logProb;
     }
 
-    private double getSumOfProbabilities() {
-        double sumP = 0.0;
+    private DoubleTensor getSumOfProbabilities(int[] shape) {
+        DoubleTensor sumP = DoubleTensor.zeros(shape);
         for (DoubleTensor p : selectableValues.values()) {
-            sumP += p.scalar();
+            sumP.plusInPlace(p);
         }
         return sumP;
     }

@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import io.improbable.keanu.tensor.generic.GenericTensor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.closeTo;
@@ -265,13 +266,13 @@ public class MultinomialVertexTest {
             Colours.RED, ConstantVertex.of(p.getValue(0)),
             Colours.GREEN, ConstantVertex.of(p.getValue(1)),
             Colours.BLUE, ConstantVertex.of(p.getValue(2)));
-        CategoricalVertex categoricalVertex = new CategoricalVertex(selectableValues);
+        CategoricalVertex<Colours> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        double pRed = categoricalVertex.logProb(Colours.RED);
+        double pRed = categoricalVertex.logProb(new GenericTensor<>(Colours.RED));
         assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).transpose()).scalar(), closeTo(pRed, 1e-7));
-        double pGreen = categoricalVertex.logProb(Colours.GREEN);
+        double pGreen = categoricalVertex.logProb(new GenericTensor<>(Colours.GREEN));
         assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0).transpose()).scalar(), closeTo(pGreen, 1e-7));
-        double pBlue = categoricalVertex.logProb(Colours.BLUE);
+        double pBlue = categoricalVertex.logProb(new GenericTensor<>(Colours.BLUE));
         assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).transpose()).scalar(), closeTo(pBlue, 1e-7));
     }
 
