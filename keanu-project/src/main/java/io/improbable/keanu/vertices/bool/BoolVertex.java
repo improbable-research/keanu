@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Booleans;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexSampler;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
@@ -94,16 +96,9 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
     }
 
     public BooleanTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
-        if (!TensorShape.isScalar(this.getShape())) {
-            throw new IllegalArgumentException("Vertex to sample must be scalar");
-        }
-
         final int length = Math.toIntExact(TensorShape.getLength(shape));
-        final boolean[] samples = new boolean[length];
-        for (int i = 0; i < length; i += 1) {
-            samples[i] = this.sample(random).scalar();
-        }
-
+        final boolean[] samples = Booleans.toArray(
+            VertexSampler.sampleManyScalarsFromTensorVertex(this, length, random));
         return BooleanTensor.create(samples, shape);
     }
 

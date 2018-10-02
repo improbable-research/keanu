@@ -4,12 +4,15 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.google.common.primitives.Doubles;
+
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexSampler;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
@@ -280,16 +283,9 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
-        if (!TensorShape.isScalar(this.getShape())) {
-            throw new IllegalArgumentException("Vertex to sample must be scalar");
-        }
-
         final int length = Math.toIntExact(TensorShape.getLength(shape));
-        final double[] samples = new double[length];
-        for (int i = 0; i < length; i += 1) {
-            samples[i] = this.sample(random).scalar();
-        }
-
+        final double[] samples = Doubles.toArray(
+            VertexSampler.sampleManyScalarsFromTensorVertex(this, length, random));
         return DoubleTensor.create(samples, shape);
     }
 
