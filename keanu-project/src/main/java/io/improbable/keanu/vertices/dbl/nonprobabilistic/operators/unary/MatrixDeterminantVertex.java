@@ -26,16 +26,12 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
     }
 
     private static void assertInputValueIsSquareMatrix(DoubleTensor value) {
-        final IllegalArgumentException exception = new IllegalArgumentException("Input tensor must be a square matrix");
-
-        if (value == null) {
-            throw exception;
-        }
-
         final int[] shape = value.getShape();
+        final boolean isMatrix = shape.length == 2;
+        final boolean isSquare = isMatrix && shape[0] == shape[1];
 
-        if ((shape.length != 2) || (shape[0] != shape[1])) {
-            throw exception;
+        if (!isMatrix || !isSquare) {
+            throw new IllegalArgumentException("Input tensor must be a square matrix");
         }
     }
 
@@ -46,13 +42,11 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        assertInputValueIsSquareMatrix(value);
         return DoubleTensor.scalar(value.determinant());
     }
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        assertInputValueIsSquareMatrix(inputVertex.getValue());
         DoubleTensor inverseTranspose = inputVertex.getValue().transpose().matrixInverse();
 
         PartialDerivatives derivativeOfOutputsWithRespectToInputs = derivativeOfOutputsWithRespectToSelf

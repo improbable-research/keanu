@@ -78,16 +78,6 @@ public class MatrixDeterminantVertexTest {
         input.matrixDeterminant();
     }
 
-    @Test(expected = IllegalArgumentException.class)
-    public void failsIfInputChangesToInvalidForm() {
-        final int[] shape = new int[]{4, 4};
-        final int[] badShape = new int[]{2, 2, 2, 2};
-        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
-        final DoubleVertex output = input.matrixDeterminant();
-        input.setValue(DoubleTensor.create(1, badShape));
-        output.eval();
-    }
-
     @Test(expected = SingularMatrixException.class)
     public void differentiationFailsWhenMatrixIsSingular() {
         final int[] shape = new int[]{2, 2};
