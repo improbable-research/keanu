@@ -33,10 +33,10 @@ class Tensor(JavaObjectWrapper):
         values = context.to_java_array(np_tensor.flatten().tolist())
         shape = context.to_java_array(np_tensor.shape)
 
-        super(Tensor, self).__init__(self._infer_tensor_from_np_tensor(np_tensor), values, shape)
+        super(Tensor, self).__init__(self.__infer_tensor_from_np_tensor(np_tensor), values, shape)
 
     @staticmethod
-    def _infer_tensor_from_np_tensor(np_tensor):
+    def __infer_tensor_from_np_tensor(np_tensor):
         if len(np_tensor) == 0:
             raise ValueError("Cannot infer type because tensor is empty")
 

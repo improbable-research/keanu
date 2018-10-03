@@ -18,13 +18,7 @@ class Singleton(type):
 
 class KeanuContext(metaclass=Singleton):
     def __init__(self):
-        stderr = sys.stderr
-
-        # Disable redirecting of stderr in jupyter notebooks as it doesn't work
-        try:
-            sys.stderr.fileno()
-        except io.UnsupportedOperation:
-            stderr = None
+        stderr = self.__stderr_with_redirect_disabled_for_jupyter()
 
         self._gateway = JavaGateway.launch_gateway(
             classpath=CLASSPATH,
@@ -33,7 +27,16 @@ class KeanuContext(metaclass=Singleton):
             redirect_stderr=stderr
         )
 
-        # Get random port for callback server
+        self.__get_random_port_for_callback_server()
+
+    def __stderr_with_redirect_disabled_for_jupyter(self):
+        try:
+            sys.stderr.fileno()
+            return sys.stderr
+        except io.UnsupportedOperation:
+            return None
+
+    def __get_random_port_for_callback_server(self):
         # See: https://github.com/bartdag/py4j/issues/147
         self._gateway.start_callback_server(CallbackServerParameters(port=0, daemonize=True, daemonize_connections=True))
         jgws = JavaObject("GATEWAY_SERVER", self._gateway._gateway_client)
@@ -45,7 +48,17 @@ class KeanuContext(metaclass=Singleton):
     def list_vertex_classes(self):
         return self._gateway.jvm.io.improbable.keanu.python.Keanu().getVertexClasses()
 
-    def _infer_class_from_array(self, l):
+    def to_java_array(self, l, klass=None, cast=lambda x: x):
+        if klass is None:
+            klass = self.__infer_class_from_array(l)
+        array = self._gateway.new_array(klass, len(l))
+
+        for idx, o in enumerate(l):
+            array[idx] = cast(o)
+
+        return array
+
+    def __infer_class_from_array(self, l):
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
 
@@ -57,13 +70,3 @@ class KeanuContext(metaclass=Singleton):
             return self._gateway.jvm.boolean
         else:
             return self._gateway.jvm.Object
-
-    def to_java_array(self, l, klass=None, cast=lambda x: x):
-        if klass is None:
-            klass = self._infer_class_from_array(l)
-        array = self._gateway.new_array(klass, len(l))
-
-        for idx, o in enumerate(l):
-            array[idx] = cast(o)
-
-        return array
