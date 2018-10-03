@@ -5,45 +5,49 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
-import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class TensorTestOperations {
 
     public static void finiteDifferenceMatchesGradient(List<DoubleVertex> inputVertices,
                                                        DoubleVertex outputVertex,
-                                                       final double INCREMENT_AMOUNT,
-                                                       final double DELTA) {
-        setInitialConditions(inputVertices);
-        inputVertices.forEach(v -> runGradientTestOnSingleInput(v, outputVertex, INCREMENT_AMOUNT, DELTA));
-    }
-
-    private static void setInitialConditions(List<DoubleVertex> inputVertices) {
-        inputVertices.forEach(v -> v.setValue(v.sample()));
+                                                       final double incrementAmount,
+                                                       final Double delta,
+                                                       final boolean doReverse) {
+        inputVertices.forEach(v -> runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, doReverse));
     }
 
     private static void runGradientTestOnSingleInput(DoubleVertex inputVertex,
                                                      DoubleVertex outputVertex,
-                                                     final double INCREMENT_AMOUNT,
-                                                     final double DELTA) {
+                                                     final double incrementAmount,
+                                                     final Double delta,
+                                                     final boolean doReverse) {
         DoubleTensor initialInput = inputVertex.getValue();
 
         DoubleTensor initialOutput = outputVertex.eval();
-        DoubleTensor outputWrtInput = outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-        int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
-        DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
-        Tensor.FlattenedView<Double> flatIncrement = incrementTensor.getFlattenedView();
-        Double boxedDelta = DELTA;
+        DoubleTensor outputWrtInputForward =
+            outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
 
-        for (int i = 0; i < flatIncrement.size(); i++) {
-            flatIncrement.set(i, INCREMENT_AMOUNT);
+        if (doReverse) {
+            DoubleTensor outputWrtInputReverse =
+                Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+            assertThat(outputWrtInputForward, allCloseTo(delta, outputWrtInputReverse));
+        }
+
+        int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
+
+        for (int i = 0; i < TensorShape.getLength(inputVertex.getShape()); i++) {
+            DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
+            incrementTensor.getFlattenedView().set(i, incrementAmount);
             inputVertex.setValue(initialInput.plus(incrementTensor));
 
             DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
-            DoubleTensor differenceUsingGradient = outputWrtInput.times(incrementTensor).sum(dimensionsToSumOver);
-            assertThat(differenceUsingGradient, allCloseTo(boxedDelta, differenceInOutput));
+            DoubleTensor differenceUsingGradient = outputWrtInputForward.times(incrementTensor).sum(dimensionsToSumOver);
+            assertThat(differenceUsingGradient, allCloseTo(delta, differenceInOutput));
         }
     }
 

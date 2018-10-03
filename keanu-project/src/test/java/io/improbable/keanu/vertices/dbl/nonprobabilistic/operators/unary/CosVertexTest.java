@@ -57,7 +57,7 @@ public class CosVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(3).cos();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5, true);
     }
 
 }

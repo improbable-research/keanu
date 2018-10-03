@@ -1,21 +1,34 @@
 package io.improbable.keanu.tensor.dbl;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
 public class Nd4jDoubleTensorTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
@@ -23,6 +36,9 @@ public class Nd4jDoubleTensorTest {
     Nd4jDoubleTensor vectorA;
     Nd4jDoubleTensor vectorB;
     Nd4jDoubleTensor rankThreeTensor;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -32,6 +48,18 @@ public class Nd4jDoubleTensorTest {
         vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
         rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+    }
+
+    @Before
+    public void enableDebugModeForNaNChecking() throws Exception {
+        TensorValidator.NAN_CATCHER.enable();
+        TensorValidator.NAN_FIXER.enable();
+    }
+
+    @After
+    public void disableDebugModeForNaNChecking() throws Exception {
+        TensorValidator.NAN_CATCHER.disable();
+        TensorValidator.NAN_FIXER.disable();
     }
 
     @Test
@@ -128,6 +156,66 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    /**
+     * Zero is a special case because it's usually the value that the mask uses to mean "false"
+     */
+    @Test
+
+    public void canSetToZero() {
+        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
+        DoubleTensor result = matrixA.setWithMaskInPlace(mask, 0.0);
+
+        assertArrayEquals(new double[]{0, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canTestIfIsNaN() {
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+        assertThat(matrix.isNaN(), hasValue(false, false, true, false));
+    }
+
+    @Test
+    public void canSetWhenNaN() {
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+
+        DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
+        DoubleTensor result = matrix.setWithMaskInPlace(mask, -2.0);
+
+        assertArrayEquals(new double[]{-2, -2, -2, -2}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void canSetToZeroWhenNaN() {
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+
+        DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
+        DoubleTensor result = matrix.setWithMaskInPlace(mask, 0.0);
+
+        assertArrayEquals(new double[]{0, 0, 0, 0}, result.asFlatDoubleArray(), 0.0);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
+        DoubleTensor tensor = Nd4jDoubleTensor.create(new double[] {1., 2., 3., 4.}, new int[] {2, 2});
+        DoubleTensor mask = Nd4jDoubleTensor.scalar(1.);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2.0);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
+        DoubleTensor tensor = Nd4jDoubleTensor.scalar(3);
+        DoubleTensor mask = Nd4jDoubleTensor.create(new double[] {1., 1., 1., 1.}, new int[] {2, 2});
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2.0);
     }
 
     @Test
@@ -794,6 +882,59 @@ public class Nd4jDoubleTensorTest {
         assertEquals(expected2, actual.get(2));
     }
 
+    @Test
+    public void canFindScalarMinAndMax() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(2, 2);
+        double min = a.min();
+        double max = a.max();
+        assertEquals(2., min, 1e-6);
+        assertEquals(5., max, 1e-6);
+    }
+
+    @Test
+    public void canFindMinAndMaxFromScalarToTensor() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        DoubleTensor min = DoubleTensor.min(a, b);
+        DoubleTensor max = DoubleTensor.max(a, b);
+
+        assertArrayEquals(new double[]{3, 3, 3, 2}, min.asFlatDoubleArray(), 1e-6);
+        assertArrayEquals(new double[]{5, 4, 3, 3}, max.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindMinFromScalarToTensorInPlace() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        a.minInPlace(b);
+
+        assertArrayEquals(new double[]{3, 3, 3, 2}, a.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindMaxFromScalarToTensorInPlace() {
+        DoubleTensor a = DoubleTensor.create(5., 4., 3., 2.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(3.);
+
+        a.maxInPlace(b);
+
+        assertArrayEquals(new double[]{5, 4, 3, 3}, a.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canFindElementWiseMinAndMax() {
+        DoubleTensor a = DoubleTensor.create(1., 2., 3., 4.).reshape(1, 4);
+        DoubleTensor b = DoubleTensor.create(2., 3., 1., 4.).reshape(1, 4);
+
+        DoubleTensor min = DoubleTensor.min(a, b);
+        DoubleTensor max = DoubleTensor.max(a, b);
+
+        assertArrayEquals(new double[]{1, 2, 1, 4}, min.asFlatDoubleArray(), 1e-6);
+        assertArrayEquals(new double[]{2, 3, 3, 4}, max.asFlatDoubleArray(), 1e-6);
+    }
+
     private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
 
         int[] splitIndices = new int[concatenatedIndices.length];
@@ -821,4 +962,104 @@ public class Nd4jDoubleTensorTest {
         }
     }
 
+    @Test
+    public void youCanCheckForZeros() {
+        DoubleTensor containsZero = DoubleTensor.create(new double[]{
+                0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
+                Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0},
+            4, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                false, true, true, true,
+                true, true, true, false},
+            4, 2);
+
+        assertThat(TensorValidator.ZERO_CATCHER.check(containsZero), equalTo(expectedMask));
+    }
+
+    @Test
+    public void youCanCheckForNaNs() {
+        DoubleTensor containsNan = DoubleTensor.create(new double[]{
+                0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
+                Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0},
+            4, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                true, true, true, false,
+                true, true, true, true},
+            4, 2);
+
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.NAN_CATCHER;
+        assertThat(validator.check(containsNan), equalTo(expectedMask));
+        assertThat(containsNan.isNaN(), equalTo(expectedMask.not()));
+    }
+
+    @Test
+    public void youCanReplaceNaNs() {
+        double[] input = {
+            0.0, -1.0, -Double.NEGATIVE_INFINITY, Double.NaN,
+            Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0};
+
+        Double[] expectedOutput = {
+            0.0, -1.0, -Double.NEGATIVE_INFINITY, 0.0,
+            Double.POSITIVE_INFINITY, Double.MIN_VALUE, Double.MAX_VALUE, -0.0};
+
+        DoubleTensor containsNan = DoubleTensor.create(input,
+            4, 2);
+
+        assertThat(containsNan.replaceNaN(0.), hasValue(expectedOutput));
+    }
+
+    @Test
+    public void youCanDoYLogXEvenWhenBothAreZero() {
+        DoubleTensor x = DoubleTensor.create(
+            Double.MIN_VALUE, 1e-8, 1., 1e8);
+        DoubleTensor y = x.duplicate();
+        assertThat(x.log().times(y), equalTo(x.safeLogTimes(y)));
+
+        DoubleTensor zeros = DoubleTensor.create(0., -0.);
+
+        assertThat(zeros.safeLogTimes(zeros), hasValue(0., 0.));
+        assertThat(zeros.log().times(zeros), hasValue(Double.NaN, Double.NaN));
+    }
+
+    @Test
+    public void logTimesFailsIfYouPassInATensorThatAlreadyContainsNaN() {
+        expectedException.expect(TensorValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.create(1., 1.);
+        DoubleTensor y = DoubleTensor.create(1., Double.NaN);
+        x.safeLogTimes(y);
+    }
+
+    @Test
+    public void logTimesFailsIfYouStartWithATensorThatAlreadyContainsNaN() {
+        expectedException.expect(TensorValueException.class);
+        expectedException.expectMessage("Invalid value found");
+
+        DoubleTensor x = DoubleTensor.create(1., Double.NaN);
+        DoubleTensor y = DoubleTensor.create(1., 1.);
+        x.safeLogTimes(y);
+    }
+
+    @Test
+    public void youCanFixAValidationIssueByReplacingTheValue() {
+        DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
+        DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, -1.0);
+
+        TensorValidator<Double, Tensor<Double>> validator = TensorValidator.thatReplaces(0., 1e-8);
+        validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValue() {
+        DoubleTensor containsZero = DoubleTensor.create(1.0, 0.0, -1.0);
+        DoubleTensor expectedResult = DoubleTensor.create(1.0, 1e-8, 1e-8);
+
+        TensorValidator<Double, DoubleTensor> validator = TensorValidator.thatFixesElementwise(x -> x > 0., TensorValidationPolicy.changeValueTo(1e-8));
+        containsZero = validator.validate(containsZero);
+        assertThat(containsZero, equalTo(expectedResult));
+    }
 }

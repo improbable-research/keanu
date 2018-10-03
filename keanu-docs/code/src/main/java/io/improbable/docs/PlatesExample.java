@@ -1,7 +1,5 @@
 package io.improbable.docs;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -11,7 +9,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -65,15 +62,15 @@ public class PlatesExample {
             .fromIterator(allMyData.iterator())
             .withFactory((plate, csvMyData) -> {
 
-                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x).setLabel(xLabel);
-                DoubleVertex y = m.multiply(x).plus(b).setLabel(yLabel);
+                ConstantDoubleVertex x = new ConstantDoubleVertex(csvMyData.x);
+                DoubleVertex y = m.multiply(x).plus(b);
 
                 DoubleVertex yObserved = new GaussianVertex(y, 1);
                 yObserved.observe(csvMyData.y);
 
                 // this labels the x and y vertex for later use
-                plate.add(x);
-                plate.add(y);
+                plate.add(xLabel, x);
+                plate.add(yLabel, y);
             })
             .build();
 

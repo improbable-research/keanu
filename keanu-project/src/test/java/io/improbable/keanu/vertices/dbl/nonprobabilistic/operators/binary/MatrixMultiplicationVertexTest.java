@@ -283,7 +283,7 @@ public class MatrixMultiplicationVertexTest {
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA, true);
     }
 
 }

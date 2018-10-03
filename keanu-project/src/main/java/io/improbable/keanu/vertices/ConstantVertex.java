@@ -23,7 +23,7 @@ public class ConstantVertex {
         return new ConstantBoolVertex(value);
     }
 
-    public static ConstantBoolVertex of(boolean[] value) {
+    public static ConstantBoolVertex of(boolean... value) {
         return new ConstantBoolVertex(value);
     }
 
@@ -39,7 +39,7 @@ public class ConstantVertex {
         return new ConstantIntegerVertex(value);
     }
 
-    public static ConstantIntegerVertex of(int[] value) {
+    public static ConstantIntegerVertex of(int... value) {
         return new ConstantIntegerVertex(value);
     }
 
@@ -55,7 +55,7 @@ public class ConstantVertex {
         return new ConstantDoubleVertex(value);
     }
 
-    public static ConstantDoubleVertex of(double[] value) {
+    public static ConstantDoubleVertex of(double... value) {
         return new ConstantDoubleVertex(value);
     }
 

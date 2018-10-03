@@ -16,7 +16,6 @@ import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -66,6 +65,7 @@ public class FoodPoisoningTest {
         generateSurveyData(50, false, false, false);
         NetworkSamples samples = sample(15000);
 
+        int dropCount = 10000;
         assertEquals(0.0, samples.get(infectedOysters).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedLamb).probability(v -> v.scalar()), 0.01);
         assertEquals(0.0, samples.get(infectedToilet).probability(v -> v.scalar()), 0.01);
@@ -87,9 +87,9 @@ public class FoodPoisoningTest {
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
         Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).setLabel(didEatOystersLabel));
-            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).setLabel(didEatLambLabel));
-            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).setLabel(didEatPooLabel));
+            BernoulliVertex didEatOysters = plate.add(didEatOystersLabel, new BernoulliVertex(0.4));
+            BernoulliVertex didEatLamb = plate.add(didEatLambLabel, new BernoulliVertex(0.4));
+            BernoulliVertex didEatPoo = plate.add(didEatPooLabel, new BernoulliVertex(0.4));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -100,11 +100,10 @@ public class FoodPoisoningTest {
 
             DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
-                .orElse(0.1)
-                .setLabel(pIllLabel);
+                .orElse(0.1);
 
-            plate.add(pIll);
-            plate.add(new BernoulliVertex(pIll).setLabel(isIllLabel));
+            plate.add(pIllLabel, pIll);
+            plate.add(isIllLabel, new BernoulliVertex(pIll));
         };
 
         Plates personPlates = new PlateBuilder()
