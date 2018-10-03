@@ -10,15 +10,14 @@ def test_coalmining():
     with kn.Model() as m:
         m.switchpoint = kn.UniformInt(start_year, end_year + 1)
 
-        m.early_rate = kn.Exponential(np.array([[1.0, 1.0], [1.0, 1.0]]))
+        m.early_rate = kn.Exponential(1.0)
         m.late_rate = kn.Exponential(1.0)
 
-        m.year = np.array(range(start_year, end_year + 1))
-        m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.year, m.early_rate, m.late_rate)
+        m.years = np.array(data.index)
+        m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
         m.disasters = kn.Poisson(m.rates)
 
-    value = data[data.index.isin(m.year)]
-    m.disasters.observe(value.values)
+    m.disasters.observe(data.values)
 
     net = kn.BayesNet(m.switchpoint.getConnectedGraph())
     posterior_dist_samples = kn.MetropolisHastings().get_posterior_samples(net, net.getLatentVertices(), 5000)
