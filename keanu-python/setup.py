@@ -7,7 +7,6 @@ setup(name='keanu',
       packages=['keanu', 'keanu.generated'],
       install_requires=[
           'py4j',
-          'pandas',
           'numpy'
       ],
       zip_safe=False)

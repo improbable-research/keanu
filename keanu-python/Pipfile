@@ -4,12 +4,12 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-pandas = "*"
 "py4j" = "*"
 numpy = "*"
 
 [dev-packages]
 pytest = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.6"
