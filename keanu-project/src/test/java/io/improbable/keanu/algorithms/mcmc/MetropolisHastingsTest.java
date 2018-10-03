@@ -243,7 +243,7 @@ public class MetropolisHastingsTest {
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        NetworkSamples samples = algo.generatePosteriorSamples(network, network.getLatentVertices())
+        NetworkSamples samples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(network, network.getLatentVertices())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .generate(sampleCount);

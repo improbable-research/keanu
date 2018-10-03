@@ -1,6 +1,7 @@
-package io.improbable.keanu.model;
+package io.improbable.keanu.model.linear;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.model.Model;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -12,10 +13,9 @@ public interface LinearModel extends Model {
 
     VertexLabel WEIGHTS_LABEL = new VertexLabel("weights");
     VertexLabel Y_OBSERVATION_LABEL = new VertexLabel("yObservation");
+    VertexLabel INTERCEPT_LABEL = new VertexLabel("intercept");
     VertexLabel X_LABEL = new VertexLabel("x");
     VertexLabel Y_LABEL = new VertexLabel("y");
-
-    BayesianNetwork getNet();
 
     default Vertex getXVertex() {
         return getNet().getVertexByLabel(X_LABEL);
@@ -26,25 +26,17 @@ public interface LinearModel extends Model {
     }
 
     default void fit() {
-        BayesianNetwork net = getNet();
-        Tensor y = ((Vertex<? extends Tensor>) getYVertex()).getValue();
-        net.getVertexByLabel(Y_OBSERVATION_LABEL).observe(y);
+        BayesianNetwork net = addObservationLayer(getNet());
+        net.getVertexByLabel(Y_OBSERVATION_LABEL).observe(getY());
         GradientOptimizer optimizer = GradientOptimizer.of(net);
         optimizer.maxAPosteriori();
     }
 
-    default boolean isFit() {
-        return true;
-    }
 
     default DoubleTensor predict(DoubleTensor x) {
-        if (isFit()) {
-            DoubleVertex xVertex = ((DoubleVertex) getXVertex());
-            xVertex.setAndCascade(x);
-            return ((DoubleVertex) getYVertex()).getValue();
-        } else {
-            throw new RuntimeException("The model must be fit before attempting to predict.");
-        }
+        DoubleVertex xVertex = ((DoubleVertex) getXVertex());
+        xVertex.setAndCascade(x);
+        return ((DoubleVertex) getYVertex()).getValue();
     }
 
     default double score(DoubleTensor x, DoubleTensor yTrue) {
@@ -53,5 +45,7 @@ public interface LinearModel extends Model {
         double totalSumOfSquares = ((yTrue.minus(yTrue.average())).pow(2.)).sum();
         return 1 - (residualSumOfSquares / totalSumOfSquares);
     }
+
+    Tensor<?> getY();
 
 }

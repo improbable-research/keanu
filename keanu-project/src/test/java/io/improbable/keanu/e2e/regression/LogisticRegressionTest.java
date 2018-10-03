@@ -1,7 +1,7 @@
 package io.improbable.keanu.e2e.regression;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.LogisticRegression;
+import io.improbable.keanu.model.linear.LogisticRegression;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -10,6 +10,8 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -25,7 +27,7 @@ public class LogisticRegressionTest {
     private static final double[] SIGMAS = new double[] {1.0, 1.0, 1.0};
 
     private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[] {0.5, -3.0, 1.5}, 1, 3);
-    private static final double TRUE_INTERCEPT = 5.0;
+    private static final double TRUE_INTERCEPT = 0.0;
 
     private static final int NUM_SAMPLES_TRAINING = 1250;
     private static final int NUM_SAMPLES_TESTING = 200;
@@ -49,31 +51,19 @@ public class LogisticRegressionTest {
     public void testLogisticRegression() {
         LogisticRegression model = new LogisticRegression(xTrain, yTrain);
         model.fit();
-//        double score = model.score(xTest, yTest);
-//        assertTrue(score > 0.3);
-//        assertWeightsAreCalculated(model.getWeights());
+        double accuracy = model.accuracy(xTest, yTest);
+        Assert.assertTrue(accuracy > 0.75);
+        assertWeightsAreCalculated(model.getWeights());
     }
 
-//    @Test
-//    public void testRegularizedLogisticRegression() {
-//        LogisticRegression unregularizedModel = new LogisticRegression(xTrain);
-//        unregularizedModel.fit(yTrain);
-//
-//        LogisticRegression regularizedModel = new LogisticRegression(xTrain, 5.);
-//        regularizedModel.fit(yTrain);
-//
-//        assertRegularizedWeightsAreSmaller(unregularizedModel.getWeights(), regularizedModel.getWeights());
-//        double score = regularizedModel.score(xTest, yTest);
-//        assertTrue(score > 0.3);
-//        assertWeightsAreCalculated(regularizedModel.getWeights());
-//    }
-//
-//    @Test(expected = RuntimeException.class)
-//    public void predictionFailsIfModelIsNotFit() {
-//        LogisticRegression model = new LogisticRegression(xTrain);
-//        model.predict(xTest);
-//    }
-//
+    @Test
+    public void testRegularizedLogisticRegression() {
+        LogisticRegression unregularizedModel = new LogisticRegression(xTrain, yTrain);
+        LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5.);
+
+        assertRegularizedWeightsAreSmaller(unregularizedModel.getWeights(), regularizedModel.getWeights());
+    }
+
     private DoubleTensor generateX(int nSamples) {
         DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
@@ -89,7 +79,7 @@ public class LogisticRegressionTest {
     }
 
     private void assertWeightsAreCalculated(DoubleVertex weights) {
-        assertTrue(weights.getValue().equalsWithinEpsilon(TRUE_WEIGHTS, 0.5));
+        assertTrue(weights.getValue().equalsWithinEpsilon(TRUE_WEIGHTS, 0.15));
     }
 
     private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {

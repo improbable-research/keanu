@@ -1,20 +1,18 @@
-package io.improbable.keanu.model;
+package io.improbable.keanu.model.linear;
+
+import java.util.Arrays;
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
-import java.util.Arrays;
-
 public class LinearRegression implements LinearModel {
 
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SIGMA = 2.0;
-    private static final VertexLabel INTERCEPT_LABEL = new VertexLabel("intercept");
 
     private final double priorOnSigma;
     private final double priorOnMu;
@@ -38,7 +36,7 @@ public class LinearRegression implements LinearModel {
         this.priorOnSigma = priorOnSigma;
         this.priorOnMu = priorOnMu;
         this.priorOnSigmaForWeights = priorOnSigmaForWeights;
-        this.net = construct();
+        this.net = buildModel();
     }
 
     private static double[] fillPriorOnWeights(DoubleTensor x, double priorOnSigma) {
@@ -48,7 +46,7 @@ public class LinearRegression implements LinearModel {
     }
 
     @Override
-    public BayesianNetwork construct() {
+    public BayesianNetwork buildModel() {
         int numberOfFeatures = x.getShape()[0];
         int[] weightShape = new int[]{1, numberOfFeatures};
         DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).reshape(weightShape).setLabel(WEIGHTS_LABEL);
@@ -57,8 +55,14 @@ public class LinearRegression implements LinearModel {
         DoubleVertex yVertex = weights.getValue().isScalar() ?
             weights.times(xVertex).plus(intercept).setLabel(Y_LABEL) :
             weights.matrixMultiply(xVertex).plus(intercept).setLabel(Y_LABEL);
-        DoubleVertex yVertexProbabilistic = new GaussianVertex(yVertex, priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
-        return new BayesianNetwork(yVertexProbabilistic.getConnectedGraph());
+        return new BayesianNetwork(yVertex.getConnectedGraph());
+    }
+
+    @Override
+    public BayesianNetwork addObservationLayer(BayesianNetwork net) {
+        DoubleVertex yVertex = (DoubleVertex) net.getVertexByLabel(Y_LABEL);
+        DoubleVertex yObservable = new GaussianVertex(yVertex, priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
+        return new BayesianNetwork(yObservable.getConnectedGraph());
     }
 
     public DoubleVertex getWeights() {
@@ -71,6 +75,11 @@ public class LinearRegression implements LinearModel {
 
     public BayesianNetwork getNet() {
         return net;
+    }
+
+    @Override
+    public DoubleTensor getY() {
+        return y;
     }
 
     public void setNet(BayesianNetwork net) {

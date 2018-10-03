@@ -3,7 +3,7 @@ package io.improbable.keanu.e2e.regression;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
-import io.improbable.keanu.model.LinearRegression;
+import io.improbable.keanu.model.linear.LinearRegression;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -38,6 +38,18 @@ public class LinearRegressionTest {
     private double expectedW2 = 7.0;
     private double expectedB = 20.0;
 
+    @Test
+    public void gaussian() {
+        DoubleTensor x = DoubleTensor.ones(1, 10);
+        DoubleVertex xVertex = ConstantVertex.of(x);
+        DoubleVertex g = new GaussianVertex(xVertex, ConstantVertex.of(2.0));
+        System.out.println(g.getValue());
+        System.out.println(g.getValue());
+
+        DoubleTensor x1 = DoubleTensor.ones(1, 10).timesInPlace(2);
+        xVertex.setAndCascade(x1);
+        System.out.println(g.getValue());
+    }
 
     @Before
     public void setupRegressionData() {
@@ -87,7 +99,6 @@ public class LinearRegressionTest {
     public void linearRegression1FactorTensorVariationalMAPAsModel() {
         LinearRegression regression = new LinearRegression(xData, yData);
         regression.fit();
-
         assertEquals(expectedW1, regression.getWeight(0), 0.05);
         assertEquals(expectedB, regression.getIntercept().getValue().scalar(), 0.05);
     }

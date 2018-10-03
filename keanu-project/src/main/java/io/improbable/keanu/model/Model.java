@@ -4,6 +4,10 @@ import io.improbable.keanu.network.BayesianNetwork;
 
 public interface Model {
 
-    BayesianNetwork construct();
+    BayesianNetwork buildModel();
+
+    BayesianNetwork addObservationLayer(BayesianNetwork net);
+
+    BayesianNetwork getNet();
 
 }

@@ -1,19 +1,12 @@
-package io.improbable.keanu.model;
+package io.improbable.keanu.model.linear;
 
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 
-public class LogisticRegression implements LinearModel {
+public class LogisticRegression implements ClassificationModel {
 
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SIGMA = 2.0;
@@ -23,12 +16,14 @@ public class LogisticRegression implements LinearModel {
     private final double regularization;
     private final LinearRegression regression;
     private final BayesianNetwork net;
+    private final BooleanTensor y;
 
     public LogisticRegression(DoubleTensor x, BooleanTensor y, double regularization, double priorMu, double priorSigma) {
+        this.y = y;
         this.priorSigma = priorSigma;
         this.regularization = regularization;
         this.regression = new LinearRegression(x, y.toDoubleMask(), priorMu, priorSigma, regularizeSigma(x));
-        this.net = construct();
+        this.net = buildModel();
         this.regression.setNet(net);
     }
 
@@ -45,13 +40,18 @@ public class LogisticRegression implements LinearModel {
     }
 
     @Override
-    public BayesianNetwork construct() {
+    public BayesianNetwork buildModel() {
         BayesianNetwork linearNetwork = regression.getNet();
-        DoubleVertex probabilities = (DoubleVertex) linearNetwork.getVertexByLabel(Y_OBSERVATION_LABEL).removeLabel();
-        DoubleVertex sigmoid = probabilities.sigmoid();
-        BernoulliVertex outcome = new BernoulliVertex(sigmoid);
+        DoubleVertex probabilities = (DoubleVertex) linearNetwork.getVertexByLabel(Y_LABEL).removeLabel();
+        DoubleVertex sigmoid = probabilities.sigmoid().setLabel(Y_LABEL);
+        return new BayesianNetwork(sigmoid.getConnectedGraph());
+    }
+
+    @Override
+    public BayesianNetwork addObservationLayer(BayesianNetwork net) {
+        BernoulliVertex outcome = new BernoulliVertex(net.getVertexByLabel(Y_LABEL));
         outcome.setLabel(Y_OBSERVATION_LABEL);
-        return new BayesianNetwork(probabilities.getConnectedGraph());
+        return new BayesianNetwork(outcome.getConnectedGraph());
     }
 
     private double[] regularizeSigma(DoubleTensor x) {
@@ -70,8 +70,8 @@ public class LogisticRegression implements LinearModel {
     }
 
     @Override
-    public boolean isFit() {
-        return true;
+    public BooleanTensor getY() {
+        return y;
     }
 
     public DoubleVertex getWeights() {
