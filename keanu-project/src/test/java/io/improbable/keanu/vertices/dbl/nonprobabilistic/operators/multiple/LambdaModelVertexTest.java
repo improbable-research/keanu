@@ -45,25 +45,33 @@ public class LambdaModelVertexTest {
         inputToModel = new ConstantDoubleVertex(25.);
     }
 
+
     @Test
     public void canRunAModelInAModel() {
-        weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
-                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        // some BAD formatting
+        weatherModel.setInputToModel(
+            inputToModel
+                                );
+        Map<VertexLabel,
+            Vertex<? extends Tensor>> inputs =
+                ImmutableMap
+                .of(
+                    new VertexLabel("Temperature"), inputToModel);
 
         ModelVertex model =
                 new LambdaModelVertex(
-                        inputs, weatherModel::modelExecution, weatherModel::updateValues);
-        DoubleVertex chanceOfRain =
+                        inputs, weatherModel::modelExecution, weatherModel::updateValues); DoubleVertex chanceOfRain =
                 model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
-        DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
+        DoubleVertex shouldIBringUmbrella =                                  chanceOfRain.times(humidity);
 
         double inputValue = 10.0;
 
         inputToModel.setAndCascade(inputValue);
-        Assert.assertEquals(shouldIBringUmbrella.getValue().scalar(), 20.0, 1e-6);
+        Assert
+            .assertEquals(shouldIBringUmbrella.getValue().scalar(), 20.0,
+                                                                        1e-6);
     }
 
     @Test
