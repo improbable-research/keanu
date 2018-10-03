@@ -34,16 +34,16 @@ class VertexOps:
 
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):
-        super(Vertex, self).__init__(ctor, *(self._parse_args(*args)))
+        super(Vertex, self).__init__(ctor, *(self.__parse_args(*args)))
 
     def observe(self, v):
         from keanu.tensor import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
 
-    def _parse_args(self, args):
-        return list(map(self._parse_arg, args))
+    def __parse_args(self, args):
+        return list(map(self.__parse_arg, args))
 
-    def _parse_arg(self, arg):
+    def __parse_arg(self, arg):
         if isinstance(arg, np.ndarray) or isinstance(arg, numbers.Number):
             from keanu.tensor import Const
             return Const(arg).unwrap()
