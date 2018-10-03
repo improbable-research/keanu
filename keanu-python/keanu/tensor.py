@@ -11,8 +11,6 @@ k = context.jvm_view()
 java_import(k, "io.improbable.keanu.tensor.dbl.DoubleTensor")
 java_import(k, "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k, "io.improbable.keanu.tensor.intgr.IntegerTensor")
-java_import(k, "io.improbable.keanu.tensor.generic.GenericTensor")
-
 java_import(k, "io.improbable.keanu.vertices.ConstantVertex")
 
 
@@ -49,5 +47,5 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(np_tensor.item(0), bool):
             return k.BooleanTensor.create
         else:
-            return k.GenericTensor
+            raise ValueError("Generic types in a tensor are not supported")
 
