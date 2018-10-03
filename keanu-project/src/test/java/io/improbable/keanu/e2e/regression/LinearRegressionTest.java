@@ -104,7 +104,7 @@ public class LinearRegressionTest {
         BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
         GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
 
-        optimizer.maxLikelihood();
+        optimizer.maxAPosteriori();
 
         log.info("W1 = " + w1.getValue().scalar() + " W2 = " + w2.getValue().scalar() + ", B = " + b.getValue().scalar());
         assertEquals(expectedW1, w1.getValue().scalar(), 0.05);

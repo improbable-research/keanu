@@ -13,11 +13,9 @@ public class LogisticRegression implements ClassificationModel {
     private static final double DEFAULT_REGULARIZATION = 1.0;
 
     private final BayesianNetwork net;
-    private final DoubleTensor x;
     private final BooleanTensor y;
 
     public LogisticRegression(DoubleTensor x, BooleanTensor y, double regularization, double priorMu, double priorSigma) {
-        this.x = x;
         this.y = y;
         this.net = buildModel(x, priorMu, priorSigma, regularizeSigma(x, priorSigma, regularization));
     }

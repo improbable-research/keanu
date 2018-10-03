@@ -19,7 +19,7 @@ public class LinearRegressionGraph {
     public static BayesianNetwork build(DoubleTensor x, double priorOnMu, double priorOnSigma, double[] priorOnSigmaForWeights) {
         int numberOfFeatures = x.getShape()[0];
         int[] weightShape = new int[]{1, numberOfFeatures};
-        DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).reshape(weightShape).setLabel(WEIGHTS_LABEL);
+        DoubleVertex weights = new GaussianVertex(weightShape, priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).setLabel(WEIGHTS_LABEL);
         DoubleVertex intercept = new GaussianVertex(priorOnMu, priorOnSigma).setLabel(INTERCEPT_LABEL);
         DoubleVertex xVertex = ConstantVertex.of(x).setLabel(X_LABEL);
         DoubleVertex yVertex = weights.getValue().isScalar() ?

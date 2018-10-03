@@ -14,8 +14,8 @@ public class LinearRegression implements LinearModel {
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SIGMA = 2.0;
 
-    private BayesianNetwork net;
-    private DoubleTensor y;
+    private final BayesianNetwork net;
+    private final DoubleTensor y;
 
     public LinearRegression(DoubleTensor x, DoubleTensor y) {
         this(x, y, DEFAULT_MU, DEFAULT_SIGMA);
@@ -45,10 +45,6 @@ public class LinearRegression implements LinearModel {
 
     public BayesianNetwork getNet() {
         return net;
-    }
-
-    public void setNet(BayesianNetwork net) {
-        this.net = net;
     }
 
     public double getWeight(int index) {
