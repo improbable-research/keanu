@@ -104,21 +104,21 @@ public class ReshapeVertexTest {
 
     @Test
     public void partialCorrectlyFlowsThroughTwoReshapes() {
-        DoubleVertex A = new UniformVertex(0, 10);
-        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+        DoubleVertex A = new UniformVertex(new int[]{2, 2, 2, 2}, 0, 10);
+        A.setValue(A.sample());
 
-        DoubleVertex B = new UniformVertex(0, 10);
-        B.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+        DoubleVertex B = new UniformVertex(new int[]{2, 2, 2, 2}, 0, 10);
+        B.setValue(B.sample());
 
         DoubleVertex C = A.plus(B);
 
-        DoubleVertex D = C.reshape(4, 1);
-        DoubleVertex E = D.reshape(1, 4);
+        DoubleVertex D = C.reshape(4, 2, 2);
+        DoubleVertex E = D.reshape(4, 4);
 
         PartialDerivatives forward = E.getDualNumber().getPartialDerivatives();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
 
-        Assert.assertArrayEquals(new int[]{1, 4, 2, 2}, forward.withRespectTo(A).getShape());
+        Assert.assertArrayEquals(new int[]{4, 4, 2, 2, 2, 2}, forward.withRespectTo(A).getShape());
         Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
     }
 
@@ -127,7 +127,7 @@ public class ReshapeVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
+        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10, true);
     }
 
 }

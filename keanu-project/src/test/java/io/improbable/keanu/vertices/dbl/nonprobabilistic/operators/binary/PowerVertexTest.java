@@ -1,7 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorsAndScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorAndScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoScalars;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
@@ -47,7 +47,7 @@ public class PowerVertexTest {
 
     @Test
     public void calculatesDualNumberOfAVectorsAndScalarPower() {
-        calculatesDualNumberOfAVectorsAndScalar(
+        calculatesDualNumberOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             3,
             DoubleTensor.create(new double[]{3.0, 3.0 * 4., 3.0 * 9, 3.0 * 16}).diag().reshape(1, 4, 1, 4),

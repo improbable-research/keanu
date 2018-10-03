@@ -1,13 +1,25 @@
 package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
+import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 public class Nd4jIntegerTensorTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void doesMinusScalar() {
@@ -243,6 +255,28 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
+    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
+        IntegerTensor tensor = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        IntegerTensor mask = Nd4jIntegerTensor.scalar(1);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
+        IntegerTensor tensor = Nd4jIntegerTensor.scalar(3);
+        IntegerTensor mask = Nd4jIntegerTensor.create(new int[]{1, 1, 1, 1}, new int[]{2, 2});
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2);
+    }
+
+    @Test
     public void doesApplyUnaryFunction() {
         IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.apply(v -> v + 1);
@@ -446,7 +480,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void canRepresentAllValues() {
         IntegerTensor tensor = IntegerTensor.create(
-            new int[]{0,0,0,0},
+            new int[]{0, 0, 0, 0},
             new int[]{2, 2}
         );
 
@@ -463,4 +497,72 @@ public class Nd4jIntegerTensorTest {
             tensor.asFlatIntegerArray());
     }
 
+    @Test
+    public void canFindScalarMinAndMax() {
+        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(2, 2);
+        int min = a.min();
+        int max = a.max();
+        assertEquals(2, min);
+        assertEquals(5, max);
+    }
+
+    @Test
+    public void canFindMinAndMaxFromScalarToTensor() {
+        IntegerTensor a = IntegerTensor.create(5, 4, 3, 2).reshape(1, 4);
+        IntegerTensor b = IntegerTensor.create(3);
+
+        IntegerTensor min = IntegerTensor.min(a, b);
+        IntegerTensor max = IntegerTensor.max(a, b);
+
+        assertArrayEquals(new int[]{3, 3, 3, 2}, min.asFlatIntegerArray());
+        assertArrayEquals(new int[]{5, 4, 3, 3}, max.asFlatIntegerArray());
+    }
+
+    @Test
+    public void canFindElementWiseMinAndMax() {
+        IntegerTensor a = IntegerTensor.create(1, 2, 3, 4).reshape(1, 4);
+        IntegerTensor b = IntegerTensor.create(2, 3, 1, 4).reshape(1, 4);
+
+        IntegerTensor min = IntegerTensor.min(a, b);
+        IntegerTensor max = IntegerTensor.max(a, b);
+
+        assertArrayEquals(new int[]{1, 2, 1, 4}, min.asFlatIntegerArray());
+        assertArrayEquals(new int[]{2, 3, 3, 4}, max.asFlatIntegerArray());
+    }
+
+    @Test
+    public void youCanCheckForZeros() {
+        IntegerTensor containsZero = IntegerTensor.create(new int[]{
+                0, -1, Integer.MAX_VALUE,
+                Integer.MIN_VALUE, -0, 1},
+            3, 2);
+
+        BooleanTensor expectedMask = BooleanTensor.create(new boolean[]{
+                false, true, true,
+                true, false, true},
+            3, 2);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatExpectsNotToFind(0);
+        assertThat(validator.check(containsZero), equalTo(expectedMask));
+    }
+
+    @Test
+    public void youCanFixAValidationIssueByReplacingTheValue() {
+        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
+        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatReplaces(-1, 0);
+        containsMinusOne = validator.validate(containsMinusOne);
+        assertThat(containsMinusOne, equalTo(expectedResult));
+    }
+
+    @Test
+    public void youCanFixACustomValidationIssueByReplacingTheValue() {
+        IntegerTensor containsMinusOne = IntegerTensor.create(1, 0, -1);
+        IntegerTensor expectedResult = IntegerTensor.create(1, 0, 0);
+
+        TensorValidator<Integer, IntegerTensor> validator = TensorValidator.thatFixesElementwise(x -> x >= 0, TensorValidationPolicy.changeValueTo(0));
+        containsMinusOne = validator.validate(containsMinusOne);
+        assertThat(containsMinusOne, equalTo(expectedResult));
+    }
 }

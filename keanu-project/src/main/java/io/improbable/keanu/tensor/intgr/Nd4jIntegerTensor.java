@@ -250,6 +250,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
@@ -440,6 +443,36 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public IntegerTensor minInPlace(IntegerTensor min) {
+        if (min.isScalar()) {
+            Transforms.min(tensor, min.scalar(), false);
+        } else {
+            Transforms.min(tensor, unsafeGetNd4J(min), false);
+        }
+        return this;
+    }
+
+    @Override
+    public IntegerTensor maxInPlace(IntegerTensor max) {
+        if (max.isScalar()) {
+            Transforms.max(tensor, max.scalar(), false);
+        } else {
+            Transforms.max(tensor, unsafeGetNd4J(max), false);
+        }
+        return this;
+    }
+
+    @Override
+    public int min() {
+        return tensor.minNumber().intValue();
+    }
+
+    @Override
+    public int max() {
+        return tensor.maxNumber().intValue();
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor value) {
 
         INDArray mask;
@@ -480,7 +513,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor toInteger() {
-        return this;
+        return duplicate();
     }
 
     @Override

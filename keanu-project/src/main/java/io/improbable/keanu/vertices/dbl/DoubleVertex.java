@@ -20,13 +20,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
@@ -37,6 +31,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpLambda;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
@@ -52,6 +47,14 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
+    }
+
+    public static DoubleVertex min(DoubleVertex a, DoubleVertex b) {
+        return new MinVertex(a, b);
+    }
+
+    public static DoubleVertex max(DoubleVertex a, DoubleVertex b) {
+        return new MaxVertex(a, b);
     }
 
     public DoubleVertex minus(DoubleVertex that) {
@@ -128,6 +131,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex log() {
         return new LogVertex(this);
+    }
+
+    public DoubleVertex logGamma() {
+        return new LogGammaVertex(this);
     }
 
     public DoubleVertex sigmoid() {

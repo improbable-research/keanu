@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
+
 import java.util.Optional;
 
 import org.junit.Test;
@@ -101,6 +103,15 @@ public class VertexLabelTest {
     }
 
     @Test
+    public void youCanGetTheUnqualifiedName() {
+        String innerNamespace = "inner";
+        String outerNamespace = "outer";
+        String name = "foo";
+        VertexLabel foo = new VertexLabel(name, innerNamespace);
+        assertThat(foo, hasUnqualifiedName(name));
+    }
+
+    @Test
     public void itUsesADotToPrint() {
         VertexLabel foo = new VertexLabel("foo", "inner", "outer");
         assertThat(foo.toString(), equalTo("outer.inner.foo"));
@@ -116,7 +127,7 @@ public class VertexLabelTest {
         assertThat(newFoo, equalTo(new VertexLabel(name, innerNamespace)));
     }
 
-    @Test(expected = VertexLabelException.class)
+    @Test(expected = IndexOutOfBoundsException.class)
     public void itThrowsIfYouDiminishTheNamespaceButThereIsNone() {
         VertexLabel foo = new VertexLabel("foo");
         foo.withoutOuterNamespace();

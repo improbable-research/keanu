@@ -38,7 +38,7 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
         DoubleTensor dSelfWrtInput = inputValue.pow(2).plusInPlace(1).reciprocalInPlace();
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dSelfWrtInput, true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
 
         return partials;
     }

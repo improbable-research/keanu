@@ -1,16 +1,16 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.C;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
+
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-import static io.improbable.keanu.distributions.dual.Diffs.C;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
-
 public class Dirichlet implements ContinuousDistribution {
 
-    private static final double EPSILON =  0.00001;
+    private static final double EPSILON = 0.00001;
     private final DoubleTensor concentration;
 
     public static ContinuousDistribution withParameters(DoubleTensor concentration) {
@@ -23,9 +23,9 @@ public class Dirichlet implements ContinuousDistribution {
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-       final ContinuousDistribution gamma = Gamma.withParameters(
-           DoubleTensor.ones(shape),
-           concentration
+        final ContinuousDistribution gamma = Gamma.withParameters(
+            DoubleTensor.ones(shape),
+            concentration
         );
         final DoubleTensor gammaSamples = gamma.sample(concentration.getShape(), random);
         return normalise(gammaSamples);
@@ -37,15 +37,15 @@ public class Dirichlet implements ContinuousDistribution {
             throw new IllegalArgumentException("Sum of values to calculate Dirichlet likelihood for must equal 1");
         }
         final double sumConcentrationLogged = concentration.minus(1.).timesInPlace(x.log()).sum();
-        final double sumLogGammaConcentration = concentration.apply(org.apache.commons.math3.special.Gamma::gamma).logInPlace().sum();
-        final double logGammaSumConcentration = Math.log(org.apache.commons.math3.special.Gamma.gamma(concentration.sum()));
+        final double sumLogGammaConcentration = concentration.logGamma().sum();
+        final double logGammaSumConcentration = org.apache.commons.math3.special.Gamma.logGamma(concentration.sum());
         return DoubleTensor.scalar(sumConcentrationLogged - sumLogGammaConcentration + logGammaSumConcentration);
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdc = x.log()
-            .minusInPlace(concentration.apply(org.apache.commons.math3.special.Gamma::digamma))
+            .minusInPlace(concentration.digamma())
             .plusInPlace(org.apache.commons.math3.special.Gamma.digamma(concentration.sum()));
         final DoubleTensor dLogPdx = concentration.minus(1).divInPlace(x);
 

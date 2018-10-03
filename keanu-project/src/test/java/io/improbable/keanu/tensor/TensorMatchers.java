@@ -63,18 +63,18 @@ public class TensorMatchers {
             @Override
             protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
                 mismatchDescription.appendText("Tensor");
-                Tensor.FlattenedView<T> itemFlattened = item.getFlattenedView();
-                if (itemFlattened.size() != valueMatchers.size()) {
+                T[] itemArray = item.asFlatArray();
+                if (itemArray.length != valueMatchers.size()) {
                     mismatchDescription
                         .appendText(" with different size ")
-                        .appendValue(itemFlattened.size());
+                        .appendValue(itemArray.length);
                     return false;
                 }
                 for (int i = 0; i < valueMatchers.size(); i++) {
-                    if (!valueMatchers.get(i).matches(itemFlattened.getOrScalar(i))) {
+                    if (!valueMatchers.get(i).matches(itemArray[i])) {
                         mismatchDescription
                             .appendText(" with different value ")
-                            .appendValue(itemFlattened.getOrScalar(i))
+                            .appendValue(itemArray[i])
                             .appendText(" at entry ")
                             .appendValue(i);
                         return false;

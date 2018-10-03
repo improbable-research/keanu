@@ -10,6 +10,7 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
@@ -45,6 +46,39 @@ public class DoubleIfVertexTest {
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
         Assert.assertArrayEquals(dCdb.getShape(), dIfdB.getShape());
+    }
+
+    @Test
+    public void canExtractDualNumberFromTruePredicateDifferentRankOf() {
+        BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
+
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(DoubleTensor.scalar(5.0));
+
+        DoubleVertex b = new UniformVertex(0, 10);
+        b.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+
+        DoubleVertex c = a.times(b);
+        DoubleVertex d = b.div(a);
+
+        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dCdb = c.getDualNumber().getPartialDerivatives().withRespectTo(b);
+
+        DoubleVertex ifVertex = If.isTrue(bool)
+            .then(c)
+            .orElse(d);
+
+        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dIfdB = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(b);
+
+        DoubleTensor dIfdAReverse = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a);
+        DoubleTensor dIfdBReverse = Differentiator.reverseModeAutoDiff(ifVertex, b).withRespectTo(b);
+
+        Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
+        Assert.assertArrayEquals(dCdb.getShape(), dIfdB.getShape());
+
+        Assert.assertArrayEquals(dIfdA.asFlatDoubleArray(), dIfdAReverse.asFlatDoubleArray(), 1e-6);
+        Assert.assertArrayEquals(dIfdB.asFlatDoubleArray(), dIfdBReverse.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
