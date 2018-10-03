@@ -69,4 +69,4 @@ class KeanuContext(metaclass=Singleton):
         elif isinstance(l[0], bool):
             return self._gateway.jvm.boolean
         else:
-            return self._gateway.jvm.Object
+            raise ValueError("Cannot infer class from array because it doesn't contain primitives")
