@@ -1,23 +1,19 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
-import org.junit.Test;
-
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class CsvReaderByRowTest {
 
-    String csv = "a,b,c\n" +
-        "hel,lo,world";
+    String csv = "a,b,c\n" + "hel,lo,world";
 
     @Test
     public void givenCsvStringThenLoadAsPOJO() {
-        List<TestPOJO> testPOJOS = ReadCsv.fromString(csv)
-            .asRowsDefinedBy(TestPOJO.class)
-            .load();
+        List<TestPOJO> testPOJOS = ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJO.class).load();
 
         TestPOJO actualPojo = testPOJOS.get(0);
 
@@ -26,9 +22,8 @@ public class CsvReaderByRowTest {
 
     @Test
     public void givenCsvStringThenLoadAsPOJOWithSetters() {
-        List<TestPOJOWithSetter> testPOJOS = ReadCsv.fromString(csv)
-            .asRowsDefinedBy(TestPOJOWithSetter.class)
-            .load();
+        List<TestPOJOWithSetter> testPOJOS =
+                ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJOWithSetter.class).load();
 
         TestPOJOWithSetter actualPojo = testPOJOS.get(0);
 
@@ -37,9 +32,8 @@ public class CsvReaderByRowTest {
 
     @Test
     public void givenCsvStringThenLoadAsPOJOWithAnnotations() {
-        List<TestPOJOWithAnnotations> testPOJOS = ReadCsv.fromString(csv)
-            .asRowsDefinedBy(TestPOJOWithAnnotations.class)
-            .load();
+        List<TestPOJOWithAnnotations> testPOJOS =
+                ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJOWithAnnotations.class).load();
 
         TestPOJOWithAnnotations actualPojo = testPOJOS.get(0);
 

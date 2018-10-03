@@ -1,8 +1,9 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
+import static java.util.stream.Collectors.toList;
+
 import io.improbable.keanu.util.csv.pojo.PublicFieldMatcher;
 import io.improbable.keanu.util.csv.pojo.SetterMatcher;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -12,13 +13,9 @@ import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
-import static java.util.stream.Collectors.toList;
-
-
 /**
- * This class parses csv lines to a specified plain old java object (POJO). This
- * can be done to a POJO that has a public field OR a setter method OR
- * a an annotated field/method.
+ * This class parses csv lines to a specified plain old java object (POJO). This can be done to a
+ * POJO that has a public field OR a setter method OR a an annotated field/method.
  */
 public class RowsAsObjectParser<T> {
 
@@ -28,15 +25,15 @@ public class RowsAsObjectParser<T> {
     private final Stream<List<String>> inputStream;
     private final List<String> csvTitles;
 
-    public RowsAsObjectParser(Class<T> base, Stream<List<String>> inputStream, List<String> csvTitles) {
+    public RowsAsObjectParser(
+            Class<T> base, Stream<List<String>> inputStream, List<String> csvTitles) {
         this.base = base;
         this.inputStream = inputStream;
         this.csvTitles = csvTitles;
     }
 
     public List<T> load(boolean ignoreUnmatchedFields) {
-        return stream(ignoreUnmatchedFields)
-            .collect(toList());
+        return stream(ignoreUnmatchedFields).collect(toList());
     }
 
     public List<T> load() {
@@ -51,31 +48,29 @@ public class RowsAsObjectParser<T> {
         return stream(IGNORE_MISSING_FIELDS_DEFAULT);
     }
 
-    public static <T> Stream<T> stream(Class<T> base,
-                                       Stream<List<String>> inputStream,
-                                       List<String> csvTitles) {
+    public static <T> Stream<T> stream(
+            Class<T> base, Stream<List<String>> inputStream, List<String> csvTitles) {
 
         return stream(base, inputStream, csvTitles, IGNORE_MISSING_FIELDS_DEFAULT);
     }
 
-    public static <T> Stream<T> stream(Class<T> base,
-                                       Stream<List<String>> csvLinesAsTokens,
-                                       List<String> csvTitles,
-                                       boolean ignoreUnmatchedFields) {
+    public static <T> Stream<T> stream(
+            Class<T> base,
+            Stream<List<String>> csvLinesAsTokens,
+            List<String> csvTitles,
+            boolean ignoreUnmatchedFields) {
 
-        List<CsvCellConsumer<T>> columnConsumers = getCellConsumers(base, csvTitles, ignoreUnmatchedFields);
+        List<CsvCellConsumer<T>> columnConsumers =
+                getCellConsumers(base, csvTitles, ignoreUnmatchedFields);
 
-        return csvLinesAsTokens
-            .map(csvTokens -> deserialize(csvTokens, columnConsumers, base));
+        return csvLinesAsTokens.map(csvTokens -> deserialize(csvTokens, columnConsumers, base));
     }
 
-    private static <T> List<CsvCellConsumer<T>> getCellConsumers(Class<T> base,
-                                                                 List<String> fieldTitles,
-                                                                 boolean ignoreUnmatchedFields) {
+    private static <T> List<CsvCellConsumer<T>> getCellConsumers(
+            Class<T> base, List<String> fieldTitles, boolean ignoreUnmatchedFields) {
 
         List<CsvCellConsumer<T>> columnConsumers = new ArrayList<>();
-        CsvCellConsumer<T> defaultConsumer = (target, value) -> {
-        };
+        CsvCellConsumer<T> defaultConsumer = (target, value) -> {};
 
         List<Field> potentialFields = new ArrayList<>(Arrays.asList(base.getFields()));
         List<Method> potentialSetters = new ArrayList<>(Arrays.asList(base.getMethods()));
@@ -91,7 +86,8 @@ public class RowsAsObjectParser<T> {
             }
 
             if (!consumerForTitle.isPresent() && !ignoreUnmatchedFields) {
-                throw new IllegalArgumentException("Unable to find field for csv data \"" + title + "\"");
+                throw new IllegalArgumentException(
+                        "Unable to find field for csv data \"" + title + "\"");
             }
 
             columnConsumers.add(consumerForTitle.orElse(defaultConsumer));
@@ -99,9 +95,8 @@ public class RowsAsObjectParser<T> {
         return columnConsumers;
     }
 
-    private static <T> T deserialize(List<String> csvTokens,
-                                     List<CsvCellConsumer<T>> fieldMappers,
-                                     Class<T> base) {
+    private static <T> T deserialize(
+            List<String> csvTokens, List<CsvCellConsumer<T>> fieldMappers, Class<T> base) {
 
         try {
             T target = base.newInstance();
@@ -118,5 +113,4 @@ public class RowsAsObjectParser<T> {
             throw new IllegalStateException(e);
         }
     }
-
 }

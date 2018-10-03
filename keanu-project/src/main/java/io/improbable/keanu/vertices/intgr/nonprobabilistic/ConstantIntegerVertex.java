@@ -1,12 +1,12 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic;
 
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class ConstantIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public class ConstantIntegerVertex extends IntegerVertex
+        implements NonProbabilistic<IntegerTensor> {
 
     public ConstantIntegerVertex(IntegerTensor constant) {
         setValue(constant);

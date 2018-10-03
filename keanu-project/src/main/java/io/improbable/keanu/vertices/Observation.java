@@ -4,8 +4,7 @@ import java.util.Optional;
 
 public class Observation<T> implements Observable<T> {
     // package private - because it's created by the factory method Observable.observableTypeFor
-    Observation() {
-    }
+    Observation() {}
 
     private T observedValue = null;
 

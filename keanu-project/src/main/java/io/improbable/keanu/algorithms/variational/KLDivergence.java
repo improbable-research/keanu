@@ -5,7 +5,6 @@ import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.network.NetworkState;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
-
 import java.util.Set;
 import java.util.function.Function;
 
@@ -16,17 +15,21 @@ public class KLDivergence {
     }
 
     public static double compute(ProbabilisticDouble q, NetworkSamples p) {
-        return compute(p, networkState -> {
-            Set<VertexId> vertexIds = networkState.getVertexIds();
-            if (vertexIds.size() != 1) {
-                throw new IllegalArgumentException("A NetworkState does not contain exactly 1 vertex and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
-            }
+        return compute(
+                p,
+                networkState -> {
+                    Set<VertexId> vertexIds = networkState.getVertexIds();
+                    if (vertexIds.size() != 1) {
+                        throw new IllegalArgumentException(
+                                "A NetworkState does not contain exactly 1 vertex and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
+                    }
 
-            return q.logProb(networkState.get(Iterables.getOnlyElement(vertexIds)));
-        });
+                    return q.logProb(networkState.get(Iterables.getOnlyElement(vertexIds)));
+                });
     }
 
-    private static double compute(NetworkSamples samples, Function<NetworkState, Double> qLogProbCalculator) {
+    private static double compute(
+            NetworkSamples samples, Function<NetworkState, Double> qLogProbCalculator) {
         double divergence = 0.;
 
         for (int i = 0; i < samples.size(); i++) {

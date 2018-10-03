@@ -1,22 +1,20 @@
 package io.improbable.keanu.tensor;
 
-
 import static org.apache.commons.math3.util.MathArrays.copyOf;
-
-import java.util.Arrays;
-import java.util.List;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import java.util.Arrays;
+import java.util.List;
 
 public interface Tensor<T> {
 
     static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
         if (!a.hasSameShapeAs(b)) {
             throw new IllegalArgumentException(
-                String.format("Cannot compare tensors of different shapes %s and %s",
-                    Arrays.toString(a.getShape()), Arrays.toString(b.getShape()))
-            );
+                    String.format(
+                            "Cannot compare tensors of different shapes %s and %s",
+                            Arrays.toString(a.getShape()), Arrays.toString(b.getShape())));
         }
 
         Object[] aArray = a.asFlatArray();
@@ -40,8 +38,8 @@ public interface Tensor<T> {
         return new GenericTensor<>(shape);
     }
 
-    int[] SCALAR_SHAPE = new int[]{1, 1};
-    int[] SCALAR_STRIDE = new int[]{1};
+    int[] SCALAR_SHAPE = new int[] {1, 1};
+    int[] SCALAR_STRIDE = new int[] {1};
 
     int getRank();
 
@@ -92,12 +90,10 @@ public interface Tensor<T> {
 
     /**
      * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
-     * <p>
-     * (1, 2, 3) is a 1x3 vector.
-     * <p>
-     * (1)
-     * (2)
-     * (3) is a 3x1 vector.
+     *
+     * <p>(1, 2, 3) is a 1x3 vector.
+     *
+     * <p>(1) (2) (3) is a 3x1 vector.
      *
      * @return true if the tensor is a vector
      */
@@ -120,5 +116,4 @@ public interface Tensor<T> {
     default BooleanTensor elementwiseEquals(Tensor that) {
         return elementwiseEquals(this, that);
     }
-
 }

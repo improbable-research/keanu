@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.LogNormal;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +13,9 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -28,9 +27,10 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
      * https://en.wikipedia.org/wiki/Log-normal_distribution
      *
      * @param tensorShape the desired shape of the vertex
-     * @param mu          the mu (location) of the LogNormal with either the same tensor shape as specified for this
-     *                    vertex or mu scalar
-     * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
+     * @param mu the mu (location) of the LogNormal with either the same tensor shape as specified
+     *     for this vertex or mu scalar
+     * @param sigma the sigma of the Logistic with either the same shape as specified for this
+     *     vertex or mu scalar
      */
     public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
 
@@ -81,7 +81,8 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = LogNormal.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();

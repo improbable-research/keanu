@@ -1,5 +1,7 @@
 package io.improbable.keanu.tensor.intgr;
 
+import static java.util.Arrays.copyOf;
+
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
@@ -8,18 +10,19 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
+import java.util.Arrays;
+import java.util.function.Function;
 import org.apache.commons.lang3.ArrayUtils;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
 import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
-
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static java.util.Arrays.copyOf;
 
 public class Nd4jIntegerTensor implements IntegerTensor {
 
@@ -102,7 +105,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight) {
-        INDArray tensorMmulResult = Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][]{dimLeft, dimsRight});
+        INDArray tensorMmulResult =
+                Nd4j.tensorMmul(tensor, unsafeGetNd4J(value), new int[][] {dimLeft, dimsRight});
         return new Nd4jIntegerTensor(tensorMmulResult);
     }
 
@@ -162,18 +166,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         INDArray mask = tensor.dup();
 
         if (greaterThanThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldGreaterThan(mask,
-                    TypedINDArrayFactory.valueArrayOf(mask.shape(), greaterThanThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
+            Nd4j.getExecutioner()
+                    .exec(
+                            new OldGreaterThan(
+                                    mask,
+                                    TypedINDArrayFactory.valueArrayOf(
+                                            mask.shape(), greaterThanThis.scalar(), BUFFER_TYPE),
+                                    mask,
+                                    mask.length()));
         } else {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanThis);
-            Nd4j.getExecutioner().exec(
-                new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length())
-            );
+            Nd4j.getExecutioner()
+                    .exec(new OldGreaterThan(mask, greaterThanThisArray, mask, mask.length()));
         }
 
         return new Nd4jIntegerTensor(mask);
@@ -185,18 +189,22 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         INDArray mask = tensor.dup();
 
         if (greaterThanOrEqualToThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldGreaterThanOrEqual(mask,
-                    TypedINDArrayFactory.valueArrayOf(mask.shape(), greaterThanOrEqualToThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
+            Nd4j.getExecutioner()
+                    .exec(
+                            new OldGreaterThanOrEqual(
+                                    mask,
+                                    TypedINDArrayFactory.valueArrayOf(
+                                            mask.shape(),
+                                            greaterThanOrEqualToThis.scalar(),
+                                            BUFFER_TYPE),
+                                    mask,
+                                    mask.length()));
         } else {
             INDArray greaterThanThisArray = unsafeGetNd4J(greaterThanOrEqualToThis);
-            Nd4j.getExecutioner().exec(
-                new OldGreaterThanOrEqual(mask, greaterThanThisArray, mask, mask.length())
-            );
+            Nd4j.getExecutioner()
+                    .exec(
+                            new OldGreaterThanOrEqual(
+                                    mask, greaterThanThisArray, mask, mask.length()));
         }
 
         return new Nd4jIntegerTensor(mask);
@@ -208,18 +216,18 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         INDArray mask = tensor.dup();
 
         if (lessThanThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldLessThan(mask,
-                    TypedINDArrayFactory.valueArrayOf(mask.shape(), lessThanThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
+            Nd4j.getExecutioner()
+                    .exec(
+                            new OldLessThan(
+                                    mask,
+                                    TypedINDArrayFactory.valueArrayOf(
+                                            mask.shape(), lessThanThis.scalar(), BUFFER_TYPE),
+                                    mask,
+                                    mask.length()));
         } else {
             INDArray lessThanThisArray = unsafeGetNd4J(lessThanThis);
-            Nd4j.getExecutioner().exec(
-                new OldLessThan(mask, lessThanThisArray, mask, mask.length())
-            );
+            Nd4j.getExecutioner()
+                    .exec(new OldLessThan(mask, lessThanThisArray, mask, mask.length()));
         }
 
         return new Nd4jIntegerTensor(mask);
@@ -231,18 +239,22 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         INDArray mask = tensor.dup();
 
         if (lessThanOrEqualToThis.isScalar()) {
-            Nd4j.getExecutioner().exec(
-                new OldLessThanOrEqual(mask,
-                    TypedINDArrayFactory.valueArrayOf(mask.shape(), lessThanOrEqualToThis.scalar(), BUFFER_TYPE),
-                    mask,
-                    mask.length()
-                )
-            );
+            Nd4j.getExecutioner()
+                    .exec(
+                            new OldLessThanOrEqual(
+                                    mask,
+                                    TypedINDArrayFactory.valueArrayOf(
+                                            mask.shape(),
+                                            lessThanOrEqualToThis.scalar(),
+                                            BUFFER_TYPE),
+                                    mask,
+                                    mask.length()));
         } else {
             INDArray lessThanOrEqualToThisArray = unsafeGetNd4J(lessThanOrEqualToThis);
-            Nd4j.getExecutioner().exec(
-                new OldLessThanOrEqual(mask, lessThanOrEqualToThisArray, mask, mask.length())
-            );
+            Nd4j.getExecutioner()
+                    .exec(
+                            new OldLessThanOrEqual(
+                                    mask, lessThanOrEqualToThisArray, mask, mask.length()));
         }
 
         return new Nd4jIntegerTensor(mask);
@@ -257,13 +269,10 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             INDArray swapOnesForZeros = maskDup.rsubi(1.0);
             tensor.muli(swapOnesForZeros);
         } else {
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(maskDup, value, Conditions.equals(1.0))
-            );
+            Nd4j.getExecutioner().exec(new CompareAndSet(maskDup, value, Conditions.equals(1.0)));
 
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
-            );
+            Nd4j.getExecutioner()
+                    .exec(new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0)));
         }
 
         return this;
@@ -492,7 +501,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         } else {
             INDArray indArray = unsafeGetNd4J(value);
             mask = tensor.dup();
-            Nd4j.getExecutioner().exec(new OldGreaterThanOrEqual(mask, indArray, mask, getLength()));
+            Nd4j.getExecutioner()
+                    .exec(new OldGreaterThanOrEqual(mask, indArray, mask, getLength()));
         }
 
         return fromMask(mask, copyOf(getShape(), getShape().length));
@@ -586,10 +596,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         } else if (o instanceof Tensor) {
             Tensor that = (Tensor) o;
             if (!Arrays.equals(that.getShape(), getShape())) return false;
-            return Arrays.equals(
-                that.asFlatArray(),
-                this.asFlatArray()
-            );
+            return Arrays.equals(that.asFlatArray(), this.asFlatArray());
         }
 
         return false;
@@ -609,7 +616,8 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     static INDArray unsafeGetNd4J(IntegerTensor that) {
         if (that.isScalar()) {
-            return TypedINDArrayFactory.scalar(that.scalar().doubleValue(), BUFFER_TYPE).reshape(that.getShape());
+            return TypedINDArrayFactory.scalar(that.scalar().doubleValue(), BUFFER_TYPE)
+                    .reshape(that.getShape());
         }
         return ((Nd4jIntegerTensor) that).tensor;
     }
@@ -655,7 +663,6 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         public void set(long index, Integer value) {
             tensor.data().put(index, value);
         }
-
     }
 
     @Override
@@ -672,5 +679,4 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     public Integer[] asFlatArray() {
         return ArrayUtils.toObject(asFlatIntegerArray());
     }
-
 }

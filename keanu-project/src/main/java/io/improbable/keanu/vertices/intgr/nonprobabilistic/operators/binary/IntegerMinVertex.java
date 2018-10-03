@@ -8,7 +8,7 @@ public class IntegerMinVertex extends IntegerBinaryOpVertex {
     /**
      * Finds the minimum between two vertices
      *
-     * @param left  one of the vertices to find the minimum of
+     * @param left one of the vertices to find the minimum of
      * @param right one of the vertices to find the minimum of
      */
     public IntegerMinVertex(IntegerVertex left, IntegerVertex right) {
@@ -19,5 +19,4 @@ public class IntegerMinVertex extends IntegerBinaryOpVertex {
     protected IntegerTensor op(IntegerTensor l, IntegerTensor r) {
         return IntegerTensor.min(l, r);
     }
-
 }

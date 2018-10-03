@@ -1,19 +1,17 @@
 package io.improbable.keanu.tensor.dbl;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.function.Function;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.math3.special.Gamma;
-import org.apache.commons.math3.util.FastMath;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.function.Function;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.math3.special.Gamma;
+import org.apache.commons.math3.util.FastMath;
 
 public class ScalarDoubleTensor implements DoubleTensor {
 
@@ -63,7 +61,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (index.length == 1 && index[0] == 0) {
             return value;
         } else {
-            throw new IndexOutOfBoundsException(ArrayUtils.toString(index) + " out of bounds on scalar");
+            throw new IndexOutOfBoundsException(
+                    ArrayUtils.toString(index) + " out of bounds on scalar");
         }
     }
 
@@ -73,7 +72,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
             this.value = value;
             return this;
         } else {
-            throw new IndexOutOfBoundsException(ArrayUtils.toString(index) + " out of bounds on scalar");
+            throw new IndexOutOfBoundsException(
+                    ArrayUtils.toString(index) + " out of bounds on scalar");
         }
     }
 
@@ -153,18 +153,24 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (value.isScalar()) {
             return value.times(value);
         }
-        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
+        throw new IllegalArgumentException(
+                "Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
     public DoubleTensor tensorMultiply(DoubleTensor value, int[] dimsLeft, int[] dimsRight) {
         if (value.isScalar()) {
-            if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
-                throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
+            if (dimsLeft.length > 1
+                    || dimsRight.length > 1
+                    || dimsLeft[0] != 0
+                    || dimsRight[0] != 0) {
+                throw new IllegalArgumentException(
+                        "Tensor multiply sum dimensions out of bounds for scalar");
             }
             return value.times(value);
         }
-        throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
+        throw new IllegalArgumentException(
+                "Cannot use tensor multiply with scalar. Use times instead.");
     }
 
     @Override
@@ -283,7 +289,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             return new ScalarDoubleTensor(value > greaterThanThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, greaterThanThis.getShape())
-                .getGreaterThanMask(greaterThanThis);
+                    .getGreaterThanMask(greaterThanThis);
         }
     }
 
@@ -293,7 +299,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             return new ScalarDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, greaterThanOrEqualToThis.getShape())
-                .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
+                    .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
         }
     }
 
@@ -303,7 +309,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             return new ScalarDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, lessThanThis.getShape())
-                .getLessThanMask(lessThanThis);
+                    .getLessThanMask(lessThanThis);
         }
     }
 
@@ -313,7 +319,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             return new ScalarDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
         } else {
             return DoubleTensor.create(value, lessThanOrEqualsThis.getShape())
-                .getLessThanOrEqualToMask(lessThanOrEqualsThis);
+                    .getLessThanOrEqualToMask(lessThanOrEqualsThis);
         }
     }
 
@@ -323,7 +329,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
             return DoubleTensor.create(value, withMask.getShape())
-                .setWithMaskInPlace(withMask, valueToApply);
+                    .setWithMaskInPlace(withMask, valueToApply);
         }
         return this;
     }
@@ -431,7 +437,8 @@ public class ScalarDoubleTensor implements DoubleTensor {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
-            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+            throw new IllegalStateException(
+                    "Slice is only valid for dimension and index zero in a scalar");
         }
     }
 
@@ -498,9 +505,10 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     /**
-     * This is identical to log().times(y), except that it changes NaN results to 0.
-     * This is important when calculating 0log0, which should return 0
-     * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
+     * This is identical to log().times(y), except that it changes NaN results to 0. This is
+     * important when calculating 0log0, which should return 0 See
+     * https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical
+     * justification
      *
      * @param y The tensor value to multiply by
      * @return the log of this tensor multiplied by y
@@ -677,11 +685,9 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     /**
-     * Note that we have modified the native Java behaviour to match Python (and therefore ND4J) behaviour
-     * Which rounds negative numbers down if they end in 0.5
-     * e.g.
-     * Java: round(-2.5) == -2.0
-     * Python: round(-2.5) == -3.0
+     * Note that we have modified the native Java behaviour to match Python (and therefore ND4J)
+     * behaviour Which rounds negative numbers down if they end in 0.5 e.g. Java: round(-2.5) ==
+     * -2.0 Python: round(-2.5) == -3.0
      *
      * @return Nearest integer value as a DoubleTensor
      */
@@ -823,12 +829,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public double[] asFlatDoubleArray() {
-        return new double[]{value};
+        return new double[] {value};
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return new int[]{value.intValue()};
+        return new int[] {value.intValue()};
     }
 
     @Override
@@ -856,9 +862,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
 
     @Override
     public String toString() {
-        return "{\n" +
-            "data = [" + value + "]" +
-            "\nshape = " + Arrays.toString(shape) +
-            "\n}";
+        return "{\n" + "data = [" + value + "]" + "\nshape = " + Arrays.toString(shape) + "\n}";
     }
 }

@@ -1,5 +1,7 @@
 package io.improbable.keanu.e2e.regression;
 
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -9,11 +11,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-
 /**
- * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html
- * It's also the same data set used for scikitlearn load_diabetes at
+ * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html It's also
+ * the same data set used for scikitlearn load_diabetes at
  * http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
  */
 public class DiabetesLinearRegression {
@@ -25,10 +25,10 @@ public class DiabetesLinearRegression {
 
     @Test
     public void doesLinearRegressionOnBMI() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data =
+                ReadCsv.fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
+                        .asVectorizedColumnsDefinedBy(Data.class)
+                        .load(true);
 
         // Linear Regression
         DoubleVertex weight = new GaussianVertex(0.0, 2.0);
@@ -46,5 +46,4 @@ public class DiabetesLinearRegression {
         assertEquals(938.2378, weight.getValue().scalar(), 0.01);
         assertEquals(152.9189, b.getValue().scalar(), 0.01);
     }
-
 }

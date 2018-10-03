@@ -2,18 +2,13 @@ package io.improbable.keanu.distributions.gradient;
 
 import static org.apache.commons.math3.special.Gamma.digamma;
 
-
 /**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.8 page 33
+ * Computer Generation of Statistical Distributions by Richard Saucier ARL-TR-2168 March 2000 5.1.8
+ * page 33
  */
-
 public class Gamma {
 
-    private Gamma() {
-    }
+    private Gamma() {}
 
     public static Diff dlnPdf(double theta, double k, double x) {
         double dPdx = (k - 1) / x - (1 / theta);

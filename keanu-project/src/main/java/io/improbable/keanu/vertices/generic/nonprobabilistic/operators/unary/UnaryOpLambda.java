@@ -1,7 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
 import io.improbable.keanu.vertices.Vertex;
-
 import java.util.function.Function;
 
 public class UnaryOpLambda<IN, OUT> extends UnaryOpVertex<IN, OUT> {
@@ -17,5 +16,4 @@ public class UnaryOpLambda<IN, OUT> extends UnaryOpVertex<IN, OUT> {
     protected OUT op(IN input) {
         return op.apply(input);
     }
-
 }

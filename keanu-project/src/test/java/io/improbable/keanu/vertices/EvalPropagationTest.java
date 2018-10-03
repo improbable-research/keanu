@@ -1,21 +1,18 @@
 package io.improbable.keanu.vertices;
 
-import static org.junit.Assert.assertEquals;
-
 import static io.improbable.keanu.vertices.TestGraphGenerator.addLinks;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
-
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.junit.Assert.assertEquals;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.Consumer;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class EvalPropagationTest {
 
@@ -42,10 +39,10 @@ public class EvalPropagationTest {
 
         evalFunction.accept(end);
 
-        //Value at the start has been evaluated correctly
+        // Value at the start has been evaluated correctly
         assertEquals(4.0, start.getValue().scalar(), 0.001);
 
-        //Does the right amount of work
+        // Does the right amount of work
         assertEquals(3 * links, n.get());
     }
 
@@ -70,12 +67,12 @@ public class EvalPropagationTest {
 
         DoubleVertex secondLayerEnd = addLinks(nextLayerStart, n, m, 1);
 
-        //Before lazy eval is called
+        // Before lazy eval is called
         assertEquals(0, n.get());
 
         evalFunction.accept(secondLayerEnd);
 
-        //Lazy eval the additional 3 vertices at the end of the chain
+        // Lazy eval the additional 3 vertices at the end of the chain
         assertEquals(6, n.get());
     }
 
@@ -89,7 +86,8 @@ public class EvalPropagationTest {
         assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(Vertex::lazyEval);
     }
 
-    private void assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(Consumer<Vertex> evalFunction) {
+    private void assertDoesNotDoUnnecessaryOperationsOnVerticesThatShareParents(
+            Consumer<Vertex> evalFunction) {
         AtomicInteger n = new AtomicInteger(0);
         AtomicInteger m = new AtomicInteger(0);
 
@@ -97,11 +95,17 @@ public class EvalPropagationTest {
         DoubleVertex start2 = ConstantVertex.of(5.0);
         DoubleVertex start3 = ConstantVertex.of(5.0);
 
-        //start 2 is a shared parent between these sums
-        DoubleVertex middleSum1 = TestGraphGenerator.sumVertex(start1, start2, n, m, id -> log.info("OP on id:" + id));
-        DoubleVertex middleSum2 = TestGraphGenerator.sumVertex(start2, start3, n, m, id -> log.info("OP on id:" + id));
+        // start 2 is a shared parent between these sums
+        DoubleVertex middleSum1 =
+                TestGraphGenerator.sumVertex(
+                        start1, start2, n, m, id -> log.info("OP on id:" + id));
+        DoubleVertex middleSum2 =
+                TestGraphGenerator.sumVertex(
+                        start2, start3, n, m, id -> log.info("OP on id:" + id));
 
-        DoubleVertex finalSum = TestGraphGenerator.sumVertex(middleSum1, middleSum2, n, m, id -> log.info("OP on id:" + id));
+        DoubleVertex finalSum =
+                TestGraphGenerator.sumVertex(
+                        middleSum1, middleSum2, n, m, id -> log.info("OP on id:" + id));
 
         evalFunction.accept(finalSum);
 
@@ -120,7 +124,7 @@ public class EvalPropagationTest {
         @Override
         protected DoubleTensor op(DoubleTensor value) {
             n.incrementAndGet();
-            return DoubleTensor.create(new double[]{0, 1, 2});
+            return DoubleTensor.create(new double[] {0, 1, 2});
         }
 
         @Override
@@ -128,6 +132,7 @@ public class EvalPropagationTest {
             return null;
         }
     }
+
     @Test
     public void doesNotRedoWorkAlreadyDoneOnLazyEval() {
         AtomicInteger n = new AtomicInteger(0);
@@ -136,9 +141,15 @@ public class EvalPropagationTest {
 
         DoubleVertex blackBox = new BlackBoxVertex(start, n);
 
-        DoubleVertex pluck0 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(0)), null, null);
-        DoubleVertex pluck1 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(1)), null, null);
-        DoubleVertex pluck2 = blackBox.lambda(blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(2)), null, null);
+        DoubleVertex pluck0 =
+                blackBox.lambda(
+                        blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(0)), null, null);
+        DoubleVertex pluck1 =
+                blackBox.lambda(
+                        blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(1)), null, null);
+        DoubleVertex pluck2 =
+                blackBox.lambda(
+                        blackBox.getShape(), bb -> DoubleTensor.scalar(bb.getValue(2)), null, null);
 
         pluck0.lazyEval();
         pluck1.lazyEval();

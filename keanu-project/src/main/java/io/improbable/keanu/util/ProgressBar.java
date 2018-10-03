@@ -17,44 +17,44 @@ public class ProgressBar {
     /**
      * Override the default print stream globally
      *
-     * @param printStream The new printStream object to use for all ProgressBars that don't declare one
+     * @param printStream The new printStream object to use for all ProgressBars that don't declare
+     *     one
      */
     public static void setDefaultPrintStream(PrintStream printStream) {
         ProgressBar.defaultPrintStream = printStream;
     }
 
-    /**
-     * Disables all progress bars globally
-     */
+    /** Disables all progress bars globally */
     public static void disable() {
         ENABLED.set(false);
     }
 
-    /**
-     * Enables all progress bars globally
-     */
+    /** Enables all progress bars globally */
     public static void enable() {
         ENABLED.set(true);
     }
 
     private static ScheduledExecutorService getDefaultScheduledExecutorService() {
-        return Executors.newScheduledThreadPool(1, r -> {
-            Thread t = Executors.defaultThreadFactory().newThread(r);
-            t.setDaemon(true);
-            return t;
-        });
+        return Executors.newScheduledThreadPool(
+                1,
+                r -> {
+                    Thread t = Executors.defaultThreadFactory().newThread(r);
+                    t.setDaemon(true);
+                    return t;
+                });
     }
 
     private static final AtomicBoolean ENABLED = new AtomicBoolean(true);
     private static final long FRAME_PERIOD_MS = 500;
     private static final ProgressUpdate DEFAULT_UPDATE = new ProgressUpdate();
     private static final String MIDDLE_MESSAGE = "Keanu";
-    private static final String[] FRAMES = new String[]{
-        "|" + MIDDLE_MESSAGE + "|",
-        "\\" + MIDDLE_MESSAGE + "/",
-        "-" + MIDDLE_MESSAGE + "-",
-        "/" + MIDDLE_MESSAGE + "\\"
-    };
+    private static final String[] FRAMES =
+            new String[] {
+                "|" + MIDDLE_MESSAGE + "|",
+                "\\" + MIDDLE_MESSAGE + "/",
+                "-" + MIDDLE_MESSAGE + "-",
+                "/" + MIDDLE_MESSAGE + "\\"
+            };
 
     private final ScheduledExecutorService scheduler;
     private final PrintStream printStream;
@@ -152,7 +152,11 @@ public class ProgressBar {
             }
 
             if (update.getProgressPercentage() != null) {
-                sb.append(String.format(" %3.1f%%", Math.min(100.0, Math.max(0, update.getProgressPercentage() * 100))));
+                sb.append(
+                        String.format(
+                                " %3.1f%%",
+                                Math.min(
+                                        100.0, Math.max(0, update.getProgressPercentage() * 100))));
             }
 
             printStream.print(sb.toString());

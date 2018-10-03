@@ -2,16 +2,13 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.lang.reflect.Array;
+import java.util.function.Function;
 
 public class BoolConcatenationVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
@@ -21,8 +18,9 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
-     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input     the input vertices to concatenate
+     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes
+     *     may be different.
+     * @param input the input vertices to concatenate
      */
     public BoolConcatenationVertex(int dimension, BoolVertex... input) {
         this.dimension = dimension;
@@ -53,5 +51,4 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
         }
         return extract;
     }
-
 }

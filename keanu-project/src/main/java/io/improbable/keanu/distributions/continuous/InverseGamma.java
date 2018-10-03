@@ -32,7 +32,8 @@ public class InverseGamma implements ContinuousDistribution {
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor aTimesLnB = alpha.times(beta.log());
-        final DoubleTensor negAMinus1TimesLnX = x.log().timesInPlace(alpha.unaryMinus().minusInPlace(1));
+        final DoubleTensor negAMinus1TimesLnX =
+                x.log().timesInPlace(alpha.unaryMinus().minusInPlace(1));
         final DoubleTensor lnGammaA = alpha.logGamma();
 
         return aTimesLnB.plus(negAMinus1TimesLnX).minusInPlace(lnGammaA).minusInPlace(beta.div(x));
@@ -40,14 +41,15 @@ public class InverseGamma implements ContinuousDistribution {
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dPdalpha = x.log().unaryMinusInPlace().minusInPlace(alpha.digamma()).plusInPlace(beta.log());
-        final DoubleTensor dLogPdbeta = x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
-        final DoubleTensor dLogPdx = x.pow(2).reciprocalInPlace().timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
+        final DoubleTensor dPdalpha =
+                x.log().unaryMinusInPlace().minusInPlace(alpha.digamma()).plusInPlace(beta.log());
+        final DoubleTensor dLogPdbeta =
+                x.reciprocal().unaryMinusInPlace().plusInPlace(alpha.div(beta));
+        final DoubleTensor dLogPdx =
+                x.pow(2)
+                        .reciprocalInPlace()
+                        .timesInPlace(x.times(alpha.plus(1).unaryMinusInPlace()).plusInPlace(beta));
 
-        return new Diffs()
-            .put(A, dPdalpha)
-            .put(B, dLogPdbeta)
-            .put(X, dLogPdx);
+        return new Diffs().put(A, dPdalpha).put(B, dLogPdbeta).put(X, dLogPdx);
     }
-
 }

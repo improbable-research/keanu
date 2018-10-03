@@ -1,5 +1,7 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -10,18 +12,13 @@ import java.util.HashSet;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
-
 /**
- * This class enables efficient propagation of vertex updates.
- * Cascade is forward propagation and eval/lazyEval is backwards
- * propagation of updates.
+ * This class enables efficient propagation of vertex updates. Cascade is forward propagation and
+ * eval/lazyEval is backwards propagation of updates.
  */
 public class VertexValuePropagation {
 
-    private VertexValuePropagation() {
-    }
+    private VertexValuePropagation() {}
 
     public static void cascadeUpdate(Vertex... cascadeFrom) {
         cascadeUpdate(Arrays.asList(cascadeFrom));
@@ -31,12 +28,11 @@ public class VertexValuePropagation {
         cascadeUpdate(Collections.singletonList(vertex));
     }
 
-    /**
-     * @param cascadeFrom A collection that contains the vertices that have been updated.
-     */
+    /** @param cascadeFrom A collection that contains the vertices that have been updated. */
     public static void cascadeUpdate(Collection<? extends Vertex> cascadeFrom) {
 
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
+        PriorityQueue<Vertex> priorityQueue =
+                new PriorityQueue<>(Comparator.comparing(Vertex::getId, Comparator.naturalOrder()));
         priorityQueue.addAll(cascadeFrom);
 
         HashSet<Vertex> alreadyQueued = new HashSet<>(cascadeFrom);
@@ -68,7 +64,8 @@ public class VertexValuePropagation {
         while (!stack.isEmpty()) {
 
             Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(hasCalculated, head.getParents());
+            Set<Vertex<?>> parentsThatAreNotYetCalculated =
+                    parentsThatAreNotCalculated(hasCalculated, head.getParents());
 
             if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
@@ -81,13 +78,12 @@ public class VertexValuePropagation {
                 for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
                     stack.push(vertex);
                 }
-
             }
-
         }
     }
 
-    private static Set<Vertex<?>> parentsThatAreNotCalculated(Set<Vertex<?>> calculated, Collection<Vertex> parents) {
+    private static Set<Vertex<?>> parentsThatAreNotCalculated(
+            Set<Vertex<?>> calculated, Collection<Vertex> parents) {
         Set<Vertex<?>> notCalculatedParents = new HashSet<>();
         for (Vertex<?> next : parents) {
             if (!calculated.contains(next)) {
@@ -107,7 +103,8 @@ public class VertexValuePropagation {
         while (!stack.isEmpty()) {
 
             Vertex<?> head = stack.peek();
-            Set<Vertex<?>> parentsThatAreNotYetCalculated = parentsThatAreNotCalculated(head.getParents());
+            Set<Vertex<?>> parentsThatAreNotYetCalculated =
+                    parentsThatAreNotCalculated(head.getParents());
 
             if (head.isProbabilistic() || parentsThatAreNotYetCalculated.isEmpty()) {
 
@@ -119,9 +116,7 @@ public class VertexValuePropagation {
                 for (Vertex<?> vertex : parentsThatAreNotYetCalculated) {
                     stack.push(vertex);
                 }
-
             }
-
         }
     }
 

@@ -35,8 +35,12 @@ public class UniformInt implements DiscreteDistribution {
         DoubleTensor xDouble = x.toDouble();
 
         DoubleTensor logOfWithinBounds = maxBound.minus(minBound).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(xDouble.getGreaterThanOrEqualToMask(maxBound), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(xDouble.getLessThanMask(minBound), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds =
+                logOfWithinBounds.setWithMaskInPlace(
+                        xDouble.getGreaterThanOrEqualToMask(maxBound), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds =
+                logOfWithinBounds.setWithMaskInPlace(
+                        xDouble.getLessThanMask(minBound), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

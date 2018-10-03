@@ -1,20 +1,18 @@
 package io.improbable.keanu.util.csv.pojo;
 
+import static org.apache.commons.lang3.ArrayUtils.toObject;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import static org.apache.commons.lang3.ArrayUtils.toObject;
-
 class CsvColumnDeserializer {
 
-    private CsvColumnDeserializer() {
-    }
+    private CsvColumnDeserializer() {}
 
     static Object convertToAppropriateType(List<String> s, Class<?> fieldType) {
         if (fieldType == int[].class) {
@@ -44,7 +42,7 @@ class CsvColumnDeserializer {
         if (fieldType == boolean[].class) {
             return convertToBooleans(s);
         }
-        
+
         if (fieldType == Boolean[].class) {
             return toObject(convertToBooleans(s));
         }
@@ -57,15 +55,11 @@ class CsvColumnDeserializer {
     }
 
     private static int[] convertToIntegers(List<String> data) {
-        return data.stream()
-            .mapToInt(Integer::parseInt)
-            .toArray();
+        return data.stream().mapToInt(Integer::parseInt).toArray();
     }
 
     private static double[] convertToDoubles(List<String> data) {
-        return data.stream()
-            .mapToDouble(Double::parseDouble)
-            .toArray();
+        return data.stream().mapToDouble(Double::parseDouble).toArray();
     }
 
     /**
@@ -76,13 +70,18 @@ class CsvColumnDeserializer {
      */
     private static boolean[] convertToBooleans(List<String> data) {
 
-        List<Boolean> bools = data.stream().map(val -> {
-            if (StringUtils.isNumeric(val)) {
-                return Double.parseDouble(val) == 1.0;
-            } else {
-                return val.equalsIgnoreCase("true") || val.equalsIgnoreCase("t");
-            }
-        }).collect(Collectors.toList());
+        List<Boolean> bools =
+                data.stream()
+                        .map(
+                                val -> {
+                                    if (StringUtils.isNumeric(val)) {
+                                        return Double.parseDouble(val) == 1.0;
+                                    } else {
+                                        return val.equalsIgnoreCase("true")
+                                                || val.equalsIgnoreCase("t");
+                                    }
+                                })
+                        .collect(Collectors.toList());
 
         return ArrayUtils.toPrimitive(bools.toArray(new Boolean[data.size()]));
     }

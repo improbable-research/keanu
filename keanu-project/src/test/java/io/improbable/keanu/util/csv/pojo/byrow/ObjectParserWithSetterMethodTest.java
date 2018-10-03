@@ -1,17 +1,14 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
 import static java.util.stream.Collectors.toList;
-
 import static org.junit.Assert.assertEquals;
 
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import io.improbable.keanu.util.csv.pojo.CsvProperty;
 
 public class ObjectParserWithSetterMethodTest {
 
@@ -19,28 +16,28 @@ public class ObjectParserWithSetterMethodTest {
 
     @Before
     public void setup() {
-        data = Arrays.asList(
-            Arrays.asList("5", "A", "0.11", "0.1", "true"),
-            Arrays.asList("12", "6", "0.22", "0.2", "false"),
-            Arrays.asList("04", "L", "0.33", "0.3", "true")
-        );
+        data =
+                Arrays.asList(
+                        Arrays.asList("5", "A", "0.11", "0.1", "true"),
+                        Arrays.asList("12", "6", "0.22", "0.2", "false"),
+                        Arrays.asList("04", "L", "0.33", "0.3", "true"));
     }
 
     @Test
     public void givenExactNameMatchThenResultIsLoadedCorrectly() {
-        List<String> titles = Arrays.asList("myInt", "myString", "myDouble", "myFloat", "myBoolean");
+        List<String> titles =
+                Arrays.asList("myInt", "myString", "myDouble", "myFloat", "myBoolean");
 
-        List<TestPOJOWithSettersClass> output = RowsAsObjectParser.stream(
-            TestPOJOWithSettersClass.class,
-            data.stream(),
-            titles
-        ).collect(toList());
+        List<TestPOJOWithSettersClass> output =
+                RowsAsObjectParser.stream(TestPOJOWithSettersClass.class, data.stream(), titles)
+                        .collect(toList());
 
-        assertEquals(output, Arrays.asList(
-            new TestPOJOWithSettersClass(5, "A", 0.11d, 0.1f, true),
-            new TestPOJOWithSettersClass(12, "6", 0.22d, 0.2f, false),
-            new TestPOJOWithSettersClass(4, "L", 0.33d, 0.3f, true)
-        ));
+        assertEquals(
+                output,
+                Arrays.asList(
+                        new TestPOJOWithSettersClass(5, "A", 0.11d, 0.1f, true),
+                        new TestPOJOWithSettersClass(12, "6", 0.22d, 0.2f, false),
+                        new TestPOJOWithSettersClass(4, "L", 0.33d, 0.3f, true)));
     }
 
     public static class TestPOJOWithSettersClass {
@@ -54,10 +51,10 @@ public class ObjectParserWithSetterMethodTest {
 
         private boolean myBoolean;
 
-        public TestPOJOWithSettersClass() {
-        }
+        public TestPOJOWithSettersClass() {}
 
-        public TestPOJOWithSettersClass(int myInt, String myString, Double myDouble, float someFloat, boolean myBoolean) {
+        public TestPOJOWithSettersClass(
+                int myInt, String myString, Double myDouble, float someFloat, boolean myBoolean) {
             this.myString = myString;
             this.myInt = myInt;
             this.myDouble = myDouble;
@@ -83,11 +80,11 @@ public class ObjectParserWithSetterMethodTest {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TestPOJOWithSettersClass that = (TestPOJOWithSettersClass) o;
-            return myInt == that.myInt &&
-                Float.compare(that.someFloat, someFloat) == 0 &&
-                myBoolean == that.myBoolean &&
-                Objects.equals(myString, that.myString) &&
-                Objects.equals(myDouble, that.myDouble);
+            return myInt == that.myInt
+                    && Float.compare(that.someFloat, someFloat) == 0
+                    && myBoolean == that.myBoolean
+                    && Objects.equals(myString, that.myString)
+                    && Objects.equals(myDouble, that.myDouble);
         }
 
         @Override

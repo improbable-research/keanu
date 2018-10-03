@@ -5,18 +5,16 @@ import static org.junit.Assert.assertFalse;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.function.BiConsumer;
-import java.util.function.Function;
-
-import org.junit.Test;
-
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
+import org.junit.Test;
 
 public class OptimizerTest {
 
@@ -41,18 +39,15 @@ public class OptimizerTest {
     }
 
     private Function<BayesianNetwork, Optimizer> getGradientOptimizer() {
-        return (bayesNet) -> GradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
-            .build();
+        return (bayesNet) -> GradientOptimizer.builder().bayesianNetwork(bayesNet).build();
     }
 
     private Function<BayesianNetwork, Optimizer> getNonGradientOptimizer() {
-        return (bayesNet) -> NonGradientOptimizer.builder()
-            .bayesianNetwork(bayesNet)
-            .build();
+        return (bayesNet) -> NonGradientOptimizer.builder().bayesianNetwork(bayesNet).build();
     }
 
-    private void assertCanCalculateMaxLikelihood(Function<BayesianNetwork, Optimizer> optimizerMapper) {
+    private void assertCanCalculateMaxLikelihood(
+            Function<BayesianNetwork, Optimizer> optimizerMapper) {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);
@@ -75,7 +70,8 @@ public class OptimizerTest {
         assertEquals(44, maxA + maxB, 0.1);
     }
 
-    public void assertCanCalculateMaxAPosteriori(Function<BayesianNetwork, Optimizer> optimizerMapper) {
+    public void assertCanCalculateMaxAPosteriori(
+            Function<BayesianNetwork, Optimizer> optimizerMapper) {
 
         DoubleVertex A = new GaussianVertex(20.0, 1.0);
         DoubleVertex B = new GaussianVertex(20.0, 1.0);

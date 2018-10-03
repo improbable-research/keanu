@@ -3,13 +3,11 @@ package io.improbable.keanu.tensor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import java.util.function.Function;
-
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
+import java.util.function.Function;
+import org.junit.Test;
 
 public class TensorValidationTest {
     @Test
@@ -61,11 +59,11 @@ public class TensorValidationTest {
         Function<Double, Boolean> checkFunction = v -> v > 0.2;
         TensorValidator validator = TensorValidator.thatExpectsElementwise(checkFunction);
         DoubleTensor input = DoubleTensor.create(1.0, 0.1, -1.0);
-        BooleanTensor expectedResult = BooleanTensor.create(new boolean[]{true, false, false});
+        BooleanTensor expectedResult = BooleanTensor.create(new boolean[] {true, false, false});
         try {
             validator.validate(input);
             throw new AssertionError("Expected it to throw TensorValueException");
-        } catch(TensorValueException e) {
+        } catch (TensorValueException e) {
             assertThat(e.getResult(), equalTo(expectedResult));
         }
     }

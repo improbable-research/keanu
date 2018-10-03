@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +13,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -25,12 +24,14 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
 
     /**
      * One mu or s or both driving an arbitrarily shaped tensor of Logistic
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
-     * @param mu          the mu (location) of the Logistic with either the same shape as specified for this vertex or mu scalar
-     * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
+     * @param mu the mu (location) of the Logistic with either the same shape as specified for this
+     *     vertex or mu scalar
+     * @param s the s (scale) of the Logistic with either the same shape as specified for this
+     *     vertex or mu scalar
      */
     public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
 
@@ -69,7 +70,8 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Logistic.withParameters(mu.getValue(), s.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();

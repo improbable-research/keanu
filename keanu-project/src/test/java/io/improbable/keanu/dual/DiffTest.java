@@ -1,17 +1,14 @@
 package io.improbable.keanu.dual;
 
-import static org.junit.Assert.assertTrue;
-
 import static io.improbable.keanu.distributions.dual.Diffs.MU;
-
-import java.util.NoSuchElementException;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import io.improbable.keanu.distributions.dual.Diff;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import java.util.NoSuchElementException;
+import org.junit.Before;
+import org.junit.Test;
 
 public class DiffTest {
     Diffs diffs;

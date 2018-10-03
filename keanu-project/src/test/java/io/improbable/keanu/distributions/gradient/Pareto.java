@@ -2,8 +2,7 @@ package io.improbable.keanu.distributions.gradient;
 
 public class Pareto {
 
-    private Pareto() {
-    }
+    private Pareto() {}
 
     public static Diff dlnPdf(double xm, double alpha, double x) {
         double dPdX = (-1.0 - alpha) / x;

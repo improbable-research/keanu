@@ -3,10 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.C;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Dirichlet;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,6 +10,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -22,13 +21,14 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     /**
      * Dirichlet distribution. The shape is driven from concentration, which must be a vector.
      *
-     * @param tensorShape   the desired shape of the vertex
+     * @param tensorShape the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
-            throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
+            throw new IllegalArgumentException(
+                    "Dirichlet must be comprised of more than one concentration parameter");
         }
         setParents(concentration);
         setValue(DoubleTensor.placeHolder(tensorShape));
@@ -46,11 +46,13 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     /**
      * Matches a scalar concentration value to a desired shape of a Dirichlet distribution
      *
-     * @param tensorShape   the desired shape of the vertex
+     * @param tensorShape the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
     public DirichletVertex(int[] tensorShape, double concentration) {
-        this(tensorShape, new ConstantDoubleVertex(DoubleTensor.create(concentration, tensorShape)));
+        this(
+                tensorShape,
+                new ConstantDoubleVertex(DoubleTensor.create(concentration, tensorShape)));
     }
 
     /**
@@ -70,7 +72,8 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Dirichlet.withParameters(concentration.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();

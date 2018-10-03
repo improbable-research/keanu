@@ -1,17 +1,14 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
 import static java.util.stream.Collectors.toList;
-
 import static org.junit.Assert.assertEquals;
 
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import io.improbable.keanu.util.csv.pojo.CsvProperty;
 
 public class ObjectParserWithPublicFieldTest {
 
@@ -19,28 +16,28 @@ public class ObjectParserWithPublicFieldTest {
 
     @Before
     public void setup() {
-        data = Arrays.asList(
-            Arrays.asList("5", "A"),
-            Arrays.asList("12", "6"),
-            Arrays.asList("04", "L")
-        );
+        data =
+                Arrays.asList(
+                        Arrays.asList("5", "A"),
+                        Arrays.asList("12", "6"),
+                        Arrays.asList("04", "L"));
     }
 
     @Test
     public void givenExactNameMatchThenResultIsLoadedCorrectly() {
         List<String> titles = Arrays.asList("id", "name");
 
-        List<TestPOJOWithPublicFieldsClass> output = RowsAsObjectParser.stream(
-            TestPOJOWithPublicFieldsClass.class,
-            data.stream(),
-            titles
-        ).collect(toList());
+        List<TestPOJOWithPublicFieldsClass> output =
+                RowsAsObjectParser.stream(
+                                TestPOJOWithPublicFieldsClass.class, data.stream(), titles)
+                        .collect(toList());
 
-        assertEquals(output, Arrays.asList(
-            new TestPOJOWithPublicFieldsClass(5, "A"),
-            new TestPOJOWithPublicFieldsClass(12, "6"),
-            new TestPOJOWithPublicFieldsClass(4, "L")
-        ));
+        assertEquals(
+                output,
+                Arrays.asList(
+                        new TestPOJOWithPublicFieldsClass(5, "A"),
+                        new TestPOJOWithPublicFieldsClass(12, "6"),
+                        new TestPOJOWithPublicFieldsClass(4, "L")));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -54,28 +51,24 @@ public class ObjectParserWithPublicFieldTest {
         List<String> titles = Arrays.asList("id", "name", "blah");
 
         RowsAsObjectParser.stream(
-            TestPOJOWithPublicFieldsClass.class,
-            data.stream(),
-            titles,
-            false
-        );
+                TestPOJOWithPublicFieldsClass.class, data.stream(), titles, false);
     }
 
     @Test
     public void givenCaseDifferenceThenStillExactMatch() {
         List<String> titles = Arrays.asList("Id", "name");
 
-        List<TestPOJOWithPublicFieldsClass> output = RowsAsObjectParser.stream(
-            TestPOJOWithPublicFieldsClass.class,
-            data.stream(),
-            titles
-        ).collect(toList());
+        List<TestPOJOWithPublicFieldsClass> output =
+                RowsAsObjectParser.stream(
+                                TestPOJOWithPublicFieldsClass.class, data.stream(), titles)
+                        .collect(toList());
 
-        assertEquals(output, Arrays.asList(
-            new TestPOJOWithPublicFieldsClass(5, "A"),
-            new TestPOJOWithPublicFieldsClass(12, "6"),
-            new TestPOJOWithPublicFieldsClass(4, "L")
-        ));
+        assertEquals(
+                output,
+                Arrays.asList(
+                        new TestPOJOWithPublicFieldsClass(5, "A"),
+                        new TestPOJOWithPublicFieldsClass(12, "6"),
+                        new TestPOJOWithPublicFieldsClass(4, "L")));
     }
 
     public static class TestPOJOWithPublicFieldsClass {
@@ -85,8 +78,7 @@ public class ObjectParserWithPublicFieldTest {
 
         public int id;
 
-        public TestPOJOWithPublicFieldsClass() {
-        }
+        public TestPOJOWithPublicFieldsClass() {}
 
         public TestPOJOWithPublicFieldsClass(int id, String name) {
             this.id = id;
@@ -98,8 +90,7 @@ public class ObjectParserWithPublicFieldTest {
             if (this == o) return true;
             if (o == null || getClass() != o.getClass()) return false;
             TestPOJOWithPublicFieldsClass that = (TestPOJOWithPublicFieldsClass) o;
-            return id == that.id &&
-                Objects.equals(myName, that.myName);
+            return id == that.id && Objects.equals(myName, that.myName);
         }
 
         @Override
@@ -108,5 +99,4 @@ public class ObjectParserWithPublicFieldTest {
             return Objects.hash(myName, id);
         }
     }
-
 }

@@ -1,7 +1,11 @@
 
+
 plugins {
     id 'com.palantir.git-version' version '0.11.0'
+    id "com.diffplug.gradle.spotless" version "3.15.0"
 }
+
+apply plugin: 'java'
 
 repositories {
     mavenLocal()
@@ -14,4 +18,16 @@ allprojects {
 
 dependencies {
 
+}
+
+spotless {
+    java {
+        target '**/*.java'
+        googleJavaFormat().aosp()
+        custom 'noWildcardImports', {
+            if (it.contains('*;\n')) {
+                throw new Error('No wildcard imports - please remove manually')
+            }
+        }
+    }
 }

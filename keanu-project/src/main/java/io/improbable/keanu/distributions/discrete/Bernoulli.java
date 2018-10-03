@@ -25,35 +25,32 @@ public class Bernoulli implements Distribution<BooleanTensor> {
 
     @Override
     public DoubleTensor logProb(BooleanTensor x) {
-        DoubleTensor probTrueClamped = probTrue.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
+        DoubleTensor probTrueClamped =
+                probTrue.clamp(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
 
-        DoubleTensor probability = x.setDoubleIf(
-            probTrueClamped,
-            probTrueClamped.unaryMinus().plusInPlace(1.0)
-        );
+        DoubleTensor probability =
+                x.setDoubleIf(probTrueClamped, probTrueClamped.unaryMinus().plusInPlace(1.0));
 
         return probability.logInPlace();
     }
 
     public DoubleTensor dLogProb(BooleanTensor x) {
-        DoubleTensor greaterThanMask = probTrue
-            .getGreaterThanMask(DoubleTensor.ONE_SCALAR);
+        DoubleTensor greaterThanMask = probTrue.getGreaterThanMask(DoubleTensor.ONE_SCALAR);
 
-        DoubleTensor lessThanOrEqualToMask = probTrue
-            .getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR);
+        DoubleTensor lessThanOrEqualToMask =
+                probTrue.getLessThanOrEqualToMask(DoubleTensor.ZERO_SCALAR);
 
-        DoubleTensor greaterThanOneOrLessThanZero = greaterThanMask.plusInPlace(lessThanOrEqualToMask);
+        DoubleTensor greaterThanOneOrLessThanZero =
+                greaterThanMask.plusInPlace(lessThanOrEqualToMask);
 
         DoubleTensor dlogProbdxForTrue = probTrue.reciprocal();
         dlogProbdxForTrue = dlogProbdxForTrue.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
         DoubleTensor dlogProbdxForFalse = probTrue.minus(1.0).reciprocalInPlace();
-        dlogProbdxForFalse = dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
+        dlogProbdxForFalse =
+                dlogProbdxForFalse.setWithMaskInPlace(greaterThanOneOrLessThanZero, 0.0);
 
-        DoubleTensor dLogPdp = x.setDoubleIf(
-            dlogProbdxForTrue,
-            dlogProbdxForFalse
-        );
+        DoubleTensor dLogPdp = x.setDoubleIf(dlogProbdxForTrue, dlogProbdxForFalse);
 
         return dLogPdp;
     }

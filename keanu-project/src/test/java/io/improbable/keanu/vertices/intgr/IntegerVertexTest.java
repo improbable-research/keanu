@@ -5,20 +5,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.function.Function;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
+import java.util.function.Function;
+import org.junit.Before;
+import org.junit.Test;
 
 public class IntegerVertexTest {
 
@@ -88,7 +83,7 @@ public class IntegerVertexTest {
     @Test
     public void canObserveArrayOfValues() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        int[] observation = new int[]{1, 2, 3};
+        int[] observation = new int[] {1, 2, 3};
         binomialVertex.observe(observation);
         assertArrayEquals(observation, binomialVertex.getValue().asFlatIntegerArray());
     }
@@ -96,17 +91,18 @@ public class IntegerVertexTest {
     @Test
     public void canObserveTensor() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        IntegerTensor observation = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        IntegerTensor observation =
+                Nd4jIntegerTensor.create(new int[] {1, 2, 3, 4}, new int[] {2, 2});
         binomialVertex.observe(observation);
-        assertArrayEquals(observation.asFlatIntegerArray(), binomialVertex.getValue().asFlatIntegerArray());
+        assertArrayEquals(
+                observation.asFlatIntegerArray(), binomialVertex.getValue().asFlatIntegerArray());
         assertArrayEquals(observation.getShape(), binomialVertex.getShape());
-
     }
 
     @Test
     public void canSetAndCascadeArrayOfValues() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        int[] values = new int[]{1, 2, 3};
+        int[] values = new int[] {1, 2, 3};
         binomialVertex.setAndCascade(values);
         assertArrayEquals(values, binomialVertex.getValue().asFlatIntegerArray());
     }
@@ -114,29 +110,29 @@ public class IntegerVertexTest {
     @Test
     public void canSetValueAsArrayOfValues() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        int[] values = new int[]{1, 2, 3};
+        int[] values = new int[] {1, 2, 3};
         binomialVertex.setValue(values);
         assertArrayEquals(values, binomialVertex.getValue().asFlatIntegerArray());
     }
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
+        IntegerVertex binomialVertex = new BinomialVertex(new int[] {2, 1}, 0.5, 20);
         binomialVertex.setValue(2);
-        assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
+        assertArrayEquals(new int[] {2}, binomialVertex.getValue().asFlatIntegerArray());
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
+        IntegerVertex binomialVertex = new BinomialVertex(new int[] {2, 1}, 0.5, 20);
         binomialVertex.setAndCascade(2);
-        assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
+        assertArrayEquals(new int[] {2}, binomialVertex.getValue().asFlatIntegerArray());
     }
 
     @Test
     public void canPluckValue() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        int[] values = new int[]{1, 2, 3};
+        int[] values = new int[] {1, 2, 3};
         binomialVertex.setValue(values);
         assertEquals(1, (long) binomialVertex.take(0, 0).getValue().scalar());
     }
@@ -145,9 +141,9 @@ public class IntegerVertexTest {
     public void canReshape() {
         IntegerVertex binomialVertex = new BinomialVertex(0, 1);
         binomialVertex.setAndCascade(IntegerTensor.ones(2, 2));
-        assertArrayEquals(binomialVertex.getShape(), new int[]{2, 2});
+        assertArrayEquals(binomialVertex.getShape(), new int[] {2, 2});
         IntegerVertex reshaped = binomialVertex.reshape(4, 1);
-        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+        assertArrayEquals(reshaped.getShape(), new int[] {4, 1});
     }
 
     @Test
@@ -159,10 +155,10 @@ public class IntegerVertexTest {
         B.setValue(IntegerTensor.ones(2, 2));
 
         IntegerVertex concatDimZero = IntegerVertex.concat(0, A, B);
-        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+        assertArrayEquals(concatDimZero.getShape(), new int[] {4, 2});
 
         IntegerVertex concatDimOne = IntegerVertex.concat(1, A, B);
-        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
+        assertArrayEquals(concatDimOne.getShape(), new int[] {2, 4});
     }
 
     @Test
@@ -173,8 +169,7 @@ public class IntegerVertexTest {
         IntegerVertex min = IntegerVertex.min(A, B);
         IntegerVertex max = IntegerVertex.max(A, B);
 
-        assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
-        assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
+        assertArrayEquals(new int[] {1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
+        assertArrayEquals(new int[] {2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
     }
-
 }

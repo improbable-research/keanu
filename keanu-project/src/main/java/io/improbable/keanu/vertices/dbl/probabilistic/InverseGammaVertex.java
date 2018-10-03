@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.InverseGamma;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +13,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -25,12 +24,14 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
 
     /**
      * One alpha or beta or both driving an arbitrarily shaped tensor of Inverse Gamma
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
-     * @param alpha       the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
-     * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
+     * @param alpha the alpha of the Inverse Gamma with either the same shape as specified for this
+     *     vertex or alpha scalar
+     * @param beta the beta of the Inverse Gamma with either the same shape as specified for this
+     *     vertex or alpha scalar
      */
     public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
 
@@ -43,14 +44,19 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
     }
 
     /**
-     * One to one constructor for mapping some shape of alpha and beta to
-     * alpha matching shaped Inverse Gamma.
+     * One to one constructor for mapping some shape of alpha and beta to alpha matching shaped
+     * Inverse Gamma.
      *
-     * @param alpha the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
-     * @param beta  the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
+     * @param alpha the alpha of the Inverse Gamma with either the same shape as specified for this
+     *     vertex or alpha scalar
+     * @param beta the beta of the Inverse Gamma with either the same shape as specified for this
+     *     vertex or alpha scalar
      */
     public InverseGammaVertex(DoubleVertex alpha, DoubleVertex beta) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
+        this(
+                checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()),
+                alpha,
+                beta);
     }
 
     public InverseGammaVertex(DoubleVertex alpha, double beta) {
@@ -87,7 +93,8 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = InverseGamma.withParameters(alpha.getValue(), beta.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
@@ -109,7 +116,7 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return InverseGamma.withParameters(alpha.getValue(), beta.getValue()).sample(getShape(), random);
+        return InverseGamma.withParameters(alpha.getValue(), beta.getValue())
+                .sample(getShape(), random);
     }
-
 }

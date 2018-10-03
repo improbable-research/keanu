@@ -1,15 +1,21 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
+
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.*;
-
-import static org.junit.Assert.*;
 
 public class UniformIntVertexTest {
     private int N = 100000;
@@ -22,7 +28,8 @@ public class UniformIntVertexTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformIntVertex testUniformVertex =
+                new UniformIntVertex(new int[] {1, N}, lowerBound, upperBound);
         samples.addAll(testUniformVertex.sample(random).asFlatList());
     }
 
@@ -67,7 +74,8 @@ public class UniformIntVertexTest {
 
     @Test
     public void canUseFullIntRange() {
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, 100}, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        UniformIntVertex testUniformVertex =
+                new UniformIntVertex(new int[] {1, 100}, Integer.MIN_VALUE, Integer.MAX_VALUE);
         IntegerTensor sample = testUniformVertex.sample(random);
 
         Set<Integer> uniqueValues = new HashSet<>(sample.asFlatList());
@@ -77,13 +85,21 @@ public class UniformIntVertexTest {
 
     @Test
     public void logProbUpperBoundIsNegativeInfinity() {
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
-        assertEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(upperBound)), Double.NEGATIVE_INFINITY, 1e-6);
+        UniformIntVertex testUniformVertex =
+                new UniformIntVertex(new int[] {1, N}, lowerBound, upperBound);
+        assertEquals(
+                testUniformVertex.logProb(Nd4jIntegerTensor.scalar(upperBound)),
+                Double.NEGATIVE_INFINITY,
+                1e-6);
     }
 
     @Test
     public void logProbLowerBoundIsNotNegativeInfinity() {
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
-        assertNotEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
+        UniformIntVertex testUniformVertex =
+                new UniformIntVertex(new int[] {1, N}, lowerBound, upperBound);
+        assertNotEquals(
+                testUniformVertex.logProb(Nd4jIntegerTensor.scalar(lowerBound)),
+                Double.NEGATIVE_INFINITY,
+                1e-6);
     }
 }

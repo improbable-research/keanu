@@ -21,5 +21,4 @@ public interface RandomFactory<T> {
     default T nextGaussian() {
         return nextGaussian(0.0, 1.0);
     }
-
 }

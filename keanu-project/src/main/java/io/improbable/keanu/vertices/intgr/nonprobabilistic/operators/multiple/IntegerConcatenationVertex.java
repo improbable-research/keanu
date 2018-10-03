@@ -2,18 +2,16 @@ package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import java.lang.reflect.Array;
+import java.util.function.Function;
 
-public class IntegerConcatenationVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public class IntegerConcatenationVertex extends IntegerVertex
+        implements NonProbabilistic<IntegerTensor> {
 
     private final int dimension;
     private final IntegerVertex[] input;
@@ -21,8 +19,9 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
-     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
-     * @param input     the input vertices to concatenate
+     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes
+     *     may be different.
+     * @param input the input vertices to concatenate
      */
     public IntegerConcatenationVertex(int dimension, IntegerVertex... input) {
         this.dimension = dimension;
@@ -53,5 +52,4 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
         }
         return extract;
     }
-
 }

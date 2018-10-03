@@ -3,9 +3,6 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -14,6 +11,8 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import java.util.Map;
+import java.util.Set;
 
 public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger {
 
@@ -22,8 +21,8 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
 
     /**
      * @param shape tensor shape of value
-     * @param min   The inclusive lower bound.
-     * @param max   The exclusive upper bound.
+     * @param min The inclusive lower bound.
+     * @param max The exclusive upper bound.
      */
     public UniformIntVertex(int[] shape, IntegerVertex min, IntegerVertex max) {
 
@@ -81,7 +80,8 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            IntegerTensor value, Set<? extends Vertex> withRespectTo) {
         throw new UnsupportedOperationException();
     }
 

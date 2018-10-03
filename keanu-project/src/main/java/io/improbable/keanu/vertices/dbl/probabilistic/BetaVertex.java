@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Beta;
 import io.improbable.keanu.distributions.dual.Diffs;
@@ -18,6 +14,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -26,12 +25,14 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
 
     /**
      * One alpha or beta or both that match a proposed tensor shape of Beta.
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor contained in the vertex
-     * @param alpha       the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
-     * @param beta        the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
+     * @param alpha the alpha of the Beta with either the same tensorShape as specified for this
+     *     vertex or a scalar
+     * @param beta the beta of the Beta with either the same tensorShape as specified for this
+     *     vertex or a scalar
      */
     public BetaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
 
@@ -44,18 +45,27 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     ContinuousDistribution distribution() {
-        return Beta.withParameters(alpha.getValue(), beta.getValue(), DoubleTensor.scalar(0.), DoubleTensor.scalar(1.));
+        return Beta.withParameters(
+                alpha.getValue(),
+                beta.getValue(),
+                DoubleTensor.scalar(0.),
+                DoubleTensor.scalar(1.));
     }
 
     /**
-     * One to one constructor for mapping some tensorShape of alpha and beta to
-     * a matching tensorShaped Beta.
+     * One to one constructor for mapping some tensorShape of alpha and beta to a matching
+     * tensorShaped Beta.
      *
-     * @param alpha the alpha of the Beta with either the same tensorShape as specified for this vertex or a scalar
-     * @param beta  the beta of the Beta with either the same tensorShape as specified for this vertex or a scalar
+     * @param alpha the alpha of the Beta with either the same tensorShape as specified for this
+     *     vertex or a scalar
+     * @param beta the beta of the Beta with either the same tensorShape as specified for this
+     *     vertex or a scalar
      */
     public BetaVertex(DoubleVertex alpha, DoubleVertex beta) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()), alpha, beta);
+        this(
+                checkHasSingleNonScalarShapeOrAllScalar(alpha.getShape(), beta.getShape()),
+                alpha,
+                beta);
     }
 
     public BetaVertex(DoubleVertex alpha, double beta) {
@@ -89,7 +99,8 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = distribution().dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
@@ -113,5 +124,4 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
     public DoubleTensor sample(KeanuRandom random) {
         return distribution().sample(getShape(), random);
     }
-
 }

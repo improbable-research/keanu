@@ -1,17 +1,22 @@
 package io.improbable.docs;
 
+import static io.improbable.docs.SelectVertexExample.MyType.A;
+import static io.improbable.docs.SelectVertexExample.MyType.B;
+import static io.improbable.docs.SelectVertexExample.MyType.C;
+import static io.improbable.docs.SelectVertexExample.MyType.D;
+
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
-
 import java.util.LinkedHashMap;
-
-import static io.improbable.docs.SelectVertexExample.MyType.*;
 
 public class SelectVertexExample {
 
     public enum MyType {
-        A, B, C, D
+        A,
+        B,
+        C,
+        D
     }
 
     public CategoricalVertex<MyType> getSelectorForMyType() {
@@ -24,5 +29,4 @@ public class SelectVertexExample {
 
         return new CategoricalVertex<MyType>(frequency);
     }
-
 }

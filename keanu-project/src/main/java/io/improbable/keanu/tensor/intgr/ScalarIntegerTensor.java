@@ -1,15 +1,12 @@
 package io.improbable.keanu.tensor.intgr;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 import com.google.common.math.IntMath;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
+import java.util.Arrays;
+import java.util.function.Function;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
@@ -163,18 +160,24 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (value.isScalar()) {
             return value.times(value);
         }
-        throw new IllegalArgumentException("Cannot use matrix multiply with scalar. Use times instead.");
+        throw new IllegalArgumentException(
+                "Cannot use matrix multiply with scalar. Use times instead.");
     }
 
     @Override
     public IntegerTensor tensorMultiply(IntegerTensor value, int[] dimsLeft, int[] dimsRight) {
         if (value.isScalar()) {
-            if (dimsLeft.length > 1 || dimsRight.length > 1 || dimsLeft[0] != 0 || dimsRight[0] != 0) {
-                throw new IllegalArgumentException("Tensor multiply sum dimensions out of bounds for scalar");
+            if (dimsLeft.length > 1
+                    || dimsRight.length > 1
+                    || dimsLeft[0] != 0
+                    || dimsRight[0] != 0) {
+                throw new IllegalArgumentException(
+                        "Tensor multiply sum dimensions out of bounds for scalar");
             }
             return value.times(value);
         }
-        throw new IllegalArgumentException("Cannot use tensor multiply with scalar. Use times instead.");
+        throw new IllegalArgumentException(
+                "Cannot use tensor multiply with scalar. Use times instead.");
     }
 
     @Override
@@ -198,7 +201,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             return new ScalarIntegerTensor(value > greaterThanThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, greaterThanThis.getShape())
-                .getGreaterThanMask(greaterThanThis);
+                    .getGreaterThanMask(greaterThanThis);
         }
     }
 
@@ -208,7 +211,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             return new ScalarIntegerTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, greaterThanOrEqualToThis.getShape())
-                .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
+                    .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
         }
     }
 
@@ -218,7 +221,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             return new ScalarIntegerTensor(value < lessThanThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, lessThanThis.getShape())
-                .getLessThanMask(lessThanThis);
+                    .getLessThanMask(lessThanThis);
         }
     }
 
@@ -228,7 +231,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             return new ScalarIntegerTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, lessThanOrEqualsThis.getShape())
-                .getLessThanOrEqualToMask(lessThanOrEqualsThis);
+                    .getLessThanOrEqualToMask(lessThanOrEqualsThis);
         }
     }
 
@@ -238,7 +241,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
             return IntegerTensor.create(value, withMask.getShape())
-                .setWithMaskInPlace(withMask, valueToApply);
+                    .setWithMaskInPlace(withMask, valueToApply);
         }
         return this;
     }
@@ -258,7 +261,8 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
-            throw new IllegalStateException("Slice is only valid for dimension and index zero in a scalar");
+            throw new IllegalStateException(
+                    "Slice is only valid for dimension and index zero in a scalar");
         }
     }
 
@@ -291,8 +295,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (exponent.isScalar()) {
             powInPlace(exponent.scalar());
         } else {
-            return IntegerTensor.create(value, exponent.getShape())
-                .powInPlace(exponent);
+            return IntegerTensor.create(value, exponent.getShape()).powInPlace(exponent);
         }
         return this;
     }
@@ -308,8 +311,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             minusInPlace(that.scalar());
         } else {
-            return IntegerTensor.create(value, that.getShape())
-                .minusInPlace(that);
+            return IntegerTensor.create(value, that.getShape()).minusInPlace(that);
         }
         return this;
     }
@@ -319,8 +321,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             plusInPlace(that.scalar());
         } else {
-            return IntegerTensor.create(value, that.getShape())
-                .plusInPlace(that);
+            return IntegerTensor.create(value, that.getShape()).plusInPlace(that);
         }
         return this;
     }
@@ -330,8 +331,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             timesInPlace(that.scalar());
         } else {
-            return IntegerTensor.create(value, that.getShape())
-                .timesInPlace(that);
+            return IntegerTensor.create(value, that.getShape()).timesInPlace(that);
         }
         return this;
     }
@@ -341,8 +341,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (that.isScalar()) {
             divInPlace(that.scalar());
         } else {
-            return IntegerTensor.create(value, that.getShape())
-                .divInPlace(that);
+            return IntegerTensor.create(value, that.getShape()).divInPlace(that);
         }
         return this;
     }
@@ -505,29 +504,25 @@ public class ScalarIntegerTensor implements IntegerTensor {
             }
             this.value = value;
         }
-
     }
 
     @Override
     public double[] asFlatDoubleArray() {
-        return new double[]{value};
+        return new double[] {value};
     }
 
     @Override
     public int[] asFlatIntegerArray() {
-        return new int[]{value};
+        return new int[] {value};
     }
 
     @Override
     public Integer[] asFlatArray() {
-        return new Integer[]{value};
+        return new Integer[] {value};
     }
 
     @Override
     public String toString() {
-        return "ScalarIntegerTensor{" +
-            "value=" + value +
-            '}';
+        return "ScalarIntegerTensor{" + "value=" + value + '}';
     }
-
 }

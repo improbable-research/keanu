@@ -10,19 +10,19 @@ import java.util.stream.Stream;
 
 public class TensorShapeValidation {
 
-    private TensorShapeValidation() {
-    }
+    private TensorShapeValidation() {}
 
     /**
-     * This is a common function to check that tensors are either
-     * the same shape of the proposal in question OR scalar.
+     * This is a common function to check that tensors are either the same shape of the proposal in
+     * question OR scalar.
      *
      * @param proposalShape the tensor shape being validated
-     * @param shapes        the tensors being validated against
-     * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the non-scalar shape does
-     *                                  not match the proposal shape.
+     * @param shapes the tensors being validated against
+     * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the
+     *     non-scalar shape does not match the proposal shape.
      */
-    public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, int[]... shapes) {
+    public static void checkTensorsMatchNonScalarShapeOrAreScalar(
+            int[] proposalShape, int[]... shapes) {
 
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
 
@@ -35,12 +35,14 @@ public class TensorShapeValidation {
             }
 
             int[] nonScalarShape = nonScalarShapes.iterator().next().getShape();
-            boolean nonScalarShapeDoesNotMatchProposal = !Arrays.equals(nonScalarShape, proposalShape);
+            boolean nonScalarShapeDoesNotMatchProposal =
+                    !Arrays.equals(nonScalarShape, proposalShape);
 
             if (nonScalarShapeDoesNotMatchProposal) {
                 throw new IllegalArgumentException(
-                    "Proposed shape " + Arrays.toString(proposalShape) + " does not match other non scalar shapes"
-                );
+                        "Proposed shape "
+                                + Arrays.toString(proposalShape)
+                                + " does not match other non scalar shapes");
             }
         }
     }
@@ -66,9 +68,9 @@ public class TensorShapeValidation {
 
     private static Set<TensorShape> getNonScalarShapes(int[]... shapes) {
         return Arrays.stream(shapes)
-            .map(TensorShape::new)
-            .filter(shape -> !shape.isScalar())
-            .collect(toSet());
+                .map(TensorShape::new)
+                .filter(shape -> !shape.isScalar())
+                .collect(toSet());
     }
 
     public static int[] checkAllShapesMatch(int[]... shapes) {
@@ -87,10 +89,9 @@ public class TensorShapeValidation {
         return checkAllShapesMatch(shapes.stream(), Optional.empty());
     }
 
-    private static int[] checkAllShapesMatch(Stream<int[]> shapesStream, Optional<String> errorMessage) {
-        Set<TensorShape> uniqueShapes = shapesStream
-            .map(TensorShape::new)
-            .collect(toSet());
+    private static int[] checkAllShapesMatch(
+            Stream<int[]> shapesStream, Optional<String> errorMessage) {
+        Set<TensorShape> uniqueShapes = shapesStream.map(TensorShape::new).collect(toSet());
 
         if (uniqueShapes.size() != 1) {
             throw new IllegalArgumentException(errorMessage.orElse("Shapes must match"));
@@ -123,19 +124,21 @@ public class TensorShapeValidation {
     public static void checkIndexIsValid(int[] shape, int... index) {
         if (shape.length != index.length) {
             throw new IllegalArgumentException(
-                "Length of desired index " + Arrays.toString(index) + " must match the length of the shape " + Arrays.toString(shape));
+                    "Length of desired index "
+                            + Arrays.toString(index)
+                            + " must match the length of the shape "
+                            + Arrays.toString(shape));
         }
 
         for (int i = 0; i < index.length; i++) {
 
             if (index[i] >= shape[i]) {
                 throw new IllegalArgumentException(
-                    "Invalid index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape)
-                );
+                        "Invalid index "
+                                + Arrays.toString(index)
+                                + " for shape "
+                                + Arrays.toString(shape));
             }
-
         }
     }
-
-
 }

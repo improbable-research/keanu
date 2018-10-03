@@ -7,7 +7,8 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public abstract class BoolUnaryOpVertex<T extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public abstract class BoolUnaryOpVertex<T extends Tensor> extends BoolVertex
+        implements NonProbabilistic<BooleanTensor> {
 
     protected final Vertex<T> a;
 

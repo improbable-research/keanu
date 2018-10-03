@@ -2,12 +2,11 @@ package io.improbable.keanu.util.csv;
 
 import static io.improbable.keanu.util.csv.WriteCsv.findLongestTensor;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.vertices.Vertex;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.Vertex;
 
 public class RowWriter extends Writer {
 
@@ -48,5 +47,4 @@ public class RowWriter extends Writer {
         withHeader(header);
         return this;
     }
-
 }

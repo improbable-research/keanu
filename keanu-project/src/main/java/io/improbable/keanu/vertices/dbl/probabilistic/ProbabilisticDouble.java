@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Probabilistic;
+import io.improbable.keanu.vertices.Vertex;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Probabilistic;
-import io.improbable.keanu.vertices.Vertex;
 
 public interface ProbabilisticDouble extends Probabilistic<DoubleTensor> {
     default double logPdf(double value) {

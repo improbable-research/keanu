@@ -27,9 +27,11 @@ public class Model {
         coalMiningDisastersModel.run();
         System.out.println("Run complete");
 
-        int switchYear = coalMiningDisastersModel.results
-            .getIntegerTensorSamples(coalMiningDisastersModel.switchpoint)
-            .getScalarMode();
+        int switchYear =
+                coalMiningDisastersModel
+                        .results
+                        .getIntegerTensorSamples(coalMiningDisastersModel.switchpoint)
+                        .getScalarMode();
 
         System.out.println("Switch year found: " + switchYear);
     }
@@ -46,17 +48,17 @@ public class Model {
         KeanuRandom.setDefaultRandomSeed(1);
     }
 
-    /**
-     * Runs the MetropolisHastings algorithm and saves the resulting samples to results
-     */
+    /** Runs the MetropolisHastings algorithm and saves the resulting samples to results */
     public void run() {
         BayesianNetwork net = buildBayesianNetwork();
         Integer numSamples = 50000;
 
-        results = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(
-            net,
-            net.getLatentVertices()
-        ).dropCount(10000).downSampleInterval(3).generate(numSamples);
+        results =
+                MetropolisHastings.withDefaultConfig()
+                        .generatePosteriorSamples(net, net.getLatentVertices())
+                        .dropCount(10000)
+                        .downSampleInterval(3)
+                        .generate(numSamples);
     }
 
     private BayesianNetwork buildBayesianNetwork() {
@@ -67,9 +69,10 @@ public class Model {
 
         ConstantIntegerVertex years = ConstantVertex.of(data.years);
 
-        DoubleVertex rateForYear = If.isTrue(new GreaterThanVertex<>(switchpoint, years))
-            .then(earlyRate)
-            .orElse(lateRate);
+        DoubleVertex rateForYear =
+                If.isTrue(new GreaterThanVertex<>(switchpoint, years))
+                        .then(earlyRate)
+                        .orElse(lateRate);
 
         PoissonVertex disastersForYear = new PoissonVertex(rateForYear);
 
@@ -77,5 +80,4 @@ public class Model {
 
         return new BayesianNetwork(switchpoint.getConnectedGraph());
     }
-
 }

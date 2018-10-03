@@ -2,14 +2,13 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static java.util.Collections.singletonMap;
 
-import java.util.Map;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import java.util.Map;
 
 public class SumVertex extends DoubleUnaryOpVertex {
 
@@ -33,10 +32,12 @@ public class SumVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        PartialDerivatives derivativesWrtInput = derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), this.getShape());
+        PartialDerivatives derivativesWrtInput =
+                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+                        DoubleTensor.ones(inputVertex.getShape()), this.getShape());
 
         return singletonMap(inputVertex, derivativesWrtInput);
     }

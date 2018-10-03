@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleModelResultVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.IntegerModelResultVertex;
-
 import java.util.Map;
 
 public interface ModelVertex<T> extends NonProbabilistic<T> {
@@ -34,5 +33,4 @@ public interface ModelVertex<T> extends NonProbabilistic<T> {
     default BoolVertex getBoolModelOutputVertex(VertexLabel label) {
         return new BoolModelResultVertex(this, label);
     }
-
 }

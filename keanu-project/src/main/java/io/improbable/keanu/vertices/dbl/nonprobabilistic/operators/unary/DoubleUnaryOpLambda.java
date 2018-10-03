@@ -1,8 +1,5 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Map;
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -11,18 +8,25 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import java.util.Map;
+import java.util.function.Function;
 
-public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
+public class DoubleUnaryOpLambda<IN> extends DoubleVertex
+        implements Differentiable, NonProbabilistic<DoubleTensor> {
 
     private final Vertex<IN> inputVertex;
     private final Function<IN, DoubleTensor> op;
     private final Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda;
-    private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
+    private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>>
+            reverseModeAutoDiffLambda;
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex,
-                               Function<IN, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
-                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
+    public DoubleUnaryOpLambda(
+            int[] shape,
+            Vertex<IN> inputVertex,
+            Function<IN, DoubleTensor> op,
+            Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+            Function<PartialDerivatives, Map<Vertex, PartialDerivatives>>
+                    reverseModeAutoDiffLambda) {
         this.inputVertex = inputVertex;
         this.op = op;
         this.forwardModeAutoDiffLambda = dualNumberCalculation;
@@ -35,11 +39,18 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
         this(shape, inputVertex, op, null, null);
     }
 
-    public DoubleUnaryOpLambda(Vertex<IN> inputVertex,
-                               Function<IN, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
-                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation, reverseModeAutoDiffLambda);
+    public DoubleUnaryOpLambda(
+            Vertex<IN> inputVertex,
+            Function<IN, DoubleTensor> op,
+            Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+            Function<PartialDerivatives, Map<Vertex, PartialDerivatives>>
+                    reverseModeAutoDiffLambda) {
+        this(
+                inputVertex.getShape(),
+                inputVertex,
+                op,
+                dualNumberCalculation,
+                reverseModeAutoDiffLambda);
     }
 
     public DoubleUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
@@ -66,7 +77,8 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         if (reverseModeAutoDiffLambda != null) {
             return reverseModeAutoDiffLambda.apply(derivativeOfOutputsWithRespectToSelf);
         }

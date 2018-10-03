@@ -7,13 +7,12 @@ import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.nullValue;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import org.junit.Before;
+import org.junit.Test;
 
 public class BayesianNetworkTest {
 
@@ -31,7 +30,6 @@ public class BayesianNetworkTest {
         input2 = new BernoulliVertex(0.75);
         output = input1.or(input2);
         network = new BayesianNetwork(output.getConnectedGraph());
-
     }
 
     @Test

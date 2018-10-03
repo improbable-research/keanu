@@ -2,16 +2,14 @@ package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Test;
 
 public class FitnessFunctionWithGradientTest {
 
@@ -36,12 +34,11 @@ public class FitnessFunctionWithGradientTest {
         dObservation.observe(Nd4jDoubleTensor.scalar(3.0));
 
         assert2DGradientEqualsApproxGradient(
-            new double[]{5, 5},
-            new double[]{0, 0},
-            0.1,
-            Arrays.asList(A, B, cObservation, dObservation),
-            Arrays.asList(A, B)
-        );
+                new double[] {5, 5},
+                new double[] {0, 0},
+                0.1,
+                Arrays.asList(A, B, cObservation, dObservation),
+                Arrays.asList(A, B));
     }
 
     @Test
@@ -63,12 +60,11 @@ public class FitnessFunctionWithGradientTest {
         dObservation.observe(Nd4jDoubleTensor.scalar(18.0));
 
         assert2DGradientEqualsApproxGradient(
-            new double[]{10, 10},
-            new double[]{2, 2},
-            0.1,
-            Arrays.asList(A, B, cObservation, dObservation),
-            Arrays.asList(A, B)
-        );
+                new double[] {10, 10},
+                new double[] {2, 2},
+                0.1,
+                Arrays.asList(A, B, cObservation, dObservation),
+                Arrays.asList(A, B));
     }
 
     @Test
@@ -93,27 +89,27 @@ public class FitnessFunctionWithGradientTest {
         fObservation.observe(Nd4jDoubleTensor.scalar(1.0));
 
         assert2DGradientEqualsApproxGradient(
-            new double[]{5, 5},
-            new double[]{0.1, 0.1},
-            0.1,
-            Arrays.asList(A, B, eObservation, fObservation),
-            Arrays.asList(A, B)
-        );
+                new double[] {5, 5},
+                new double[] {0.1, 0.1},
+                0.1,
+                Arrays.asList(A, B, eObservation, fObservation),
+                Arrays.asList(A, B));
     }
 
-
     /**
-     * @param topRight   max input 1 and max input 2
+     * @param topRight max input 1 and max input 2
      * @param bottomLeft min input 1 and min input 2
-     * @param stepSize   step size for moving from max to min in both dimensions
+     * @param stepSize step size for moving from max to min in both dimensions
      */
-    private void assert2DGradientEqualsApproxGradient(double[] topRight,
-                                                      double[] bottomLeft,
-                                                      double stepSize,
-                                                      List<Vertex> vertices,
-                                                      List<? extends Vertex<DoubleTensor>> latentVertices) {
+    private void assert2DGradientEqualsApproxGradient(
+            double[] topRight,
+            double[] bottomLeft,
+            double stepSize,
+            List<Vertex> vertices,
+            List<? extends Vertex<DoubleTensor>> latentVertices) {
 
-        FitnessFunctionWithGradient fitness = new FitnessFunctionWithGradient(vertices, latentVertices);
+        FitnessFunctionWithGradient fitness =
+                new FitnessFunctionWithGradient(vertices, latentVertices);
 
         double[] point = Arrays.copyOf(bottomLeft, bottomLeft.length);
 
@@ -151,7 +147,5 @@ public class FitnessFunctionWithGradientTest {
             point[0] += stepSize;
             point[1] = bottomLeft[1];
         }
-
     }
-
 }

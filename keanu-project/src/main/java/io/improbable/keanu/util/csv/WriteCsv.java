@@ -3,12 +3,9 @@ package io.improbable.keanu.util.csv;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
-
 import java.util.List;
 
-/**
- * This class provides static helper functions for writing csv data
- */
+/** This class provides static helper functions for writing csv data */
 public class WriteCsv {
 
     /**
@@ -16,7 +13,8 @@ public class WriteCsv {
      * @param vertices the vertices whose samples will be written to CSV
      * @return a writer for the csv file
      */
-    public static SampleWriter asSamples(NetworkSamples samples, List<? extends Vertex<? extends Tensor>> vertices) {
+    public static SampleWriter asSamples(
+            NetworkSamples samples, List<? extends Vertex<? extends Tensor>> vertices) {
         return new SampleWriter(samples, vertices);
     }
 
@@ -34,7 +32,6 @@ public class WriteCsv {
      */
     public static ColumnWriter asColumns(List<? extends Vertex<? extends Tensor>> vertices) {
         return new ColumnWriter(vertices);
-
     }
 
     public static int findLongestTensor(List<? extends Vertex<? extends Tensor>> tensors) {
@@ -46,5 +43,4 @@ public class WriteCsv {
         }
         return longestTensor;
     }
-
 }

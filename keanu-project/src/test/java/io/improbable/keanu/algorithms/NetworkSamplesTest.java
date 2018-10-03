@@ -2,15 +2,13 @@ package io.improbable.keanu.algorithms;
 
 import static org.junit.Assert.assertTrue;
 
+import io.improbable.keanu.vertices.VertexId;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Before;
 import org.junit.Test;
-
-import io.improbable.keanu.vertices.VertexId;
 
 public class NetworkSamplesTest {
 
@@ -50,23 +48,26 @@ public class NetworkSamplesTest {
 
     @Test
     public void doesCalculateProbability() {
-        double result2 = samples.probability(state -> {
-            int a = state.get(v1);
-            int b = state.get(v2);
-            return a == b;
-        });
+        double result2 =
+                samples.probability(
+                        state -> {
+                            int a = state.get(v1);
+                            int b = state.get(v2);
+                            return a == b;
+                        });
         assertTrue(result2 == 0.1);
     }
 
     @Test
     public void doesFind100PercentProbability() {
 
-        double result = samples.probability(state -> {
-            int a = state.get(v1);
-            int b = state.get(v2);
-            return (a + b) == 10;
-        });
+        double result =
+                samples.probability(
+                        state -> {
+                            int a = state.get(v1);
+                            int b = state.get(v2);
+                            return (a + b) == 10;
+                        });
         assertTrue(result == 1.0);
-
     }
 }

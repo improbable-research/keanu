@@ -1,12 +1,11 @@
 package io.improbable.keanu.network.grouping.continuouspointgroupers;
 
+import static java.util.stream.Collectors.toList;
+
 import io.improbable.keanu.network.grouping.ContinuousPoint;
+import java.util.List;
 import org.apache.commons.math3.ml.clustering.Cluster;
 import org.apache.commons.math3.ml.clustering.DBSCANClusterer;
-
-import java.util.List;
-
-import static java.util.stream.Collectors.toList;
 
 public class DBSCANContinuousPointGrouper implements ContinuousPointGrouper {
 
@@ -24,8 +23,6 @@ public class DBSCANContinuousPointGrouper implements ContinuousPointGrouper {
 
         List<Cluster<ContinuousPoint>> clusters = kmeansClusterer.cluster(points);
 
-        return clusters.stream()
-            .map(Cluster::getPoints)
-            .collect(toList());
+        return clusters.stream().map(Cluster::getPoints).collect(toList());
     }
 }

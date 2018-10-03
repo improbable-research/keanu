@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +13,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -25,12 +24,13 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
 
     /**
      * Theta or k or both driving an arbitrarily shaped tensor of Gamma
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
-     * @param theta       the theta (scale) of the Gamma with either the same shape as specified for this vertex
-     * @param k           the k (shape) of the Gamma with either the same shape as specified for this vertex
+     * @param theta the theta (scale) of the Gamma with either the same shape as specified for this
+     *     vertex
+     * @param k the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(int[] tensorShape, DoubleVertex theta, DoubleVertex k) {
 
@@ -45,8 +45,9 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     /**
      * One to one constructor for mapping some shape of theta and k to matching shaped gamma.
      *
-     * @param theta the theta (scale) of the Gamma with either the same shape as specified for this vertex
-     * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
+     * @param theta the theta (scale) of the Gamma with either the same shape as specified for this
+     *     vertex
+     * @param k the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
     public GammaVertex(DoubleVertex theta, DoubleVertex k) {
         this(checkHasSingleNonScalarShapeOrAllScalar(theta.getShape(), k.getShape()), theta, k);
@@ -74,7 +75,8 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Gamma.withParameters(theta.getValue(), k.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
@@ -98,5 +100,4 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     public DoubleTensor sample(KeanuRandom random) {
         return Gamma.withParameters(theta.getValue(), k.getValue()).sample(getShape(), random);
     }
-
 }

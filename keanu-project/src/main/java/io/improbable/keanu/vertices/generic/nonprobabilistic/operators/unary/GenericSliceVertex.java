@@ -15,8 +15,8 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
      * Takes the slice along a given dimension and index of a vertex
      *
      * @param inputVertex the input vertex
-     * @param dimension   the dimension to extract along
-     * @param index       the index of extraction
+     * @param dimension the dimension to extract along
+     * @param index the index of extraction
      */
     public GenericSliceVertex(Vertex<Tensor<T>> inputVertex, int dimension, int index) {
         super(inputVertex);
@@ -33,5 +33,4 @@ public class GenericSliceVertex<T> extends UnaryOpVertex<Tensor<T>, Tensor<T>> {
     protected Tensor<T> op(Tensor<T> input) {
         return input.slice(dimension, index);
     }
-
 }

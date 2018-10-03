@@ -1,5 +1,10 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.NonProbabilistic;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -8,20 +13,18 @@ import java.util.List;
 import java.util.function.BiFunction;
 import java.util.function.Function;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.NonProbabilistic;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BoolReduceVertex(int[] shape, Collection<Vertex<BooleanTensor>> input,
-                            BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
+    public BoolReduceVertex(
+            int[] shape,
+            Collection<Vertex<BooleanTensor>> input,
+            BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         if (input.size() < 2) {
-            throw new IllegalArgumentException("BoolReduceVertex should have at least two input vertices, called with " + input.size());
+            throw new IllegalArgumentException(
+                    "BoolReduceVertex should have at least two input vertices, called with "
+                            + input.size());
         }
 
         this.inputs = new ArrayList<>(input);
@@ -30,8 +33,10 @@ public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<Boo
         setValue(BooleanTensor.placeHolder(shape));
     }
 
-
-    public BoolReduceVertex(int[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
+    public BoolReduceVertex(
+            int[] shape,
+            BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f,
+            Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
     }
 

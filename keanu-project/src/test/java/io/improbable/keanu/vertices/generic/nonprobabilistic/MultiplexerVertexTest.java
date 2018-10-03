@@ -1,20 +1,19 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.probabilistic.discrete.CategoricalVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class MultiplexerVertexTest {
     private final Logger log = LoggerFactory.getLogger(MultiplexerVertexTest.class);
@@ -45,7 +44,8 @@ public class MultiplexerVertexTest {
         optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
         CategoricalVertex<TestEnum> select2 = new CategoricalVertex<>(optionGroup2);
 
-        MultiplexerVertex<TestEnum> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
+        MultiplexerVertex<TestEnum> multiplexerVertex =
+                new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 
         LinkedHashMap<TestEnum, Integer> frequencies = new LinkedHashMap<>();
         frequencies.put(TestEnum.A, 0);
@@ -65,7 +65,8 @@ public class MultiplexerVertexTest {
         assertProportionsWithinExpectedRanges(expected, proportions);
     }
 
-    private LinkedHashMap<TestEnum, Double> calculateProportions(LinkedHashMap<TestEnum, Integer> sampleFrequencies, int n) {
+    private LinkedHashMap<TestEnum, Double> calculateProportions(
+            LinkedHashMap<TestEnum, Integer> sampleFrequencies, int n) {
         LinkedHashMap<TestEnum, Double> proportions = new LinkedHashMap<>();
         for (Map.Entry<TestEnum, Integer> entry : sampleFrequencies.entrySet()) {
             double proportion = (double) entry.getValue() / n;
@@ -75,8 +76,8 @@ public class MultiplexerVertexTest {
         return proportions;
     }
 
-    private void assertProportionsWithinExpectedRanges(Map<TestEnum, Double> expectedValues,
-                                                       HashMap<TestEnum, Double> proportions) {
+    private void assertProportionsWithinExpectedRanges(
+            Map<TestEnum, Double> expectedValues, HashMap<TestEnum, Double> proportions) {
 
         for (Map.Entry<TestEnum, Double> entry : proportions.entrySet()) {
             log.info(entry.getKey() + ": " + entry.getValue());
@@ -87,6 +88,9 @@ public class MultiplexerVertexTest {
     }
 
     private enum TestEnum {
-        A, B, C, D
+        A,
+        B,
+        C,
+        D
     }
 }

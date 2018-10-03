@@ -5,7 +5,8 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public interface TensorValidationPolicy<TENSOR extends Tensor<?>> {
 
-    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidationPolicy<TENSOR> changeValueTo(DATATYPE v) {
+    static <DATATYPE, TENSOR extends Tensor<DATATYPE>> TensorValidationPolicy<TENSOR> changeValueTo(
+            DATATYPE v) {
         return new ChangeValueTo<>(v);
     }
 

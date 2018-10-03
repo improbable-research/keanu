@@ -88,5 +88,4 @@ public interface BooleanTensor extends Tensor<Boolean> {
 
     @Override
     BooleanTensor slice(int dimension, int index);
-
 }

@@ -1,24 +1,22 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleCPTVertex;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class ConditionalProbabilityTable {
 
-    private ConditionalProbabilityTable() {
-    }
+    private ConditionalProbabilityTable() {}
 
-    private static final String WHEN_CONDITION_SIZE_MISMATCH = "The 'when' condition size does not match input count";
+    private static final String WHEN_CONDITION_SIZE_MISMATCH =
+            "The 'when' condition size does not match input count";
 
     @SafeVarargs
     public static CPTRawBuilder of(Vertex<? extends Tensor<Boolean>>... inputs) {
@@ -46,7 +44,8 @@ public class ConditionalProbabilityTable {
         private final CPTCondition condition;
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
 
-        public CPTWhenRawBuilder(List<Boolean> condition, List<Vertex<? extends Tensor<Boolean>>> inputs) {
+        public CPTWhenRawBuilder(
+                List<Boolean> condition, List<Vertex<? extends Tensor<Boolean>>> inputs) {
             this.condition = new CPTCondition(condition);
             this.inputs = inputs;
         }
@@ -72,7 +71,9 @@ public class ConditionalProbabilityTable {
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
         private final Map<CPTCondition, DoubleVertex> conditions;
 
-        public DoubleCPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, DoubleVertex> conditions) {
+        public DoubleCPTBuilder(
+                List<Vertex<? extends Tensor<Boolean>>> inputs,
+                Map<CPTCondition, DoubleVertex> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }
@@ -81,7 +82,8 @@ public class ConditionalProbabilityTable {
             if (condition.length != inputs.size()) {
                 throw new IllegalArgumentException(WHEN_CONDITION_SIZE_MISMATCH);
             }
-            return new DoubleCPTWhenBuilder(new CPTCondition(ImmutableList.copyOf(condition)), this);
+            return new DoubleCPTWhenBuilder(
+                    new CPTCondition(ImmutableList.copyOf(condition)), this);
         }
 
         public DoubleCPTVertex orDefault(DoubleVertex defaultResult) {
@@ -117,7 +119,9 @@ public class ConditionalProbabilityTable {
         private final List<Vertex<? extends Tensor<Boolean>>> inputs;
         private final Map<CPTCondition, Vertex<OUT>> conditions;
 
-        public CPTBuilder(List<Vertex<? extends Tensor<Boolean>>> inputs, Map<CPTCondition, Vertex<OUT>> conditions) {
+        public CPTBuilder(
+                List<Vertex<? extends Tensor<Boolean>>> inputs,
+                Map<CPTCondition, Vertex<OUT>> conditions) {
             this.inputs = inputs;
             this.conditions = conditions;
         }

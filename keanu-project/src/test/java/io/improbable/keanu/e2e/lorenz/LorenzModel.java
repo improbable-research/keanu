@@ -25,7 +25,8 @@ public class LorenzModel {
     }
 
     private Coordinates getNextPosition(Coordinates currentPosition) {
-        return new Coordinates(getNextX(currentPosition), getNextY(currentPosition), getNextZ(currentPosition));
+        return new Coordinates(
+                getNextX(currentPosition), getNextY(currentPosition), getNextZ(currentPosition));
     }
 
     private double getNextX(Coordinates currentPosition) {
@@ -33,11 +34,13 @@ public class LorenzModel {
     }
 
     private double getNextY(Coordinates currentPosition) {
-        return currentPosition.y + timeStep * (currentPosition.x * (rho - currentPosition.z) - currentPosition.y);
+        return currentPosition.y
+                + timeStep * (currentPosition.x * (rho - currentPosition.z) - currentPosition.y);
     }
 
     private double getNextZ(Coordinates currentPosition) {
-        return currentPosition.z + timeStep * (currentPosition.x * currentPosition.y - beta * currentPosition.z);
+        return currentPosition.z
+                + timeStep * (currentPosition.x * currentPosition.y - beta * currentPosition.z);
     }
 
     public static class Coordinates {
@@ -55,5 +58,4 @@ public class LorenzModel {
             return "x:" + x + " y:" + y + " z:" + z;
         }
     }
-
 }

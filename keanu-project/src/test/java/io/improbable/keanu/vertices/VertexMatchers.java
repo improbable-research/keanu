@@ -3,17 +3,15 @@ package io.improbable.keanu.vertices;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
+import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorMatchers;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
-
-import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.TensorMatchers;
 
 public class VertexMatchers {
 
@@ -40,7 +38,8 @@ public class VertexMatchers {
         };
     }
 
-    public static <T> Matcher<Vertex<T>> hasParents(Matcher<? super Collection<Vertex<T>>> parentMatcher) {
+    public static <T> Matcher<Vertex<T>> hasParents(
+            Matcher<? super Collection<Vertex<T>>> parentMatcher) {
         return new TypeSafeDiagnosingMatcher<Vertex<T>>() {
             @Override
             protected boolean matchesSafely(Vertex<T> vertex, Description description) {
@@ -55,12 +54,13 @@ public class VertexMatchers {
         };
     }
 
-
-    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(DATATYPE... values) {
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(
+            DATATYPE... values) {
         return hasValue(Arrays.stream(values).map(v -> equalTo(v)).collect(Collectors.toList()));
     }
 
-    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(List<Matcher<DATATYPE>> valueMatcher) {
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(
+            List<Matcher<DATATYPE>> valueMatcher) {
         return new TypeSafeDiagnosingMatcher<Vertex<TENSOR>>() {
             @Override
             protected boolean matchesSafely(Vertex<TENSOR> vertex, Description description) {

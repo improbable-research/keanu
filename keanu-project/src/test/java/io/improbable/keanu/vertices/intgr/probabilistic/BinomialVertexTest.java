@@ -2,10 +2,9 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static org.junit.Assert.assertEquals;
 
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import org.apache.commons.math3.distribution.BinomialDistribution;
 import org.junit.Test;
-
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public class BinomialVertexTest {
 
@@ -15,7 +14,7 @@ public class BinomialVertexTest {
         double p = 0.25;
         int n = 5;
 
-        BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, N}, p, n);
+        BinomialVertex testPoissonVertex = new BinomialVertex(new int[] {1, N}, p, n);
         IntegerTensor samples = testPoissonVertex.sample();
 
         double mean = samples.toDouble().average();
@@ -49,10 +48,10 @@ public class BinomialVertexTest {
         int k1 = 20;
         int k2 = 80;
 
-        BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, 2}, p, n);
+        BinomialVertex testPoissonVertex = new BinomialVertex(new int[] {1, 2}, p, n);
         BinomialDistribution distribution = new BinomialDistribution(n, p);
 
-        double actual = testPoissonVertex.logPmf(new int[]{k1, k2});
+        double actual = testPoissonVertex.logPmf(new int[] {k1, k2});
         double expected = distribution.logProbability(k1) + distribution.logProbability(k2);
         assertEquals(expected, actual, 1e-6);
     }

@@ -1,19 +1,18 @@
 package io.improbable.keanu.algorithms.particlefiltering;
 
+import static junit.framework.TestCase.assertEquals;
+import static junit.framework.TestCase.assertTrue;
+
+import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.ConstantVertex;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static junit.framework.TestCase.assertEquals;
-import static junit.framework.TestCase.assertTrue;
+import org.junit.Test;
 
 public class LatentIncrementSortTest {
 
@@ -69,15 +68,17 @@ public class LatentIncrementSortTest {
         assertTrue(dependencies.get(g1).contains(sigma1));
 
         assertEquals(3, dependencies.get(g3).size());
-        assertTrue(dependencies.get(g3).contains(g2) &&
-            dependencies.get(g3).contains(sigma2) &&
-            dependencies.get(g3).contains(sigma3));
+        assertTrue(
+                dependencies.get(g3).contains(g2)
+                        && dependencies.get(g3).contains(sigma2)
+                        && dependencies.get(g3).contains(sigma3));
 
         assertEquals(4, dependencies.get(g6).size());
-        assertTrue(dependencies.get(g6).contains(g4) &&
-            dependencies.get(g6).contains(sigma4) &&
-            dependencies.get(g6).contains(g5) &&
-            dependencies.get(g6).contains(sigma5));
+        assertTrue(
+                dependencies.get(g6).contains(g4)
+                        && dependencies.get(g6).contains(sigma4)
+                        && dependencies.get(g6).contains(g5)
+                        && dependencies.get(g6).contains(sigma5));
 
         List<Vertex<?>> expectedOrder = Arrays.asList(g1, g3, g6);
         int idx = 0;

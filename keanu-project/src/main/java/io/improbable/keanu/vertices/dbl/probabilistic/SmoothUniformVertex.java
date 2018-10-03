@@ -1,14 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static java.util.Collections.singletonMap;
-
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
+import static java.util.Collections.singletonMap;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.SmoothUniform;
@@ -17,6 +12,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -28,15 +26,18 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
 
     /**
      * One xMin or Xmax or both that match a proposed tensor shape of Smooth Uniform
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param tensorShape   the desired shape of the vertex
-     * @param xMin          the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
-     * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * @param tensorShape the desired shape of the vertex
+     * @param xMin the xMin of the Smooth Uniform with either the same shape as specified for this
+     *     vertex or a scalar
+     * @param xMax the xMax of the Smooth Uniform with either the same shape as specified for this
+     *     vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(
+            int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
@@ -47,17 +48,22 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     /**
-     * One to one constructor for mapping some shape of mu and sigma to
-     * a matching shaped Smooth Uniform.
+     * One to one constructor for mapping some shape of mu and sigma to a matching shaped Smooth
+     * Uniform.
      *
-     * @param xMin          the xMin of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
-     * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
+     * @param xMin the xMin of the Smooth Uniform with either the same shape as specified for this
+     *     vertex or a scalar
+     * @param xMax the xMax of the Smooth Uniform with either the same shape as specified for this
+     *     vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
     public SmoothUniformVertex(DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax, edgeSharpness);
+        this(
+                checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()),
+                xMin,
+                xMax,
+                edgeSharpness);
     }
-
 
     public SmoothUniformVertex(DoubleVertex xMin, double xMax, double edgeSharpness) {
         this(xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
@@ -84,19 +90,28 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     public SmoothUniformVertex(double xMin, double xMax) {
-        this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+        this(
+                new ConstantDoubleVertex(xMin),
+                new ConstantDoubleVertex(xMax),
+                DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax, double edgeSharpness) {
+    public SmoothUniformVertex(
+            int[] tensorShape, DoubleVertex xMin, double xMax, double edgeSharpness) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(
+            int[] tensorShape, double xMin, DoubleVertex xMax, double edgeSharpness) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
     }
 
     public SmoothUniformVertex(int[] tensorShape, double xMin, double xMax, double edgeSharpness) {
-        this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
+        this(
+                tensorShape,
+                new ConstantDoubleVertex(xMin),
+                new ConstantDoubleVertex(xMax),
+                edgeSharpness);
     }
 
     public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
@@ -112,24 +127,31 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     public SmoothUniformVertex(int[] tensorShape, double xMin, double xMax) {
-        this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
+        this(
+                tensorShape,
+                new ConstantDoubleVertex(xMin),
+                new ConstantDoubleVertex(xMax),
+                DEFAULT_EDGE_SHARPNESS);
     }
 
     @Override
     public double logProb(DoubleTensor value) {
         final DoubleTensor min = xMin.getValue();
         final DoubleTensor max = xMax.getValue();
-        final DoubleTensor density = SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
+        final DoubleTensor density =
+                SmoothUniform.withParameters(min, max, this.edgeSharpness).logProb(value);
         return density.logInPlace().sum();
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
 
         if (withRespectTo.contains(this)) {
             final DoubleTensor min = xMin.getValue();
             final DoubleTensor max = xMax.getValue();
-            ContinuousDistribution distribution = SmoothUniform.withParameters(min, max, this.edgeSharpness);
+            ContinuousDistribution distribution =
+                    SmoothUniform.withParameters(min, max, this.edgeSharpness);
             final DoubleTensor dPdx = distribution.dLogProb(value).get(X).getValue();
             final DoubleTensor density = distribution.logProb(value);
             final DoubleTensor dLogPdx = dPdx.divInPlace(density);
@@ -141,6 +163,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness).sample(getShape(), random);
+        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness)
+                .sample(getShape(), random);
     }
 }

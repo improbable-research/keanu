@@ -5,7 +5,8 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public class TensorValueNotEqualsCheck<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
+public class TensorValueNotEqualsCheck<DATATYPE, TENSOR extends Tensor<DATATYPE>>
+        implements TensorValueChecker<TENSOR> {
 
     private final DATATYPE value;
 
@@ -22,7 +23,8 @@ public class TensorValueNotEqualsCheck<DATATYPE, TENSOR extends Tensor<DATATYPE>
             IntegerTensor testTensor = IntegerTensor.create((Integer) value, tensor.getShape());
             return tensor.elementwiseEquals(testTensor).not();
         } else {
-            throw new ClassCastException("Cannot handle tensor of type " + tensor.getClass().getSimpleName());
+            throw new ClassCastException(
+                    "Cannot handle tensor of type " + tensor.getClass().getSimpleName());
         }
     }
 }

@@ -1,5 +1,7 @@
 package io.improbable.keanu.algorithms.mcmc.initialconditions;
 
+import static org.junit.Assert.assertTrue;
+
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -11,18 +13,14 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import java.util.List;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
-import java.util.List;
-
-import static org.junit.Assert.assertTrue;
-
 public class MultimodalSimulatedAnnealingTest {
 
-    @Rule
-    public DeterministicRule deterministicRule = new DeterministicRule();
+    @Rule public DeterministicRule deterministicRule = new DeterministicRule();
 
     private KeanuRandom random;
 
@@ -41,10 +39,13 @@ public class MultimodalSimulatedAnnealingTest {
         C.observe(4.0);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
+        List<NetworkState> modes =
+                MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
-        boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() + 2) < 0.01);
-        boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
+        boolean findsLowerMode =
+                modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() + 2) < 0.01);
+        boolean findsUpperMode =
+                modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
 
         assertTrue(findsLowerMode);
         assertTrue(findsUpperMode);
@@ -62,21 +63,21 @@ public class MultimodalSimulatedAnnealingTest {
 
         BoolVertex E = new BernoulliVertex(0.5);
 
-        DoubleVertex F = If.isTrue(E)
-            .then(B)
-            .orElse(D);
+        DoubleVertex F = If.isTrue(E).then(B).orElse(D);
 
         DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
         G.observe(4.0);
 
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        List<NetworkState> modes = MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
+        List<NetworkState> modes =
+                MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
-        boolean findsUpperMode = modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
-        boolean findsLowerMode = modes.stream().anyMatch(state -> Math.abs(state.get(C).scalar() + 2) < 0.01);
+        boolean findsUpperMode =
+                modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
+        boolean findsLowerMode =
+                modes.stream().anyMatch(state -> Math.abs(state.get(C).scalar() + 2) < 0.01);
 
         assertTrue(findsLowerMode);
         assertTrue(findsUpperMode);
     }
-
 }

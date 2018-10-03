@@ -1,6 +1,10 @@
 package io.improbable.keanu.algorithms.mcmc;
 
-import io.improbable.keanu.algorithms.NetworkSamples;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.network.NetworkState;
@@ -9,16 +13,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import java.util.stream.Collectors;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collections;
-import java.util.stream.Collectors;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
 
 public class SimulatedAnnealingTest {
 
@@ -46,11 +43,18 @@ public class SimulatedAnnealingTest {
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
         network.probeForNonZeroProbability(100, random);
 
-        NetworkState maxAPosterioriSamples = SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(network, 10000);
+        NetworkState maxAPosterioriSamples =
+                SimulatedAnnealing.withDefaultConfig(random).getMaxAPosteriori(network, 10000);
         NetworkState maxValuesFromVariational = findMAPWithOptimizer();
 
-        assertEquals(maxValuesFromVariational.get(A).scalar(), maxAPosterioriSamples.get(A).scalar(), 0.05);
-        assertEquals(maxValuesFromVariational.get(B).scalar(), maxAPosterioriSamples.get(B).scalar(), 0.05);
+        assertEquals(
+                maxValuesFromVariational.get(A).scalar(),
+                maxAPosterioriSamples.get(A).scalar(),
+                0.05);
+        assertEquals(
+                maxValuesFromVariational.get(B).scalar(),
+                maxAPosterioriSamples.get(B).scalar(),
+                0.05);
     }
 
     @Test
@@ -59,9 +63,7 @@ public class SimulatedAnnealingTest {
         BayesianNetwork net = new BayesianNetwork(new GaussianVertex(0.0, 1.0).getConnectedGraph());
         net.probeForNonZeroProbability(100, random);
 
-        SimulatedAnnealing algo = SimulatedAnnealing.builder()
-            .useCacheOnRejection(false)
-            .build();
+        SimulatedAnnealing algo = SimulatedAnnealing.builder().useCacheOnRejection(false).build();
 
         assertNotNull(algo.getProposalDistribution());
         assertNotNull(algo.getRandom());
@@ -82,7 +84,9 @@ public class SimulatedAnnealingTest {
         GradientOptimizer graphOptimizer = GradientOptimizer.of(network);
         graphOptimizer.maxAPosteriori();
 
-        return new SimpleNetworkState(network.getLatentVertices().stream()
-            .collect(Collectors.toMap(Vertex::getId, Vertex::getValue)));
+        return new SimpleNetworkState(
+                network.getLatentVertices()
+                        .stream()
+                        .collect(Collectors.toMap(Vertex::getId, Vertex::getValue)));
     }
 }

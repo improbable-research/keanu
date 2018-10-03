@@ -1,17 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static org.junit.Assert.assertEquals;
-
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import org.apache.commons.math3.distribution.CauchyDistribution;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import io.improbable.keanu.distributions.gradient.Cauchy;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -20,6 +10,13 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import org.apache.commons.math3.distribution.CauchyDistribution;
+import org.junit.Before;
+import org.junit.Test;
 
 public class HalfCauchyVertexTest {
 
@@ -38,30 +35,35 @@ public class HalfCauchyVertexTest {
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
         double expectedDensity = distribution.logDensity(0.5) + Math.log(2.0);
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorHalfCauchyVertex, 0.5, expectedDensity);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(
+                tensorHalfCauchyVertex, 0.5, expectedDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfNegativeScalar() {
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorHalfCauchyVertex, -0.5, Double.NEGATIVE_INFINITY);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(
+                tensorHalfCauchyVertex, -0.5, Double.NEGATIVE_INFINITY);
     }
 
     @Test
     public void matchesKnownLogDensityOfVector() {
 
         CauchyDistribution distribution = new CauchyDistribution(0.0, 1.0);
-        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2.0 * Math.log(2.0);
+        double expectedLogDensity =
+                distribution.logDensity(0.25) + distribution.logDensity(0.75) + 2.0 * Math.log(2.0);
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorHalfCauchyVertex, new double[]{0.25, 0.75}, expectedLogDensity);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(
+                tensorHalfCauchyVertex, new double[] {0.25, 0.75}, expectedLogDensity);
     }
 
     @Test
     public void matchesKnownLogDensityOfNegativeVector() {
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(1);
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorHalfCauchyVertex, new double[]{-0.25, 0.75}, Double.NEGATIVE_INFINITY);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(
+                tensorHalfCauchyVertex, new double[] {-0.25, 0.75}, Double.NEGATIVE_INFINITY);
     }
 
     @Test
@@ -73,23 +75,26 @@ public class HalfCauchyVertexTest {
         scaleTensor.setValue(1.0);
 
         HalfCauchyVertex tensorHalfCauchyVertex = new HalfCauchyVertex(scaleTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
+        Map<Vertex, DoubleTensor> actualDerivatives =
+                tensorHalfCauchyVertex.dLogPdf(0.5, scaleTensor, tensorHalfCauchyVertex);
 
         assertEquals(cauchyLogDiff.dPdscale, actualDerivatives.get(scaleTensor).scalar(), 1e-5);
-        assertEquals(cauchyLogDiff.dPdx, actualDerivatives.get(tensorHalfCauchyVertex).scalar(), 1e-5);
+        assertEquals(
+                cauchyLogDiff.dPdx, actualDerivatives.get(tensorHalfCauchyVertex).scalar(), 1e-5);
     }
 
     @Test
     public void matchesKnownDerivativeLogDensityOfVector() {
 
-        double[] vector = new double[]{0.25, 0.75, 0.1, 2, 1.3};
+        double[] vector = new double[] {0.25, 0.75, 0.1, 2, 1.3};
 
         UniformVertex scaleTensor = new UniformVertex(0.0, 1.0);
         scaleTensor.setValue(1.0);
 
         Supplier<HalfCauchyVertex> vertexSupplier = () -> new HalfCauchyVertex(scaleTensor);
 
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(
+                vector, vertexSupplier);
     }
 
     @Test
@@ -97,7 +102,8 @@ public class HalfCauchyVertexTest {
         HalfCauchyVertex vertexUnderTest = new HalfCauchyVertex(3.0);
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
-        ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(
+                vertexUnderTest);
     }
 
     @Test
@@ -110,31 +116,30 @@ public class HalfCauchyVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(3.0),
-            0.1,
-            uniformA,
-            cauchy,
-            vertexStartValue,
-            vertexEndValue,
-            vertexIncrement,
-            DELTA);
+                Nd4jDoubleTensor.scalar(1.0),
+                Nd4jDoubleTensor.scalar(3.0),
+                0.1,
+                uniformA,
+                cauchy,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
     }
 
     @Test
     public void cauchySampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        HalfCauchyVertex vertex = new HalfCauchyVertex(
-            new int[]{sampleCount, 1},
-            ConstantVertex.of(2.0)
-        );
+        HalfCauchyVertex vertex =
+                new HalfCauchyVertex(new int[] {sampleCount, 1}, ConstantVertex.of(2.0));
 
         double from = 0;
         double to = 4;
         double bucketSize = 0.05;
 
-        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
+        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(
+                vertex, from, to, bucketSize, 1e-2, random);
     }
 
     @Test
@@ -152,10 +157,9 @@ public class HalfCauchyVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new HalfCauchyVertex(new int[]{numSamples, 1}, hyperParams.get(0)),
-            scale,
-            latentScaleList,
-            random
-        );
+                hyperParams -> new HalfCauchyVertex(new int[] {numSamples, 1}, hyperParams.get(0)),
+                scale,
+                latentScaleList,
+                random);
     }
 }

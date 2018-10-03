@@ -1,5 +1,9 @@
 package io.improbable.keanu.plating;
 
+import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
+import static io.improbable.keanu.vertices.VertexMatchers.hasLabel;
+import static io.improbable.keanu.vertices.VertexMatchers.hasNoLabel;
+import static io.improbable.keanu.vertices.VertexMatchers.hasParents;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.allOf;
 import static org.hamcrest.Matchers.contains;
@@ -11,23 +15,10 @@ import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
-import static io.improbable.keanu.vertices.VertexMatchers.hasLabel;
-import static io.improbable.keanu.vertices.VertexMatchers.hasNoLabel;
-import static io.improbable.keanu.vertices.VertexMatchers.hasParents;
-
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Rule;
-import org.junit.Test;
-import org.junit.rules.ExpectedException;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.collect.Iterables;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -46,6 +37,11 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class PlateBuilderTest {
 
@@ -57,23 +53,14 @@ public class PlateBuilderTest {
         }
     }
 
-    private static final List<Bean> ROWS = Arrays.asList(
-        new Bean(0),
-        new Bean(0),
-        new Bean(0)
-    );
+    private static final List<Bean> ROWS = Arrays.asList(new Bean(0), new Bean(0), new Bean(0));
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    @Rule public ExpectedException expectedException = ExpectedException.none();
 
     @Test
     public void buildPlatesFromCount_Size() {
         int n = 100;
-        Plates plates = new PlateBuilder()
-            .count(n)
-            .withFactory(plate -> {
-            })
-            .build();
+        Plates plates = new PlateBuilder().count(n).withFactory(plate -> {}).build();
         assertEquals(n, plates.size());
     }
 
@@ -81,33 +68,38 @@ public class PlateBuilderTest {
     public void buildPlatesFromCount_PlateContents() {
         int n = 100;
         VertexLabel vertexName = new VertexLabel("vertexName");
-        Plates plates = new PlateBuilder<>()
-            .count(n)
-            .withFactory((plate) -> plate.add(vertexName, new BernoulliVertex(0.5)))
-            .build();
-        plates.asList().forEach(plate -> {
-            assertNotNull(plate.get(vertexName));
-        });
+        Plates plates =
+                new PlateBuilder<>()
+                        .count(n)
+                        .withFactory((plate) -> plate.add(vertexName, new BernoulliVertex(0.5)))
+                        .build();
+        plates.asList()
+                .forEach(
+                        plate -> {
+                            assertNotNull(plate.get(vertexName));
+                        });
     }
 
     @Test
     public void buildPlatesFromData_Size() {
-        Plates plates = new PlateBuilder<Bean>()
-            .fromIterator(ROWS.iterator())
-            .withFactory((plate, bean) -> {
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Bean>()
+                        .fromIterator(ROWS.iterator())
+                        .withFactory((plate, bean) -> {})
+                        .build();
         assertEquals(ROWS.size(), plates.size());
     }
 
     @Test
     public void buildPlatesFromData_Contents() {
-        Plates plates = new PlateBuilder<Bean>()
-            .fromIterator(ROWS.iterator())
-            .withFactory((plate, bean) -> {
-                assertEquals(0, bean.x);
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Bean>()
+                        .fromIterator(ROWS.iterator())
+                        .withFactory(
+                                (plate, bean) -> {
+                                    assertEquals(0, bean.x);
+                                })
+                        .build();
     }
 
     @Test
@@ -116,15 +108,17 @@ public class PlateBuilderTest {
 
         Vertex<?> startVertex = ConstantVertex.of(1.).labeledAs(label);
 
-        Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(startVertex)
-            .withTransitionMapping(ImmutableMap.of(label, label))
-            .count(10)
-            .withFactory((plate) -> {
-                DoubleVertex intermediateVertex = new DoubleProxyVertex(label);
-                plate.add(intermediateVertex);
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withInitialState(startVertex)
+                        .withTransitionMapping(ImmutableMap.of(label, label))
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    DoubleVertex intermediateVertex = new DoubleProxyVertex(label);
+                                    plate.add(intermediateVertex);
+                                })
+                        .build();
 
         for (Plate plate : plates) {
             Vertex<?> vertex = plate.get(label);
@@ -137,15 +131,16 @@ public class PlateBuilderTest {
     @Test(expected = IllegalArgumentException.class)
     public void youCannotAddTheSameLabelTwiceIntoOnePlate() {
         new PlateBuilder<Integer>()
-            .count(10)
-            .withFactory((plate) -> {
-                VertexLabel label = new VertexLabel("x");
-                DoubleVertex vertex1 = ConstantVertex.of(1.);
-                DoubleVertex vertex2 = ConstantVertex.of(1.);
-                plate.add(label, vertex1);
-                plate.add(label, vertex2);
-            })
-            .build();
+                .count(10)
+                .withFactory(
+                        (plate) -> {
+                            VertexLabel label = new VertexLabel("x");
+                            DoubleVertex vertex1 = ConstantVertex.of(1.);
+                            DoubleVertex vertex2 = ConstantVertex.of(1.);
+                            plate.add(label, vertex1);
+                            plate.add(label, vertex2);
+                        })
+                .build();
     }
 
     @Test
@@ -154,15 +149,16 @@ public class PlateBuilderTest {
 
         VertexLabel label = new VertexLabel("flip");
 
-        Plates plates = new PlateBuilder<Bean>()
-            .count(10)
-            .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
-                flip.observe(false);
-                plate.add(label, flip);
-            })
-            .build();
-
+        Plates plates =
+                new PlateBuilder<Bean>()
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    BoolVertex flip = new BernoulliVertex(commonTheta);
+                                    flip.observe(false);
+                                    plate.add(label, flip);
+                                })
+                        .build();
 
         for (Plate plate : plates) {
             Vertex<DoubleTensor> flip = plate.get(label);
@@ -176,14 +172,16 @@ public class PlateBuilderTest {
 
         VertexLabel label = new VertexLabel("flip");
 
-        Plates plates = new PlateBuilder<Bean>()
-            .count(10)
-            .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
-                flip.observe(false);
-                plate.add(label, flip);
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Bean>()
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    BoolVertex flip = new BernoulliVertex(commonTheta);
+                                    flip.observe(false);
+                                    plate.add(label, flip);
+                                })
+                        .build();
 
         new BayesianNetwork(commonTheta.getConnectedGraph());
     }
@@ -195,18 +193,18 @@ public class PlateBuilderTest {
         GaussianVertex commonTheta = new GaussianVertex(0.5, 0.01);
 
         new PlateBuilder<Bean>()
-            .count(10)
-            .withFactory((plate) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
-                flip.observe(false);
-                plate.add(thetaLabel, commonTheta);
-                plate.add(flipLabel, flip);
-            })
-            .build();
+                .count(10)
+                .withFactory(
+                        (plate) -> {
+                            BoolVertex flip = new BernoulliVertex(commonTheta);
+                            flip.observe(false);
+                            plate.add(thetaLabel, commonTheta);
+                            plate.add(flipLabel, flip);
+                        })
+                .build();
 
         new BayesianNetwork(commonTheta.getConnectedGraph());
     }
-
 
     @Test
     public void youCanCreateASetOfPlatesWithACommonParameterFromAnIterator() {
@@ -214,15 +212,16 @@ public class PlateBuilderTest {
 
         VertexLabel label = new VertexLabel("flip");
 
-        Plates plates = new PlateBuilder<Bean>()
-            .fromIterator(ROWS.iterator())
-            .withFactory((plate, bean) -> {
-                BoolVertex flip = new BernoulliVertex(commonTheta);
-                flip.observe(false);
-                plate.add(label, flip);
-            })
-            .build();
-
+        Plates plates =
+                new PlateBuilder<Bean>()
+                        .fromIterator(ROWS.iterator())
+                        .withFactory(
+                                (plate, bean) -> {
+                                    BoolVertex flip = new BernoulliVertex(commonTheta);
+                                    flip.observe(false);
+                                    plate.add(label, flip);
+                                })
+                        .build();
 
         for (Plate plate : plates) {
             Vertex<DoubleTensor> flip = plate.get(label);
@@ -231,12 +230,10 @@ public class PlateBuilderTest {
     }
 
     /**
-     * This is a Hidden Markov Model -
-     * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     * This is a Hidden Markov Model - see for example
+     * http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
      *
-     * ...  -->  X[t-1]  -->  X[t]  --> ...
-     *             |           |
-     *           Y[t-1]       Y[t]
+     * <p>... --> X[t-1] --> X[t] --> ... | | Y[t-1] Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromPlatesFromACount() {
@@ -248,19 +245,20 @@ public class PlateBuilderTest {
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
-        Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(xLabel, initialX)
-            .count(10)
-            .withFactory((plate) -> {
-                DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
-                DoubleVertex x = new ExponentialVertex(xPrevious);
-                IntegerVertex y = new PoissonVertex(x);
-                plate.add(xPrevious);
-                plate.add(xLabel, x);
-                plate.add(yLabel, y);
-            })
-            .build();
-
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withInitialState(xLabel, initialX)
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    DoubleVertex xPrevious = new DoubleProxyVertex(xPreviousLabel);
+                                    DoubleVertex x = new ExponentialVertex(xPrevious);
+                                    IntegerVertex y = new PoissonVertex(x);
+                                    plate.add(xPrevious);
+                                    plate.add(xLabel, x);
+                                    plate.add(yLabel, y);
+                                })
+                        .build();
 
         Vertex<DoubleTensor> previousX = initialX;
 
@@ -276,12 +274,10 @@ public class PlateBuilderTest {
     }
 
     /**
-     * This is a Hidden Markov Model -
-     * see for example http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
+     * This is a Hidden Markov Model - see for example
+     * http://mlg.eng.cam.ac.uk/zoubin/papers/ijprai.pdf
      *
-     * ...  -->  X[t-1]  -->  X[t]  --> ...
-     *             |           |
-     *           Y[t-1]       Y[t]
+     * <p>... --> X[t-1] --> X[t] --> ... | | Y[t-1] Y[t]
      */
     @Test
     public void youCanCreateATimeSeriesFromPlatesFromAnIterator() {
@@ -293,20 +289,22 @@ public class PlateBuilderTest {
         Vertex<DoubleTensor> initialX = ConstantVertex.of(1.);
         List<Integer> ys = ImmutableList.of(0, 1, 2, 1, 3, 2);
 
-        Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(xLabel, initialX)
-            .fromIterator(ys.iterator())
-            .withFactory((plate, observedY) -> {
-                DoubleVertex xPreviousProxy = new DoubleProxyVertex(xPreviousLabel);
-                DoubleVertex x = new ExponentialVertex(xPreviousProxy);
-                IntegerVertex y = new PoissonVertex(x);
-                y.observe(observedY);
-                plate.add(xPreviousProxy);
-                plate.add(xLabel, x);
-                plate.add(yLabel, y);
-            })
-            .build();
-
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withInitialState(xLabel, initialX)
+                        .fromIterator(ys.iterator())
+                        .withFactory(
+                                (plate, observedY) -> {
+                                    DoubleVertex xPreviousProxy =
+                                            new DoubleProxyVertex(xPreviousLabel);
+                                    DoubleVertex x = new ExponentialVertex(xPreviousProxy);
+                                    IntegerVertex y = new PoissonVertex(x);
+                                    y.observe(observedY);
+                                    plate.add(xPreviousProxy);
+                                    plate.add(xLabel, x);
+                                    plate.add(yLabel, y);
+                                })
+                        .build();
 
         Vertex<DoubleTensor> previousX = initialX;
 
@@ -321,10 +319,7 @@ public class PlateBuilderTest {
         }
     }
 
-    /**
-     * Note that this behaviour is wrapped by the Loop class
-     * See LoopTest.java for example usage
-     */
+    /** Note that this behaviour is wrapped by the Loop class See LoopTest.java for example usage */
     @Test
     public void youCanCreateALoopFromPlatesFromACount() {
         // inputs
@@ -348,40 +343,47 @@ public class PlateBuilderTest {
 
         int maximumLoopLength = 100;
 
-        Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(SimpleVertexDictionary.backedBy(ImmutableMap.of(
-                plusLabel, initialSum,
-                loopLabel, tru,
-                valueOutLabel, initialValue)))
-            .withTransitionMapping(ImmutableMap.of(
-                runningTotalLabel, plusLabel,
-                stillLoopingLabel, loopLabel,
-                valueInLabel, valueOutLabel
-            ))
-            .count(maximumLoopLength)
-            .withFactory((plate) -> {
-                // inputs
-                DoubleVertex runningTotal = new DoubleProxyVertex(runningTotalLabel);
-                BoolVertex stillLooping = new BoolProxyVertex(stillLoopingLabel);
-                DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
-                plate.addAll(ImmutableSet.of(runningTotal, stillLooping, valueIn));
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withInitialState(
+                                SimpleVertexDictionary.backedBy(
+                                        ImmutableMap.of(
+                                                plusLabel, initialSum,
+                                                loopLabel, tru,
+                                                valueOutLabel, initialValue)))
+                        .withTransitionMapping(
+                                ImmutableMap.of(
+                                        runningTotalLabel, plusLabel,
+                                        stillLoopingLabel, loopLabel,
+                                        valueInLabel, valueOutLabel))
+                        .count(maximumLoopLength)
+                        .withFactory(
+                                (plate) -> {
+                                    // inputs
+                                    DoubleVertex runningTotal =
+                                            new DoubleProxyVertex(runningTotalLabel);
+                                    BoolVertex stillLooping =
+                                            new BoolProxyVertex(stillLoopingLabel);
+                                    DoubleVertex valueIn = new DoubleProxyVertex(valueInLabel);
+                                    plate.addAll(
+                                            ImmutableSet.of(runningTotal, stillLooping, valueIn));
 
-                // intermediate
-                DoubleVertex one = ConstantVertex.of(1.);
-                BoolVertex condition = new BernoulliVertex(0.5);
-                plate.add(oneLabel, one);
-                plate.add(conditionLabel, condition);
+                                    // intermediate
+                                    DoubleVertex one = ConstantVertex.of(1.);
+                                    BoolVertex condition = new BernoulliVertex(0.5);
+                                    plate.add(oneLabel, one);
+                                    plate.add(conditionLabel, condition);
 
-                // outputs
-                DoubleVertex plus = runningTotal.plus(one);
-                BoolVertex loopAgain = stillLooping.and(condition);
-                DoubleVertex result = If.isTrue(loopAgain).then(plus).orElse(valueIn);
-                plate.add(plusLabel, plus);
-                plate.add(loopLabel, loopAgain);
-                plate.add(valueOutLabel, result);
-            })
-            .build();
-
+                                    // outputs
+                                    DoubleVertex plus = runningTotal.plus(one);
+                                    BoolVertex loopAgain = stillLooping.and(condition);
+                                    DoubleVertex result =
+                                            If.isTrue(loopAgain).then(plus).orElse(valueIn);
+                                    plate.add(plusLabel, plus);
+                                    plate.add(loopLabel, loopAgain);
+                                    plate.add(valueOutLabel, result);
+                                })
+                        .build();
 
         DoubleVertex previousPlus = initialSum;
         BoolVertex previousLoop = tru;
@@ -404,10 +406,10 @@ public class PlateBuilderTest {
             assertThat(valueIn.getParents(), contains(previousValueOut));
 
             assertThat(one.getParents(), is(empty()));
-            assertThat(condition, hasParents(contains(allOf(
-                hasNoLabel(),
-                instanceOf(ConstantDoubleVertex.class)
-            ))));
+            assertThat(
+                    condition,
+                    hasParents(
+                            contains(allOf(hasNoLabel(), instanceOf(ConstantDoubleVertex.class)))));
 
             assertThat(plus.getParents(), containsInAnyOrder(runningTotal, one));
             assertThat(loop.getParents(), containsInAnyOrder(condition, stillLooping));
@@ -418,10 +420,9 @@ public class PlateBuilderTest {
             previousValueOut = valueOut;
         }
 
-
         DoubleVertex output = plates.asList().get(maximumLoopLength - 1).get(valueOutLabel);
 
-        for (int firstFailure : new int[]{0, 1, 2, 10, 99}) {
+        for (int firstFailure : new int[] {0, 1, 2, 10, 99}) {
             for (Plate plate : plates) {
                 BoolVertex condition = plate.get(conditionLabel);
                 condition.setAndCascade(true);
@@ -439,28 +440,33 @@ public class PlateBuilderTest {
         expectedException.expectMessage(startsWith("Cannot find transition mapping for "));
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
-        Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(SimpleVertexDictionary.of())
-            .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
-            .count(10)
-            .withFactory((plate) -> {
-                plate.add(new DoubleProxyVertex(fakeLabel));
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withInitialState(SimpleVertexDictionary.of())
+                        .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    plate.add(new DoubleProxyVertex(fakeLabel));
+                                })
+                        .build();
     }
 
     @Test
     public void itThrowsIfTheresAProxyVertexButNoBaseCase() {
         expectedException.expect(IllegalArgumentException.class);
-        expectedException.expectMessage("You must provide a base case for the Transition Vertices - use withInitialState()");
+        expectedException.expectMessage(
+                "You must provide a base case for the Transition Vertices - use withInitialState()");
         VertexLabel realLabel = new VertexLabel("real");
-        Plates plates = new PlateBuilder<Integer>()
-            .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
-            .count(10)
-            .withFactory((plate) -> {
-                plate.add(new DoubleProxyVertex(realLabel));
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withTransitionMapping(ImmutableMap.of(realLabel, realLabel))
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    plate.add(new DoubleProxyVertex(realLabel));
+                                })
+                        .build();
     }
 
     @Test
@@ -470,13 +476,15 @@ public class PlateBuilderTest {
         VertexLabel realLabel = new VertexLabel("real");
         VertexLabel fakeLabel = new VertexLabel("fake");
         DoubleVertex initialState = ConstantVertex.of(1.);
-        Plates plates = new PlateBuilder<Integer>()
-            .withInitialState(realLabel, initialState)
-            .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
-            .count(10)
-            .withFactory((plate) -> {
-                plate.add(new DoubleProxyVertex(realLabel));
-            })
-            .build();
+        Plates plates =
+                new PlateBuilder<Integer>()
+                        .withInitialState(realLabel, initialState)
+                        .withTransitionMapping(ImmutableMap.of(realLabel, fakeLabel))
+                        .count(10)
+                        .withFactory(
+                                (plate) -> {
+                                    plate.add(new DoubleProxyVertex(realLabel));
+                                })
+                        .build();
     }
 }

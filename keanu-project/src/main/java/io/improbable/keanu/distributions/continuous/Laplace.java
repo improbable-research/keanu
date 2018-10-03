@@ -4,13 +4,12 @@ import static io.improbable.keanu.distributions.dual.Diffs.BETA;
 import static io.improbable.keanu.distributions.dual.Diffs.MU;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 
-import org.nd4j.linalg.util.ArrayUtil;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 public class Laplace implements ContinuousDistribution {
 
@@ -18,9 +17,9 @@ public class Laplace implements ContinuousDistribution {
     private final DoubleTensor beta;
 
     /**
-     * @param mu     location
-     * @param beta   shape
-     * @return       a new ContinuousDistribution object
+     * @param mu location
+     * @param beta shape
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor beta) {
         return new Laplace(mu, beta);
@@ -74,10 +73,6 @@ public class Laplace implements ContinuousDistribution {
         final DoubleTensor dLogPdMu = x.minus(mu).divInPlace(denominator);
         final DoubleTensor dLogPdBeta = muMinusXAbs.minusInPlace(beta).divInPlace(beta.pow(2));
 
-        return new Diffs()
-            .put(MU, dLogPdMu)
-            .put(BETA, dLogPdBeta)
-            .put(X, dLogPdx);
+        return new Diffs().put(MU, dLogPdMu).put(BETA, dLogPdBeta).put(X, dLogPdx);
     }
-
 }

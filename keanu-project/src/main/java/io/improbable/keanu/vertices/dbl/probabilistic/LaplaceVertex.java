@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -17,6 +13,9 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -25,12 +24,14 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
 
     /**
      * One mu or beta or both that match a proposed tensor shape of Laplace
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor within the vertex
-     * @param mu          the mu of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param beta        the beta of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param mu the mu of the Laplace with either the same shape as specified for this vertex or a
+     *     scalar
+     * @param beta the beta of the Laplace with either the same shape as specified for this vertex
+     *     or a scalar
      */
     public LaplaceVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex beta) {
 
@@ -43,11 +44,12 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     /**
-     * One to one constructor for mapping some shape of mu and sigma to
-     * a matching shaped Laplace.
+     * One to one constructor for mapping some shape of mu and sigma to a matching shaped Laplace.
      *
-     * @param mu   the mu of the Laplace with either the same shape as specified for this vertex or a scalar
-     * @param beta the beta of the Laplace with either the same shape as specified for this vertex or a scalar
+     * @param mu the mu of the Laplace with either the same shape as specified for this vertex or a
+     *     scalar
+     * @param beta the beta of the Laplace with either the same shape as specified for this vertex
+     *     or a scalar
      */
     public LaplaceVertex(DoubleVertex mu, DoubleVertex beta) {
         this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), beta.getShape()), mu, beta);
@@ -77,7 +79,8 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Laplace.withParameters(mu.getValue(), beta.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
@@ -101,5 +104,4 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
     public DoubleTensor sample(KeanuRandom random) {
         return Laplace.withParameters(mu.getValue(), beta.getValue()).sample(getShape(), random);
     }
-
 }

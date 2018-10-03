@@ -35,8 +35,12 @@ public class Gaussian implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor lnSigma = sigma.log();
         final DoubleTensor xMinusMuSquared = x.minus(mu).powInPlace(2);
-        final DoubleTensor xMinusMuSquaredOver2Variance = xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
-        return xMinusMuSquaredOver2Variance.plusInPlace(lnSigma).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
+        final DoubleTensor xMinusMuSquaredOver2Variance =
+                xMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
+        return xMinusMuSquaredOver2Variance
+                .plusInPlace(lnSigma)
+                .plusInPlace(LN_SQRT_2PI)
+                .unaryMinusInPlace();
     }
 
     @Override
@@ -46,14 +50,11 @@ public class Gaussian implements ContinuousDistribution {
 
         final DoubleTensor dLogPdmu = xMinusMu.div(variance);
         final DoubleTensor dLogPdx = dLogPdmu.unaryMinus();
-        final DoubleTensor dLogPdsigma = xMinusMu.powInPlace(2)
-            .divInPlace(variance.timesInPlace(sigma))
-            .minusInPlace(sigma.reciprocal());
+        final DoubleTensor dLogPdsigma =
+                xMinusMu.powInPlace(2)
+                        .divInPlace(variance.timesInPlace(sigma))
+                        .minusInPlace(sigma.reciprocal());
 
-        return new Diffs()
-            .put(MU, dLogPdmu)
-            .put(SIGMA, dLogPdsigma)
-            .put(X, dLogPdx);
+        return new Diffs().put(MU, dLogPdmu).put(SIGMA, dLogPdsigma).put(X, dLogPdx);
     }
-
 }

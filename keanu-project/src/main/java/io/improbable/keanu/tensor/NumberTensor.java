@@ -1,13 +1,13 @@
 package io.improbable.keanu.tensor;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.kotlin.Operators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import java.util.function.Function;
 
-public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> extends Tensor<N>, Operators<T> {
+public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>>
+        extends Tensor<N>, Operators<T> {
 
     N sum();
 
@@ -20,13 +20,13 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
     T transpose();
 
     T sum(int... overDimensions);
-    
+
     // New tensor Ops and transforms
-    
+
     T matrixMultiply(T value);
 
     T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
-    
+
     T abs();
 
     T getGreaterThanMask(T greaterThanThis);
@@ -42,7 +42,7 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
     T setWithMask(T mask, N value);
 
     T apply(Function<N, N> function);
-    
+
     // In Place
 
     T minusInPlace(T that);

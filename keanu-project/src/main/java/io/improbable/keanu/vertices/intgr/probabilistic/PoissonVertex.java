@@ -2,10 +2,6 @@ package io.improbable.keanu.vertices.intgr.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.discrete.Poisson;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -17,6 +13,9 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger {
 
@@ -24,11 +23,12 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
 
     /**
      * One mu that must match a proposed tensor shape of Poisson.
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param shape the desired shape of the vertex
-     * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
+     * @param mu the mu of the Poisson with either the same shape as specified for this vertex or a
+     *     scalar
      */
     public PoissonVertex(int[] shape, DoubleVertex mu) {
 
@@ -44,8 +44,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     /**
-     * One to one constructor for mapping some shape of mu to
-     * a matching shaped Poisson.
+     * One to one constructor for mapping some shape of mu to a matching shaped Poisson.
      *
      * @param mu mu with same shape as desired Poisson tensor or scalar
      */
@@ -71,7 +70,8 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(IntegerTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            IntegerTensor value, Set<? extends Vertex> withRespectTo) {
         return Collections.emptyMap();
     }
 

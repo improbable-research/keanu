@@ -1,5 +1,7 @@
 package io.improbable.keanu.util.csv;
 
+import com.opencsv.CSVWriter;
+import com.opencsv.ICSVWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -8,20 +10,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-import com.opencsv.CSVWriter;
-import com.opencsv.ICSVWriter;
-
 public abstract class Writer {
 
     public static final char DEFAULT_SEPARATOR = ICSVWriter.DEFAULT_SEPARATOR;
     public static final char DEFAULT_QUOTE_CHAR = ICSVWriter.DEFAULT_QUOTE_CHARACTER;
-    public static final char  DEFAULT_ESCAPE_CHAR = ICSVWriter.DEFAULT_ESCAPE_CHARACTER;
+    public static final char DEFAULT_ESCAPE_CHAR = ICSVWriter.DEFAULT_ESCAPE_CHARACTER;
     public static final String DEFAULT_LINE_END = ICSVWriter.DEFAULT_LINE_END;
     public static final String DEFAULT_EMPTY_VALUE = "-";
 
     private char separator = DEFAULT_SEPARATOR;
     private char quoteChar = DEFAULT_QUOTE_CHAR;
-    private char escapeChar= DEFAULT_ESCAPE_CHAR;
+    private char escapeChar = DEFAULT_ESCAPE_CHAR;
     private String lineEnd = DEFAULT_LINE_END;
     private String emptyValue = DEFAULT_EMPTY_VALUE;
     private String[] header = null;
@@ -89,8 +88,15 @@ public abstract class Writer {
         return writeToFile(file, data, separator, quoteChar, escapeChar, lineEnd);
     }
 
-    File writeToFile(File file, List<String[]> data, char separator, char quoteChar, char escapeChar, String lineEnd) {
-        try (CSVWriter writer = new CSVWriter(new FileWriter(file), separator, quoteChar, escapeChar, lineEnd)) {
+    File writeToFile(
+            File file,
+            List<String[]> data,
+            char separator,
+            char quoteChar,
+            char escapeChar,
+            String lineEnd) {
+        try (CSVWriter writer =
+                new CSVWriter(new FileWriter(file), separator, quoteChar, escapeChar, lineEnd)) {
             if (headerEnabled) {
                 writer.writeNext(header, false);
             }
@@ -114,5 +120,4 @@ public abstract class Writer {
         withHeaderEnabled(true);
         return this;
     }
-
 }

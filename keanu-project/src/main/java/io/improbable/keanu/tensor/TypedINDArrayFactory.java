@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor;
 
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
@@ -44,7 +43,8 @@ public class TypedINDArrayFactory {
         return Nd4j.zeros(shape);
     }
 
-    public static INDArray linspace(double start, double end, int numberOfPoints, DataBuffer.Type bufferType) {
+    public static INDArray linspace(
+            double start, double end, int numberOfPoints, DataBuffer.Type bufferType) {
         Nd4j.setDataType(bufferType);
         return Nd4j.linspace(start, end, numberOfPoints);
     }

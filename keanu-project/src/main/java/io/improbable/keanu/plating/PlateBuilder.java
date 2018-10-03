@@ -1,5 +1,9 @@
 package io.improbable.keanu.plating;
 
+import com.google.common.collect.ImmutableMap;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexDictionary;
+import io.improbable.keanu.vertices.VertexLabel;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Iterator;
@@ -7,17 +11,10 @@ import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-import com.google.common.collect.ImmutableMap;
-
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexDictionary;
-import io.improbable.keanu.vertices.VertexLabel;
-
 /**
  * PlateBuilder allows plates to be constructed in steps
  *
- * @param <T> The data type provided to user-provided plate
- *            factory function, if building from data
+ * @param <T> The data type provided to user-provided plate factory function, if building from data
  */
 public class PlateBuilder<T> {
 
@@ -38,7 +35,8 @@ public class PlateBuilder<T> {
          * Build plates from current factory settings
          *
          * @return Collection of all created plates
-         * @throws PlateConstructionException which can occur e.g. if the labels don't marry up in the transition mapping
+         * @throws PlateConstructionException which can occur e.g. if the labels don't marry up in
+         *     the transition mapping
          */
         Plates build();
     }
@@ -46,7 +44,6 @@ public class PlateBuilder<T> {
     public static VertexLabel proxyFor(VertexLabel label) {
         return label.withExtraNamespace(PROXY_LABEL_MARKER);
     }
-
 
     public PlateBuilder<T> withInitialState(Vertex<?> vertex) {
         return withInitialState(VertexDictionary.of(vertex));
@@ -97,9 +94,7 @@ public class PlateBuilder<T> {
         return new FromIterator(iterator, sizeHint, initialState, transitionMapping);
     }
 
-    /**
-     * An intermediate builder, with a set count
-     */
+    /** An intermediate builder, with a set count */
     public class FromCount implements PlateCount {
         private final int count;
         private final VertexDictionary initialState;
@@ -124,15 +119,17 @@ public class PlateBuilder<T> {
         }
     }
 
-    /**
-     * An intermediate builder, with a set data iterator
-     */
+    /** An intermediate builder, with a set data iterator */
     public class FromIterator implements PlateData<T> {
         private Iterator<T> iterator;
         private int size;
         private final VertexDictionary initialState;
 
-        private FromIterator(Iterator<T> iterator, int size, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
+        private FromIterator(
+                Iterator<T> iterator,
+                int size,
+                VertexDictionary initialState,
+                Map<VertexLabel, VertexLabel> transitionMapping) {
             this.iterator = iterator;
             this.size = size;
             this.initialState = initialState;
@@ -153,16 +150,18 @@ public class PlateBuilder<T> {
         }
     }
 
-    /**
-     * Build Plates from some provided Data
-     */
+    /** Build Plates from some provided Data */
     public class FromDataFactory implements PlateFactory {
         private BiConsumer<Plate, T> factory;
         private PlateData<T> data;
         private int size;
         private final VertexDictionary initialState;
 
-        private FromDataFactory(BiConsumer<Plate, T> factory, PlateData<T> data, int size, VertexDictionary initialState) {
+        private FromDataFactory(
+                BiConsumer<Plate, T> factory,
+                PlateData<T> data,
+                int size,
+                VertexDictionary initialState) {
             this.factory = factory;
             this.data = data;
             this.size = size;
@@ -184,18 +183,25 @@ public class PlateBuilder<T> {
         }
     }
 
-    private void connectTransitionVariables(VertexDictionary candidateVertices, Plate plate, Map<VertexLabel, VertexLabel> transitionMapping) throws PlateConstructionException {
+    private void connectTransitionVariables(
+            VertexDictionary candidateVertices,
+            Plate plate,
+            Map<VertexLabel, VertexLabel> transitionMapping)
+            throws PlateConstructionException {
         Collection<Vertex<?>> proxyVertices = plate.getProxyVertices();
         if (candidateVertices == null && !proxyVertices.isEmpty()) {
-            throw new IllegalArgumentException("You must provide a base case for the Transition Vertices - use withInitialState()");
+            throw new IllegalArgumentException(
+                    "You must provide a base case for the Transition Vertices - use withInitialState()");
         }
         for (Vertex<?> proxy : proxyVertices) {
             VertexLabel proxyLabel = proxy.getLabel().withoutOuterNamespace();
             VertexLabel defaultParentLabel = getDefaultParentLabel(proxyLabel);
-            VertexLabel parentLabel = transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
+            VertexLabel parentLabel =
+                    transitionMapping.getOrDefault(proxyLabel, defaultParentLabel);
 
             if (parentLabel == null) {
-                throw new PlateConstructionException("Cannot find transition mapping for " + proxy.getLabel());
+                throw new PlateConstructionException(
+                        "Cannot find transition mapping for " + proxy.getLabel());
             }
 
             Vertex<?> parent = candidateVertices.get(parentLabel);
@@ -215,18 +221,19 @@ public class PlateBuilder<T> {
         }
     }
 
-    /**
-     * Build some number of plates
-     */
+    /** Build some number of plates */
     public class FromCountFactory implements PlateFactory {
         private Consumer<Plate> factory;
         private PlateCount count;
 
-        private FromCountFactory(Consumer<Plate> factory, PlateCount count, VertexDictionary initialState, Map<VertexLabel, VertexLabel> transitionMapping) {
+        private FromCountFactory(
+                Consumer<Plate> factory,
+                PlateCount count,
+                VertexDictionary initialState,
+                Map<VertexLabel, VertexLabel> transitionMapping) {
             this.factory = factory;
             this.count = count;
         }
-
 
         public Plates build() throws PlateConstructionException {
             Plates plates = new Plates(count.getCount());

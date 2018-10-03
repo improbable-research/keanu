@@ -1,7 +1,6 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
 import io.improbable.keanu.vertices.Vertex;
-
 import java.util.List;
 import java.util.Set;
 

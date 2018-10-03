@@ -1,32 +1,27 @@
 package io.improbable.keanu.tensor;
 
 import com.google.common.primitives.Ints;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.api.ops.BroadcastOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastAddOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastDivOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
 import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastSubOp;
-import org.nd4j.linalg.api.shape.Shape;
 import org.nd4j.linalg.factory.Nd4j;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 /**
- * This class provides shim methods for the ND4J INDArray class.
- * The INDArray broadcast operations are currently broken
- * (https://github.com/deeplearning4j/deeplearning4j/issues/5893).
- * Until this is fixed in the ND4J codebase, these methods can be
- * used to work around the issue. The need for this should be
- * reevaluated each time the ND4J dependency is updated.
+ * This class provides shim methods for the ND4J INDArray class. The INDArray broadcast operations
+ * are currently broken (https://github.com/deeplearning4j/deeplearning4j/issues/5893). Until this
+ * is fixed in the ND4J codebase, these methods can be used to work around the issue. The need for
+ * this should be reevaluated each time the ND4J dependency is updated.
  *
- * To work around another issue in ND4J where you cannot broadcast
- * a higher rank tensor onto a lower rank tensor, the shim broadcast operations
- * ensure the higher rank tensor is always being operated on. In the case of
- * subtract and minus, this requires a small change in the logic, as A - B != B - A and
- * A / B != B / A.
+ * <p>To work around another issue in ND4J where you cannot broadcast a higher rank tensor onto a
+ * lower rank tensor, the shim broadcast operations ensure the higher rank tensor is always being
+ * operated on. In the case of subtract and minus, this requires a small change in the logic, as A -
+ * B != B - A and A / B != B / A.
  */
 public class INDArrayShim {
 
@@ -43,9 +38,7 @@ public class INDArrayShim {
             return broadcastMultiply(b, a);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastMulOp(a, b, a.dup(), broadcastDimensions)
-            );
+            return execBroadcast(a, b, new BroadcastMulOp(a, b, a.dup(), broadcastDimensions));
         }
     }
 
@@ -62,9 +55,7 @@ public class INDArrayShim {
             return broadcastMultiply(b, a.rdiv(1.0));
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastDivOp(a, b, a.dup(), broadcastDimensions)
-            );
+            return execBroadcast(a, b, new BroadcastDivOp(a, b, a.dup(), broadcastDimensions));
         }
     }
 
@@ -81,9 +72,7 @@ public class INDArrayShim {
             return broadcastPlus(b, a);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastAddOp(a, b, a.dup(), broadcastDimensions)
-            );
+            return execBroadcast(a, b, new BroadcastAddOp(a, b, a.dup(), broadcastDimensions));
         }
     }
 
@@ -100,9 +89,7 @@ public class INDArrayShim {
             return broadcastPlus(a.neg(), b);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastSubOp(a, b, a.dup(), broadcastDimensions)
-            );
+            return execBroadcast(a, b, new BroadcastSubOp(a, b, a.dup(), broadcastDimensions));
         }
     }
 
@@ -123,7 +110,7 @@ public class INDArrayShim {
         List<Integer> along = new ArrayList<>();
 
         for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] != shapeB[i]){
+            if (shapeA[i] != shapeB[i]) {
                 along.add(i);
             }
         }
@@ -142,7 +129,7 @@ public class INDArrayShim {
         List<Integer> along = new ArrayList<>();
 
         for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] == shapeB[i]){
+            if (shapeA[i] == shapeB[i]) {
                 along.add(i);
             }
         }

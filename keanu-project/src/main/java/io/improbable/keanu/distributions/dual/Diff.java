@@ -1,15 +1,12 @@
 package io.improbable.keanu.distributions.dual;
 
-
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import java.util.Objects;
-
 import org.jetbrains.annotations.NotNull;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 /**
- * A Diff is identified only by its name
- * so that you can store it in io.improbable.keanu.distributions.dual.Diffs
+ * A Diff is identified only by its name so that you can store it in
+ * io.improbable.keanu.distributions.dual.Diffs
  */
 public class Diff implements Comparable<Diff> {
 

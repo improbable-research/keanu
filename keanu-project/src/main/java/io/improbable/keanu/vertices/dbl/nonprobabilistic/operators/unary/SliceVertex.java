@@ -2,9 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -12,6 +9,8 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import java.util.HashMap;
+import java.util.Map;
 
 public class SliceVertex extends DoubleUnaryOpVertex {
 
@@ -22,8 +21,8 @@ public class SliceVertex extends DoubleUnaryOpVertex {
      * Takes the slice along a given dimension and index of a vertex
      *
      * @param inputVertex the input vertex
-     * @param dimension   the dimension to extract along
-     * @param index       the index of extraction
+     * @param dimension the dimension to extract along
+     * @param index the index of extraction
      */
     public SliceVertex(DoubleVertex inputVertex, int dimension, int index) {
         super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
@@ -37,10 +36,12 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
 
-        for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+        for (Map.Entry<VertexId, DoubleTensor> entry :
+                derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
             DoubleTensor padded = padSliceWithZerosToMatchOriginalShape(v);
@@ -48,7 +49,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
         }
 
         return partials;
-     }
+    }
 
     @Override
     protected DualNumber dualOp(DualNumber dualNumber) {
@@ -77,5 +78,4 @@ public class SliceVertex extends DoubleUnaryOpVertex {
 
         return outputTensor;
     }
-
 }

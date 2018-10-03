@@ -2,11 +2,9 @@ package io.improbable.keanu.vertices;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
-import org.junit.Test;
-
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
 
 public class DualNumberPropagationTest {
 
@@ -21,8 +19,7 @@ public class DualNumberPropagationTest {
 
         end.getDualNumber();
 
-        //Does the right amount of work
+        // Does the right amount of work
         assertEquals(3 * links, m.get());
     }
-
 }

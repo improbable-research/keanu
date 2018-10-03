@@ -1,8 +1,9 @@
 package io.improbable.keanu.util.csv;
 
+import static java.util.Collections.emptyList;
+
 import io.improbable.keanu.util.csv.pojo.bycolumn.ColumnsVectorizedObjectParser;
 import io.improbable.keanu.util.csv.pojo.byrow.RowsAsObjectParser;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.Reader;
@@ -12,8 +13,6 @@ import java.util.List;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
-
-import static java.util.Collections.emptyList;
 
 public class CsvReader {
 
@@ -32,11 +31,11 @@ public class CsvReader {
     }
 
     /**
-     * This will read the entire csv file and return it as a list.
-     * Warning: avoid using this for large csv files.
+     * This will read the entire csv file and return it as a list. Warning: avoid using this for
+     * large csv files.
      *
-     * @return a list lines that are represented as a list of strings where each
-     * string is a field in that line.
+     * @return a list lines that are represented as a list of strings where each string is a field
+     *     in that line.
      */
     public List<List<String>> readLines() {
         try (Stream<List<String>> stream = streamLines()) {
@@ -45,11 +44,11 @@ public class CsvReader {
     }
 
     /**
-     * Read all lines from the csv file one at a time without ever holding
-     * the entire csv file in memory
+     * Read all lines from the csv file one at a time without ever holding the entire csv file in
+     * memory
      *
-     * @return a stream of lines represented by a list of strings where
-     * each string is a field in the line.
+     * @return a stream of lines represented by a list of strings where each string is a field in
+     *     the line.
      */
     public Stream<List<String>> streamLines() {
 
@@ -63,18 +62,17 @@ public class CsvReader {
             }
         }
 
-        return bufferedReader.lines()
-            .map(this::splitLine);
+        return bufferedReader.lines().map(this::splitLine);
     }
 
     public <T> RowsAsObjectParser<T> asRowsDefinedBy(Class<T> clazz) {
-        //Header required for pojo deserialize
+        // Header required for pojo deserialize
         expectHeader(true);
         return new RowsAsObjectParser<>(clazz, streamLines(), getHeader());
     }
 
     public <T> ColumnsVectorizedObjectParser<T> asVectorizedColumnsDefinedBy(Class<T> clazz) {
-        //Header required for pojo deserialize
+        // Header required for pojo deserialize
         expectHeader(true);
         return new ColumnsVectorizedObjectParser<>(clazz, streamLines(), getHeader());
     }
@@ -124,8 +122,6 @@ public class CsvReader {
     }
 
     private List<String> splitLine(String line) {
-        return Arrays.stream(line.split(delimiter))
-            .map(String::trim)
-            .collect(Collectors.toList());
+        return Arrays.stream(line.split(delimiter)).map(String::trim).collect(Collectors.toList());
     }
 }

@@ -6,9 +6,6 @@ import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
@@ -19,13 +16,11 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.model.LambdaModelVertex;
 import io.improbable.keanu.vertices.model.ModelVertex;
+import java.io.IOException;
+import java.util.Map;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
 
 public class LambdaModelVertexTest {
 
@@ -53,10 +48,14 @@ public class LambdaModelVertexTest {
     @Test
     public void canRunAModelInAModel() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
+                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
-        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        ModelVertex model =
+                new LambdaModelVertex(
+                        inputs, weatherModel::modelExecution, weatherModel::updateValues);
+        DoubleVertex chanceOfRain =
+                model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -70,10 +69,14 @@ public class LambdaModelVertexTest {
     @Test
     public void canRunEvalOnTheOutputsToRecalculateTheModel() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
+                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
-        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        ModelVertex model =
+                new LambdaModelVertex(
+                        inputs, weatherModel::modelExecution, weatherModel::updateValues);
+        DoubleVertex chanceOfRain =
+                model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
@@ -90,10 +93,16 @@ public class LambdaModelVertexTest {
     @Test
     public void canRunAModelInAModelWithDifferentOutputTypes() {
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
+                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValuesMultipleTypes);
-        IntegerVertex suggestedFactorSuncream = model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
+        ModelVertex model =
+                new LambdaModelVertex(
+                        inputs,
+                        weatherModel::modelExecution,
+                        weatherModel::updateValuesMultipleTypes);
+        IntegerVertex suggestedFactorSuncream =
+                model.getIntegerModelOutputVertex(new VertexLabel("suggestedFactorSuncream"));
         BoolVertex isSunny = model.getBoolModelOutputVertex(new VertexLabel("isSunny"));
 
         double inputValue = 20.0;
@@ -107,10 +116,14 @@ public class LambdaModelVertexTest {
     public void modelInsideVertexIsRecalculatedOnEachParentSample() {
         int numSamples = 50;
         weatherModel.setInputToModel(inputToModel);
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
+                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
-        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        ModelVertex model =
+                new LambdaModelVertex(
+                        inputs, weatherModel::modelExecution, weatherModel::updateValues);
+        DoubleVertex chanceOfRain =
+                model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
         DoubleVertex shouldIBringUmbrella = chanceOfRain.times(humidity);
 
@@ -129,10 +142,14 @@ public class LambdaModelVertexTest {
         inputToModel = inputToModelOne.plus(inputToModelTwo);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
+                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
-        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        ModelVertex model =
+                new LambdaModelVertex(
+                        inputs, weatherModel::modelExecution, weatherModel::updateValues);
+        DoubleVertex chanceOfRain =
+                model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
         DoubleVertex temperatureReadingOne = new GaussianVertex(chanceOfRain, 5);
@@ -140,7 +157,8 @@ public class LambdaModelVertexTest {
         temperatureReadingOne.observe(3.0);
         temperatureReadingTwo.observe(60.0);
 
-        NonGradientOptimizer gradientOptimizer = NonGradientOptimizer.of(temperatureReadingTwo.getConnectedGraph());
+        NonGradientOptimizer gradientOptimizer =
+                NonGradientOptimizer.of(temperatureReadingTwo.getConnectedGraph());
         gradientOptimizer.maxLikelihood();
         Assert.assertEquals(30.0, inputToModel.getValue().scalar(), 0.1);
     }
@@ -150,30 +168,33 @@ public class LambdaModelVertexTest {
         inputToModel = new GaussianVertex(25., 5);
         weatherModel.setInputToModel(inputToModel);
 
-        Map<VertexLabel, Vertex<? extends Tensor>> inputs = ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
+        Map<VertexLabel, Vertex<? extends Tensor>> inputs =
+                ImmutableMap.of(new VertexLabel("Temperature"), inputToModel);
 
-        ModelVertex model = new LambdaModelVertex(inputs, weatherModel::modelExecution, weatherModel::updateValues);
-        DoubleVertex chanceOfRain = model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
+        ModelVertex model =
+                new LambdaModelVertex(
+                        inputs, weatherModel::modelExecution, weatherModel::updateValues);
+        DoubleVertex chanceOfRain =
+                model.getDoubleModelOutputVertex(new VertexLabel("ChanceOfRain"));
         DoubleVertex humidity = model.getDoubleModelOutputVertex(new VertexLabel("Humidity"));
 
-        //My prior belief is the temperature is 29.0.
-        //These observations are indicative of a temperature of 30.
+        // My prior belief is the temperature is 29.0.
+        // These observations are indicative of a temperature of 30.
         DoubleVertex chanceOfRainObservation = new GaussianVertex(chanceOfRain, 5);
         DoubleVertex humidityObservation = new GaussianVertex(humidity, 5);
         humidityObservation.observe(60.0);
         chanceOfRainObservation.observe(3.0);
 
-        BayesianNetwork bayesianNetwork = new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
+        BayesianNetwork bayesianNetwork =
+                new BayesianNetwork(chanceOfRainObservation.getConnectedGraph());
 
-        NetworkSamples posteriorSamples = MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(
-            bayesianNetwork,
-            inputToModel,
-            2500
-        );
+        NetworkSamples posteriorSamples =
+                MetropolisHastings.withDefaultConfig(random)
+                        .getPosteriorSamples(bayesianNetwork, inputToModel, 2500);
 
-        double averagePosteriorInput = posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
+        double averagePosteriorInput =
+                posteriorSamples.getDoubleTensorSamples(inputToModel).getAverages().scalar();
 
         Assert.assertEquals(29., averagePosteriorInput, 0.1);
     }
-
 }

@@ -4,19 +4,9 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
-
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -27,6 +17,13 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ParetoVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import org.junit.Before;
+import org.junit.Test;
 
 public class ModelCompositionTest {
 
@@ -57,11 +54,12 @@ public class ModelCompositionTest {
 
         trueLocation = new UniformVertex(0.1, 50.0);
 
-        Map<VertexLabel, Vertex> inputVertices = ImmutableMap.of(new VertexLabel("Location"), trueLocation);
+        Map<VertexLabel, Vertex> inputVertices =
+                ImmutableMap.of(new VertexLabel("Location"), trueLocation);
 
-        Map<VertexLabel, Vertex> outputs = ModelComposition.composeModel(
-            innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1"))
-        );
+        Map<VertexLabel, Vertex> outputs =
+                ModelComposition.composeModel(
+                        innerNet, inputVertices, ImmutableList.of(new VertexLabel("Output1")));
 
         gaussOutputVertex = (DoubleVertex) outputs.get(new VertexLabel("Output1"));
 
@@ -118,7 +116,8 @@ public class ModelCompositionTest {
 
         trueLocation.setValue(9.9);
         size.setValue(9.9);
-        GaussianVertex sourceOfTruth = new GaussianVertex(new int[]{NUM_SAMPLES, 1}, REAL_HYPER_LOC, REAL_HYPER_SIZE);
+        GaussianVertex sourceOfTruth =
+                new GaussianVertex(new int[] {NUM_SAMPLES, 1}, REAL_HYPER_LOC, REAL_HYPER_SIZE);
 
         gaussOutputVertex.observe(sourceOfTruth.sample());
         GradientOptimizer optimizer = GradientOptimizer.of(outerNet);
@@ -137,10 +136,8 @@ public class ModelCompositionTest {
         assertTrue(filteredVertices.containsAll(latentOuterVertices));
     }
 
-    private void triggerCompositionWarnings(List<VertexLabel> outputs,
-                                            String inputLabel,
-                                            String outputLabel,
-                                            String plusLabel) {
+    private void triggerCompositionWarnings(
+            List<VertexLabel> outputs, String inputLabel, String outputLabel, String plusLabel) {
         DoubleVertex inputVertex = new DoubleProxyVertex(new VertexLabel(inputLabel));
         DoubleVertex plusValue = new ConstantDoubleVertex(1.0);
         plusValue.setLabel(new VertexLabel(plusLabel));
@@ -149,9 +146,8 @@ public class ModelCompositionTest {
         BayesianNetwork bayesNet = new BayesianNetwork(outputVertex.getConnectedGraph());
         DoubleVertex outerInput = new GaussianVertex(0.0, 1.0);
 
-        ModelComposition.composeModel(bayesNet,
-            ImmutableMap.of(new VertexLabel("Input1"), outerInput),
-            outputs);
+        ModelComposition.composeModel(
+                bayesNet, ImmutableMap.of(new VertexLabel("Input1"), outerInput), outputs);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -161,20 +157,20 @@ public class ModelCompositionTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void willRejectMissingOutput() {
-        triggerCompositionWarnings(ImmutableList.of(new VertexLabel("Invalid Label")),
-            "Input1", "Output1", "Plus");
+        triggerCompositionWarnings(
+                ImmutableList.of(new VertexLabel("Invalid Label")), "Input1", "Output1", "Plus");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void willRejectMissingInput() {
-        triggerCompositionWarnings(ImmutableList.of(new VertexLabel("Output1")),
-            "Random Name", "Output1", "Plus");
+        triggerCompositionWarnings(
+                ImmutableList.of(new VertexLabel("Output1")), "Random Name", "Output1", "Plus");
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void willRejectNonProxyInput() {
-        triggerCompositionWarnings(ImmutableList.of(new VertexLabel("Output1")),
-            "Random Name", "Output1", "Input1");
+        triggerCompositionWarnings(
+                ImmutableList.of(new VertexLabel("Output1")), "Random Name", "Output1", "Input1");
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -187,9 +183,10 @@ public class ModelCompositionTest {
         proxy.setParent(invalidParent);
 
         BayesianNetwork bayesNet = new BayesianNetwork(output.getConnectedGraph());
-        ModelComposition.composeModel(bayesNet,
-            ImmutableMap.of(new VertexLabel("Input1"), outerInput),
-            ImmutableList.of(new VertexLabel("Output1")));
+        ModelComposition.composeModel(
+                bayesNet,
+                ImmutableMap.of(new VertexLabel("Input1"), outerInput),
+                ImmutableList.of(new VertexLabel("Output1")));
     }
 
     @Test
@@ -202,5 +199,4 @@ public class ModelCompositionTest {
         assertTrue(shouldMatch.prefixMatches(prefix));
         assertFalse(shouldNotMatch.prefixMatches(prefix));
     }
-
 }

@@ -1,5 +1,7 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
+import static java.util.stream.Collectors.toMap;
+
 import io.improbable.keanu.distributions.discrete.Categorical;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -10,12 +12,13 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
-
-import java.util.*;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-
-import static java.util.stream.Collectors.toMap;
 
 public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> {
 
@@ -34,8 +37,9 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
         final int categoriesCount = categories.size();
         final IntStream categoriesIndices = IntStream.range(0, categoriesCount);
         final Map<T, DoubleVertex> selectableValues =
-            categoriesIndices.boxed().collect(toMap(categories::get,
-                index -> new TakeVertex(vertex, 0, index)));
+                categoriesIndices
+                        .boxed()
+                        .collect(toMap(categories::get, index -> new TakeVertex(vertex, 0, index)));
         return new CategoricalVertex<>(selectableValues);
     }
 
@@ -66,14 +70,14 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     @Override
     public T sample(KeanuRandom random) {
         Categorical<T> categorical =
-            Categorical.withParameters(selectableValuesMappedToDoubleTensor());
+                Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.sample(getShape(), random);
     }
 
     @Override
     public double logProb(T value) {
         Categorical<T> categorical =
-            Categorical.withParameters(selectableValuesMappedToDoubleTensor());
+                Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.logProb(value).sum();
     }
 
@@ -83,7 +87,9 @@ public class CategoricalVertex<T> extends Vertex<T> implements Probabilistic<T> 
     }
 
     private Map<T, DoubleTensor> selectableValuesMappedToDoubleTensor() {
-        return selectableValues.entrySet().stream().collect(toMap(Map.Entry::getKey,
-            e -> e.getValue().getValue()));
+        return selectableValues
+                .entrySet()
+                .stream()
+                .collect(toMap(Map.Entry::getKey, e -> e.getValue().getValue()));
     }
 }

@@ -1,15 +1,13 @@
 package io.improbable.keanu.tensor.generic;
 
-import static java.util.Arrays.copyOf;
-
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import static java.util.Arrays.copyOf;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 public class GenericTensor<T> implements Tensor<T> {
 
@@ -28,14 +26,12 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     public GenericTensor(T scalar) {
-        this.data = (T[]) (new Object[]{scalar});
+        this.data = (T[]) (new Object[] {scalar});
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
     }
 
-    /**
-     * @param shape placeholder shape
-     */
+    /** @param shape placeholder shape */
     public GenericTensor(int[] shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
@@ -124,7 +120,8 @@ public class GenericTensor<T> implements Tensor<T> {
         @Override
         public T get(long index) {
             if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for generic tensors");
+                throw new IllegalArgumentException(
+                        "Only integer based indexing supported for generic tensors");
             }
             return data[(int) index];
         }
@@ -141,11 +138,11 @@ public class GenericTensor<T> implements Tensor<T> {
         @Override
         public void set(long index, T value) {
             if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for generic tensors");
+                throw new IllegalArgumentException(
+                        "Only integer based indexing supported for generic tensors");
             }
             data[(int) index] = value;
         }
-
     }
 
     @Override
@@ -182,8 +179,11 @@ public class GenericTensor<T> implements Tensor<T> {
     @Override
     public Tensor<T> reshape(int... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
-            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
-                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
+            throw new IllegalArgumentException(
+                    "Cannot reshape a tensor to a shape of different length. Failed to reshape: "
+                            + Arrays.toString(shape)
+                            + " to: "
+                            + Arrays.toString(newShape));
         }
         return new GenericTensor<>(data, newShape);
     }
@@ -205,7 +205,8 @@ public class GenericTensor<T> implements Tensor<T> {
 
     private void assertIsNumber() {
         if (data.length > 0 && !(data[0] instanceof Number)) {
-            throw new IllegalStateException(data[0].getClass().getName() + " cannot be converted to number");
+            throw new IllegalStateException(
+                    data[0].getClass().getName() + " cannot be converted to number");
         }
     }
 }

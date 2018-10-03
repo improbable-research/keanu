@@ -1,5 +1,11 @@
 package io.improbable.keanu.vertices.bool;
 
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
@@ -10,13 +16,9 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.Collections;
 import org.junit.Before;
 import org.junit.Test;
-
-import java.util.Collections;
-
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
-import static org.junit.Assert.*;
 
 public class BoolVertexTest {
 
@@ -107,9 +109,7 @@ public class BoolVertexTest {
     }
 
     private boolean xor(boolean b1, boolean b2) {
-        BoolVertex v3 =
-            v1.and(not(v2))
-                .or(not(v1).and(v2));
+        BoolVertex v3 = v1.and(not(v2)).or(not(v1).and(v2));
         v1.setValue(b1);
         v2.setValue(b2);
         return v3.eval().scalar();
@@ -160,15 +160,16 @@ public class BoolVertexTest {
     @Test
     public void canObserveArrayOfValues() {
         BoolVertex flip = new BernoulliVertex(0.5);
-        boolean[] observation = new boolean[]{true, false, true};
+        boolean[] observation = new boolean[] {true, false, true};
         flip.observe(observation);
-        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+        assertArrayEquals(new Boolean[] {true, false, true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canObserveTensor() {
         BoolVertex flip = new BernoulliVertex(0.5);
-        BooleanTensor observation = BooleanTensor.create(new boolean[]{true, false, true, false}, new int[]{2, 2});
+        BooleanTensor observation =
+                BooleanTensor.create(new boolean[] {true, false, true, false}, new int[] {2, 2});
         flip.observe(observation);
         assertArrayEquals(observation.asFlatArray(), flip.getValue().asFlatArray());
         assertArrayEquals(flip.getShape(), observation.getShape());
@@ -177,37 +178,37 @@ public class BoolVertexTest {
     @Test
     public void canSetAndCascadeArrayOfValues() {
         BoolVertex flip = new BernoulliVertex(0.5);
-        boolean[] values = new boolean[]{true, false, true};
+        boolean[] values = new boolean[] {true, false, true};
         flip.setAndCascade(values);
-        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+        assertArrayEquals(new Boolean[] {true, false, true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canSetValueArrayOfValues() {
         BoolVertex flip = new BernoulliVertex(0.5);
-        boolean[] values = new boolean[]{true, false, true};
+        boolean[] values = new boolean[] {true, false, true};
         flip.setValue(values);
-        assertArrayEquals(new Boolean[]{true, false, true}, flip.getValue().asFlatArray());
+        assertArrayEquals(new Boolean[] {true, false, true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new BernoulliVertex(new int[]{2, 1}, 0.5);
+        BoolVertex flip = new BernoulliVertex(new int[] {2, 1}, 0.5);
         flip.setValue(true);
-        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+        assertArrayEquals(new Boolean[] {true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new BernoulliVertex(new int[]{2, 1}, 0.5);
+        BoolVertex flip = new BernoulliVertex(new int[] {2, 1}, 0.5);
         flip.setAndCascade(true);
-        assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
+        assertArrayEquals(new Boolean[] {true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canPluckValue() {
         BoolVertex flip = new BernoulliVertex(0.5);
-        boolean[] values = new boolean[]{true, false, true};
+        boolean[] values = new boolean[] {true, false, true};
         flip.setAndCascade(values);
         assertEquals(true, flip.take(0, 0).getValue().scalar());
     }
@@ -216,9 +217,9 @@ public class BoolVertexTest {
     public void canReshape() {
         BoolVertex flip = new BernoulliVertex(0.5);
         flip.setAndCascade(BooleanTensor.trues(2, 2));
-        assertArrayEquals(flip.getShape(), new int[]{2, 2});
+        assertArrayEquals(flip.getShape(), new int[] {2, 2});
         BoolVertex reshaped = flip.reshape(4, 1);
-        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+        assertArrayEquals(reshaped.getShape(), new int[] {4, 1});
     }
 
     @Test
@@ -230,10 +231,10 @@ public class BoolVertexTest {
         B.setValue(BooleanTensor.falses(2, 2));
 
         BoolVertex concatDimZero = BoolVertex.concat(0, A, A);
-        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+        assertArrayEquals(concatDimZero.getShape(), new int[] {4, 2});
 
         BoolVertex concatDimOne = BoolVertex.concat(1, A, B);
-        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
+        assertArrayEquals(concatDimOne.getShape(), new int[] {2, 4});
     }
 
     private double andProbability(double pA, double pB) {
@@ -244,16 +245,18 @@ public class BoolVertexTest {
         return pA + pB - (pA * pB);
     }
 
-    public static double priorProbabilityTrue(Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
+    public static double priorProbabilityTrue(
+            Vertex<? extends Tensor<Boolean>> vertex, int sampleCount, KeanuRandom random) {
         BayesianNetwork net = new BayesianNetwork(vertex.getConnectedGraph());
 
-        long trueCount = MetropolisHastings.withDefaultConfig(random)
-            .generatePosteriorSamples(net, Collections.singletonList(vertex)).stream()
-            .limit(sampleCount)
-            .filter(state -> state.get(vertex).scalar())
-            .count();
+        long trueCount =
+                MetropolisHastings.withDefaultConfig(random)
+                        .generatePosteriorSamples(net, Collections.singletonList(vertex))
+                        .stream()
+                        .limit(sampleCount)
+                        .filter(state -> state.get(vertex).scalar())
+                        .count();
 
         return trueCount / (double) sampleCount;
     }
-
 }

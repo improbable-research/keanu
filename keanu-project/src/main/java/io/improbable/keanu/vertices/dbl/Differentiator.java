@@ -2,6 +2,12 @@ package io.improbable.keanu.vertices.dbl;
 
 import static java.util.Collections.singletonMap;
 
+import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import java.util.ArrayDeque;
 import java.util.Arrays;
 import java.util.Collection;
@@ -13,18 +19,16 @@ import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
 
-import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
 public class Differentiator {
 
-    public static PartialDerivatives reverseModeAutoDiff(Vertex<?> ofVertex, PartialDerivatives dWrtOfVertex, Set<? extends Vertex<?>> wrt) {
+    public static PartialDerivatives reverseModeAutoDiff(
+            Vertex<?> ofVertex, PartialDerivatives dWrtOfVertex, Set<? extends Vertex<?>> wrt) {
 
-        PriorityQueue<Vertex> priorityQueue = new PriorityQueue<>(Comparator.<Vertex, VertexId>comparing(Vertex::getId, Comparator.naturalOrder()).reversed());
+        PriorityQueue<Vertex> priorityQueue =
+                new PriorityQueue<>(
+                        Comparator.<Vertex, VertexId>comparing(
+                                        Vertex::getId, Comparator.naturalOrder())
+                                .reversed());
         priorityQueue.add(ofVertex);
 
         HashSet<Vertex> alreadyQueued = new HashSet<>();
@@ -45,7 +49,8 @@ public class Differentiator {
 
             if (visiting instanceof Differentiable) {
                 Differentiable visitingDifferentiable = ((Differentiable) visiting);
-                Map<Vertex, PartialDerivatives> partialDerivatives = visitingDifferentiable.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
+                Map<Vertex, PartialDerivatives> partialDerivatives =
+                        visitingDifferentiable.reverseModeAutoDifferentiation(dwrtOf.get(visiting));
                 collectPartials(partialDerivatives, dwrtOf, visiting);
             }
 
@@ -62,9 +67,10 @@ public class Differentiator {
         return wrtOfToOfWrt(wrtOf).get(ofVertex.getId());
     }
 
-    private static void collectPartials(Map<Vertex, PartialDerivatives> partialDerivatives,
-                                        Map<Vertex, PartialDerivatives> dwrtOf,
-                                        Vertex visiting) {
+    private static void collectPartials(
+            Map<Vertex, PartialDerivatives> partialDerivatives,
+            Map<Vertex, PartialDerivatives> dwrtOf,
+            Vertex visiting) {
 
         for (Map.Entry<Vertex, PartialDerivatives> v : partialDerivatives.entrySet()) {
 
@@ -89,7 +95,10 @@ public class Differentiator {
     }
 
     public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, Set<DoubleVertex> wrt) {
-        return reverseModeAutoDiff(ofVertex, PartialDerivatives.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()), wrt);
+        return reverseModeAutoDiff(
+                ofVertex,
+                PartialDerivatives.withRespectToSelf(ofVertex.getId(), ofVertex.getShape()),
+                wrt);
     }
 
     public static PartialDerivatives reverseModeAutoDiff(Vertex ofVertex, DoubleVertex... wrt) {
@@ -97,13 +106,16 @@ public class Differentiator {
     }
 
     /**
-     * Reorganize collection of partials to be easily used to get partial OF Y WRT X. This structure is what
-     * forward mode auto diff returns but needs to be used on reverse mode so that it is in the same form.
+     * Reorganize collection of partials to be easily used to get partial OF Y WRT X. This structure
+     * is what forward mode auto diff returns but needs to be used on reverse mode so that it is in
+     * the same form.
      *
      * @param wrtOf map of partials where key is wrt vertex and key in partial is key of vertex
-     * @return a reordered map with the key being the of vertex and the key in the partial being wrt vertex
+     * @return a reordered map with the key being the of vertex and the key in the partial being wrt
+     *     vertex
      */
-    private static Map<VertexId, PartialDerivatives> wrtOfToOfWrt(Map<VertexId, PartialDerivatives> wrtOf) {
+    private static Map<VertexId, PartialDerivatives> wrtOfToOfWrt(
+            Map<VertexId, PartialDerivatives> wrtOf) {
         Map<VertexId, PartialDerivatives> ofWrt = new HashMap<>();
 
         for (Map.Entry<VertexId, PartialDerivatives> wrtOfEntry : wrtOf.entrySet()) {
@@ -112,9 +124,12 @@ public class Differentiator {
             for (Map.Entry<VertexId, DoubleTensor> ofsEntry : ofs.entrySet()) {
 
                 if (ofWrt.containsKey(ofsEntry.getKey())) {
-                    ofWrt.get(ofsEntry.getKey()).putWithRespectTo(wrtOfEntry.getKey(), ofsEntry.getValue());
+                    ofWrt.get(ofsEntry.getKey())
+                            .putWithRespectTo(wrtOfEntry.getKey(), ofsEntry.getValue());
                 } else {
-                    ofWrt.put(ofsEntry.getKey(), new PartialDerivatives(wrtOfEntry.getKey(), ofsEntry.getValue()));
+                    ofWrt.put(
+                            ofsEntry.getKey(),
+                            new PartialDerivatives(wrtOfEntry.getKey(), ofsEntry.getValue()));
                 }
             }
         }
@@ -130,7 +145,8 @@ public class Differentiator {
         while (!stack.isEmpty()) {
 
             V head = stack.peek();
-            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+            Set<Vertex> parentsThatDualNumberIsNotCalculated =
+                    parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
 
             if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
                 V top = stack.pop();
@@ -148,7 +164,8 @@ public class Differentiator {
         return dualNumbers.get(vertex);
     }
 
-    private static Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Collection<? extends Vertex> parents) {
+    private static Set<Vertex> parentsThatDualNumberIsNotCalculated(
+            Map<Vertex, DualNumber> dualNumbers, Collection<? extends Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex next : parents) {
             if (!dualNumbers.containsKey(next) && next instanceof Differentiable) {

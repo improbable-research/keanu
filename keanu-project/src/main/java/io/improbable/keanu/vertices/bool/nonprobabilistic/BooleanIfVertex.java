@@ -12,10 +12,11 @@ public class BooleanIfVertex extends BoolVertex implements NonProbabilistic<Bool
     private final Vertex<? extends BooleanTensor> thn;
     private final Vertex<? extends BooleanTensor> els;
 
-    public BooleanIfVertex(int[] shape,
-                           Vertex<? extends BooleanTensor> predicate,
-                           Vertex<? extends BooleanTensor> thn,
-                           Vertex<? extends BooleanTensor> els) {
+    public BooleanIfVertex(
+            int[] shape,
+            Vertex<? extends BooleanTensor> predicate,
+            Vertex<? extends BooleanTensor> thn,
+            Vertex<? extends BooleanTensor> els) {
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

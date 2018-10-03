@@ -1,5 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -7,16 +10,12 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import org.apache.commons.io.FileUtils;
-
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.apache.commons.io.FileUtils;
 
 public class SimpleWeatherModel {
 
@@ -30,44 +29,61 @@ public class SimpleWeatherModel {
         this.inputToModel = inputToModel;
 
         humidityReader = mock(BufferedReader.class);
-        when(humidityReader .readLine()).thenAnswer(
-            invocation -> String.valueOf(blackBoxHumidityModel(this.inputToModel.getValue().scalar()))
-        );
+        when(humidityReader.readLine())
+                .thenAnswer(
+                        invocation ->
+                                String.valueOf(
+                                        blackBoxHumidityModel(
+                                                this.inputToModel.getValue().scalar())));
 
         rainReader = mock(BufferedReader.class);
-        when(rainReader .readLine()).thenAnswer(
-            invocation -> String.valueOf(blackBoxRainModel(this.inputToModel.getValue().scalar()))
-        );
+        when(rainReader.readLine())
+                .thenAnswer(
+                        invocation ->
+                                String.valueOf(
+                                        blackBoxRainModel(this.inputToModel.getValue().scalar())));
 
         suggestedFactorSuncreamReader = mock(BufferedReader.class);
-        when(suggestedFactorSuncreamReader.readLine()).thenAnswer(
-            invocation -> String.valueOf(blackBoxSunCreamModel(this.inputToModel.getValue().scalar()))
-        );
+        when(suggestedFactorSuncreamReader.readLine())
+                .thenAnswer(
+                        invocation ->
+                                String.valueOf(
+                                        blackBoxSunCreamModel(
+                                                this.inputToModel.getValue().scalar())));
 
         isSunnyReader = mock(BufferedReader.class);
-        when(isSunnyReader .readLine()).thenAnswer(
-            invocation -> String.valueOf(blackBoxIsSunnyModel(this.inputToModel.getValue().scalar()))
-        );
+        when(isSunnyReader.readLine())
+                .thenAnswer(
+                        invocation ->
+                                String.valueOf(
+                                        blackBoxIsSunnyModel(
+                                                this.inputToModel.getValue().scalar())));
     }
 
     public void modelExecution(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        double temperature = inputs.get(new VertexLabel("Temperature")).getValue().asFlatDoubleArray()[0];
+        double temperature =
+                inputs.get(new VertexLabel("Temperature")).getValue().asFlatDoubleArray()[0];
         try {
             double chanceOfRain = blackBoxRainModel(temperature);
             double humidity = blackBoxHumidityModel(temperature);
-            FileUtils.writeStringToFile(File.createTempFile("chanceOfRainResults", "csv"), String.valueOf(chanceOfRain));
-            FileUtils.writeStringToFile(File.createTempFile("humidityResults", "csv"), String.valueOf(humidity));
+            FileUtils.writeStringToFile(
+                    File.createTempFile("chanceOfRainResults", "csv"),
+                    String.valueOf(chanceOfRain));
+            FileUtils.writeStringToFile(
+                    File.createTempFile("humidityResults", "csv"), String.valueOf(humidity));
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public Map<VertexLabel, Tensor> updateValues(
+            Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
 
         try {
             double chanceOfRainResult = Double.parseDouble(getRainReader().readLine());
-            modelOutput.put(new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
+            modelOutput.put(
+                    new VertexLabel("ChanceOfRain"), DoubleTensor.scalar(chanceOfRainResult));
             double humidityResult = Double.parseDouble(getHumidityReader().readLine());
             modelOutput.put(new VertexLabel("Humidity"), DoubleTensor.scalar(humidityResult));
         } catch (IOException e) {
@@ -77,12 +93,16 @@ public class SimpleWeatherModel {
         return modelOutput;
     }
 
-    public Map<VertexLabel, Tensor> updateValuesMultipleTypes(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    public Map<VertexLabel, Tensor> updateValuesMultipleTypes(
+            Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
         Map<VertexLabel, Tensor> modelOutput = new HashMap<>();
 
         try {
-            int chanceOfRainResult = (int) Double.parseDouble(getSuggestedFactorSuncreamReader().readLine());
-            modelOutput.put(new VertexLabel("suggestedFactorSuncream"), IntegerTensor.scalar(chanceOfRainResult));
+            int chanceOfRainResult =
+                    (int) Double.parseDouble(getSuggestedFactorSuncreamReader().readLine());
+            modelOutput.put(
+                    new VertexLabel("suggestedFactorSuncream"),
+                    IntegerTensor.scalar(chanceOfRainResult));
             boolean humidityResult = Boolean.parseBoolean(getIsSunnyReader().readLine());
             modelOutput.put(new VertexLabel("isSunny"), BooleanTensor.scalar(humidityResult));
         } catch (IOException e) {

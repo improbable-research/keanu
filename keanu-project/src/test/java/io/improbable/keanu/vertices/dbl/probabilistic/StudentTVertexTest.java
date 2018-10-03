@@ -1,11 +1,10 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static java.lang.Math.pow;
-
 import static junit.framework.TestCase.assertEquals;
 
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.List;
-
 import org.apache.commons.math3.distribution.TDistribution;
 import org.apache.commons.math3.stat.descriptive.SummaryStatistics;
 import org.junit.Assert;
@@ -14,13 +13,9 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 public class StudentTVertexTest {
     private static final double DELTA = 0.0001;
-    private static final int[] TEST_VALUES_OF_V = new int[]{
-        1, 2, 3
-    };
+    private static final int[] TEST_VALUES_OF_V = new int[] {1, 2, 3};
     private final Logger log = LoggerFactory.getLogger(StudentTVertexTest.class);
     private KeanuRandom random;
 
@@ -37,7 +32,7 @@ public class StudentTVertexTest {
 
         int v = 3;
 
-        StudentTVertex studentT = new StudentTVertex(new int[]{N, 1}, v);
+        StudentTVertex studentT = new StudentTVertex(new int[] {N, 1}, v);
 
         List<Double> samples = studentT.sample(random).asFlatList();
 
@@ -51,9 +46,7 @@ public class StudentTVertexTest {
         }
     }
 
-    /**
-     * Test the differential of the log of the StudentT Probability Density Function
-     */
+    /** Test the differential of the log of the StudentT Probability Density Function */
     @Test
     public void dLogPdfTest() {
         for (int testValueForV : TEST_VALUES_OF_V) {
@@ -61,7 +54,8 @@ public class StudentTVertexTest {
         }
     }
 
-    private void testSampleMeanAndStdDeviation(int v, double expectedMean, double expectedSd, List<Double> samples, double delta) {
+    private void testSampleMeanAndStdDeviation(
+            int v, double expectedMean, double expectedSd, List<Double> samples, double delta) {
         SummaryStatistics stats = new SummaryStatistics();
         samples.forEach(stats::addValue);
 

@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary;
 
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 

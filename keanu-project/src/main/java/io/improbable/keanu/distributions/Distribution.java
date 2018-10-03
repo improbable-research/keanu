@@ -5,5 +5,6 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public interface Distribution<T> {
     T sample(int[] shape, KeanuRandom random);
+
     DoubleTensor logProb(T x);
 }

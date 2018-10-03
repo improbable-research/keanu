@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
-
 import java.util.function.Function;
 
 public abstract class BoolUnaryOpLambda<A extends Tensor> extends BoolUnaryOpVertex<A> {

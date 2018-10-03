@@ -1,10 +1,9 @@
 package io.improbable.keanu.network;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
+import java.util.Map;
+import java.util.Set;
 
 public class SimpleNetworkState implements NetworkState {
 

@@ -1,8 +1,10 @@
 package io.improbable.keanu.e2e.regression;
 
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -16,13 +18,10 @@ import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.junit.Assert.assertEquals;
-
 public class LinearRegression {
     private final Logger log = LoggerFactory.getLogger(LinearRegression.class);
 
-    @Rule
-    public DeterministicRule deterministicRule = new DeterministicRule();
+    @Rule public DeterministicRule deterministicRule = new DeterministicRule();
 
     private KeanuRandom random;
 
@@ -39,7 +38,7 @@ public class LinearRegression {
         double expectedM = 3.0;
         double expectedB = 20.0;
 
-        DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);
+        DoubleVertex xGenerator = new UniformVertex(new int[] {1, N}, 0, 10);
         DoubleVertex mu = xGenerator.multiply(expectedM).plus(expectedB);
         DoubleVertex yGenerator = new GaussianVertex(mu, 1.0);
         DoubleTensor xData = xGenerator.sample(random);
@@ -70,12 +69,15 @@ public class LinearRegression {
         double expectedW2 = 7.0;
         double expectedB = 20.0;
 
-        DoubleVertex x1Generator = new UniformVertex(new int[]{1, N}, 0, 10);
-        DoubleVertex x2Generator = new UniformVertex(new int[]{1, N}, 50, 100);
-        DoubleVertex yGenerator = new GaussianVertex(
-            x1Generator.multiply(expectedW1).plus(x2Generator.multiply(expectedW2)).plus(expectedB),
-            1.0
-        );
+        DoubleVertex x1Generator = new UniformVertex(new int[] {1, N}, 0, 10);
+        DoubleVertex x2Generator = new UniformVertex(new int[] {1, N}, 50, 100);
+        DoubleVertex yGenerator =
+                new GaussianVertex(
+                        x1Generator
+                                .multiply(expectedW1)
+                                .plus(x2Generator.multiply(expectedW2))
+                                .plus(expectedB),
+                        1.0);
         DoubleTensor x1Data = x1Generator.sample(random);
         x1Generator.setAndCascade(x1Data);
         DoubleTensor x2Data = x1Generator.sample(random);
@@ -96,7 +98,13 @@ public class LinearRegression {
 
         optimizer.maxLikelihood();
 
-        log.info("W1 = " + w1.getValue().scalar() + " W2 = " + w2.getValue().scalar() + ", B = " + b.getValue().scalar());
+        log.info(
+                "W1 = "
+                        + w1.getValue().scalar()
+                        + " W2 = "
+                        + w2.getValue().scalar()
+                        + ", B = "
+                        + b.getValue().scalar());
         assertEquals(expectedW1, w1.getValue().scalar(), 0.05);
         assertEquals(expectedW2, w2.getValue().scalar(), 0.05);
         assertEquals(expectedB, b.getValue().scalar(), 0.05);
@@ -116,7 +124,7 @@ public class LinearRegression {
         DoubleVertex yGeneratorMu = ConstantVertex.of(0.0);
         for (int i = 0; i < expectedWeights.length; i++) {
             expectedWeights[i] = random.nextDouble() * 100 + 20;
-            xGenerators[i] = new UniformVertex(new int[]{1, N}, 0, 10000);
+            xGenerators[i] = new UniformVertex(new int[] {1, N}, 0, 10000);
             xData[i] = xGenerators[i].sample(random);
             xGenerators[i].setValue(xData[i]);
             yGeneratorMu = yGeneratorMu.plus(xGenerators[i].multiply(expectedWeights[i]));
@@ -158,19 +166,17 @@ public class LinearRegression {
         double expectedW1 = 12.0;
         double expectedW2 = 7.0;
 
-        DoubleVertex wGenerator = ConstantVertex.of(DoubleTensor.create(new double[]{expectedW1, expectedW2}, 2, 1));
-        DoubleVertex xGenerator = new UniformVertex(new int[]{N, 2}, 0, 10);
-        DoubleVertex yGenerator = new GaussianVertex(
-            xGenerator.matrixMultiply(wGenerator),
-            1.0
-        );
+        DoubleVertex wGenerator =
+                ConstantVertex.of(DoubleTensor.create(new double[] {expectedW1, expectedW2}, 2, 1));
+        DoubleVertex xGenerator = new UniformVertex(new int[] {N, 2}, 0, 10);
+        DoubleVertex yGenerator = new GaussianVertex(xGenerator.matrixMultiply(wGenerator), 1.0);
         DoubleTensor xData = xGenerator.sample(random);
         xGenerator.setAndCascade(xData);
         DoubleTensor yData = yGenerator.sample(random);
 
         // Linear Regression
-        DoubleVertex w = new GaussianVertex(new int[]{2, 1}, 0.0, 10.0);
-        w.setValue(DoubleTensor.create(new double[]{2, 2}, 2, 1));
+        DoubleVertex w = new GaussianVertex(new int[] {2, 1}, 0.0, 10.0);
+        w.setValue(DoubleTensor.create(new double[] {2, 2}, 2, 1));
 
         DoubleVertex x = ConstantVertex.of(xData);
         DoubleVertex yMu = x.matrixMultiply(w);
@@ -186,5 +192,4 @@ public class LinearRegression {
         assertEquals(expectedW1, w.getValue(0), 0.05);
         assertEquals(expectedW2, w.getValue(1), 0.05);
     }
-
 }

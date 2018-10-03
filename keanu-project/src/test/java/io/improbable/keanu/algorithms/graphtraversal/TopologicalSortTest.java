@@ -1,15 +1,14 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import static junit.framework.TestCase.assertTrue;
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.List;
-
-import static junit.framework.TestCase.assertTrue;
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class TopologicalSortTest {
 
@@ -88,7 +87,8 @@ public class TopologicalSortTest {
         assertTrue(sorted.indexOf(K) < sorted.indexOf(L));
     }
 
-    private void assertExactOrder(List<? extends Vertex<?>> expected, List<? extends Vertex> actual) {
+    private void assertExactOrder(
+            List<? extends Vertex<?>> expected, List<? extends Vertex> actual) {
         assertEquals(actual.size(), expected.size());
         for (int i = 0; i < actual.size(); i++) {
             assertEquals(actual.get(i), expected.get(i));

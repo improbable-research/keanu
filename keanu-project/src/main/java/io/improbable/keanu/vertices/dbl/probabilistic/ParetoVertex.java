@@ -6,10 +6,6 @@ import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -18,6 +14,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -26,15 +25,18 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
     /**
      * Provides a Vertex implementing the Pareto Distribution.
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
-     * @param location    the location value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
-     * @param scale       the scale value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
+     * @param location the location value(s) of the Pareto. Must either be the same shape as
+     *     tensorShape or a scalar
+     * @param scale the scale value(s) of the Pareto. Must either be the same shape as tensorShape
+     *     or a scalar
      */
     public ParetoVertex(int[] tensorShape, DoubleVertex location, DoubleVertex scale) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
+        checkTensorsMatchNonScalarShapeOrAreScalar(
+                tensorShape, location.getShape(), scale.getShape());
 
         this.scale = scale;
         this.location = location;
@@ -43,7 +45,10 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     public ParetoVertex(DoubleVertex location, DoubleVertex scale) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
+        this(
+                checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()),
+                location,
+                scale);
     }
 
     public ParetoVertex(double location, DoubleVertex scale) {
@@ -89,7 +94,8 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Diffs dlnP = Pareto.withParameters(location.getValue(), scale.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
@@ -111,7 +117,8 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return Pareto.withParameters(location.getValue(), scale.getValue()).sample(getShape(), random);
+        return Pareto.withParameters(location.getValue(), scale.getValue())
+                .sample(getShape(), random);
     }
 
     @Override

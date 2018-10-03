@@ -15,5 +15,4 @@ public class NotEqualsVertex<A extends Tensor, B extends Tensor> extends BoolBin
     protected BooleanTensor op(A l, B r) {
         return l.elementwiseEquals(r).not();
     }
-
 }

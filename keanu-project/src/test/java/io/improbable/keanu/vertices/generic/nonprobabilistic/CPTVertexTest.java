@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
-import org.junit.Test;
-
 import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.FALSE;
 import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
 import static junit.framework.TestCase.assertTrue;
+
+import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.vertices.bool.BoolVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
+import org.junit.Test;
 
 public class CPTVertexTest {
 
@@ -17,9 +17,8 @@ public class CPTVertexTest {
 
         BoolVertex A = new BernoulliVertex(0.2);
 
-        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A)
-            .when(true).then(TRUE)
-            .orDefault(FALSE);
+        CPTVertex<BooleanTensor> cpt =
+                ConditionalProbabilityTable.of(A).when(true).then(TRUE).orDefault(FALSE);
 
         A.setAndCascade(false);
         assertFalse(cpt.getValue().scalar());
@@ -34,11 +33,15 @@ public class CPTVertexTest {
         BoolVertex A = new BernoulliVertex(0.5);
         BoolVertex B = new BernoulliVertex(0.5);
 
-        CPTVertex<BooleanTensor> cpt = ConditionalProbabilityTable.of(A, B)
-            .when(true, true).then(FALSE)
-            .when(false, true).then(TRUE)
-            .when(true, false).then(TRUE)
-            .orDefault(FALSE);
+        CPTVertex<BooleanTensor> cpt =
+                ConditionalProbabilityTable.of(A, B)
+                        .when(true, true)
+                        .then(FALSE)
+                        .when(false, true)
+                        .then(TRUE)
+                        .when(true, false)
+                        .then(TRUE)
+                        .orDefault(FALSE);
 
         A.setAndCascade(true);
         B.setAndCascade(true);

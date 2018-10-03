@@ -12,10 +12,11 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
     private final Vertex<? extends Tensor<T>> thn;
     private final Vertex<? extends Tensor<T>> els;
 
-    public IfVertex(int[] shape,
-                    Vertex<? extends BooleanTensor> predicate,
-                    Vertex<? extends Tensor<T>> thn,
-                    Vertex<? extends Tensor<T>> els) {
+    public IfVertex(
+            int[] shape,
+            Vertex<? extends BooleanTensor> predicate,
+            Vertex<? extends Tensor<T>> thn,
+            Vertex<? extends Tensor<T>> els) {
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;

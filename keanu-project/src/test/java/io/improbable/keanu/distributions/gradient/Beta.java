@@ -1,22 +1,14 @@
 package io.improbable.keanu.distributions.gradient;
 
-
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
-import static java.lang.Math.pow;
-import static org.apache.commons.math3.special.Gamma.*;
+import static org.apache.commons.math3.special.Gamma.digamma;
 
 /**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.2 page 14
+ * Computer Generation of Statistical Distributions by Richard Saucier ARL-TR-2168 March 2000 5.1.2
+ * page 14
  */
-
 public class Beta {
 
-    private Beta() {
-    }
+    private Beta() {}
 
     public static Diff dlnPdf(double alpha, double beta, double x) {
         double dPdx = ((alpha - 1) / x) - ((beta - 1) / (1 - x));
@@ -37,5 +29,4 @@ public class Beta {
             this.dPdx = dPdx;
         }
     }
-
 }

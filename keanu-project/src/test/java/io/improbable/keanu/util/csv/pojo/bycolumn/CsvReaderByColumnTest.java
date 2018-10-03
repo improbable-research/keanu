@@ -3,81 +3,87 @@ package io.improbable.keanu.util.csv.pojo.bycolumn;
 import static org.apache.commons.lang3.ArrayUtils.toPrimitive;
 import static org.junit.Assert.assertArrayEquals;
 
-import java.util.Arrays;
-
-import org.junit.Test;
-
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.util.csv.pojo.CsvProperty;
+import java.util.Arrays;
+import org.junit.Test;
 
 public class CsvReaderByColumnTest {
 
-    String csv = "a,b,c\n" +
-        "0,2.5,t\n" +
-        "1,3,true\n" +
-        "-3,4e3,0";
+    String csv = "a,b,c\n" + "0,2.5,t\n" + "1,3,true\n" + "-3,4e3,0";
 
     @Test
     public void givenCsvStringThenLoadAsPOJO() {
-        TestPOJO testPOJO = ReadCsv.fromString(csv)
-            .asVectorizedColumnsDefinedBy(TestPOJO.class)
-            .load();
+        TestPOJO testPOJO =
+                ReadCsv.fromString(csv).asVectorizedColumnsDefinedBy(TestPOJO.class).load();
 
         assertCorrectlyDeserialized(toPrimitive(testPOJO.a), testPOJO.b, testPOJO.c);
     }
 
     @Test
     public void givenCsvStringThenLoadAsPOJOWithSetters() {
-        TestPOJOWithSetters testPOJO = ReadCsv.fromString(csv)
-            .asVectorizedColumnsDefinedBy(TestPOJOWithSetters.class)
-            .load();
+        TestPOJOWithSetters testPOJO =
+                ReadCsv.fromString(csv)
+                        .asVectorizedColumnsDefinedBy(TestPOJOWithSetters.class)
+                        .load();
 
         assertCorrectlyDeserialized(testPOJO.a, toPrimitive(testPOJO.b), testPOJO.c);
     }
 
     @Test
     public void givenCsvStringThenLoadAsPOJOWithAnnotations() {
-        TestPOJOWithAnnotations testPOJO = ReadCsv.fromString(csv)
-            .asVectorizedColumnsDefinedBy(TestPOJOWithAnnotations.class)
-            .load();
+        TestPOJOWithAnnotations testPOJO =
+                ReadCsv.fromString(csv)
+                        .asVectorizedColumnsDefinedBy(TestPOJOWithAnnotations.class)
+                        .load();
 
         assertCorrectlyDeserialized(testPOJO.a, testPOJO.b, toPrimitive(testPOJO.c));
     }
 
     @Test
     public void givenCsvStringThenLoadAsTensorPOJO() {
-        TestTensorPOJO testPOJO = ReadCsv.fromString(csv)
-            .asVectorizedColumnsDefinedBy(TestTensorPOJO.class)
-            .load();
+        TestTensorPOJO testPOJO =
+                ReadCsv.fromString(csv).asVectorizedColumnsDefinedBy(TestTensorPOJO.class).load();
 
-        assertCorrectlyDeserialized(testPOJO.a.asFlatIntegerArray(), testPOJO.b.asFlatDoubleArray(), toPrimitive(testPOJO.c.asFlatArray()));
+        assertCorrectlyDeserialized(
+                testPOJO.a.asFlatIntegerArray(),
+                testPOJO.b.asFlatDoubleArray(),
+                toPrimitive(testPOJO.c.asFlatArray()));
     }
 
     @Test
     public void givenCsvStringThenLoadAsTensorPOJOWithSetters() {
-        TestTensorPOJOWithSetters testPOJO = ReadCsv.fromString(csv)
-            .asVectorizedColumnsDefinedBy(TestTensorPOJOWithSetters.class)
-            .load();
+        TestTensorPOJOWithSetters testPOJO =
+                ReadCsv.fromString(csv)
+                        .asVectorizedColumnsDefinedBy(TestTensorPOJOWithSetters.class)
+                        .load();
 
-        assertCorrectlyDeserialized(testPOJO.a.asFlatIntegerArray(), testPOJO.b.asFlatDoubleArray(), toPrimitive(testPOJO.c.asFlatArray()));
+        assertCorrectlyDeserialized(
+                testPOJO.a.asFlatIntegerArray(),
+                testPOJO.b.asFlatDoubleArray(),
+                toPrimitive(testPOJO.c.asFlatArray()));
     }
 
     @Test
     public void givenCsvStringThenLoadAsTensorPOJOWithAnnotations() {
-        TestTensorPOJOWithAnnotations testPOJO = ReadCsv.fromString(csv)
-            .asVectorizedColumnsDefinedBy(TestTensorPOJOWithAnnotations.class)
-            .load();
+        TestTensorPOJOWithAnnotations testPOJO =
+                ReadCsv.fromString(csv)
+                        .asVectorizedColumnsDefinedBy(TestTensorPOJOWithAnnotations.class)
+                        .load();
 
-        assertCorrectlyDeserialized(testPOJO.a.asFlatIntegerArray(), testPOJO.b.asFlatDoubleArray(), toPrimitive(testPOJO.c.asFlatArray()));
+        assertCorrectlyDeserialized(
+                testPOJO.a.asFlatIntegerArray(),
+                testPOJO.b.asFlatDoubleArray(),
+                toPrimitive(testPOJO.c.asFlatArray()));
     }
 
     private void assertCorrectlyDeserialized(int[] actualA, double[] actualB, boolean[] actualC) {
-        assertArrayEquals(new int[]{0, 1, -3}, actualA);
-        assertArrayEquals(new double[]{2.5, 3.0, 4e3}, actualB, 0.0);
-        assertArrayEquals(new boolean[]{true, true, false}, actualC);
+        assertArrayEquals(new int[] {0, 1, -3}, actualA);
+        assertArrayEquals(new double[] {2.5, 3.0, 4e3}, actualB, 0.0);
+        assertArrayEquals(new boolean[] {true, true, false}, actualC);
     }
 
     public static class TestPOJO {

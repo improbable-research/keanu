@@ -5,7 +5,8 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolBinaryOpVertex;
 
-public class GreaterThanVertex<A extends NumberTensor, B extends NumberTensor> extends BoolBinaryOpVertex<A, B> {
+public class GreaterThanVertex<A extends NumberTensor, B extends NumberTensor>
+        extends BoolBinaryOpVertex<A, B> {
 
     public GreaterThanVertex(Vertex<A> a, Vertex<B> b) {
         super(a, b);
@@ -15,5 +16,4 @@ public class GreaterThanVertex<A extends NumberTensor, B extends NumberTensor> e
     protected BooleanTensor op(A l, B r) {
         return l.greaterThan(r);
     }
-
 }

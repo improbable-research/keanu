@@ -2,10 +2,6 @@ package io.improbable.keanu.vertices.bool.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.discrete.Bernoulli;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -15,6 +11,9 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
 
@@ -22,10 +21,10 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
 
     /**
      * One probTrue that must match a proposed tensor shape of Bernoulli.
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
      *
-     * @param shape    the desired shape of the vertex
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * @param shape the desired shape of the vertex
      * @param probTrue the probability the bernoulli returns true
      */
     public BernoulliVertex(int[] shape, Vertex<DoubleTensor> probTrue) {
@@ -36,8 +35,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     /**
-     * One to one constructor for mapping some shape of probTrue to
-     * a matching shaped Bernoulli.
+     * One to one constructor for mapping some shape of probTrue to a matching shaped Bernoulli.
      *
      * @param probTrue probTrue with same shape as desired Bernoulli tensor or scalar
      */
@@ -63,10 +61,12 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(BooleanTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            BooleanTensor value, Set<? extends Vertex> withRespectTo) {
 
         if (!(probTrue instanceof Differentiable)) {
-            throw new UnsupportedOperationException("The probability of the Bernoulli being true must be differentiable");
+            throw new UnsupportedOperationException(
+                    "The probability of the Bernoulli being true must be differentiable");
         }
 
         if (withRespectTo.contains(probTrue)) {

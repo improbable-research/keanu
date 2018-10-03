@@ -1,19 +1,17 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
 import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.FALSE;
 import static io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex.TRUE;
 import static junit.framework.TestCase.assertFalse;
-
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.BoolVertexTest;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.junit.Before;
+import org.junit.Test;
 
 public class IfVertexTest {
 
@@ -35,9 +33,7 @@ public class IfVertexTest {
 
         BoolVertex predicate = new BernoulliVertex(0.5);
 
-        BoolVertex ifIsTrue = If.isTrue(predicate)
-            .then(TRUE)
-            .orElse(FALSE);
+        BoolVertex ifIsTrue = If.isTrue(predicate).then(TRUE).orElse(FALSE);
 
         predicate.setAndCascade(true);
         assertTrue(ifIsTrue.getValue().scalar());
@@ -52,9 +48,7 @@ public class IfVertexTest {
         double pV3 = 0.1;
         BernoulliVertex v3 = new BernoulliVertex(pV3);
 
-        BoolVertex v4 = If.isTrue(v1)
-            .then(v2)
-            .orElse(v3);
+        BoolVertex v4 = If.isTrue(v1).then(v2).orElse(v3);
 
         double pV4True = ifProbability(pV1, pV2, pV3);
 
@@ -67,5 +61,4 @@ public class IfVertexTest {
 
         return pThnAndThnIsValue + pElsAndElsIsValue;
     }
-
 }

@@ -1,14 +1,12 @@
 package io.improbable.keanu.vertices;
 
+import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-import static io.improbable.keanu.vertices.VertexLabelMatchers.hasUnqualifiedName;
-
 import java.util.Optional;
-
 import org.junit.Test;
 
 public class VertexLabelTest {

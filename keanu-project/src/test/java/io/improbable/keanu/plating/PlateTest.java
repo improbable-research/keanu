@@ -6,8 +6,13 @@ import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.when;
 
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexLabel;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
 import java.util.Collection;
-
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
@@ -16,28 +21,18 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.IntegerProxyVertex;
-
 @RunWith(MockitoJUnitRunner.class)
 public class PlateTest {
 
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+    @Rule public ExpectedException expectedException = ExpectedException.none();
 
     public static final VertexLabel VERTEX_LABEL_1 = new VertexLabel("foo");
     public static final VertexLabel VERTEX_LABEL_2 = new VertexLabel("bar");
     private Plate plate;
 
-    @Mock
-    private Vertex<?> vertex1;
+    @Mock private Vertex<?> vertex1;
 
-    @Mock
-    private Vertex<?> vertex2;
+    @Mock private Vertex<?> vertex2;
 
     @Before
     public void createPlate() throws Exception {
@@ -75,7 +70,8 @@ public class PlateTest {
     @Test
     public void itThrowsIfYouAddAVertexWithNoLabel() {
         expectedException.expect(PlateConstructionException.class);
-        expectedException.expectMessage(endsWith(" must contain a label in order to be added to a plate"));
+        expectedException.expectMessage(
+                endsWith(" must contain a label in order to be added to a plate"));
         plate.add(ConstantVertex.of(1.));
     }
 }

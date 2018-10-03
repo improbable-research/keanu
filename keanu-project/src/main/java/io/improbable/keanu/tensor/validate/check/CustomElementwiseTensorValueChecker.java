@@ -1,13 +1,12 @@
 package io.improbable.keanu.tensor.validate.check;
 
-import java.util.function.Function;
-
-import org.nd4j.linalg.util.ArrayUtil;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import java.util.function.Function;
+import org.nd4j.linalg.util.ArrayUtil;
 
-public class CustomElementwiseTensorValueChecker<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements TensorValueChecker<TENSOR> {
+public class CustomElementwiseTensorValueChecker<DATATYPE, TENSOR extends Tensor<DATATYPE>>
+        implements TensorValueChecker<TENSOR> {
 
     private final Function<DATATYPE, Boolean> checkFunction;
 

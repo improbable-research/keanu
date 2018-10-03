@@ -5,7 +5,8 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public abstract class IntegerUnaryOpVertex extends IntegerVertex
+        implements NonProbabilistic<IntegerTensor> {
 
     protected final IntegerVertex inputVertex;
 
@@ -21,7 +22,7 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonP
     /**
      * A vertex that performs a user defined operation on a singe input vertex
      *
-     * @param shape       the shape of the tensor
+     * @param shape the shape of the tensor
      * @param inputVertex the input vertex
      */
     public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {

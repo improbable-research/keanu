@@ -2,10 +2,9 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
+import org.junit.Test;
 
 public class GreaterThanOrEqualVertexTest {
 

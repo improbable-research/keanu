@@ -2,8 +2,6 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import static org.junit.Assert.assertEquals;
 
-import org.junit.Test;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -12,14 +10,15 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConditionalProbabilityTable;
+import org.junit.Test;
 
 public class DoubleCPTVertexTest {
 
-    private DoubleTensor aValue = DoubleTensor.create(new double[]{0.5, 0.25});
-    private DoubleTensor bValue = DoubleTensor.create(new double[]{-0.5, -0.25});
+    private DoubleTensor aValue = DoubleTensor.create(new double[] {0.5, 0.25});
+    private DoubleTensor bValue = DoubleTensor.create(new double[] {-0.5, -0.25});
 
     private DoubleCPTVertex doubleCPTNetwork(boolean left, boolean right) {
-        DoubleVertex A = new GaussianVertex(new int[]{1, 2}, 0, 1);
+        DoubleVertex A = new GaussianVertex(new int[] {1, 2}, 0, 1);
         A.setValue(aValue);
         DoubleVertex B = new GaussianVertex(0, 1);
         B.observe(bValue);
@@ -30,10 +29,13 @@ public class DoubleCPTVertexTest {
         rightPredicate.observe(right);
 
         return ConditionalProbabilityTable.of(leftPredicate, rightPredicate)
-            .when(true, true).then(A.times(B))
-            .when(true, false).then(A.div(B))
-            .when(false, true).then(A.plus(B))
-            .orDefault(B.minus(A));
+                .when(true, true)
+                .then(A.times(B))
+                .when(true, false)
+                .then(A.div(B))
+                .when(false, true)
+                .then(A.plus(B))
+                .orDefault(B.minus(A));
     }
 
     @Test
@@ -52,11 +54,12 @@ public class DoubleCPTVertexTest {
 
     @Test
     public void canGetDiffFromACondition() {
-        int[] expectedShape = new int[]{1, 2, 1, 2};
+        int[] expectedShape = new int[] {1, 2, 1, 2};
         assertDiffFromACondition(true, true, bValue.diag().reshape(expectedShape));
         assertDiffFromACondition(true, false, bValue.reciprocal().diag().reshape(expectedShape));
         assertDiffFromACondition(false, true, DoubleTensor.eye(2).reshape(expectedShape));
-        assertDiffFromACondition(false, false, DoubleTensor.eye(2).reshape(expectedShape).unaryMinus());
+        assertDiffFromACondition(
+                false, false, DoubleTensor.eye(2).reshape(expectedShape).unaryMinus());
     }
 
     private void assertDiffFromACondition(boolean left, boolean right, DoubleTensor expected) {
@@ -65,9 +68,9 @@ public class DoubleCPTVertexTest {
 
         Vertex<DoubleTensor> A = network.getContinuousLatentVertices().get(0);
 
-        DoubleTensor actual = doubleCPTVertex.getDualNumber().getPartialDerivatives().withRespectTo(A);
+        DoubleTensor actual =
+                doubleCPTVertex.getDualNumber().getPartialDerivatives().withRespectTo(A);
 
         assertEquals(expected, actual);
     }
-
 }

@@ -1,9 +1,8 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.T;
 import static java.lang.Math.PI;
 import static java.lang.Math.log;
-
-import static io.improbable.keanu.distributions.dual.Diffs.T;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
@@ -21,9 +20,7 @@ public class StudentT implements ContinuousDistribution {
     private final IntegerTensor v;
 
     /**
-     * Computer Generation of Statistical Distributions
-     * by Richard Saucier
-     * ARL-TR-2168 March 2000
+     * Computer Generation of Statistical Distributions by Richard Saucier ARL-TR-2168 March 2000
      * 5.1.23 page 36
      *
      * @param v Degrees of Freedom
@@ -40,7 +37,8 @@ public class StudentT implements ContinuousDistribution {
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
         DoubleTensor chi2Samples = ChiSquared.withParameters(v).sample(shape, random);
-        return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
+        return random.nextGaussian(shape)
+                .divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }
 
     @Override
@@ -54,26 +52,22 @@ public class StudentT implements ContinuousDistribution {
         DoubleTensor halfLogV = vAsDouble.log().divInPlace(2);
 
         return logGammaHalfVPlusOne
-            .minusInPlace(halfLogV)
-            .minusInPlace(HALF_LOG_PI)
-            .minusInPlace(logGammaHalfV)
-            .minusInPlace(
-                halfVPlusOne.timesInPlace(
-                    t.pow(2).divInPlace(vAsDouble).plusInPlace(1).logInPlace()
-                )
-            );
+                .minusInPlace(halfLogV)
+                .minusInPlace(HALF_LOG_PI)
+                .minusInPlace(logGammaHalfV)
+                .minusInPlace(
+                        halfVPlusOne.timesInPlace(
+                                t.pow(2).divInPlace(vAsDouble).plusInPlace(1).logInPlace()));
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor t) {
         DoubleTensor vAsDouble = v.toDouble();
-        DoubleTensor dPdt = t.unaryMinus()
-            .timesInPlace(vAsDouble.plus(1.0))
-            .divInPlace(
-                t.pow(2).plusInPlace(vAsDouble)
-            );
+        DoubleTensor dPdt =
+                t.unaryMinus()
+                        .timesInPlace(vAsDouble.plus(1.0))
+                        .divInPlace(t.pow(2).plusInPlace(vAsDouble));
 
-        return new Diffs()
-            .put(T, dPdt);
+        return new Diffs().put(T, dPdt);
     }
 }

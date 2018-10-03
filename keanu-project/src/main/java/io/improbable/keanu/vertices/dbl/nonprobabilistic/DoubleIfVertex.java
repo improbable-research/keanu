@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -18,10 +17,11 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     private final Vertex<? extends DoubleTensor> thn;
     private final Vertex<? extends DoubleTensor> els;
 
-    public DoubleIfVertex(int[] shape,
-                          Vertex<? extends BooleanTensor> predicate,
-                          Vertex<? extends DoubleTensor> thn,
-                          Vertex<? extends DoubleTensor> els) {
+    public DoubleIfVertex(
+            int[] shape,
+            Vertex<? extends BooleanTensor> predicate,
+            Vertex<? extends DoubleTensor> thn,
+            Vertex<? extends DoubleTensor> els) {
         this.predicate = predicate;
         this.thn = thn;
         this.els = els;
@@ -36,7 +36,8 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
 
     @Override
     public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els), getShape());
+        return DualNumber.ifThenElse(
+                predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els), getShape());
     }
 
     @Override
@@ -49,14 +50,18 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
-        partials.put(thn, derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask(), this.getShape()));
-        partials.put(els, derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask(), this.getShape()));
+        partials.put(
+                thn,
+                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+                        predicateValue.toDoubleMask(), this.getShape()));
+        partials.put(
+                els,
+                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+                        predicateValue.not().toDoubleMask(), this.getShape()));
         return partials;
     }
-
 }

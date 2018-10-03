@@ -1,23 +1,22 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 import java.util.List;
 import java.util.function.Function;
-
-import static org.junit.Assert.assertEquals;
 
 public class VertexVariationalMAP {
 
     public static void inferHyperParamsFromSamples(
-        Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
-        List<DoubleVertex> hyperParamsForSampling,
-        List<DoubleVertex> latentsToInfer,
-        KeanuRandom random) {
+            Function<List<DoubleVertex>, DoubleVertex> vertexUnderTestCreator,
+            List<DoubleVertex> hyperParamsForSampling,
+            List<DoubleVertex> latentsToInfer,
+            KeanuRandom random) {
 
         // SOURCE OF TRUTH
         DoubleVertex sourceVertex = vertexUnderTestCreator.apply(hyperParamsForSampling);
@@ -32,7 +31,10 @@ public class VertexVariationalMAP {
         doInferenceOn(latentsToInfer.get(0), random);
 
         for (int i = 0; i < latentsToInfer.size(); i++) {
-            assertEquals(hyperParamsForSampling.get(i).getValue().scalar(), latentsToInfer.get(i).getValue().scalar(), 0.1);
+            assertEquals(
+                    hyperParamsForSampling.get(i).getValue().scalar(),
+                    latentsToInfer.get(i).getValue().scalar(),
+                    0.1);
         }
     }
 
@@ -45,5 +47,4 @@ public class VertexVariationalMAP {
 
         gradientOptimizer.maxAPosteriori();
     }
-
 }

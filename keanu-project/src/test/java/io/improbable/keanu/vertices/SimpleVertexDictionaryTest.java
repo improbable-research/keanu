@@ -1,18 +1,14 @@
 package io.improbable.keanu.vertices;
 
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.nullValue;
 import static org.hamcrest.Matchers.sameInstance;
 import static org.mockito.Mockito.mock;
 
-import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import java.util.Map;
+import org.junit.Before;
+import org.junit.Test;
 
 public class SimpleVertexDictionaryTest {
 
@@ -45,9 +41,11 @@ public class SimpleVertexDictionaryTest {
     public void youCanCombineTwoVertexDictionaries() {
         VertexLabel label3 = new VertexLabel("label3");
         Vertex<?> vertex3 = mock(Vertex.class);
-        SimpleVertexDictionary dictionary2 = SimpleVertexDictionary.backedBy(ImmutableMap.of(label3, vertex3));
+        SimpleVertexDictionary dictionary2 =
+                SimpleVertexDictionary.backedBy(ImmutableMap.of(label3, vertex3));
 
-        VertexDictionary combinedDictionary = SimpleVertexDictionary.combine(dictionary, dictionary2);
+        VertexDictionary combinedDictionary =
+                SimpleVertexDictionary.combine(dictionary, dictionary2);
         assertThat(combinedDictionary.get(label1), sameInstance(vertex1));
         assertThat(combinedDictionary.get(label2), sameInstance(vertex2));
         assertThat(combinedDictionary.get(label3), sameInstance(vertex3));
@@ -57,7 +55,8 @@ public class SimpleVertexDictionaryTest {
     public void youCanAddExtraEntriesAndGetANewDictionary() {
         VertexLabel label3 = new VertexLabel("label3");
         Vertex<?> vertex3 = mock(Vertex.class);
-        VertexDictionary newDictionary = dictionary.withExtraEntries(ImmutableMap.of(label3, vertex3));
+        VertexDictionary newDictionary =
+                dictionary.withExtraEntries(ImmutableMap.of(label3, vertex3));
 
         assertThat(newDictionary.get(label1), sameInstance(vertex1));
         assertThat(newDictionary.get(label2), sameInstance(vertex2));

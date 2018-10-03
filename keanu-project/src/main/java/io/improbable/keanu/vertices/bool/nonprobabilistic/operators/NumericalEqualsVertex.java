@@ -8,18 +8,17 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-/**
- * Returns true if a vertex value is equal to another vertex value within an epsilon.
- */
+/** Returns true if a vertex value is equal to another vertex value within an epsilon. */
 public class NumericalEqualsVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
     protected Vertex<? extends NumberTensor> a;
     protected Vertex<? extends NumberTensor> b;
     private Vertex<? extends NumberTensor> epsilon;
 
-    public NumericalEqualsVertex(Vertex<? extends NumberTensor> a,
-                                 Vertex<? extends NumberTensor> b,
-                                 Vertex<? extends NumberTensor> epsilon) {
+    public NumericalEqualsVertex(
+            Vertex<? extends NumberTensor> a,
+            Vertex<? extends NumberTensor> b,
+            Vertex<? extends NumberTensor> epsilon) {
         this.a = a;
         this.b = b;
         this.epsilon = epsilon;
@@ -40,5 +39,4 @@ public class NumericalEqualsVertex extends BoolVertex implements NonProbabilisti
         DoubleTensor absoluteDifference = a.toDouble().minus(b.toDouble()).absInPlace();
         return absoluteDifference.lessThanOrEqual(epsilon.toDouble());
     }
-
 }

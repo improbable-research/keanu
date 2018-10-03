@@ -26,26 +26,31 @@ public class Pareto implements ContinuousDistribution {
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         DoubleTensor dLogPdx = scale.plus(1.0).divInPlace(x).unaryMinusInPlace();
-        DoubleTensor dLogPdLocation = DoubleTensor.zeros(x.getShape()).plusInPlace(scale).divInPlace(location);
-        DoubleTensor dLogPdScale = scale.reciprocal().plusInPlace(location.log()).minusInPlace(x.log());
+        DoubleTensor dLogPdLocation =
+                DoubleTensor.zeros(x.getShape()).plusInPlace(scale).divInPlace(location);
+        DoubleTensor dLogPdScale =
+                scale.reciprocal().plusInPlace(location.log()).minusInPlace(x.log());
 
-        return new Diffs()
-            .put(X, dLogPdx)
-            .put(L, dLogPdLocation)
-            .put(S, dLogPdScale);
+        return new Diffs().put(X, dLogPdx).put(L, dLogPdLocation).put(S, dLogPdScale);
     }
 
     @Override
     public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return random.nextDouble(shape).unaryMinusInPlace().plusInPlace(1.0).powInPlace(scale.reciprocal())
-            .reciprocalInPlace().timesInPlace(location);
+        return random.nextDouble(shape)
+                .unaryMinusInPlace()
+                .plusInPlace(1.0)
+                .powInPlace(scale.reciprocal())
+                .reciprocalInPlace()
+                .timesInPlace(location);
     }
 
     @Override
     public DoubleTensor logProb(DoubleTensor x) {
         if (checkParamsAreValid()) {
-            DoubleTensor result = scale.log().plusInPlace(location.log().timesInPlace(scale))
-                .minusInPlace(scale.plus(1.0).timesInPlace(x.log()));
+            DoubleTensor result =
+                    scale.log()
+                            .plusInPlace(location.log().timesInPlace(scale))
+                            .minusInPlace(scale.plus(1.0).timesInPlace(x.log()));
 
             return setProbToZeroForInvalidX(x, result);
         } else {

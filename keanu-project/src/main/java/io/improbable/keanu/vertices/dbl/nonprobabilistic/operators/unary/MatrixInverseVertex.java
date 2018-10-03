@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import java.util.HashMap;
+import java.util.Map;
 
 public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
@@ -26,14 +25,17 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         DoubleTensor parentValue = getValue();
         DoubleTensor negativeValue = getValue().unaryMinus();
 
         PartialDerivatives newPartials =
-            PartialDerivatives.matrixMultiplyAlongWrtDimensions(derivativeOfOutputsWithRespectToSelf, negativeValue, false);
-        newPartials = PartialDerivatives.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
+                PartialDerivatives.matrixMultiplyAlongWrtDimensions(
+                        derivativeOfOutputsWithRespectToSelf, negativeValue, false);
+        newPartials =
+                PartialDerivatives.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
 
         partials.put(inputVertex, newPartials);
 
@@ -42,15 +44,19 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
     private static int[] checkInputIsSquareMatrix(int[] shape) {
         if (shape.length != 2) {
-            throw new IllegalArgumentException("Can only invert a Matrix (received rank: " + shape.length + ")");
+            throw new IllegalArgumentException(
+                    "Can only invert a Matrix (received rank: " + shape.length + ")");
         }
 
         if (shape[0] != shape[1]) {
-            throw new IllegalArgumentException("Can only invert a square Matrix (received: "
-                + shape[0] + ", " + shape[1] + ")");
+            throw new IllegalArgumentException(
+                    "Can only invert a square Matrix (received: "
+                            + shape[0]
+                            + ", "
+                            + shape[1]
+                            + ")");
         }
 
         return shape;
     }
-
 }

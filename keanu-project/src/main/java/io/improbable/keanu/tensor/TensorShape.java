@@ -1,10 +1,9 @@
 package io.improbable.keanu.tensor;
 
+import com.google.common.primitives.Ints;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.google.common.primitives.Ints;
 
 public class TensorShape {
 
@@ -39,8 +38,7 @@ public class TensorShape {
 
     /**
      * @param shape for finding length of
-     * @return the number of elements in a tensor. This
-     * is the product of all ints in shape.
+     * @return the number of elements in a tensor. This is the product of all ints in shape.
      */
     public static long getLength(int[] shape) {
         if (shape.length == 0) {
@@ -56,9 +54,8 @@ public class TensorShape {
 
     /**
      * @param shape shape to find stride for
-     * @return the stride which is used to convert from a N dimensional index
-     * to a buffer array flat index. This is based on the C convention of
-     * row first instead of column.
+     * @return the stride which is used to convert from a N dimensional index to a buffer array flat
+     *     index. This is based on the C convention of row first instead of column.
      */
     public static int[] getRowFirstStride(int[] shape) {
         int[] stride = new int[shape.length];
@@ -74,9 +71,9 @@ public class TensorShape {
     }
 
     /**
-     * @param shape  shape to find the index for
+     * @param shape shape to find the index for
      * @param stride stride to find the index for
-     * @param index  the index in each dimension
+     * @param index the index in each dimension
      * @return the flat index from a N dimensional index
      */
     public static int getFlatIndex(int[] shape, int[] stride, int... index) {
@@ -85,8 +82,10 @@ public class TensorShape {
 
             if (index[i] >= shape[i]) {
                 throw new IllegalArgumentException(
-                    "Invalid index " + Arrays.toString(index) + " for shape " + Arrays.toString(shape)
-                );
+                        "Invalid index "
+                                + Arrays.toString(index)
+                                + " for shape "
+                                + Arrays.toString(shape));
             }
 
             flatIndex += stride[i] * index[i];
@@ -97,14 +96,16 @@ public class TensorShape {
     /**
      * This method can be interpreted as the opposite to getFlatIndex.
      *
-     * @param shape     the shape to find the index of
-     * @param stride    the stride to find the index of
+     * @param shape the shape to find the index of
+     * @param stride the stride to find the index of
      * @param flatIndex the index to f
-     * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
+     * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of
+     *     the shape.
      */
     public static int[] getShapeIndices(int[] shape, int[] stride, int flatIndex) {
         if (flatIndex > getLength(shape)) {
-            throw new IllegalArgumentException("The requested index is out of the bounds of this shape.");
+            throw new IllegalArgumentException(
+                    "The requested index is out of the bounds of this shape.");
         }
         int[] shapeIndices = new int[stride.length];
         int remainder = flatIndex;
@@ -128,9 +129,9 @@ public class TensorShape {
 
     /**
      * @param fromDimension starting from and including this dimension
-     * @param toDimension   up to but excluding this dimension
+     * @param toDimension up to but excluding this dimension
      * @return an int array containing the dimension numbers from a given dimension to a higher
-     * dimension. e.g. dimensionRange(0, 3) = int[]{0, 1, 2}
+     *     dimension. e.g. dimensionRange(0, 3) = int[]{0, 1, 2}
      */
     public static int[] dimensionRange(int fromDimension, int toDimension) {
         if (fromDimension > toDimension) {
@@ -166,25 +167,34 @@ public class TensorShape {
         return Ints.toArray(shapeList);
     }
 
-    public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
+    public static int[] shapeDesiredToRankByAppendingOnes(
+            int[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
     }
 
-    public static int[] shapeToDesiredRankByPrependingOnes(int[] lowRankTensorShape, int desiredRank) {
+    public static int[] shapeToDesiredRankByPrependingOnes(
+            int[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false);
     }
 
-    private static int[] increaseRankByPaddingOnes(int[] lowRankTensorShape, int desiredRank, boolean append) {
+    private static int[] increaseRankByPaddingOnes(
+            int[] lowRankTensorShape, int desiredRank, boolean append) {
         int[] paddedShape = new int[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {
-            throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");
+            throw new IllegalArgumentException(
+                    "low rank tensor must be rank less than or equal to desired rank");
         }
 
         Arrays.fill(paddedShape, 1);
         if (append) {
             System.arraycopy(lowRankTensorShape, 0, paddedShape, 0, lowRankTensorShape.length);
         } else {
-            System.arraycopy(lowRankTensorShape, 0, paddedShape, paddedShape.length - lowRankTensorShape.length, lowRankTensorShape.length);
+            System.arraycopy(
+                    lowRankTensorShape,
+                    0,
+                    paddedShape,
+                    paddedShape.length - lowRankTensorShape.length,
+                    lowRankTensorShape.length);
         }
 
         return paddedShape;
@@ -198,22 +208,21 @@ public class TensorShape {
 
     /**
      * Writes a lower rank shape over a higher rank shape, starting from the right.
-     * <p>
-     * e.g: high rank shape = [1, 2, 2, 1]
-     * low rank shape = [1, 4]
-     * <p>
-     * Result after copy = [1, 2, 1, 4]
+     *
+     * <p>e.g: high rank shape = [1, 2, 2, 1] low rank shape = [1, 4]
+     *
+     * <p>Result after copy = [1, 2, 1, 4]
      *
      * @param higherRankShape source shape that will get written over
-     * @param lowerRankShape  shape to write
-     * @return the high rank  shape with the lower rank shape inserted on top of it
+     * @param lowerRankShape shape to write
+     * @return the high rank shape with the lower rank shape inserted on top of it
      */
-    public static int[] copyLowRankOverHighRankFromTailEnd(int[] higherRankShape, int[] lowerRankShape) {
+    public static int[] copyLowRankOverHighRankFromTailEnd(
+            int[] higherRankShape, int[] lowerRankShape) {
         int[] highRankCopy = Arrays.copyOf(higherRankShape, higherRankShape.length);
         int deltaLength = highRankCopy.length - lowerRankShape.length;
-        System.arraycopy(lowerRankShape, 0, highRankCopy, deltaLength, highRankCopy.length - deltaLength);
+        System.arraycopy(
+                lowerRankShape, 0, highRankCopy, deltaLength, highRankCopy.length - deltaLength);
         return highRankCopy;
     }
-
 }
-

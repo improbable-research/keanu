@@ -2,6 +2,9 @@ package io.improbable.keanu.algorithms.particlefiltering;
 
 import static java.lang.Math.exp;
 
+import io.improbable.keanu.vertices.ProbabilityCalculator;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,51 +12,54 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.improbable.keanu.vertices.ProbabilityCalculator;
-import io.improbable.keanu.vertices.Vertex;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 public class ParticleFilter {
 
-    private ParticleFilter() {
+    private ParticleFilter() {}
+
+    public static List<Particle> getProbableValues(
+            Collection<? extends Vertex> vertices,
+            int numParticles,
+            int resamplingCycles,
+            double resamplingProportion) {
+        return getProbableValues(
+                vertices,
+                numParticles,
+                resamplingCycles,
+                resamplingProportion,
+                KeanuRandom.getDefaultRandom());
     }
 
-
-    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices,
-                                                   int numParticles,
-                                                   int resamplingCycles,
-                                                   double resamplingProportion) {
-        return getProbableValues(vertices, numParticles, resamplingCycles, resamplingProportion, KeanuRandom.getDefaultRandom());
-    }
-
-    /***
-     * A particle filtering approach is used to find probable values for the latent vertices of a Bayesian network,
-     * given a set of observed vertices. This is done by incrementally increasing the proportion of the graph under
-     * consideration, randomly sampling values for newly added latent variables at each stage. Each increment
-     * involves the addition of one new observed vertex and the latent vertices that it depend on. This is done for a
-     * specified number of 'particles', each of which represents one set of randomly sampled values of the latent
-     * vertices in the Bayesian network and has an associated probability. As the proportion of the graph under
-     * consideration incrementally grows, less probable particles are culled and more probable particles are duplicated,
-     * resulting in a final set of relatively probable particles.
+    /**
+     * * A particle filtering approach is used to find probable values for the latent vertices of a
+     * Bayesian network, given a set of observed vertices. This is done by incrementally increasing
+     * the proportion of the graph under consideration, randomly sampling values for newly added
+     * latent variables at each stage. Each increment involves the addition of one new observed
+     * vertex and the latent vertices that it depend on. This is done for a specified number of
+     * 'particles', each of which represents one set of randomly sampled values of the latent
+     * vertices in the Bayesian network and has an associated probability. As the proportion of the
+     * graph under consideration incrementally grows, less probable particles are culled and more
+     * probable particles are duplicated, resulting in a final set of relatively probable particles.
      *
-     * This methodology is similar to the Sequential Importance Resampling Algorithm described here
-     * (https://www.lancaster.ac.uk/pg/turnerl/PartileFiltering.pdf).
+     * <p>This methodology is similar to the Sequential Importance Resampling Algorithm described
+     * here (https://www.lancaster.ac.uk/pg/turnerl/PartileFiltering.pdf).
      *
      * @param vertices the vertices of a Bayesian network to find probable values for
-     * @param numParticles the number of particles to generate (a larger number will yield better results but is more
-     *                     computationally expensive)
-     * @param resamplingCycles the number of times low probability particles are culled and high probability particles
-     *                         are replicated each time the subgraph under consideration is expanded
-     * @param resamplingProportion the proportion of particles to cull (e.g. the 25% of least probably particles could
-     *                             be culled)
+     * @param numParticles the number of particles to generate (a larger number will yield better
+     *     results but is more computationally expensive)
+     * @param resamplingCycles the number of times low probability particles are culled and high
+     *     probability particles are replicated each time the subgraph under consideration is
+     *     expanded
+     * @param resamplingProportion the proportion of particles to cull (e.g. the 25% of least
+     *     probably particles could be culled)
      * @param random a random number generator
      * @return a list of particles representing the most probable found values of latent variables
      */
-    public static List<Particle> getProbableValues(Collection<? extends Vertex> vertices,
-                                                   int numParticles,
-                                                   int resamplingCycles,
-                                                   double resamplingProportion,
-                                                   KeanuRandom random) {
+    public static List<Particle> getProbableValues(
+            Collection<? extends Vertex> vertices,
+            int numParticles,
+            int resamplingCycles,
+            double resamplingProportion,
+            KeanuRandom random) {
 
         Map<Vertex, Set<Vertex>> obsVertIncrDependencies = LatentIncrementSort.sort(vertices);
         List<Vertex> observedVertexOrder = new ArrayList<>(obsVertIncrDependencies.keySet());
@@ -62,20 +68,28 @@ public class ParticleFilter {
         for (int i = 0; i < observedVertexOrder.size(); i++) {
             Vertex<?> nextObsVertex = observedVertexOrder.get(i);
             Set<Vertex> vertexDeps = obsVertIncrDependencies.get(nextObsVertex);
-            particles = updateParticles(nextObsVertex, vertexDeps, particles, numParticles, resamplingCycles,
-                resamplingProportion, random);
+            particles =
+                    updateParticles(
+                            nextObsVertex,
+                            vertexDeps,
+                            particles,
+                            numParticles,
+                            resamplingCycles,
+                            resamplingProportion,
+                            random);
         }
 
         return particles;
     }
 
-    private static List<Particle> updateParticles(Vertex<?> nextObservedVertex,
-                                                  Set<Vertex> vertexDeps,
-                                                  List<Particle> particles,
-                                                  int numParticles,
-                                                  int resamplingCycles,
-                                                  double resamplingProportion,
-                                                  KeanuRandom random) {
+    private static List<Particle> updateParticles(
+            Vertex<?> nextObservedVertex,
+            Set<Vertex> vertexDeps,
+            List<Particle> particles,
+            int numParticles,
+            int resamplingCycles,
+            double resamplingProportion,
+            KeanuRandom random) {
 
         List<Particle> updatedParticles = sampleAndCopy(particles, numParticles, random);
         addObservedVertexToParticles(updatedParticles, nextObservedVertex, vertexDeps, random);
@@ -91,7 +105,6 @@ public class ParticleFilter {
         return updatedParticles;
     }
 
-
     private static List<Particle> createEmptyParticles(int number) {
 
         List<Particle> emptyParticles = new ArrayList<>();
@@ -102,10 +115,11 @@ public class ParticleFilter {
         return emptyParticles;
     }
 
-    private static void addObservedVertexToParticles(List<Particle> particles,
-                                                     Vertex<?> observedVertex,
-                                                     Set<Vertex> vertexDependencies,
-                                                     KeanuRandom random) {
+    private static void addObservedVertexToParticles(
+            List<Particle> particles,
+            Vertex<?> observedVertex,
+            Set<Vertex> vertexDependencies,
+            KeanuRandom random) {
 
         for (Particle particle : particles) {
             particle.addObservedVertex(observedVertex);
@@ -117,21 +131,25 @@ public class ParticleFilter {
         }
     }
 
-    private static <T> void sampleValueAndAddToParticle(Vertex<T> vertex, Particle particle, KeanuRandom random) {
+    private static <T> void sampleValueAndAddToParticle(
+            Vertex<T> vertex, Particle particle, KeanuRandom random) {
         T sample = vertex.sample(random);
         particle.addLatentVertex(vertex, sample);
     }
 
-    private static List<Particle> removeWorstParticles(List<Particle> particles, double proportionToRemove) {
+    private static List<Particle> removeWorstParticles(
+            List<Particle> particles, double proportionToRemove) {
         particles.sort(Particle::sortDescending);
         int numberToKeep = (int) (particles.size() * (1.0 - proportionToRemove));
         List<Particle> particlesToKeep = particles.subList(0, numberToKeep);
         return new ArrayList<>(particlesToKeep);
     }
 
-    private static List<Particle> sampleAndCopy(List<Particle> particles, int numToSample, KeanuRandom random) {
+    private static List<Particle> sampleAndCopy(
+            List<Particle> particles, int numToSample, KeanuRandom random) {
 
-        double sumWeights = particles.stream().mapToDouble(p -> exp(p.getSumLogPOfSubgraph())).sum();
+        double sumWeights =
+                particles.stream().mapToDouble(p -> exp(p.getSumLogPOfSubgraph())).sum();
         List<Particle> sampledParticles = new ArrayList<>();
         for (int i = 0; i < numToSample; i++) {
             Particle sampledParticle = weightedRandomParticle(particles, sumWeights, random);
@@ -141,7 +159,8 @@ public class ParticleFilter {
         return sampledParticles;
     }
 
-    private static Particle weightedRandomParticle(List<Particle> particles, double sumWeights, KeanuRandom random) {
+    private static Particle weightedRandomParticle(
+            List<Particle> particles, double sumWeights, KeanuRandom random) {
         double r = random.nextDouble() * sumWeights;
         double cumulativeWeight = 0;
         Particle p = particles.get(0);
@@ -180,8 +199,10 @@ public class ParticleFilter {
 
         public double updateSumLogPOfSubgraph() {
             applyLatentVertexValues();
-            double sumLogPOfLatents = ProbabilityCalculator.calculateLogProbFor(latentVertices.keySet());
-            double sumLogPOfObservables = ProbabilityCalculator.calculateLogProbFor(observedVertices);
+            double sumLogPOfLatents =
+                    ProbabilityCalculator.calculateLogProbFor(latentVertices.keySet());
+            double sumLogPOfObservables =
+                    ProbabilityCalculator.calculateLogProbFor(observedVertices);
             sumLogPOfSubgraph = sumLogPOfLatents + sumLogPOfObservables;
             return sumLogPOfSubgraph;
         }

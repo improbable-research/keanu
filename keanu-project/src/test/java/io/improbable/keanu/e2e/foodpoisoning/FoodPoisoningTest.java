@@ -1,13 +1,7 @@
 package io.improbable.keanu.e2e.foodpoisoning;
 
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-
-import java.util.function.Consumer;
-
-import org.junit.Before;
-import org.junit.Test;
 
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
@@ -21,6 +15,9 @@ import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+import java.util.function.Consumer;
+import org.junit.Before;
+import org.junit.Test;
 
 public class FoodPoisoningTest {
 
@@ -75,10 +72,15 @@ public class FoodPoisoningTest {
         BayesianNetwork myNet = new BayesianNetwork(infectedOysters.getConnectedGraph());
         myNet.probeForNonZeroProbability(100, random);
         assertNotEquals(Double.NEGATIVE_INFINITY, myNet.getLogOfMasterP());
-        return MetropolisHastings.withDefaultConfig(random).getPosteriorSamples(myNet, myNet.getLatentVertices(), n);
+        return MetropolisHastings.withDefaultConfig(random)
+                .getPosteriorSamples(myNet, myNet.getLatentVertices(), n);
     }
 
-    public void generateSurveyData(int peopleCount, boolean oystersAreInfected, boolean lambIsInfected, boolean toiletIsInfected) {
+    public void generateSurveyData(
+            int peopleCount,
+            boolean oystersAreInfected,
+            boolean lambIsInfected,
+            boolean toiletIsInfected) {
 
         VertexLabel didEatOystersLabel = new VertexLabel("didEatOysters");
         VertexLabel didEatLambLabel = new VertexLabel("didEatLamb");
@@ -86,30 +88,30 @@ public class FoodPoisoningTest {
         VertexLabel isIllLabel = new VertexLabel("isIll");
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
-        Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add(didEatOystersLabel, new BernoulliVertex(0.4));
-            BernoulliVertex didEatLamb = plate.add(didEatLambLabel, new BernoulliVertex(0.4));
-            BernoulliVertex didEatPoo = plate.add(didEatPooLabel, new BernoulliVertex(0.4));
+        Consumer<Plate> personMaker =
+                (plate) -> {
+                    BernoulliVertex didEatOysters =
+                            plate.add(didEatOystersLabel, new BernoulliVertex(0.4));
+                    BernoulliVertex didEatLamb =
+                            plate.add(didEatLambLabel, new BernoulliVertex(0.4));
+                    BernoulliVertex didEatPoo = plate.add(didEatPooLabel, new BernoulliVertex(0.4));
 
-            BoolVertex ingestedPathogen =
-                didEatOysters.and(infectedOysters).or(
-                    didEatLamb.and(infectedLamb).or(
-                        didEatPoo.and(infectedToilet)
-                    )
-                );
+                    BoolVertex ingestedPathogen =
+                            didEatOysters
+                                    .and(infectedOysters)
+                                    .or(
+                                            didEatLamb
+                                                    .and(infectedLamb)
+                                                    .or(didEatPoo.and(infectedToilet)));
 
-            DoubleVertex pIll = If.isTrue(ingestedPathogen)
-                .then(0.9)
-                .orElse(0.1);
+                    DoubleVertex pIll = If.isTrue(ingestedPathogen).then(0.9).orElse(0.1);
 
-            plate.add(pIllLabel, pIll);
-            plate.add(isIllLabel, new BernoulliVertex(pIll));
-        };
+                    plate.add(pIllLabel, pIll);
+                    plate.add(isIllLabel, new BernoulliVertex(pIll));
+                };
 
-        Plates personPlates = new PlateBuilder()
-            .count(peopleCount)
-            .withFactory(personMaker)
-            .build();
+        Plates personPlates =
+                new PlateBuilder().count(peopleCount).withFactory(personMaker).build();
 
         infectedOysters.observe(oystersAreInfected);
         infectedLamb.observe(lambIsInfected);
@@ -117,16 +119,16 @@ public class FoodPoisoningTest {
 
         sample(10000);
 
-        personPlates.forEach(plate -> {
-            plate.get(didEatOystersLabel).observeOwnValue();
-            plate.get(didEatLambLabel).observeOwnValue();
-            plate.get(didEatPooLabel).observeOwnValue();
-            plate.get(isIllLabel).observeOwnValue();
-        });
+        personPlates.forEach(
+                plate -> {
+                    plate.get(didEatOystersLabel).observeOwnValue();
+                    plate.get(didEatLambLabel).observeOwnValue();
+                    plate.get(didEatPooLabel).observeOwnValue();
+                    plate.get(isIllLabel).observeOwnValue();
+                });
 
         infectedOysters.unobserve();
         infectedLamb.unobserve();
         infectedToilet.unobserve();
     }
-
 }

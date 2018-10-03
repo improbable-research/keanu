@@ -2,7 +2,6 @@ package io.improbable.keanu.util.csv.pojo.bycolumn;
 
 import io.improbable.keanu.util.csv.pojo.PublicFieldMatcher;
 import io.improbable.keanu.util.csv.pojo.SetterMatcher;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -21,7 +20,8 @@ public class ColumnsVectorizedObjectParser<T> {
     private final Stream<List<String>> inputStream;
     private final List<String> csvTitles;
 
-    public ColumnsVectorizedObjectParser(Class<T> base, Stream<List<String>> inputStream, List<String> csvTitles) {
+    public ColumnsVectorizedObjectParser(
+            Class<T> base, Stream<List<String>> inputStream, List<String> csvTitles) {
         this.base = base;
         this.inputStream = inputStream;
         this.csvTitles = csvTitles;
@@ -33,28 +33,30 @@ public class ColumnsVectorizedObjectParser<T> {
 
     public T load(boolean ignoreUnmatchedFields) {
 
-        List<List<String>> csvColumns = csvTitles.stream()
-            .map(title -> new ArrayList<String>())
-            .collect(Collectors.toList());
+        List<List<String>> csvColumns =
+                csvTitles
+                        .stream()
+                        .map(title -> new ArrayList<String>())
+                        .collect(Collectors.toList());
 
-        inputStream.forEach(line -> {
-            for (int i = 0; i < line.size(); i++) {
-                csvColumns.get(i).add(line.get(i));
-            }
-        });
+        inputStream.forEach(
+                line -> {
+                    for (int i = 0; i < line.size(); i++) {
+                        csvColumns.get(i).add(line.get(i));
+                    }
+                });
 
-        List<CsvColumnConsumer<T>> columnConsumers = getColumnConsumers(base, csvTitles, ignoreUnmatchedFields);
+        List<CsvColumnConsumer<T>> columnConsumers =
+                getColumnConsumers(base, csvTitles, ignoreUnmatchedFields);
 
         return deserialize(csvColumns, columnConsumers, base);
     }
 
-    private static <T> List<CsvColumnConsumer<T>> getColumnConsumers(Class<T> base,
-                                                                     List<String> fieldTitles,
-                                                                     boolean ignoreUnmatchedFields) {
+    private static <T> List<CsvColumnConsumer<T>> getColumnConsumers(
+            Class<T> base, List<String> fieldTitles, boolean ignoreUnmatchedFields) {
 
         List<CsvColumnConsumer<T>> columnConsumers = new ArrayList<>();
-        CsvColumnConsumer<T> defaultConsumer = (target, value) -> {
-        };
+        CsvColumnConsumer<T> defaultConsumer = (target, value) -> {};
 
         List<Field> potentialFields = new ArrayList<>(Arrays.asList(base.getFields()));
         List<Method> potentialSetters = new ArrayList<>(Arrays.asList(base.getMethods()));
@@ -70,7 +72,8 @@ public class ColumnsVectorizedObjectParser<T> {
             }
 
             if (!consumerForTitle.isPresent() && !ignoreUnmatchedFields) {
-                throw new IllegalArgumentException("Unable to find field for csv data \"" + title + "\"");
+                throw new IllegalArgumentException(
+                        "Unable to find field for csv data \"" + title + "\"");
             }
 
             columnConsumers.add(consumerForTitle.orElse(defaultConsumer));
@@ -78,9 +81,8 @@ public class ColumnsVectorizedObjectParser<T> {
         return columnConsumers;
     }
 
-    private static <T> T deserialize(List<List<String>> csvColumns,
-                                     List<CsvColumnConsumer<T>> fieldMappers,
-                                     Class<T> base) {
+    private static <T> T deserialize(
+            List<List<String>> csvColumns, List<CsvColumnConsumer<T>> fieldMappers, Class<T> base) {
 
         try {
             T target = base.newInstance();

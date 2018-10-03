@@ -1,5 +1,12 @@
 package io.improbable.keanu.algorithms.variational;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.lessThan;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.google.common.collect.Iterables;
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
@@ -11,27 +18,19 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDouble;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertEquals;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-import org.junit.rules.ExpectedException;
-
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class KLDivergenceTest {
 
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
+    @Rule public ExpectedException thrown = ExpectedException.none();
 
     private QDistribution qDist;
 
@@ -64,7 +63,8 @@ public class KLDivergenceTest {
     @Test
     public void klDivergenceReturnsZeroIfPIsZeroButQIsNot() {
         when(qDist.getLogOfMasterP(any(NetworkState.class))).thenReturn(Math.log(0.5));
-        NetworkSamples samples = createNetworkSamplesWithOneVertexAndOneSample(Double.NEGATIVE_INFINITY);
+        NetworkSamples samples =
+                createNetworkSamplesWithOneVertexAndOneSample(Double.NEGATIVE_INFINITY);
 
         assertEquals(0., KLDivergence.compute(qDist, samples), 1e-10);
     }
@@ -72,7 +72,8 @@ public class KLDivergenceTest {
     @Test
     public void klDivergenceReturnsZeroIfPAndQAreZero() {
         when(qDist.getLogOfMasterP(any(NetworkState.class))).thenReturn(Double.NEGATIVE_INFINITY);
-        NetworkSamples samples = createNetworkSamplesWithOneVertexAndOneSample(Double.NEGATIVE_INFINITY);
+        NetworkSamples samples =
+                createNetworkSamplesWithOneVertexAndOneSample(Double.NEGATIVE_INFINITY);
 
         assertEquals(0., KLDivergence.compute(qDist, samples), 1e-10);
     }
@@ -84,9 +85,9 @@ public class KLDivergenceTest {
         DoubleVertex v3 = v1.plus(v2);
 
         BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings
-            .withDefaultConfig()
-            .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
+        NetworkSamples samples =
+                MetropolisHastings.withDefaultConfig()
+                        .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
 
         ProbabilisticDouble q1 = new GaussianVertex(0.1, 1.);
         ProbabilisticDouble q2 = new GaussianVertex(10.0, 1.);
@@ -101,9 +102,9 @@ public class KLDivergenceTest {
         DoubleVertex v3 = v1.plus(v2);
 
         BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings
-            .withDefaultConfig()
-            .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
+        NetworkSamples samples =
+                MetropolisHastings.withDefaultConfig()
+                        .getPosteriorSamples(network, Collections.singletonList(v1), 1000);
 
         QDistribution q1 = new TestGaussianQDistribution(0.1, 1.);
         QDistribution q2 = new TestGaussianQDistribution(10.0, 1.);
@@ -118,13 +119,14 @@ public class KLDivergenceTest {
         DoubleVertex v3 = v1.plus(v2);
 
         BayesianNetwork network = new BayesianNetwork(v3.getConnectedGraph());
-        NetworkSamples samples = MetropolisHastings
-            .withDefaultConfig()
-            .getPosteriorSamples(network, Arrays.asList(v1, v3), 1000);
+        NetworkSamples samples =
+                MetropolisHastings.withDefaultConfig()
+                        .getPosteriorSamples(network, Arrays.asList(v1, v3), 1000);
         ProbabilisticDouble q = new GaussianVertex(0.1, 1.);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("A NetworkState does not contain exactly 1 vertex and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
+        thrown.expectMessage(
+                "A NetworkState does not contain exactly 1 vertex and ProbabilisticDouble can only compute the log probability of one value. Try computing KL divergence against a QDistribution instead.");
 
         KLDivergence.compute(q, samples);
     }
@@ -149,5 +151,4 @@ public class KLDivergenceTest {
             return logPdf(vertexValue);
         }
     }
-
 }

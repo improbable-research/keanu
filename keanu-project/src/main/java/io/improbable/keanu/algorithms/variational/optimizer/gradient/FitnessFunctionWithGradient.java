@@ -1,22 +1,18 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-
 import static io.improbable.keanu.algorithms.variational.optimizer.Optimizer.setAndCascadePoint;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.BiConsumer;
-
-import org.apache.commons.math3.analysis.MultivariateFunction;
-import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ProbabilityCalculator;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
-
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.BiConsumer;
+import org.apache.commons.math3.analysis.MultivariateFunction;
+import org.apache.commons.math3.analysis.MultivariateVectorFunction;
 
 public class FitnessFunctionWithGradient {
 
@@ -27,10 +23,11 @@ public class FitnessFunctionWithGradient {
     private final BiConsumer<double[], double[]> onGradientCalculation;
     private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunctionWithGradient(List<? extends Vertex> ofVertices,
-                                       List<? extends Vertex<DoubleTensor>> wrtVertices,
-                                       BiConsumer<double[], double[]> onGradientCalculation,
-                                       BiConsumer<double[], Double> onFitnessCalculation) {
+    public FitnessFunctionWithGradient(
+            List<? extends Vertex> ofVertices,
+            List<? extends Vertex<DoubleTensor>> wrtVertices,
+            BiConsumer<double[], double[]> onGradientCalculation,
+            BiConsumer<double[], Double> onFitnessCalculation) {
         this.ofVertices = ofVertices;
         this.wrtVertices = wrtVertices;
         this.logProbGradientCalculator = new LogProbGradientCalculator(ofVertices, wrtVertices);
@@ -38,17 +35,17 @@ public class FitnessFunctionWithGradient {
         this.onFitnessCalculation = onFitnessCalculation;
     }
 
-    public FitnessFunctionWithGradient(List<? extends Vertex> ofVertices,
-                                       List<? extends Vertex<DoubleTensor>> wrtVertices) {
+    public FitnessFunctionWithGradient(
+            List<? extends Vertex> ofVertices, List<? extends Vertex<DoubleTensor>> wrtVertices) {
         this(ofVertices, wrtVertices, null, null);
     }
 
     public MultivariateVectorFunction gradient() {
         return point -> {
-
             setAndCascadePoint(point, wrtVertices);
 
-            Map<VertexId, DoubleTensor> diffs = logProbGradientCalculator.getJointLogProbGradientWrtLatents();
+            Map<VertexId, DoubleTensor> diffs =
+                    logProbGradientCalculator.getJointLogProbGradientWrtLatents();
 
             double[] gradients = alignGradientsToAppropriateIndex(diffs, wrtVertices);
 
@@ -73,8 +70,9 @@ public class FitnessFunctionWithGradient {
         };
     }
 
-    private static double[] alignGradientsToAppropriateIndex(Map<VertexId, DoubleTensor /*Gradient*/> diffs,
-                                                             List<? extends Vertex<DoubleTensor>> latentVertices) {
+    private static double[] alignGradientsToAppropriateIndex(
+            Map<VertexId, DoubleTensor /*Gradient*/> diffs,
+            List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         List<DoubleTensor> tensors = new ArrayList<>();
         for (Vertex<DoubleTensor> vertex : latentVertices) {
@@ -105,5 +103,4 @@ public class FitnessFunctionWithGradient {
 
         return gradient;
     }
-
 }

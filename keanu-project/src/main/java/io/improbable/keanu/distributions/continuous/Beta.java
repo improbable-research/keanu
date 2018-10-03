@@ -16,7 +16,8 @@ public class Beta implements ContinuousDistribution {
     private final DoubleTensor xMin;
     private final DoubleTensor xMax;
 
-    public static ContinuousDistribution withParameters(DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
+    public static ContinuousDistribution withParameters(
+            DoubleTensor alpha, DoubleTensor beta, DoubleTensor xMin, DoubleTensor xMax) {
         return new Beta(alpha, beta, xMin, xMax);
     }
 
@@ -51,11 +52,15 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor lnGammaBeta = beta.logGamma();
         final DoubleTensor alphaPlusBetaLnGamma = (alpha.plus(beta)).logGammaInPlace();
         final DoubleTensor alphaMinusOneTimesLnX = x.log().timesInPlace(alpha.minus(1));
-        final DoubleTensor betaMinusOneTimesOneMinusXLn = x.unaryMinus().plusInPlace(1).logInPlace().timesInPlace(beta.minus(1));
+        final DoubleTensor betaMinusOneTimesOneMinusXLn =
+                x.unaryMinus().plusInPlace(1).logInPlace().timesInPlace(beta.minus(1));
 
-        final DoubleTensor betaFunction = lnGammaAlpha.plusInPlace(lnGammaBeta).minusInPlace(alphaPlusBetaLnGamma);
+        final DoubleTensor betaFunction =
+                lnGammaAlpha.plusInPlace(lnGammaBeta).minusInPlace(alphaPlusBetaLnGamma);
 
-        return alphaMinusOneTimesLnX.plusInPlace(betaMinusOneTimesOneMinusXLn).minusInPlace(betaFunction);
+        return alphaMinusOneTimesLnX
+                .plusInPlace(betaMinusOneTimesOneMinusXLn)
+                .minusInPlace(betaFunction);
     }
 
     @Override
@@ -64,13 +69,15 @@ public class Beta implements ContinuousDistribution {
         final DoubleTensor digammaAlphaPlusBeta = alpha.plus(beta).digammaInPlace();
         final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alpha.minus(1));
 
-        final DoubleTensor dLogPdx = alphaMinusOneDivX.minusInPlace(oneMinusX.reciprocal().timesInPlace(beta.minus(1)));
-        final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.digamma()));
-        final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.digamma()));
+        final DoubleTensor dLogPdx =
+                alphaMinusOneDivX.minusInPlace(oneMinusX.reciprocal().timesInPlace(beta.minus(1)));
+        final DoubleTensor dLogPda =
+                x.log().plusInPlace(digammaAlphaPlusBeta.minus(alpha.digamma()));
+        final DoubleTensor dLogPdb =
+                oneMinusX
+                        .logInPlace()
+                        .plusInPlace(digammaAlphaPlusBeta.minusInPlace(beta.digamma()));
 
-        return new Diffs()
-            .put(A, dLogPda)
-            .put(B, dLogPdb)
-            .put(X, dLogPdx);
+        return new Diffs().put(A, dLogPda).put(B, dLogPdb).put(X, dLogPdx);
     }
 }

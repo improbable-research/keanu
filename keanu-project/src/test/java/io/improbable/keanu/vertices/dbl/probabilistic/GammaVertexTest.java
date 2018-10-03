@@ -1,17 +1,7 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static org.junit.Assert.assertEquals;
-
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Supplier;
-
-import org.apache.commons.math3.distribution.GammaDistribution;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import io.improbable.keanu.distributions.gradient.Gamma;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -20,6 +10,13 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Supplier;
+import org.apache.commons.math3.distribution.GammaDistribution;
+import org.junit.Before;
+import org.junit.Test;
 
 public class GammaVertexTest {
 
@@ -39,7 +36,8 @@ public class GammaVertexTest {
         GammaVertex tensorGamma = new GammaVertex(1.5, 1.0);
         double expectedDensity = distribution.logDensity(0.5);
 
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(tensorGamma, 0.5, expectedDensity);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfScalar(
+                tensorGamma, 0.5, expectedDensity);
     }
 
     @Test
@@ -48,7 +46,8 @@ public class GammaVertexTest {
         GammaDistribution distribution = new GammaDistribution(5.0, 1.0);
         double expectedLogDensity = distribution.logDensity(1) + distribution.logDensity(3);
         GammaVertex tensorGamma = new GammaVertex(1., 5.);
-        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGamma, new double[]{1., 3.}, expectedLogDensity);
+        ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(
+                tensorGamma, new double[] {1., 3.}, expectedLogDensity);
     }
 
     @Test
@@ -62,7 +61,9 @@ public class GammaVertexTest {
         kTensor.setValue(Nd4jDoubleTensor.scalar(5.5));
 
         GammaVertex tensorGamma = new GammaVertex(thetaTensor, kTensor);
-        Map<Vertex, DoubleTensor> actualDerivatives = tensorGamma.dLogPdf(Nd4jDoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
+        Map<Vertex, DoubleTensor> actualDerivatives =
+                tensorGamma.dLogPdf(
+                        Nd4jDoubleTensor.scalar(1.5), thetaTensor, kTensor, tensorGamma);
 
         assertEquals(gammaLogDiff.dPdtheta, actualDerivatives.get(thetaTensor).scalar(), 1e-5);
         assertEquals(gammaLogDiff.dPdk, actualDerivatives.get(kTensor).scalar(), 1e-5);
@@ -72,7 +73,7 @@ public class GammaVertexTest {
     @Test
     public void matchesKnownDerivativeLogDensityOfVector() {
 
-        double[] vector = new double[]{1.5, 2, 2.5, 3, 3.5};
+        double[] vector = new double[] {1.5, 2, 2.5, 3, 3.5};
 
         UniformVertex thetaTensor = new UniformVertex(0.5, 1.0);
         thetaTensor.setValue(Nd4jDoubleTensor.scalar(0.75));
@@ -82,7 +83,8 @@ public class GammaVertexTest {
 
         Supplier<GammaVertex> vertexSupplier = () -> new GammaVertex(thetaTensor, kTensor);
 
-        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(vector, vertexSupplier);
+        ProbabilisticDoubleTensorContract.matchesKnownDerivativeLogDensityOfVector(
+                vector, vertexSupplier);
     }
 
     @Test
@@ -90,7 +92,8 @@ public class GammaVertexTest {
         GammaVertex vertexUnderTest = new GammaVertex(1.5, 5.0);
         vertexUnderTest.setAndCascade(Nd4jDoubleTensor.scalar(1.0));
         ProbabilisticDoubleTensorContract.isTreatedAsConstantWhenObserved(vertexUnderTest);
-        ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(vertexUnderTest);
+        ProbabilisticDoubleTensorContract.hasNoGradientWithRespectToItsValueWhenObserved(
+                vertexUnderTest);
     }
 
     @Test
@@ -104,15 +107,15 @@ public class GammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(1.0),
-            Nd4jDoubleTensor.scalar(2.5),
-            0.1,
-            uniformA,
-            gamma,
-            vertexStartValue,
-            vertexEndValue,
-            vertexIncrement,
-            DELTA);
+                Nd4jDoubleTensor.scalar(1.0),
+                Nd4jDoubleTensor.scalar(2.5),
+                0.1,
+                uniformA,
+                gamma,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
     }
 
     @Test
@@ -126,15 +129,15 @@ public class GammaVertexTest {
         double vertexIncrement = 0.1;
 
         moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues(
-            Nd4jDoubleTensor.scalar(2.0),
-            Nd4jDoubleTensor.scalar(4.5),
-            0.1,
-            uniformA,
-            gamma,
-            vertexStartValue,
-            vertexEndValue,
-            vertexIncrement,
-            DELTA);
+                Nd4jDoubleTensor.scalar(2.0),
+                Nd4jDoubleTensor.scalar(4.5),
+                0.1,
+                uniformA,
+                gamma,
+                vertexStartValue,
+                vertexEndValue,
+                vertexIncrement,
+                DELTA);
     }
 
     @Test
@@ -142,17 +145,16 @@ public class GammaVertexTest {
         KeanuRandom random = new KeanuRandom(1);
 
         int sampleCount = 1000000;
-        GammaVertex vertex = new GammaVertex(
-            new int[]{sampleCount, 1},
-            ConstantVertex.of(2.0),
-            ConstantVertex.of(7.5)
-        );
+        GammaVertex vertex =
+                new GammaVertex(
+                        new int[] {sampleCount, 1}, ConstantVertex.of(2.0), ConstantVertex.of(7.5));
 
         double from = 1.5;
         double to = 2.5;
         double bucketSize = 0.05;
 
-        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(vertex, from, to, bucketSize, 1e-2, random);
+        ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(
+                vertex, from, to, bucketSize, 1e-2, random);
     }
 
     @Test
@@ -179,12 +181,11 @@ public class GammaVertexTest {
 
         int numSamples = 5000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new GammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
-            thetaK,
-            latentThetaK,
-            random
-        );
-
+                hyperParams ->
+                        new GammaVertex(
+                                new int[] {numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+                thetaK,
+                latentThetaK,
+                random);
     }
-
 }

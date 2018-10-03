@@ -10,12 +10,14 @@ public class HalfCauchyVertex extends CauchyVertex {
     private static final double LOG_TWO = Math.log(2);
 
     /**
-     * One scale that matches a proposed tensor shape of HalfCauchy (Cauchy with location = 0 and non-negative x)
-     * <p>
-     * If provided parameter is scalar then the proposed shape determines the shape
+     * One scale that matches a proposed tensor shape of HalfCauchy (Cauchy with location = 0 and
+     * non-negative x)
+     *
+     * <p>If provided parameter is scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the tensor in this vertex
-     * @param scale       the scale of the HalfCauchy with either the same tensorShape as specified for this vertex or a scalar
+     * @param scale the scale of the HalfCauchy with either the same tensorShape as specified for
+     *     this vertex or a scalar
      */
     public HalfCauchyVertex(int[] tensorShape, DoubleVertex scale) {
         super(tensorShape, LOC_ZERO, scale);
@@ -45,5 +47,4 @@ public class HalfCauchyVertex extends CauchyVertex {
     public DoubleTensor sample(KeanuRandom random) {
         return super.sample(random).absInPlace();
     }
-
 }

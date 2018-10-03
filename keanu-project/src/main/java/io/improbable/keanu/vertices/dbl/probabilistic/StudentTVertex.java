@@ -3,10 +3,6 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 import static io.improbable.keanu.distributions.dual.Diffs.T;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.StudentT;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
@@ -16,6 +12,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
 
 public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -23,11 +22,11 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
 
     /**
      * One v that must match a proposed tensor shape of StudentT
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape expected tensor shape
-     * @param v           Degrees of Freedom
+     * @param v Degrees of Freedom
      */
     public StudentTVertex(int[] tensorShape, IntegerVertex v) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, v.getShape());

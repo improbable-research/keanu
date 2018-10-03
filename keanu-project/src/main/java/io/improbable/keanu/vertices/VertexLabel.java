@@ -1,12 +1,11 @@
 package io.improbable.keanu.vertices;
 
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-
 import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 public class VertexLabel {
     private static final char NAMESPACE_SEPARATOR = '.';
@@ -23,7 +22,8 @@ public class VertexLabel {
     }
 
     public VertexLabel withExtraNamespace(String topLevelNamespace) {
-        List<String> newNamespace = ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
+        List<String> newNamespace =
+                ImmutableList.<String>builder().addAll(namespace).add(topLevelNamespace).build();
         return new VertexLabel(this.name, newNamespace);
     }
 
@@ -35,7 +35,7 @@ public class VertexLabel {
     public Optional<String> getOuterNamespace() {
         try {
             return Optional.of(namespace.get(namespace.size() - 1));
-        } catch(IndexOutOfBoundsException e) {
+        } catch (IndexOutOfBoundsException e) {
             return Optional.empty();
         }
     }
@@ -46,7 +46,8 @@ public class VertexLabel {
 
     @Override
     public String toString() {
-        ImmutableList<String> names = ImmutableList.<String>builder().add(name).addAll(namespace).build();
+        ImmutableList<String> names =
+                ImmutableList.<String>builder().add(name).addAll(namespace).build();
         return Joiner.on(NAMESPACE_SEPARATOR).join(Lists.reverse(names));
     }
 
@@ -55,8 +56,7 @@ public class VertexLabel {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         VertexLabel that = (VertexLabel) o;
-        return Objects.equals(name, that.name) &&
-            Objects.equals(namespace, that.namespace);
+        return Objects.equals(name, that.name) && Objects.equals(namespace, that.namespace);
     }
 
     @Override

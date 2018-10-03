@@ -2,8 +2,7 @@ package io.improbable.keanu.util.csv.pojo;
 
 class CsvCellDeserializer {
 
-    private CsvCellDeserializer() {
-    }
+    private CsvCellDeserializer() {}
 
     static Object convertToAppropriateType(String s, Class<?> fieldType) {
         if (fieldType == Integer.class || fieldType == Integer.TYPE) {

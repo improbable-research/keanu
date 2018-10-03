@@ -11,7 +11,7 @@ public class PlatesTest {
     public void youCanGetTheLastPlate() {
         int numPlates = 10;
         Plates plates = new Plates(numPlates);
-        for (int i = 0; i < numPlates-1; i++) {
+        for (int i = 0; i < numPlates - 1; i++) {
             plates.add(mock(Plate.class));
         }
 

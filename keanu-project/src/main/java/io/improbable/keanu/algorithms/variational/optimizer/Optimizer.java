@@ -1,10 +1,5 @@
 package io.improbable.keanu.algorithms.variational.optimizer;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer;
@@ -14,6 +9,10 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.ProgressBar;
 import io.improbable.keanu.vertices.Vertex;
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 
 public interface Optimizer {
 
@@ -43,11 +42,13 @@ public interface Optimizer {
         return of(vertexFromNetwork.getConnectedGraph());
     }
 
-    static double[] currentPoint(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
+    static double[] currentPoint(
+            List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
         long totalLatentDimensions = totalNumberOfLatentDimensions(continuousLatentVertices);
 
         if (totalLatentDimensions > Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
+            throw new IllegalArgumentException(
+                    "Greater than " + Integer.MAX_VALUE + " latent dimensions not supported");
         }
 
         int position = 0;
@@ -62,7 +63,8 @@ public interface Optimizer {
         return point;
     }
 
-    static void setAndCascadePoint(double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {
+    static void setAndCascadePoint(
+            double[] point, List<? extends Vertex<DoubleTensor>> latentVertices) {
 
         int position = 0;
         for (Vertex<DoubleTensor> vertex : latentVertices) {
@@ -81,7 +83,8 @@ public interface Optimizer {
         VertexValuePropagation.cascadeUpdate(latentVertices);
     }
 
-    static long totalNumberOfLatentDimensions(List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
+    static long totalNumberOfLatentDimensions(
+            List<? extends Vertex<? extends NumberTensor>> continuousLatentVertices) {
         return continuousLatentVertices.stream().mapToLong(Optimizer::numDimensions).sum();
     }
 
@@ -92,14 +95,20 @@ public interface Optimizer {
     static ProgressBar createFitnessProgressBar(final Optimizer optimizerThatNeedsProgressBar) {
         AtomicInteger evalCount = new AtomicInteger(0);
         ProgressBar progressBar = new ProgressBar();
-        BiConsumer<double[], Double> progressBarFitnessCalculationHandler = (position, logProb) -> {
-            progressBar.progress(
-                String.format("Fitness Evaluation #%d LogProb: %.2f", evalCount.incrementAndGet(), logProb)
-            );
-        };
+        BiConsumer<double[], Double> progressBarFitnessCalculationHandler =
+                (position, logProb) -> {
+                    progressBar.progress(
+                            String.format(
+                                    "Fitness Evaluation #%d LogProb: %.2f",
+                                    evalCount.incrementAndGet(), logProb));
+                };
 
-        optimizerThatNeedsProgressBar.addFitnessCalculationHandler(progressBarFitnessCalculationHandler);
-        progressBar.addFinishHandler(() -> optimizerThatNeedsProgressBar.removeFitnessCalculationHandler(progressBarFitnessCalculationHandler));
+        optimizerThatNeedsProgressBar.addFitnessCalculationHandler(
+                progressBarFitnessCalculationHandler);
+        progressBar.addFinishHandler(
+                () ->
+                        optimizerThatNeedsProgressBar.removeFitnessCalculationHandler(
+                                progressBarFitnessCalculationHandler));
 
         return progressBar;
     }

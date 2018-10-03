@@ -63,11 +63,29 @@ Interested in more technical examples? Explore [Examples](keanu-docs/examples.md
 
 ## Development
 
+### Lombok
+
 We use [Lombok](https://projectlombok.org/) annotations, which you will need to enable in your IDE.
 
 For IntelliJ:
  - Install the [Lombok plugin](https://plugins.jetbrains.com/plugin/6317-lombok-plugin)
  - Settings > Build, Execution, Deployment > Compiler > Annotation Processors - Enable annotation processing
+ 
+### Formatting
+
+We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) for formatting code and
+checking that it is formatted. In particular, we use the Android variant of [google-java-format](https://github.com/google/google-java-format).
+
+Out of the box, you can format all code with
+
+```
+gradle spotlessApply
+```
+
+If you want better integration with your IDE, you can follow instructions to add [google-java-format](https://github.com/google/google-java-format) plugins (make sure
+to set it to Android).
+
+Checks (therefore PRs) will fail if code is not properly formatted.
 
 ## Hiring
 

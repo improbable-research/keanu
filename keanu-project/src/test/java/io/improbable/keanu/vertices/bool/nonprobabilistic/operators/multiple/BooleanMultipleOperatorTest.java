@@ -1,17 +1,16 @@
 package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 
+import static org.junit.Assert.assertEquals;
+
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
-import org.junit.Test;
-
 import java.util.LinkedList;
 import java.util.List;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Before;
+import org.junit.Test;
 
 public class BooleanMultipleOperatorTest {
 
@@ -49,7 +48,8 @@ public class BooleanMultipleOperatorTest {
         assertEquals(false, orFalse.sample(random).scalar());
     }
 
-    private List<Vertex<BooleanTensor>> buildVertexList(int numberOfVertices, int numberThatAreTrue) {
+    private List<Vertex<BooleanTensor>> buildVertexList(
+            int numberOfVertices, int numberThatAreTrue) {
         List<Vertex<BooleanTensor>> list = new LinkedList<>();
 
         for (int i = 0; i < numberThatAreTrue; i++) {
@@ -61,5 +61,4 @@ public class BooleanMultipleOperatorTest {
         }
         return list;
     }
-
 }

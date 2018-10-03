@@ -5,8 +5,7 @@ import static org.apache.commons.math3.special.Gamma.gamma;
 
 public class InverseGamma {
 
-    private InverseGamma() {
-    }
+    private InverseGamma() {}
 
     public static double logPdf(double a, double b, double x) {
         return a * Math.log(b) + (-a - 1) * Math.log(x) - Math.log(gamma(a)) - (b / x);
@@ -30,7 +29,5 @@ public class InverseGamma {
             this.dPdb = dPdb;
             this.dPdx = dPdx;
         }
-
     }
-
 }

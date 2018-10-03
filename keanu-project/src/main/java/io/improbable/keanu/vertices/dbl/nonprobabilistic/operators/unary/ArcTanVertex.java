@@ -1,13 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ArcTanVertex extends DoubleUnaryOpVertex {
 
@@ -31,14 +30,18 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         DoubleTensor inputValue = inputVertex.getValue();
 
-        //dArcTandx = 1 / (1 + x^2)
+        // dArcTandx = 1 / (1 + x^2)
         DoubleTensor dSelfWrtInput = inputValue.pow(2).plusInPlace(1).reciprocalInPlace();
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
+        partials.put(
+                inputVertex,
+                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+                        dSelfWrtInput, this.getShape()));
 
         return partials;
     }

@@ -1,18 +1,15 @@
 package io.improbable.keanu.distributions.discrete;
 
-import org.nd4j.linalg.util.ArrayUtil;
-
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 /**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.2.8 page 49
+ * Computer Generation of Statistical Distributions by Richard Saucier ARL-TR-2168 March 2000 5.2.8
+ * page 49
  */
 public class Poisson implements DiscreteDistribution {
 

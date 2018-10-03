@@ -16,9 +16,9 @@ public class LogNormal implements ContinuousDistribution {
     private final DoubleTensor sigma;
 
     /**
-     * @param mu     location parameter (any real number)
-     * @param sigma  square root of variance (greater than 0)
-     * @return       a new ContinuousDistribution object
+     * @param mu location parameter (any real number)
+     * @param sigma square root of variance (greater than 0)
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor mu, DoubleTensor sigma) {
         return new LogNormal(mu, sigma);
@@ -38,8 +38,12 @@ public class LogNormal implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor lnSigmaX = sigma.times(x).logInPlace();
         final DoubleTensor lnXMinusMuSquared = x.log().minusInPlace(mu).powInPlace(2);
-        final DoubleTensor lnXMinusMuSquaredOver2Variance = lnXMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
-        return lnXMinusMuSquaredOver2Variance.plusInPlace(lnSigmaX).plusInPlace(LN_SQRT_2PI).unaryMinusInPlace();
+        final DoubleTensor lnXMinusMuSquaredOver2Variance =
+                lnXMinusMuSquared.divInPlace(sigma.pow(2).timesInPlace(2.0));
+        return lnXMinusMuSquaredOver2Variance
+                .plusInPlace(lnSigmaX)
+                .plusInPlace(LN_SQRT_2PI)
+                .unaryMinusInPlace();
     }
 
     @Override
@@ -49,13 +53,12 @@ public class LogNormal implements ContinuousDistribution {
 
         final DoubleTensor dLogPdmu = lnXMinusMu.div(variance);
         final DoubleTensor dLogPdx = dLogPdmu.plus(1.0).unaryMinus().divInPlace(x);
-        final DoubleTensor dLogPdsigma = lnXMinusMu.powInPlace(2)
-            .divInPlace(variance.timesInPlace(sigma))
-            .minusInPlace(sigma.reciprocal());
+        final DoubleTensor dLogPdsigma =
+                lnXMinusMu
+                        .powInPlace(2)
+                        .divInPlace(variance.timesInPlace(sigma))
+                        .minusInPlace(sigma.reciprocal());
 
-        return new Diffs()
-            .put(MU, dLogPdmu)
-            .put(SIGMA, dLogPdsigma)
-            .put(X, dLogPdx);
+        return new Diffs().put(MU, dLogPdmu).put(SIGMA, dLogPdsigma).put(X, dLogPdx);
     }
 }

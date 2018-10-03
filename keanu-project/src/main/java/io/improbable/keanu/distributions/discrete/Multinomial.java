@@ -1,14 +1,6 @@
 package io.improbable.keanu.distributions.discrete;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.util.ArrayUtil;
-
 import com.google.common.base.Preconditions;
-
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -17,11 +9,16 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.DebugTensorValidator;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.util.ArrayUtil;
 
 public class Multinomial implements DiscreteDistribution {
 
-    public static final DebugTensorValidator CATEGORY_PROBABILITIES_CANNOT_BE_ZERO = new DebugTensorValidator<>(TensorValidator.ZERO_CATCHER);
+    public static final DebugTensorValidator CATEGORY_PROBABILITIES_CANNOT_BE_ZERO =
+            new DebugTensorValidator<>(TensorValidator.ZERO_CATCHER);
     private final IntegerTensor n;
     private final DoubleTensor p;
     private final int numCategories;
@@ -32,16 +29,16 @@ public class Multinomial implements DiscreteDistribution {
 
     /**
      * @param n The number of draws from the variable
-     * @param p The probability of observing each of the k values (which sum to 1)
-     *          p is a Tensor whose first dimension must be of size k
-     * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial Distribution</a>
-     * Generalisation of the Binomial distribution to variables with more than 2 possible values
+     * @param p The probability of observing each of the k values (which sum to 1) p is a Tensor
+     *     whose first dimension must be of size k
+     * @see <a href="https://en.wikipedia.org/wiki/Multinomial_distribution">Multinomial
+     *     Distribution</a> Generalisation of the Binomial distribution to variables with more than
+     *     2 possible values
      */
     private Multinomial(IntegerTensor n, DoubleTensor p) {
         Preconditions.checkArgument(
-            p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
-            "Probabilities must sum to one"
-        );
+                p.sum(0).elementwiseEquals(DoubleTensor.ones(n.getShape())).allTrue(),
+                "Probabilities must sum to one");
         CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
         numCategories = p.getShape()[0];
@@ -62,21 +59,27 @@ public class Multinomial implements DiscreteDistribution {
 
         for (int i = 0; i < length; i++) {
             final int j = i;
-            List<Double> categoryProbabilities = sliced.stream().map(p -> p.getFlattenedView().getOrScalar(j)).collect(Collectors.toList());
-            int[] sample = drawNTimes(nFlattened.getOrScalar(i), random, categoryProbabilities.toArray(new Double[0]));
+            List<Double> categoryProbabilities =
+                    sliced.stream()
+                            .map(p -> p.getFlattenedView().getOrScalar(j))
+                            .collect(Collectors.toList());
+            int[] sample =
+                    drawNTimes(
+                            nFlattened.getOrScalar(i),
+                            random,
+                            categoryProbabilities.toArray(new Double[0]));
             samples = ArrayUtils.addAll(samples, sample);
         }
         return constructSampleTensor(shape, samples);
     }
 
     /**
-     * This method is necessary because I've constructed a flat array by concatenation samples of size k
-     * So for example, if the shape of n is [a, b]
-     * then I've now got a tensor of shape [a, b, k]
-     * which I need to convert to a tensor of shape [k, a, b]
-     * by doing a slice in the highest dimension and then concatenating again
+     * This method is necessary because I've constructed a flat array by concatenation samples of
+     * size k So for example, if the shape of n is [a, b] then I've now got a tensor of shape [a, b,
+     * k] which I need to convert to a tensor of shape [k, a, b] by doing a slice in the highest
+     * dimension and then concatenating again
      *
-     * @param shape   the desired shape, not including the probabilities dimension
+     * @param shape the desired shape, not including the probabilities dimension
      * @param samples the flat array of samples
      * @return
      */
@@ -85,8 +88,9 @@ public class Multinomial implements DiscreteDistribution {
         if (shape[0] == 1) {
             outputShape = ArrayUtils.remove(outputShape, 0);
         }
-        IntegerTensor abkTensor = IntegerTensor.create(samples, ArrayUtils.add(outputShape, numCategories));
-        int[] kabArray = new int[]{};
+        IntegerTensor abkTensor =
+                IntegerTensor.create(samples, ArrayUtils.add(outputShape, numCategories));
+        int[] kabArray = new int[] {};
         for (int category = 0; category < numCategories; category++) {
             IntegerTensor abTensor = abkTensor.slice(outputShape.length, category);
             kabArray = ArrayUtils.addAll(kabArray, abTensor.asFlatIntegerArray());
@@ -125,19 +129,17 @@ public class Multinomial implements DiscreteDistribution {
     public DoubleTensor logProb(IntegerTensor k) {
         int[] expectedShape = p.getShape();
         TensorShapeValidation.checkAllShapesMatch(
-            String.format("Shape mismatch. k: %s, p: %s",
-                Arrays.toString(k.getShape()),
-                Arrays.toString(expectedShape)),
-            k.getShape(), expectedShape
-        );
+                String.format(
+                        "Shape mismatch. k: %s, p: %s",
+                        Arrays.toString(k.getShape()), Arrays.toString(expectedShape)),
+                k.getShape(),
+                expectedShape);
         Preconditions.checkArgument(
-            k.sum(0).elementwiseEquals(this.n).allTrue(),
-            String.format("Inputs %s must sum to n = %s", k, this.n)
-        );
+                k.sum(0).elementwiseEquals(this.n).allTrue(),
+                String.format("Inputs %s must sum to n = %s", k, this.n));
         Preconditions.checkArgument(
-            k.greaterThanOrEqual(0).allTrue(),
-            String.format("Inputs %s cannot be negative", k)
-        );
+                k.greaterThanOrEqual(0).allTrue(),
+                String.format("Inputs %s cannot be negative", k));
 
         DoubleTensor gammaN = n.plus(1).toDouble().logGammaInPlace();
         DoubleTensor gammaKs = k.plus(1).toDouble().logGammaInPlace().sum(0);

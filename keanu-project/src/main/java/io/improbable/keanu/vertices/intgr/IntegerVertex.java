@@ -6,16 +6,32 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;
-import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.*;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanOrEqualVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.CastIntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerAdditionVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDifferenceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerDivisionVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMaxVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMinVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerMultiplicationVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.binary.IntegerPowerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.multiple.IntegerConcatenationVertex;
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.*;
-
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerAbsVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerReshapeVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSliceVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerSumVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerTakeVertex;
+import io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary.IntegerUnaryOpLambda;
 import java.util.function.Function;
 
-public abstract class IntegerVertex extends Vertex<IntegerTensor> implements IntegerOperators<IntegerVertex> {
+public abstract class IntegerVertex extends Vertex<IntegerTensor>
+        implements IntegerOperators<IntegerVertex> {
 
     public static IntegerVertex concat(int dimension, IntegerVertex... toConcat) {
         return new IntegerConcatenationVertex(dimension, toConcat);
@@ -102,7 +118,8 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerUnaryOpLambda<>(this, op);
     }
 
-    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the
+    // DoubleOperators interface)
     public IntegerVertex times(IntegerVertex that) {
         return multiply(that);
     }
@@ -186,5 +203,4 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
     public int getValue(int... index) {
         return getValue().getValue(index);
     }
-
 }

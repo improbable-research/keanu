@@ -1,13 +1,13 @@
 package io.improbable.keanu.algorithms;
 
+import static java.util.Comparator.comparing;
+import static java.util.stream.Collectors.groupingBy;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
-
-import static java.util.Comparator.comparing;
-import static java.util.stream.Collectors.groupingBy;
 
 public class VertexSamples<T> {
 
@@ -18,9 +18,7 @@ public class VertexSamples<T> {
     }
 
     public double probability(Function<T, Boolean> samplePredicate) {
-        long trueCount = samples.parallelStream()
-            .filter(samplePredicate::apply)
-            .count();
+        long trueCount = samples.parallelStream().filter(samplePredicate::apply).count();
 
         return (double) trueCount / samples.size();
     }
@@ -31,13 +29,15 @@ public class VertexSamples<T> {
             throw new IllegalStateException("Mode for empty samples is undefined");
         }
 
-        Map<T, List<T>> groupedByValue = samples.stream()
-            .collect(groupingBy(v -> v));
+        Map<T, List<T>> groupedByValue = samples.stream().collect(groupingBy(v -> v));
 
-        Optional<T> mode = groupedByValue.entrySet().stream()
-            .sorted(comparing(v -> -v.getValue().size()))
-            .map(Map.Entry::getKey)
-            .findFirst();
+        Optional<T> mode =
+                groupedByValue
+                        .entrySet()
+                        .stream()
+                        .sorted(comparing(v -> -v.getValue().size()))
+                        .map(Map.Entry::getKey)
+                        .findFirst();
 
         if (mode.isPresent()) {
             return mode.get();

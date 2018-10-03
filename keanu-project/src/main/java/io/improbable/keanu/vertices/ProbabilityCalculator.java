@@ -15,7 +15,8 @@ public class ProbabilityCalculator {
                     return Double.NEGATIVE_INFINITY;
                 }
             } else {
-                throw new IllegalArgumentException("Found a vertex that is neither Probabilistic nor Non-Probabilistic");
+                throw new IllegalArgumentException(
+                        "Found a vertex that is neither Probabilistic nor Non-Probabilistic");
             }
         }
         return sum;

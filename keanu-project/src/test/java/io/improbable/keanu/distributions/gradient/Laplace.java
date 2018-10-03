@@ -1,18 +1,12 @@
 package io.improbable.keanu.distributions.gradient;
 
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
-
 /**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.8 page 25
+ * Computer Generation of Statistical Distributions by Richard Saucier ARL-TR-2168 March 2000 5.1.8
+ * page 25
  */
-
 public class Laplace {
 
-    private Laplace() {
-    }
+    private Laplace() {}
 
     public static Diff dlnPdf(double mu, double beta, double x) {
         double denominator = (beta * Math.abs(mu - x));

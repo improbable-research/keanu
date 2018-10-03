@@ -11,13 +11,13 @@ public class BoolReshapeVertexTest {
     @Test
     public void reshapeVertexWorksAsExpected() {
         BoolVertex a = new BernoulliVertex(0.5);
-        a.setValue(BooleanTensor.create(new boolean[]{true, true, false, false}, 2, 2));
+        a.setValue(BooleanTensor.create(new boolean[] {true, true, false, false}, 2, 2));
 
         BoolReshapeVertex reshapeVertex = new BoolReshapeVertex(a, 4, 1);
         reshapeVertex.getValue();
 
-        Assert.assertArrayEquals(new int[]{4, 1}, reshapeVertex.getShape());
-        Assert.assertArrayEquals(new int[]{1, 1, 0, 0}, reshapeVertex.getValue().asFlatIntegerArray());
+        Assert.assertArrayEquals(new int[] {4, 1}, reshapeVertex.getShape());
+        Assert.assertArrayEquals(
+                new int[] {1, 1, 0, 0}, reshapeVertex.getValue().asFlatIntegerArray());
     }
-
 }

@@ -1,17 +1,16 @@
 package io.improbable.keanu.tensor.intgr;
 
-import java.util.Arrays;
-import java.util.function.Function;
-
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import java.util.Arrays;
+import java.util.function.Function;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
-public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
+public interface IntegerTensor
+        extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
     IntegerTensor ZERO_SCALAR = scalar(0);
 
@@ -103,7 +102,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor sum(int... overDimensions);
 
-    //New tensor Ops and transforms
+    // New tensor Ops and transforms
 
     IntegerTensor minus(int value);
 
@@ -177,5 +176,4 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     int min();
 
     int max();
-
 }

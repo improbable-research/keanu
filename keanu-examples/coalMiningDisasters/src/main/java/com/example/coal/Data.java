@@ -2,7 +2,6 @@ package com.example.coal;
 
 import io.improbable.keanu.util.csv.CsvReader;
 import io.improbable.keanu.util.csv.ReadCsv;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,26 +27,25 @@ public class Data {
             int year = yearToDisaster.getKey();
             years[i] = year;
 
-            //find start and end year from data
+            // find start and end year from data
             startYear = Math.min(startYear, year);
             endYear = Math.max(endYear, year);
 
             i++;
         }
-
     }
 
     public static Data load(String fileName) {
-        //Load a csv file from src/main/resources
+        // Load a csv file from src/main/resources
         CsvReader csvReader = ReadCsv.fromResources(fileName).expectHeader(false);
 
         Map<Integer, Integer> yearToDisasterCounts = new HashMap<>();
         for (List<String> csvLine : csvReader.readLines()) {
             // parses lines e.g. "1851,4"
-            yearToDisasterCounts.put(Integer.parseInt(csvLine.get(0)), Integer.parseInt(csvLine.get(1)));
+            yearToDisasterCounts.put(
+                    Integer.parseInt(csvLine.get(0)), Integer.parseInt(csvLine.get(1)));
         }
 
         return new Data(yearToDisasterCounts);
     }
-
 }

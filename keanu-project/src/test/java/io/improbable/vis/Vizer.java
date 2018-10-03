@@ -1,5 +1,9 @@
 package io.improbable.vis;
 
+import java.awt.Color;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
@@ -11,15 +15,11 @@ import org.jfree.data.xy.XYSeriesCollection;
 import org.jfree.ui.ApplicationFrame;
 import org.jfree.ui.RefineryUtilities;
 
-import java.awt.*;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-
 public class Vizer {
 
     enum PlotType {
-        SCATTER, AREA_CHART
+        SCATTER,
+        AREA_CHART
     }
 
     private static JFreeChart createHistogram(List<Double> samples) {
@@ -42,8 +42,9 @@ public class Vizer {
         boolean toolTips = false;
         boolean urls = false;
 
-        JFreeChart chart = ChartFactory.createHistogram(plotTitle, xAxis, yAxis,
-            dataset, orientation, show, toolTips, urls);
+        JFreeChart chart =
+                ChartFactory.createHistogram(
+                        plotTitle, xAxis, yAxis, dataset, orientation, show, toolTips, urls);
 
         chart.setBackgroundPaint(Color.white);
 
@@ -76,14 +77,29 @@ public class Vizer {
 
         switch (plotType) {
             case SCATTER:
-                chart = ChartFactory.createScatterPlot(plotTitle, xAxis, yAxis,
-                    collection, orientation, show, toolTips, urls);
+                chart =
+                        ChartFactory.createScatterPlot(
+                                plotTitle,
+                                xAxis,
+                                yAxis,
+                                collection,
+                                orientation,
+                                show,
+                                toolTips,
+                                urls);
                 break;
             default:
-                chart = ChartFactory.createXYAreaChart(plotTitle, xAxis, yAxis,
-                    collection, orientation, show, toolTips, urls);
+                chart =
+                        ChartFactory.createXYAreaChart(
+                                plotTitle,
+                                xAxis,
+                                yAxis,
+                                collection,
+                                orientation,
+                                show,
+                                toolTips,
+                                urls);
                 break;
-
         }
 
         chart.setBackgroundPaint(Color.white);
@@ -93,9 +109,8 @@ public class Vizer {
 
     private static JFreeChart createPlot(List<Double> y) {
 
-        List<Double> x = IntStream.range(0, y.size())
-            .asDoubleStream().boxed()
-            .collect(Collectors.toList());
+        List<Double> x =
+                IntStream.range(0, y.size()).asDoubleStream().boxed().collect(Collectors.toList());
 
         return createPlot(x, y, PlotType.AREA_CHART);
     }
@@ -126,5 +141,4 @@ public class Vizer {
         RefineryUtilities.centerFrameOnScreen(frame);
         frame.setVisible(true);
     }
-
 }

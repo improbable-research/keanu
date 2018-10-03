@@ -54,5 +54,4 @@ public class DoubleVertexFactory implements RandomFactory<DoubleVertex> {
         gaussianVertex.setValue(gaussianVertex.sample(random));
         return gaussianVertex;
     }
-
 }

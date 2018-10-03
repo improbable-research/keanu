@@ -11,13 +11,11 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex;
-
 import java.util.Arrays;
 
 public class If {
 
-    private If() {
-    }
+    private If() {}
 
     public static IfThenBuilder isTrue(Vertex<BooleanTensor> predicate) {
         return new IfThenBuilder(predicate);
@@ -56,8 +54,8 @@ public class If {
         private final Vertex<? extends BooleanTensor> predicate;
         private final Vertex<? extends Tensor<T>> thn;
 
-        public IfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
-                                 Vertex<? extends Tensor<T>> thn) {
+        public IfThenElseBuilder(
+                Vertex<? extends BooleanTensor> predicate, Vertex<? extends Tensor<T>> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
@@ -73,8 +71,8 @@ public class If {
         private final Vertex<? extends BooleanTensor> predicate;
         private final Vertex<? extends BooleanTensor> thn;
 
-        public BooleanIfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
-                                        Vertex<? extends BooleanTensor> thn) {
+        public BooleanIfThenElseBuilder(
+                Vertex<? extends BooleanTensor> predicate, Vertex<? extends BooleanTensor> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
@@ -90,8 +88,8 @@ public class If {
         private final Vertex<? extends BooleanTensor> predicate;
         private final Vertex<? extends DoubleTensor> thn;
 
-        public DoubleIfThenElseBuilder(Vertex<? extends BooleanTensor> predicate,
-                                       Vertex<? extends DoubleTensor> thn) {
+        public DoubleIfThenElseBuilder(
+                Vertex<? extends BooleanTensor> predicate, Vertex<? extends DoubleTensor> thn) {
             this.predicate = predicate;
             this.thn = thn;
         }
@@ -106,10 +104,14 @@ public class If {
         }
     }
 
-    private static void assertShapesMatchOrAreScalar(int[] thnShape, int[] elsShape, int[] predicateShape) {
+    private static void assertShapesMatchOrAreScalar(
+            int[] thnShape, int[] elsShape, int[] predicateShape) {
         if (!Arrays.equals(thnShape, elsShape)
-            || (!TensorShape.isScalar(predicateShape) && !TensorShape.isScalar(thnShape) && !Arrays.equals(predicateShape, thnShape))) {
-            throw new IllegalArgumentException("The shape of the then and else condition must match. The predicate should either match or be scalar.");
+                || (!TensorShape.isScalar(predicateShape)
+                        && !TensorShape.isScalar(thnShape)
+                        && !Arrays.equals(predicateShape, thnShape))) {
+            throw new IllegalArgumentException(
+                    "The shape of the then and else condition must match. The predicate should either match or be scalar.");
         }
     }
 }

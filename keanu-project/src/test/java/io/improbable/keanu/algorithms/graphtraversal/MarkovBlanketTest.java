@@ -1,15 +1,14 @@
 package io.improbable.keanu.algorithms.graphtraversal;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-
 import java.util.Arrays;
 import java.util.Set;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class MarkovBlanketTest {
 
@@ -58,5 +57,4 @@ public class MarkovBlanketTest {
         assertEquals(4, blanket.size());
         assertTrue(blanket.containsAll(Arrays.asList(B, C, F, E)));
     }
-
 }

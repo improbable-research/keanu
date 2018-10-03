@@ -1,12 +1,11 @@
 package io.improbable.keanu.util.csv;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
-
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.Vertex;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class SampleWriter extends Writer {
 

@@ -1,19 +1,20 @@
 package io.improbable.keanu.vertices.intgr.nonprobabilistic.operators.unary;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import java.util.function.Function;
 
-public class IntegerUnaryOpLambda<IN> extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
+public class IntegerUnaryOpLambda<IN> extends IntegerVertex
+        implements NonProbabilistic<IntegerTensor> {
 
     protected final Vertex<IN> inputVertex;
     protected final Function<IN, IntegerTensor> op;
 
-    public IntegerUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+    public IntegerUnaryOpLambda(
+            int[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
         this.inputVertex = inputVertex;
         this.op = op;
         setParents(inputVertex);

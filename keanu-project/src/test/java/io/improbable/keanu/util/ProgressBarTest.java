@@ -20,7 +20,6 @@ import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.atomic.AtomicReference;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -44,10 +43,11 @@ public class ProgressBarTest {
         progressUpdateCall = new AtomicReference<>(null);
 
         when(scheduler.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
-            .thenAnswer(invocation -> {
-                progressUpdateCall.set(invocation.getArgument(0));
-                return null;
-            });
+                .thenAnswer(
+                        invocation -> {
+                            progressUpdateCall.set(invocation.getArgument(0));
+                            return null;
+                        });
 
         progressBar = new ProgressBar(printStream, scheduler);
     }
@@ -149,13 +149,16 @@ public class ProgressBarTest {
     @Test
     public void youCanOverrideTheDefaultPrintStream() {
         PrintStream mockStream = mock(PrintStream.class);
-        doAnswer(new Answer() {
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                System.out.println(invocation.getArgument(0).toString());
-                return null;
-            }
-        }).when(mockStream).print(anyString());
+        doAnswer(
+                        new Answer() {
+                            @Override
+                            public Object answer(InvocationOnMock invocation) throws Throwable {
+                                System.out.println(invocation.getArgument(0).toString());
+                                return null;
+                            }
+                        })
+                .when(mockStream)
+                .print(anyString());
 
         ProgressBar.setDefaultPrintStream(mockStream);
         ProgressBar.enable();

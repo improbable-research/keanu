@@ -1,12 +1,7 @@
 package io.improbable.keanu.tensor.bool;
 
-import static java.util.Arrays.copyOf;
-
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
-
-import java.util.Arrays;
-
-import org.apache.commons.lang3.ArrayUtils;
+import static java.util.Arrays.copyOf;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -14,6 +9,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import java.util.Arrays;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 
@@ -30,7 +27,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     private final int[] stride;
 
     /**
-     * @param data  tensor data used c ordering
+     * @param data tensor data used c ordering
      * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean[] data, int[] shape) {
@@ -40,18 +37,14 @@ public class SimpleBooleanTensor implements BooleanTensor {
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
-    /**
-     * @param constant constant boolean value to fill shape
-     */
+    /** @param constant constant boolean value to fill shape */
     public SimpleBooleanTensor(boolean constant) {
-        this.data = new boolean[]{constant};
+        this.data = new boolean[] {constant};
         this.shape = Tensor.SCALAR_SHAPE;
         this.stride = Tensor.SCALAR_STRIDE;
     }
 
-    /**
-     * @param shape shape to use as place holder
-     */
+    /** @param shape shape to use as place holder */
     public SimpleBooleanTensor(int[] shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
@@ -60,7 +53,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     /**
      * @param constant constant boolean value to fill shape
-     * @param shape    desired shape of tensor
+     * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, int[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
@@ -72,8 +65,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
     @Override
     public BooleanTensor reshape(int... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
-            throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
-                + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
+            throw new IllegalArgumentException(
+                    "Cannot reshape a tensor to a shape of different length. Failed to reshape: "
+                            + Arrays.toString(shape)
+                            + " to: "
+                            + Arrays.toString(newShape));
         }
         return new SimpleBooleanTensor(data, newShape);
     }
@@ -121,7 +117,10 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
         int[] result = new int[data.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] =
+                    data[i]
+                            ? trueValuesFlattened.getOrScalar(i)
+                            : falseValuesFlattened.getOrScalar(i);
         }
 
         return IntegerTensor.create(result, copyOf(shape, shape.length));
@@ -134,7 +133,10 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
         boolean[] result = new boolean[data.length];
         for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
+            result[i] =
+                    data[i]
+                            ? trueValuesFlattened.getOrScalar(i)
+                            : falseValuesFlattened.getOrScalar(i);
         }
 
         return BooleanTensor.create(result, copyOf(shape, shape.length));
@@ -213,7 +215,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public BooleanTensor slice(int dimension, int index) {
-        DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
+        DoubleTensor tadDoubles =
+                Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
         double[] tadFlat = tadDoubles.asFlatDoubleArray();
         boolean[] tadToBooleans = new boolean[tadFlat.length];
         for (int i = 0; i < tadFlat.length; i++) {
@@ -270,10 +273,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
         if (o instanceof Tensor) {
             Tensor that = (Tensor) o;
             if (!Arrays.equals(that.getShape(), shape)) return false;
-            return Arrays.equals(
-                that.asFlatArray(),
-                this.asFlatArray()
-            );
+            return Arrays.equals(that.asFlatArray(), this.asFlatArray());
         }
 
         return false;
@@ -294,15 +294,18 @@ public class SimpleBooleanTensor implements BooleanTensor {
         if (data.length > 20) {
             dataString.append(Arrays.toString(Arrays.copyOfRange(data, 0, 10)));
             dataString.append("...");
-            dataString.append(Arrays.toString(Arrays.copyOfRange(data, data.length - 10, data.length)));
+            dataString.append(
+                    Arrays.toString(Arrays.copyOfRange(data, data.length - 10, data.length)));
         } else {
             dataString.append(Arrays.toString(data));
         }
 
-        return "{\n" +
-            "shape = " + Arrays.toString(shape) +
-            "\ndata = " + dataString.toString() +
-            "\n}";
+        return "{\n"
+                + "shape = "
+                + Arrays.toString(shape)
+                + "\ndata = "
+                + dataString.toString()
+                + "\n}";
     }
 
     @Override
@@ -326,7 +329,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
         @Override
         public Boolean get(long index) {
             if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for boolean tensors");
+                throw new IllegalArgumentException(
+                        "Only integer based indexing supported for boolean tensors");
             }
             return data[(int) index];
         }
@@ -343,11 +347,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
         @Override
         public void set(long index, Boolean value) {
             if (index > Integer.MAX_VALUE) {
-                throw new IllegalArgumentException("Only integer based indexing supported for generic tensors");
+                throw new IllegalArgumentException(
+                        "Only integer based indexing supported for generic tensors");
             }
             data[(int) index] = value;
         }
-
     }
 
     @Override
@@ -374,5 +378,4 @@ public class SimpleBooleanTensor implements BooleanTensor {
     public Boolean[] asFlatArray() {
         return ArrayUtils.toObject(data);
     }
-
 }

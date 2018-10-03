@@ -2,8 +2,7 @@ package io.improbable.keanu.distributions.gradient;
 
 public class Gaussian {
 
-    private Gaussian() {
-    }
+    private Gaussian() {}
 
     public static Diff dlnPdf(double mu, double sigma, double x) {
         final double variance = sigma * sigma;

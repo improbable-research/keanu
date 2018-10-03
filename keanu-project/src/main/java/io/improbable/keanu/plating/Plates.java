@@ -3,7 +3,6 @@ package io.improbable.keanu.plating;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import org.jetbrains.annotations.NotNull;
 
 public class Plates implements Iterable<Plate> {

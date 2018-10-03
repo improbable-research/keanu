@@ -10,7 +10,6 @@ public class VertexLabelMatchers {
 
     public static Matcher<VertexLabel> hasUnqualifiedName(String nameMatcher) {
         return hasUnqualifiedName(equalTo(nameMatcher));
-
     }
 
     public static Matcher<VertexLabel> hasUnqualifiedName(Matcher<String> nameMatcher) {
@@ -23,7 +22,9 @@ public class VertexLabelMatchers {
 
             @Override
             public void describeTo(Description description) {
-                description.appendText("vertex with unqualified name ").appendDescriptionOf(nameMatcher);
+                description
+                        .appendText("vertex with unqualified name ")
+                        .appendDescriptionOf(nameMatcher);
             }
         };
     }

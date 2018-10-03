@@ -1,15 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -29,19 +28,20 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     public KDEVertex(List<Double> samples) {
-        this(DoubleTensor.create(samples.stream()
-            .mapToDouble(Double::doubleValue)
-            .toArray(), new int[]{samples.size(), 1}));
+        this(
+                DoubleTensor.create(
+                        samples.stream().mapToDouble(Double::doubleValue).toArray(),
+                        new int[] {samples.size(), 1}));
     }
 
     public KDEVertex(List<Double> samples, double bandwidth) {
-        this(DoubleTensor.create(samples.stream()
-            .mapToDouble(Double::doubleValue)
-            .toArray()), bandwidth);
+        this(
+                DoubleTensor.create(samples.stream().mapToDouble(Double::doubleValue).toArray()),
+                bandwidth);
     }
 
     private DoubleTensor getDiffs(DoubleTensor x) {
-        DoubleTensor diffs = DoubleTensor.zeros(new int[]{samples.getShape()[0], x.getShape()[1]});
+        DoubleTensor diffs = DoubleTensor.zeros(new int[] {samples.getShape()[0], x.getShape()[1]});
         return diffs.plusInPlace(x).minusInPlace(samples).divInPlace(bandwidth);
     }
 
@@ -56,7 +56,8 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         Map<Vertex, DoubleTensor> partialDerivatives = new HashMap<>();
 
         if (withRespectTo.contains(this)) {
@@ -69,8 +70,11 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
 
     private DoubleTensor dPdx(DoubleTensor x) {
         DoubleTensor diff = getDiffs(x);
-        return gaussianKernel(diff).timesInPlace(diff).unaryMinusInPlace().sum(0)
-            .divInPlace(bandwidth * bandwidth * samples.getLength());
+        return gaussianKernel(diff)
+                .timesInPlace(diff)
+                .unaryMinusInPlace()
+                .sum(0)
+                .divInPlace(bandwidth * bandwidth * samples.getLength());
     }
 
     private DoubleTensor gaussianKernel(DoubleTensor x) {
@@ -84,11 +88,12 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
 
     public DoubleTensor sample(int nSamples, KeanuRandom random) {
         // get a random sample as the mean of a gaussian
-        // then draw a sample from the gaussian around that mean with the bandwidth as the standard deviation
-        DoubleTensor value = Uniform.withParameters(
-            DoubleTensor.scalar(0),
-            DoubleTensor.scalar(samples.getLength())
-        ).sample(new int[]{1, nSamples}, random);
+        // then draw a sample from the gaussian around that mean with the bandwidth as the standard
+        // deviation
+        DoubleTensor value =
+                Uniform.withParameters(
+                                DoubleTensor.scalar(0), DoubleTensor.scalar(samples.getLength()))
+                        .sample(new int[] {1, nSamples}, random);
 
         DoubleTensor index = value.floorInPlace();
         double[] shuffledSamples = new double[nSamples];
@@ -99,7 +104,9 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
         }
 
         DoubleTensor sampleMus = DoubleTensor.create(shuffledSamples);
-        return random.nextGaussian(new int[]{1, nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
+        return random.nextGaussian(new int[] {1, nSamples})
+                .timesInPlace(bandwidth)
+                .plusInPlace(sampleMus);
     }
 
     @Override

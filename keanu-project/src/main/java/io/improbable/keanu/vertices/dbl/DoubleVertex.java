@@ -1,10 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-
-import java.util.Collections;
-import java.util.Map;
-import java.util.function.Function;
-
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
@@ -20,7 +15,15 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
@@ -42,8 +45,12 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SliceVe
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TakeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
+import java.util.Collections;
+import java.util.Map;
+import java.util.function.Function;
 
-public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
+public abstract class DoubleVertex extends Vertex<DoubleTensor>
+        implements DoubleOperators<DoubleVertex>, Differentiable {
 
     public static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
@@ -181,19 +188,27 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new ReshapeVertex(this, proposedShape);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
-                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
+    public DoubleVertex lambda(
+            int[] outputShape,
+            Function<DoubleTensor, DoubleTensor> op,
+            Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
+            Function<PartialDerivatives, Map<Vertex, PartialDerivatives>>
+                    reverseModeAutoDiffLambda) {
+        return new DoubleUnaryOpLambda<>(
+                outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
-                               Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
-        return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
+    public DoubleVertex lambda(
+            Function<DoubleTensor, DoubleTensor> op,
+            Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
+            Function<PartialDerivatives, Map<Vertex, PartialDerivatives>>
+                    reverseModeAutoDiffLambda) {
+        return new DoubleUnaryOpLambda<>(
+                this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the DoubleOperators interface)
+    // 'times' and 'div' are required to enable operator overloading in Kotlin (through the
+    // DoubleOperators interface)
     @Override
     public DoubleVertex times(DoubleVertex that) {
         return multiply(that);
@@ -289,10 +304,9 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         return Collections.singletonMap(
-            this,
-            PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
-        );
+                this, PartialDerivatives.withRespectToSelf(this.getId(), this.getShape()));
     }
 }

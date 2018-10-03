@@ -1,18 +1,17 @@
 package io.improbable.keanu.tensor.dbl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
-
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
 
-public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
+public interface DoubleTensor
+        extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
     DoubleTensor MINUS_ONE_SCALAR = scalar(-1.0);
 
@@ -72,7 +71,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     /**
      * @param start start of range
-     * @param end   end of range (exclusive)
+     * @param end end of range (exclusive)
      * @return a vector of numbers from start incrementing by one to end (exclusively)
      */
     static DoubleTensor arange(double start, double end) {
@@ -80,8 +79,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     /**
-     * @param start    start of range
-     * @param end      end of range (exclusive)
+     * @param start start of range
+     * @param end end of range (exclusive)
      * @param stepSize size of step from start to end
      * @return a vector of numbers starting at start and stepping to end (exclusively)
      */
@@ -131,7 +130,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor sum(int... overDimensions);
 
-    //New tensor Ops and transforms
+    // New tensor Ops and transforms
 
     DoubleTensor reciprocal();
 
@@ -226,7 +225,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return slicedTensors;
     }
 
-    //In place Ops and Transforms. These mutate the source vertex (i.e. this).
+    // In place Ops and Transforms. These mutate the source vertex (i.e. this).
 
     DoubleTensor reciprocalInPlace();
 
@@ -299,6 +298,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     BooleanTensor notNaN();
 
-    default BooleanTensor isNaN() { return notNaN().not(); }
-
+    default BooleanTensor isNaN() {
+        return notNaN().not();
+    }
 }

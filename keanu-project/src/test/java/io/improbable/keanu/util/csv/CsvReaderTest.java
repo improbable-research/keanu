@@ -1,11 +1,10 @@
 package io.improbable.keanu.util.csv;
 
-import org.junit.Test;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
-
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class CsvReaderTest {
 
@@ -35,9 +34,7 @@ public class CsvReaderTest {
 
     @Test
     public void givenTsvStringWithoutHeaderThenReturnsData() {
-        CsvReader csvReader = ReadCsv.fromString(tsv)
-            .expectHeader(false)
-            .withDelimiter("\t");
+        CsvReader csvReader = ReadCsv.fromString(tsv).expectHeader(false).withDelimiter("\t");
         testWithoutHeader(csvReader);
     }
 

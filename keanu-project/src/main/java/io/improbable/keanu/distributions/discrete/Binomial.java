@@ -1,12 +1,11 @@
 package io.improbable.keanu.distributions.discrete;
 
-import org.nd4j.linalg.util.ArrayUtil;
-
 import io.improbable.keanu.distributions.DiscreteDistribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 public class Binomial implements DiscreteDistribution {
 
@@ -65,7 +64,8 @@ public class Binomial implements DiscreteDistribution {
         DoubleTensor kDouble = k.toDouble();
         DoubleTensor logNFactorial = nDouble.plus(1.0).logGammaInPlace();
         DoubleTensor logKFactorial = kDouble.plus(1.0).logGammaInPlace();
-        DoubleTensor logNMinusKFactorial = nDouble.minusInPlace(kDouble).plusInPlace(1.0).logGammaInPlace();
+        DoubleTensor logNMinusKFactorial =
+                nDouble.minusInPlace(kDouble).plusInPlace(1.0).logGammaInPlace();
 
         return logNFactorial.minusInPlace(logKFactorial).minusInPlace(logNMinusKFactorial);
     }

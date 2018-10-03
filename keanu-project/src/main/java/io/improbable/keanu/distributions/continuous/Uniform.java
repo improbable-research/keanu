@@ -6,10 +6,8 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 /**
- * Computer Generation of Statistical Distributions
- * by Richard Saucier
- * ARL-TR-2168 March 2000
- * 5.1.8 page 48
+ * Computer Generation of Statistical Distributions by Richard Saucier ARL-TR-2168 March 2000 5.1.8
+ * page 48
  */
 public class Uniform implements ContinuousDistribution {
 
@@ -17,13 +15,14 @@ public class Uniform implements ContinuousDistribution {
     private final DoubleTensor xMax;
 
     /**
-     * @param xMin   minimum x value
-     * @param xMax   maximum x value
-     * @return       a new ContinuousDistribution object
+     * @param xMin minimum x value
+     * @param xMax maximum x value
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
         return new Uniform(xMin, xMax);
     }
+
     private Uniform(DoubleTensor xMin, DoubleTensor xMax) {
         this.xMin = xMin;
         this.xMax = xMax;
@@ -38,8 +37,12 @@ public class Uniform implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
 
         DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds = logOfWithinBounds.setWithMaskInPlace(x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds =
+                logOfWithinBounds.setWithMaskInPlace(
+                        x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+        logOfWithinBounds =
+                logOfWithinBounds.setWithMaskInPlace(
+                        x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
         return logOfWithinBounds;
     }

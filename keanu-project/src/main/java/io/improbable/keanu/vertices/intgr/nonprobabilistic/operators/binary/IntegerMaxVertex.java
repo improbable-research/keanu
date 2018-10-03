@@ -8,7 +8,7 @@ public class IntegerMaxVertex extends IntegerBinaryOpVertex {
     /**
      * Finds the maximum between two vertices
      *
-     * @param left  one of the vertices to find the maximum of
+     * @param left one of the vertices to find the maximum of
      * @param right one of the vertices to find the maximum of
      */
     public IntegerMaxVertex(IntegerVertex left, IntegerVertex right) {

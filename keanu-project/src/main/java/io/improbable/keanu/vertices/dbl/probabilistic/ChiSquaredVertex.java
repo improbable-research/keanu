@@ -2,18 +2,16 @@ package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
-import java.util.Map;
-import java.util.Set;
-
 import io.improbable.keanu.distributions.continuous.ChiSquared;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
+import java.util.Map;
+import java.util.Set;
 
 public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -21,11 +19,11 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
 
     /**
      * One k that must match a proposed tensor shape of ChiSquared
-     * <p>
-     * If all provided parameters are scalar then the proposed shape determines the shape
+     *
+     * <p>If all provided parameters are scalar then the proposed shape determines the shape
      *
      * @param tensorShape the desired shape of the vertex
-     * @param k           the number of degrees of freedom
+     * @param k the number of degrees of freedom
      */
     public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
@@ -40,8 +38,7 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
     }
 
     /**
-     * One to one constructor for mapping some shape of k to
-     * a matching shaped ChiSquared.
+     * One to one constructor for mapping some shape of k to a matching shaped ChiSquared.
      *
      * @param k the number of degrees of freedom
      */
@@ -64,8 +61,8 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(
+            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
         throw new UnsupportedOperationException();
     }
-
 }

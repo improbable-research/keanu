@@ -2,18 +2,16 @@ package io.improbable.keanu.network;
 
 import static org.junit.Assert.assertTrue;
 
+import io.improbable.keanu.network.grouping.NetworkStateGrouper;
+import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
+import io.improbable.keanu.vertices.VertexId;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.junit.Test;
-
-import io.improbable.keanu.network.grouping.NetworkStateGrouper;
-import io.improbable.keanu.network.grouping.continuouspointgroupers.DBSCANContinuousPointGrouper;
-import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class NetworkStateGrouperTest {
 
@@ -39,13 +37,16 @@ public class NetworkStateGrouperTest {
         List<VertexId> discreteIds = Arrays.asList(v1Id, v2Id);
         List<VertexId> continuousIds = Arrays.asList(v3Id, v4Id, v5Id);
 
-        NetworkStateGrouper grouper = new NetworkStateGrouper(new DBSCANContinuousPointGrouper(1.0, 3));
-        List<List<NetworkState>> filteredStates = grouper.groupNetworkStates(networkStates, discreteIds, continuousIds);
+        NetworkStateGrouper grouper =
+                new NetworkStateGrouper(new DBSCANContinuousPointGrouper(1.0, 3));
+        List<List<NetworkState>> filteredStates =
+                grouper.groupNetworkStates(networkStates, discreteIds, continuousIds);
 
         assertTrue(filteredStates.size() == 5);
     }
 
-    private List<NetworkState> createGroup(boolean v1, boolean v2, double v3, double v4, double v5) {
+    private List<NetworkState> createGroup(
+            boolean v1, boolean v2, double v3, double v4, double v5) {
 
         List<NetworkState> group = new ArrayList<>();
 

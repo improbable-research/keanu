@@ -6,15 +6,12 @@ import static org.hamcrest.Matchers.equalTo;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
-
 import org.hamcrest.Description;
 import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
-
 public class TensorMatchers {
     private TensorMatchers() {}
-
 
     public static <T> Matcher<Tensor<T>> hasShape(int... shape) {
         return hasShape(equalTo(shape));
@@ -66,17 +63,17 @@ public class TensorMatchers {
                 T[] itemArray = item.asFlatArray();
                 if (itemArray.length != valueMatchers.size()) {
                     mismatchDescription
-                        .appendText(" with different size ")
-                        .appendValue(itemArray.length);
+                            .appendText(" with different size ")
+                            .appendValue(itemArray.length);
                     return false;
                 }
                 for (int i = 0; i < valueMatchers.size(); i++) {
                     if (!valueMatchers.get(i).matches(itemArray[i])) {
                         mismatchDescription
-                            .appendText(" with different value ")
-                            .appendValue(itemArray[i])
-                            .appendText(" at entry ")
-                            .appendValue(i);
+                                .appendText(" with different value ")
+                                .appendValue(itemArray[i])
+                                .appendText(" at entry ")
+                                .appendValue(i);
                         return false;
                     }
                 }
@@ -100,10 +97,10 @@ public class TensorMatchers {
                 for (int i = 0; i < itemFlattened.size(); i++) {
                     if (!valueMatcher.matches(itemFlattened.getOrScalar(i))) {
                         mismatchDescription
-                            .appendText(" with different value ")
-                            .appendValue(itemFlattened.getOrScalar(i))
-                            .appendText(" at entry ")
-                            .appendValue(i);
+                                .appendText(" with different value ")
+                                .appendValue(itemFlattened.getOrScalar(i))
+                                .appendText(" at entry ")
+                                .appendValue(i);
                         return false;
                     }
                 }
@@ -121,8 +118,12 @@ public class TensorMatchers {
         return hasValue(other.asFlatArray());
     }
 
-
-    public static <T extends Double> Matcher<Tensor<Double>> allCloseTo(T epsilon, Tensor<T> other) {
-        return hasValue(other.asFlatList().stream().map(v -> closeTo(v, epsilon)).collect(Collectors.toList()));
+    public static <T extends Double> Matcher<Tensor<Double>> allCloseTo(
+            T epsilon, Tensor<T> other) {
+        return hasValue(
+                other.asFlatList()
+                        .stream()
+                        .map(v -> closeTo(v, epsilon))
+                        .collect(Collectors.toList()));
     }
 }

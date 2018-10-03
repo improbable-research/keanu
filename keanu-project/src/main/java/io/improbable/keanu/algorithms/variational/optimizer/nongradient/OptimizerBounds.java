@@ -2,10 +2,9 @@ package io.improbable.keanu.algorithms.variational.optimizer.nongradient;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
-import lombok.Value;
-
 import java.util.HashMap;
 import java.util.Map;
+import lombok.Value;
 
 public class OptimizerBounds {
 
@@ -17,7 +16,8 @@ public class OptimizerBounds {
 
     private Map<Vertex<? extends DoubleTensor>, VertexBounds> vertexBounds = new HashMap<>();
 
-    public void addBound(Vertex<? extends DoubleTensor> vertex, DoubleTensor min, DoubleTensor max) {
+    public void addBound(
+            Vertex<? extends DoubleTensor> vertex, DoubleTensor min, DoubleTensor max) {
         DoubleTensor minDup = min.duplicate();
         DoubleTensor maxDup = max.duplicate();
 
@@ -47,5 +47,4 @@ public class OptimizerBounds {
     public DoubleTensor getUpper(Vertex<? extends DoubleTensor> vertex) {
         return vertexBounds.get(vertex).getMax();
     }
-
 }

@@ -4,12 +4,12 @@ import java.util.Optional;
 
 public class NotObservable<T> implements Observable<T> {
     // package private - because it's created by the factory method Observable.observableTypeFor
-    NotObservable() {
-    }
+    NotObservable() {}
 
     @Override
     public void observe(T value) {
-        throw new UnsupportedOperationException("This type of vertex does not support being observed");
+        throw new UnsupportedOperationException(
+                "This type of vertex does not support being observed");
     }
 
     @Override

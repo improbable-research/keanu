@@ -12,8 +12,7 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 
 public class ConstantVertex {
 
-    private ConstantVertex() {
-    }
+    private ConstantVertex() {}
 
     public static ConstantBoolVertex of(Boolean value) {
         return new ConstantBoolVertex(value);
@@ -68,7 +67,8 @@ public class ConstantVertex {
     }
 
     public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(values, new int[]{1, values.length}));
+        return new ConstantGenericVertex<>(
+                new GenericTensor<>(values, new int[] {1, values.length}));
     }
 
     public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {

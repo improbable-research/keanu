@@ -1,21 +1,19 @@
 package io.improbable.keanu.distributions.continuous;
 
+import static io.improbable.keanu.distributions.dual.Diffs.K;
+import static io.improbable.keanu.distributions.dual.Diffs.THETA;
+import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static java.lang.Math.exp;
 import static java.lang.Math.log;
 import static java.lang.Math.pow;
 import static java.lang.Math.sqrt;
-
-import static io.improbable.keanu.distributions.dual.Diffs.K;
-import static io.improbable.keanu.distributions.dual.Diffs.THETA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
-
-import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.dual.Diffs;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+import org.nd4j.linalg.util.ArrayUtil;
 
 public class Gamma implements ContinuousDistribution {
 
@@ -25,7 +23,7 @@ public class Gamma implements ContinuousDistribution {
 
     /**
      * @param theta scale
-     * @param k     shape
+     * @param k shape
      * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(DoubleTensor theta, DoubleTensor k) {
@@ -53,7 +51,8 @@ public class Gamma implements ContinuousDistribution {
 
     private static double sample(double theta, double k, KeanuRandom random) {
         if (theta <= 0. || k <= 0.) {
-            throw new IllegalArgumentException("Invalid value for theta or k. Theta: " + theta + ". k: " + k);
+            throw new IllegalArgumentException(
+                    "Invalid value for theta or k. Theta: " + theta + ". k: " + k);
         }
         final double A = 1. / sqrt(2. * k - 1.);
         final double B = k - log(4.);
@@ -78,7 +77,8 @@ public class Gamma implements ContinuousDistribution {
         }
     }
 
-    private static double sampleWhileKLessThanOne(double c, double k, double theta, KeanuRandom random) {
+    private static double sampleWhileKLessThanOne(
+            double c, double k, double theta, KeanuRandom random) {
         while (true) {
             double p = c * random.nextDouble();
             if (p > 1.) {
@@ -115,13 +115,13 @@ public class Gamma implements ContinuousDistribution {
     @Override
     public Diffs dLogProb(DoubleTensor x) {
         final DoubleTensor dLogPdx = k.minus(1.).divInPlace(x).minusInPlace(theta.reciprocal());
-        final DoubleTensor dLogPdtheta = theta.times(k).plusInPlace(x.unaryMinus()).divInPlace(theta.pow(2.)).unaryMinusInPlace();
+        final DoubleTensor dLogPdtheta =
+                theta.times(k)
+                        .plusInPlace(x.unaryMinus())
+                        .divInPlace(theta.pow(2.))
+                        .unaryMinusInPlace();
         final DoubleTensor dLogPdk = x.log().minusInPlace(theta.log()).minusInPlace(k.digamma());
 
-        return new Diffs()
-            .put(THETA, dLogPdtheta)
-            .put(K, dLogPdk)
-            .put(X, dLogPdx);
+        return new Diffs().put(THETA, dLogPdtheta).put(K, dLogPdk).put(X, dLogPdx);
     }
-
 }

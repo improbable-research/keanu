@@ -1,16 +1,11 @@
 package io.improbable.keanu.algorithms.variational.optimizer.gradient;
 
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
-import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.BiConsumer;
-
-import org.junit.Test;
 
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import java.util.concurrent.atomic.AtomicInteger;
+import org.junit.Test;
 
 public class GradientOptimizerTest {
 
@@ -18,11 +13,11 @@ public class GradientOptimizerTest {
     public void doesCallOnFitnessAndOnGradientHandler() {
         AtomicInteger fitnessTimesCalled = new AtomicInteger(0);
         AtomicInteger gradientTimesCalled = new AtomicInteger(0);
-        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(
-            new GaussianVertex(0, 1)
-        );
-        optimizer.addFitnessCalculationHandler((point, fitness) -> fitnessTimesCalled.incrementAndGet());
-        optimizer.addGradientCalculationHandler((point, fitness) -> gradientTimesCalled.incrementAndGet());
+        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(new GaussianVertex(0, 1));
+        optimizer.addFitnessCalculationHandler(
+                (point, fitness) -> fitnessTimesCalled.incrementAndGet());
+        optimizer.addGradientCalculationHandler(
+                (point, fitness) -> gradientTimesCalled.incrementAndGet());
         optimizer.maxAPosteriori();
 
         assertTrue(fitnessTimesCalled.get() > 0);

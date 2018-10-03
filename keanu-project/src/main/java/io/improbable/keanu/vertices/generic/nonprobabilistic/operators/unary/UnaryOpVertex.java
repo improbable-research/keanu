@@ -1,6 +1,5 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary;
 
-
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -26,4 +25,3 @@ public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonP
 
     protected abstract OUT op(IN a);
 }
-

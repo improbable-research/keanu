@@ -1,15 +1,15 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import java.util.Map;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import java.util.Map;
 
-public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public abstract class DoubleUnaryOpVertex extends DoubleVertex
+        implements NonProbabilistic<DoubleTensor> {
 
     protected final DoubleVertex inputVertex;
 
@@ -25,7 +25,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
     /**
      * A vertex that performs a user defined operation on a single input vertex
      *
-     * @param shape       the shape of the tensor
+     * @param shape the shape of the tensor
      * @param inputVertex the input vertex
      */
     public DoubleUnaryOpVertex(int[] shape, DoubleVertex inputVertex) {

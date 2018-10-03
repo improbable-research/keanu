@@ -29,15 +29,15 @@ public class Exponential implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         final DoubleTensor negXMinusADivB = x.unaryMinus().divInPlace(lambda);
         final DoubleTensor negXMinusADivBMinusLogB = negXMinusADivB.minusInPlace(lambda.log());
-        return negXMinusADivBMinusLogB.setWithMask(x.getLessThanMask(DoubleTensor.ZERO_SCALAR), Double.NEGATIVE_INFINITY);
+        return negXMinusADivBMinusLogB.setWithMask(
+                x.getLessThanMask(DoubleTensor.ZERO_SCALAR), Double.NEGATIVE_INFINITY);
     }
 
     @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor dLogPdx = DoubleTensor.zeros(x.getShape()).minusInPlace(lambda).reciprocalInPlace();
+        final DoubleTensor dLogPdx =
+                DoubleTensor.zeros(x.getShape()).minusInPlace(lambda).reciprocalInPlace();
         final DoubleTensor dLogPdlambda = x.minus(lambda).divInPlace(lambda.pow(2));
-        return new Diffs()
-            .put(LAMBDA, dLogPdlambda)
-            .put(X, dLogPdx);
+        return new Diffs().put(LAMBDA, dLogPdlambda).put(X, dLogPdx);
     }
 }

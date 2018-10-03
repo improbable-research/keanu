@@ -2,7 +2,6 @@ package io.improbable.keanu.distributions.dual;
 
 import com.google.common.collect.Sets;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-
 import java.util.NoSuchElementException;
 import java.util.TreeSet;
 

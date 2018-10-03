@@ -1,14 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.rng.DefaultRandom;
-import org.nd4j.linalg.api.rng.Random;
-import org.nd4j.linalg.factory.Nd4j;
-
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.discrete.Poisson;
@@ -18,6 +9,13 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.rng.DefaultRandom;
+import org.nd4j.linalg.api.rng.Random;
+import org.nd4j.linalg.factory.Nd4j;
 
 public class KeanuRandom {
 
@@ -74,7 +72,7 @@ public class KeanuRandom {
     public double nextDoubleNonZero() {
         double randomValue;
 
-        while ((randomValue = nextDouble()) == 0.0);
+        while ((randomValue = nextDouble()) == 0.0) ;
 
         return randomValue;
     }
@@ -113,7 +111,6 @@ public class KeanuRandom {
 
     public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
         return Poisson.withParameters(mu).sample(shape, this);
-
     }
 
     public int nextInt(int maxExclusive) {
@@ -134,5 +131,4 @@ public class KeanuRandom {
         Nd4j.setDataType(bufferType);
         return nd4jRandom.nextGaussian(shape);
     }
-
 }
