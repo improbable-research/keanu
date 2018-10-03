@@ -2,9 +2,13 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static java.util.Collections.singletonMap;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
-import io.improbable.keanu.tensor.Tensor;
+import com.google.common.primitives.Ints;
+
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -13,23 +17,54 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class SumVertex extends DoubleUnaryOpVertex {
 
+    private final int[] sumOverDimensions;
+
+    public SumVertex(DoubleVertex inputVertex, int[] sumOverDimensions) {
+        super(getSummationResultShape(inputVertex.getShape(), sumOverDimensions), inputVertex);
+        this.sumOverDimensions = sumOverDimensions;
+    }
+
+    /**
+     * This is here due to strange behavior in tensor summing over dimensions where
+     * dimensions are not dropped if the rank is 2 or less.
+     */
+    private static int[] getSummationResultShape(int[] inputShape, int[] sumOverDimensions) {
+        List<Integer> inputShapeList = new ArrayList<>(Ints.asList(inputShape));
+
+        for (int dim : sumOverDimensions) {
+            inputShapeList.set(dim, 0);
+        }
+
+        for (int i = inputShapeList.size() - 1; i >= 0; i--) {
+            if (inputShapeList.get(i) == 0) {
+                if (inputShapeList.size() > 2) {
+                    inputShapeList.remove(i);
+                } else {
+                    inputShapeList.set(i, 1);
+                }
+            }
+        }
+
+        return Ints.toArray(inputShapeList);
+    }
+
     /**
      * Performs a sum across each value stored in a vertex
      *
      * @param inputVertex the vertex to have its values summed
      */
     public SumVertex(DoubleVertex inputVertex) {
-        super(Tensor.SCALAR_SHAPE, inputVertex);
+        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
     }
 
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return DoubleTensor.scalar(value.sum());
+        return value.sum(sumOverDimensions);
     }
 
     @Override
     protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.sum();
+        return dualNumber.sum(sumOverDimensions);
     }
 
     @Override

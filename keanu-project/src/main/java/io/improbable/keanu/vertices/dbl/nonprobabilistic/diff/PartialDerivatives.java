@@ -5,13 +5,10 @@ import static java.util.Collections.singletonMap;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
-import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -64,17 +61,21 @@ public class PartialDerivatives {
      * This will sum partial derivatives that are represented as tensors over given dimensions.
      * The dimensions that are summed over will be reshaped to a scalar shape of 1x1.
      *
-     * @param ofDimensions dimensions to sum over (should be first n dimensions)
+     * @param resultShape
+     * @param sumOfRank   the rank of the of part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivatives sumOverOfDimensions(int... ofDimensions) {
+    public PartialDerivatives sumOverOfDimensions(int[] sumOverDimensions, int[] resultShape, int sumOfRank) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
-            DoubleTensor summedV = v.sum(ofDimensions);
-            int[] newShape = TensorShape.concat(Tensor.SCALAR_SHAPE, summedV.getShape());
+            DoubleTensor summedV = v.sum(sumOverDimensions);
+            int[] vShape = v.getShape();
+            int[] wrtShape = TensorShape.selectDimensions(sumOfRank, vShape.length - 1, vShape);
+
+            int[] newShape = TensorShape.concat(resultShape, wrtShape);
             summedV = summedV.reshape(newShape);
 
             summed.put(k, summedV);
@@ -226,6 +227,7 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, int[] ofShape) {
 
         int[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
+//        !Arrays.equals(partialOfShape, multiplier.getShape())
         if (TensorShape.isScalar(partialOfShape)) {
 
             int[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
@@ -244,7 +246,7 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier, int[] wrtShape) {
 
         int[] partialWrtShape = extractWrtShape(partial.getShape(), partial.getRank() - wrtShape.length);
-        if (TensorShape.isScalar(partialWrtShape)) {
+        if (!Arrays.equals(partialWrtShape, multiplier.getShape())) {
             int[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
             int[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
 
