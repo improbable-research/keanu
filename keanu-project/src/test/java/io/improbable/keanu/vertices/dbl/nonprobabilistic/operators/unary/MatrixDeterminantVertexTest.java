@@ -1,10 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static org.hamcrest.Matchers.closeTo;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertThat;
+
+import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
+import static io.improbable.keanu.vertices.VertexMatchers.hasValue;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
 
-import org.apache.commons.math3.exception.MathArithmeticException;
 import org.apache.commons.math3.linear.SingularMatrixException;
-import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -12,8 +16,8 @@ import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexMatchers;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
@@ -24,7 +28,7 @@ public class MatrixDeterminantVertexTest {
     @Test
     public void calculatesDeterminant() {
         final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
-        Assert.assertThat(input.matrixDeterminant().getValue(), TensorMatchers.isScalarWithValue(-2d));
+        Assert.assertThat(input.matrixDeterminant(), hasValue(isScalarWithValue(-2d)));
     }
 
     @Test
@@ -36,13 +40,13 @@ public class MatrixDeterminantVertexTest {
             7, 8, 9, 20, 10,
             12, 32, 43, -2, 5};
         final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(values, 5, 5));
-        Assert.assertThat(input.matrixDeterminant().getValue(), TensorMatchers.isScalarWithValue(Matchers.closeTo(6120880d, 1e-5)));
+        assertThat(input.matrixDeterminant(), VertexMatchers.hasValue(isScalarWithValue(closeTo(6120880d, 1e-5))));
     }
 
     @Test
     public void calculatesDeterminantOnScalar() {
         final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.scalar(5));
-        Assert.assertThat(input.matrixDeterminant().getValue(), TensorMatchers.isScalarWithValue(5d));
+        assertThat(input.matrixDeterminant(), hasValue(isScalarWithValue(5d)));
     }
 
     @Test
@@ -82,7 +86,7 @@ public class MatrixDeterminantVertexTest {
     public void differentiationFailsWhenMatrixIsSingular() {
         final int[] shape = new int[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
-        input.setValue(DoubleTensor.create(new double[]{0, 0, 0,0}, shape));
+        input.setValue(DoubleTensor.create(new double[]{0, 0, 0, 0}, shape));
         final DoubleVertex output = input.matrixDeterminant();
         Differentiator.reverseModeAutoDiff(output, input);
     }
@@ -106,6 +110,6 @@ public class MatrixDeterminantVertexTest {
         final BayesianNetwork net = new BayesianNetwork(output.getConnectedGraph());
 
         Optimizer.of(net).maxLikelihood();
-        Assert.assertEquals(input.getValue().determinant(), 2.2, 0.1);
+        assertEquals(input.getValue().determinant(), 2.2, 0.1);
     }
 }
