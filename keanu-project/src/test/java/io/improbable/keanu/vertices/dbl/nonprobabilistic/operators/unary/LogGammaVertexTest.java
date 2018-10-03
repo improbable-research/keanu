@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static org.apache.commons.math3.special.Gamma.digamma;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfMatrixElementWiseOperator;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfScalar;
@@ -65,6 +65,6 @@ public class LogGammaVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, 1.0, 10.0);
         DoubleVertex outputVertex = inputVertex.div(3).logGamma();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);
     }
 }

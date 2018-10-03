@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -119,7 +119,7 @@ public class DifferentiatorTest {
         DoubleVertex F = D.plus(B).exp();
         DoubleVertex H = G.plus(F).sum().times(A).sum().times(C);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3,  true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3);
     }
 
     @Test

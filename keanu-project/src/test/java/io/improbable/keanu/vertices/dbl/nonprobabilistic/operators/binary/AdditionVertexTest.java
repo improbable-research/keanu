@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 import org.junit.Test;
@@ -83,6 +83,6 @@ public class AdditionVertexTest {
         DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex C = A.plus(B);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10);
     }
 }

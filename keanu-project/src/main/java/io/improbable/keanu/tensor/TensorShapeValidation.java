@@ -64,6 +64,16 @@ public class TensorShapeValidation {
         }
     }
 
+    public static void checkShapeIsSquareMatrix(int[] shape) {
+        if (shape.length != 2) {
+            throw new IllegalArgumentException("Input tensor must be a matrix");
+        }
+
+        if (shape[0] != shape[1]) {
+            throw new IllegalArgumentException("Input matrix must be square");
+        }
+    }
+
     private static Set<TensorShape> getNonScalarShapes(int[]... shapes) {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
