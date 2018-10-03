@@ -78,13 +78,6 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new MatrixInverseVertex(this);
     }
 
-    /**
-     * Get a vertex that is the determinant of this vertex.
-     * <p>
-     * Gradient calculations (and thus gradient-based optimisations) will fail if the matrixDeterminant is 0.
-     *
-     * @return a new vertex with the value of the determinant of this vertex
-     */
     public DoubleVertex matrixDeterminant() {
         return new MatrixDeterminantVertex(this);
     }

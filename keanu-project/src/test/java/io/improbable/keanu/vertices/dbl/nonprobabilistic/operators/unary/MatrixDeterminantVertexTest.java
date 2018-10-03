@@ -1,7 +1,14 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesReverseModeGradient;
+
+import org.apache.commons.math3.exception.MathArithmeticException;
+import org.apache.commons.math3.linear.SingularMatrixException;
+import org.hamcrest.Matchers;
 import org.junit.Assert;
 import org.junit.Test;
+
+import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -21,45 +28,86 @@ public class MatrixDeterminantVertexTest {
     }
 
     @Test
-    public void canDifferentiateWrtScalar() {
-        final int[] shape = new int[]{2, 2};
-        final DoubleVertex input = new UniformVertex(shape, 0, 10);
-        input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
-        final DoubleVertex output = input.matrixDeterminant().plus(1);
-        final DoubleTensor expectedDerivative = DoubleTensor.create(new double[]{4, -3, -2, 1}, shape);
-        assertReverseAutoDiffMatches(output, input, expectedDerivative);
+    public void calculatesDeterminantOnLargeMatrix() {
+        final double[] values = new double[]{
+            1, 8, 4, 5, 6,
+            1, 100, 232, 4, 15,
+            -10, 3, 57, 68, 10,
+            7, 8, 9, 20, 10,
+            12, 32, 43, -2, 5};
+        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(values, 5, 5));
+        Assert.assertThat(input.matrixDeterminant().getValue(), TensorMatchers.isScalarWithValue(Matchers.closeTo(6120880d, 1e-5)));
     }
 
     @Test
-    public void canDifferentiateWrtTensor() {
+    public void calculatesDeterminantOnScalar() {
+        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.scalar(5));
+        Assert.assertThat(input.matrixDeterminant().getValue(), TensorMatchers.isScalarWithValue(5d));
+    }
+
+    @Test
+    public void canDifferentiateWhenOutputIsScalar() {
+        final int[] shape = new int[]{2, 2};
+        final DoubleVertex input = new UniformVertex(shape, 0, 10);
+        input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
+        final DoubleVertex output = input.matrixDeterminant();
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(input), output, 0.001, 1e-5);
+    }
+
+    @Test
+    public void canDifferentiateWhenOutputIsTensor() {
         final int[] shape = new int[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
         final DoubleVertex output = input.matrixDeterminant().times(input);
 
-        // For calculation of derivative, see
-        // https://www.wolframalpha.com/input/?i=x+%3D+1;+y+%3D+2;+z+%3D+3;+w+%3D+4;+d%2Fdx+(%7B%7Bx,y%7D,%7Bz,w%7D%7D+*+det(%7B%7Bx,y%7D,%7Bz,w%7D%7D))
-        final double[] expectedDerivativeValues = new double[]{2, -3, -2, 1, 8, -8, -4, 2, 12, -9, -8, 3, 16, -12, -8, 2};
-        final DoubleTensor expectedDerivative = DoubleTensor.create(expectedDerivativeValues, 2, 2, 2, 2);
-        assertReverseAutoDiffMatches(output, input, expectedDerivative);
+        finiteDifferenceMatchesReverseModeGradient(ImmutableList.of(input), output, 0.001, 1e-5);
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsForNonMatrixInputs() {
+        final int[] shape = new int[]{2, 2, 2};
+        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
+        input.matrixDeterminant();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsForNonSquareMatrices() {
+        final int[] shape = new int[]{2, 3};
+        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
+        input.matrixDeterminant();
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void failsIfInputChangesToInvalidForm() {
+        final int[] shape = new int[]{4, 4};
+        final int[] badShape = new int[]{2, 2, 2, 2};
+        final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
+        final DoubleVertex output = input.matrixDeterminant();
+        input.setValue(DoubleTensor.create(1, badShape));
+        output.eval();
+    }
+
+    @Test(expected = SingularMatrixException.class)
+    public void differentiationFailsWhenMatrixIsSingular() {
+        final int[] shape = new int[]{2, 2};
+        final DoubleVertex input = new UniformVertex(shape, 0, 10);
+        input.setValue(DoubleTensor.create(new double[]{0, 0, 0,0}, shape));
+        final DoubleVertex output = input.matrixDeterminant();
+        Differentiator.reverseModeAutoDiff(output, input);
     }
 
     @Test
     public void canOptimiseOutOfTheBox() {
-        assertOptimizerWorks(2);
+        assertOptimizerWorksWithDeterminant(2);
     }
 
     @Test
     public void canOptimiseOutOfTheBoxStartingAtZero() {
-        assertOptimizerWorks(0);
+        assertOptimizerWorksWithDeterminant(0);
     }
 
-    private void assertReverseAutoDiffMatches(DoubleVertex output, DoubleVertex input, DoubleTensor expectedDerivative) {
-        final DoubleTensor derivative = Differentiator.reverseModeAutoDiff(output, input).withRespectTo(input);
-        Assert.assertThat(derivative, TensorMatchers.elementwiseEqualTo(expectedDerivative));
-    }
-
-    private void assertOptimizerWorks(double inputGaussianMu) {
+    private void assertOptimizerWorksWithDeterminant(double inputGaussianMu) {
         final int[] shape = new int[]{2, 2};
         final DoubleVertex input = new GaussianVertex(shape, inputGaussianMu, 5);
         final DoubleVertex determinant = input.matrixDeterminant();

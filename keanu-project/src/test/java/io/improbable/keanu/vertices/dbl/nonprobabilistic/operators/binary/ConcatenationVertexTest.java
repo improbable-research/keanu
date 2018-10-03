@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Assert;
@@ -444,7 +444,7 @@ public class ConcatenationVertexTest {
         DoubleVertex inputB = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex inputC = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10);
     }
 
 }
