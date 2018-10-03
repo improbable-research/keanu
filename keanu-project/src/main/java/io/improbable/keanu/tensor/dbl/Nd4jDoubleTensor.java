@@ -755,6 +755,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
         double trueValue = 1.0;

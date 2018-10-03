@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 
 import org.junit.Test;
 
@@ -208,7 +208,7 @@ public class SumVertexTest {
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
         DoubleVertex outputVertex = inputVertex.sum().times(inputVertex);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-10, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-10);
     }
 
     @Test
@@ -225,7 +225,7 @@ public class SumVertexTest {
                 inputVertex.sum()
             );
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-6, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-6);
     }
 
 }

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 import org.junit.Test;
@@ -83,6 +83,6 @@ public class DivisionVertexTest {
         DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, 100.0, 150.0);
         DoubleVertex C = A.div(B).times(A);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 0.001, 1e-5, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 0.001, 1e-5);
     }
 }

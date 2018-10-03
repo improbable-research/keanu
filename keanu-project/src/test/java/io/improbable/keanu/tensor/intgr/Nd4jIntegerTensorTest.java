@@ -10,12 +10,16 @@ import java.util.Arrays;
 
 import org.junit.Test;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
+import org.junit.Rule;
+import org.junit.rules.ExpectedException;
 
 public class Nd4jIntegerTensorTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     @Test
     public void doesMinusScalar() {
@@ -251,6 +255,28 @@ public class Nd4jIntegerTensorTest {
     }
 
     @Test
+    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
+        IntegerTensor tensor = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        IntegerTensor mask = Nd4jIntegerTensor.scalar(1);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
+        IntegerTensor tensor = Nd4jIntegerTensor.scalar(3);
+        IntegerTensor mask = Nd4jIntegerTensor.create(new int[]{1, 1, 1, 1}, new int[]{2, 2});
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, -2);
+    }
+
+    @Test
     public void doesApplyUnaryFunction() {
         IntegerTensor matrixA = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
         IntegerTensor result = matrixA.apply(v -> v + 1);
@@ -454,7 +480,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void canRepresentAllValues() {
         IntegerTensor tensor = IntegerTensor.create(
-            new int[]{0,0,0,0},
+            new int[]{0, 0, 0, 0},
             new int[]{2, 2}
         );
 

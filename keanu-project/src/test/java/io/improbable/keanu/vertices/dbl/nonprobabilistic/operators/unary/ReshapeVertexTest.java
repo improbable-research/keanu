@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 
 import org.junit.Assert;
 import org.junit.Test;
@@ -127,7 +127,7 @@ public class ReshapeVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);
     }
 
 }

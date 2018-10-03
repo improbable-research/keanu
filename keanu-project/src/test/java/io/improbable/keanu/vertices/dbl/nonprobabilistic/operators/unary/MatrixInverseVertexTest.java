@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -114,8 +114,8 @@ public class MatrixInverseVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{3, 3}, 1.0, 25.0);
         DoubleVertex invertVertex = inputVertex.matrixInverse();
 
-        finiteDifferenceMatchesGradient(
-            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(
+            ImmutableList.of(inputVertex), invertVertex, 0.001, 1e-5);
     }
 
 }
