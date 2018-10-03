@@ -13,6 +13,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class LinearRegressionGraph {
 
+    private LinearRegressionGraph() {
+    }
+
     public static BayesianNetwork build(DoubleTensor x, double priorOnMu, double priorOnSigma, double[] priorOnSigmaForWeights) {
         int numberOfFeatures = x.getShape()[0];
         int[] weightShape = new int[]{1, numberOfFeatures};

@@ -32,7 +32,6 @@ public interface LinearModel extends Model {
         optimizer.maxAPosteriori();
     }
 
-
     default DoubleTensor predict(DoubleTensor x) {
         DoubleVertex xVertex = ((DoubleVertex) getXVertex());
         xVertex.setAndCascade(x);

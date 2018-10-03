@@ -14,12 +14,7 @@ public class LinearRegression implements LinearModel {
     private static final double DEFAULT_MU = 0.0;
     private static final double DEFAULT_SIGMA = 2.0;
 
-    private final double priorOnSigma;
-    private final double priorOnMu;
-    private final double[] priorOnSigmaForWeights;
-
     private BayesianNetwork net;
-    private DoubleTensor x;
     private DoubleTensor y;
 
     public LinearRegression(DoubleTensor x, DoubleTensor y) {
@@ -31,26 +26,13 @@ public class LinearRegression implements LinearModel {
     }
 
     public LinearRegression(DoubleTensor x, DoubleTensor y, double priorOnMu, double priorOnSigma, double... priorOnSigmaForWeights) {
-        this.x = x;
         this.y = y;
-        this.priorOnSigma = priorOnSigma;
-        this.priorOnMu = priorOnMu;
-        this.priorOnSigmaForWeights = priorOnSigmaForWeights;
-        this.net = buildModel();
-    }
-
-    private static double[] fillPriorOnWeights(DoubleTensor x, double priorOnSigma) {
-        double[] priorWeights = new double[x.getShape()[0]];
-        Arrays.fill(priorWeights, priorOnSigma);
-        return priorWeights;
+        this.net = buildModel(x, priorOnMu, priorOnSigma, priorOnSigmaForWeights);
     }
 
     @Override
-    public BayesianNetwork buildModel() {
-        BayesianNetwork net = LinearRegressionGraph.build(x, priorOnMu, priorOnSigma, priorOnSigmaForWeights);
-        DoubleVertex yVertex = (DoubleVertex) net.getVertexByLabel(Y_LABEL);
-        DoubleVertex yObservable = new GaussianVertex(yVertex, priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
-        return new BayesianNetwork(yObservable.getConnectedGraph());
+    public DoubleTensor getY() {
+        return y;
     }
 
     public DoubleVertex getWeights() {
@@ -65,11 +47,6 @@ public class LinearRegression implements LinearModel {
         return net;
     }
 
-    @Override
-    public DoubleTensor getY() {
-        return y;
-    }
-
     public void setNet(BayesianNetwork net) {
         this.net = net;
     }
@@ -77,6 +54,19 @@ public class LinearRegression implements LinearModel {
     public double getWeight(int index) {
         DoubleVertex weight = (DoubleVertex) net.getVertexByLabel(WEIGHTS_LABEL);
         return weight.getValue().isScalar() ? weight.getValue().scalar() : weight.getValue(0, index);
+    }
+
+    private BayesianNetwork buildModel(DoubleTensor x, double priorOnMu, double priorOnSigma, double... priorOnSigmaForWeights) {
+        BayesianNetwork net = LinearRegressionGraph.build(x, priorOnMu, priorOnSigma, priorOnSigmaForWeights);
+        DoubleVertex yVertex = (DoubleVertex) net.getVertexByLabel(Y_LABEL);
+        DoubleVertex yObservable = new GaussianVertex(yVertex, priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
+        return new BayesianNetwork(yObservable.getConnectedGraph());
+    }
+
+    private static double[] fillPriorOnWeights(DoubleTensor x, double priorOnSigma) {
+        double[] priorWeights = new double[x.getShape()[0]];
+        Arrays.fill(priorWeights, priorOnSigma);
+        return priorWeights;
     }
 
 }
