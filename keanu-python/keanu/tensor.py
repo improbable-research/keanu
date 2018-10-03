@@ -2,6 +2,7 @@ from keanu.base import JavaObjectWrapper
 from keanu.context import KeanuContext
 
 import numpy as np
+import numbers
 from py4j.java_gateway import java_import
 
 context = KeanuContext()
@@ -12,34 +13,19 @@ java_import(k, "io.improbable.keanu.tensor.bool.BooleanTensor")
 java_import(k, "io.improbable.keanu.tensor.intgr.IntegerTensor")
 java_import(k, "io.improbable.keanu.tensor.generic.GenericTensor")
 
-java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex")
-java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
-java_import(k, "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
-java_import(k, "io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex")
+java_import(k, "io.improbable.keanu.vertices.ConstantVertex")
 
 
 class Const(JavaObjectWrapper):
     def __init__(self, t):
-        np_tensor = t if isinstance(t, np.ndarray) else np.array([t])
-
-        ctor = self._infer_vertex_from_np_tensor(np_tensor)
-        tensor = Tensor(np_tensor)
-
-        super(Const, self).__init__(ctor, tensor.unwrap())
-
-    @staticmethod
-    def _infer_vertex_from_np_tensor(np_tensor):
-        if len(np_tensor) == 0:
-            raise ValueError("Cannot infer type because tensor is empty")
-
-        if isinstance(np_tensor.item(0), int):
-            return k.ConstantIntegerVertex
-        elif isinstance(np_tensor.item(0), float):
-            return k.ConstantDoubleVertex
-        elif isinstance(np_tensor.item(0), bool):
-            return k.ConstantBoolVertex
+        if isinstance(t, np.ndarray):
+            val = Tensor(t).unwrap()
+        elif isinstance(t, numbers.Number):
+            val = t
         else:
-            return k.ConstantGenericVertex
+            raise ValueError("Argument t must be either a numpy array or an instance of numbers.Number")
+
+        super(Const, self).__init__(k.ConstantVertex.of, val)
 
 
 class Tensor(JavaObjectWrapper):
