@@ -7,11 +7,11 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public interface Differentiable {
 
-    PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> derivativeOfSelfWithRespectToInputs);
+    PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs);
 
     Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf);
 
-    default PartialDerivatives getDualNumber() {
-        return Differentiator.calculateDual((Vertex & Differentiable) this);
+    default PartialDerivatives getDerivativeWrtLatents() {
+        return Differentiator.forwardModeAutoDiff((Vertex & Differentiable) this);
     }
 }

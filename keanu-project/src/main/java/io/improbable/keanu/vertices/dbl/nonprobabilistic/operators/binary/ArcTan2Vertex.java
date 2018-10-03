@@ -26,7 +26,7 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives x, PartialDerivatives y) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives x, PartialDerivatives y) {
         DoubleTensor yValue = right.getValue();
         DoubleTensor xValue = left.getValue();
 

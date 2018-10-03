@@ -26,7 +26,7 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
         throw new UnsupportedOperationException();
     }
 

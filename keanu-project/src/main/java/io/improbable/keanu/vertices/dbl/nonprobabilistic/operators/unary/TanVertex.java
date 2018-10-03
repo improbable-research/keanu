@@ -25,13 +25,13 @@ public class TanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
             DoubleTensor dTan = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
-            return partialDerivatives.multiplyAlongOfDimensions(dTan, this.getValue().getShape());
+            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dTan, this.getValue().getShape());
         }
     }
 

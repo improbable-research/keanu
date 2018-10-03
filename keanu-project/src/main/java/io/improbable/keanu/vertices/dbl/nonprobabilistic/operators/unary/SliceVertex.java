@@ -50,10 +50,10 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
         boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
-        return partialDerivatives.slice(dimension, index, needReshape);
+        return derivativeOfParentWithRespectToInputs.slice(dimension, index, needReshape);
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {

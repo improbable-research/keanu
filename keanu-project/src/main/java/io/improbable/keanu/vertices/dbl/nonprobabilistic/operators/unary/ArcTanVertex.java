@@ -25,14 +25,14 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
         DoubleTensor value = inputVertex.getValue();
 
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
             DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();
-            return partialDerivatives.multiplyAlongOfDimensions(dArcTan, inputVertex.getShape());
+            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcTan, inputVertex.getShape());
         }
     }
 

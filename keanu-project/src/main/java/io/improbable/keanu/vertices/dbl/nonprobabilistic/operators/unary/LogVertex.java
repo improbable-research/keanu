@@ -25,12 +25,12 @@ public class LogVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
-            return partialDerivatives.divideBy(inputVertex.getValue());
+            return derivativeOfParentWithRespectToInputs.divideBy(inputVertex.getValue());
         }
     }
 

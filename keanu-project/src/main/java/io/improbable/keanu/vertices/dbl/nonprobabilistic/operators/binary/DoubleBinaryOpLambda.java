@@ -63,9 +63,9 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
     }
 
     @Override
-    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         if (forwardModeAutoDiffLambda != null) {
-            return forwardModeAutoDiffLambda.apply(dualNumbers);
+            return forwardModeAutoDiffLambda.apply(derivativeOfParentsWithRespectToInputs);
         }
 
         throw new UnsupportedOperationException();

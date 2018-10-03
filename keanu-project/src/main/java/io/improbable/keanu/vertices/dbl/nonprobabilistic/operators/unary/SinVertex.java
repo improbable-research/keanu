@@ -25,13 +25,13 @@ public class SinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
             DoubleTensor dSin = inputVertex.getValue().cos();
-            return partialDerivatives.multiplyAlongOfDimensions(dSin, this.getValue().getShape());
+            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dSin, this.getValue().getShape());
         }
     }
 

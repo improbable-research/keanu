@@ -22,8 +22,8 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
-        return partialDerivatives.reshape(inputVertex.getValue().getRank(), getShape());
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        return derivativeOfParentWithRespectToInputs.reshape(inputVertex.getValue().getRank(), getShape());
     }
 
     @Override

@@ -24,8 +24,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsDivided() {
-        calculatesDualNumberOfTwoScalars(
+    public void calculatesDerivativeOfTwoScalarsDivided() {
+        calculatesDerivativeOfTwoScalars(
             2.0,
             3.0,
             1.0 / 3.0,
@@ -45,8 +45,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseDivided() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseDivided() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
             DoubleTensor.create(new double[]{1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0}).diag().reshape(1, 4, 1, 4),
@@ -56,8 +56,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarMultiplied() {
-        calculatesDualNumberOfAVectorAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarMultiplied() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.eye(4).div(2).reshape(1, 4, 1, 4),
@@ -67,8 +67,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorsMultiplied() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorsMultiplied() {
+        calculatesDerivativeOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.create(new double[]{1. / 1., 1. / 2., 1. / 3., 1. / 4.}, 1, 4, 1, 1),

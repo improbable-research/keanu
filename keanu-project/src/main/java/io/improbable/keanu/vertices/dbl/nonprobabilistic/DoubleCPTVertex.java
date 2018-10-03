@@ -45,9 +45,9 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
     }
 
     @Override
-    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
-        return vertex == null ? dualNumbers.get(defaultResult) : dualNumbers.get(vertex);
+        return vertex == null ? derivativeOfParentsWithRespectToInputs.get(defaultResult) : derivativeOfParentsWithRespectToInputs.get(vertex);
     }
 }

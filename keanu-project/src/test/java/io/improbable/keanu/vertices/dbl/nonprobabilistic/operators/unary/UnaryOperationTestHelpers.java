@@ -12,7 +12,6 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
@@ -27,7 +26,7 @@ public class UnaryOperationTestHelpers {
         assertEquals(expected, op.apply(A).getValue().scalar(), 1e-5);
     }
 
-    public static void calculatesDualNumberOfScalar(double aValue,
+    public static void calculatesDerivativeOfScalar(double aValue,
                                                     double expectedGradientWrtA,
                                                     Function<DoubleVertex, DoubleVertex> op) {
 
@@ -35,7 +34,7 @@ public class UnaryOperationTestHelpers {
         A.setAndCascade(Nd4jDoubleTensor.scalar(aValue));
         DoubleVertex output = op.apply(A);
 
-        DoubleTensor wrtAForward = output.getDualNumber().withRespectTo(A);
+        DoubleTensor wrtAForward = output.getDerivativeWrtLatents().withRespectTo(A);
         assertEquals(
             expectedGradientWrtA,
             wrtAForward.scalar(),
@@ -66,7 +65,7 @@ public class UnaryOperationTestHelpers {
         assertEquals(expectedTensor.getValue(1, 1), result.getValue(1, 1), 1e-5);
     }
 
-    public static void calculatesDualNumberOfMatrixElementWiseOperator(double[] aValues,
+    public static void calculatesDerivativeOfMatrixElementWiseOperator(double[] aValues,
                                                                        double[] expectedGradientWrtA,
                                                                        Function<DoubleVertex, DoubleVertex> op) {
 
@@ -77,7 +76,7 @@ public class UnaryOperationTestHelpers {
 
         DoubleVertex output = op.apply(A);
 
-        PartialDerivatives result = output.getDualNumber();
+        PartialDerivatives result = output.getDerivativeWrtLatents();
         DoubleTensor wrtAForward = result.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA, wrtAForward.asFlatDoubleArray(), 1e-10);
         assertArrayEquals(expectedShape, wrtAForward.getShape());

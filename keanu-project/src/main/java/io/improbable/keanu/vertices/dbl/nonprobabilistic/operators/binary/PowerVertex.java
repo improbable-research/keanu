@@ -26,7 +26,7 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
         PartialDerivatives thisInfBase;

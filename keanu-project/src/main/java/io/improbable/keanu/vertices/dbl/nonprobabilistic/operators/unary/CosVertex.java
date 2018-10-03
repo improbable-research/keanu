@@ -25,15 +25,15 @@ public class CosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
         DoubleTensor inputValue = inputVertex.getValue();
 
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
             DoubleTensor dCos = inputValue.sin().unaryMinusInPlace();
-            return partialDerivatives.multiplyAlongOfDimensions(dCos, inputValue.getShape());
+            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dCos, inputValue.getShape());
         }
     }
 

@@ -20,14 +20,14 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
         //dc = -A^-1 * da * A^-1
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
             DoubleTensor negatedValue = this.getValue().unaryMinus();
-            PartialDerivatives partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(partialDerivatives, negatedValue, false);
+            PartialDerivatives partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(derivativeOfParentWithRespectToInputs, negatedValue, false);
             partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(partial, this.getValue(), true);
             return partial;
         }

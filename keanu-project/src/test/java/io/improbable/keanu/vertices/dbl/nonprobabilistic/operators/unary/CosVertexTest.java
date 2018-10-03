@@ -2,8 +2,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfMatrixElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfMatrixElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
@@ -26,8 +26,8 @@ public class CosVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOScalarCos() {
-        calculatesDualNumberOfScalar(
+    public void calculatesDerivativeOScalarCos() {
+        calculatesDerivativeOfScalar(
             0.5,
             -Math.sin(0.5),
             DoubleVertex::cos
@@ -44,8 +44,8 @@ public class CosVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfMatrixElementWiseCos() {
-        calculatesDualNumberOfMatrixElementWiseOperator(
+    public void calculatesDerivativeOfMatrixElementWiseCos() {
+        calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{-Math.sin(0.1), -Math.sin(0.2), -Math.sin(0.3), -Math.sin(0.4)}),
             DoubleVertex::cos

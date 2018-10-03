@@ -35,7 +35,7 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
         return l.subtract(r, getShape());
     }
 }

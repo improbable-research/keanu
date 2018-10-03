@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.C;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Dirichlet;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;

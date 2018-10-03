@@ -25,8 +25,8 @@ public class LogGammaVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
-        return partialDerivatives.multiplyAlongOfDimensions(inputVertex.getValue().digamma(), getShape());
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(inputVertex.getValue().digamma(), getShape());
     }
 
     @Override

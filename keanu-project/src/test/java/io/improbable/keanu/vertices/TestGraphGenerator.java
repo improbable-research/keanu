@@ -8,7 +8,6 @@ import org.slf4j.LoggerFactory;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
@@ -17,12 +16,12 @@ public class TestGraphGenerator {
 
     private static final Logger log = LoggerFactory.getLogger(TestGraphGenerator.class);
 
-    static DoubleVertex addLinks(DoubleVertex end, AtomicInteger opCount, AtomicInteger dualNumberCount, int links) {
+    static DoubleVertex addLinks(DoubleVertex end, AtomicInteger opCount, AtomicInteger autoDiffCount, int links) {
 
         for (int i = 0; i < links; i++) {
-            DoubleVertex left = passThroughVertex(end, opCount, dualNumberCount, id -> log.info("OP on id:" + id));
-            DoubleVertex right = passThroughVertex(end, opCount, dualNumberCount, id -> log.info("OP on id:" + id));
-            end = sumVertex(left, right, opCount, dualNumberCount, id -> log.info("OP on id:" + id));
+            DoubleVertex left = passThroughVertex(end, opCount, autoDiffCount, id -> log.info("OP on id:" + id));
+            DoubleVertex right = passThroughVertex(end, opCount, autoDiffCount, id -> log.info("OP on id:" + id));
+            end = sumVertex(left, right, opCount, autoDiffCount, id -> log.info("OP on id:" + id));
         }
 
         return end;
@@ -31,13 +30,13 @@ public class TestGraphGenerator {
     static class PassThroughVertex extends DoubleUnaryOpVertex {
 
         private final AtomicInteger opCount;
-        private final AtomicInteger dualNumberCount;
+        private final AtomicInteger autoDiffCount;
         private final Consumer<VertexId> onOp;
 
-        public PassThroughVertex(DoubleVertex inputVertex, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
+        public PassThroughVertex(DoubleVertex inputVertex, AtomicInteger opCount, AtomicInteger autoDiffCount, Consumer<VertexId> onOp) {
             super(inputVertex);
             this.opCount = opCount;
-            this.dualNumberCount = dualNumberCount;
+            this.autoDiffCount = autoDiffCount;
             this.onOp = onOp;
         }
 
@@ -49,28 +48,28 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected PartialDerivatives dualOp(PartialDerivatives a) {
-            dualNumberCount.incrementAndGet();
-            return a;
+        protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+            autoDiffCount.incrementAndGet();
+            return derivativeOfParentWithRespectToInputs;
         }
     }
 
-    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger dualNumberCount, Consumer<VertexId> onOp) {
-        return new PassThroughVertex(from, opCount, dualNumberCount, onOp);
+    static DoubleVertex passThroughVertex(DoubleVertex from, AtomicInteger opCount, AtomicInteger autoDiffCount, Consumer<VertexId> onOp) {
+        return new PassThroughVertex(from, opCount, autoDiffCount, onOp);
     }
 
     static class SumVertex extends DoubleBinaryOpVertex {
 
         private final AtomicInteger opCount;
-        private final AtomicInteger dualNumberCount;
+        private final AtomicInteger autoDiffCount;
         private final Consumer<VertexId> onOp;
 
         public SumVertex(DoubleVertex left, DoubleVertex right,
-                         AtomicInteger opCount, AtomicInteger dualNumberCount,
+                         AtomicInteger opCount, AtomicInteger autoDiffCount,
                          Consumer<VertexId> onOp) {
             super(left, right);
             this.opCount = opCount;
-            this.dualNumberCount = dualNumberCount;
+            this.autoDiffCount = autoDiffCount;
             this.onOp = onOp;
         }
 
@@ -82,8 +81,8 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
-            dualNumberCount.incrementAndGet();
+        protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
+            autoDiffCount.incrementAndGet();
             return l.add(r);
         }
     }

@@ -60,8 +60,8 @@ public class DoubleProxyVertex extends DoubleVertex implements ProxyVertex<Doubl
     }
 
     @Override
-    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
-        return dualNumbers.get(getParent());
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+        return derivativeOfParentsWithRespectToInputs.get(getParent());
     }
 
     @Override

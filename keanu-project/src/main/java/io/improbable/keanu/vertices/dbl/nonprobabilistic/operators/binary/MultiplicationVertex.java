@@ -39,7 +39,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
 
         // dc = A * db + da * B;
         PartialDerivatives thisInfMultiplied;

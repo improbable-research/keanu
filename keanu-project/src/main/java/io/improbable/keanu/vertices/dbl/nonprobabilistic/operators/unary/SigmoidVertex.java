@@ -26,11 +26,11 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
         DoubleTensor x = inputVertex.getValue();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
-        return partialDerivatives.multiplyAlongOfDimensions(dxdfx, x.getShape());
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dxdfx, x.getShape());
     }
 
     @Override

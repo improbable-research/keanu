@@ -30,7 +30,7 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
     }
 
     @Override
-    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
     }
 

@@ -25,16 +25,16 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
 
         DoubleTensor inputValue = inputVertex.getValue();
 
-        if (partialDerivatives.isEmpty()) {
+        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
             return PartialDerivatives.OF_CONSTANT;
         } else {
             DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1)
                 .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
-            return partialDerivatives.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
+            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
         }
     }
 

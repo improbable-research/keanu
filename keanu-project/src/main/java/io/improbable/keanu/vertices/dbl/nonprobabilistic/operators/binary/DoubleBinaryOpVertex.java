@@ -63,15 +63,15 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
 
 
     @Override
-    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> derivativeOfSelfWithRespectToInputs) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         try {
-            return dualOp(derivativeOfSelfWithRespectToInputs.get(left), derivativeOfSelfWithRespectToInputs.get(right));
+            return forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs.get(left), derivativeOfParentsWithRespectToInputs.get(right));
         } catch (UnsupportedOperationException e) {
-            return super.calculateDualNumber(derivativeOfSelfWithRespectToInputs);
+            return super.forwardModeAutoDifferentiation(derivativeOfParentsWithRespectToInputs);
         }
     }
 
     protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);
 
-    protected abstract PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r);
+    protected abstract PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r);
 }

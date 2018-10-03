@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
-public class DualNumberTensorTest {
+public class AutoDiffTensorTest {
 
     @Test
     public void diffWrtVectorOverMultipleMultiplies() {
@@ -28,7 +28,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        PartialDerivatives dualNumber = output.getDualNumber();
+        PartialDerivatives dualNumber = output.getDerivativeWrtLatents();
 
         DoubleTensor wrtA = dualNumber.withRespectTo(A);
 
@@ -54,7 +54,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        PartialDerivatives dualNumber = output.getDualNumber();
+        PartialDerivatives dualNumber = output.getDerivativeWrtLatents();
 
         DoubleTensor wrtA = dualNumber.withRespectTo(A);
 
@@ -72,7 +72,7 @@ public class DualNumberTensorTest {
 
         DoubleVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        PartialDerivatives dualNumber = B.getDualNumber();
+        PartialDerivatives dualNumber = B.getDerivativeWrtLatents();
 
         DoubleTensor wrtA = dualNumber.withRespectTo(A);
 

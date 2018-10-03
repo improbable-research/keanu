@@ -34,11 +34,11 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     @Override
-    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
 
         int[] ofShape = getShape();
-        PartialDerivatives thnPartial = dualNumbers.get(thn);
-        PartialDerivatives elsPartial = dualNumbers.get(els);
+        PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.get(thn);
+        PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.get(els);
         BooleanTensor predicateValue = predicate.getValue();
 
         if (predicateValue.allTrue()) {
