@@ -8,7 +8,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
@@ -31,7 +30,7 @@ public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<D
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
         throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
     }
 

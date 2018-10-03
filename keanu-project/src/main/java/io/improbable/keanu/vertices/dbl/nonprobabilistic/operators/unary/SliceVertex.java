@@ -10,7 +10,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class SliceVertex extends DoubleUnaryOpVertex {
@@ -48,11 +47,13 @@ public class SliceVertex extends DoubleUnaryOpVertex {
         }
 
         return partials;
-     }
+    }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.slice(dimension, index);
+    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+
+        boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
+        return partialDerivatives.slice(dimension, index, needReshape);
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {

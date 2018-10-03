@@ -16,12 +16,12 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     private final Vertex<IN> inputVertex;
     private final Function<IN, DoubleTensor> op;
-    private final Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda;
+    private final Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda;
     private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
     public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex,
                                Function<IN, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> dualNumberCalculation,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         this.inputVertex = inputVertex;
         this.op = op;
@@ -37,7 +37,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
 
     public DoubleUnaryOpLambda(Vertex<IN> inputVertex,
                                Function<IN, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> dualNumberCalculation,
+                               Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> dualNumberCalculation,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         this(inputVertex.getShape(), inputVertex, op, dualNumberCalculation, reverseModeAutoDiffLambda);
     }
@@ -57,7 +57,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
         if (forwardModeAutoDiffLambda != null) {
             return forwardModeAutoDiffLambda.apply(dualNumbers);
         }

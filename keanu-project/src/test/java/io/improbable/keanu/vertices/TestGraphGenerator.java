@@ -9,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 
@@ -48,7 +49,7 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected DualNumber dualOp(DualNumber a) {
+        protected PartialDerivatives dualOp(PartialDerivatives a) {
             dualNumberCount.incrementAndGet();
             return a;
         }
@@ -81,7 +82,7 @@ public class TestGraphGenerator {
         }
 
         @Override
-        protected DualNumber dualOp(DualNumber l, DualNumber r) {
+        protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
             dualNumberCount.incrementAndGet();
             return l.add(r);
         }

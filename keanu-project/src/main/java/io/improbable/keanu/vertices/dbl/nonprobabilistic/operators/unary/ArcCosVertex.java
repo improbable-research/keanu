@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ArcCosVertex extends DoubleUnaryOpVertex {
@@ -26,8 +25,17 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.acos();
+    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+
+        DoubleTensor inputValue = inputVertex.getValue();
+
+        if (partialDerivatives.isEmpty()) {
+            return PartialDerivatives.OF_CONSTANT;
+        } else {
+            DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1)
+                .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
+            return partialDerivatives.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
+        }
     }
 
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {

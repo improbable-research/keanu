@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -61,16 +61,17 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
         return right;
     }
 
+
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> derivativeOfSelfWithRespectToInputs) {
         try {
-            return dualOp(dualNumbers.get(left), dualNumbers.get(right));
+            return dualOp(derivativeOfSelfWithRespectToInputs.get(left), derivativeOfSelfWithRespectToInputs.get(right));
         } catch (UnsupportedOperationException e) {
-            return super.calculateDualNumber(dualNumbers);
+            return super.calculateDualNumber(derivativeOfSelfWithRespectToInputs);
         }
     }
 
     protected abstract DoubleTensor op(DoubleTensor l, DoubleTensor r);
 
-    protected abstract DualNumber dualOp(DualNumber l, DualNumber r);
+    protected abstract PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r);
 }

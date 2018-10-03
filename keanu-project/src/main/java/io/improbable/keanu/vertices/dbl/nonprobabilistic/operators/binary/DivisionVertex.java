@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class DivisionVertex extends DoubleBinaryOpVertex {
@@ -40,7 +39,32 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.div(r);
+    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+
+        // dc = (B * da - A * db) / B^2;
+        DoubleTensor newValue = this.getValue();
+        PartialDerivatives thisInfMultiplied;
+        PartialDerivatives thatInfMultiplied;
+        PartialDerivatives newInf;
+
+        if (l.isEmpty()) {
+            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thisInfMultiplied = l.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        }
+
+        if (r.isEmpty()) {
+            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thatInfMultiplied = r.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        }
+
+        if (thisInfMultiplied.isEmpty() && thatInfMultiplied.isEmpty()) {
+            newInf = PartialDerivatives.OF_CONSTANT;
+        } else {
+            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(right.getValue().pow(2));
+        }
+
+        return newInf;
     }
 }

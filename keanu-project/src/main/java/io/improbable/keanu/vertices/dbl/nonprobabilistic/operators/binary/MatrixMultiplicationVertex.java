@@ -7,7 +7,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
@@ -53,8 +52,25 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.matrixMultiplyBy(r);
+    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+
+        // dc = A * db + da * B;
+        PartialDerivatives thisInfMultiplied;
+        PartialDerivatives thatInfMultiplied;
+
+        if (l.isEmpty()) {
+            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thisInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(l, right.getValue(), true);
+        }
+
+        if (r.isEmpty()) {
+            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thatInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(r, left.getValue(), false);
+        }
+
+        return thisInfMultiplied.add(thatInfMultiplied);
     }
 
     private static int[] getResultingShape(int[] left, int[] right) {

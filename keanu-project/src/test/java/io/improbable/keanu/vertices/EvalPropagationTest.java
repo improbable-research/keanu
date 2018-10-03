@@ -14,6 +14,7 @@ import org.slf4j.LoggerFactory;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -124,7 +125,7 @@ public class EvalPropagationTest {
         }
 
         @Override
-        protected DualNumber dualOp(DualNumber dualNumber) {
+        protected PartialDerivatives dualOp(PartialDerivatives dualNumber) {
             return null;
         }
     }

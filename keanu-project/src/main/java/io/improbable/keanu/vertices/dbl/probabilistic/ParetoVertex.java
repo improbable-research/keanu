@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -115,11 +115,11 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> dualNumbers) {
         if (isObserved()) {
-            return DualNumber.createConstant(getValue());
+            return PartialDerivatives.OF_CONSTANT;
         } else {
-            return DualNumber.createWithRespectToSelf(getId(), getValue());
+            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
         }
     }
 }

@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,8 +36,32 @@ public class TakeVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.take(index);
+    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+
+        Map<VertexId, DoubleTensor> dualsAtIndex = new HashMap<>();
+        DoubleTensor newValue = this.getValue();
+
+        for (Map.Entry<VertexId, DoubleTensor> entry : partialDerivatives.asMap().entrySet()) {
+            DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
+            int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
+            int[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
+            atIndexTensor = atIndexTensor.reshape(paddedShape);
+            dualsAtIndex.put(entry.getKey(), atIndexTensor);
+        }
+
+        return new PartialDerivatives(dualsAtIndex);
+    }
+
+    private DoubleTensor takeFromPartial(DoubleTensor from, int... indices) {
+        int[] fromShape = from.getShape();
+        int[] subFromShape = Arrays.copyOf(fromShape, indices.length);
+        int indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
+        int[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
+        int subShapeLength = (int) TensorShape.getLength(subFromShape);
+
+        return from.reshape(subShapeLength, -1)
+            .slice(0, indexToTakeFrom)
+            .reshape(takeShape);
     }
 
     @Override

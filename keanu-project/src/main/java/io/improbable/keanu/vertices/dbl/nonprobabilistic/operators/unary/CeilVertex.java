@@ -5,7 +5,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class CeilVertex extends DoubleUnaryOpVertex {
@@ -26,7 +25,7 @@ public class CeilVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
+    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
         throw new UnsupportedOperationException();
     }
 

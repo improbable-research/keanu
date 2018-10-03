@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ArcTanVertex extends DoubleUnaryOpVertex {
@@ -26,8 +25,15 @@ public class ArcTanVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.atan();
+    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+        DoubleTensor value = inputVertex.getValue();
+
+        if (partialDerivatives.isEmpty()) {
+            return PartialDerivatives.OF_CONSTANT;
+        } else {
+            DoubleTensor dArcTan = value.pow(2).plusInPlace(1).reciprocalInPlace();
+            return partialDerivatives.multiplyAlongOfDimensions(dArcTan, inputVertex.getShape());
+        }
     }
 
     @Override

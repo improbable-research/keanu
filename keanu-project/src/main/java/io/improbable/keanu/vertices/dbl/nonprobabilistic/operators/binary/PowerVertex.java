@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
@@ -27,8 +26,31 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.pow(r);
+    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+
+        // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
+        PartialDerivatives thisInfBase;
+        PartialDerivatives thisInfExponent;
+
+        if (l.isEmpty()) {
+            thisInfBase = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thisInfBase = l.multiplyAlongOfDimensions(
+                right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
+                this.getValue().getShape()
+            );
+        }
+
+        if (r.isEmpty()) {
+            thisInfExponent = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thisInfExponent = r.multiplyAlongOfDimensions(
+                left.getValue().log().timesInPlace(this.getValue()),
+                right.getValue().getShape()
+            );
+        }
+
+        return thisInfBase.add(thisInfExponent);
     }
 
     @Override

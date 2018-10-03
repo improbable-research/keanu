@@ -26,7 +26,7 @@ public class DifferentiatorTest {
         DoubleVertex B = new GaussianVertex(0, 1);
         DoubleVertex C = A.times(B);
 
-        PartialDerivatives dC = C.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dC = C.getDualNumber();
 
         DoubleTensor dCdA = dC.withRespectTo(A);
         DoubleTensor dCdB = dC.withRespectTo(B);
@@ -88,7 +88,7 @@ public class DifferentiatorTest {
         DoubleVertex H = G.plus(F).sum();
 
         PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
-        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dHForward = H.getDualNumber();
 
         DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
         DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);

@@ -6,19 +6,23 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
+import org.apache.commons.math3.util.Pair;
+
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ConcatenationVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
@@ -41,14 +45,75 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        List<DualNumber> dualNumbersOfInputs = new ArrayList<>();
+    public PartialDerivatives calculateDualNumber(Map<Vertex, PartialDerivatives> derivativeOfSelfWithRespectToInputs) {
+        List<PartialDerivatives> dualNumbersOfInputs = new ArrayList<>();
 
         for (DoubleVertex vertex : input) {
-            dualNumbersOfInputs.add(dualNumbers.get(vertex));
+            dualNumbersOfInputs.add(derivativeOfSelfWithRespectToInputs.get(vertex));
         }
-        DoubleTensor[] inputValues = extractFromInputs(DoubleTensor.class, Vertex::getValue);
-        return DualNumber.concat(dualNumbers, dualNumbersOfInputs, input, dimension, inputValues);
+
+        return concat(derivativeOfSelfWithRespectToInputs, dualNumbersOfInputs, input, dimension);
+    }
+
+    public static PartialDerivatives concat(Map<Vertex, PartialDerivatives> dualNumbers,
+                                            List<PartialDerivatives> dualNumbersOfInputs,
+                                            DoubleVertex[] input,
+                                            int dimension) {
+
+        Map<VertexId, List<DoubleTensor>> dualNumbersToConcat = new HashMap<>();
+        List<Pair<VertexId, List<Integer>>> vertexIds = findShapesOfVertexWithRespectTo(dualNumbersOfInputs);
+
+        for (Pair<VertexId, List<Integer>> wrtVertex : vertexIds) {
+            VertexId vertexId = wrtVertex.getFirst();
+
+            for (DoubleVertex ofVertex : input) {
+                int[] shapeOfVertexWithRespectTo = wrtVertex.getSecond().stream().mapToInt(i -> i).toArray();
+                int[] wrtVertexShape = Arrays.copyOfRange(shapeOfVertexWithRespectTo, ofVertex.getValue().getRank(), wrtVertex.getSecond().size());
+                int[] shape = TensorShape.concat(ofVertex.getShape(), wrtVertexShape);
+                PartialDerivatives dualNumberOf = dualNumbers.get(ofVertex);
+
+                if (dualNumberOf.asMap().containsKey(vertexId)) {
+                    dualNumbersToConcat.computeIfAbsent(vertexId, k -> new ArrayList<>()).add(dualNumberOf.asMap().get(vertexId));
+                } else {
+                    dualNumbersToConcat.computeIfAbsent(vertexId, k -> new ArrayList<>()).add(DoubleTensor.zeros(shape));
+                }
+
+            }
+        }
+
+        Map<VertexId, DoubleTensor> concattedDualNumbers = new HashMap<>();
+
+        for (Map.Entry<VertexId, List<DoubleTensor>> dualNumberForVertex : dualNumbersToConcat.entrySet()) {
+            DoubleTensor concatted = concatPartialDerivates(dimension, dualNumberForVertex.getValue());
+            concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
+        }
+
+        return new PartialDerivatives(concattedDualNumbers);
+    }
+
+    private static DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
+        if (partialDerivates.size() == 1) {
+            return partialDerivates.get(0);
+        } else {
+            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
+            return DoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
+        }
+    }
+
+    private static List<Pair<VertexId, List<Integer>>> findShapesOfVertexWithRespectTo(List<PartialDerivatives> dualNumbers) {
+        List<Pair<VertexId, List<Integer>>> vertexInfo = new ArrayList<>();
+        Set ids = new HashSet();
+
+        for (PartialDerivatives dualNumber : dualNumbers) {
+            for (Map.Entry<VertexId, DoubleTensor> entry : dualNumber.asMap().entrySet()) {
+                if (!ids.contains(entry.getKey())) {
+                    vertexInfo.add(new Pair<>(entry.getKey(), Arrays.stream(entry.getValue().getShape()).boxed().collect(Collectors.toList())));
+                    ids.add(entry.getKey());
+                }
+            }
+        }
+
+        return vertexInfo;
     }
 
     @Override

@@ -26,7 +26,7 @@ public class FloorVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
+    protected  PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
         throw new UnsupportedOperationException();
     }
 

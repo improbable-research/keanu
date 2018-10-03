@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class MatrixInverseVertex extends DoubleUnaryOpVertex {
@@ -21,8 +20,17 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.matrixInverse();
+    protected PartialDerivatives dualOp(PartialDerivatives partialDerivatives) {
+
+        //dc = -A^-1 * da * A^-1
+        if (partialDerivatives.isEmpty()) {
+            return PartialDerivatives.OF_CONSTANT;
+        } else {
+            DoubleTensor negatedValue = this.getValue().unaryMinus();
+            PartialDerivatives partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(partialDerivatives, negatedValue, false);
+            partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(partial, this.getValue(), true);
+            return partial;
+        }
     }
 
     @Override

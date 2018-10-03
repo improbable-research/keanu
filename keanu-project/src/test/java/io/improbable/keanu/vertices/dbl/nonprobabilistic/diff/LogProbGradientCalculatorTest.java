@@ -149,7 +149,7 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dJLogProbWrtAValue = gradient.get(A.getId());
         DoubleTensor dJLogProbWrtBValue = gradient.get(B.getId());
 
-        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dHForward = H.getDualNumber();
 
         DoubleTensor dHdA = dHForward.withRespectTo(A);
         DoubleTensor dHdB = dHForward.withRespectTo(B);

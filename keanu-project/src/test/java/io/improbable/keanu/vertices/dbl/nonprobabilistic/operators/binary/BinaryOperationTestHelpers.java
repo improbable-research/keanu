@@ -41,7 +41,7 @@ public class BinaryOperationTestHelpers {
         B.setAndCascade(Nd4jDoubleTensor.scalar(bValue));
         DoubleVertex output = op.apply(A, B);
 
-        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
+        PartialDerivatives wrtForward = output.getDualNumber();
         assertEquals(expectedGradientWrtA, wrtForward.withRespectTo(A).scalar(), 1e-5);
         assertEquals(expectedGradientWrtB, wrtForward.withRespectTo(B).scalar(), 1e-5);
 
@@ -82,7 +82,7 @@ public class BinaryOperationTestHelpers {
         B.setAndCascade(bValues);
 
         DoubleVertex output = op.apply(A, B);
-        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
+        PartialDerivatives wrtForward = output.getDualNumber();
 
         DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
@@ -114,7 +114,7 @@ public class BinaryOperationTestHelpers {
         B.setAndCascade(DoubleTensor.scalar(bValue));
 
         DoubleVertex output = op.apply(A, B);
-        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
+        PartialDerivatives wrtForward = output.getDualNumber();
 
         DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);
@@ -145,7 +145,7 @@ public class BinaryOperationTestHelpers {
         B.setAndCascade(bValues);
 
         DoubleVertex output = op.apply(A, B);
-        PartialDerivatives wrtForward = output.getDualNumber().getPartialDerivatives();
+        PartialDerivatives wrtForward = output.getDualNumber();
 
         DoubleTensor wrtAForward = wrtForward.withRespectTo(A);
         assertArrayEquals(expectedGradientWrtA.asFlatDoubleArray(), wrtAForward.asFlatDoubleArray(), 1e-10);

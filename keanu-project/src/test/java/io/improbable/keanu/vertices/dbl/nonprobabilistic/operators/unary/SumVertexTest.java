@@ -34,7 +34,7 @@ public class SumVertexTest {
 
         DoubleVertex b = a.sum();
 
-        DoubleTensor dbdaForward = b.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dbdaForward = b.getDualNumber().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
         DoubleTensor expectedDbDa = DoubleTensor.ones(new int[]{1, 1, 2, 2, 2});
@@ -55,7 +55,7 @@ public class SumVertexTest {
 
         DoubleVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dfdaForward = f.getDualNumber().withRespectTo(a);
 
         PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
@@ -87,7 +87,7 @@ public class SumVertexTest {
 
         DoubleVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dfdaForward = f.getDualNumber().withRespectTo(a);
 
         PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
@@ -113,7 +113,7 @@ public class SumVertexTest {
 
         DoubleVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dfdaForward = f.getDualNumber().withRespectTo(a);
 
         PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
         DoubleTensor dfdaReverse = dfdx.withRespectTo(a);

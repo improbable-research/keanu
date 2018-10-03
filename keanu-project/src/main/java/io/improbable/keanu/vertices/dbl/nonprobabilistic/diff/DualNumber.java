@@ -42,69 +42,6 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         }
     }
 
-    public static DualNumber concat(Map<Vertex, DualNumber> dualNumbers,
-                                    List<DualNumber> dualNumbersOfInputs,
-                                    DoubleVertex[] input,
-                                    int dimension,
-                                    DoubleTensor[] dualValues) {
-
-        Map<VertexId, List<DoubleTensor>> dualNumbersToConcat = new HashMap<>();
-        List<Pair<VertexId, List<Integer>>> vertexIds = findShapesOfVertexWithRespectTo(dualNumbersOfInputs);
-
-        for (Pair<VertexId, List<Integer>> wrtVertex : vertexIds) {
-            VertexId vertexId = wrtVertex.getFirst();
-
-            for (DoubleVertex ofVertex : input) {
-                int[] shapeOfVertexWithRespectTo = wrtVertex.getSecond().stream().mapToInt(i -> i).toArray();
-                int[] wrtVertexShape = Arrays.copyOfRange(shapeOfVertexWithRespectTo, ofVertex.getValue().getRank(), wrtVertex.getSecond().size());
-                int[] shape = TensorShape.concat(ofVertex.getShape(), wrtVertexShape);
-                DualNumber dualNumberOf = dualNumbers.get(ofVertex);
-
-                if (dualNumberOf.getPartialDerivatives().asMap().containsKey(vertexId)) {
-                    dualNumbersToConcat.computeIfAbsent(vertexId, k -> new ArrayList<>()).add(dualNumberOf.partialDerivatives.asMap().get(vertexId));
-                } else {
-                    dualNumbersToConcat.computeIfAbsent(vertexId, k -> new ArrayList<>()).add(DoubleTensor.zeros(shape));
-                }
-
-            }
-        }
-
-        Map<VertexId, DoubleTensor> concattedDualNumbers = new HashMap<>();
-
-        for (Map.Entry<VertexId, List<DoubleTensor>> dualNumberForVertex : dualNumbersToConcat.entrySet()) {
-            DoubleTensor concatted = concatPartialDerivates(dimension, dualNumberForVertex.getValue());
-            concattedDualNumbers.put(dualNumberForVertex.getKey(), concatted);
-        }
-
-        final DoubleTensor concattedValues = DoubleTensor.concat(dimension, dualValues);
-        return new DualNumber(concattedValues, concattedDualNumbers);
-    }
-
-    private static DoubleTensor concatPartialDerivates(int dimension, List<DoubleTensor> partialDerivates) {
-        if (partialDerivates.size() == 1) {
-            return partialDerivates.get(0);
-        } else {
-            DoubleTensor[] derivativesToConcat = new DoubleTensor[partialDerivates.size()];
-            return DoubleTensor.concat(dimension, partialDerivates.toArray(derivativesToConcat));
-        }
-    }
-
-    private static List<Pair<VertexId, List<Integer>>> findShapesOfVertexWithRespectTo(List<DualNumber> dualNumbers) {
-        List<Pair<VertexId, List<Integer>>> vertexInfo = new ArrayList<>();
-        Set ids = new HashSet();
-
-        for (DualNumber dualNumber : dualNumbers) {
-            for (Map.Entry<VertexId, DoubleTensor> entry : dualNumber.getPartialDerivatives().asMap().entrySet()) {
-                if (!ids.contains(entry.getKey())) {
-                    vertexInfo.add(new Pair<>(entry.getKey(), Arrays.stream(entry.getValue().getShape()).boxed().collect(Collectors.toList())));
-                    ids.add(entry.getKey());
-                }
-            }
-        }
-
-        return vertexInfo;
-    }
-
     private DoubleTensor value;
     private PartialDerivatives partialDerivatives;
 

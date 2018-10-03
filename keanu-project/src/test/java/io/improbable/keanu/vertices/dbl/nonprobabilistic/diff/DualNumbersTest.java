@@ -68,10 +68,10 @@ public class DualNumbersTest {
         vB.setValue(B);
         vC.eval();
 
-        DualNumber cDual = vC.getDualNumber();
+        PartialDerivatives cDual = vC.getDualNumber();
 
-        DoubleTensor C = cDual.getValue();
-        Map<VertexId, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();
+        DoubleTensor C = vC.getValue();
+        Map<VertexId, DoubleTensor> dc = cDual.asMap();
 
         double da = 0.00000001;
 

@@ -26,7 +26,7 @@ public class AbsVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
+    protected PartialDerivatives dualOp(PartialDerivatives dualNumber) {
         throw new UnsupportedOperationException();
     }
 

@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class MultiplicationVertex extends DoubleBinaryOpVertex {
@@ -40,7 +39,24 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.multiplyBy(r);
+    protected PartialDerivatives dualOp(PartialDerivatives l, PartialDerivatives r) {
+
+        // dc = A * db + da * B;
+        PartialDerivatives thisInfMultiplied;
+        PartialDerivatives thatInfMultiplied;
+
+        if (l.isEmpty()) {
+            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thisInfMultiplied = l.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        }
+
+        if (r.isEmpty()) {
+            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        } else {
+            thatInfMultiplied = r.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        }
+
+        return thisInfMultiplied.add(thatInfMultiplied);
     }
 }
