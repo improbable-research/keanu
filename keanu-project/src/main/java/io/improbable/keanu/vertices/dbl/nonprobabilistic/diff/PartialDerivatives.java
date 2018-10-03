@@ -61,8 +61,9 @@ public class PartialDerivatives {
      * This will sum partial derivatives that are represented as tensors over given dimensions.
      * The dimensions that are summed over will be reshaped to a scalar shape of 1x1.
      *
-     * @param resultShape
-     * @param sumOfRank   the rank of the of part of the partials
+     * @param sumOverDimensions dimensions to sum over
+     * @param resultShape       shape of sum result
+     * @param sumOfRank         the rank of the of part of the partials
      * @return summed and reshaped partials
      */
     public PartialDerivatives sumOverOfDimensions(int[] sumOverDimensions, int[] resultShape, int sumOfRank) {
@@ -227,7 +228,6 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyAlongOf(DoubleTensor partial, DoubleTensor multiplier, int[] ofShape) {
 
         int[] partialOfShape = extractOfShape(partial.getShape(), ofShape.length);
-//        !Arrays.equals(partialOfShape, multiplier.getShape())
         if (TensorShape.isScalar(partialOfShape)) {
 
             int[] partialWrtShape = extractWrtShape(partial.getShape(), ofShape.length);
@@ -246,7 +246,10 @@ public class PartialDerivatives {
     private DoubleTensor elementWiseMultiplyAlongWrt(DoubleTensor partial, DoubleTensor multiplier, int[] wrtShape) {
 
         int[] partialWrtShape = extractWrtShape(partial.getShape(), partial.getRank() - wrtShape.length);
-        if (!Arrays.equals(partialWrtShape, multiplier.getShape())) {
+
+        boolean needsBroadcast = !Arrays.equals(partialWrtShape, multiplier.getShape());
+        if (needsBroadcast) {
+
             int[] partialOfShape = extractOfShape(partial.getShape(), partial.getRank() - wrtShape.length);
             int[] resultShape = TensorShape.concat(partialOfShape, multiplier.getShape());
 

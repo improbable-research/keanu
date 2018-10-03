@@ -3,6 +3,8 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 import static java.util.Collections.singletonMap;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -11,6 +13,7 @@ import com.google.common.primitives.Ints;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
@@ -70,9 +73,33 @@ public class SumVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        PartialDerivatives derivativesWrtInput = derivativeOfOutputsWithRespectToSelf
-            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), this.getShape());
+        int[] wrtShape = summedOverShape(inputVertex.getShape(), sumOverDimensions);
+
+        PartialDerivatives reshapedDiffWrtSelf = new PartialDerivatives(new HashMap<>());
+        for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+            DoubleTensor partial = partialDerivative.getValue();
+
+            int[] newPartialShape = TensorShape.concat(
+                TensorShape.selectDimensions(0, partial.getRank() - getShape().length - 1, partial.getShape()),
+                wrtShape
+            );
+
+            DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
+
+            reshapedDiffWrtSelf.putWithRespectTo(partialDerivative.getKey(), reshapedPartialDerivative);
+        }
+
+        PartialDerivatives derivativesWrtInput = reshapedDiffWrtSelf
+            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShape);
 
         return singletonMap(inputVertex, derivativesWrtInput);
+    }
+
+    private int[] summedOverShape(int[] shape, int[] sumOverDimensions) {
+        int[] shapeCopy = Arrays.copyOf(shape, shape.length);
+        for (int i = 0; i < sumOverDimensions.length; i++) {
+            shapeCopy[sumOverDimensions[i]] = 1;
+        }
+        return shapeCopy;
     }
 }
