@@ -28,148 +28,148 @@ import org.mockito.stubbing.Answer;
 
 public class ProgressBarTest {
 
-    private AtomicReference<Runnable> progressUpdateCall;
-    private ProgressBar progressBar;
-    private ByteArrayOutputStream byteArrayOutputStream;
-    private ScheduledExecutorService scheduler;
+  private AtomicReference<Runnable> progressUpdateCall;
+  private ProgressBar progressBar;
+  private ByteArrayOutputStream byteArrayOutputStream;
+  private ScheduledExecutorService scheduler;
 
-    @Before
-    public void setup() throws UnsupportedEncodingException {
+  @Before
+  public void setup() throws UnsupportedEncodingException {
 
-        byteArrayOutputStream = new ByteArrayOutputStream();
-        PrintStream printStream = new PrintStream(byteArrayOutputStream, true, "UTF-8");
-        scheduler = mock(ScheduledExecutorService.class);
+    byteArrayOutputStream = new ByteArrayOutputStream();
+    PrintStream printStream = new PrintStream(byteArrayOutputStream, true, "UTF-8");
+    scheduler = mock(ScheduledExecutorService.class);
 
-        progressUpdateCall = new AtomicReference<>(null);
+    progressUpdateCall = new AtomicReference<>(null);
 
-        when(scheduler.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
-                .thenAnswer(
-                        invocation -> {
-                            progressUpdateCall.set(invocation.getArgument(0));
-                            return null;
-                        });
+    when(scheduler.scheduleAtFixedRate(any(), anyLong(), anyLong(), any()))
+        .thenAnswer(
+            invocation -> {
+              progressUpdateCall.set(invocation.getArgument(0));
+              return null;
+            });
 
-        progressBar = new ProgressBar(printStream, scheduler);
+    progressBar = new ProgressBar(printStream, scheduler);
+  }
+
+  @After
+  public void cleanup() throws IOException {
+    byteArrayOutputStream.close();
+  }
+
+  private void convertCrToNewLine(byte[] outputBytes) {
+    for (int i = 0; i < outputBytes.length; i++) {
+      if (outputBytes[i] == '\r') {
+        outputBytes[i] = '\n';
+      }
     }
+  }
 
-    @After
-    public void cleanup() throws IOException {
-        byteArrayOutputStream.close();
-    }
+  private String getResultWithNewLinesInsteadOfCR() {
+    byte[] outputBytes = byteArrayOutputStream.toByteArray();
+    convertCrToNewLine(outputBytes);
+    return new String(outputBytes, StandardCharsets.UTF_8);
+  }
 
-    private void convertCrToNewLine(byte[] outputBytes) {
-        for (int i = 0; i < outputBytes.length; i++) {
-            if (outputBytes[i] == '\r') {
-                outputBytes[i] = '\n';
-            }
-        }
-    }
+  @Test
+  public void doesPrintToStreamWhenEnabled() {
+    ProgressBar.enable();
 
-    private String getResultWithNewLinesInsteadOfCR() {
-        byte[] outputBytes = byteArrayOutputStream.toByteArray();
-        convertCrToNewLine(outputBytes);
-        return new String(outputBytes, StandardCharsets.UTF_8);
-    }
+    progressBar.progress();
+    progressUpdateCall.get().run();
+    progressUpdateCall.get().run();
+    progressBar.progress();
+    progressUpdateCall.get().run();
+    progressBar.finish();
 
-    @Test
-    public void doesPrintToStreamWhenEnabled() {
-        ProgressBar.enable();
+    String result = getResultWithNewLinesInsteadOfCR();
 
-        progressBar.progress();
-        progressUpdateCall.get().run();
-        progressUpdateCall.get().run();
-        progressBar.progress();
-        progressUpdateCall.get().run();
-        progressBar.finish();
+    assertEquals(5, result.split("\n").length);
+  }
 
-        String result = getResultWithNewLinesInsteadOfCR();
+  @Test
+  public void doesNotPrintToStreamWhenGloballyDisabled() {
+    ProgressBar.disable();
 
-        assertEquals(5, result.split("\n").length);
-    }
+    progressBar.progress();
+    progressUpdateCall.get().run();
+    progressUpdateCall.get().run();
+    progressBar.progress();
+    progressBar.finish();
 
-    @Test
-    public void doesNotPrintToStreamWhenGloballyDisabled() {
-        ProgressBar.disable();
+    String result = getResultWithNewLinesInsteadOfCR();
 
-        progressBar.progress();
-        progressUpdateCall.get().run();
-        progressUpdateCall.get().run();
-        progressBar.progress();
-        progressBar.finish();
+    assertEquals("", result);
+  }
 
-        String result = getResultWithNewLinesInsteadOfCR();
+  @Test
+  public void doesPrintProgressInAppropriateFormat() {
+    ProgressBar.enable();
 
-        assertEquals("", result);
-    }
+    progressBar.progress(0.0);
+    progressUpdateCall.get().run();
+    progressBar.progress(0.675);
+    progressBar.finish();
 
-    @Test
-    public void doesPrintProgressInAppropriateFormat() {
-        ProgressBar.enable();
+    String result = getResultWithNewLinesInsteadOfCR();
 
-        progressBar.progress(0.0);
-        progressUpdateCall.get().run();
-        progressBar.progress(0.675);
-        progressBar.finish();
+    assertThat(result, containsString("67.5%"));
+  }
 
-        String result = getResultWithNewLinesInsteadOfCR();
+  @Test
+  public void doesLimitProgressTo100Percent() {
+    ProgressBar.enable();
 
-        assertThat(result, containsString("67.5%"));
-    }
+    progressBar.progress(-0.7);
+    progressUpdateCall.get().run();
+    progressBar.progress(1.5);
+    progressBar.finish();
 
-    @Test
-    public void doesLimitProgressTo100Percent() {
-        ProgressBar.enable();
+    String result = getResultWithNewLinesInsteadOfCR();
+    String[] lines = result.split("\n");
 
-        progressBar.progress(-0.7);
-        progressUpdateCall.get().run();
-        progressBar.progress(1.5);
-        progressBar.finish();
+    assertThat(lines[1], containsString("0.0%"));
+    assertThat(lines[2], containsString("100.0%"));
+  }
 
-        String result = getResultWithNewLinesInsteadOfCR();
-        String[] lines = result.split("\n");
+  @Test
+  public void doesCallFinishHandler() {
+    ProgressBar.enable();
 
-        assertThat(lines[1], containsString("0.0%"));
-        assertThat(lines[2], containsString("100.0%"));
-    }
+    Runnable finishHandler = mock(Runnable.class);
+    progressBar.addFinishHandler(finishHandler);
+    progressBar.progress();
+    progressUpdateCall.get().run();
+    progressBar.finish();
 
-    @Test
-    public void doesCallFinishHandler() {
-        ProgressBar.enable();
+    verify(finishHandler).run();
+    verifyNoMoreInteractions(finishHandler);
+  }
 
-        Runnable finishHandler = mock(Runnable.class);
-        progressBar.addFinishHandler(finishHandler);
-        progressBar.progress();
-        progressUpdateCall.get().run();
-        progressBar.finish();
+  @Test
+  public void youCanOverrideTheDefaultPrintStream() {
+    PrintStream mockStream = mock(PrintStream.class);
+    doAnswer(
+            new Answer() {
+              @Override
+              public Object answer(InvocationOnMock invocation) throws Throwable {
+                System.out.println(invocation.getArgument(0).toString());
+                return null;
+              }
+            })
+        .when(mockStream)
+        .print(anyString());
 
-        verify(finishHandler).run();
-        verifyNoMoreInteractions(finishHandler);
-    }
+    ProgressBar.setDefaultPrintStream(mockStream);
+    ProgressBar.enable();
+    ProgressBar progressBar = new ProgressBar(scheduler);
+    progressBar.progress();
+    progressBar.finish();
+    verify(mockStream, atLeastOnce()).print("\r|Keanu|");
+  }
 
-    @Test
-    public void youCanOverrideTheDefaultPrintStream() {
-        PrintStream mockStream = mock(PrintStream.class);
-        doAnswer(
-                        new Answer() {
-                            @Override
-                            public Object answer(InvocationOnMock invocation) throws Throwable {
-                                System.out.println(invocation.getArgument(0).toString());
-                                return null;
-                            }
-                        })
-                .when(mockStream)
-                .print(anyString());
-
-        ProgressBar.setDefaultPrintStream(mockStream);
-        ProgressBar.enable();
-        ProgressBar progressBar = new ProgressBar(scheduler);
-        progressBar.progress();
-        progressBar.finish();
-        verify(mockStream, atLeastOnce()).print("\r|Keanu|");
-    }
-
-    @After
-    public void tearDown() throws Exception {
-        ProgressBar.setDefaultPrintStream(System.out);
-    }
+  @After
+  public void tearDown() throws Exception {
+    ProgressBar.setDefaultPrintStream(System.out);
+  }
 }

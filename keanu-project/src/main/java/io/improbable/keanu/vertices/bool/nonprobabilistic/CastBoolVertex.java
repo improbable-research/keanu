@@ -8,20 +8,20 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class CastBoolVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
 
-    private final Vertex<? extends BooleanTensor> inputVertex;
+  private final Vertex<? extends BooleanTensor> inputVertex;
 
-    public CastBoolVertex(Vertex<? extends BooleanTensor> inputVertex) {
-        this.inputVertex = inputVertex;
-        setParents(inputVertex);
-    }
+  public CastBoolVertex(Vertex<? extends BooleanTensor> inputVertex) {
+    this.inputVertex = inputVertex;
+    setParents(inputVertex);
+  }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random);
-    }
+  @Override
+  public BooleanTensor sample(KeanuRandom random) {
+    return inputVertex.sample(random);
+  }
 
-    @Override
-    public BooleanTensor calculate() {
-        return inputVertex.getValue();
-    }
+  @Override
+  public BooleanTensor calculate() {
+    return inputVertex.getValue();
+  }
 }

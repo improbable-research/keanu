@@ -20,64 +20,64 @@ import org.junit.Test;
 
 public class MultimodalSimulatedAnnealingTest {
 
-    @Rule public DeterministicRule deterministicRule = new DeterministicRule();
+  @Rule public DeterministicRule deterministicRule = new DeterministicRule();
 
-    private KeanuRandom random;
+  private KeanuRandom random;
 
-    @Before
-    public void setup() {
-        random = new KeanuRandom(1);
-    }
+  @Before
+  public void setup() {
+    random = new KeanuRandom(1);
+  }
 
-    @Test
-    public void findsBothModesForContinuousNetwork() {
+  @Test
+  public void findsBothModesForContinuousNetwork() {
 
-        DoubleVertex A = new UniformVertex(-3.0, 3.0);
-        A.setValue(0.0);
-        DoubleVertex B = A.multiply(A);
-        DoubleVertex C = new GaussianVertex(B, 1.5);
-        C.observe(4.0);
+    DoubleVertex A = new UniformVertex(-3.0, 3.0);
+    A.setValue(0.0);
+    DoubleVertex B = A.multiply(A);
+    DoubleVertex C = new GaussianVertex(B, 1.5);
+    C.observe(4.0);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        List<NetworkState> modes =
-                MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
+    BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+    List<NetworkState> modes =
+        MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
-        boolean findsLowerMode =
-                modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() + 2) < 0.01);
-        boolean findsUpperMode =
-                modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
+    boolean findsLowerMode =
+        modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() + 2) < 0.01);
+    boolean findsUpperMode =
+        modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
 
-        assertTrue(findsLowerMode);
-        assertTrue(findsUpperMode);
-    }
+    assertTrue(findsLowerMode);
+    assertTrue(findsUpperMode);
+  }
 
-    @Test
-    public void findsModesForDiscreteContinuousHybridNetwork() {
+  @Test
+  public void findsModesForDiscreteContinuousHybridNetwork() {
 
-        UniformVertex A = new UniformVertex(0.0, 3.0);
-        A.setValue(1.0);
-        DoubleVertex B = A.multiply(A);
+    UniformVertex A = new UniformVertex(0.0, 3.0);
+    A.setValue(1.0);
+    DoubleVertex B = A.multiply(A);
 
-        DoubleVertex C = new UniformVertex(-3.0, 0.0);
-        DoubleVertex D = C.multiply(C);
+    DoubleVertex C = new UniformVertex(-3.0, 0.0);
+    DoubleVertex D = C.multiply(C);
 
-        BoolVertex E = new BernoulliVertex(0.5);
+    BoolVertex E = new BernoulliVertex(0.5);
 
-        DoubleVertex F = If.isTrue(E).then(B).orElse(D);
+    DoubleVertex F = If.isTrue(E).then(B).orElse(D);
 
-        DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
-        G.observe(4.0);
+    DoubleVertex G = new GaussianVertex(new CastDoubleVertex(F), 1.5);
+    G.observe(4.0);
 
-        BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        List<NetworkState> modes =
-                MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
+    BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
+    List<NetworkState> modes =
+        MultiModeDiscovery.findModesBySimulatedAnnealing(network, 100, 1000, random);
 
-        boolean findsUpperMode =
-                modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
-        boolean findsLowerMode =
-                modes.stream().anyMatch(state -> Math.abs(state.get(C).scalar() + 2) < 0.01);
+    boolean findsUpperMode =
+        modes.stream().anyMatch(state -> Math.abs(state.get(A).scalar() - 2) < 0.01);
+    boolean findsLowerMode =
+        modes.stream().anyMatch(state -> Math.abs(state.get(C).scalar() + 2) < 0.01);
 
-        assertTrue(findsLowerMode);
-        assertTrue(findsUpperMode);
-    }
+    assertTrue(findsLowerMode);
+    assertTrue(findsUpperMode);
+  }
 }

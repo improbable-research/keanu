@@ -8,10 +8,10 @@ import org.junit.runners.model.Statement;
 
 public class DeterministicRule implements TestRule {
 
-    @Override
-    public Statement apply(final Statement base, final Description description) {
-        KeanuRandom.setDefaultRandomSeed(1);
-        VertexId.ID_GENERATOR.set(1);
-        return base;
-    }
+  @Override
+  public Statement apply(final Statement base, final Description description) {
+    KeanuRandom.setDefaultRandomSeed(1);
+    VertexId.ID_GENERATOR.set(1);
+    return base;
+  }
 }

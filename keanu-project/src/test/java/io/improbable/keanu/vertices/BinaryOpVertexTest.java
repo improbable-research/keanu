@@ -17,41 +17,40 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class BinaryOpVertexTest {
-    private final Logger log = LoggerFactory.getLogger(BinaryOpVertexTest.class);
+  private final Logger log = LoggerFactory.getLogger(BinaryOpVertexTest.class);
 
-    private KeanuRandom random;
+  private KeanuRandom random;
 
-    @Before
-    public void setup() {
-        this.random = new KeanuRandom(1);
+  @Before
+  public void setup() {
+    this.random = new KeanuRandom(1);
+  }
+
+  @Test
+  public void canSampleFromTwoParents() {
+    BernoulliVertex bernoulliVertex = new BernoulliVertex(0.5);
+
+    GaussianVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
+    BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom =
+        new BinaryOpLambda<>(
+            bernoulliVertex,
+            gaussianVertex,
+            (BooleanTensor f, DoubleTensor g) -> f.setDoubleIf(g, DoubleTensor.scalar(0.0)));
+
+    int N = 1000000;
+    List<Double> samples = new ArrayList<>();
+    for (int i = 0; i < N; i++) {
+      samples.add(custom.sample(random).scalar());
     }
 
-    @Test
-    public void canSampleFromTwoParents() {
-        BernoulliVertex bernoulliVertex = new BernoulliVertex(0.5);
+    SummaryStatistics stats = new SummaryStatistics();
+    samples.forEach(stats::addValue);
 
-        GaussianVertex gaussianVertex = new GaussianVertex(0.0, 1.0);
-        BinaryOpLambda<BooleanTensor, DoubleTensor, DoubleTensor> custom =
-                new BinaryOpLambda<>(
-                        bernoulliVertex,
-                        gaussianVertex,
-                        (BooleanTensor f, DoubleTensor g) ->
-                                f.setDoubleIf(g, DoubleTensor.scalar(0.0)));
-
-        int N = 1000000;
-        List<Double> samples = new ArrayList<>();
-        for (int i = 0; i < N; i++) {
-            samples.add(custom.sample(random).scalar());
-        }
-
-        SummaryStatistics stats = new SummaryStatistics();
-        samples.forEach(stats::addValue);
-
-        double mean = stats.getMean();
-        double sd = stats.getStandardDeviation();
-        log.info("Mean: " + mean);
-        log.info("SD: " + sd);
-        assertEquals(0.0, mean, 0.01);
-        assertEquals(0.707, sd, 0.01);
-    }
+    double mean = stats.getMean();
+    double sd = stats.getStandardDeviation();
+    log.info("Mean: " + mean);
+    log.info("SD: " + sd);
+    assertEquals(0.0, mean, 0.01);
+    assertEquals(0.707, sd, 0.01);
+  }
 }

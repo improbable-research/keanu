@@ -13,9 +13,9 @@ import java.util.Set;
  */
 public interface NetworkState {
 
-    <T> T get(Vertex<T> vertex);
+  <T> T get(Vertex<T> vertex);
 
-    <T> T get(VertexId vertexId);
+  <T> T get(VertexId vertexId);
 
-    Set<VertexId> getVertexIds();
+  Set<VertexId> getVertexIds();
 }

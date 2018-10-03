@@ -9,29 +9,29 @@ import org.junit.Test;
 
 public class NotEqualsVertexTest {
 
-    @Test
-    public void comparesIntegers() {
-        equals(1, 1, false);
-        equals(1, 0, true);
-    }
+  @Test
+  public void comparesIntegers() {
+    equals(1, 1, false);
+    equals(1, 0, true);
+  }
 
-    @Test
-    public void comparesDoubles() {
-        equals(1.0, 1.0, false);
-        equals(1.0, 0.0, true);
-    }
+  @Test
+  public void comparesDoubles() {
+    equals(1.0, 1.0, false);
+    equals(1.0, 0.0, true);
+  }
 
-    @Test
-    public void comparesObjects() {
-        Object obj = new Object();
-        equals(obj, obj, false);
+  @Test
+  public void comparesObjects() {
+    Object obj = new Object();
+    equals(obj, obj, false);
 
-        equals("test", "otherTest", true);
-    }
+    equals("test", "otherTest", true);
+  }
 
-    private <T> void equals(T a, T b, boolean expected) {
-        NotEqualsVertex<GenericTensor<T>, GenericTensor<T>> vertex =
-                new NotEqualsVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
-        assertEquals(expected, vertex.eval().scalar());
-    }
+  private <T> void equals(T a, T b, boolean expected) {
+    NotEqualsVertex<GenericTensor<T>, GenericTensor<T>> vertex =
+        new NotEqualsVertex<>(ConstantVertex.of(a), ConstantVertex.of(b));
+    assertEquals(expected, vertex.eval().scalar());
+  }
 }

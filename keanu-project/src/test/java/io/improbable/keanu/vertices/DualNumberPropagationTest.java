@@ -8,18 +8,18 @@ import org.junit.Test;
 
 public class DualNumberPropagationTest {
 
-    @Test
-    public void doesNotPerformUnneccesaryDualNumberCalculations() {
-        AtomicInteger n = new AtomicInteger(0);
-        AtomicInteger m = new AtomicInteger(0);
-        DoubleVertex start = ConstantVertex.of(Math.PI / 3).sin();
+  @Test
+  public void doesNotPerformUnneccesaryDualNumberCalculations() {
+    AtomicInteger n = new AtomicInteger(0);
+    AtomicInteger m = new AtomicInteger(0);
+    DoubleVertex start = ConstantVertex.of(Math.PI / 3).sin();
 
-        int links = 20;
-        DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
+    int links = 20;
+    DoubleVertex end = TestGraphGenerator.addLinks(start, n, m, links);
 
-        end.getDualNumber();
+    end.getDualNumber();
 
-        // Does the right amount of work
-        assertEquals(3 * links, m.get());
-    }
+    // Does the right amount of work
+    assertEquals(3 * links, m.get());
+  }
 }

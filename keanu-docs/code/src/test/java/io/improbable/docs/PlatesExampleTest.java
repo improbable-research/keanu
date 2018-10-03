@@ -12,11 +12,11 @@ import org.junit.Test;
 
 public class PlatesExampleTest {
 
-    @Test
-    public void youCanAccessAVertexByPlateNumberAndVertexName() {
-        Plates plates = new PlatesExample().buildPlates("plates_example_data.csv");
-        Plate plate1 = plates.asList().get(1);
-        Vertex<DoubleTensor> x = plate1.get(new VertexLabel("x"));
-        assertThat(x.getValue().scalar(), equalTo(0.2));
-    }
+  @Test
+  public void youCanAccessAVertexByPlateNumberAndVertexName() {
+    Plates plates = new PlatesExample().buildPlates("plates_example_data.csv");
+    Plate plate1 = plates.asList().get(1);
+    Vertex<DoubleTensor> x = plate1.get(new VertexLabel("x"));
+    assertThat(x.getValue().scalar(), equalTo(0.2));
+  }
 }

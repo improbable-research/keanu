@@ -12,46 +12,45 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class BoolProxyVertex extends BoolVertex
-        implements ProxyVertex<BoolVertex>, NonProbabilistic<BooleanTensor> {
+    implements ProxyVertex<BoolVertex>, NonProbabilistic<BooleanTensor> {
 
-    /**
-     * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are
-     * explicitly known (ie for model in model scenarios) but allows linking at a later point in
-     * time.
-     *
-     * @param label The label for this Vertex (all Proxy Vertices must be labelled)
-     */
-    public BoolProxyVertex(VertexLabel label) {
-        this(Tensor.SCALAR_SHAPE, label);
-    }
+  /**
+   * This vertex acts as a "Proxy" to allow a BayesNet to be built up before parents are explicitly
+   * known (ie for model in model scenarios) but allows linking at a later point in time.
+   *
+   * @param label The label for this Vertex (all Proxy Vertices must be labelled)
+   */
+  public BoolProxyVertex(VertexLabel label) {
+    this(Tensor.SCALAR_SHAPE, label);
+  }
 
-    public BoolProxyVertex(int[] shape, VertexLabel label) {
-        this.setValue(BooleanTensor.placeHolder(shape));
-        this.setLabel(label);
-    }
+  public BoolProxyVertex(int[] shape, VertexLabel label) {
+    this.setValue(BooleanTensor.placeHolder(shape));
+    this.setLabel(label);
+  }
 
-    @Override
-    public BooleanTensor calculate() {
-        return getParent().getValue();
-    }
+  @Override
+  public BooleanTensor calculate() {
+    return getParent().getValue();
+  }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return getParent().sample();
-    }
+  @Override
+  public BooleanTensor sample(KeanuRandom random) {
+    return getParent().sample();
+  }
 
-    @Override
-    public void setParent(BoolVertex newParent) {
-        checkTensorsMatchNonScalarShapeOrAreScalar(getShape(), newParent.getShape());
-        setParents(newParent);
-    }
+  @Override
+  public void setParent(BoolVertex newParent) {
+    checkTensorsMatchNonScalarShapeOrAreScalar(getShape(), newParent.getShape());
+    setParents(newParent);
+  }
 
-    public BoolVertex getParent() {
-        return (BoolVertex) Iterables.getOnlyElement(getParents(), null);
-    }
+  public BoolVertex getParent() {
+    return (BoolVertex) Iterables.getOnlyElement(getParents(), null);
+  }
 
-    @Override
-    public boolean hasParent() {
-        return !getParents().isEmpty();
-    }
+  @Override
+  public boolean hasParent() {
+    return !getParents().isEmpty();
+  }
 }

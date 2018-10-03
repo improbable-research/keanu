@@ -10,45 +10,45 @@ import java.util.Map;
 
 public class ArcCosVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Takes the inverse cosine of a vertex, Arccos(vertex)
-     *
-     * @param inputVertex the vertex
-     */
-    public ArcCosVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Takes the inverse cosine of a vertex, Arccos(vertex)
+   *
+   * @param inputVertex the vertex
+   */
+  public ArcCosVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.acos();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.acos();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.acos();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.acos();
+  }
 
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        DoubleTensor inputValue = inputVertex.getValue();
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    DoubleTensor inputValue = inputVertex.getValue();
 
-        // dArcCosdx = -1 / sqrt(1 - x^2)
-        DoubleTensor dSelfWrtInput =
-                inputValue
-                        .pow(2)
-                        .unaryMinusInPlace()
-                        .plusInPlace(1)
-                        .sqrtInPlace()
-                        .reciprocalInPlace()
-                        .unaryMinusInPlace();
+    // dArcCosdx = -1 / sqrt(1 - x^2)
+    DoubleTensor dSelfWrtInput =
+        inputValue
+            .pow(2)
+            .unaryMinusInPlace()
+            .plusInPlace(1)
+            .sqrtInPlace()
+            .reciprocalInPlace()
+            .unaryMinusInPlace();
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(
-                inputVertex,
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        dSelfWrtInput, this.getShape()));
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(
+        inputVertex,
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            dSelfWrtInput, this.getShape()));
 
-        return partials;
-    }
+    return partials;
+  }
 }

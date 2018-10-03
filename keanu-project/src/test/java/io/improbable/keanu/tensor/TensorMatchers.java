@@ -11,119 +11,113 @@ import org.hamcrest.Matcher;
 import org.hamcrest.TypeSafeDiagnosingMatcher;
 
 public class TensorMatchers {
-    private TensorMatchers() {}
+  private TensorMatchers() {}
 
-    public static <T> Matcher<Tensor<T>> hasShape(int... shape) {
-        return hasShape(equalTo(shape));
-    }
+  public static <T> Matcher<Tensor<T>> hasShape(int... shape) {
+    return hasShape(equalTo(shape));
+  }
 
-    public static <T> Matcher<Tensor<T>> hasShape(Matcher<int[]> shapeMatcher) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
-            @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
-                mismatchDescription.appendValue(item.getShape());
-                return shapeMatcher.matches(item.getShape());
-            }
+  public static <T> Matcher<Tensor<T>> hasShape(Matcher<int[]> shapeMatcher) {
+    return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+      @Override
+      protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+        mismatchDescription.appendValue(item.getShape());
+        return shapeMatcher.matches(item.getShape());
+      }
 
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Tensor with shape ").appendValue(shapeMatcher);
-            }
-        };
-    }
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("Tensor with shape ").appendValue(shapeMatcher);
+      }
+    };
+  }
 
-    public static <T> Matcher<Tensor<T>> isScalarWithValue(T value) {
-        return isScalarWithValue(equalTo(value));
-    }
+  public static <T> Matcher<Tensor<T>> isScalarWithValue(T value) {
+    return isScalarWithValue(equalTo(value));
+  }
 
-    public static <T> Matcher<Tensor<T>> isScalarWithValue(Matcher<T> value) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
-            @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
-                mismatchDescription.appendValue(item);
-                return item.isScalar() && value.matches(item.getValue(0));
-            }
+  public static <T> Matcher<Tensor<T>> isScalarWithValue(Matcher<T> value) {
+    return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+      @Override
+      protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+        mismatchDescription.appendValue(item);
+        return item.isScalar() && value.matches(item.getValue(0));
+      }
 
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Scalar with value ").appendValue(value);
-            }
-        };
-    }
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("Scalar with value ").appendValue(value);
+      }
+    };
+  }
 
-    public static <T> Matcher<Tensor<T>> hasValue(T... values) {
-        return hasValue(Arrays.stream(values).map(v -> equalTo(v)).collect(Collectors.toList()));
-    }
+  public static <T> Matcher<Tensor<T>> hasValue(T... values) {
+    return hasValue(Arrays.stream(values).map(v -> equalTo(v)).collect(Collectors.toList()));
+  }
 
-    public static <T> Matcher<Tensor<T>> hasValue(List<Matcher<T>> valueMatchers) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
-            @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
-                mismatchDescription.appendText("Tensor");
-                T[] itemArray = item.asFlatArray();
-                if (itemArray.length != valueMatchers.size()) {
-                    mismatchDescription
-                            .appendText(" with different size ")
-                            .appendValue(itemArray.length);
-                    return false;
-                }
-                for (int i = 0; i < valueMatchers.size(); i++) {
-                    if (!valueMatchers.get(i).matches(itemArray[i])) {
-                        mismatchDescription
-                                .appendText(" with different value ")
-                                .appendValue(itemArray[i])
-                                .appendText(" at entry ")
-                                .appendValue(i);
-                        return false;
-                    }
-                }
-                return true;
-            }
+  public static <T> Matcher<Tensor<T>> hasValue(List<Matcher<T>> valueMatchers) {
+    return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+      @Override
+      protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+        mismatchDescription.appendText("Tensor");
+        T[] itemArray = item.asFlatArray();
+        if (itemArray.length != valueMatchers.size()) {
+          mismatchDescription.appendText(" with different size ").appendValue(itemArray.length);
+          return false;
+        }
+        for (int i = 0; i < valueMatchers.size(); i++) {
+          if (!valueMatchers.get(i).matches(itemArray[i])) {
+            mismatchDescription
+                .appendText(" with different value ")
+                .appendValue(itemArray[i])
+                .appendText(" at entry ")
+                .appendValue(i);
+            return false;
+          }
+        }
+        return true;
+      }
 
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Tensor with value ").appendValue(valueMatchers);
-            }
-        };
-    }
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("Tensor with value ").appendValue(valueMatchers);
+      }
+    };
+  }
 
-    public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
-        return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
-            @Override
-            protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
-                mismatchDescription.appendText("Tensor");
-                Tensor.FlattenedView<T> itemFlattened = item.getFlattenedView();
+  public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
+    return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
+      @Override
+      protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
+        mismatchDescription.appendText("Tensor");
+        Tensor.FlattenedView<T> itemFlattened = item.getFlattenedView();
 
-                for (int i = 0; i < itemFlattened.size(); i++) {
-                    if (!valueMatcher.matches(itemFlattened.getOrScalar(i))) {
-                        mismatchDescription
-                                .appendText(" with different value ")
-                                .appendValue(itemFlattened.getOrScalar(i))
-                                .appendText(" at entry ")
-                                .appendValue(i);
-                        return false;
-                    }
-                }
-                return true;
-            }
+        for (int i = 0; i < itemFlattened.size(); i++) {
+          if (!valueMatcher.matches(itemFlattened.getOrScalar(i))) {
+            mismatchDescription
+                .appendText(" with different value ")
+                .appendValue(itemFlattened.getOrScalar(i))
+                .appendText(" at entry ")
+                .appendValue(i);
+            return false;
+          }
+        }
+        return true;
+      }
 
-            @Override
-            public void describeTo(Description description) {
-                description.appendText("Tensor with all values ").appendValue(valueMatcher);
-            }
-        };
-    }
+      @Override
+      public void describeTo(Description description) {
+        description.appendText("Tensor with all values ").appendValue(valueMatcher);
+      }
+    };
+  }
 
-    public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
-        return hasValue(other.asFlatArray());
-    }
+  public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
+    return hasValue(other.asFlatArray());
+  }
 
-    public static <T extends Double> Matcher<Tensor<Double>> allCloseTo(
-            T epsilon, Tensor<T> other) {
-        return hasValue(
-                other.asFlatList()
-                        .stream()
-                        .map(v -> closeTo(v, epsilon))
-                        .collect(Collectors.toList()));
-    }
+  public static <T extends Double> Matcher<Tensor<Double>> allCloseTo(T epsilon, Tensor<T> other) {
+    return hasValue(
+        other.asFlatList().stream().map(v -> closeTo(v, epsilon)).collect(Collectors.toList()));
+  }
 }

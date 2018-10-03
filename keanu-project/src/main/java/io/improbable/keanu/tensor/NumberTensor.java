@@ -7,67 +7,67 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import java.util.function.Function;
 
 public interface NumberTensor<N extends Number, T extends NumberTensor<N, T>>
-        extends Tensor<N>, Operators<T> {
+    extends Tensor<N>, Operators<T> {
 
-    N sum();
+  N sum();
 
-    DoubleTensor toDouble();
+  DoubleTensor toDouble();
 
-    IntegerTensor toInteger();
+  IntegerTensor toInteger();
 
-    T diag();
+  T diag();
 
-    T transpose();
+  T transpose();
 
-    T sum(int... overDimensions);
+  T sum(int... overDimensions);
 
-    // New tensor Ops and transforms
+  // New tensor Ops and transforms
 
-    T matrixMultiply(T value);
+  T matrixMultiply(T value);
 
-    T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
+  T tensorMultiply(T value, int[] dimLeft, int[] dimsRight);
 
-    T abs();
+  T abs();
 
-    T getGreaterThanMask(T greaterThanThis);
+  T getGreaterThanMask(T greaterThanThis);
 
-    T getGreaterThanOrEqualToMask(T greaterThanThis);
+  T getGreaterThanOrEqualToMask(T greaterThanThis);
 
-    T getLessThanMask(T lessThanThis);
+  T getLessThanMask(T lessThanThis);
 
-    T getLessThanOrEqualToMask(T lessThanThis);
+  T getLessThanOrEqualToMask(T lessThanThis);
 
-    T setWithMaskInPlace(T mask, N value);
+  T setWithMaskInPlace(T mask, N value);
 
-    T setWithMask(T mask, N value);
+  T setWithMask(T mask, N value);
 
-    T apply(Function<N, N> function);
+  T apply(Function<N, N> function);
 
-    // In Place
+  // In Place
 
-    T minusInPlace(T that);
+  T minusInPlace(T that);
 
-    T plusInPlace(T that);
+  T plusInPlace(T that);
 
-    T timesInPlace(T that);
+  T timesInPlace(T that);
 
-    T divInPlace(T that);
+  T divInPlace(T that);
 
-    T powInPlace(T exponent);
+  T powInPlace(T exponent);
 
-    T unaryMinusInPlace();
+  T unaryMinusInPlace();
 
-    T absInPlace();
+  T absInPlace();
 
-    T applyInPlace(Function<N, N> function);
+  T applyInPlace(Function<N, N> function);
 
-    // Comparisons
+  // Comparisons
 
-    BooleanTensor lessThan(T value);
+  BooleanTensor lessThan(T value);
 
-    BooleanTensor lessThanOrEqual(T value);
+  BooleanTensor lessThanOrEqual(T value);
 
-    BooleanTensor greaterThan(T value);
+  BooleanTensor greaterThan(T value);
 
-    BooleanTensor greaterThanOrEqual(T value);
+  BooleanTensor greaterThanOrEqual(T value);
 }

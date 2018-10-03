@@ -9,85 +9,85 @@ import org.junit.Test;
 
 public class CsvReaderByRowTest {
 
-    String csv = "a,b,c\n" + "hel,lo,world";
+  String csv = "a,b,c\n" + "hel,lo,world";
 
-    @Test
-    public void givenCsvStringThenLoadAsPOJO() {
-        List<TestPOJO> testPOJOS = ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJO.class).load();
+  @Test
+  public void givenCsvStringThenLoadAsPOJO() {
+    List<TestPOJO> testPOJOS = ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJO.class).load();
 
-        TestPOJO actualPojo = testPOJOS.get(0);
+    TestPOJO actualPojo = testPOJOS.get(0);
 
-        assertCorrectlyDeserialized(actualPojo.a, actualPojo.b, actualPojo.c);
+    assertCorrectlyDeserialized(actualPojo.a, actualPojo.b, actualPojo.c);
+  }
+
+  @Test
+  public void givenCsvStringThenLoadAsPOJOWithSetters() {
+    List<TestPOJOWithSetter> testPOJOS =
+        ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJOWithSetter.class).load();
+
+    TestPOJOWithSetter actualPojo = testPOJOS.get(0);
+
+    assertCorrectlyDeserialized(actualPojo.a, actualPojo.b, actualPojo.c);
+  }
+
+  @Test
+  public void givenCsvStringThenLoadAsPOJOWithAnnotations() {
+    List<TestPOJOWithAnnotations> testPOJOS =
+        ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJOWithAnnotations.class).load();
+
+    TestPOJOWithAnnotations actualPojo = testPOJOS.get(0);
+
+    assertCorrectlyDeserialized(actualPojo.a, actualPojo.b, actualPojo.c);
+  }
+
+  private void assertCorrectlyDeserialized(String actualA, String actualB, String actualC) {
+    assertEquals("hel", actualA);
+    assertEquals("lo", actualB);
+    assertEquals("world", actualC);
+  }
+
+  public static class TestPOJO {
+    public String a;
+    public String b;
+    public String c;
+  }
+
+  public static class TestPOJOWithSetter {
+    private String a;
+    private String b;
+    private String c;
+
+    public void setA(String a) {
+      this.a = a;
     }
 
-    @Test
-    public void givenCsvStringThenLoadAsPOJOWithSetters() {
-        List<TestPOJOWithSetter> testPOJOS =
-                ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJOWithSetter.class).load();
-
-        TestPOJOWithSetter actualPojo = testPOJOS.get(0);
-
-        assertCorrectlyDeserialized(actualPojo.a, actualPojo.b, actualPojo.c);
+    public void setB(String b) {
+      this.b = b;
     }
 
-    @Test
-    public void givenCsvStringThenLoadAsPOJOWithAnnotations() {
-        List<TestPOJOWithAnnotations> testPOJOS =
-                ReadCsv.fromString(csv).asRowsDefinedBy(TestPOJOWithAnnotations.class).load();
+    public void setC(String c) {
+      this.c = c;
+    }
+  }
 
-        TestPOJOWithAnnotations actualPojo = testPOJOS.get(0);
+  public static class TestPOJOWithAnnotations {
+    private String a;
+    private String b;
+    private String c;
 
-        assertCorrectlyDeserialized(actualPojo.a, actualPojo.b, actualPojo.c);
+    @CsvProperty("a")
+    public void setSomething(String a) {
+      this.a = a;
     }
 
-    private void assertCorrectlyDeserialized(String actualA, String actualB, String actualC) {
-        assertEquals("hel", actualA);
-        assertEquals("lo", actualB);
-        assertEquals("world", actualC);
+    @CsvProperty("b")
+    public void setSomethingElse(String b) {
+      this.b = b;
     }
 
-    public static class TestPOJO {
-        public String a;
-        public String b;
-        public String c;
+    @CsvProperty("c")
+    public void setSomethingFinal(String c) {
+      this.c = c;
     }
-
-    public static class TestPOJOWithSetter {
-        private String a;
-        private String b;
-        private String c;
-
-        public void setA(String a) {
-            this.a = a;
-        }
-
-        public void setB(String b) {
-            this.b = b;
-        }
-
-        public void setC(String c) {
-            this.c = c;
-        }
-    }
-
-    public static class TestPOJOWithAnnotations {
-        private String a;
-        private String b;
-        private String c;
-
-        @CsvProperty("a")
-        public void setSomething(String a) {
-            this.a = a;
-        }
-
-        @CsvProperty("b")
-        public void setSomethingElse(String b) {
-            this.b = b;
-        }
-
-        @CsvProperty("c")
-        public void setSomethingFinal(String c) {
-            this.c = c;
-        }
-    }
+  }
 }

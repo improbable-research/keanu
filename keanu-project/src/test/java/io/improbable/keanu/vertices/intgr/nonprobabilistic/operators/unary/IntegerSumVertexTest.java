@@ -8,13 +8,13 @@ import org.junit.Test;
 
 public class IntegerSumVertexTest {
 
-    @Test
-    public void doesSum() {
+  @Test
+  public void doesSum() {
 
-        IntegerVertex in = new UniformIntVertex(new int[] {1, 5}, 0, 10);
-        in.setValue(new int[] {1, 2, 3, 4, 5});
-        IntegerVertex summed = in.sum();
+    IntegerVertex in = new UniformIntVertex(new int[] {1, 5}, 0, 10);
+    in.setValue(new int[] {1, 2, 3, 4, 5});
+    IntegerVertex summed = in.sum();
 
-        assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar().intValue());
-    }
+    assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar().intValue());
+  }
 }

@@ -16,45 +16,45 @@ import org.junit.Test;
 
 public class ObservableTest {
 
-    @Test
-    public void youCanObserveANonProbabilisticBooleanVertex() {
-        BoolVertex vertex = ConstantVertex.of(true);
-        assertFalse(vertex instanceof Probabilistic);
-        vertex.observe(BooleanTensor.scalar(false));
-    }
+  @Test
+  public void youCanObserveANonProbabilisticBooleanVertex() {
+    BoolVertex vertex = ConstantVertex.of(true);
+    assertFalse(vertex instanceof Probabilistic);
+    vertex.observe(BooleanTensor.scalar(false));
+  }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void youCannotObserveANonProbabilisticIntegerVertex() {
-        IntegerVertex vertex = ConstantVertex.of(1);
-        assertFalse(vertex instanceof Probabilistic);
-        vertex.observe(IntegerTensor.scalar(0));
-    }
+  @Test(expected = UnsupportedOperationException.class)
+  public void youCannotObserveANonProbabilisticIntegerVertex() {
+    IntegerVertex vertex = ConstantVertex.of(1);
+    assertFalse(vertex instanceof Probabilistic);
+    vertex.observe(IntegerTensor.scalar(0));
+  }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void youCannotObserveANonProbabilisticDoubleVertex() {
-        DoubleVertex vertex = ConstantVertex.of(1.0);
-        assertFalse(vertex instanceof Probabilistic);
-        vertex.observe(DoubleTensor.scalar(1.0));
-    }
+  @Test(expected = UnsupportedOperationException.class)
+  public void youCannotObserveANonProbabilisticDoubleVertex() {
+    DoubleVertex vertex = ConstantVertex.of(1.0);
+    assertFalse(vertex instanceof Probabilistic);
+    vertex.observe(DoubleTensor.scalar(1.0));
+  }
 
-    @Test
-    public void youCanObserveAProbabilisticBooleanVertex() {
-        BoolVertex vertex = new BernoulliVertex(0.5);
-        assertTrue(vertex instanceof Probabilistic);
-        vertex.observe(BooleanTensor.scalar(false));
-    }
+  @Test
+  public void youCanObserveAProbabilisticBooleanVertex() {
+    BoolVertex vertex = new BernoulliVertex(0.5);
+    assertTrue(vertex instanceof Probabilistic);
+    vertex.observe(BooleanTensor.scalar(false));
+  }
 
-    @Test
-    public void youCanObserveAProbabilisticIntegerVertex() {
-        IntegerVertex vertex = new UniformIntVertex(1, 1);
-        assertTrue(vertex instanceof Probabilistic);
-        vertex.observe(IntegerTensor.scalar(0));
-    }
+  @Test
+  public void youCanObserveAProbabilisticIntegerVertex() {
+    IntegerVertex vertex = new UniformIntVertex(1, 1);
+    assertTrue(vertex instanceof Probabilistic);
+    vertex.observe(IntegerTensor.scalar(0));
+  }
 
-    @Test
-    public void youCanObserveAProbabilisticDoubleVertex() {
-        DoubleVertex vertex = new UniformVertex(1.0, 1.0);
-        assertTrue(vertex instanceof Probabilistic);
-        vertex.observe(DoubleTensor.scalar(1.0));
-    }
+  @Test
+  public void youCanObserveAProbabilisticDoubleVertex() {
+    DoubleVertex vertex = new UniformVertex(1.0, 1.0);
+    assertTrue(vertex instanceof Probabilistic);
+    vertex.observe(DoubleTensor.scalar(1.0));
+  }
 }

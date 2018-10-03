@@ -9,111 +9,111 @@ import java.util.List;
 
 public interface Tensor<T> {
 
-    static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
-        if (!a.hasSameShapeAs(b)) {
-            throw new IllegalArgumentException(
-                    String.format(
-                            "Cannot compare tensors of different shapes %s and %s",
-                            Arrays.toString(a.getShape()), Arrays.toString(b.getShape())));
-        }
-
-        Object[] aArray = a.asFlatArray();
-        Object[] bArray = b.asFlatArray();
-
-        boolean[] equality = new boolean[aArray.length];
-
-        for (int i = 0; i < aArray.length; i++) {
-            equality[i] = aArray[i].equals(bArray[i]);
-        }
-
-        int[] shape = a.getShape();
-        return BooleanTensor.create(equality, copyOf(shape, shape.length));
+  static BooleanTensor elementwiseEquals(Tensor a, Tensor b) {
+    if (!a.hasSameShapeAs(b)) {
+      throw new IllegalArgumentException(
+          String.format(
+              "Cannot compare tensors of different shapes %s and %s",
+              Arrays.toString(a.getShape()), Arrays.toString(b.getShape())));
     }
 
-    static <T> Tensor<T> scalar(T value) {
-        return new GenericTensor<>(value);
+    Object[] aArray = a.asFlatArray();
+    Object[] bArray = b.asFlatArray();
+
+    boolean[] equality = new boolean[aArray.length];
+
+    for (int i = 0; i < aArray.length; i++) {
+      equality[i] = aArray[i].equals(bArray[i]);
     }
 
-    static <T> Tensor<T> placeHolder(int[] shape) {
-        return new GenericTensor<>(shape);
-    }
+    int[] shape = a.getShape();
+    return BooleanTensor.create(equality, copyOf(shape, shape.length));
+  }
 
-    int[] SCALAR_SHAPE = new int[] {1, 1};
-    int[] SCALAR_STRIDE = new int[] {1};
+  static <T> Tensor<T> scalar(T value) {
+    return new GenericTensor<>(value);
+  }
 
-    int getRank();
+  static <T> Tensor<T> placeHolder(int[] shape) {
+    return new GenericTensor<>(shape);
+  }
 
-    int[] getShape();
+  int[] SCALAR_SHAPE = new int[] {1, 1};
+  int[] SCALAR_STRIDE = new int[] {1};
 
-    long getLength();
+  int getRank();
 
-    boolean isShapePlaceholder();
+  int[] getShape();
 
-    T getValue(int... index);
+  long getLength();
 
-    Tensor<T> setValue(T value, int... index);
+  boolean isShapePlaceholder();
 
-    T scalar();
+  T getValue(int... index);
 
-    Tensor<T> duplicate();
+  Tensor<T> setValue(T value, int... index);
 
-    Tensor<T> slice(int dimension, int index);
+  T scalar();
 
-    double[] asFlatDoubleArray();
+  Tensor<T> duplicate();
 
-    int[] asFlatIntegerArray();
+  Tensor<T> slice(int dimension, int index);
 
-    T[] asFlatArray();
+  double[] asFlatDoubleArray();
 
-    Tensor<T> reshape(int... newShape);
+  int[] asFlatIntegerArray();
 
-    FlattenedView<T> getFlattenedView();
+  T[] asFlatArray();
 
-    interface FlattenedView<T> {
+  Tensor<T> reshape(int... newShape);
 
-        long size();
+  FlattenedView<T> getFlattenedView();
 
-        T get(long index);
+  interface FlattenedView<T> {
 
-        T getOrScalar(long index);
+    long size();
 
-        void set(long index, T value);
-    }
+    T get(long index);
 
-    default List<T> asFlatList() {
-        return Arrays.asList(asFlatArray());
-    }
+    T getOrScalar(long index);
 
-    default boolean isScalar() {
-        return getLength() == 1;
-    }
+    void set(long index, T value);
+  }
 
-    /**
-     * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
-     *
-     * <p>(1, 2, 3) is a 1x3 vector.
-     *
-     * <p>(1) (2) (3) is a 3x1 vector.
-     *
-     * @return true if the tensor is a vector
-     */
-    default boolean isVector() {
-        return getRank() == 1 || (getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1));
-    }
+  default List<T> asFlatList() {
+    return Arrays.asList(asFlatArray());
+  }
 
-    default boolean isMatrix() {
-        return getRank() == 2;
-    }
+  default boolean isScalar() {
+    return getLength() == 1;
+  }
 
-    default boolean hasSameShapeAs(Tensor that) {
-        return hasSameShapeAs(that.getShape());
-    }
+  /**
+   * Returns true if the tensor is a vector. A vector being a 1xn or a nx1 tensor.
+   *
+   * <p>(1, 2, 3) is a 1x3 vector.
+   *
+   * <p>(1) (2) (3) is a 3x1 vector.
+   *
+   * @return true if the tensor is a vector
+   */
+  default boolean isVector() {
+    return getRank() == 1 || (getRank() == 2 && (getShape()[0] == 1 || getShape()[1] == 1));
+  }
 
-    default boolean hasSameShapeAs(int[] shape) {
-        return Arrays.equals(this.getShape(), shape);
-    }
+  default boolean isMatrix() {
+    return getRank() == 2;
+  }
 
-    default BooleanTensor elementwiseEquals(Tensor that) {
-        return elementwiseEquals(this, that);
-    }
+  default boolean hasSameShapeAs(Tensor that) {
+    return hasSameShapeAs(that.getShape());
+  }
+
+  default boolean hasSameShapeAs(int[] shape) {
+    return Arrays.equals(this.getShape(), shape);
+  }
+
+  default BooleanTensor elementwiseEquals(Tensor that) {
+    return elementwiseEquals(this, that);
+  }
 }

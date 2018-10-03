@@ -23,7 +23,7 @@ dependencies {
 spotless {
     java {
         target '**/*.java'
-        googleJavaFormat().aosp()
+        googleJavaFormat()
         custom 'noWildcardImports', {
             if (it.contains('*;\n')) {
                 throw new Error('No wildcard imports - please remove manually')

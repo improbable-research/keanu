@@ -25,114 +25,108 @@ import lombok.Setter;
 @Builder
 public class SimulatedAnnealing {
 
-    private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION =
-            ProposalDistribution.usePrior();
-    private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR =
-            SINGLE_VARIABLE_SELECTOR;
-    private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
+  private static final ProposalDistribution DEFAULT_PROPOSAL_DISTRIBUTION =
+      ProposalDistribution.usePrior();
+  private static final MHStepVariableSelector DEFAULT_VARIABLE_SELECTOR = SINGLE_VARIABLE_SELECTOR;
+  private static final boolean DEFAULT_USE_CACHE_ON_REJECTION = true;
 
-    public static SimulatedAnnealing withDefaultConfig() {
-        return withDefaultConfig(KeanuRandom.getDefaultRandom());
+  public static SimulatedAnnealing withDefaultConfig() {
+    return withDefaultConfig(KeanuRandom.getDefaultRandom());
+  }
+
+  public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
+    return SimulatedAnnealing.builder().random(random).build();
+  }
+
+  @Getter @Setter @Builder.Default private KeanuRandom random = KeanuRandom.getDefaultRandom();
+
+  @Getter @Setter @Builder.Default
+  private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
+
+  @Getter @Setter @Builder.Default
+  private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
+
+  @Getter @Setter @Builder.Default
+  private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
+
+  public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet, int sampleCount) {
+    AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
+    return getMaxAPosteriori(bayesNet, sampleCount, schedule);
+  }
+
+  /**
+   * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
+   *
+   * @param bayesNet a bayesian network containing latent vertices
+   * @param sampleCount the number of samples to take
+   * @param annealingSchedule the schedule to update T (temperature) as a function of sample number.
+   * @return the NetworkState that represents the Max A Posteriori
+   */
+  public NetworkState getMaxAPosteriori(
+      BayesianNetwork bayesNet, int sampleCount, AnnealingSchedule annealingSchedule) {
+
+    bayesNet.cascadeObservations();
+
+    if (bayesNet.isInImpossibleState()) {
+      throw new IllegalArgumentException("Cannot start optimizer on zero probability network");
     }
 
-    public static SimulatedAnnealing withDefaultConfig(KeanuRandom random) {
-        return SimulatedAnnealing.builder().random(random).build();
-    }
+    Map<VertexId, ?> maxSamplesByVertex = new HashMap<>();
+    List<Vertex> latentVertices = bayesNet.getLatentVertices();
 
-    @Getter @Setter @Builder.Default private KeanuRandom random = KeanuRandom.getDefaultRandom();
+    double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
+    double maxLogP = logProbabilityBeforeStep;
+    setSamplesAsMax(maxSamplesByVertex, latentVertices);
 
-    @Getter @Setter @Builder.Default
-    private ProposalDistribution proposalDistribution = DEFAULT_PROPOSAL_DISTRIBUTION;
+    MetropolisHastingsStep mhStep =
+        new MetropolisHastingsStep(latentVertices, proposalDistribution, true, random);
 
-    @Getter @Setter @Builder.Default
-    private MHStepVariableSelector variableSelector = DEFAULT_VARIABLE_SELECTOR;
+    for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
 
-    @Getter @Setter @Builder.Default
-    private boolean useCacheOnRejection = DEFAULT_USE_CACHE_ON_REJECTION;
+      Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
 
-    public NetworkState getMaxAPosteriori(BayesianNetwork bayesNet, int sampleCount) {
-        AnnealingSchedule schedule = exponentialSchedule(sampleCount, 2, 0.01);
-        return getMaxAPosteriori(bayesNet, sampleCount, schedule);
-    }
+      double temperature = annealingSchedule.getTemperature(sampleNum);
+      logProbabilityBeforeStep =
+          mhStep
+              .step(Collections.singleton(chosenVertex), logProbabilityBeforeStep, temperature)
+              .getLogProbabilityAfterStep();
 
-    /**
-     * Finds the MAP using the default annealing schedule, which is an exponential decay schedule.
-     *
-     * @param bayesNet a bayesian network containing latent vertices
-     * @param sampleCount the number of samples to take
-     * @param annealingSchedule the schedule to update T (temperature) as a function of sample
-     *     number.
-     * @return the NetworkState that represents the Max A Posteriori
-     */
-    public NetworkState getMaxAPosteriori(
-            BayesianNetwork bayesNet, int sampleCount, AnnealingSchedule annealingSchedule) {
-
-        bayesNet.cascadeObservations();
-
-        if (bayesNet.isInImpossibleState()) {
-            throw new IllegalArgumentException(
-                    "Cannot start optimizer on zero probability network");
-        }
-
-        Map<VertexId, ?> maxSamplesByVertex = new HashMap<>();
-        List<Vertex> latentVertices = bayesNet.getLatentVertices();
-
-        double logProbabilityBeforeStep = bayesNet.getLogOfMasterP();
-        double maxLogP = logProbabilityBeforeStep;
+      if (logProbabilityBeforeStep > maxLogP) {
+        maxLogP = logProbabilityBeforeStep;
         setSamplesAsMax(maxSamplesByVertex, latentVertices);
-
-        MetropolisHastingsStep mhStep =
-                new MetropolisHastingsStep(latentVertices, proposalDistribution, true, random);
-
-        for (int sampleNum = 0; sampleNum < sampleCount; sampleNum++) {
-
-            Vertex<?> chosenVertex = latentVertices.get(sampleNum % latentVertices.size());
-
-            double temperature = annealingSchedule.getTemperature(sampleNum);
-            logProbabilityBeforeStep =
-                    mhStep.step(
-                                    Collections.singleton(chosenVertex),
-                                    logProbabilityBeforeStep,
-                                    temperature)
-                            .getLogProbabilityAfterStep();
-
-            if (logProbabilityBeforeStep > maxLogP) {
-                maxLogP = logProbabilityBeforeStep;
-                setSamplesAsMax(maxSamplesByVertex, latentVertices);
-            }
-        }
-
-        return new SimpleNetworkState(maxSamplesByVertex);
+      }
     }
 
-    private static void setSamplesAsMax(
-            Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {
-        fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
-    }
+    return new SimpleNetworkState(maxSamplesByVertex);
+  }
 
-    private static <T> void setSampleForVertex(Vertex<T> vertex, Map<VertexId, ?> samples) {
-        ((Map<VertexId, ? super T>) samples).put(vertex.getId(), vertex.getValue());
-    }
+  private static void setSamplesAsMax(
+      Map<VertexId, ?> samples, List<? extends Vertex> fromVertices) {
+    fromVertices.forEach(vertex -> setSampleForVertex((Vertex<?>) vertex, samples));
+  }
 
-    /**
-     * An annealing schedule determines how T (temperature) changes as a function of the current
-     * iteration number (i.e. sample number)
-     */
-    public interface AnnealingSchedule {
-        double getTemperature(int iteration);
-    }
+  private static <T> void setSampleForVertex(Vertex<T> vertex, Map<VertexId, ?> samples) {
+    ((Map<VertexId, ? super T>) samples).put(vertex.getId(), vertex.getValue());
+  }
 
-    /**
-     * @param iterations the number of iterations annealing over
-     * @param startT the value of T at iteration 0
-     * @param endT the value of T at the last iteration
-     * @return the annealing schedule
-     */
-    public static AnnealingSchedule exponentialSchedule(
-            int iterations, double startT, double endT) {
+  /**
+   * An annealing schedule determines how T (temperature) changes as a function of the current
+   * iteration number (i.e. sample number)
+   */
+  public interface AnnealingSchedule {
+    double getTemperature(int iteration);
+  }
 
-        final double minusK = Math.log(endT / startT) / iterations;
+  /**
+   * @param iterations the number of iterations annealing over
+   * @param startT the value of T at iteration 0
+   * @param endT the value of T at the last iteration
+   * @return the annealing schedule
+   */
+  public static AnnealingSchedule exponentialSchedule(int iterations, double startT, double endT) {
 
-        return n -> startT * Math.exp(minusK * n);
-    }
+    final double minusK = Math.log(endT / startT) / iterations;
+
+    return n -> startT * Math.exp(minusK * n);
+  }
 }

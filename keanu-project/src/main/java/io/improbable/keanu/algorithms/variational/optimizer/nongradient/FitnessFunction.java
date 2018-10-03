@@ -11,39 +11,38 @@ import org.apache.commons.math3.analysis.MultivariateFunction;
 
 public class FitnessFunction {
 
-    private final List<Vertex> outputVertices;
-    private final List<? extends Vertex<DoubleTensor>> latentVertices;
-    private final BiConsumer<double[], Double> onFitnessCalculation;
+  private final List<Vertex> outputVertices;
+  private final List<? extends Vertex<DoubleTensor>> latentVertices;
+  private final BiConsumer<double[], Double> onFitnessCalculation;
 
-    public FitnessFunction(
-            List<Vertex> outputVertices,
-            List<? extends Vertex<DoubleTensor>> latentVertices,
-            BiConsumer<double[], Double> onFitnessCalculation) {
-        this.outputVertices = outputVertices;
-        this.latentVertices = latentVertices;
-        this.onFitnessCalculation = onFitnessCalculation;
-    }
+  public FitnessFunction(
+      List<Vertex> outputVertices,
+      List<? extends Vertex<DoubleTensor>> latentVertices,
+      BiConsumer<double[], Double> onFitnessCalculation) {
+    this.outputVertices = outputVertices;
+    this.latentVertices = latentVertices;
+    this.onFitnessCalculation = onFitnessCalculation;
+  }
 
-    public FitnessFunction(
-            List<Vertex> outputVertices, List<? extends Vertex<DoubleTensor>> latentVertices) {
-        this(outputVertices, latentVertices, null);
-    }
+  public FitnessFunction(
+      List<Vertex> outputVertices, List<? extends Vertex<DoubleTensor>> latentVertices) {
+    this(outputVertices, latentVertices, null);
+  }
 
-    public MultivariateFunction fitness() {
-        return point -> {
-            setAndCascadePoint(point, latentVertices);
-            double logOfTotalProbability =
-                    ProbabilityCalculator.calculateLogProbFor(outputVertices);
+  public MultivariateFunction fitness() {
+    return point -> {
+      setAndCascadePoint(point, latentVertices);
+      double logOfTotalProbability = ProbabilityCalculator.calculateLogProbFor(outputVertices);
 
-            if (onFitnessCalculation != null) {
-                onFitnessCalculation.accept(point, logOfTotalProbability);
-            }
+      if (onFitnessCalculation != null) {
+        onFitnessCalculation.accept(point, logOfTotalProbability);
+      }
 
-            return logOfTotalProbability;
-        };
-    }
+      return logOfTotalProbability;
+    };
+  }
 
-    public static boolean isValidInitialFitness(double fitnessValue) {
-        return fitnessValue == Double.NEGATIVE_INFINITY || Double.isNaN(fitnessValue);
-    }
+  public static boolean isValidInitialFitness(double fitnessValue) {
+    return fitnessValue == Double.NEGATIVE_INFINITY || Double.isNaN(fitnessValue);
+  }
 }

@@ -10,37 +10,36 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex
-        implements NonProbabilistic<BooleanTensor> {
+    implements NonProbabilistic<BooleanTensor> {
 
-    protected final Vertex<A> a;
-    protected final Vertex<B> b;
+  protected final Vertex<A> a;
+  protected final Vertex<B> b;
 
-    public BoolBinaryOpVertex(Vertex<A> a, Vertex<B> b) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
-    }
+  public BoolBinaryOpVertex(Vertex<A> a, Vertex<B> b) {
+    this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+  }
 
-    public BoolBinaryOpVertex(int[] shape, Vertex<A> a, Vertex<B> b) {
-        this.a = a;
-        this.b = b;
-        setParents(a, b);
-        setValue(BooleanTensor.placeHolder(shape));
-    }
+  public BoolBinaryOpVertex(int[] shape, Vertex<A> a, Vertex<B> b) {
+    this.a = a;
+    this.b = b;
+    setParents(a, b);
+    setValue(BooleanTensor.placeHolder(shape));
+  }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
-    }
+  @Override
+  public BooleanTensor sample(KeanuRandom random) {
+    return op(a.sample(random), b.sample(random));
+  }
 
-    @Override
-    public boolean contradictsObservation() {
-        return isObserved()
-                && !op(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
-    }
+  @Override
+  public boolean contradictsObservation() {
+    return isObserved() && !op(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
+  }
 
-    @Override
-    public BooleanTensor calculate() {
-        return op(a.getValue(), b.getValue());
-    }
+  @Override
+  public BooleanTensor calculate() {
+    return op(a.getValue(), b.getValue());
+  }
 
-    protected abstract BooleanTensor op(A l, B r);
+  protected abstract BooleanTensor op(A l, B r);
 }

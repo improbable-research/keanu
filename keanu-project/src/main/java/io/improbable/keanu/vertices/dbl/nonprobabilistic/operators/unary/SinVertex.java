@@ -10,33 +10,33 @@ import java.util.Map;
 
 public class SinVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Takes the sine of a vertex. Sin(vertex).
-     *
-     * @param inputVertex the vertex
-     */
-    public SinVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Takes the sine of a vertex. Sin(vertex).
+   *
+   * @param inputVertex the vertex
+   */
+  public SinVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.sin();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.sin();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.sin();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.sin();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(
-                inputVertex,
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        inputVertex.getValue().cos(), this.getShape()));
-        return partials;
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(
+        inputVertex,
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            inputVertex.getValue().cos(), this.getShape()));
+    return partials;
+  }
 }

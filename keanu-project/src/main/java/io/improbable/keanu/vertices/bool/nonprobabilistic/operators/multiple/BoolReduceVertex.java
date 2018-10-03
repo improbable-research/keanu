@@ -14,49 +14,48 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 
 public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<BooleanTensor> {
-    private final List<? extends Vertex<BooleanTensor>> inputs;
-    private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
+  private final List<? extends Vertex<BooleanTensor>> inputs;
+  private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BoolReduceVertex(
-            int[] shape,
-            Collection<Vertex<BooleanTensor>> input,
-            BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
-        if (input.size() < 2) {
-            throw new IllegalArgumentException(
-                    "BoolReduceVertex should have at least two input vertices, called with "
-                            + input.size());
-        }
-
-        this.inputs = new ArrayList<>(input);
-        this.reduceFunction = reduceFunction;
-        setParents(inputs);
-        setValue(BooleanTensor.placeHolder(shape));
+  public BoolReduceVertex(
+      int[] shape,
+      Collection<Vertex<BooleanTensor>> input,
+      BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
+    if (input.size() < 2) {
+      throw new IllegalArgumentException(
+          "BoolReduceVertex should have at least two input vertices, called with " + input.size());
     }
 
-    public BoolReduceVertex(
-            int[] shape,
-            BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f,
-            Vertex<BooleanTensor>... input) {
-        this(shape, Arrays.asList(input), f);
-    }
+    this.inputs = new ArrayList<>(input);
+    this.reduceFunction = reduceFunction;
+    setParents(inputs);
+    setValue(BooleanTensor.placeHolder(shape));
+  }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return applyReduce((vertex) -> vertex.sample(random));
-    }
+  public BoolReduceVertex(
+      int[] shape,
+      BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f,
+      Vertex<BooleanTensor>... input) {
+    this(shape, Arrays.asList(input), f);
+  }
 
-    @Override
-    public BooleanTensor calculate() {
-        return applyReduce(Vertex::getValue);
-    }
+  @Override
+  public BooleanTensor sample(KeanuRandom random) {
+    return applyReduce((vertex) -> vertex.sample(random));
+  }
 
-    private BooleanTensor applyReduce(Function<Vertex<BooleanTensor>, BooleanTensor> mapper) {
-        Iterator<? extends Vertex<BooleanTensor>> vertices = inputs.iterator();
+  @Override
+  public BooleanTensor calculate() {
+    return applyReduce(Vertex::getValue);
+  }
 
-        BooleanTensor c = mapper.apply(vertices.next());
-        while (vertices.hasNext()) {
-            c = reduceFunction.apply(c, mapper.apply(vertices.next()));
-        }
-        return c;
+  private BooleanTensor applyReduce(Function<Vertex<BooleanTensor>, BooleanTensor> mapper) {
+    Iterator<? extends Vertex<BooleanTensor>> vertices = inputs.iterator();
+
+    BooleanTensor c = mapper.apply(vertices.next());
+    while (vertices.hasNext()) {
+      c = reduceFunction.apply(c, mapper.apply(vertices.next()));
     }
+    return c;
+  }
 }

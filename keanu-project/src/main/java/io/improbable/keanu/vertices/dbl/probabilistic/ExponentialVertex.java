@@ -18,72 +18,72 @@ import java.util.Set;
 
 public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
 
-    private final DoubleVertex lambda;
+  private final DoubleVertex lambda;
 
-    /**
-     * Lambda driving an arbitrarily shaped tensor of Exponential
-     *
-     * <p>pdf = lambda * exp(-lambda*x)
-     *
-     * <p>If all provided parameters are scalar then the proposed shape determines the shape
-     *
-     * @param tensorShape the desired shape of the vertex
-     * @param lambda the lambda of the Exponential with either be the same shape as specified for
-     *     this vertex or scalar.
-     */
-    public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
+  /**
+   * Lambda driving an arbitrarily shaped tensor of Exponential
+   *
+   * <p>pdf = lambda * exp(-lambda*x)
+   *
+   * <p>If all provided parameters are scalar then the proposed shape determines the shape
+   *
+   * @param tensorShape the desired shape of the vertex
+   * @param lambda the lambda of the Exponential with either be the same shape as specified for this
+   *     vertex or scalar.
+   */
+  public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
+    checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
 
-        this.lambda = lambda;
-        setParents(lambda);
-        setValue(DoubleTensor.placeHolder(tensorShape));
+    this.lambda = lambda;
+    setParents(lambda);
+    setValue(DoubleTensor.placeHolder(tensorShape));
+  }
+
+  /**
+   * One to one constructor for mapping some shape of lambda to matching shaped exponential.
+   *
+   * @param lambda the lambda of the Exponential with either the same shape as specified for this
+   *     vertex or scalar
+   */
+  public ExponentialVertex(DoubleVertex lambda) {
+    this(checkHasSingleNonScalarShapeOrAllScalar(lambda.getShape()), lambda);
+  }
+
+  public ExponentialVertex(double lambda) {
+    this(new ConstantDoubleVertex(lambda));
+  }
+
+  @Override
+  public double logProb(DoubleTensor value) {
+
+    DoubleTensor lambdaValues = lambda.getValue();
+
+    DoubleTensor logPdfs = Exponential.withParameters(lambdaValues).logProb(value);
+
+    return logPdfs.sum();
+  }
+
+  @Override
+  public Map<Vertex, DoubleTensor> dLogProb(
+      DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    Diffs dlnP = Exponential.withParameters(lambda.getValue()).dLogProb(value);
+
+    Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+    if (withRespectTo.contains(lambda)) {
+      dLogProbWrtParameters.put(lambda, dlnP.get(LAMBDA).getValue());
     }
 
-    /**
-     * One to one constructor for mapping some shape of lambda to matching shaped exponential.
-     *
-     * @param lambda the lambda of the Exponential with either the same shape as specified for this
-     *     vertex or scalar
-     */
-    public ExponentialVertex(DoubleVertex lambda) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(lambda.getShape()), lambda);
+    if (withRespectTo.contains(this)) {
+      dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
     }
 
-    public ExponentialVertex(double lambda) {
-        this(new ConstantDoubleVertex(lambda));
-    }
+    return dLogProbWrtParameters;
+  }
 
-    @Override
-    public double logProb(DoubleTensor value) {
-
-        DoubleTensor lambdaValues = lambda.getValue();
-
-        DoubleTensor logPdfs = Exponential.withParameters(lambdaValues).logProb(value);
-
-        return logPdfs.sum();
-    }
-
-    @Override
-    public Map<Vertex, DoubleTensor> dLogProb(
-            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = Exponential.withParameters(lambda.getValue()).dLogProb(value);
-
-        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
-
-        if (withRespectTo.contains(lambda)) {
-            dLogProbWrtParameters.put(lambda, dlnP.get(LAMBDA).getValue());
-        }
-
-        if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
-        }
-
-        return dLogProbWrtParameters;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Exponential.withParameters(lambda.getValue()).sample(getShape(), random);
-    }
+  @Override
+  public DoubleTensor sample(KeanuRandom random) {
+    return Exponential.withParameters(lambda.getValue()).sample(getShape(), random);
+  }
 }

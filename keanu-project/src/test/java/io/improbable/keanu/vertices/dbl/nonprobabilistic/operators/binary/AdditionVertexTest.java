@@ -16,61 +16,61 @@ import org.junit.Test;
 
 public class AdditionVertexTest {
 
-    @Test
-    public void addsTwoScalarVertexValues() {
-        operatesOnTwoScalarVertexValues(2.0, 3.0, 5.0, DoubleVertex::plus);
-    }
+  @Test
+  public void addsTwoScalarVertexValues() {
+    operatesOnTwoScalarVertexValues(2.0, 3.0, 5.0, DoubleVertex::plus);
+  }
 
-    @Test
-    public void calculatesDualNumberOfTwoScalarsAdded() {
-        calculatesDualNumberOfTwoScalars(2.0, 3.0, 1.0, 1.0, DoubleVertex::plus);
-    }
+  @Test
+  public void calculatesDualNumberOfTwoScalarsAdded() {
+    calculatesDualNumberOfTwoScalars(2.0, 3.0, 1.0, 1.0, DoubleVertex::plus);
+  }
 
-    @Test
-    public void addsTwoMatrixVertexValues() {
-        operatesOnTwo2x2MatrixVertexValues(
-                new double[] {1.0, 2.0, 6.0, 4.0},
-                new double[] {2.0, 4.0, 3.0, 8.0},
-                new double[] {3.0, 6.0, 9.0, 12.0},
-                DoubleVertex::plus);
-    }
+  @Test
+  public void addsTwoMatrixVertexValues() {
+    operatesOnTwo2x2MatrixVertexValues(
+        new double[] {1.0, 2.0, 6.0, 4.0},
+        new double[] {2.0, 4.0, 3.0, 8.0},
+        new double[] {3.0, 6.0, 9.0, 12.0},
+        DoubleVertex::plus);
+  }
 
-    @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseAdded() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
-                DoubleTensor.create(new double[] {1.0, 2.0, 3.0, 4.0}, 2, 2),
-                DoubleTensor.create(new double[] {2.0, 3.0, 4.0, 5.0}, 2, 2),
-                DoubleTensor.eye(4).reshape(2, 2, 2, 2),
-                DoubleTensor.eye(4).reshape(2, 2, 2, 2),
-                DoubleVertex::plus);
-    }
+  @Test
+  public void calculatesDualNumberOfTwoMatricesElementWiseAdded() {
+    calculatesDualNumberOfTwoMatricesElementWiseOperator(
+        DoubleTensor.create(new double[] {1.0, 2.0, 3.0, 4.0}, 2, 2),
+        DoubleTensor.create(new double[] {2.0, 3.0, 4.0, 5.0}, 2, 2),
+        DoubleTensor.eye(4).reshape(2, 2, 2, 2),
+        DoubleTensor.eye(4).reshape(2, 2, 2, 2),
+        DoubleVertex::plus);
+  }
 
-    @Test
-    public void calculatesDualNumberOfAVectorsAndScalarAdded() {
-        calculatesDualNumberOfAVectorAndScalar(
-                DoubleTensor.create(new double[] {1.0, 2.0, 3.0, 4.0}),
-                2,
-                DoubleTensor.eye(4).reshape(1, 4, 1, 4),
-                DoubleTensor.ones(1, 4, 1, 1),
-                DoubleVertex::plus);
-    }
+  @Test
+  public void calculatesDualNumberOfAVectorsAndScalarAdded() {
+    calculatesDualNumberOfAVectorAndScalar(
+        DoubleTensor.create(new double[] {1.0, 2.0, 3.0, 4.0}),
+        2,
+        DoubleTensor.eye(4).reshape(1, 4, 1, 4),
+        DoubleTensor.ones(1, 4, 1, 1),
+        DoubleVertex::plus);
+  }
 
-    @Test
-    public void calculatesDualNumberofAScalarAndVectorsAdded() {
-        calculatesDualNumberOfAScalarAndVector(
-                2,
-                DoubleTensor.create(new double[] {1.0, 2.0, 3.0, 4.0}),
-                DoubleTensor.ones(1, 4, 1, 1),
-                DoubleTensor.eye(4).reshape(1, 4, 1, 4),
-                DoubleVertex::plus);
-    }
+  @Test
+  public void calculatesDualNumberofAScalarAndVectorsAdded() {
+    calculatesDualNumberOfAScalarAndVector(
+        2,
+        DoubleTensor.create(new double[] {1.0, 2.0, 3.0, 4.0}),
+        DoubleTensor.ones(1, 4, 1, 1),
+        DoubleTensor.eye(4).reshape(1, 4, 1, 4),
+        DoubleVertex::plus);
+  }
 
-    @Test
-    public void changesMatchGradient() {
-        DoubleVertex A = new UniformVertex(new int[] {2, 2, 2}, -10.0, 10.0);
-        DoubleVertex B = new UniformVertex(new int[] {2, 2, 2}, -10.0, 10.0);
-        DoubleVertex C = A.plus(B);
+  @Test
+  public void changesMatchGradient() {
+    DoubleVertex A = new UniformVertex(new int[] {2, 2, 2}, -10.0, 10.0);
+    DoubleVertex B = new UniformVertex(new int[] {2, 2, 2}, -10.0, 10.0);
+    DoubleVertex C = A.plus(B);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10, true);
-    }
+    finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10, true);
+  }
 }

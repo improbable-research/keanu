@@ -18,46 +18,41 @@ import org.junit.Test;
 
 public class LogGammaVertexTest {
 
-    @Rule public DeterministicRule rule = new DeterministicRule();
+  @Rule public DeterministicRule rule = new DeterministicRule();
 
-    @Test
-    public void logGammaScalarVertexValue() {
-        operatesOnScalarVertexValue(5, Gamma.logGamma(5), DoubleVertex::logGamma);
-    }
+  @Test
+  public void logGammaScalarVertexValue() {
+    operatesOnScalarVertexValue(5, Gamma.logGamma(5), DoubleVertex::logGamma);
+  }
 
-    @Test
-    public void calculatesDualNumberOScalarLogGamma() {
-        calculatesDualNumberOfScalar(0.5, digamma(0.5), DoubleVertex::logGamma);
-    }
+  @Test
+  public void calculatesDualNumberOScalarLogGamma() {
+    calculatesDualNumberOfScalar(0.5, digamma(0.5), DoubleVertex::logGamma);
+  }
 
-    @Test
-    public void logGammaMatrixVertexValues() {
-        operatesOn2x2MatrixVertexValues(
-                new double[] {0.0, 0.1, 0.2, 0.3},
-                new double[] {
-                    Gamma.logGamma(0.0),
-                    Gamma.logGamma(0.1),
-                    Gamma.logGamma(0.2),
-                    Gamma.logGamma(0.3)
-                },
-                DoubleVertex::logGamma);
-    }
+  @Test
+  public void logGammaMatrixVertexValues() {
+    operatesOn2x2MatrixVertexValues(
+        new double[] {0.0, 0.1, 0.2, 0.3},
+        new double[] {
+          Gamma.logGamma(0.0), Gamma.logGamma(0.1), Gamma.logGamma(0.2), Gamma.logGamma(0.3)
+        },
+        DoubleVertex::logGamma);
+  }
 
-    @Test
-    public void calculatesDualNumberOfMatrixElementWiseLogGamma() {
-        calculatesDualNumberOfMatrixElementWiseOperator(
-                new double[] {0.1, 0.2, 0.3, 0.4},
-                toDiagonalArray(
-                        new double[] {digamma(0.1), digamma(0.2), digamma(0.3), digamma(0.4)}),
-                DoubleVertex::logGamma);
-    }
+  @Test
+  public void calculatesDualNumberOfMatrixElementWiseLogGamma() {
+    calculatesDualNumberOfMatrixElementWiseOperator(
+        new double[] {0.1, 0.2, 0.3, 0.4},
+        toDiagonalArray(new double[] {digamma(0.1), digamma(0.2), digamma(0.3), digamma(0.4)}),
+        DoubleVertex::logGamma);
+  }
 
-    @Test
-    public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new int[] {2, 2, 2}, 1.0, 10.0);
-        DoubleVertex outputVertex = inputVertex.div(3).logGamma();
+  @Test
+  public void changesMatchGradient() {
+    DoubleVertex inputVertex = new UniformVertex(new int[] {2, 2, 2}, 1.0, 10.0);
+    DoubleVertex outputVertex = inputVertex.div(3).logGamma();
 
-        finiteDifferenceMatchesGradient(
-                ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5, true);
-    }
+    finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5, true);
+  }
 }

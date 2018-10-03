@@ -8,11 +8,10 @@ import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class AndMultipleVertex extends BoolReduceVertex {
-    public AndMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
-        super(
-                checkAllShapesMatch(
-                        input.stream().map(Vertex::getShape).collect(Collectors.toList())),
-                input,
-                BooleanTensor::and);
-    }
+  public AndMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
+    super(
+        checkAllShapesMatch(input.stream().map(Vertex::getShape).collect(Collectors.toList())),
+        input,
+        BooleanTensor::and);
+  }
 }

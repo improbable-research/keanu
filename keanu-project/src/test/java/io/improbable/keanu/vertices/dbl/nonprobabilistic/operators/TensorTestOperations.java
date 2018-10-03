@@ -11,61 +11,58 @@ import java.util.List;
 
 public class TensorTestOperations {
 
-    public static void finiteDifferenceMatchesGradient(
-            List<DoubleVertex> inputVertices,
-            DoubleVertex outputVertex,
-            final double incrementAmount,
-            final Double delta,
-            final boolean doReverse) {
-        inputVertices.forEach(
-                v ->
-                        runGradientTestOnSingleInput(
-                                v, outputVertex, incrementAmount, delta, doReverse));
+  public static void finiteDifferenceMatchesGradient(
+      List<DoubleVertex> inputVertices,
+      DoubleVertex outputVertex,
+      final double incrementAmount,
+      final Double delta,
+      final boolean doReverse) {
+    inputVertices.forEach(
+        v -> runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, doReverse));
+  }
+
+  private static void runGradientTestOnSingleInput(
+      DoubleVertex inputVertex,
+      DoubleVertex outputVertex,
+      final double incrementAmount,
+      final Double delta,
+      final boolean doReverse) {
+    DoubleTensor initialInput = inputVertex.getValue();
+
+    DoubleTensor initialOutput = outputVertex.eval();
+    DoubleTensor outputWrtInputForward =
+        outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+
+    if (doReverse) {
+      DoubleTensor outputWrtInputReverse =
+          Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+      assertThat(outputWrtInputForward, allCloseTo(delta, outputWrtInputReverse));
     }
 
-    private static void runGradientTestOnSingleInput(
-            DoubleVertex inputVertex,
-            DoubleVertex outputVertex,
-            final double incrementAmount,
-            final Double delta,
-            final boolean doReverse) {
-        DoubleTensor initialInput = inputVertex.getValue();
+    int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
 
-        DoubleTensor initialOutput = outputVertex.eval();
-        DoubleTensor outputWrtInputForward =
-                outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+    for (int i = 0; i < TensorShape.getLength(inputVertex.getShape()); i++) {
+      DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
+      incrementTensor.getFlattenedView().set(i, incrementAmount);
+      inputVertex.setValue(initialInput.plus(incrementTensor));
 
-        if (doReverse) {
-            DoubleTensor outputWrtInputReverse =
-                    Differentiator.reverseModeAutoDiff(outputVertex, inputVertex)
-                            .withRespectTo(inputVertex);
-            assertThat(outputWrtInputForward, allCloseTo(delta, outputWrtInputReverse));
-        }
+      DoubleTensor newOutput = outputVertex.eval();
+      DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
+      DoubleTensor differenceUsingGradient =
+          outputWrtInputForward.times(incrementTensor).sum(dimensionsToSumOver);
+      assertThat(differenceUsingGradient, allCloseTo(delta, differenceInOutput));
+    }
+  }
 
-        int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
+  private static int[] getWrtDimensions(DoubleVertex wrtVertex, DoubleVertex ofVertex) {
+    int wrtRank = wrtVertex.getShape().length;
+    int ofRank = ofVertex.getShape().length;
+    int[] wrtDimensions = new int[wrtRank];
 
-        for (int i = 0; i < TensorShape.getLength(inputVertex.getShape()); i++) {
-            DoubleTensor incrementTensor = DoubleTensor.zeros(inputVertex.getShape());
-            incrementTensor.getFlattenedView().set(i, incrementAmount);
-            inputVertex.setValue(initialInput.plus(incrementTensor));
-
-            DoubleTensor newOutput = outputVertex.eval();
-            DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
-            DoubleTensor differenceUsingGradient =
-                    outputWrtInputForward.times(incrementTensor).sum(dimensionsToSumOver);
-            assertThat(differenceUsingGradient, allCloseTo(delta, differenceInOutput));
-        }
+    for (int i = 0; i < wrtRank; i++) {
+      wrtDimensions[i] = ofRank + i;
     }
 
-    private static int[] getWrtDimensions(DoubleVertex wrtVertex, DoubleVertex ofVertex) {
-        int wrtRank = wrtVertex.getShape().length;
-        int ofRank = ofVertex.getShape().length;
-        int[] wrtDimensions = new int[wrtRank];
-
-        for (int i = 0; i < wrtRank; i++) {
-            wrtDimensions[i] = ofRank + i;
-        }
-
-        return wrtDimensions;
-    }
+    return wrtDimensions;
+  }
 }

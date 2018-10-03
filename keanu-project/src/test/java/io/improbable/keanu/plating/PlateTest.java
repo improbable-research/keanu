@@ -24,54 +24,54 @@ import org.mockito.junit.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class PlateTest {
 
-    @Rule public ExpectedException expectedException = ExpectedException.none();
+  @Rule public ExpectedException expectedException = ExpectedException.none();
 
-    public static final VertexLabel VERTEX_LABEL_1 = new VertexLabel("foo");
-    public static final VertexLabel VERTEX_LABEL_2 = new VertexLabel("bar");
-    private Plate plate;
+  public static final VertexLabel VERTEX_LABEL_1 = new VertexLabel("foo");
+  public static final VertexLabel VERTEX_LABEL_2 = new VertexLabel("bar");
+  private Plate plate;
 
-    @Mock private Vertex<?> vertex1;
+  @Mock private Vertex<?> vertex1;
 
-    @Mock private Vertex<?> vertex2;
+  @Mock private Vertex<?> vertex2;
 
-    @Before
-    public void createPlate() throws Exception {
-        when(vertex1.getLabel()).thenReturn(VERTEX_LABEL_1);
-        plate = new Plate();
-        plate.add(vertex1);
-        plate.add(VERTEX_LABEL_2, vertex2);
-    }
+  @Before
+  public void createPlate() throws Exception {
+    when(vertex1.getLabel()).thenReturn(VERTEX_LABEL_1);
+    plate = new Plate();
+    plate.add(vertex1);
+    plate.add(VERTEX_LABEL_2, vertex2);
+  }
 
-    @Test
-    public void youCanGetAVertexByName() {
-        Vertex<?> vertex = plate.get(VERTEX_LABEL_1);
-        assertThat(vertex, equalTo(this.vertex1));
-    }
+  @Test
+  public void youCanGetAVertexByName() {
+    Vertex<?> vertex = plate.get(VERTEX_LABEL_1);
+    assertThat(vertex, equalTo(this.vertex1));
+  }
 
-    @Test
-    public void unlabelledVerticesCanAlsoBeGotIfYouKnowTheLabelToUse() {
-        Vertex<?> vertex = plate.get(VERTEX_LABEL_2);
-        assertThat(vertex, equalTo(this.vertex2));
-    }
+  @Test
+  public void unlabelledVerticesCanAlsoBeGotIfYouKnowTheLabelToUse() {
+    Vertex<?> vertex = plate.get(VERTEX_LABEL_2);
+    assertThat(vertex, equalTo(this.vertex2));
+  }
 
-    @Test
-    public void youCanGetAllTheProxyVertices() {
-        DoubleProxyVertex proxy1 = new DoubleProxyVertex(new VertexLabel("proxy1"));
-        IntegerProxyVertex proxy2 = new IntegerProxyVertex(new VertexLabel("proxy2"));
-        BoolProxyVertex proxy3 = new BoolProxyVertex(new VertexLabel("proxy3"));
-        plate.add(proxy1);
-        plate.add(proxy2);
-        plate.add(proxy3);
+  @Test
+  public void youCanGetAllTheProxyVertices() {
+    DoubleProxyVertex proxy1 = new DoubleProxyVertex(new VertexLabel("proxy1"));
+    IntegerProxyVertex proxy2 = new IntegerProxyVertex(new VertexLabel("proxy2"));
+    BoolProxyVertex proxy3 = new BoolProxyVertex(new VertexLabel("proxy3"));
+    plate.add(proxy1);
+    plate.add(proxy2);
+    plate.add(proxy3);
 
-        Collection<Vertex<?>> proxies = plate.getProxyVertices();
-        assertThat(proxies, containsInAnyOrder(proxy1, proxy2, proxy3));
-    }
+    Collection<Vertex<?>> proxies = plate.getProxyVertices();
+    assertThat(proxies, containsInAnyOrder(proxy1, proxy2, proxy3));
+  }
 
-    @Test
-    public void itThrowsIfYouAddAVertexWithNoLabel() {
-        expectedException.expect(PlateConstructionException.class);
-        expectedException.expectMessage(
-                endsWith(" must contain a label in order to be added to a plate"));
-        plate.add(ConstantVertex.of(1.));
-    }
+  @Test
+  public void itThrowsIfYouAddAVertexWithNoLabel() {
+    expectedException.expect(PlateConstructionException.class);
+    expectedException.expectMessage(
+        endsWith(" must contain a label in order to be added to a plate"));
+    plate.add(ConstantVertex.of(1.));
+  }
 }

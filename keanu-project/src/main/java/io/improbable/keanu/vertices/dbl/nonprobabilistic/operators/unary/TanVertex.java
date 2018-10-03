@@ -10,36 +10,36 @@ import java.util.Map;
 
 public class TanVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Takes the tangent of a vertex. Tan(vertex).
-     *
-     * @param inputVertex the vertex
-     */
-    public TanVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Takes the tangent of a vertex. Tan(vertex).
+   *
+   * @param inputVertex the vertex
+   */
+  public TanVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.tan();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.tan();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.tan();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.tan();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        // dTandInput = sec^2(x)
-        DoubleTensor dTandInput = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    // dTandInput = sec^2(x)
+    DoubleTensor dTandInput = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
 
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(
-                inputVertex,
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        dTandInput, this.getShape()));
-        return partials;
-    }
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(
+        inputVertex,
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            dTandInput, this.getShape()));
+    return partials;
+  }
 }

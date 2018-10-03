@@ -9,28 +9,28 @@ import java.util.Map;
 
 public class RoundVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Applies the Rounding operator to a vertex. This maps a vertex to the nearest integer value
-     *
-     * @param inputVertex the vertex to be rounded
-     */
-    public RoundVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Applies the Rounding operator to a vertex. This maps a vertex to the nearest integer value
+   *
+   * @param inputVertex the vertex to be rounded
+   */
+  public RoundVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.round();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.round();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    throw new UnsupportedOperationException();
+  }
 }

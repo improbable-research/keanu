@@ -11,44 +11,43 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
  */
 public class Uniform implements ContinuousDistribution {
 
-    private final DoubleTensor xMin;
-    private final DoubleTensor xMax;
+  private final DoubleTensor xMin;
+  private final DoubleTensor xMax;
 
-    /**
-     * @param xMin minimum x value
-     * @param xMax maximum x value
-     * @return a new ContinuousDistribution object
-     */
-    public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
-        return new Uniform(xMin, xMax);
-    }
+  /**
+   * @param xMin minimum x value
+   * @param xMax maximum x value
+   * @return a new ContinuousDistribution object
+   */
+  public static ContinuousDistribution withParameters(DoubleTensor xMin, DoubleTensor xMax) {
+    return new Uniform(xMin, xMax);
+  }
 
-    private Uniform(DoubleTensor xMin, DoubleTensor xMax) {
-        this.xMin = xMin;
-        this.xMax = xMax;
-    }
+  private Uniform(DoubleTensor xMin, DoubleTensor xMax) {
+    this.xMin = xMin;
+    this.xMax = xMax;
+  }
 
-    @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
-        return random.nextDouble(shape).timesInPlace(xMax.minus(xMin)).plusInPlace(xMin);
-    }
+  @Override
+  public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    return random.nextDouble(shape).timesInPlace(xMax.minus(xMin)).plusInPlace(xMin);
+  }
 
-    @Override
-    public DoubleTensor logProb(DoubleTensor x) {
+  @Override
+  public DoubleTensor logProb(DoubleTensor x) {
 
-        DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
-        logOfWithinBounds =
-                logOfWithinBounds.setWithMaskInPlace(
-                        x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
-        logOfWithinBounds =
-                logOfWithinBounds.setWithMaskInPlace(
-                        x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
+    DoubleTensor logOfWithinBounds = xMax.minus(xMin).logInPlace().unaryMinusInPlace();
+    logOfWithinBounds =
+        logOfWithinBounds.setWithMaskInPlace(
+            x.getGreaterThanOrEqualToMask(xMax), Double.NEGATIVE_INFINITY);
+    logOfWithinBounds =
+        logOfWithinBounds.setWithMaskInPlace(x.getLessThanMask(xMin), Double.NEGATIVE_INFINITY);
 
-        return logOfWithinBounds;
-    }
+    return logOfWithinBounds;
+  }
 
-    @Override
-    public Diffs dLogProb(DoubleTensor x) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public Diffs dLogProb(DoubleTensor x) {
+    throw new UnsupportedOperationException();
+  }
 }

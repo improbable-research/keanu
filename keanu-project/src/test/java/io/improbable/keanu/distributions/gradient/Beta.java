@@ -8,25 +8,25 @@ import static org.apache.commons.math3.special.Gamma.digamma;
  */
 public class Beta {
 
-    private Beta() {}
+  private Beta() {}
 
-    public static Diff dlnPdf(double alpha, double beta, double x) {
-        double dPdx = ((alpha - 1) / x) - ((beta - 1) / (1 - x));
-        double dPda = digamma(alpha + beta) - digamma(alpha) + Math.log(x);
-        double dPdb = digamma(alpha + beta) - digamma(beta) + Math.log(1 - x);
+  public static Diff dlnPdf(double alpha, double beta, double x) {
+    double dPdx = ((alpha - 1) / x) - ((beta - 1) / (1 - x));
+    double dPda = digamma(alpha + beta) - digamma(alpha) + Math.log(x);
+    double dPdb = digamma(alpha + beta) - digamma(beta) + Math.log(1 - x);
 
-        return new Diff(dPda, dPdb, dPdx);
+    return new Diff(dPda, dPdb, dPdx);
+  }
+
+  public static class Diff {
+    public final double dPdalpha;
+    public final double dPdbeta;
+    public final double dPdx;
+
+    public Diff(double dPdalpha, double dPdbeta, double dPdx) {
+      this.dPdalpha = dPdalpha;
+      this.dPdbeta = dPdbeta;
+      this.dPdx = dPdx;
     }
-
-    public static class Diff {
-        public final double dPdalpha;
-        public final double dPdbeta;
-        public final double dPdx;
-
-        public Diff(double dPdalpha, double dPdbeta, double dPdx) {
-            this.dPdalpha = dPdalpha;
-            this.dPdbeta = dPdbeta;
-            this.dPdx = dPdx;
-        }
-    }
+  }
 }

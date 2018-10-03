@@ -6,22 +6,22 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class UnaryOpVertex<IN, OUT> extends Vertex<OUT> implements NonProbabilistic<OUT> {
 
-    protected final Vertex<IN> inputVertex;
+  protected final Vertex<IN> inputVertex;
 
-    public UnaryOpVertex(Vertex<IN> inputVertex) {
-        this.inputVertex = inputVertex;
-        setParents(inputVertex);
-    }
+  public UnaryOpVertex(Vertex<IN> inputVertex) {
+    this.inputVertex = inputVertex;
+    setParents(inputVertex);
+  }
 
-    @Override
-    public OUT sample(KeanuRandom random) {
-        return op(inputVertex.sample(random));
-    }
+  @Override
+  public OUT sample(KeanuRandom random) {
+    return op(inputVertex.sample(random));
+  }
 
-    @Override
-    public OUT calculate() {
-        return op(inputVertex.getValue());
-    }
+  @Override
+  public OUT calculate() {
+    return op(inputVertex.getValue());
+  }
 
-    protected abstract OUT op(IN a);
+  protected abstract OUT op(IN a);
 }

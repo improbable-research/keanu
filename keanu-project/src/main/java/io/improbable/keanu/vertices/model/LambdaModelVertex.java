@@ -14,112 +14,109 @@ import java.util.function.Function;
 
 public class LambdaModelVertex extends DoubleVertex implements ModelVertex<DoubleTensor> {
 
-    private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
-    private Map<VertexLabel, Tensor> outputs;
-    private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
-    private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>>
-            extractOutput;
-    private boolean hasValue;
+  private Map<VertexLabel, Vertex<? extends Tensor>> inputs;
+  private Map<VertexLabel, Tensor> outputs;
+  private Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor;
+  private Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>>
+      extractOutput;
+  private boolean hasValue;
 
-    /**
-     * A vertex whose operation is the execution of a lambda. It is able to execute a lambda and is
-     * able to parse the result. It stores multiple output values in a map. Use a ModelResultVertex
-     * to extract a value by label from this vertex.
-     *
-     * @param inputs input vertices to the model
-     * @param executor the operation to perform
-     * @param updateValues a function to extract the output values (once the operation has been
-     *     performed) and update the models output values.
-     */
-    public LambdaModelVertex(
-            Map<VertexLabel, Vertex<? extends Tensor>> inputs,
-            Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
-            Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>>
-                    updateValues) {
-        this.inputs = inputs;
-        this.outputs = Collections.emptyMap();
-        this.executor = executor;
-        this.extractOutput = updateValues;
-        this.hasValue = false;
-        setParents(inputs.values());
-    }
+  /**
+   * A vertex whose operation is the execution of a lambda. It is able to execute a lambda and is
+   * able to parse the result. It stores multiple output values in a map. Use a ModelResultVertex to
+   * extract a value by label from this vertex.
+   *
+   * @param inputs input vertices to the model
+   * @param executor the operation to perform
+   * @param updateValues a function to extract the output values (once the operation has been
+   *     performed) and update the models output values.
+   */
+  public LambdaModelVertex(
+      Map<VertexLabel, Vertex<? extends Tensor>> inputs,
+      Consumer<Map<VertexLabel, Vertex<? extends Tensor>>> executor,
+      Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+    this.inputs = inputs;
+    this.outputs = Collections.emptyMap();
+    this.executor = executor;
+    this.extractOutput = updateValues;
+    this.hasValue = false;
+    setParents(inputs.values());
+  }
 
-    /**
-     * A vertex whose operation is the execution of a command line process. It is able to execute
-     * this process and parse the result. It stores multiple output values in a map. Use a
-     * ModelResultVertex to extract a value by label from this vertex.
-     *
-     * @param inputs input vertices to the model
-     * @param command the command to execute
-     * @param updateValues a function to extract the output values (once the operation has been
-     *     performed) and update the models output values.
-     * @return a process model vertex
-     */
-    public static LambdaModelVertex createFromProcess(
-            Map<VertexLabel, Vertex<? extends Tensor>> inputs,
-            String command,
-            Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>>
-                    updateValues) {
-        return new LambdaModelVertex(
-                inputs,
-                i -> {
-                    try {
-                        Process cmd = Runtime.getRuntime().exec(command);
-                        cmd.waitFor();
-                    } catch (IOException | InterruptedException e) {
-                        throw new RuntimeException("Failed during execution of the process. " + e);
-                    }
-                },
-                updateValues);
-    }
+  /**
+   * A vertex whose operation is the execution of a command line process. It is able to execute this
+   * process and parse the result. It stores multiple output values in a map. Use a
+   * ModelResultVertex to extract a value by label from this vertex.
+   *
+   * @param inputs input vertices to the model
+   * @param command the command to execute
+   * @param updateValues a function to extract the output values (once the operation has been
+   *     performed) and update the models output values.
+   * @return a process model vertex
+   */
+  public static LambdaModelVertex createFromProcess(
+      Map<VertexLabel, Vertex<? extends Tensor>> inputs,
+      String command,
+      Function<Map<VertexLabel, Vertex<? extends Tensor>>, Map<VertexLabel, Tensor>> updateValues) {
+    return new LambdaModelVertex(
+        inputs,
+        i -> {
+          try {
+            Process cmd = Runtime.getRuntime().exec(command);
+            cmd.waitFor();
+          } catch (IOException | InterruptedException e) {
+            throw new RuntimeException("Failed during execution of the process. " + e);
+          }
+        },
+        updateValues);
+  }
 
-    /**
-     * This vertex stores multiple values in a key value pair of label to result. As a result it
-     * should never be asked for its value directly. Use a ModelResultVertex to extract a value from
-     * this vertex by label.
-     *
-     * @return a placeholder value
-     */
-    @Override
-    public DoubleTensor calculate() {
-        run();
-        updateValues(inputs);
-        return DoubleTensor.scalar(0.0);
-    }
+  /**
+   * This vertex stores multiple values in a key value pair of label to result. As a result it
+   * should never be asked for its value directly. Use a ModelResultVertex to extract a value from
+   * this vertex by label.
+   *
+   * @return a placeholder value
+   */
+  @Override
+  public DoubleTensor calculate() {
+    run();
+    updateValues(inputs);
+    return DoubleTensor.scalar(0.0);
+  }
 
-    @Override
-    public boolean hasValue() {
-        return hasValue;
-    }
+  @Override
+  public boolean hasValue() {
+    return hasValue;
+  }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        for (Vertex<? extends Tensor> input : inputs.values()) {
-            input.sample();
-        }
-        return calculate();
+  @Override
+  public DoubleTensor sample(KeanuRandom random) {
+    for (Vertex<? extends Tensor> input : inputs.values()) {
+      input.sample();
     }
+    return calculate();
+  }
 
-    @Override
-    public void run() {
-        executor.accept(inputs);
-        hasValue = true;
-    }
+  @Override
+  public void run() {
+    executor.accept(inputs);
+    hasValue = true;
+  }
 
-    @Override
-    public Map<VertexLabel, Tensor> updateValues(
-            Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
-        outputs = extractOutput.apply(inputs);
-        return outputs;
-    }
+  @Override
+  public Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs) {
+    outputs = extractOutput.apply(inputs);
+    return outputs;
+  }
 
-    @Override
-    public boolean hasCalculated() {
-        return hasValue();
-    }
+  @Override
+  public boolean hasCalculated() {
+    return hasValue();
+  }
 
-    @Override
-    public <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label) {
-        return (T) outputs.get(label);
-    }
+  @Override
+  public <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label) {
+    return (T) outputs.get(label);
+  }
 }

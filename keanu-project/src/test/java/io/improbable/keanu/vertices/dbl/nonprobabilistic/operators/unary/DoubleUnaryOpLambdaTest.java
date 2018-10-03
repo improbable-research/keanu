@@ -9,14 +9,14 @@ import org.junit.Test;
 
 public class DoubleUnaryOpLambdaTest {
 
-    @Test
-    public void GIVEN_a_double_tensor_THEN_transform() {
+  @Test
+  public void GIVEN_a_double_tensor_THEN_transform() {
 
-        UniformVertex matrix = new UniformVertex(new int[] {2, 2}, 0, 5);
-        matrix.setAndCascade(DoubleTensor.create(2.5, new int[] {2, 2}));
-        DoubleVertex matrixLambda = matrix.lambda((val) -> val.times(2), null, null);
+    UniformVertex matrix = new UniformVertex(new int[] {2, 2}, 0, 5);
+    matrix.setAndCascade(DoubleTensor.create(2.5, new int[] {2, 2}));
+    DoubleVertex matrixLambda = matrix.lambda((val) -> val.times(2), null, null);
 
-        assertArrayEquals(
-                new double[] {5, 5, 5, 5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
-    }
+    assertArrayEquals(
+        new double[] {5, 5, 5, 5}, matrixLambda.getValue().asFlatDoubleArray(), 0.001);
+  }
 }

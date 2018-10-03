@@ -7,11 +7,11 @@ package io.improbable.keanu.plating;
  */
 public class PlateConstructionException extends RuntimeException {
 
-    public PlateConstructionException(String message) {
-        super(message);
-    }
+  public PlateConstructionException(String message) {
+    super(message);
+  }
 
-    public PlateConstructionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+  public PlateConstructionException(String message, Throwable cause) {
+    super(message, cause);
+  }
 }

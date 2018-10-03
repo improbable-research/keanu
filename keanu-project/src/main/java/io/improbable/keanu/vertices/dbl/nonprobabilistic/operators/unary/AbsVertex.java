@@ -9,28 +9,28 @@ import java.util.Map;
 
 public class AbsVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Takes the absolute of a vertex
-     *
-     * @param inputVertex the vertex
-     */
-    public AbsVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Takes the absolute of a vertex
+   *
+   * @param inputVertex the vertex
+   */
+  public AbsVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.abs();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.abs();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    throw new UnsupportedOperationException();
+  }
 }

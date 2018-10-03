@@ -7,12 +7,12 @@ import java.util.Map;
 
 public interface Differentiable {
 
-    DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
+  DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers);
 
-    Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf);
+  Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf);
 
-    default DualNumber getDualNumber() {
-        return Differentiator.calculateDual((Vertex & Differentiable) this);
-    }
+  default DualNumber getDualNumber() {
+    return Differentiator.calculateDual((Vertex & Differentiable) this);
+  }
 }

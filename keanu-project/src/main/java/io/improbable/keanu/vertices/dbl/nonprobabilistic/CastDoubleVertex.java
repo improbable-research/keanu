@@ -12,31 +12,31 @@ import java.util.Map;
 
 public class CastDoubleVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
-    private final Vertex<? extends NumberTensor> inputVertex;
+  private final Vertex<? extends NumberTensor> inputVertex;
 
-    public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
-        this.inputVertex = inputVertex;
-        setParents(inputVertex);
-    }
+  public CastDoubleVertex(Vertex<? extends NumberTensor> inputVertex) {
+    this.inputVertex = inputVertex;
+    setParents(inputVertex);
+  }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random).toDouble();
-    }
+  @Override
+  public DoubleTensor sample(KeanuRandom random) {
+    return inputVertex.sample(random).toDouble();
+  }
 
-    @Override
-    public DoubleTensor calculate() {
-        return inputVertex.getValue().toDouble();
-    }
+  @Override
+  public DoubleTensor calculate() {
+    return inputVertex.getValue().toDouble();
+  }
 
-    @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
-    }
+  @Override
+  public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    throw new UnsupportedOperationException("CastDoubleTensorVertex is non-differentiable");
+  }
 }

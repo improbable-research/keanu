@@ -5,12 +5,12 @@ import io.improbable.keanu.vertices.Vertex;
 
 public class NotVertex extends BoolUnaryOpVertex<BooleanTensor> {
 
-    public NotVertex(Vertex<BooleanTensor> a) {
-        super(a.getShape(), a);
-    }
+  public NotVertex(Vertex<BooleanTensor> a) {
+    super(a.getShape(), a);
+  }
 
-    @Override
-    protected BooleanTensor op(BooleanTensor value) {
-        return value.not();
-    }
+  @Override
+  protected BooleanTensor op(BooleanTensor value) {
+    return value.not();
+  }
 }

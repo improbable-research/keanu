@@ -7,7 +7,7 @@ package io.improbable.keanu.vertices;
  */
 public interface ProxyVertex<T extends Vertex<?>> {
 
-    void setParent(T newParent);
+  void setParent(T newParent);
 
-    boolean hasParent();
+  boolean hasParent();
 }

@@ -7,14 +7,14 @@ import java.util.function.Function;
 
 public abstract class BoolUnaryOpLambda<A extends Tensor> extends BoolUnaryOpVertex<A> {
 
-    private final Function<A, BooleanTensor> boolOp;
+  private final Function<A, BooleanTensor> boolOp;
 
-    public BoolUnaryOpLambda(int[] shape, Vertex<A> a, Function<A, BooleanTensor> boolOp) {
-        super(shape, a);
-        this.boolOp = boolOp;
-    }
+  public BoolUnaryOpLambda(int[] shape, Vertex<A> a, Function<A, BooleanTensor> boolOp) {
+    super(shape, a);
+    this.boolOp = boolOp;
+  }
 
-    protected BooleanTensor op(A a) {
-        return boolOp.apply(a);
-    }
+  protected BooleanTensor op(A a) {
+    return boolOp.apply(a);
+  }
 }

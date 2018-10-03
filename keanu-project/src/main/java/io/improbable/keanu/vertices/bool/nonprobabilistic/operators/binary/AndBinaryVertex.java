@@ -5,12 +5,12 @@ import io.improbable.keanu.vertices.Vertex;
 
 public class AndBinaryVertex extends BoolBinaryOpVertex<BooleanTensor, BooleanTensor> {
 
-    public AndBinaryVertex(Vertex<BooleanTensor> a, Vertex<BooleanTensor> b) {
-        super(a, b);
-    }
+  public AndBinaryVertex(Vertex<BooleanTensor> a, Vertex<BooleanTensor> b) {
+    super(a, b);
+  }
 
-    @Override
-    protected BooleanTensor op(BooleanTensor l, BooleanTensor r) {
-        return l.and(r);
-    }
+  @Override
+  protected BooleanTensor op(BooleanTensor l, BooleanTensor r) {
+    return l.and(r);
+  }
 }

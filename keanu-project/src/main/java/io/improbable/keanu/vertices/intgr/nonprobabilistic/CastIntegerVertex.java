@@ -8,20 +8,20 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class CastIntegerVertex extends IntegerVertex implements NonProbabilistic<IntegerTensor> {
 
-    private final Vertex<IntegerTensor> inputVertex;
+  private final Vertex<IntegerTensor> inputVertex;
 
-    public CastIntegerVertex(Vertex<IntegerTensor> inputVertex) {
-        this.inputVertex = inputVertex;
-        setParents(inputVertex);
-    }
+  public CastIntegerVertex(Vertex<IntegerTensor> inputVertex) {
+    this.inputVertex = inputVertex;
+    setParents(inputVertex);
+  }
 
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return inputVertex.sample(random);
-    }
+  @Override
+  public IntegerTensor sample(KeanuRandom random) {
+    return inputVertex.sample(random);
+  }
 
-    @Override
-    public IntegerTensor calculate() {
-        return inputVertex.getValue();
-    }
+  @Override
+  public IntegerTensor calculate() {
+    return inputVertex.getValue();
+  }
 }

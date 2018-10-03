@@ -5,15 +5,15 @@ import java.util.function.Function;
 
 public class UnaryOpLambda<IN, OUT> extends UnaryOpVertex<IN, OUT> {
 
-    private Function<IN, OUT> op;
+  private Function<IN, OUT> op;
 
-    public UnaryOpLambda(Vertex<IN> inputVertex, Function<IN, OUT> op) {
-        super(inputVertex);
-        this.op = op;
-    }
+  public UnaryOpLambda(Vertex<IN> inputVertex, Function<IN, OUT> op) {
+    super(inputVertex);
+    this.op = op;
+  }
 
-    @Override
-    protected OUT op(IN input) {
-        return op.apply(input);
-    }
+  @Override
+  protected OUT op(IN input) {
+    return op.apply(input);
+  }
 }

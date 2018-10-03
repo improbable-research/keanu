@@ -7,13 +7,13 @@ import java.util.Set;
 
 public final class SingleVariableSelector implements MHStepVariableSelector {
 
-    static final SingleVariableSelector INSTANCE = new SingleVariableSelector();
+  static final SingleVariableSelector INSTANCE = new SingleVariableSelector();
 
-    private SingleVariableSelector() {}
+  private SingleVariableSelector() {}
 
-    @Override
-    public Set<Vertex> select(List<? extends Vertex> latentVertices, int sampleNumber) {
-        Vertex chosenVertex = latentVertices.get(sampleNumber % latentVertices.size());
-        return Collections.singleton(chosenVertex);
-    }
+  @Override
+  public Set<Vertex> select(List<? extends Vertex> latentVertices, int sampleNumber) {
+    Vertex chosenVertex = latentVertices.get(sampleNumber % latentVertices.size());
+    return Collections.singleton(chosenVertex);
+  }
 }

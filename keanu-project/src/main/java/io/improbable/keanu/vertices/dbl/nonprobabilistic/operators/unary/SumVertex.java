@@ -12,33 +12,33 @@ import java.util.Map;
 
 public class SumVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Performs a sum across each value stored in a vertex
-     *
-     * @param inputVertex the vertex to have its values summed
-     */
-    public SumVertex(DoubleVertex inputVertex) {
-        super(Tensor.SCALAR_SHAPE, inputVertex);
-    }
+  /**
+   * Performs a sum across each value stored in a vertex
+   *
+   * @param inputVertex the vertex to have its values summed
+   */
+  public SumVertex(DoubleVertex inputVertex) {
+    super(Tensor.SCALAR_SHAPE, inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return DoubleTensor.scalar(value.sum());
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return DoubleTensor.scalar(value.sum());
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.sum();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.sum();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        PartialDerivatives derivativesWrtInput =
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        DoubleTensor.ones(inputVertex.getShape()), this.getShape());
+    PartialDerivatives derivativesWrtInput =
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            DoubleTensor.ones(inputVertex.getShape()), this.getShape());
 
-        return singletonMap(inputVertex, derivativesWrtInput);
-    }
+    return singletonMap(inputVertex, derivativesWrtInput);
+  }
 }

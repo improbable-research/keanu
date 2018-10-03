@@ -12,42 +12,40 @@ import java.util.Map;
 
 public class ReshapeVertex extends DoubleUnaryOpVertex {
 
-    public ReshapeVertex(DoubleVertex inputVertex, int... proposedShape) {
-        super(proposedShape, inputVertex);
+  public ReshapeVertex(DoubleVertex inputVertex, int... proposedShape) {
+    super(proposedShape, inputVertex);
+  }
+
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.reshape(getShape());
+  }
+
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.reshape(getShape());
+  }
+
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
+
+    for (Map.Entry<VertexId, DoubleTensor> partialDerivative :
+        derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
+      DoubleTensor partial = partialDerivative.getValue();
+      int[] newPartialShape =
+          TensorShape.concat(
+              TensorShape.selectDimensions(
+                  0, partial.getRank() - getShape().length - 1, partial.getShape()),
+              inputVertex.getShape());
+      DoubleTensor reshapedPartialDerivative =
+          partialDerivative.getValue().reshape(newPartialShape);
+      reshapedDerivatives.put(
+          inputVertex,
+          new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
     }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.reshape(getShape());
-    }
-
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.reshape(getShape());
-    }
-
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> reshapedDerivatives = new HashMap<>();
-
-        for (Map.Entry<VertexId, DoubleTensor> partialDerivative :
-                derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
-            DoubleTensor partial = partialDerivative.getValue();
-            int[] newPartialShape =
-                    TensorShape.concat(
-                            TensorShape.selectDimensions(
-                                    0,
-                                    partial.getRank() - getShape().length - 1,
-                                    partial.getShape()),
-                            inputVertex.getShape());
-            DoubleTensor reshapedPartialDerivative =
-                    partialDerivative.getValue().reshape(newPartialShape);
-            reshapedDerivatives.put(
-                    inputVertex,
-                    new PartialDerivatives(partialDerivative.getKey(), reshapedPartialDerivative));
-        }
-
-        return reshapedDerivatives;
-    }
+    return reshapedDerivatives;
+  }
 }

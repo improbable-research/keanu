@@ -7,12 +7,12 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.BoolB
 
 public class EqualsVertex<TENSOR extends Tensor> extends BoolBinaryOpVertex<TENSOR, TENSOR> {
 
-    public EqualsVertex(Vertex<TENSOR> a, Vertex<TENSOR> b) {
-        super(a, b);
-    }
+  public EqualsVertex(Vertex<TENSOR> a, Vertex<TENSOR> b) {
+    super(a, b);
+  }
 
-    @Override
-    protected BooleanTensor op(TENSOR l, TENSOR r) {
-        return l.elementwiseEquals(r);
-    }
+  @Override
+  protected BooleanTensor op(TENSOR l, TENSOR r) {
+    return l.elementwiseEquals(r);
+  }
 }

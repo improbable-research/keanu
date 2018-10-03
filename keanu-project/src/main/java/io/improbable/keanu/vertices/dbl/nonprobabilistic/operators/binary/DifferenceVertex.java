@@ -10,32 +10,32 @@ import java.util.Map;
 
 public class DifferenceVertex extends DoubleBinaryOpVertex {
 
-    /**
-     * Subtracts one vertex from another
-     *
-     * @param left the vertex that will be subtracted from
-     * @param right the vertex to subtract
-     */
-    public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right);
-    }
+  /**
+   * Subtracts one vertex from another
+   *
+   * @param left the vertex that will be subtracted from
+   * @param right the vertex to subtract
+   */
+  public DifferenceVertex(DoubleVertex left, DoubleVertex right) {
+    super(left, right);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.minus(r);
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
+    return l.minus(r);
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(left, derivativeOfOutputsWithRespectToSelf);
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0));
-        return partials;
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(left, derivativeOfOutputsWithRespectToSelf);
+    partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0));
+    return partials;
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.minus(r);
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber l, DualNumber r) {
+    return l.minus(r);
+  }
 }

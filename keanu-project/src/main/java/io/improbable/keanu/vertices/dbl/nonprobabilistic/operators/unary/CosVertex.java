@@ -10,33 +10,33 @@ import java.util.Map;
 
 public class CosVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Takes the cosine of a vertex, Cos(vertex)
-     *
-     * @param inputVertex the vertex
-     */
-    public CosVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Takes the cosine of a vertex, Cos(vertex)
+   *
+   * @param inputVertex the vertex
+   */
+  public CosVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.cos();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.cos();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.cos();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.cos();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(
-                inputVertex,
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        inputVertex.getValue().sin().unaryMinusInPlace(), this.getShape()));
-        return partials;
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(
+        inputVertex,
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            inputVertex.getValue().sin().unaryMinusInPlace(), this.getShape()));
+    return partials;
+  }
 }

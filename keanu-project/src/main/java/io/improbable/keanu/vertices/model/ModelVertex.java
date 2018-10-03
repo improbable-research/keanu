@@ -14,23 +14,23 @@ import java.util.Map;
 
 public interface ModelVertex<T> extends NonProbabilistic<T> {
 
-    void run();
+  void run();
 
-    Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
+  Map<VertexLabel, Tensor> updateValues(Map<VertexLabel, Vertex<? extends Tensor>> inputs);
 
-    boolean hasCalculated();
+  boolean hasCalculated();
 
-    <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label);
+  <U, T extends Tensor<U>> T getModelOutputValue(VertexLabel label);
 
-    default DoubleVertex getDoubleModelOutputVertex(VertexLabel label) {
-        return new DoubleModelResultVertex(this, label);
-    }
+  default DoubleVertex getDoubleModelOutputVertex(VertexLabel label) {
+    return new DoubleModelResultVertex(this, label);
+  }
 
-    default IntegerVertex getIntegerModelOutputVertex(VertexLabel label) {
-        return new IntegerModelResultVertex(this, label);
-    }
+  default IntegerVertex getIntegerModelOutputVertex(VertexLabel label) {
+    return new IntegerModelResultVertex(this, label);
+  }
 
-    default BoolVertex getBoolModelOutputVertex(VertexLabel label) {
-        return new BoolModelResultVertex(this, label);
-    }
+  default BoolVertex getBoolModelOutputVertex(VertexLabel label) {
+    return new BoolModelResultVertex(this, label);
+  }
 }

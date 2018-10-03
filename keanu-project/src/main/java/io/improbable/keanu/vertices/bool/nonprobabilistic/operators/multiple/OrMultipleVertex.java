@@ -9,11 +9,10 @@ import java.util.stream.Collectors;
 
 public class OrMultipleVertex extends BoolReduceVertex {
 
-    public OrMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
-        super(
-                checkAllShapesMatch(
-                        input.stream().map(Vertex::getShape).collect(Collectors.toList())),
-                input,
-                BooleanTensor::or);
-    }
+  public OrMultipleVertex(Collection<Vertex<BooleanTensor>> input) {
+    super(
+        checkAllShapesMatch(input.stream().map(Vertex::getShape).collect(Collectors.toList())),
+        input,
+        BooleanTensor::or);
+  }
 }

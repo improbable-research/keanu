@@ -6,17 +6,17 @@ import io.improbable.keanu.vertices.Vertex;
 import java.util.function.BiFunction;
 
 public abstract class BoolBinaryOpLambda<A extends Tensor, B extends Tensor>
-        extends BoolBinaryOpVertex<A, B> {
+    extends BoolBinaryOpVertex<A, B> {
 
-    private final BiFunction<A, B, BooleanTensor> boolOp;
+  private final BiFunction<A, B, BooleanTensor> boolOp;
 
-    public BoolBinaryOpLambda(
-            int[] shape, Vertex<A> a, Vertex<B> b, BiFunction<A, B, BooleanTensor> boolOp) {
-        super(shape, a, b);
-        this.boolOp = boolOp;
-    }
+  public BoolBinaryOpLambda(
+      int[] shape, Vertex<A> a, Vertex<B> b, BiFunction<A, B, BooleanTensor> boolOp) {
+    super(shape, a, b);
+    this.boolOp = boolOp;
+  }
 
-    protected BooleanTensor op(A a, B b) {
-        return boolOp.apply(a, b);
-    }
+  protected BooleanTensor op(A a, B b) {
+    return boolOp.apply(a, b);
+  }
 }

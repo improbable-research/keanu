@@ -4,14 +4,14 @@ import io.improbable.keanu.vertices.VertexLabel;
 
 public interface ModelResultProvider<T> {
 
-    ModelVertex<T> getModel();
+  ModelVertex<T> getModel();
 
-    VertexLabel getLabel();
+  VertexLabel getLabel();
 
-    default T getValue() {
-        if (!getModel().hasCalculated()) {
-            getModel().calculate();
-        }
-        return getModel().getModelOutputValue(getLabel());
+  default T getValue() {
+    if (!getModel().hasCalculated()) {
+      getModel().calculate();
     }
+    return getModel().getModelOutputValue(getLabel());
+  }
 }

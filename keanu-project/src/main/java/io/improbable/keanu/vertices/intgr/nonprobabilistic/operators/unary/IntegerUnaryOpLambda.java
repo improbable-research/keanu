@@ -8,30 +8,29 @@ import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import java.util.function.Function;
 
 public class IntegerUnaryOpLambda<IN> extends IntegerVertex
-        implements NonProbabilistic<IntegerTensor> {
+    implements NonProbabilistic<IntegerTensor> {
 
-    protected final Vertex<IN> inputVertex;
-    protected final Function<IN, IntegerTensor> op;
+  protected final Vertex<IN> inputVertex;
+  protected final Function<IN, IntegerTensor> op;
 
-    public IntegerUnaryOpLambda(
-            int[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
-        this.inputVertex = inputVertex;
-        this.op = op;
-        setParents(inputVertex);
-        setValue(IntegerTensor.placeHolder(shape));
-    }
+  public IntegerUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+    this.inputVertex = inputVertex;
+    this.op = op;
+    setParents(inputVertex);
+    setValue(IntegerTensor.placeHolder(shape));
+  }
 
-    public IntegerUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
-        this(inputVertex.getShape(), inputVertex, op);
-    }
+  public IntegerUnaryOpLambda(Vertex<IN> inputVertex, Function<IN, IntegerTensor> op) {
+    this(inputVertex.getShape(), inputVertex, op);
+  }
 
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return op.apply(inputVertex.sample(random));
-    }
+  @Override
+  public IntegerTensor sample(KeanuRandom random) {
+    return op.apply(inputVertex.sample(random));
+  }
 
-    @Override
-    public IntegerTensor calculate() {
-        return op.apply(inputVertex.getValue());
-    }
+  @Override
+  public IntegerTensor calculate() {
+    return op.apply(inputVertex.getValue());
+  }
 }

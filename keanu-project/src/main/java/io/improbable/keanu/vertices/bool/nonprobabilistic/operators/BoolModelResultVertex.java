@@ -12,27 +12,27 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 
 /** A non-probabilistic boolean vertex whose value is extracted from an upstream model vertex. */
 public class BoolModelResultVertex extends BoolVertex
-        implements ModelResultProvider<BooleanTensor>, NonProbabilistic<BooleanTensor> {
+    implements ModelResultProvider<BooleanTensor>, NonProbabilistic<BooleanTensor> {
 
-    private final ModelResult<BooleanTensor> delegate;
+  private final ModelResult<BooleanTensor> delegate;
 
-    public BoolModelResultVertex(ModelVertex model, VertexLabel label) {
-        delegate = new ModelResult<>(model, label);
-        setParents((Vertex) model);
-    }
+  public BoolModelResultVertex(ModelVertex model, VertexLabel label) {
+    delegate = new ModelResult<>(model, label);
+    setParents((Vertex) model);
+  }
 
-    @Override
-    public ModelVertex<BooleanTensor> getModel() {
-        return delegate.getModel();
-    }
+  @Override
+  public ModelVertex<BooleanTensor> getModel() {
+    return delegate.getModel();
+  }
 
-    @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
-    }
+  @Override
+  public BooleanTensor sample(KeanuRandom random) {
+    return delegate.sample(random);
+  }
 
-    @Override
-    public BooleanTensor calculate() {
-        return delegate.calculate();
-    }
+  @Override
+  public BooleanTensor calculate() {
+    return delegate.calculate();
+  }
 }

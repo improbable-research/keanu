@@ -10,170 +10,170 @@ import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 public interface IntegerTensor
-        extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
+    extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
-    IntegerTensor ZERO_SCALAR = scalar(0);
+  IntegerTensor ZERO_SCALAR = scalar(0);
 
-    IntegerTensor ONE_SCALAR = scalar(1);
+  IntegerTensor ONE_SCALAR = scalar(1);
 
-    IntegerTensor TWO_SCALAR = scalar(2);
+  IntegerTensor TWO_SCALAR = scalar(2);
 
-    static IntegerTensor create(int value, int[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarIntegerTensor(value);
-        } else {
-            return Nd4jIntegerTensor.create(value, shape);
-        }
+  static IntegerTensor create(int value, int[] shape) {
+    if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+      return new ScalarIntegerTensor(value);
+    } else {
+      return Nd4jIntegerTensor.create(value, shape);
     }
+  }
 
-    static IntegerTensor create(int[] values, int... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
-            return new ScalarIntegerTensor(values[0]);
-        } else {
-            return Nd4jIntegerTensor.create(values, shape);
-        }
+  static IntegerTensor create(int[] values, int... shape) {
+    if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
+      return new ScalarIntegerTensor(values[0]);
+    } else {
+      return Nd4jIntegerTensor.create(values, shape);
     }
+  }
 
-    static IntegerTensor create(int... values) {
-        return create(values, 1, values.length);
+  static IntegerTensor create(int... values) {
+    return create(values, 1, values.length);
+  }
+
+  static IntegerTensor ones(int... shape) {
+    if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+      return new ScalarIntegerTensor(1);
+    } else {
+      return Nd4jIntegerTensor.ones(shape);
     }
+  }
 
-    static IntegerTensor ones(int... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarIntegerTensor(1);
-        } else {
-            return Nd4jIntegerTensor.ones(shape);
-        }
+  static IntegerTensor eye(int n) {
+    if (n == 1) {
+      return new ScalarIntegerTensor(1);
+    } else {
+      return Nd4jIntegerTensor.eye(n);
     }
+  }
 
-    static IntegerTensor eye(int n) {
-        if (n == 1) {
-            return new ScalarIntegerTensor(1);
-        } else {
-            return Nd4jIntegerTensor.eye(n);
-        }
+  static IntegerTensor zeros(int... shape) {
+    if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+      return new ScalarIntegerTensor(0);
+    } else {
+      return Nd4jIntegerTensor.zeros(shape);
     }
+  }
 
-    static IntegerTensor zeros(int... shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new ScalarIntegerTensor(0);
-        } else {
-            return Nd4jIntegerTensor.zeros(shape);
-        }
+  static IntegerTensor scalar(int scalarValue) {
+    return new ScalarIntegerTensor(scalarValue);
+  }
+
+  static IntegerTensor placeHolder(int[] shape) {
+    return new ScalarIntegerTensor(shape);
+  }
+
+  static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
+    INDArray[] concatAsINDArray = new INDArray[toConcat.length];
+    for (int i = 0; i < toConcat.length; i++) {
+      concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
     }
+    INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
+    return new Nd4jIntegerTensor(concat);
+  }
 
-    static IntegerTensor scalar(int scalarValue) {
-        return new ScalarIntegerTensor(scalarValue);
-    }
+  static IntegerTensor min(IntegerTensor a, IntegerTensor b) {
+    return a.duplicate().minInPlace(b);
+  }
 
-    static IntegerTensor placeHolder(int[] shape) {
-        return new ScalarIntegerTensor(shape);
-    }
+  static IntegerTensor max(IntegerTensor a, IntegerTensor b) {
+    return a.duplicate().maxInPlace(b);
+  }
 
-    static IntegerTensor concat(int dimension, IntegerTensor... toConcat) {
-        INDArray[] concatAsINDArray = new INDArray[toConcat.length];
-        for (int i = 0; i < toConcat.length; i++) {
-            concatAsINDArray[i] = Nd4jIntegerTensor.unsafeGetNd4J(toConcat[i]).dup();
-        }
-        INDArray concat = Nd4j.concat(dimension, concatAsINDArray);
-        return new Nd4jIntegerTensor(concat);
-    }
+  @Override
+  IntegerTensor setValue(Integer value, int... index);
 
-    static IntegerTensor min(IntegerTensor a, IntegerTensor b) {
-        return a.duplicate().minInPlace(b);
-    }
+  @Override
+  IntegerTensor reshape(int... newShape);
 
-    static IntegerTensor max(IntegerTensor a, IntegerTensor b) {
-        return a.duplicate().maxInPlace(b);
-    }
+  @Override
+  IntegerTensor duplicate();
 
-    @Override
-    IntegerTensor setValue(Integer value, int... index);
+  IntegerTensor diag();
 
-    @Override
-    IntegerTensor reshape(int... newShape);
+  IntegerTensor transpose();
 
-    @Override
-    IntegerTensor duplicate();
+  IntegerTensor sum(int... overDimensions);
 
-    IntegerTensor diag();
+  // New tensor Ops and transforms
 
-    IntegerTensor transpose();
+  IntegerTensor minus(int value);
 
-    IntegerTensor sum(int... overDimensions);
+  IntegerTensor plus(int value);
 
-    // New tensor Ops and transforms
+  IntegerTensor times(int value);
 
-    IntegerTensor minus(int value);
+  IntegerTensor div(int value);
 
-    IntegerTensor plus(int value);
+  IntegerTensor pow(int exponent);
 
-    IntegerTensor times(int value);
+  IntegerTensor minus(IntegerTensor that);
 
-    IntegerTensor div(int value);
+  IntegerTensor plus(IntegerTensor that);
 
-    IntegerTensor pow(int exponent);
+  IntegerTensor times(IntegerTensor that);
 
-    IntegerTensor minus(IntegerTensor that);
+  IntegerTensor matrixMultiply(IntegerTensor value);
 
-    IntegerTensor plus(IntegerTensor that);
+  IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
 
-    IntegerTensor times(IntegerTensor that);
+  IntegerTensor div(IntegerTensor that);
 
-    IntegerTensor matrixMultiply(IntegerTensor value);
+  IntegerTensor unaryMinus();
 
-    IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
+  IntegerTensor abs();
 
-    IntegerTensor div(IntegerTensor that);
+  IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis);
 
-    IntegerTensor unaryMinus();
+  IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanThis);
 
-    IntegerTensor abs();
+  IntegerTensor getLessThanMask(IntegerTensor lessThanThis);
 
-    IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis);
+  IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanThis);
 
-    IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanThis);
+  IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value);
 
-    IntegerTensor getLessThanMask(IntegerTensor lessThanThis);
+  IntegerTensor setWithMask(IntegerTensor mask, Integer value);
 
-    IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanThis);
+  IntegerTensor apply(Function<Integer, Integer> function);
 
-    IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value);
+  @Override
+  IntegerTensor slice(int dimension, int index);
 
-    IntegerTensor setWithMask(IntegerTensor mask, Integer value);
+  // In Place
 
-    IntegerTensor apply(Function<Integer, Integer> function);
+  IntegerTensor minusInPlace(int value);
 
-    @Override
-    IntegerTensor slice(int dimension, int index);
+  IntegerTensor plusInPlace(int value);
 
-    // In Place
+  IntegerTensor timesInPlace(int value);
 
-    IntegerTensor minusInPlace(int value);
+  IntegerTensor divInPlace(int value);
 
-    IntegerTensor plusInPlace(int value);
+  IntegerTensor powInPlace(int exponent);
 
-    IntegerTensor timesInPlace(int value);
+  // Comparisons
 
-    IntegerTensor divInPlace(int value);
+  BooleanTensor lessThan(int value);
 
-    IntegerTensor powInPlace(int exponent);
+  BooleanTensor lessThanOrEqual(int value);
 
-    // Comparisons
+  BooleanTensor greaterThan(int value);
 
-    BooleanTensor lessThan(int value);
+  BooleanTensor greaterThanOrEqual(int value);
 
-    BooleanTensor lessThanOrEqual(int value);
+  IntegerTensor minInPlace(IntegerTensor min);
 
-    BooleanTensor greaterThan(int value);
+  IntegerTensor maxInPlace(IntegerTensor max);
 
-    BooleanTensor greaterThanOrEqual(int value);
+  int min();
 
-    IntegerTensor minInPlace(IntegerTensor min);
-
-    IntegerTensor maxInPlace(IntegerTensor max);
-
-    int min();
-
-    int max();
+  int max();
 }

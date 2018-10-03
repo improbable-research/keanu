@@ -12,21 +12,21 @@ import java.util.LinkedHashMap;
 
 public class SelectVertexExample {
 
-    public enum MyType {
-        A,
-        B,
-        C,
-        D
-    }
+  public enum MyType {
+    A,
+    B,
+    C,
+    D
+  }
 
-    public CategoricalVertex<MyType> getSelectorForMyType() {
+  public CategoricalVertex<MyType> getSelectorForMyType() {
 
-        LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
-        frequency.put(A, ConstantVertex.of(0.25));
-        frequency.put(B, ConstantVertex.of(0.25));
-        frequency.put(C, ConstantVertex.of(0.25));
-        frequency.put(D, ConstantVertex.of(0.25));
+    LinkedHashMap<MyType, DoubleVertex> frequency = new LinkedHashMap<>();
+    frequency.put(A, ConstantVertex.of(0.25));
+    frequency.put(B, ConstantVertex.of(0.25));
+    frequency.put(C, ConstantVertex.of(0.25));
+    frequency.put(D, ConstantVertex.of(0.25));
 
-        return new CategoricalVertex<MyType>(frequency);
-    }
+    return new CategoricalVertex<MyType>(frequency);
+  }
 }

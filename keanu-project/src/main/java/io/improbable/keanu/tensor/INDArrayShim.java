@@ -25,114 +25,114 @@ import org.nd4j.linalg.factory.Nd4j;
  */
 public class INDArrayShim {
 
-    public static INDArray muli(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.muli(right);
-        } else {
-            return broadcastMultiply(left, right);
-        }
+  public static INDArray muli(INDArray left, INDArray right) {
+    if (Arrays.equals(left.shape(), right.shape())) {
+      return left.muli(right);
+    } else {
+      return broadcastMultiply(left, right);
+    }
+  }
+
+  private static INDArray broadcastMultiply(INDArray a, INDArray b) {
+    if (a.shape().length < b.shape().length) {
+      return broadcastMultiply(b, a);
+    } else {
+      int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+      return execBroadcast(a, b, new BroadcastMulOp(a, b, a.dup(), broadcastDimensions));
+    }
+  }
+
+  public static INDArray divi(INDArray left, INDArray right) {
+    if (Arrays.equals(left.shape(), right.shape())) {
+      return left.divi(right);
+    } else {
+      return broadcastDivide(left, right);
+    }
+  }
+
+  private static INDArray broadcastDivide(INDArray a, INDArray b) {
+    if (a.shape().length < b.shape().length) {
+      return broadcastMultiply(b, a.rdiv(1.0));
+    } else {
+      int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+      return execBroadcast(a, b, new BroadcastDivOp(a, b, a.dup(), broadcastDimensions));
+    }
+  }
+
+  public static INDArray addi(INDArray left, INDArray right) {
+    if (Arrays.equals(left.shape(), right.shape())) {
+      return left.addi(right);
+    } else {
+      return broadcastPlus(left, right);
+    }
+  }
+
+  private static INDArray broadcastPlus(INDArray a, INDArray b) {
+    if (a.shape().length < b.shape().length) {
+      return broadcastPlus(b, a);
+    } else {
+      int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+      return execBroadcast(a, b, new BroadcastAddOp(a, b, a.dup(), broadcastDimensions));
+    }
+  }
+
+  public static INDArray subi(INDArray left, INDArray right) {
+    if (Arrays.equals(left.shape(), right.shape())) {
+      return left.subi(right);
+    } else {
+      return broadcastMinus(left, right);
+    }
+  }
+
+  private static INDArray broadcastMinus(INDArray a, INDArray b) {
+    if (a.shape().length < b.shape().length) {
+      return broadcastPlus(a.neg(), b);
+    } else {
+      int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
+      return execBroadcast(a, b, new BroadcastSubOp(a, b, a.dup(), broadcastDimensions));
+    }
+  }
+
+  private static INDArray execBroadcast(INDArray a, INDArray b, BroadcastOp op) {
+    int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
+    return Nd4j.getExecutioner().exec(op, executeAlong);
+  }
+
+  private static int[] getBroadcastDimensions(int[] shapeA, int[] shapeB) {
+    int maxRank = Math.max(shapeA.length, shapeB.length);
+
+    if (shapeA.length < shapeB.length) {
+      shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
+    } else {
+      shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
     }
 
-    private static INDArray broadcastMultiply(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastMultiply(b, a);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b, new BroadcastMulOp(a, b, a.dup(), broadcastDimensions));
-        }
+    List<Integer> along = new ArrayList<>();
+
+    for (int i = maxRank - 1; i >= 0; i--) {
+      if (shapeA[i] != shapeB[i]) {
+        along.add(i);
+      }
+    }
+    return Ints.toArray(along);
+  }
+
+  private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
+    int maxRank = Math.max(shapeA.length, shapeB.length);
+
+    if (shapeA.length < shapeB.length) {
+      shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
+    } else {
+      shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
     }
 
-    public static INDArray divi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.divi(right);
-        } else {
-            return broadcastDivide(left, right);
-        }
+    List<Integer> along = new ArrayList<>();
+
+    for (int i = maxRank - 1; i >= 0; i--) {
+      if (shapeA[i] == shapeB[i]) {
+        along.add(i);
+      }
     }
-
-    private static INDArray broadcastDivide(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastMultiply(b, a.rdiv(1.0));
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b, new BroadcastDivOp(a, b, a.dup(), broadcastDimensions));
-        }
-    }
-
-    public static INDArray addi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.addi(right);
-        } else {
-            return broadcastPlus(left, right);
-        }
-    }
-
-    private static INDArray broadcastPlus(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastPlus(b, a);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b, new BroadcastAddOp(a, b, a.dup(), broadcastDimensions));
-        }
-    }
-
-    public static INDArray subi(INDArray left, INDArray right) {
-        if (Arrays.equals(left.shape(), right.shape())) {
-            return left.subi(right);
-        } else {
-            return broadcastMinus(left, right);
-        }
-    }
-
-    private static INDArray broadcastMinus(INDArray a, INDArray b) {
-        if (a.shape().length < b.shape().length) {
-            return broadcastPlus(a.neg(), b);
-        } else {
-            int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b, new BroadcastSubOp(a, b, a.dup(), broadcastDimensions));
-        }
-    }
-
-    private static INDArray execBroadcast(INDArray a, INDArray b, BroadcastOp op) {
-        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        return Nd4j.getExecutioner().exec(op, executeAlong);
-    }
-
-    private static int[] getBroadcastDimensions(int[] shapeA, int[] shapeB) {
-        int maxRank = Math.max(shapeA.length, shapeB.length);
-
-        if (shapeA.length < shapeB.length) {
-            shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
-        } else {
-            shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
-        }
-
-        List<Integer> along = new ArrayList<>();
-
-        for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] != shapeB[i]) {
-                along.add(i);
-            }
-        }
-        return Ints.toArray(along);
-    }
-
-    private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
-        int maxRank = Math.max(shapeA.length, shapeB.length);
-
-        if (shapeA.length < shapeB.length) {
-            shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
-        } else {
-            shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
-        }
-
-        List<Integer> along = new ArrayList<>();
-
-        for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] == shapeB[i]) {
-                along.add(i);
-            }
-        }
-        return Ints.toArray(along);
-    }
+    return Ints.toArray(along);
+  }
 }

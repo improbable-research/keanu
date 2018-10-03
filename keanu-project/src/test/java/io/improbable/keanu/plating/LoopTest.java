@@ -25,149 +25,145 @@ import org.junit.rules.ExpectedException;
 
 public class LoopTest {
 
-    @Rule public ExpectedException expectedException = ExpectedException.none();
+  @Rule public ExpectedException expectedException = ExpectedException.none();
 
-    private final Function<DoubleVertex, DoubleVertex> increment = (v) -> v.plus(1.);
-    private final Supplier<BoolVertex> flip = () -> new BernoulliVertex(0.5);
-    private final Supplier<BoolVertex> alwaysTrue = () -> ConstantVertex.of(true);
-    private final Vertex startValue = ConstantVertex.of(0.);
+  private final Function<DoubleVertex, DoubleVertex> increment = (v) -> v.plus(1.);
+  private final Supplier<BoolVertex> flip = () -> new BernoulliVertex(0.5);
+  private final Supplier<BoolVertex> alwaysTrue = () -> ConstantVertex.of(true);
+  private final Vertex startValue = ConstantVertex.of(0.);
 
-    @Test
-    public void youCanGetTheOutputVertex() {
-        Loop loop = Loop.withInitialConditions(startValue).iterateWhile(flip).apply(increment);
-        Vertex<?> output = loop.getOutput();
-        assertThat(output, instanceOf(DoubleVertex.class));
+  @Test
+  public void youCanGetTheOutputVertex() {
+    Loop loop = Loop.withInitialConditions(startValue).iterateWhile(flip).apply(increment);
+    Vertex<?> output = loop.getOutput();
+    assertThat(output, instanceOf(DoubleVertex.class));
+  }
+
+  @Test
+  public void thereIsADefaultMaxLength() {
+    Loop loop = Loop.withInitialConditions(startValue).iterateWhile(alwaysTrue).apply(increment);
+    assertThat(loop.getPlates().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
+  }
+
+  @Test
+  public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() {
+    expectedException.expect(LoopDidNotTerminateException.class);
+    expectedException.expectMessage("Loop has exceeded its max count");
+    Loop loop = Loop.withInitialConditions(startValue).iterateWhile(alwaysTrue).apply(increment);
+    loop.getOutput();
+  }
+
+  @Test
+  public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() {
+    Loop loop =
+        Loop.withInitialConditions(startValue)
+            .doNotThrowWhenMaxCountIsReached()
+            .iterateWhile(alwaysTrue)
+            .apply(increment);
+    loop.getOutput();
+    // does not throw
+  }
+
+  @Test
+  public void youCanOverrideTheDefaultMaxLength() {
+    int customMaxCount = 5;
+    Loop loop =
+        Loop.withInitialConditions(startValue)
+            .withMaxIterations(customMaxCount)
+            .iterateWhile(alwaysTrue)
+            .apply(increment);
+    assertThat(loop.getPlates().size(), equalTo(customMaxCount));
+  }
+
+  @Test
+  public void itThrowsIfYouPassInMultipleOutputVertices() {
+    expectedException.expect(LoopConstructionException.class);
+    expectedException.expectMessage("Duplicate label found in base case");
+    Loop.withInitialConditions(
+            ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL),
+            ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
+        .iterateWhile(alwaysTrue)
+        .apply(increment);
+  }
+
+  @Test
+  public void youCanLoopUntilAConditionIsTrue() {
+    Loop loop = Loop.withInitialConditions(startValue).iterateWhile(flip).apply(increment);
+
+    DoubleVertex output = loop.getOutput();
+
+    for (int firstFailure : new int[] {0, 1, 2, 10, Loop.DEFAULT_MAX_COUNT - 1}) {
+      for (Plate plate : loop.getPlates()) {
+        BoolVertex condition = plate.get(Loop.CONDITION_LABEL);
+        condition.setAndCascade(true);
+      }
+      BoolVertex condition = loop.getPlates().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
+      condition.setAndCascade(false);
+      Double expectedOutput = new Double(firstFailure);
+      assertThat(output, VertexMatchers.hasValue(expectedOutput));
     }
+  }
 
-    @Test
-    public void thereIsADefaultMaxLength() {
-        Loop loop =
-                Loop.withInitialConditions(startValue).iterateWhile(alwaysTrue).apply(increment);
-        assertThat(loop.getPlates().size(), equalTo(Loop.DEFAULT_MAX_COUNT));
-    }
+  @Test
+  public void youCanChainTwoLoopsTogetherInABayesNet() {
+    Loop loop =
+        Loop.withInitialConditions(startValue)
+            .doNotThrowWhenMaxCountIsReached()
+            .iterateWhile(alwaysTrue)
+            .apply(increment);
 
-    @Test
-    public void itThrowsIfYouGetTheOutputButTheMaxNumberOfIterationsHasBeenReached() {
-        expectedException.expect(LoopDidNotTerminateException.class);
-        expectedException.expectMessage("Loop has exceeded its max count");
-        Loop loop =
-                Loop.withInitialConditions(startValue).iterateWhile(alwaysTrue).apply(increment);
-        loop.getOutput();
-    }
+    Vertex<?> outputFromFirstLoop = loop.getOutput();
 
-    @Test
-    public void youCanTellItNotToThrowWhenTheMaxNumberOfIterationsHaveBeenReached() {
-        Loop loop =
-                Loop.withInitialConditions(startValue)
-                        .doNotThrowWhenMaxCountIsReached()
-                        .iterateWhile(alwaysTrue)
-                        .apply(increment);
-        loop.getOutput();
-        // does not throw
-    }
+    Loop loop2 =
+        Loop.withInitialConditions((Vertex<?>) loop.getOutput())
+            .doNotThrowWhenMaxCountIsReached()
+            .iterateWhile(alwaysTrue)
+            .apply(increment);
 
-    @Test
-    public void youCanOverrideTheDefaultMaxLength() {
-        int customMaxCount = 5;
-        Loop loop =
-                Loop.withInitialConditions(startValue)
-                        .withMaxIterations(customMaxCount)
-                        .iterateWhile(alwaysTrue)
-                        .apply(increment);
-        assertThat(loop.getPlates().size(), equalTo(customMaxCount));
-    }
+    Vertex<?> output = loop2.getOutput();
 
-    @Test
-    public void itThrowsIfYouPassInMultipleOutputVertices() {
-        expectedException.expect(LoopConstructionException.class);
-        expectedException.expectMessage("Duplicate label found in base case");
-        Loop.withInitialConditions(
-                        ConstantVertex.of(0.).labeledAs(Loop.VALUE_OUT_LABEL),
-                        ConstantVertex.of(1.).labeledAs(Loop.VALUE_OUT_LABEL))
-                .iterateWhile(alwaysTrue)
-                .apply(increment);
-    }
+    new BayesianNetwork(output.getConnectedGraph());
+  }
 
-    @Test
-    public void youCanLoopUntilAConditionIsTrue() {
-        Loop loop = Loop.withInitialConditions(startValue).iterateWhile(flip).apply(increment);
+  @Test
+  public void theConditionCanBeAFunctionOfThePlateVariables() {
+    Function<Plate, BoolVertex> lessThanTen =
+        plate -> {
+          DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
+          return valueIn.lessThan(ConstantVertex.of(10.));
+        };
 
-        DoubleVertex output = loop.getOutput();
+    Loop loop = Loop.withInitialConditions(startValue).iterateWhile(lessThanTen).apply(increment);
 
-        for (int firstFailure : new int[] {0, 1, 2, 10, Loop.DEFAULT_MAX_COUNT - 1}) {
-            for (Plate plate : loop.getPlates()) {
-                BoolVertex condition = plate.get(Loop.CONDITION_LABEL);
-                condition.setAndCascade(true);
-            }
-            BoolVertex condition =
-                    loop.getPlates().asList().get(firstFailure).get(Loop.CONDITION_LABEL);
-            condition.setAndCascade(false);
-            Double expectedOutput = new Double(firstFailure);
-            assertThat(output, VertexMatchers.hasValue(expectedOutput));
-        }
-    }
+    DoubleVertex output = loop.getOutput();
+    assertThat(output, VertexMatchers.hasValue(10.));
+  }
 
-    @Test
-    public void youCanChainTwoLoopsTogetherInABayesNet() {
-        Loop loop =
-                Loop.withInitialConditions(startValue)
-                        .doNotThrowWhenMaxCountIsReached()
-                        .iterateWhile(alwaysTrue)
-                        .apply(increment);
+  @Test
+  public void youCanAddCustomProxyVariableMappings() {
+    VertexLabel factorInLabel = new VertexLabel("factorIn");
+    VertexLabel factorOutLabel = new VertexLabel("factorOut");
+    DoubleVertex startFactorial = ConstantVertex.of(1.);
+    DoubleVertex startFactor = ConstantVertex.of(1.).labeledAs(factorOutLabel);
 
-        Vertex<?> outputFromFirstLoop = loop.getOutput();
+    BiFunction<Plate, DoubleVertex, DoubleVertex> factorial =
+        (plate, valueIn) -> {
+          DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
+          DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.));
+          plate.add(factorIn);
+          plate.add(factorOutLabel, factorOut);
+          return valueIn.times(factorOut);
+        };
 
-        Loop loop2 =
-                Loop.withInitialConditions((Vertex<?>) loop.getOutput())
-                        .doNotThrowWhenMaxCountIsReached()
-                        .iterateWhile(alwaysTrue)
-                        .apply(increment);
+    Loop loop =
+        Loop.withInitialConditions(startFactorial, startFactor)
+            .withMaxIterations(5)
+            .doNotThrowWhenMaxCountIsReached()
+            .mapping(factorInLabel, factorOutLabel)
+            .iterateWhile(alwaysTrue)
+            .apply(factorial);
 
-        Vertex<?> output = loop2.getOutput();
-
-        new BayesianNetwork(output.getConnectedGraph());
-    }
-
-    @Test
-    public void theConditionCanBeAFunctionOfThePlateVariables() {
-        Function<Plate, BoolVertex> lessThanTen =
-                plate -> {
-                    DoubleVertex valueIn = plate.get(Loop.VALUE_IN_LABEL);
-                    return valueIn.lessThan(ConstantVertex.of(10.));
-                };
-
-        Loop loop =
-                Loop.withInitialConditions(startValue).iterateWhile(lessThanTen).apply(increment);
-
-        DoubleVertex output = loop.getOutput();
-        assertThat(output, VertexMatchers.hasValue(10.));
-    }
-
-    @Test
-    public void youCanAddCustomProxyVariableMappings() {
-        VertexLabel factorInLabel = new VertexLabel("factorIn");
-        VertexLabel factorOutLabel = new VertexLabel("factorOut");
-        DoubleVertex startFactorial = ConstantVertex.of(1.);
-        DoubleVertex startFactor = ConstantVertex.of(1.).labeledAs(factorOutLabel);
-
-        BiFunction<Plate, DoubleVertex, DoubleVertex> factorial =
-                (plate, valueIn) -> {
-                    DoubleVertex factorIn = new DoubleProxyVertex(factorInLabel);
-                    DoubleVertex factorOut = factorIn.plus(ConstantVertex.of(1.));
-                    plate.add(factorIn);
-                    plate.add(factorOutLabel, factorOut);
-                    return valueIn.times(factorOut);
-                };
-
-        Loop loop =
-                Loop.withInitialConditions(startFactorial, startFactor)
-                        .withMaxIterations(5)
-                        .doNotThrowWhenMaxCountIsReached()
-                        .mapping(factorInLabel, factorOutLabel)
-                        .iterateWhile(alwaysTrue)
-                        .apply(factorial);
-
-        DoubleVertex output = loop.getOutput();
-        assertThat(output, VertexMatchers.hasValue(720.));
-    }
+    DoubleVertex output = loop.getOutput();
+    assertThat(output, VertexMatchers.hasValue(720.));
+  }
 }

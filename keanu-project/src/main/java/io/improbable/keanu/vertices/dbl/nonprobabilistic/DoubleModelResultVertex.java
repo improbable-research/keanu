@@ -12,27 +12,27 @@ import io.improbable.keanu.vertices.model.ModelVertex;
 
 /** A non-probabilistic double vertex whose value is extracted from an upstream model vertex. */
 public class DoubleModelResultVertex extends DoubleVertex
-        implements ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor> {
+    implements ModelResultProvider<DoubleTensor>, NonProbabilistic<DoubleTensor> {
 
-    private final ModelResult<DoubleTensor> delegate;
+  private final ModelResult<DoubleTensor> delegate;
 
-    public DoubleModelResultVertex(ModelVertex model, VertexLabel label) {
-        this.delegate = new ModelResult<>(model, label);
-        setParents((Vertex) model);
-    }
+  public DoubleModelResultVertex(ModelVertex model, VertexLabel label) {
+    this.delegate = new ModelResult<>(model, label);
+    setParents((Vertex) model);
+  }
 
-    @Override
-    public ModelVertex<DoubleTensor> getModel() {
-        return delegate.getModel();
-    }
+  @Override
+  public ModelVertex<DoubleTensor> getModel() {
+    return delegate.getModel();
+  }
 
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return delegate.sample(random);
-    }
+  @Override
+  public DoubleTensor sample(KeanuRandom random) {
+    return delegate.sample(random);
+  }
 
-    @Override
-    public DoubleTensor calculate() {
-        return delegate.calculate();
-    }
+  @Override
+  public DoubleTensor calculate() {
+    return delegate.calculate();
+  }
 }

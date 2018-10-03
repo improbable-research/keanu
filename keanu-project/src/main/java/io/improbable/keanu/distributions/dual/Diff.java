@@ -10,42 +10,42 @@ import org.jetbrains.annotations.NotNull;
  */
 public class Diff implements Comparable<Diff> {
 
-    private final ParameterName id;
-    private final DoubleTensor value;
+  private final ParameterName id;
+  private final DoubleTensor value;
 
-    public Diff(ParameterName name) {
-        this(name, null);
-    }
+  public Diff(ParameterName name) {
+    this(name, null);
+  }
 
-    public Diff(ParameterName name, DoubleTensor value) {
-        this.id = name;
-        this.value = value;
-    }
+  public Diff(ParameterName name, DoubleTensor value) {
+    this.id = name;
+    this.value = value;
+  }
 
-    public String getName() {
-        return id.getName();
-    }
+  public String getName() {
+    return id.getName();
+  }
 
-    public DoubleTensor getValue() {
-        return value;
-    }
+  public DoubleTensor getValue() {
+    return value;
+  }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Diff diff = (Diff) o;
-        return Objects.equals(id, diff.id);
-    }
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Diff diff = (Diff) o;
+    return Objects.equals(id, diff.id);
+  }
 
-    @Override
-    public int hashCode() {
+  @Override
+  public int hashCode() {
 
-        return Objects.hash(id);
-    }
+    return Objects.hash(id);
+  }
 
-    @Override
-    public int compareTo(@NotNull Diff o) {
-        return id.getName().compareTo(o.id.getName());
-    }
+  @Override
+  public int compareTo(@NotNull Diff o) {
+    return id.getName().compareTo(o.id.getName());
+  }
 }

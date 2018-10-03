@@ -11,23 +11,23 @@ import java.util.List;
 
 public class MultiModeDiscovery {
 
-    private MultiModeDiscovery() {}
+  private MultiModeDiscovery() {}
 
-    public static List<NetworkState> findModesBySimulatedAnnealing(
-            BayesianNetwork network, int attempts, int samplesPerAttempt, KeanuRandom random) {
+  public static List<NetworkState> findModesBySimulatedAnnealing(
+      BayesianNetwork network, int attempts, int samplesPerAttempt, KeanuRandom random) {
 
-        List<NetworkState> maxSamples = new ArrayList<>();
-        network.cascadeObservations();
-        List<Vertex> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
+    List<NetworkState> maxSamples = new ArrayList<>();
+    network.cascadeObservations();
+    List<Vertex> sortedByDependency = TopologicalSort.sort(network.getLatentVertices());
 
-        for (int i = 0; i < attempts; i++) {
-            BayesianNetwork.setFromSampleAndCascade(sortedByDependency, random);
-            NetworkState maxAPosteriori =
-                    SimulatedAnnealing.withDefaultConfig(random)
-                            .getMaxAPosteriori(network, samplesPerAttempt);
-            maxSamples.add(maxAPosteriori);
-        }
-
-        return maxSamples;
+    for (int i = 0; i < attempts; i++) {
+      BayesianNetwork.setFromSampleAndCascade(sortedByDependency, random);
+      NetworkState maxAPosteriori =
+          SimulatedAnnealing.withDefaultConfig(random)
+              .getMaxAPosteriori(network, samplesPerAttempt);
+      maxSamples.add(maxAPosteriori);
     }
+
+    return maxSamples;
+  }
 }

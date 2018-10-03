@@ -19,91 +19,91 @@ import java.util.Set;
 
 public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble {
 
-    private final DoubleVertex mu;
-    private final DoubleVertex sigma;
+  private final DoubleVertex mu;
+  private final DoubleVertex sigma;
 
-    /**
-     * One mu or s or both driving an arbitrarily shaped tensor of LogNormal
-     * https://en.wikipedia.org/wiki/Log-normal_distribution
-     *
-     * @param tensorShape the desired shape of the vertex
-     * @param mu the mu (location) of the LogNormal with either the same tensor shape as specified
-     *     for this vertex or mu scalar
-     * @param sigma the sigma of the Logistic with either the same shape as specified for this
-     *     vertex or mu scalar
-     */
-    public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+  /**
+   * One mu or s or both driving an arbitrarily shaped tensor of LogNormal
+   * https://en.wikipedia.org/wiki/Log-normal_distribution
+   *
+   * @param tensorShape the desired shape of the vertex
+   * @param mu the mu (location) of the LogNormal with either the same tensor shape as specified for
+   *     this vertex or mu scalar
+   * @param sigma the sigma of the Logistic with either the same shape as specified for this vertex
+   *     or mu scalar
+   */
+  public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
+    checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
-        this.mu = mu;
-        this.sigma = sigma;
-        setParents(mu, sigma);
-        setValue(DoubleTensor.placeHolder(tensorShape));
+    this.mu = mu;
+    this.sigma = sigma;
+    setParents(mu, sigma);
+    setValue(DoubleTensor.placeHolder(tensorShape));
+  }
+
+  public LogNormalVertex(int[] tensorShape, DoubleVertex mu, double sigma) {
+    this(tensorShape, mu, ConstantVertex.of(sigma));
+  }
+
+  public LogNormalVertex(int[] tensorShape, double mu, DoubleVertex sigma) {
+    this(tensorShape, ConstantVertex.of(mu), sigma);
+  }
+
+  public LogNormalVertex(int[] tensorShape, double mu, double sigma) {
+    this(tensorShape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
+  }
+
+  public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {
+    this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
+  }
+
+  public LogNormalVertex(double mu, DoubleVertex sigma) {
+    this(ConstantVertex.of(mu), sigma);
+  }
+
+  public LogNormalVertex(DoubleVertex mu, double sigma) {
+    this(mu, ConstantVertex.of(sigma));
+  }
+
+  public LogNormalVertex(double mu, double sigma) {
+    this(ConstantVertex.of(mu), ConstantVertex.of(sigma));
+  }
+
+  @Override
+  public double logProb(DoubleTensor value) {
+    DoubleTensor muValues = mu.getValue();
+    DoubleTensor sigmaValues = sigma.getValue();
+
+    DoubleTensor logPdfs = LogNormal.withParameters(muValues, sigmaValues).logProb(value);
+
+    return logPdfs.sum();
+  }
+
+  @Override
+  public Map<Vertex, DoubleTensor> dLogProb(
+      DoubleTensor value, Set<? extends Vertex> withRespectTo) {
+    Diffs dlnP = LogNormal.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
+
+    Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
+
+    if (withRespectTo.contains(mu)) {
+      dLogProbWrtParameters.put(mu, dlnP.get(MU).getValue());
     }
 
-    public LogNormalVertex(int[] tensorShape, DoubleVertex mu, double sigma) {
-        this(tensorShape, mu, ConstantVertex.of(sigma));
+    if (withRespectTo.contains(sigma)) {
+      dLogProbWrtParameters.put(sigma, dlnP.get(SIGMA).getValue());
     }
 
-    public LogNormalVertex(int[] tensorShape, double mu, DoubleVertex sigma) {
-        this(tensorShape, ConstantVertex.of(mu), sigma);
+    if (withRespectTo.contains(this)) {
+      dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
     }
 
-    public LogNormalVertex(int[] tensorShape, double mu, double sigma) {
-        this(tensorShape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
-    }
+    return dLogProbWrtParameters;
+  }
 
-    public LogNormalVertex(DoubleVertex mu, DoubleVertex sigma) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(mu.getShape(), sigma.getShape()), mu, sigma);
-    }
-
-    public LogNormalVertex(double mu, DoubleVertex sigma) {
-        this(ConstantVertex.of(mu), sigma);
-    }
-
-    public LogNormalVertex(DoubleVertex mu, double sigma) {
-        this(mu, ConstantVertex.of(sigma));
-    }
-
-    public LogNormalVertex(double mu, double sigma) {
-        this(ConstantVertex.of(mu), ConstantVertex.of(sigma));
-    }
-
-    @Override
-    public double logProb(DoubleTensor value) {
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor sigmaValues = sigma.getValue();
-
-        DoubleTensor logPdfs = LogNormal.withParameters(muValues, sigmaValues).logProb(value);
-
-        return logPdfs.sum();
-    }
-
-    @Override
-    public Map<Vertex, DoubleTensor> dLogProb(
-            DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = LogNormal.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
-
-        Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
-
-        if (withRespectTo.contains(mu)) {
-            dLogProbWrtParameters.put(mu, dlnP.get(MU).getValue());
-        }
-
-        if (withRespectTo.contains(sigma)) {
-            dLogProbWrtParameters.put(sigma, dlnP.get(SIGMA).getValue());
-        }
-
-        if (withRespectTo.contains(this)) {
-            dLogProbWrtParameters.put(this, dlnP.get(X).getValue());
-        }
-
-        return dLogProbWrtParameters;
-    }
-
-    @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return LogNormal.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
-    }
+  @Override
+  public DoubleTensor sample(KeanuRandom random) {
+    return LogNormal.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
+  }
 }

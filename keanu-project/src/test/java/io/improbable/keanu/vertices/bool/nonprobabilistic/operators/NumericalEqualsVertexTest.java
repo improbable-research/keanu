@@ -8,45 +8,45 @@ import org.junit.Test;
 
 public class NumericalEqualsVertexTest {
 
-    @Test
-    public void canCompareNumbersNotEqual() {
+  @Test
+  public void canCompareNumbersNotEqual() {
 
-        NumericalEqualsVertex equals =
-                new NumericalEqualsVertex(
-                        ConstantVertex.of(new double[] {1, 2, 3}),
-                        ConstantVertex.of(new double[] {4, 5, 6}),
-                        ConstantVertex.of(new double[] {0, 0, 0}));
+    NumericalEqualsVertex equals =
+        new NumericalEqualsVertex(
+            ConstantVertex.of(new double[] {1, 2, 3}),
+            ConstantVertex.of(new double[] {4, 5, 6}),
+            ConstantVertex.of(new double[] {0, 0, 0}));
 
-        BooleanTensor equality = equals.lazyEval();
+    BooleanTensor equality = equals.lazyEval();
 
-        assertArrayEquals(new Boolean[] {false, false, false}, equality.asFlatArray());
-    }
+    assertArrayEquals(new Boolean[] {false, false, false}, equality.asFlatArray());
+  }
 
-    @Test
-    public void canCompareNumbersEqual() {
+  @Test
+  public void canCompareNumbersEqual() {
 
-        NumericalEqualsVertex equals =
-                new NumericalEqualsVertex(
-                        ConstantVertex.of(new double[] {1, 2, 3}),
-                        ConstantVertex.of(new double[] {1, 2, 3}),
-                        ConstantVertex.of(new double[] {0, 0, 0}));
+    NumericalEqualsVertex equals =
+        new NumericalEqualsVertex(
+            ConstantVertex.of(new double[] {1, 2, 3}),
+            ConstantVertex.of(new double[] {1, 2, 3}),
+            ConstantVertex.of(new double[] {0, 0, 0}));
 
-        BooleanTensor equality = equals.lazyEval();
+    BooleanTensor equality = equals.lazyEval();
 
-        assertArrayEquals(new Boolean[] {true, true, true}, equality.asFlatArray());
-    }
+    assertArrayEquals(new Boolean[] {true, true, true}, equality.asFlatArray());
+  }
 
-    @Test
-    public void canCompareNumbersAlmostEqual() {
+  @Test
+  public void canCompareNumbersAlmostEqual() {
 
-        NumericalEqualsVertex equals =
-                new NumericalEqualsVertex(
-                        ConstantVertex.of(new double[] {1, 2, 3}),
-                        ConstantVertex.of(new double[] {1.5, 2.01, 3}),
-                        ConstantVertex.of(new double[] {0.1, 0.1, 0.1}));
+    NumericalEqualsVertex equals =
+        new NumericalEqualsVertex(
+            ConstantVertex.of(new double[] {1, 2, 3}),
+            ConstantVertex.of(new double[] {1.5, 2.01, 3}),
+            ConstantVertex.of(new double[] {0.1, 0.1, 0.1}));
 
-        BooleanTensor equality = equals.lazyEval();
+    BooleanTensor equality = equals.lazyEval();
 
-        assertArrayEquals(new Boolean[] {false, true, true}, equality.asFlatArray());
-    }
+    assertArrayEquals(new Boolean[] {false, true, true}, equality.asFlatArray());
+  }
 }

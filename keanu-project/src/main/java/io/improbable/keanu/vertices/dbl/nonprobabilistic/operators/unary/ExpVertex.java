@@ -10,33 +10,33 @@ import java.util.Map;
 
 public class ExpVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Calculates the exponential of an input vertex
-     *
-     * @param inputVertex the vertex
-     */
-    public ExpVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Calculates the exponential of an input vertex
+   *
+   * @param inputVertex the vertex
+   */
+  public ExpVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.exp();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.exp();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.exp();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.exp();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(
-                inputVertex,
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        getValue(), this.getShape()));
-        return partials;
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(
+        inputVertex,
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            getValue(), this.getShape()));
+    return partials;
+  }
 }

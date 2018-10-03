@@ -10,13 +10,13 @@ import lombok.Value;
 @Value
 public class CPTCondition {
 
-    private final List<Boolean> conditions;
+  private final List<Boolean> conditions;
 
-    public static CPTCondition from(
-            List<Vertex<? extends Tensor<Boolean>>> inputs,
-            Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {
+  public static CPTCondition from(
+      List<Vertex<? extends Tensor<Boolean>>> inputs,
+      Function<Vertex<? extends Tensor<Boolean>>, Boolean> mapper) {
 
-        List<Boolean> condition = inputs.stream().map(mapper).collect(Collectors.toList());
-        return new CPTCondition(condition);
-    }
+    List<Boolean> condition = inputs.stream().map(mapper).collect(Collectors.toList());
+    return new CPTCondition(condition);
+  }
 }

@@ -7,5 +7,5 @@ import io.improbable.keanu.network.NetworkState;
  * KLDivergence} (Kullback Leibler divergence) from probability distributions P to Q.
  */
 public interface QDistribution {
-    double getLogOfMasterP(NetworkState state);
+  double getLogOfMasterP(NetworkState state);
 }

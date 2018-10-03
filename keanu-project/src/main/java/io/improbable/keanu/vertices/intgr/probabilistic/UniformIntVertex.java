@@ -16,77 +16,77 @@ import java.util.Set;
 
 public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger {
 
-    private IntegerVertex min;
-    private IntegerVertex max;
+  private IntegerVertex min;
+  private IntegerVertex max;
 
-    /**
-     * @param shape tensor shape of value
-     * @param min The inclusive lower bound.
-     * @param max The exclusive upper bound.
-     */
-    public UniformIntVertex(int[] shape, IntegerVertex min, IntegerVertex max) {
+  /**
+   * @param shape tensor shape of value
+   * @param min The inclusive lower bound.
+   * @param max The exclusive upper bound.
+   */
+  public UniformIntVertex(int[] shape, IntegerVertex min, IntegerVertex max) {
 
-        checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
+    checkTensorsMatchNonScalarShapeOrAreScalar(shape, min.getShape(), max.getShape());
 
-        this.min = min;
-        this.max = max;
-        setParents(min, max);
-        setValue(IntegerTensor.placeHolder(shape));
-    }
+    this.min = min;
+    this.max = max;
+    setParents(min, max);
+    setValue(IntegerTensor.placeHolder(shape));
+  }
 
-    public UniformIntVertex(int[] shape, int min, int max) {
-        this(shape, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
-    }
+  public UniformIntVertex(int[] shape, int min, int max) {
+    this(shape, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
+  }
 
-    public UniformIntVertex(int[] shape, IntegerTensor min, IntegerTensor max) {
-        this(shape, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
-    }
+  public UniformIntVertex(int[] shape, IntegerTensor min, IntegerTensor max) {
+    this(shape, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
+  }
 
-    public UniformIntVertex(int[] shape, IntegerVertex min, int max) {
-        this(shape, min, new ConstantIntegerVertex(max));
-    }
+  public UniformIntVertex(int[] shape, IntegerVertex min, int max) {
+    this(shape, min, new ConstantIntegerVertex(max));
+  }
 
-    public UniformIntVertex(int[] shape, int min, IntegerVertex max) {
-        this(shape, new ConstantIntegerVertex(min), max);
-    }
+  public UniformIntVertex(int[] shape, int min, IntegerVertex max) {
+    this(shape, new ConstantIntegerVertex(min), max);
+  }
 
-    public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(min.getShape(), max.getShape()), min, max);
-    }
+  public UniformIntVertex(IntegerVertex min, IntegerVertex max) {
+    this(checkHasSingleNonScalarShapeOrAllScalar(min.getShape(), max.getShape()), min, max);
+  }
 
-    public UniformIntVertex(IntegerVertex min, int max) {
-        this(min.getShape(), min, new ConstantIntegerVertex(max));
-    }
+  public UniformIntVertex(IntegerVertex min, int max) {
+    this(min.getShape(), min, new ConstantIntegerVertex(max));
+  }
 
-    public UniformIntVertex(int min, IntegerVertex max) {
-        this(max.getShape(), new ConstantIntegerVertex(min), max);
-    }
+  public UniformIntVertex(int min, IntegerVertex max) {
+    this(max.getShape(), new ConstantIntegerVertex(min), max);
+  }
 
-    public UniformIntVertex(int min, int max) {
-        this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
-    }
+  public UniformIntVertex(int min, int max) {
+    this(Tensor.SCALAR_SHAPE, new ConstantIntegerVertex(min), new ConstantIntegerVertex(max));
+  }
 
-    public Vertex<IntegerTensor> getMin() {
-        return min;
-    }
+  public Vertex<IntegerTensor> getMin() {
+    return min;
+  }
 
-    public Vertex<IntegerTensor> getMax() {
-        return max;
-    }
+  public Vertex<IntegerTensor> getMax() {
+    return max;
+  }
 
-    @Override
-    public double logProb(IntegerTensor value) {
-        return UniformInt.withParameters(min.getValue(), max.getValue()).logProb(value).sum();
-    }
+  @Override
+  public double logProb(IntegerTensor value) {
+    return UniformInt.withParameters(min.getValue(), max.getValue()).logProb(value).sum();
+  }
 
-    @Override
-    public Map<Vertex, DoubleTensor> dLogProb(
-            IntegerTensor value, Set<? extends Vertex> withRespectTo) {
-        throw new UnsupportedOperationException();
-    }
+  @Override
+  public Map<Vertex, DoubleTensor> dLogProb(
+      IntegerTensor value, Set<? extends Vertex> withRespectTo) {
+    throw new UnsupportedOperationException();
+  }
 
-    @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return UniformInt.withParameters(min.getValue(), max.getValue()).sample(getShape(), random);
-    }
+  @Override
+  public IntegerTensor sample(KeanuRandom random) {
+    return UniformInt.withParameters(min.getValue(), max.getValue()).sample(getShape(), random);
+  }
 }

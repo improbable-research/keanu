@@ -17,67 +17,67 @@ import lombok.EqualsAndHashCode;
 @EqualsAndHashCode
 public class VertexId implements Comparable<VertexId> {
 
-    public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
-    private static final int TOP_LEVEL_ARRAY_SIZE = 1;
+  public static final AtomicLong ID_GENERATOR = new AtomicLong(0L);
+  private static final int TOP_LEVEL_ARRAY_SIZE = 1;
 
-    long[] idValues = new long[TOP_LEVEL_ARRAY_SIZE];
+  long[] idValues = new long[TOP_LEVEL_ARRAY_SIZE];
 
-    public VertexId() {
-        idValues[0] = ID_GENERATOR.getAndIncrement();
+  public VertexId() {
+    idValues[0] = ID_GENERATOR.getAndIncrement();
+  }
+
+  public void addPrefix(VertexId prefix) {
+    long[] newIdValues = new long[idValues.length + prefix.idValues.length];
+    System.arraycopy(prefix.idValues, 0, newIdValues, 0, prefix.idValues.length);
+    System.arraycopy(idValues, 0, newIdValues, prefix.idValues.length, idValues.length);
+    idValues = newIdValues;
+  }
+
+  public void resetID() {
+    idValues = new long[TOP_LEVEL_ARRAY_SIZE];
+    idValues[0] = ID_GENERATOR.getAndIncrement();
+  }
+
+  public VertexId(long id) {
+    idValues[0] = id;
+  }
+
+  @Override
+  public int compareTo(VertexId that) {
+    long comparisonValue = 0;
+    int minDepth = Math.min(this.idValues.length, that.idValues.length);
+
+    for (int i = 0; i < minDepth && comparisonValue == 0; i++) {
+      comparisonValue = this.idValues[i] - that.idValues[i];
     }
 
-    public void addPrefix(VertexId prefix) {
-        long[] newIdValues = new long[idValues.length + prefix.idValues.length];
-        System.arraycopy(prefix.idValues, 0, newIdValues, 0, prefix.idValues.length);
-        System.arraycopy(idValues, 0, newIdValues, prefix.idValues.length, idValues.length);
-        idValues = newIdValues;
+    if (comparisonValue == 0) {
+      comparisonValue = this.idValues.length - that.idValues.length;
     }
 
-    public void resetID() {
-        idValues = new long[TOP_LEVEL_ARRAY_SIZE];
-        idValues[0] = ID_GENERATOR.getAndIncrement();
+    return Ints.saturatedCast(comparisonValue);
+  }
+
+  public boolean prefixMatches(VertexId prefix) {
+    if (prefix.idValues.length > idValues.length) {
+      return false;
     }
 
-    public VertexId(long id) {
-        idValues[0] = id;
+    for (int i = 0; i < prefix.idValues.length; i++) {
+      if (idValues[i] != prefix.idValues[i]) {
+        return false;
+      }
     }
 
-    @Override
-    public int compareTo(VertexId that) {
-        long comparisonValue = 0;
-        int minDepth = Math.min(this.idValues.length, that.idValues.length);
+    return true;
+  }
 
-        for (int i = 0; i < minDepth && comparisonValue == 0; i++) {
-            comparisonValue = this.idValues[i] - that.idValues[i];
-        }
+  @Override
+  public String toString() {
+    return Arrays.toString(idValues);
+  }
 
-        if (comparisonValue == 0) {
-            comparisonValue = this.idValues.length - that.idValues.length;
-        }
-
-        return Ints.saturatedCast(comparisonValue);
-    }
-
-    public boolean prefixMatches(VertexId prefix) {
-        if (prefix.idValues.length > idValues.length) {
-            return false;
-        }
-
-        for (int i = 0; i < prefix.idValues.length; i++) {
-            if (idValues[i] != prefix.idValues[i]) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public String toString() {
-        return Arrays.toString(idValues);
-    }
-
-    public int getIndentation() {
-        return idValues.length;
-    }
+  public int getIndentation() {
+    return idValues.length;
+  }
 }

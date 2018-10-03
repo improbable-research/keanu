@@ -6,86 +6,86 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public interface BooleanTensor extends Tensor<Boolean> {
 
-    static BooleanTensor create(boolean value, int[] shape) {
-        return new SimpleBooleanTensor(value, shape);
+  static BooleanTensor create(boolean value, int[] shape) {
+    return new SimpleBooleanTensor(value, shape);
+  }
+
+  static BooleanTensor create(boolean[] values, int... shape) {
+    return new SimpleBooleanTensor(values, shape);
+  }
+
+  static BooleanTensor create(boolean[] values) {
+    return create(values, 1, values.length);
+  }
+
+  static BooleanTensor scalar(boolean scalarValue) {
+    return new SimpleBooleanTensor(scalarValue);
+  }
+
+  static BooleanTensor placeHolder(int[] shape) {
+    return new SimpleBooleanTensor(shape);
+  }
+
+  static BooleanTensor trues(int... shape) {
+    return new SimpleBooleanTensor(true, shape);
+  }
+
+  static BooleanTensor falses(int... shape) {
+    return new SimpleBooleanTensor(false, shape);
+  }
+
+  static BooleanTensor concat(int dimension, BooleanTensor[] toConcat) {
+    DoubleTensor[] toDoubles = new DoubleTensor[toConcat.length];
+
+    for (int i = 0; i < toConcat.length; i++) {
+      toDoubles[i] = toConcat[i].toDoubleMask();
     }
 
-    static BooleanTensor create(boolean[] values, int... shape) {
-        return new SimpleBooleanTensor(values, shape);
+    DoubleTensor concat = DoubleTensor.concat(dimension, toDoubles);
+    double[] concatFlat = concat.asFlatDoubleArray();
+    boolean[] data = new boolean[concat.asFlatDoubleArray().length];
+
+    for (int i = 0; i < data.length; i++) {
+      data[i] = concatFlat[i] == 1.0;
     }
 
-    static BooleanTensor create(boolean[] values) {
-        return create(values, 1, values.length);
-    }
+    return new SimpleBooleanTensor(data, concat.getShape());
+  }
 
-    static BooleanTensor scalar(boolean scalarValue) {
-        return new SimpleBooleanTensor(scalarValue);
-    }
+  @Override
+  BooleanTensor reshape(int... newShape);
 
-    static BooleanTensor placeHolder(int[] shape) {
-        return new SimpleBooleanTensor(shape);
-    }
+  @Override
+  BooleanTensor duplicate();
 
-    static BooleanTensor trues(int... shape) {
-        return new SimpleBooleanTensor(true, shape);
-    }
+  BooleanTensor and(BooleanTensor that);
 
-    static BooleanTensor falses(int... shape) {
-        return new SimpleBooleanTensor(false, shape);
-    }
+  BooleanTensor or(BooleanTensor that);
 
-    static BooleanTensor concat(int dimension, BooleanTensor[] toConcat) {
-        DoubleTensor[] toDoubles = new DoubleTensor[toConcat.length];
+  BooleanTensor not();
 
-        for (int i = 0; i < toConcat.length; i++) {
-            toDoubles[i] = toConcat[i].toDoubleMask();
-        }
+  DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue);
 
-        DoubleTensor concat = DoubleTensor.concat(dimension, toDoubles);
-        double[] concatFlat = concat.asFlatDoubleArray();
-        boolean[] data = new boolean[concat.asFlatDoubleArray().length];
+  IntegerTensor setIntegerIf(IntegerTensor trueValue, IntegerTensor falseValue);
 
-        for (int i = 0; i < data.length; i++) {
-            data[i] = concatFlat[i] == 1.0;
-        }
+  BooleanTensor setBooleanIf(BooleanTensor trueValue, BooleanTensor falseValue);
 
-        return new SimpleBooleanTensor(data, concat.getShape());
-    }
+  <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue);
 
-    @Override
-    BooleanTensor reshape(int... newShape);
+  BooleanTensor andInPlace(BooleanTensor that);
 
-    @Override
-    BooleanTensor duplicate();
+  BooleanTensor orInPlace(BooleanTensor that);
 
-    BooleanTensor and(BooleanTensor that);
+  BooleanTensor notInPlace();
 
-    BooleanTensor or(BooleanTensor that);
+  boolean allTrue();
 
-    BooleanTensor not();
+  boolean allFalse();
 
-    DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue);
+  DoubleTensor toDoubleMask();
 
-    IntegerTensor setIntegerIf(IntegerTensor trueValue, IntegerTensor falseValue);
+  IntegerTensor toIntegerMask();
 
-    BooleanTensor setBooleanIf(BooleanTensor trueValue, BooleanTensor falseValue);
-
-    <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue);
-
-    BooleanTensor andInPlace(BooleanTensor that);
-
-    BooleanTensor orInPlace(BooleanTensor that);
-
-    BooleanTensor notInPlace();
-
-    boolean allTrue();
-
-    boolean allFalse();
-
-    DoubleTensor toDoubleMask();
-
-    IntegerTensor toIntegerMask();
-
-    @Override
-    BooleanTensor slice(int dimension, int index);
+  @Override
+  BooleanTensor slice(int dimension, int index);
 }

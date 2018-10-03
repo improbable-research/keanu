@@ -15,140 +15,139 @@ import org.junit.Test;
 
 public class SumVertexTest {
 
-    @Test
-    public void doesSum() {
-        DoubleVertex a = new UniformVertex(new int[] {1, 5}, 0, 10);
-        a.setValue(new double[] {1, 2, 3, 4, 5});
+  @Test
+  public void doesSum() {
+    DoubleVertex a = new UniformVertex(new int[] {1, 5}, 0, 10);
+    a.setValue(new double[] {1, 2, 3, 4, 5});
 
-        DoubleVertex summed = a.sum();
+    DoubleVertex summed = a.sum();
 
-        assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar(), 1e-5);
-    }
+    assertEquals(1 + 2 + 3 + 4 + 5, summed.eval().scalar(), 1e-5);
+  }
 
-    @Test
-    public void doesSumSimpleAutoDiff() {
-        DoubleVertex a = new UniformVertex(new int[] {2, 2, 2}, 0, 10);
-        a.setValue(a.sample());
+  @Test
+  public void doesSumSimpleAutoDiff() {
+    DoubleVertex a = new UniformVertex(new int[] {2, 2, 2}, 0, 10);
+    a.setValue(a.sample());
 
-        DoubleVertex b = a.sum();
+    DoubleVertex b = a.sum();
 
-        DoubleTensor dbdaForward = b.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
+    DoubleTensor dbdaForward = b.getDualNumber().getPartialDerivatives().withRespectTo(a);
+    DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
-        DoubleTensor expectedDbDa = DoubleTensor.ones(new int[] {1, 1, 2, 2, 2});
+    DoubleTensor expectedDbDa = DoubleTensor.ones(new int[] {1, 1, 2, 2, 2});
 
-        assertThat(dbdaForward, equalTo(expectedDbDa));
-        assertThat(dbdaReverse, equalTo(expectedDbDa));
-    }
+    assertThat(dbdaForward, equalTo(expectedDbDa));
+    assertThat(dbdaReverse, equalTo(expectedDbDa));
+  }
 
-    @Test
-    public void canDoSumAutoDiffWhenSumIsNotWrtOrOf() {
-        DoubleVertex a = new UniformVertex(new int[] {2, 3}, 0, 10);
-        a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
+  @Test
+  public void canDoSumAutoDiffWhenSumIsNotWrtOrOf() {
+    DoubleVertex a = new UniformVertex(new int[] {2, 3}, 0, 10);
+    a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
 
-        DoubleVertex d = a.sum();
+    DoubleVertex d = a.sum();
 
-        DoubleVertex e = new UniformVertex(new int[] {2, 2}, 0, 10);
-        e.setValue(DoubleTensor.arange(4, 8).reshape(2, 2));
+    DoubleVertex e = new UniformVertex(new int[] {2, 2}, 0, 10);
+    e.setValue(DoubleTensor.arange(4, 8).reshape(2, 2));
 
-        DoubleVertex f = d.times(e);
+    DoubleVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+    DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
-        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
+    PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
+    DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
-        DoubleTensor expectedDfdx =
-                DoubleTensor.create(
-                        new double[] {
-                            4, 4, 4,
-                            4, 4, 4,
-                            5, 5, 5,
-                            5, 5, 5,
-                            6, 6, 6,
-                            6, 6, 6,
-                            7, 7, 7,
-                            7, 7, 7
-                        },
-                        2,
-                        2,
-                        2,
-                        3);
+    DoubleTensor expectedDfdx =
+        DoubleTensor.create(
+            new double[] {
+              4, 4, 4,
+              4, 4, 4,
+              5, 5, 5,
+              5, 5, 5,
+              6, 6, 6,
+              6, 6, 6,
+              7, 7, 7,
+              7, 7, 7
+            },
+            2,
+            2,
+            2,
+            3);
 
-        assertThat(dfdaReverse, equalTo(expectedDfdx));
-        assertThat(dfdaForward, equalTo(expectedDfdx));
-    }
+    assertThat(dfdaReverse, equalTo(expectedDfdx));
+    assertThat(dfdaForward, equalTo(expectedDfdx));
+  }
 
-    @Test
-    public void canDoSumAutoDiffWhenOfIsScalar() {
-        DoubleVertex a = new UniformVertex(new int[] {2, 3}, 0, 10);
-        a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
+  @Test
+  public void canDoSumAutoDiffWhenOfIsScalar() {
+    DoubleVertex a = new UniformVertex(new int[] {2, 3}, 0, 10);
+    a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
 
-        DoubleVertex d = a.sum();
+    DoubleVertex d = a.sum();
 
-        DoubleVertex e = new UniformVertex(0, 10);
-        e.setValue(2);
+    DoubleVertex e = new UniformVertex(0, 10);
+    e.setValue(2);
 
-        DoubleVertex f = d.times(e);
+    DoubleVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+    DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
-        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
+    PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
+    DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
-        DoubleTensor expectedDfdx =
-                DoubleTensor.create(
-                        new double[] {
-                            2, 2, 2,
-                            2, 2, 2
-                        },
-                        1,
-                        1,
-                        2,
-                        3);
+    DoubleTensor expectedDfdx =
+        DoubleTensor.create(
+            new double[] {
+              2, 2, 2,
+              2, 2, 2
+            },
+            1,
+            1,
+            2,
+            3);
 
-        assertThat(dfdaForward, equalTo(expectedDfdx));
-        assertThat(dfdaReverse, equalTo(expectedDfdx));
-    }
+    assertThat(dfdaForward, equalTo(expectedDfdx));
+    assertThat(dfdaReverse, equalTo(expectedDfdx));
+  }
 
-    @Test
-    public void canDoSumAutoDiffWhenWrtIsScalar() {
-        DoubleVertex a = new UniformVertex(0, 10);
-        a.setValue(2);
+  @Test
+  public void canDoSumAutoDiffWhenWrtIsScalar() {
+    DoubleVertex a = new UniformVertex(0, 10);
+    a.setValue(2);
 
-        DoubleVertex d = a.sum();
+    DoubleVertex d = a.sum();
 
-        DoubleVertex e = new UniformVertex(0, 10);
-        e.setValue(new double[] {1, 2, 3});
+    DoubleVertex e = new UniformVertex(0, 10);
+    e.setValue(new double[] {1, 2, 3});
 
-        DoubleVertex f = d.times(e);
+    DoubleVertex f = d.times(e);
 
-        DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
+    DoubleTensor dfdaForward = f.getDualNumber().getPartialDerivatives().withRespectTo(a);
 
-        PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
-        DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
+    PartialDerivatives dfdx = Differentiator.reverseModeAutoDiff(f, a);
+    DoubleTensor dfdaReverse = dfdx.withRespectTo(a);
 
-        DoubleTensor expectedDfdx =
-                DoubleTensor.create(
-                        new double[] {
-                            1, 2, 3,
-                        },
-                        1,
-                        3,
-                        1,
-                        1);
+    DoubleTensor expectedDfdx =
+        DoubleTensor.create(
+            new double[] {
+              1, 2, 3,
+            },
+            1,
+            3,
+            1,
+            1);
 
-        assertThat(dfdaForward, equalTo(expectedDfdx));
-        assertThat(dfdaReverse, equalTo(expectedDfdx));
-    }
+    assertThat(dfdaForward, equalTo(expectedDfdx));
+    assertThat(dfdaReverse, equalTo(expectedDfdx));
+  }
 
-    @Test
-    public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new int[] {2, 2, 2}, -10.0, 10.0);
-        inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
-        DoubleVertex outputVertex = inputVertex.sum().times(inputVertex);
+  @Test
+  public void changesMatchGradient() {
+    DoubleVertex inputVertex = new UniformVertex(new int[] {2, 2, 2}, -10.0, 10.0);
+    inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
+    DoubleVertex outputVertex = inputVertex.sum().times(inputVertex);
 
-        finiteDifferenceMatchesGradient(
-                ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-10, true);
-    }
+    finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 1e-6, 1e-10, true);
+  }
 }

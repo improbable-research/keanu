@@ -9,26 +9,26 @@ import org.junit.Test;
 
 public class GradientOptimizerTest {
 
-    @Test
-    public void doesCallOnFitnessAndOnGradientHandler() {
-        AtomicInteger fitnessTimesCalled = new AtomicInteger(0);
-        AtomicInteger gradientTimesCalled = new AtomicInteger(0);
-        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(new GaussianVertex(0, 1));
-        optimizer.addFitnessCalculationHandler(
-                (point, fitness) -> fitnessTimesCalled.incrementAndGet());
-        optimizer.addGradientCalculationHandler(
-                (point, fitness) -> gradientTimesCalled.incrementAndGet());
-        optimizer.maxAPosteriori();
+  @Test
+  public void doesCallOnFitnessAndOnGradientHandler() {
+    AtomicInteger fitnessTimesCalled = new AtomicInteger(0);
+    AtomicInteger gradientTimesCalled = new AtomicInteger(0);
+    GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(new GaussianVertex(0, 1));
+    optimizer.addFitnessCalculationHandler(
+        (point, fitness) -> fitnessTimesCalled.incrementAndGet());
+    optimizer.addGradientCalculationHandler(
+        (point, fitness) -> gradientTimesCalled.incrementAndGet());
+    optimizer.maxAPosteriori();
 
-        assertTrue(fitnessTimesCalled.get() > 0);
-        assertTrue(gradientTimesCalled.get() > 0);
-    }
+    assertTrue(fitnessTimesCalled.get() > 0);
+    assertTrue(gradientTimesCalled.get() > 0);
+  }
 
-    @Test(expected = UnsupportedOperationException.class)
-    public void errorOnDiscreteLatents() {
-        PoissonVertex v1 = new PoissonVertex(15);
-        PoissonVertex v2 = new PoissonVertex(v1);
+  @Test(expected = UnsupportedOperationException.class)
+  public void errorOnDiscreteLatents() {
+    PoissonVertex v1 = new PoissonVertex(15);
+    PoissonVertex v2 = new PoissonVertex(v1);
 
-        GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
-    }
+    GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
+  }
 }

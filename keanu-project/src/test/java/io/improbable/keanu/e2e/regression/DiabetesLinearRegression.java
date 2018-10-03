@@ -18,32 +18,32 @@ import org.junit.Test;
  */
 public class DiabetesLinearRegression {
 
-    public static class Data {
-        public DoubleTensor bmi;
-        public DoubleTensor y;
-    }
+  public static class Data {
+    public DoubleTensor bmi;
+    public DoubleTensor y;
+  }
 
-    @Test
-    public void doesLinearRegressionOnBMI() {
-        Data data =
-                ReadCsv.fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-                        .asVectorizedColumnsDefinedBy(Data.class)
-                        .load(true);
+  @Test
+  public void doesLinearRegressionOnBMI() {
+    Data data =
+        ReadCsv.fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
+            .asVectorizedColumnsDefinedBy(Data.class)
+            .load(true);
 
-        // Linear Regression
-        DoubleVertex weight = new GaussianVertex(0.0, 2.0);
-        DoubleVertex b = new GaussianVertex(0.0, 2.0);
-        DoubleVertex x = ConstantVertex.of(data.bmi);
-        DoubleVertex yMu = x.multiply(weight);
+    // Linear Regression
+    DoubleVertex weight = new GaussianVertex(0.0, 2.0);
+    DoubleVertex b = new GaussianVertex(0.0, 2.0);
+    DoubleVertex x = ConstantVertex.of(data.bmi);
+    DoubleVertex yMu = x.multiply(weight);
 
-        DoubleVertex y = new GaussianVertex(yMu.plus(b), 1.0);
-        y.observe(data.y);
+    DoubleVertex y = new GaussianVertex(yMu.plus(b), 1.0);
+    y.observe(data.y);
 
-        BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
-        GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
-        optimizer.maxLikelihood();
+    BayesianNetwork bayesNet = new BayesianNetwork(y.getConnectedGraph());
+    GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
+    optimizer.maxLikelihood();
 
-        assertEquals(938.2378, weight.getValue().scalar(), 0.01);
-        assertEquals(152.9189, b.getValue().scalar(), 0.01);
-    }
+    assertEquals(938.2378, weight.getValue().scalar(), 0.01);
+    assertEquals(152.9189, b.getValue().scalar(), 0.01);
+  }
 }

@@ -18,74 +18,73 @@ import lombok.experimental.Accessors;
 @Accessors(fluent = true)
 public class NetworkSamplesGenerator {
 
-    private final SamplingAlgorithm algorithm;
+  private final SamplingAlgorithm algorithm;
 
-    @Getter @Setter private int dropCount = 0;
+  @Getter @Setter private int dropCount = 0;
 
-    @Getter @Setter private int downSampleInterval = 1;
+  @Getter @Setter private int downSampleInterval = 1;
 
-    private Supplier<ProgressBar> progressBarSupplier;
+  private Supplier<ProgressBar> progressBarSupplier;
 
-    public NetworkSamplesGenerator(
-            SamplingAlgorithm algorithm, Supplier<ProgressBar> progressBarSupplier) {
-        this.algorithm = algorithm;
-        this.progressBarSupplier = progressBarSupplier;
+  public NetworkSamplesGenerator(
+      SamplingAlgorithm algorithm, Supplier<ProgressBar> progressBarSupplier) {
+    this.algorithm = algorithm;
+    this.progressBarSupplier = progressBarSupplier;
+  }
+
+  public NetworkSamples generate(final int totalSampleCount) {
+
+    ProgressBar progressBar = progressBarSupplier.get();
+
+    Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
+    List<Double> logOfMasterPForEachSample = new ArrayList<>();
+
+    dropSamples(dropCount, progressBar);
+
+    int sampleCount = 0;
+    int samplesLeft = totalSampleCount - dropCount;
+    for (int i = 0; i < samplesLeft; i++) {
+      if (i % downSampleInterval == 0) {
+        algorithm.sample(samplesByVertex, logOfMasterPForEachSample);
+        sampleCount++;
+      } else {
+        algorithm.step();
+      }
+
+      progressBar.progress("Sampling...", (i + 1) / (double) samplesLeft);
     }
 
-    public NetworkSamples generate(final int totalSampleCount) {
+    progressBar.finish();
+    return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
+  }
 
-        ProgressBar progressBar = progressBarSupplier.get();
+  public Stream<NetworkState> stream() {
 
-        Map<VertexId, List<?>> samplesByVertex = new HashMap<>();
-        List<Double> logOfMasterPForEachSample = new ArrayList<>();
+    ProgressBar progressBar = progressBarSupplier.get();
 
-        dropSamples(dropCount, progressBar);
+    dropSamples(dropCount, progressBar);
 
-        int sampleCount = 0;
-        int samplesLeft = totalSampleCount - dropCount;
-        for (int i = 0; i < samplesLeft; i++) {
-            if (i % downSampleInterval == 0) {
-                algorithm.sample(samplesByVertex, logOfMasterPForEachSample);
-                sampleCount++;
-            } else {
+    final AtomicInteger sampleNumber = new AtomicInteger(0);
+
+    return Stream.generate(
+            () -> {
+              sampleNumber.getAndIncrement();
+
+              for (int i = 0; i < downSampleInterval - 1; i++) {
                 algorithm.step();
-            }
+              }
 
-            progressBar.progress("Sampling...", (i + 1) / (double) samplesLeft);
-        }
+              NetworkState sample = algorithm.sample();
+              progressBar.progress(String.format("Sample #%,d completed", sampleNumber.get()));
+              return sample;
+            })
+        .onClose(() -> progressBar.finish());
+  }
 
-        progressBar.finish();
-        return new NetworkSamples(samplesByVertex, logOfMasterPForEachSample, sampleCount);
+  private void dropSamples(int dropCount, ProgressBar progressBar) {
+    for (int i = 0; i < dropCount; i++) {
+      algorithm.step();
+      progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);
     }
-
-    public Stream<NetworkState> stream() {
-
-        ProgressBar progressBar = progressBarSupplier.get();
-
-        dropSamples(dropCount, progressBar);
-
-        final AtomicInteger sampleNumber = new AtomicInteger(0);
-
-        return Stream.generate(
-                        () -> {
-                            sampleNumber.getAndIncrement();
-
-                            for (int i = 0; i < downSampleInterval - 1; i++) {
-                                algorithm.step();
-                            }
-
-                            NetworkState sample = algorithm.sample();
-                            progressBar.progress(
-                                    String.format("Sample #%,d completed", sampleNumber.get()));
-                            return sample;
-                        })
-                .onClose(() -> progressBar.finish());
-    }
-
-    private void dropSamples(int dropCount, ProgressBar progressBar) {
-        for (int i = 0; i < dropCount; i++) {
-            algorithm.step();
-            progressBar.progress("Dropping samples...", (i + 1) / (double) dropCount);
-        }
-    }
+  }
 }

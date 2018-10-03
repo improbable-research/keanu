@@ -12,49 +12,49 @@ import java.util.Optional;
 
 public class IntegerTensorVertexSamples extends VertexSamples<IntegerTensor> {
 
-    public IntegerTensorVertexSamples(List<IntegerTensor> samples) {
-        super(samples);
+  public IntegerTensorVertexSamples(List<IntegerTensor> samples) {
+    super(samples);
+  }
+
+  public DoubleTensor getAverages() {
+    if (samples.isEmpty()) {
+      throw new IllegalStateException("No samples exist for averaging.");
     }
 
-    public DoubleTensor getAverages() {
-        if (samples.isEmpty()) {
-            throw new IllegalStateException("No samples exist for averaging.");
-        }
+    int[] shape = samples.iterator().next().getShape();
 
-        int[] shape = samples.iterator().next().getShape();
+    return this.samples
+        .stream()
+        .reduce(IntegerTensor.zeros(shape), IntegerTensor::plusInPlace)
+        .toDouble()
+        .divInPlace(samples.size());
+  }
 
-        return this.samples
-                .stream()
-                .reduce(IntegerTensor.zeros(shape), IntegerTensor::plusInPlace)
-                .toDouble()
-                .divInPlace(samples.size());
+  public Integer getScalarMode() {
+    return getModeAtIndex(0, 0);
+  }
+
+  public Integer getModeAtIndex(int... index) {
+
+    if (samples.isEmpty()) {
+      throw new IllegalStateException("Mode for empty samples is undefined");
     }
 
-    public Integer getScalarMode() {
-        return getModeAtIndex(0, 0);
+    Map<Integer, List<Integer>> groupedByValue =
+        samples.stream().map(v -> v.getValue(index)).collect(groupingBy(v -> v));
+
+    Optional<Integer> mode =
+        groupedByValue
+            .entrySet()
+            .stream()
+            .sorted(comparing(v -> -v.getValue().size()))
+            .map(Map.Entry::getKey)
+            .findFirst();
+
+    if (mode.isPresent()) {
+      return mode.get();
+    } else {
+      throw new IllegalStateException("Mode is undefined");
     }
-
-    public Integer getModeAtIndex(int... index) {
-
-        if (samples.isEmpty()) {
-            throw new IllegalStateException("Mode for empty samples is undefined");
-        }
-
-        Map<Integer, List<Integer>> groupedByValue =
-                samples.stream().map(v -> v.getValue(index)).collect(groupingBy(v -> v));
-
-        Optional<Integer> mode =
-                groupedByValue
-                        .entrySet()
-                        .stream()
-                        .sorted(comparing(v -> -v.getValue().size()))
-                        .map(Map.Entry::getKey)
-                        .findFirst();
-
-        if (mode.isPresent()) {
-            return mode.get();
-        } else {
-            throw new IllegalStateException("Mode is undefined");
-        }
-    }
+  }
 }

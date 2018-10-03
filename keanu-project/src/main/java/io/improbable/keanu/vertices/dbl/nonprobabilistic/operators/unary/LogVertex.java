@@ -10,33 +10,33 @@ import java.util.Map;
 
 public class LogVertex extends DoubleUnaryOpVertex {
 
-    /**
-     * Returns the natural logarithm, base e, of a vertex
-     *
-     * @param inputVertex the vertex
-     */
-    public LogVertex(DoubleVertex inputVertex) {
-        super(inputVertex);
-    }
+  /**
+   * Returns the natural logarithm, base e, of a vertex
+   *
+   * @param inputVertex the vertex
+   */
+  public LogVertex(DoubleVertex inputVertex) {
+    super(inputVertex);
+  }
 
-    @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return value.log();
-    }
+  @Override
+  protected DoubleTensor op(DoubleTensor value) {
+    return value.log();
+  }
 
-    @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.log();
-    }
+  @Override
+  protected DualNumber dualOp(DualNumber dualNumber) {
+    return dualNumber.log();
+  }
 
-    @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
-            PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(
-                inputVertex,
-                derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
-                        inputVertex.getValue().reciprocal(), this.getShape()));
-        return partials;
-    }
+  @Override
+  public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(
+      PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+    Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    partials.put(
+        inputVertex,
+        derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(
+            inputVertex.getValue().reciprocal(), this.getShape()));
+    return partials;
+  }
 }

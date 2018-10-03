@@ -12,66 +12,65 @@ import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
 
 public class ConstantVertex {
 
-    private ConstantVertex() {}
+  private ConstantVertex() {}
 
-    public static ConstantBoolVertex of(Boolean value) {
-        return new ConstantBoolVertex(value);
-    }
+  public static ConstantBoolVertex of(Boolean value) {
+    return new ConstantBoolVertex(value);
+  }
 
-    public static ConstantBoolVertex of(boolean value) {
-        return new ConstantBoolVertex(value);
-    }
+  public static ConstantBoolVertex of(boolean value) {
+    return new ConstantBoolVertex(value);
+  }
 
-    public static ConstantBoolVertex of(boolean... value) {
-        return new ConstantBoolVertex(value);
-    }
+  public static ConstantBoolVertex of(boolean... value) {
+    return new ConstantBoolVertex(value);
+  }
 
-    public static ConstantBoolVertex of(BooleanTensor value) {
-        return new ConstantBoolVertex(value);
-    }
+  public static ConstantBoolVertex of(BooleanTensor value) {
+    return new ConstantBoolVertex(value);
+  }
 
-    public static ConstantIntegerVertex of(Integer value) {
-        return new ConstantIntegerVertex(value);
-    }
+  public static ConstantIntegerVertex of(Integer value) {
+    return new ConstantIntegerVertex(value);
+  }
 
-    public static ConstantIntegerVertex of(int value) {
-        return new ConstantIntegerVertex(value);
-    }
+  public static ConstantIntegerVertex of(int value) {
+    return new ConstantIntegerVertex(value);
+  }
 
-    public static ConstantIntegerVertex of(int... value) {
-        return new ConstantIntegerVertex(value);
-    }
+  public static ConstantIntegerVertex of(int... value) {
+    return new ConstantIntegerVertex(value);
+  }
 
-    public static ConstantIntegerVertex of(IntegerTensor value) {
-        return new ConstantIntegerVertex(value);
-    }
+  public static ConstantIntegerVertex of(IntegerTensor value) {
+    return new ConstantIntegerVertex(value);
+  }
 
-    public static ConstantDoubleVertex of(Double value) {
-        return new ConstantDoubleVertex(value);
-    }
+  public static ConstantDoubleVertex of(Double value) {
+    return new ConstantDoubleVertex(value);
+  }
 
-    public static ConstantDoubleVertex of(double value) {
-        return new ConstantDoubleVertex(value);
-    }
+  public static ConstantDoubleVertex of(double value) {
+    return new ConstantDoubleVertex(value);
+  }
 
-    public static ConstantDoubleVertex of(double... value) {
-        return new ConstantDoubleVertex(value);
-    }
+  public static ConstantDoubleVertex of(double... value) {
+    return new ConstantDoubleVertex(value);
+  }
 
-    public static ConstantDoubleVertex of(DoubleTensor value) {
-        return new ConstantDoubleVertex(value);
-    }
+  public static ConstantDoubleVertex of(DoubleTensor value) {
+    return new ConstantDoubleVertex(value);
+  }
 
-    public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC value) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(value));
-    }
+  public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC value) {
+    return new ConstantGenericVertex<>(new GenericTensor<>(value));
+  }
 
-    public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(
-                new GenericTensor<>(values, new int[] {1, values.length}));
-    }
+  public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
+    return new ConstantGenericVertex<>(new GenericTensor<>(values, new int[] {1, values.length}));
+  }
 
-    public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
-        return new ConstantGenericVertex<>(tensor);
-    }
+  public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {
+    return new ConstantGenericVertex<>(tensor);
+  }
 }
