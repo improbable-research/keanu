@@ -106,6 +106,14 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new Nd4jDoubleTensor(concat);
     }
 
+    static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
+        return a.duplicate().minInPlace(b);
+    }
+
+    static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
+        return a.duplicate().maxInPlace(b);
+    }
+
     @Override
     DoubleTensor setValue(Double value, int... index);
 
@@ -147,6 +155,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor log();
 
+    DoubleTensor safeLogTimes(DoubleTensor y);
+
     DoubleTensor logGamma();
 
     DoubleTensor digamma();
@@ -169,13 +179,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor exp();
 
-    DoubleTensor max(DoubleTensor max);
-
     DoubleTensor matrixInverse();
 
     double max();
-
-    DoubleTensor min(DoubleTensor min);
 
     double min();
 
@@ -186,6 +192,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
 
     DoubleTensor standardize();
+
+    DoubleTensor replaceNaN(double value);
 
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
@@ -236,6 +244,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor logInPlace();
 
+    DoubleTensor safeLogTimesInPlace(DoubleTensor y);
+
     DoubleTensor logGammaInPlace();
 
     DoubleTensor digammaInPlace();
@@ -258,9 +268,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor expInPlace();
 
-    DoubleTensor maxInPlace(DoubleTensor max);
+    DoubleTensor minInPlace(DoubleTensor min);
 
-    DoubleTensor minInPlace(DoubleTensor max);
+    DoubleTensor maxInPlace(DoubleTensor max);
 
     DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 
@@ -274,6 +284,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor standardizeInPlace();
 
+    DoubleTensor replaceNaNInPlace(double value);
+
     DoubleTensor setAllInPlace(double value);
 
     // Comparisons
@@ -285,5 +297,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     BooleanTensor greaterThanOrEqual(double value);
 
+    BooleanTensor notNaN();
+
+    default BooleanTensor isNaN() { return notNaN().not(); }
 
 }

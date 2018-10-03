@@ -2,12 +2,11 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
 import static io.improbable.keanu.tensor.TensorShape.shapeSlice;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -57,25 +56,26 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
-        int[] partialShape = tensor.getShape();
-        int[] inputShape = inputVertex.getShape();
-        int length = getShape().length;
-        int dimensionOfWrtToExtend = dimension + length;
-        int lengthInSlicedDimension = inputShape[dimension] - 1;
+        int[] targetShape = TensorShape.concat(getShape(), inputVertex.getShape());
+        int dimensionInWrt = dimension + getShape().length;
+        int indicesBefore = index;
+        int indicesAfter = targetShape[dimensionInWrt] - index - 1;
+        targetShape[dimensionInWrt] = 1;
+        DoubleTensor outputTensor = tensor.reshape(targetShape);
 
-        if (index == 0) {
-            partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return DoubleTensor.concat(dimensionOfWrtToExtend, tensor, DoubleTensor.zeros(partialShape));
-        } else if (index == lengthInSlicedDimension) {
-            partialShape[dimensionOfWrtToExtend] = lengthInSlicedDimension;
-            return DoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(partialShape), tensor);
-        } else {
-            int[] zerosBeforeSlice = Arrays.copyOf(partialShape, partialShape.length);
-            int[] zerosAfterSlice = Arrays.copyOf(partialShape, partialShape.length);
-            zerosBeforeSlice[dimensionOfWrtToExtend] = index;
-            zerosAfterSlice[dimensionOfWrtToExtend] = lengthInSlicedDimension - index;
-            return DoubleTensor.concat(dimensionOfWrtToExtend, DoubleTensor.zeros(zerosBeforeSlice), tensor, DoubleTensor.zeros(zerosAfterSlice));
+        if (indicesBefore != 0) {
+            targetShape[dimensionInWrt] = indicesBefore;
+            DoubleTensor prefixTensor = DoubleTensor.zeros(targetShape).reshape(targetShape);
+            outputTensor = DoubleTensor.concat(dimensionInWrt, prefixTensor, outputTensor);
         }
+
+        if (indicesAfter != 0) {
+            targetShape[dimensionInWrt] = indicesAfter;
+            DoubleTensor postfixTensor = DoubleTensor.zeros(targetShape).reshape(targetShape);
+            outputTensor = DoubleTensor.concat(dimensionInWrt, outputTensor, postfixTensor);
+        }
+
+        return outputTensor;
     }
 
 }

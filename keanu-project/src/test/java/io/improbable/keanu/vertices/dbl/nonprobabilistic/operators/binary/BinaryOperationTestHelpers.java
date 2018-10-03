@@ -103,11 +103,11 @@ public class BinaryOperationTestHelpers {
         assertArrayEquals(expectedGradientWrtB.getShape(), wrtBReverse.getShape());
     }
 
-    public static void calculatesDualNumberOfAVectorsAndScalar(DoubleTensor aValues,
-                                                               double bValue,
-                                                               DoubleTensor expectedGradientWrtA,
-                                                               DoubleTensor expectedGradientWrtB,
-                                                               BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
+    public static void calculatesDualNumberOfAVectorAndScalar(DoubleTensor aValues,
+                                                              double bValue,
+                                                              DoubleTensor expectedGradientWrtA,
+                                                              DoubleTensor expectedGradientWrtB,
+                                                              BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
         UniformVertex A = new UniformVertex(aValues.getShape(), 0.0, 1.0);
         A.setAndCascade(aValues);
         UniformVertex B = new UniformVertex(0.0, 1.0);

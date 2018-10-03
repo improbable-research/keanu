@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -283,7 +283,7 @@ public class MatrixMultiplicationVertexTest {
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }
 
 }

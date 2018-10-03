@@ -40,7 +40,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
             .reciprocalInPlace();
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dSelfWrtInput, true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
 
         return partials;
     }

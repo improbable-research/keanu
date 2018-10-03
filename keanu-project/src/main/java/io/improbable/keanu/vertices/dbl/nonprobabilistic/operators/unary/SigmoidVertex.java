@@ -31,7 +31,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
         DoubleTensor x = a.getValue();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
-        PartialDerivatives infinitesimal = a.getPartialDerivatives().multiplyBy(dxdfx);
+        PartialDerivatives infinitesimal = a.getPartialDerivatives().multiplyAlongOfDimensions(dxdfx, x.getShape());
         return new DualNumber(x.sigmoid(), infinitesimal);
     }
 
@@ -42,7 +42,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(derivativeOfSigmoidWrtInput, true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput, this.getShape()));
         return partials;
     }
 
