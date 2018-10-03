@@ -250,6 +250,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 
