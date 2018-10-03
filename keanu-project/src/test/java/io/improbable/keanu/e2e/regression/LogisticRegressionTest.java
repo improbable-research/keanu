@@ -25,10 +25,8 @@ public class LogisticRegressionTest {
 
     private static final int NUM_FEATURES = 3;
     private static final double[] SIGMAS = new double[] {1.0, 1.0, 1.0};
-
     private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[] {0.5, -3.0, 1.5}, 1, 3);
     private static final double TRUE_INTERCEPT = 0.0;
-
     private static final int NUM_SAMPLES_TRAINING = 1250;
     private static final int NUM_SAMPLES_TESTING = 200;
 

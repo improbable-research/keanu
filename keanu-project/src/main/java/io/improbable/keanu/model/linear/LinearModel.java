@@ -26,7 +26,7 @@ public interface LinearModel extends Model {
     }
 
     default void fit() {
-        BayesianNetwork net = addObservationLayer(getNet());
+        BayesianNetwork net = getNet();
         net.getVertexByLabel(Y_OBSERVATION_LABEL).observe(getY());
         GradientOptimizer optimizer = GradientOptimizer.of(net);
         optimizer.maxAPosteriori();
@@ -46,6 +46,6 @@ public interface LinearModel extends Model {
         return 1 - (residualSumOfSquares / totalSumOfSquares);
     }
 
-    Tensor<?> getY();
+    Tensor getY();
 
 }

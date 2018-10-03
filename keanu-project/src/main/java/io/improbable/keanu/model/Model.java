@@ -6,8 +6,6 @@ public interface Model {
 
     BayesianNetwork buildModel();
 
-    BayesianNetwork addObservationLayer(BayesianNetwork net);
-
     BayesianNetwork getNet();
 
 }

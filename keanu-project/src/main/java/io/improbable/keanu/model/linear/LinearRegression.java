@@ -47,19 +47,7 @@ public class LinearRegression implements LinearModel {
 
     @Override
     public BayesianNetwork buildModel() {
-        int numberOfFeatures = x.getShape()[0];
-        int[] weightShape = new int[]{1, numberOfFeatures};
-        DoubleVertex weights = new GaussianVertex(priorOnMu, ConstantVertex.of(priorOnSigmaForWeights)).reshape(weightShape).setLabel(WEIGHTS_LABEL);
-        DoubleVertex intercept = new GaussianVertex(priorOnMu, priorOnSigma).setLabel(INTERCEPT_LABEL);
-        DoubleVertex xVertex = ConstantVertex.of(x).setLabel(X_LABEL);
-        DoubleVertex yVertex = weights.getValue().isScalar() ?
-            weights.times(xVertex).plus(intercept).setLabel(Y_LABEL) :
-            weights.matrixMultiply(xVertex).plus(intercept).setLabel(Y_LABEL);
-        return new BayesianNetwork(yVertex.getConnectedGraph());
-    }
-
-    @Override
-    public BayesianNetwork addObservationLayer(BayesianNetwork net) {
+        BayesianNetwork net = LinearRegressionGraph.build(x, priorOnMu, priorOnSigma, priorOnSigmaForWeights);
         DoubleVertex yVertex = (DoubleVertex) net.getVertexByLabel(Y_LABEL);
         DoubleVertex yObservable = new GaussianVertex(yVertex, priorOnSigma).setLabel(Y_OBSERVATION_LABEL);
         return new BayesianNetwork(yObservable.getConnectedGraph());

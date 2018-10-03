@@ -38,19 +38,6 @@ public class LinearRegressionTest {
     private double expectedW2 = 7.0;
     private double expectedB = 20.0;
 
-    @Test
-    public void gaussian() {
-        DoubleTensor x = DoubleTensor.ones(1, 10);
-        DoubleVertex xVertex = ConstantVertex.of(x);
-        DoubleVertex g = new GaussianVertex(xVertex, ConstantVertex.of(2.0));
-        System.out.println(g.getValue());
-        System.out.println(g.getValue());
-
-        DoubleTensor x1 = DoubleTensor.ones(1, 10).timesInPlace(2);
-        xVertex.setAndCascade(x1);
-        System.out.println(g.getValue());
-    }
-
     @Before
     public void setupRegressionData() {
         DoubleVertex xGenerator = new UniformVertex(new int[]{1, N}, 0, 10);

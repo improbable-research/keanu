@@ -12,19 +12,20 @@ public class LogisticRegression implements ClassificationModel {
     private static final double DEFAULT_SIGMA = 2.0;
     private static final double DEFAULT_REGULARIZATION = 1;
 
+    private final double priorMu;
     private final double priorSigma;
     private final double regularization;
-    private final LinearRegression regression;
     private final BayesianNetwork net;
+    private final DoubleTensor x;
     private final BooleanTensor y;
 
     public LogisticRegression(DoubleTensor x, BooleanTensor y, double regularization, double priorMu, double priorSigma) {
+        this.x = x;
         this.y = y;
+        this.priorMu = priorMu;
         this.priorSigma = priorSigma;
         this.regularization = regularization;
-        this.regression = new LinearRegression(x, y.toDoubleMask(), priorMu, priorSigma, regularizeSigma(x));
         this.net = buildModel();
-        this.regression.setNet(net);
     }
 
     public LogisticRegression(DoubleTensor x, BooleanTensor y) {
@@ -41,15 +42,10 @@ public class LogisticRegression implements ClassificationModel {
 
     @Override
     public BayesianNetwork buildModel() {
-        BayesianNetwork linearNetwork = regression.getNet();
-        DoubleVertex probabilities = (DoubleVertex) linearNetwork.getVertexByLabel(Y_LABEL).removeLabel();
+        BayesianNetwork net = LinearRegressionGraph.build(x, priorMu, priorSigma, regularizeSigma(x));
+        DoubleVertex probabilities = (DoubleVertex) net.getVertexByLabel(Y_LABEL).removeLabel();
         DoubleVertex sigmoid = probabilities.sigmoid().setLabel(Y_LABEL);
-        return new BayesianNetwork(sigmoid.getConnectedGraph());
-    }
-
-    @Override
-    public BayesianNetwork addObservationLayer(BayesianNetwork net) {
-        BernoulliVertex outcome = new BernoulliVertex(net.getVertexByLabel(Y_LABEL));
+        BernoulliVertex outcome = new BernoulliVertex(sigmoid);
         outcome.setLabel(Y_OBSERVATION_LABEL);
         return new BayesianNetwork(outcome.getConnectedGraph());
     }
