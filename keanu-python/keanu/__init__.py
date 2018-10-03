@@ -4,4 +4,3 @@ from keanu.inference import *
 from keanu.model import *
 from keanu.tensor import Const
 from keanu.context import *
-from keanu.utils import *
