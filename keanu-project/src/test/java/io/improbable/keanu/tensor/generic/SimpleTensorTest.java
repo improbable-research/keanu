@@ -31,7 +31,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[] {3, 3}
+            new int[]{3, 3}
         );
 
         assertEquals(Something.D, somethingTensor.getValue(1, 1));
@@ -46,7 +46,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[] {3, 3}
+            new int[]{3, 3}
         );
 
         assertEquals(Something.D, somethingTensor.getValue(1, 1));
@@ -65,7 +65,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[] {3, 3}
+            new int[]{3, 3}
         );
 
         Tensor<Something> reshapedSomething = somethingTensor.reshape(9, 1);
@@ -83,7 +83,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[] {3, 3}
+            new int[]{3, 3}
         );
 
         ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(somethingTensor);
@@ -102,7 +102,8 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[] {3, 3});
+            new int[]{3, 3}
+        );
 
         Tensor<Something> taddedSomethingRow = somethingTensor.slice(0, 1);
         assertArrayEquals(new int[]{1, 3}, taddedSomethingRow.getShape());
@@ -115,7 +116,7 @@ public class SimpleTensorTest {
 
     @Test
     public void isNullReturnsTrueIfNoDataIsSet() {
-        GenericTensor<Something> tensor = new GenericTensor<>(1, 1);
+        GenericTensor<Something> tensor = new GenericTensor<>(new int[] {1, 1});
         assertTrue(tensor.isNull());
     }
 
@@ -132,7 +133,7 @@ public class SimpleTensorTest {
                 Something.A, Something.A,
                 Something.C, Something.D,
             },
-            new int[] {2, 2});
+            new int[]{2, 2});
          DoubleTensor mask = tensor.equalsMask(Something.A);
          GenericTensor result = tensor.setWithMaskInPlace(mask, Something.B);
 
@@ -147,7 +148,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[] {3, 3});
+            new int[]{3, 3});
         DoubleTensor mask = DoubleTensor.scalar(1);
 
         thrown.expect(IllegalArgumentException.class);

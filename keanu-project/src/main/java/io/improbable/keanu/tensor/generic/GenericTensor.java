@@ -46,7 +46,7 @@ public class GenericTensor<T> implements Tensor<T> {
     /**
      * @param shape placeholder shape
      */
-    public GenericTensor(int... shape) {
+    public GenericTensor(int[] shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
