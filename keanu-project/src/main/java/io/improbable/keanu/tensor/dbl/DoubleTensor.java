@@ -137,11 +137,19 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor minus(double value);
 
+    default DoubleTensor doubleMinusThis(double value) {
+        return DoubleTensor.scalar(value).minus(this);
+    }
+
     DoubleTensor plus(double value);
 
     DoubleTensor times(double value);
 
     DoubleTensor div(double value);
+
+    default DoubleTensor doubleDivThis(double value) {
+        return DoubleTensor.scalar(value).div(this);
+    }
 
     DoubleTensor matrixMultiply(DoubleTensor value);
 

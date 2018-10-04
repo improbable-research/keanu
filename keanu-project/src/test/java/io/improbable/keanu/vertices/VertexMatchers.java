@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices;
 
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.nullValue;
 
@@ -58,6 +59,10 @@ public class VertexMatchers {
 
     public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(DATATYPE... values) {
         return hasValue(Arrays.stream(values).map(v -> equalTo(v)).collect(Collectors.toList()));
+    }
+
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasTensorValue(TENSOR tensor) {
+        return hasValue(TensorMatchers.tensorEqualTo(tensor));
     }
 
     public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(List<Matcher<DATATYPE>> valueMatcher) {

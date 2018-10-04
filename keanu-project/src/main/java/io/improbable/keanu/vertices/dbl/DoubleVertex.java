@@ -103,6 +103,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
+    public DoubleVertex doubleMinusThis(double that) {
+        return new ConstantDoubleVertex(that).minus(this);
+    }
+
+    @Override
     public DoubleVertex plus(double that) {
         return plus(new ConstantDoubleVertex(that));
     }
@@ -228,6 +233,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     @Override
     public DoubleVertex div(double that) {
         return divideBy(that);
+    }
+
+    @Override
+    public DoubleVertex doubleDivThis(double that) {
+        return new ConstantDoubleVertex(that).div(this);
     }
 
     @Override
