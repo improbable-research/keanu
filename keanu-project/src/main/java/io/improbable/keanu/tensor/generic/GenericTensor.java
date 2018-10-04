@@ -19,7 +19,7 @@ public class GenericTensor<T> implements Tensor<T> {
     private int[] shape;
     private int[] stride;
 
-    public GenericTensor(T[] data, int... shape) {
+    public GenericTensor(T[] data, int[] shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -27,6 +27,14 @@ public class GenericTensor<T> implements Tensor<T> {
         if (getLength() != data.length) {
             throw new IllegalArgumentException("Shape size does not match data length");
         }
+    }
+
+    public GenericTensor(T data, int[] shape) {
+        this.data = (T[]) (new Object[(int) TensorShape.getLength(shape)]);
+        Arrays.fill(this.data, data);
+
+        this.shape = Arrays.copyOf(shape, shape.length);
+        this.stride = TensorShape.getRowFirstStride(shape);
     }
 
     public GenericTensor(T scalar) {

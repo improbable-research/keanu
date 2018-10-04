@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -7,13 +8,12 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.DirichletVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.equalTo;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
-import static org.hamcrest.Matchers.lessThan;
 
 import java.util.Arrays;
 import java.util.LinkedHashMap;
@@ -22,6 +22,8 @@ import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import org.junit.rules.ExpectedException;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class CategoricalVertexTest {
     private static double epsilon = 0.01;
@@ -245,6 +247,37 @@ public class CategoricalVertexTest {
     }
 
     @Test
+    public void canSampleEvenIfRandomReturnsAValueGreaterThanTotalCumulativeProbability() {
+
+        KeanuRandom alwaysReturnsGreaterThan1 = mock(KeanuRandom.class);
+        when(alwaysReturnsGreaterThan1.nextDouble()).thenReturn(2.);
+
+        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(1.));
+
+        CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        Tensor<TestEnum> sample = categoricalVertex.sample(alwaysReturnsGreaterThan1);
+
+        assertThat(sample.scalar(), equalTo(TestEnum.A));
+    }
+
+    @Test
+    public void heterogeneousNonScalarTensorSelectableValuesCanProduceHeterogeneousNonScalarSample() {
+        KeanuRandom alwaysReturnsHalf = mock(KeanuRandom.class);
+        when(alwaysReturnsHalf.nextDouble()).thenReturn(0.5);
+
+        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(TestEnum.A, ConstantVertex.of(DoubleTensor.create(0., 1.)));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(DoubleTensor.create(1., 0.)));
+
+        CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        Tensor<TestEnum> sample = categoricalVertex.sample(alwaysReturnsHalf);
+
+        assertThat(sample.getValue(0, 0), equalTo(TestEnum.B));
+        assertThat(sample.getValue(0, 1), equalTo(TestEnum.A));
+    }
+
+    @Test
     public void logProbOfCategoryIsEquivalentToItsLogProbabilityDividedBySum() {
         double probA = 0.25;
         double probB = 0.75;
@@ -281,39 +314,20 @@ public class CategoricalVertexTest {
     }
 
     @Test
-    public void canObserveAGenericTensorAndInferItsProbabilities() {
+    public void canComputeLogProbOfNonScalarTensor() {
 
-        UniformVertex A = new UniformVertex(0., 1.);
-        UniformVertex B = new UniformVertex(0., 1.);
+        double[] aProbs = {0.1, 0.4, 0.8, 0.7};
+        double bProb = 0.2;
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(TestEnum.A, A);
-        selectableValues.put(TestEnum.B, B);
+        selectableValues.put(TestEnum.A, ConstantVertex.of(DoubleTensor.create(aProbs, 2, 2)));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(bProb));
+
         CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        GenericTensor<TestEnum> observation = new GenericTensor<>(new TestEnum[]{TestEnum.A, TestEnum.A, TestEnum.A, TestEnum.A}, 2, 2);
-        categoricalVertex.observe(observation);
-
-        DoubleTensor sampleA = A.sample();
-        DoubleTensor sampleB = B.sample();
-
-        assertThat(sampleB.scalar(), lessThan(sampleA.scalar()));
-    }
-
-    @Test
-    public void canComputeLogProbOfGenericTensor() {
-        Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
-
-        double[] chosenValues = {0.25, 0.1, 0.6, 0.5};
-
-        DoubleTensor probA = DoubleTensor.create(new double[]{chosenValues[0], chosenValues[1], 0.4, 0.5}, 2, 2);
-        selectableValues.put(TestEnum.A, ConstantVertex.of(probA));
-        selectableValues.put(TestEnum.B, ConstantVertex.of(DoubleTensor.create(new double[]{0.75, 0.9, chosenValues[2], chosenValues[3]}, 2, 2)));
-        CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
-
-        GenericTensor<TestEnum> value = new GenericTensor<>(new TestEnum[]{TestEnum.A, TestEnum.A, TestEnum.B, TestEnum.B}, 2, 2);
+        GenericTensor<TestEnum> value = new GenericTensor<>(TestEnum.A, new int[] {2, 2});
         double logProbA = categoricalVertex.logProb(value);
-        double expectedLogProb = Arrays.stream(chosenValues).map(Math::log).sum();
+        double expectedLogProb = Arrays.stream(aProbs).map(v -> Math.log(v / (v + bProb))).sum();
 
         assertThat(expectedLogProb, closeTo(logProbA, 1e-6));
     }
