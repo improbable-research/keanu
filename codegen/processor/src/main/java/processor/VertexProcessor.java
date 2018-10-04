@@ -24,8 +24,11 @@ import java.util.Map;
 
 class VertexProcessor {
 
+    final private static String TEMPLATE_FILE = "vertex.py.ftl";
+    final private static String GENERATED_FILE = "vertex.py";
+
     static void process(String dir) throws IOException, TemplateException {
-        File file = new File(dir + "vertex.py");
+        File file = new File(dir + GENERATED_FILE);
         if (file.exists() && (!file.delete() || !file.createNewFile())) {
             throw new FileNotFoundException("Couldn't regenerate file: " + file.getPath());
         }
@@ -40,10 +43,10 @@ class VertexProcessor {
     }
 
     private static void generateVertices(Configuration cfg, Writer fileWriter) throws IOException, TemplateException {
-        Template vertexTemplate = cfg.getTemplate("vertex.py.ftl");
+        Template vertexTemplate = cfg.getTemplate(TEMPLATE_FILE);
 
         Reflections reflections = new Reflections(new ConfigurationBuilder()
-            .setUrls(ClasspathHelper.forPackage("io.improbable.keanu"))
+            .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
 
         List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
@@ -54,16 +57,18 @@ class VertexProcessor {
         int index = 1;
 
         for (Constructor constructor : constructors) {
-            String str = String.valueOf(index);
             String javaClass = constructor.getDeclaringClass().getSimpleName();
 
-            input.put("package" + str, constructor.getDeclaringClass().getCanonicalName());
-            input.put("class" + str, javaClass);
-            input.put("py_class" + str, javaClass.replaceAll("Vertex$", ""));
+            input.put("package" + index, constructor.getDeclaringClass().getCanonicalName());
+            input.put("class" + index, javaClass);
+            input.put("py_class" + index, toPythonClass(javaClass));
 
             index++;
         }
         vertexTemplate.process(input, fileWriter);
     }
 
+    private static String toPythonClass(String javaClass) {
+        return javaClass.replaceAll("Vertex$", "");
+    }
 }
