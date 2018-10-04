@@ -46,7 +46,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     public GenericTensor(int[] shape, T value) {
-        this((T[]) fillArray(shape, value), shape);
+        this(fillArray(shape, value), shape);
     }
 
     private static <T> T[] fillArray(int[] shape, T value) {
