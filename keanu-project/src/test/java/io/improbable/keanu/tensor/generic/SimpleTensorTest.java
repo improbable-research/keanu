@@ -23,12 +23,12 @@ public class SimpleTensorTest {
         A, B, C, D
     }
 
-    Tensor<Something> tensorA;
-    DoubleTensor maskA;
+    Tensor<Something> tensor;
+    DoubleTensor mask;
 
     @Before
     public void setup() {
-        tensorA = new GenericTensor<>(
+        tensor = new GenericTensor<>(
             new Something[]{
                 Something.A, Something.B, Something.B,
                 Something.C, Something.D, Something.B,
@@ -36,7 +36,7 @@ public class SimpleTensorTest {
             },
             new int[]{3, 3}
         );
-        maskA = DoubleTensor.create(
+        mask = DoubleTensor.create(
             new double[] {
                 1., 1., 1.,
                 0., 0., 0.,
@@ -48,29 +48,29 @@ public class SimpleTensorTest {
 
     @Test
     public void canGetRandomAccessValue() {
-        assertEquals(Something.D, tensorA.getValue(1, 1));
+        assertEquals(Something.D, tensor.getValue(1, 1));
     }
 
     @Test
     public void canSetRandomAccessValue() {
-        assertEquals(Something.D, tensorA.getValue(1, 1));
+        assertEquals(Something.D, tensor.getValue(1, 1));
 
-        tensorA.setValue(Something.A, 1, 1);
+        tensor.setValue(Something.A, 1, 1);
 
-        assertEquals(Something.A, tensorA.getValue(1, 1));
+        assertEquals(Something.A, tensor.getValue(1, 1));
     }
 
     @Test
     public void canReshape() {
-        Tensor<Something> reshapedSomething = tensorA.reshape(9, 1);
+        Tensor<Something> reshapedSomething = tensor.reshape(9, 1);
 
         assertArrayEquals(new int[]{9, 1}, reshapedSomething.getShape());
-        assertArrayEquals(tensorA.asFlatArray(), reshapedSomething.asFlatArray());
+        assertArrayEquals(tensor.asFlatArray(), reshapedSomething.asFlatArray());
     }
 
     @Test
     public void canTake() {
-        ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(tensorA);
+        ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(tensor);
 
         GenericTakeVertex<Something> take = new GenericTakeVertex(somethingVertex, 0, 0);
 
@@ -79,39 +79,39 @@ public class SimpleTensorTest {
 
     @Test
     public void canSliceRankTwoTensor() {
-        Tensor<Something> taddedSomethingRow = tensorA.slice(0, 1);
+        Tensor<Something> taddedSomethingRow = tensor.slice(0, 1);
         assertArrayEquals(new int[]{1, 3}, taddedSomethingRow.getShape());
         assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
 
-        Tensor<Something> taddedSomethingColumn = tensorA.slice(1, 1);
+        Tensor<Something> taddedSomethingColumn = tensor.slice(1, 1);
         assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
     }
 
     @Test
     public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        DoubleTensor mask = DoubleTensor.scalar(1.);
+        DoubleTensor smallMask = DoubleTensor.scalar(1.);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensorA.getLength() + ", mask length: " + mask.getLength());
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + smallMask.getLength());
 
-        tensorA.setWithMaskInPlace(mask, Something.A);
+        tensor.setWithMaskInPlace(smallMask, Something.A);
     }
 
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        Tensor<Something> tensor = Tensor.scalar(Something.A);
-        DoubleTensor mask = DoubleTensor.create(new double[] {1., 1., 1., 1.}, 2, 2);
+        Tensor<Something> smallTensor = Tensor.scalar(Something.A);
+        DoubleTensor largerMask = DoubleTensor.create(new double[] {1., 1., 1., 1.}, 2, 2);
 
         thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + smallTensor.getLength() + ", mask length: " + largerMask.getLength());
 
-        tensor.setWithMaskInPlace(mask, Something.B);
+        smallTensor.setWithMaskInPlace(largerMask, Something.B);
     }
 
     @Test
     public void canSetWithMaskIfLengthOfMaskAndNonScalarTensorAreEqual() {
-        Tensor<Something> result = tensorA.setWithMask(maskA, Something.B);
+        Tensor<Something> result = tensor.setWithMask(mask, Something.B);
 
         assertArrayEquals(new Something[] {
             Something.B, Something.B, Something.B,
@@ -122,30 +122,31 @@ public class SimpleTensorTest {
 
     @Test
     public void canSetWithMaskInPlaceIfLengthOfMaskAndNonScalarTensorAreEqual() {
-        tensorA.setWithMaskInPlace(maskA, Something.B);
+        tensor.setWithMaskInPlace(mask, Something.B);
         assertArrayEquals(new Something[] {
             Something.B, Something.B, Something.B,
             Something.C, Something.D, Something.B,
             Something.B, Something.B, Something.B
-        }, tensorA.asFlatArray());
+        }, tensor.asFlatArray());
     }
 
     @Test
     public void canSetWithMaskInPlaceIfMaskAndTensorAreScalars() {
         Tensor<Something> scalarTensor = new GenericTensor<>(Something.A);
-        DoubleTensor mask = DoubleTensor.scalar(1.);
-        scalarTensor.setWithMaskInPlace(mask, Something.B);
+        DoubleTensor scalarMask = DoubleTensor.scalar(1.);
+        scalarTensor.setWithMaskInPlace(scalarMask, Something.B);
 
         assertTrue(scalarTensor.isScalar());
         assertEquals(Something.B, scalarTensor.scalar());
     }
 
     @Test
-    public void canSetWithMaskInPlaceIfTensorIsShapePlaceHolder() {
+    public void canSetWithMaskInPlaceIfTensorIsNonScalarShapePlaceHolder() {
         Tensor<Something> shapePlaceHolder = new GenericTensor<>(new int[] {3, 3});
 
+        assertFalse(shapePlaceHolder.isScalar());
         assertTrue(shapePlaceHolder.isShapePlaceholder());
-        shapePlaceHolder.setWithMaskInPlace(maskA, Something.B);
+        shapePlaceHolder.setWithMaskInPlace(mask, Something.B);
         assertFalse(shapePlaceHolder.isShapePlaceholder());
 
         assertArrayEquals(new Something[] {
@@ -155,4 +156,17 @@ public class SimpleTensorTest {
         }, shapePlaceHolder.asFlatArray());
     }
 
+
+    @Test
+    public void canSetWithMaskInPlaceIfTensorIsScalarShapePlaceHolder() {
+        Tensor<Something> shapePlaceHolder = new GenericTensor<>(new int[] {1, 1});
+        DoubleTensor scalarMask = DoubleTensor.scalar(1.);
+
+        assertTrue(shapePlaceHolder.isScalar());
+        assertTrue(shapePlaceHolder.isShapePlaceholder());
+        shapePlaceHolder.setWithMaskInPlace(scalarMask, Something.B);
+        assertFalse(shapePlaceHolder.isShapePlaceholder());
+
+        assertArrayEquals(new Something[] {Something.B}, shapePlaceHolder.asFlatArray());
+    }
 }
