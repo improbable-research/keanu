@@ -167,6 +167,7 @@ public class SimpleTensorTest {
         shapePlaceHolder.setWithMaskInPlace(scalarMask, Something.B);
         assertFalse(shapePlaceHolder.isShapePlaceholder());
 
-        assertArrayEquals(new Something[] {Something.B}, shapePlaceHolder.asFlatArray());
+        assertTrue(shapePlaceHolder.isScalar());
+        assertEquals(Something.B, shapePlaceHolder.scalar());
     }
 }
