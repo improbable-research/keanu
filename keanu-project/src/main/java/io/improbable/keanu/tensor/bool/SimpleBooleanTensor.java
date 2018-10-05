@@ -267,9 +267,9 @@ public class SimpleBooleanTensor implements BooleanTensor {
         if (this.isScalar()) {
             data[0] = mask.scalar() == 1.0 ? value : data[0];
         } else {
-            double[] flatArray = mask.asFlatDoubleArray();
-            for (int i = 0; i < flatArray.length; i++) {
-                if (flatArray[i] == 1.0) {
+            double[] maskFlat = mask.asFlatDoubleArray();
+            for (int i = 0; i < maskFlat.length; i++) {
+                if (maskFlat[i] == 1.0) {
                     data[i] = value;
                 }
             }
