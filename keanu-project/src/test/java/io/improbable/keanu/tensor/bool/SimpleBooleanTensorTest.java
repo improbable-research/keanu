@@ -7,7 +7,6 @@ import static junit.framework.TestCase.assertTrue;
 
 import java.util.Arrays;
 
-import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;

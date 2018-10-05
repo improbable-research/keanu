@@ -259,7 +259,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
         IntegerTensor tensor = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
-        DoubleTensor mask = DoubleTensor.scalar(1);
+        DoubleTensor mask = DoubleTensor.scalar(1.);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());

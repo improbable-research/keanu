@@ -775,6 +775,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         Nd4j.getExecutioner().exec(
             new CompareAndSet(tensor, maskDup, Conditions.notEquals(falseValue))
         );
+
         return this;
     }
 
