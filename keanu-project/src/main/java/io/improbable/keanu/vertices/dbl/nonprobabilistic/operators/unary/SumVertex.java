@@ -20,11 +20,26 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class SumVertex extends DoubleUnaryOpVertex {
 
-    private final int[] sumOverDimensions;
+    private final int[] overDimensions;
 
-    public SumVertex(DoubleVertex inputVertex, int[] sumOverDimensions) {
-        super(getSummationResultShape(inputVertex.getShape(), sumOverDimensions), inputVertex);
-        this.sumOverDimensions = sumOverDimensions;
+    /**
+     * Performs a sum across specified dimensions
+     *
+     * @param inputVertex    the vertex to have its values summed
+     * @param overDimensions dimensions to sum over
+     */
+    public SumVertex(DoubleVertex inputVertex, int[] overDimensions) {
+        super(getSummationResultShape(inputVertex.getShape(), overDimensions), inputVertex);
+        this.overDimensions = overDimensions;
+    }
+
+    /**
+     * Performs a sum across all dimensions
+     *
+     * @param inputVertex the vertex to have its values summed
+     */
+    public SumVertex(DoubleVertex inputVertex) {
+        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
     }
 
     /**
@@ -51,29 +66,20 @@ public class SumVertex extends DoubleUnaryOpVertex {
         return Ints.toArray(inputShapeList);
     }
 
-    /**
-     * Performs a sum across each value stored in a vertex
-     *
-     * @param inputVertex the vertex to have its values summed
-     */
-    public SumVertex(DoubleVertex inputVertex) {
-        this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
-    }
-
     @Override
     protected DoubleTensor op(DoubleTensor value) {
-        return value.sum(sumOverDimensions);
+        return value.sum(overDimensions);
     }
 
     @Override
     protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.sum(sumOverDimensions);
+        return dualNumber.sum(overDimensions);
     }
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        int[] wrtShape = summedOverShape(inputVertex.getShape(), sumOverDimensions);
+        int[] wrtShape = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
         PartialDerivatives reshapedDiffWrtSelf = new PartialDerivatives(new HashMap<>());
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
@@ -95,10 +101,10 @@ public class SumVertex extends DoubleUnaryOpVertex {
         return singletonMap(inputVertex, derivativesWrtInput);
     }
 
-    private int[] summedOverShape(int[] shape, int[] sumOverDimensions) {
+    private static int[] summedOverShapeWithoutRankLoss(int[] shape, int[] sumOverDimensions) {
         int[] shapeCopy = Arrays.copyOf(shape, shape.length);
-        for (int i = 0; i < sumOverDimensions.length; i++) {
-            shapeCopy[sumOverDimensions[i]] = 1;
+        for (int sumOverDimension : sumOverDimensions) {
+            shapeCopy[sumOverDimension] = 1;
         }
         return shapeCopy;
     }
