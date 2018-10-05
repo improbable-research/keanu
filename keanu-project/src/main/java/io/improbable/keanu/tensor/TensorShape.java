@@ -150,9 +150,9 @@ public class TensorShape {
             throw new IllegalArgumentException("to dimension must be less than from");
         }
 
-        int[] newShape = new int[to - from + 1];
+        int[] newShape = new int[to - from];
 
-        for (int i = 0; i < (to - from + 1); i++) {
+        for (int i = 0; i < (to - from); i++) {
             newShape[i] = shape[i + from];
         }
 

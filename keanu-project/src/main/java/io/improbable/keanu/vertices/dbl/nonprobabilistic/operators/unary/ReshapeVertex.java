@@ -34,7 +34,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
             int[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length - 1, partial.getShape()),
+                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
                 inputVertex.getShape()
             );
             DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);

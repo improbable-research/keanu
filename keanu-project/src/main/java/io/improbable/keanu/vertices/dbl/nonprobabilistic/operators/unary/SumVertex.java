@@ -80,7 +80,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
             DoubleTensor partial = partialDerivative.getValue();
 
             int[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length - 1, partial.getShape()),
+                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
                 wrtShape
             );
 

@@ -7,7 +7,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -59,23 +58,23 @@ public class PartialDerivatives {
 
     /**
      * This will sum partial derivatives that are represented as tensors over given dimensions.
-     * The dimensions that are summed over will be reshaped to a scalar shape of 1x1.
+     * The dimensions that are summed over will be reshaped to the specified resultShape.
      *
-     * @param sumOverDimensions dimensions to sum over
-     * @param resultShape       shape of sum result
-     * @param sumOfRank         the rank of the of part of the partials
+     * @param dimensions  dimensions to sum over
+     * @param resultShape shape of sum result
+     * @param ofRank      the rank of the "of" part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivatives sumOverOfDimensions(int[] sumOverDimensions, int[] resultShape, int sumOfRank) {
+    public PartialDerivatives sumOverOfDimensions(int[] dimensions, int[] resultShape, int ofRank) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
-            DoubleTensor summedV = v.sum(sumOverDimensions);
             int[] vShape = v.getShape();
-            int[] wrtShape = TensorShape.selectDimensions(sumOfRank, vShape.length - 1, vShape);
+            int[] wrtShape = TensorShape.selectDimensions(ofRank, vShape.length, vShape);
 
+            DoubleTensor summedV = v.sum(dimensions);
             int[] newShape = TensorShape.concat(resultShape, wrtShape);
             summedV = summedV.reshape(newShape);
 
@@ -87,19 +86,24 @@ public class PartialDerivatives {
 
     /**
      * This will sum partial derivatives that are represented as tensors over given dimensions.
-     * The dimensions that are summed over will be reshaped to a scalar shape of 1x1.
+     * The dimensions that are summed over will be reshaped to the specified resultShape.
      *
-     * @param wrtDimensions dimensions to sum over (should be last n dimensions)
+     * @param dimensions  dimensions to sum over
+     * @param resultShape shape of sum result
+     * @param wrtRank     the rank of the "wrt" part of the partials
      * @return summed and reshaped partials
      */
-    public PartialDerivatives sumOverWrtDimensions(int... wrtDimensions) {
+    public PartialDerivatives sumOverWrtDimensions(int[] dimensions, int[] resultShape, int wrtRank) {
         Map<VertexId, DoubleTensor> summed = cloneInfinitesimals(derivativeWithRespectTo);
 
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeWithRespectTo.entrySet()) {
             VertexId k = entry.getKey();
             DoubleTensor v = entry.getValue();
-            DoubleTensor summedV = v.sum(wrtDimensions);
-            int[] newShape = TensorShape.concat(summedV.getShape(), Tensor.SCALAR_SHAPE);
+            int[] vShape = v.getShape();
+            int[] ofShape = TensorShape.selectDimensions(0, v.getShape().length - wrtRank, vShape);
+
+            DoubleTensor summedV = v.sum(dimensions);
+            int[] newShape = TensorShape.concat(ofShape, resultShape);
             summedV = summedV.reshape(newShape);
 
             summed.put(k, summedV);
