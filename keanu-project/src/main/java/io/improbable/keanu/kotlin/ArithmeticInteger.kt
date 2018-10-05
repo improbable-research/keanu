@@ -15,13 +15,13 @@ import com.google.common.math.IntMath
  */
 data class ArithmeticInteger(val value: Int) : IntegerOperators<ArithmeticInteger> {
 
-    override fun minus(that: ArithmeticInteger) = ArithmeticInteger(value - that.value)
+    override fun minus(that: ArithmeticInteger) = this.minus(that.value)
 
-    override fun plus(that: ArithmeticInteger) = ArithmeticInteger(value + that.value)
+    override fun plus(that: ArithmeticInteger) = this.plus(that.value)
 
-    override fun times(that: ArithmeticInteger) = ArithmeticInteger(value * that.value)
+    override fun times(that: ArithmeticInteger) = this.times(that.value)
 
-    override fun div(that: ArithmeticInteger) = ArithmeticInteger(value / that.value)
+    override fun div(that: ArithmeticInteger) = this.div(that.value)
 
     override fun minus(value: Int) = ArithmeticInteger(this.value - value)
 
@@ -35,9 +35,9 @@ data class ArithmeticInteger(val value: Int) : IntegerOperators<ArithmeticIntege
 
     override fun intDivThis(that: Int) = ArithmeticInteger(that / this.value)
 
-    override fun unaryMinus() = ArithmeticInteger(value) * -1
+    override fun unaryMinus() = ArithmeticInteger(-this.value)
 
-    override fun pow(exponent: ArithmeticInteger) = ArithmeticInteger(IntMath.pow(this.value, exponent.value))
+    override fun pow(exponent: ArithmeticInteger) = this.pow(exponent.value);
 
     override fun pow(exponent: Int) = ArithmeticInteger(IntMath.pow(this.value, exponent))
 

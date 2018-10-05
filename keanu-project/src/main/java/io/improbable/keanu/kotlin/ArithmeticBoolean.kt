@@ -13,13 +13,13 @@ package io.improbable.keanu.kotlin
  */
 data class ArithmeticBoolean(val value: Boolean) : BooleanOperators<ArithmeticBoolean> {
 
-    override fun and(that: ArithmeticBoolean) = ArithmeticBoolean(this.value && that.value)
+    override fun and(that: ArithmeticBoolean) = this.and(that.value)
 
     override fun and(that: Boolean) = ArithmeticBoolean(this.value && that)
 
-    override fun or(that: ArithmeticBoolean) = ArithmeticBoolean(this.value || that.value)
+    override fun or(that: ArithmeticBoolean) = this.or(that.value)
 
-    override fun or(that: Boolean) = ArithmeticBoolean(this.value || value)
+    override fun or(that: Boolean) = ArithmeticBoolean(this.value || that)
 
     override fun not() = ArithmeticBoolean(!this.value)
 

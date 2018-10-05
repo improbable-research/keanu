@@ -15,7 +15,7 @@ data class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDoubl
 
     override fun exp() = ArithmeticDouble(Math.exp(this.value))
 
-    override fun pow(exponent: ArithmeticDouble) = ArithmeticDouble(Math.pow(this.value, exponent.value))
+    override fun pow(exponent: ArithmeticDouble) = this.pow(exponent.value)
 
     override fun pow(exponent: Double) = ArithmeticDouble(Math.pow(this.value, exponent))
 
@@ -29,13 +29,13 @@ data class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDoubl
 
     override fun acos() = ArithmeticDouble(Math.acos(this.value))
 
-    override fun minus(that: ArithmeticDouble) = ArithmeticDouble(value - that.value)
+    override fun minus(that: ArithmeticDouble) = this.minus(that.value)
 
-    override fun plus(that: ArithmeticDouble) = ArithmeticDouble(value + that.value)
+    override fun plus(that: ArithmeticDouble) = this.plus(that.value)
 
-    override fun times(that: ArithmeticDouble) = ArithmeticDouble(value * that.value)
+    override fun times(that: ArithmeticDouble) = this.times(that.value)
 
-    override fun div(that: ArithmeticDouble) = ArithmeticDouble(value / that.value)
+    override fun div(that: ArithmeticDouble) = this.div(that.value)
 
     override fun minus(that: Double) = ArithmeticDouble(this.value - that)
 
@@ -49,6 +49,6 @@ data class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDoubl
 
     override fun div(that: Double) = ArithmeticDouble(this.value / that)
 
-    override fun unaryMinus() = this * -1.0
+    override fun unaryMinus() = ArithmeticDouble(-this.value)
 
 }

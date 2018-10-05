@@ -3,7 +3,8 @@ package io.improbable.keanu.kotlin
 /**
  * Custom operators for booleans.
  *
- * Built-in operators (&&, ||) cannot be overridden so infix functions are used instead.
+ * Built-in binary operators (&&, ||) cannot be overridden so infix functions are used instead. [See this
+ * discussion for more info](https://discuss.kotlinlang.org/t/overloading-and-and-or-operators/1623/2).
  */
 interface BooleanOperators<T> {
 
@@ -22,5 +23,3 @@ interface BooleanOperators<T> {
 infix fun <T : BooleanOperators<T>> Boolean.and(that: T) = that.and(this)
 
 infix fun <T : BooleanOperators<T>> Boolean.or(that: T) = that.or(this)
-
-fun <T : BooleanOperators<T>> not(that: T) = that.not()

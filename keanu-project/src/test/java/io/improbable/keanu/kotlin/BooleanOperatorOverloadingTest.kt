@@ -57,14 +57,14 @@ class BooleanOperatorOverloadingTest {
     fun boolVertexPrefixOperators() {
         val boolVertex = ConstantBoolVertex(true)
 
-        TestCase.assertEquals(false, not(boolVertex).value.scalar())
+        TestCase.assertEquals(false, !boolVertex.value.scalar())
     }
 
     @Test
     fun arithmeticBooleanPrefixOperators() {
         val arithmeticBoolean = ArithmeticBoolean(true)
 
-        TestCase.assertEquals(false, not(arithmeticBoolean).value)
+        TestCase.assertEquals(false, !arithmeticBoolean.value)
     }
 
 }
