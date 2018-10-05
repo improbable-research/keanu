@@ -254,12 +254,12 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor setWithMask(Tensor<Double> mask, Boolean value) {
+    public BooleanTensor setWithMask(DoubleTensor mask, Boolean value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override
-    public BooleanTensor setWithMaskInPlace(Tensor<Double> mask, Boolean value) {
+    public BooleanTensor setWithMaskInPlace(DoubleTensor mask, Boolean value) {
         if (this.getLength() != mask.getLength()) {
             throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
         }

@@ -233,18 +233,18 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMaskInPlace(Tensor<Double> withMask, Integer valueToApply) {
-        if (withMask.isScalar()) {
-            this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
+    public IntegerTensor setWithMaskInPlace(DoubleTensor mask, Integer valueToApply) {
+        if (mask.isScalar()) {
+            this.value = mask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            return IntegerTensor.create(value, withMask.getShape())
-                .setWithMaskInPlace(withMask, valueToApply);
+            return IntegerTensor.create(value, mask.getShape())
+                .setWithMaskInPlace(mask, valueToApply);
         }
         return this;
     }
 
     @Override
-    public IntegerTensor setWithMask(Tensor<Double> mask, Integer value) {
+    public IntegerTensor setWithMask(DoubleTensor mask, Integer value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 

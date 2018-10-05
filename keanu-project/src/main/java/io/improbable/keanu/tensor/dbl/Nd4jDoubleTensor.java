@@ -422,7 +422,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(Tensor<Double> mask, Double value) {
+    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -754,7 +754,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(Tensor<Double> mask, Double value) {
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
         if (this.getLength() != mask.getLength()) {
             throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
         }
@@ -1029,7 +1029,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         }
     }
 
-    static public INDArray unsafeGetNd4J(Tensor<Double> that) {
+    static public INDArray unsafeGetNd4J(DoubleTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }

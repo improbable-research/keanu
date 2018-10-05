@@ -1,6 +1,7 @@
 package io.improbable.keanu.tensor;
 
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 import java.util.Arrays;
@@ -55,9 +56,9 @@ public interface Tensor<T> {
 
     Tensor<T> setValue(T value, int... index);
 
-    Tensor<T> setWithMask(Tensor<Double> mask, T value);
+    Tensor<T> setWithMask(DoubleTensor mask, T value);
 
-    Tensor<T> setWithMaskInPlace(Tensor<Double> mask, T value);
+    Tensor<T> setWithMaskInPlace(DoubleTensor mask, T value);
 
     T scalar();
 

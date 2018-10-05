@@ -92,10 +92,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor setValue(Integer value, int... index);
 
     @Override
-    IntegerTensor setWithMask(Tensor<Double> mask, Integer value);
+    IntegerTensor setWithMask(DoubleTensor mask, Integer value);
 
     @Override
-    IntegerTensor setWithMaskInPlace(Tensor<Double> mask, Integer value);
+    IntegerTensor setWithMaskInPlace(DoubleTensor mask, Integer value);
 
     @Override
     IntegerTensor reshape(int... newShape);

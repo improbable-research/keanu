@@ -152,7 +152,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMask(Tensor<Double> mask, Integer value) {
+    public IntegerTensor setWithMask(DoubleTensor mask, Integer value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
@@ -249,7 +249,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMaskInPlace(Tensor<Double> mask, Integer value) {
+    public IntegerTensor setWithMaskInPlace(DoubleTensor mask, Integer value) {
         if (this.getLength() != mask.getLength()) {
             throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
         }

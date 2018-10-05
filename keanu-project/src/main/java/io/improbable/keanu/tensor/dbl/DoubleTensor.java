@@ -289,10 +289,10 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor setAllInPlace(double value);
 
     @Override
-    DoubleTensor setWithMask(Tensor<Double> mask, Double value);
+    DoubleTensor setWithMask(DoubleTensor mask, Double value);
 
     @Override
-    DoubleTensor setWithMaskInPlace(Tensor<Double> mask, Double value);
+    DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value);
 
     // Comparisons
     BooleanTensor lessThan(double value);
