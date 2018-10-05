@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.intgr;
 
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
@@ -192,8 +191,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new int[]{2, 2});
         IntegerTensor scalarTwo = IntegerTensor.scalar(2);
 
-        Tensor maskFromMatrix = matrix.getGreaterThanMask(matrixTwos);
-        Tensor maskFromScalar = matrix.getGreaterThanMask(scalarTwo);
+        DoubleTensor maskFromMatrix = matrix.getGreaterThanMask(matrixTwos);
+        DoubleTensor maskFromScalar = matrix.getGreaterThanMask(scalarTwo);
 
         int[] expected = new int[]{0, 0, 1, 1};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -206,8 +205,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new int[]{2, 2});
         IntegerTensor scalarTWo = IntegerTensor.scalar(2);
 
-        Tensor maskFromMatrix = matrix.getGreaterThanOrEqualToMask(matrixTwos);
-        Tensor maskFromScalar = matrix.getGreaterThanOrEqualToMask(scalarTWo);
+        DoubleTensor maskFromMatrix = matrix.getGreaterThanOrEqualToMask(matrixTwos);
+        DoubleTensor maskFromScalar = matrix.getGreaterThanOrEqualToMask(scalarTWo);
 
         int[] expected = new int[]{0, 1, 1, 1};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -220,8 +219,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new int[]{2, 2});
         IntegerTensor scalarTwo = IntegerTensor.scalar(2);
 
-        Tensor maskFromMatrix = matrix.getLessThanMask(matrixTwos);
-        Tensor maskFromScalar = matrix.getLessThanMask(scalarTwo);
+        DoubleTensor maskFromMatrix = matrix.getLessThanMask(matrixTwos);
+        DoubleTensor maskFromScalar = matrix.getLessThanMask(scalarTwo);
 
         int[] expected = new int[]{1, 0, 0, 0};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -234,8 +233,8 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor matrixTwos = Nd4jIntegerTensor.create(2, new int[]{2, 2});
         IntegerTensor scalarTwo = IntegerTensor.scalar(2);
 
-        Tensor maskFromMatrix = matrix.getLessThanOrEqualToMask(matrixTwos);
-        Tensor maskFromScalar = matrix.getLessThanOrEqualToMask(scalarTwo);
+        DoubleTensor maskFromMatrix = matrix.getLessThanOrEqualToMask(matrixTwos);
+        DoubleTensor maskFromScalar = matrix.getLessThanOrEqualToMask(scalarTwo);
 
         int[] expected = new int[]{1, 1, 0, 0};
         assertArrayEquals(expected, maskFromMatrix.asFlatIntegerArray());
@@ -245,7 +244,7 @@ public class Nd4jIntegerTensorTest {
     @Test
     public void doesSetWithMask() {
         IntegerTensor matrix = Nd4jIntegerTensor.create(new int[]{-1, 2, 3, 4}, new int[]{2, 2});
-        Tensor mask = DoubleTensor.create(new double[]{1., 1., 0., 0.}, 2, 2);
+        DoubleTensor mask = DoubleTensor.create(new double[]{1., 1., 0., 0.}, 2, 2);
         int[] expected = new int[]{100, 100, 3, 4};
 
         IntegerTensor result = matrix.setWithMask(mask, 100);
