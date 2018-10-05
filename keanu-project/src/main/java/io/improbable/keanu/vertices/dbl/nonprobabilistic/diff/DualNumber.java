@@ -387,9 +387,9 @@ public class DualNumber implements DoubleOperators<DualNumber> {
     }
 
     public DualNumber sum(int[] overDimensions) {
-        DoubleTensor sumOfAll = value.sum(overDimensions);
+        DoubleTensor sumResult = value.sum(overDimensions);
         int operandRank = value.getRank();
-        return new DualNumber(sumOfAll, this.partialDerivatives.sumOverOfDimensions(overDimensions, sumOfAll.getShape(), operandRank));
+        return new DualNumber(sumResult, this.partialDerivatives.sumOverOfDimensions(overDimensions, sumResult.getShape(), operandRank));
     }
 
     public DualNumber reshape(int[] proposedShape) {

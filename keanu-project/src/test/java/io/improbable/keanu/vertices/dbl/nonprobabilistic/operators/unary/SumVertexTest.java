@@ -216,11 +216,11 @@ public class SumVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
-        DoubleVertex outputVertex = inputVertex.sum(0).reshape(2, 2)
+        DoubleVertex outputVertex = inputVertex.sum(0)
             .times(
-                inputVertex.sum(1).reshape(2, 2)
+                inputVertex.sum(1)
             ).times(
-                inputVertex.sum(2).reshape(2, 2)
+                inputVertex.sum(2)
             ).times(
                 inputVertex.sum()
             );

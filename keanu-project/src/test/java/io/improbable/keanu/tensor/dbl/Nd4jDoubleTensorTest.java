@@ -210,7 +210,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
         DoubleTensor tensor = Nd4jDoubleTensor.scalar(3);
-        DoubleTensor mask = Nd4jDoubleTensor.create(new double[]{1., 1., 1., 1.}, new int[]{2, 2});
+        DoubleTensor mask = Nd4jDoubleTensor.ones(2, 2);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
@@ -241,6 +241,8 @@ public class Nd4jDoubleTensorTest {
     public void canBroadcastMultiplyRank4ContainingVectorAndMatrix() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           a = np.array([1, 2, 3, 4, 5, 6, 7, 8]).reshape(2,2,2,1)
           b = np.array([1, 2, 3, 4]).reshape(2,2,1,1)
           ab = a * b
@@ -260,6 +262,8 @@ public class Nd4jDoubleTensorTest {
     public void canBroadcastMultiplyRank4ContainingMatrixAndMatrix() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6]).reshape(2,2,2,2)
           b = np.array([1, 2, 3, 4]).reshape(2,2,1,1)
           ab = a * b
@@ -287,6 +291,8 @@ public class Nd4jDoubleTensorTest {
     public void canBroadcastMultiplyRank5ContainingMatrixAndMatrix() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           a = np.array([
           1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
           6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
@@ -316,6 +322,8 @@ public class Nd4jDoubleTensorTest {
     public void canSuperBroadcast() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           a = np.zeros([2,2,2,2])
           b = np.array([1,0,1,0]).reshape(2,2)
           ab = a + b
@@ -410,6 +418,8 @@ public class Nd4jDoubleTensorTest {
     public void canBroadcastAdd() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           x = np.array([1,2,3]).reshape(3,1)
           s = np.array([-5, -2, -3, -7, -8, -5, -2, -3, -7, -8, -5, -2, -3, -7, -8]).reshape(3,5)
           sx = s + x
@@ -438,6 +448,8 @@ public class Nd4jDoubleTensorTest {
     public void canBroadcastSubtract() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           x = np.array([-1,-2,-3]).reshape(3,1)
           s = np.array([-5, -2, -3, -7, -8, -5, -2, -3, -7, -8, -5, -2, -3, -7, -8]).reshape(3,5)
           sx = s - x
@@ -467,6 +479,8 @@ public class Nd4jDoubleTensorTest {
     public void canBroadcastDivide() {
 
         /*
+          # test to make sure numpy returns same result
+          import numpy as np
           x = np.array([1,2,3]).reshape(3,1)
           s = np.array([5, 2, 3, 7, 8, 5, 2, 3, 7, 8, 5, 2, 3, 7, 8]).reshape(3,5)
           sx = s / x

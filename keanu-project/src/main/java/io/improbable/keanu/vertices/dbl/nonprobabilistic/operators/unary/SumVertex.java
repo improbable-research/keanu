@@ -79,7 +79,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        int[] wrtShape = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
+        int[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
         PartialDerivatives reshapedDiffWrtSelf = new PartialDerivatives(new HashMap<>());
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
@@ -87,7 +87,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
 
             int[] newPartialShape = TensorShape.concat(
                 TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
-                wrtShape
+                wrtShapeWithoutRankLoss
             );
 
             DoubleTensor reshapedPartialDerivative = partialDerivative.getValue().reshape(newPartialShape);
@@ -96,7 +96,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
         }
 
         PartialDerivatives derivativesWrtInput = reshapedDiffWrtSelf
-            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShape);
+            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShapeWithoutRankLoss);
 
         return singletonMap(inputVertex, derivativesWrtInput);
     }
