@@ -255,6 +255,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         }
 
         INDArray maskDup = Nd4jDoubleTensor.unsafeGetNd4J(mask).dup();
+
         if (value == 0.0) {
             INDArray swapOnesForZeros = maskDup.rsubi(1.0);
             tensor.muli(swapOnesForZeros);

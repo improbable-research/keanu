@@ -188,7 +188,7 @@ public class SimpleBooleanTensorTest {
     }
 
     @Test
-    public void canSetWithMaskIfLengthOfMaskAndTensorAreEqual() {
+    public void canSetWithMaskIfLengthOfMaskAndNonScalarTensorAreEqual() {
         DoubleTensor mask = DoubleTensor.create(new double[] {1., 1., 0., 0.}, 2, 2);
         BooleanTensor result = matrixA.setWithMask(mask, false);
         assertArrayEquals(new Boolean[] {false, false, true, false}, result.asFlatArray());

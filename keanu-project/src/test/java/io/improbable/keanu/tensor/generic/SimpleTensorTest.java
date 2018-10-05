@@ -110,7 +110,7 @@ public class SimpleTensorTest {
     }
 
     @Test
-    public void canSetWithMaskIfLengthOfMaskAndTensorAreEqual() {
+    public void canSetWithMaskIfLengthOfMaskAndNonScalarTensorAreEqual() {
         Tensor<Something> result = tensorA.setWithMask(maskA, Something.B);
 
         assertArrayEquals(new Something[] {

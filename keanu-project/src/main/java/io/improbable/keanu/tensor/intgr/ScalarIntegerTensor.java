@@ -237,7 +237,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            return (IntegerTensor) IntegerTensor.create(value, withMask.getShape())
+            return IntegerTensor.create(value, withMask.getShape())
                 .setWithMaskInPlace(withMask, valueToApply);
         }
         return this;
@@ -245,7 +245,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setWithMask(Tensor<Double> mask, Integer value) {
-        return (IntegerTensor) duplicate().setWithMaskInPlace(mask, value);
+        return duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override

@@ -11,5 +11,4 @@ public class INDArrayExtensions {
         Transforms.floor(Transforms.abs(tensorToDropFractionOn, false), false).muli(sign);
         return tensorToDropFractionOn;
     }
-
 }
