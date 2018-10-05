@@ -92,6 +92,12 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor setValue(Integer value, int... index);
 
     @Override
+    IntegerTensor setWithMask(DoubleTensor mask, Integer value);
+
+    @Override
+    IntegerTensor setWithMaskInPlace(DoubleTensor mask, Integer value);
+
+    @Override
     IntegerTensor reshape(int... newShape);
 
     @Override
@@ -130,18 +136,6 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor unaryMinus();
 
     IntegerTensor abs();
-
-    IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis);
-
-    IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanThis);
-
-    IntegerTensor getLessThanMask(IntegerTensor lessThanThis);
-
-    IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanThis);
-
-    IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value);
-
-    IntegerTensor setWithMask(IntegerTensor mask, Integer value);
 
     IntegerTensor apply(Function<Integer, Integer> function);
 

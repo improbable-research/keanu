@@ -8,14 +8,19 @@ import static junit.framework.TestCase.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.junit.rules.ExpectedException;
 
 public class SimpleBooleanTensorTest {
+
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
 
     BooleanTensor matrixA;
     BooleanTensor matrixB;
@@ -160,4 +165,48 @@ public class SimpleBooleanTensorTest {
         assertArrayEquals(new int[]{4, 1}, reshaped.getShape());
     }
 
+    @Test
+    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
+        DoubleTensor mask = DoubleTensor.scalar(1.);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + matrixA.getLength() + ", mask length: " + mask.getLength());
+
+        matrixA.setWithMaskInPlace(mask, false);
+    }
+
+    @Test
+    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
+        BooleanTensor tensor = BooleanTensor.scalar(false);
+        DoubleTensor mask = DoubleTensor.create(new double[] {1., 1., 1., 1.}, 2, 2);
+
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
+
+        tensor.setWithMaskInPlace(mask, false);
+    }
+
+    @Test
+    public void canSetWithMaskIfLengthOfMaskAndNonScalarTensorAreEqual() {
+        DoubleTensor mask = DoubleTensor.create(new double[] {1., 1., 0., 0.}, 2, 2);
+        BooleanTensor result = matrixA.setWithMask(mask, false);
+        assertArrayEquals(new Boolean[] {false, false, true, false}, result.asFlatArray());
+    }
+
+    @Test
+    public void canSetWithMaskInPlaceIfLengthOfMaskAndNonScalarTensorAreEqual() {
+        DoubleTensor mask = DoubleTensor.create(new double[] {1., 1., 0., 0.}, 2, 2);
+        matrixA.setWithMaskInPlace(mask, false);
+        assertArrayEquals(new Boolean[] {false, false, true, false}, matrixA.asFlatArray());
+    }
+
+    @Test
+    public void canSetWithMaskInPlaceIfMaskAndTensorAreScalars() {
+        BooleanTensor scalarTensor = BooleanTensor.scalar(false);
+        DoubleTensor mask = DoubleTensor.scalar(1.);
+        scalarTensor.setWithMaskInPlace(mask, true);
+
+        assertTrue(scalarTensor.isScalar());
+        assertTrue(scalarTensor.allTrue());
+    }
 }

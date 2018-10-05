@@ -1029,7 +1029,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         }
     }
 
-    static INDArray unsafeGetNd4J(DoubleTensor that) {
+    static public INDArray unsafeGetNd4J(DoubleTensor that) {
         if (that.isScalar()) {
             return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
         }

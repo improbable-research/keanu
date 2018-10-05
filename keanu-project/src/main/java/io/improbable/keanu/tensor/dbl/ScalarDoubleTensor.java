@@ -318,12 +318,12 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, Double valueToApply) {
-        if (withMask.isScalar()) {
-            this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
+    public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double valueToApply) {
+        if (mask.isScalar()) {
+            this.value = mask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            return DoubleTensor.create(value, withMask.getShape())
-                .setWithMaskInPlace(withMask, valueToApply);
+            return DoubleTensor.create(value, mask.getShape())
+                .setWithMaskInPlace(mask, valueToApply);
         }
         return this;
     }

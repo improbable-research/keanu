@@ -254,6 +254,30 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor setWithMask(DoubleTensor mask, Boolean value) {
+        return duplicate().setWithMaskInPlace(mask, value);
+    }
+
+    @Override
+    public BooleanTensor setWithMaskInPlace(DoubleTensor mask, Boolean value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
+
+        if (this.isScalar()) {
+            data[0] = mask.scalar() == 1.0 ? value : data[0];
+        } else {
+            double[] maskFlat = mask.asFlatDoubleArray();
+            for (int i = 0; i < maskFlat.length; i++) {
+                if (maskFlat[i] == 1.0) {
+                    data[i] = value;
+                }
+            }
+        }
+        return this;
+    }
+
+    @Override
     public Boolean scalar() {
         return data[0];
     }

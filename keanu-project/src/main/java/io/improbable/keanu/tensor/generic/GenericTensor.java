@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import static java.util.Arrays.copyOf;
 
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -70,6 +71,34 @@ public class GenericTensor<T> implements Tensor<T> {
     @Override
     public GenericTensor<T> setValue(T value, int... index) {
         data[getFlatIndex(shape, stride, index)] = value;
+        return this;
+    }
+
+    @Override
+    public Tensor<T> setWithMask(DoubleTensor mask, T value) {
+        return duplicate().setWithMaskInPlace(mask, value);
+    }
+
+    @Override
+    public Tensor<T> setWithMaskInPlace(DoubleTensor mask, T value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
+
+        if (this.isShapePlaceholder()) {
+            data = (T[]) new Object[(int) getLength()];
+        }
+        if (this.isScalar()) {
+            data[0] = mask.scalar() == 1.0 ? value : data[0];
+        } else {
+            double[] maskFlat = mask.asFlatDoubleArray();
+            for (int i = 0; i < maskFlat.length; i++) {
+                if (maskFlat[i] == 1.) {
+                    data[i] = value;
+                }
+            }
+        }
+
         return this;
     }
 
