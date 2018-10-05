@@ -193,9 +193,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
+    public DoubleTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
         if (greaterThanThis.isScalar()) {
-            return new ScalarIntegerTensor(value > greaterThanThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value > greaterThanThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, greaterThanThis.getShape())
                 .getGreaterThanMask(greaterThanThis);
@@ -203,9 +203,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
+    public DoubleTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
         if (greaterThanOrEqualToThis.isScalar()) {
-            return new ScalarIntegerTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value >= greaterThanOrEqualToThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, greaterThanOrEqualToThis.getShape())
                 .getGreaterThanOrEqualToMask(greaterThanOrEqualToThis);
@@ -213,9 +213,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor getLessThanMask(IntegerTensor lessThanThis) {
+    public DoubleTensor getLessThanMask(IntegerTensor lessThanThis) {
         if (lessThanThis.isScalar()) {
-            return new ScalarIntegerTensor(value < lessThanThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value < lessThanThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, lessThanThis.getShape())
                 .getLessThanMask(lessThanThis);
@@ -223,9 +223,9 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualsThis) {
+    public DoubleTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualsThis) {
         if (lessThanOrEqualsThis.isScalar()) {
-            return new ScalarIntegerTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
+            return new ScalarDoubleTensor(value <= lessThanOrEqualsThis.scalar() ? 1 : 0);
         } else {
             return IntegerTensor.create(value, lessThanOrEqualsThis.getShape())
                 .getLessThanOrEqualToMask(lessThanOrEqualsThis);
@@ -233,19 +233,19 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMaskInPlace(IntegerTensor withMask, Integer valueToApply) {
+    public IntegerTensor setWithMaskInPlace(Tensor<Double> withMask, Integer valueToApply) {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
-            return IntegerTensor.create(value, withMask.getShape())
+            return (IntegerTensor) IntegerTensor.create(value, withMask.getShape())
                 .setWithMaskInPlace(withMask, valueToApply);
         }
         return this;
     }
 
     @Override
-    public IntegerTensor setWithMask(IntegerTensor mask, Integer value) {
-        return duplicate().setWithMaskInPlace(mask, value);
+    public IntegerTensor setWithMask(Tensor<Double> mask, Integer value) {
+        return (IntegerTensor) duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override

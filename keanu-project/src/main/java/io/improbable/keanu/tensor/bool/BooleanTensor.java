@@ -72,6 +72,12 @@ public interface BooleanTensor extends Tensor<Boolean> {
 
     <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue);
 
+    @Override
+    BooleanTensor setWithMask(Tensor<Double> mask, Boolean value);
+
+    @Override
+    BooleanTensor setWithMaskInPlace(Tensor<Double> mask, Boolean value);
+
     BooleanTensor andInPlace(BooleanTensor that);
 
     BooleanTensor orInPlace(BooleanTensor that);

@@ -18,10 +18,10 @@ public class ChangeValueTo<DATATYPE, TENSOR extends Tensor<DATATYPE>> implements
         if (tensor instanceof DoubleTensor) {
             Double value = (Double) this.value;
             DoubleTensor mask = result.not().toDoubleMask();
-            tensor = (TENSOR) ((DoubleTensor) tensor).setWithMask(mask, value);
+            tensor = (TENSOR) (((DoubleTensor) tensor).setWithMask(mask, value));
         } else if (tensor instanceof IntegerTensor) {
             Integer value = (Integer) this.value;
-            IntegerTensor mask = result.not().toIntegerMask();
+            DoubleTensor mask = result.not().toDoubleMask();
             tensor = (TENSOR) ((IntegerTensor) tensor).setWithMask(mask, value);
         } else {
             throw new ClassCastException("Cannot handle tensor of type " + tensor.getClass().getSimpleName());

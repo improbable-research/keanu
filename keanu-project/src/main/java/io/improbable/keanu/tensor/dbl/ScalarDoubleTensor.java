@@ -318,7 +318,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMaskInPlace(DoubleTensor withMask, Double valueToApply) {
+    public DoubleTensor setWithMaskInPlace(Tensor<Double> withMask, Double valueToApply) {
         if (withMask.isScalar()) {
             this.value = withMask.scalar() == 1.0 ? valueToApply : this.value;
         } else {
@@ -329,7 +329,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setWithMask(DoubleTensor mask, Double value) {
+    public DoubleTensor setWithMask(Tensor<Double> mask, Double value) {
         return this.duplicate().setWithMaskInPlace(mask, value);
     }
 

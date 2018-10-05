@@ -152,12 +152,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor setWithMask(IntegerTensor mask, Integer value) {
+    public IntegerTensor setWithMask(Tensor<Double> mask, Integer value) {
         return duplicate().setWithMaskInPlace(mask, value);
     }
 
     @Override
-    public IntegerTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
+    public DoubleTensor getGreaterThanMask(IntegerTensor greaterThanThis) {
 
         INDArray mask = tensor.dup();
 
@@ -176,11 +176,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             );
         }
 
-        return new Nd4jIntegerTensor(mask);
+        return new Nd4jDoubleTensor(mask);
     }
 
     @Override
-    public IntegerTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
+    public DoubleTensor getGreaterThanOrEqualToMask(IntegerTensor greaterThanOrEqualToThis) {
 
         INDArray mask = tensor.dup();
 
@@ -199,11 +199,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             );
         }
 
-        return new Nd4jIntegerTensor(mask);
+        return new Nd4jDoubleTensor(mask);
     }
 
     @Override
-    public IntegerTensor getLessThanMask(IntegerTensor lessThanThis) {
+    public DoubleTensor getLessThanMask(IntegerTensor lessThanThis) {
 
         INDArray mask = tensor.dup();
 
@@ -222,11 +222,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             );
         }
 
-        return new Nd4jIntegerTensor(mask);
+        return new Nd4jDoubleTensor(mask);
     }
 
     @Override
-    public IntegerTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualToThis) {
+    public DoubleTensor getLessThanOrEqualToMask(IntegerTensor lessThanOrEqualToThis) {
 
         INDArray mask = tensor.dup();
 
@@ -245,17 +245,16 @@ public class Nd4jIntegerTensor implements IntegerTensor {
             );
         }
 
-        return new Nd4jIntegerTensor(mask);
+        return new Nd4jDoubleTensor(mask);
     }
 
     @Override
-    public IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value) {
+    public IntegerTensor setWithMaskInPlace(Tensor<Double> mask, Integer value) {
         if (this.getLength() != mask.getLength()) {
             throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
         }
 
-        INDArray maskDup = unsafeGetNd4J(mask).dup();
-
+        INDArray maskDup = Nd4jDoubleTensor.unsafeGetNd4J(mask).dup();
         if (value == 0.0) {
             INDArray swapOnesForZeros = maskDup.rsubi(1.0);
             tensor.muli(swapOnesForZeros);

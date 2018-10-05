@@ -29,17 +29,13 @@ public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> ext
     
     T abs();
 
-    T getGreaterThanMask(T greaterThanThis);
+    DoubleTensor getGreaterThanMask(T greaterThanThis);
 
-    T getGreaterThanOrEqualToMask(T greaterThanThis);
+    DoubleTensor getGreaterThanOrEqualToMask(T greaterThanThis);
 
-    T getLessThanMask(T lessThanThis);
+    DoubleTensor getLessThanMask(T lessThanThis);
 
-    T getLessThanOrEqualToMask(T lessThanThis);
-
-    T setWithMaskInPlace(T mask, N value);
-
-    T setWithMask(T mask, N value);
+    DoubleTensor getLessThanOrEqualToMask(T lessThanThis);
 
     T apply(Function<N, N> function);
     

@@ -26,13 +26,13 @@ public class ScalarDoubleTensorTest {
 
 
     @Before
-    public void enableDebugModeForNaNChecking() throws Exception {
+    public void enableDebugModeForNaNChecking() {
         TensorValidator.NAN_CATCHER.enable();
         TensorValidator.NAN_FIXER.enable();
     }
 
     @After
-    public void disableDebugModeForNaNChecking() throws Exception {
+    public void disableDebugModeForNaNChecking() {
         TensorValidator.NAN_CATCHER.disable();
         TensorValidator.NAN_FIXER.disable();
     }

@@ -74,6 +74,34 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
+    public Tensor<T> setWithMask(Tensor<Double> mask, T value) {
+        return duplicate().setWithMaskInPlace(mask, value);
+    }
+
+    @Override
+    public Tensor<T> setWithMaskInPlace(Tensor<Double> mask, T value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
+
+        if (this.isShapePlaceholder()) {
+            data = (T[]) new Object[(int) getLength()];
+        }
+        if (this.isScalar()) {
+            data[0] = mask.scalar() == 1.0 ? value : data[0];
+        } else {
+            double[] flatArray = mask.asFlatDoubleArray();
+            for (int i = 0; i < flatArray.length; i++) {
+                if (flatArray[i] == 1.) {
+                    data[i] = value;
+                }
+            }
+        }
+
+        return this;
+    }
+
+    @Override
     public T scalar() {
         return data[0];
     }

@@ -55,6 +55,10 @@ public interface Tensor<T> {
 
     Tensor<T> setValue(T value, int... index);
 
+    Tensor<T> setWithMask(Tensor<Double> mask, T value);
+
+    Tensor<T> setWithMaskInPlace(Tensor<Double> mask, T value);
+
     T scalar();
 
     Tensor<T> duplicate();
