@@ -6,6 +6,8 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
+import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
@@ -29,16 +32,14 @@ public class Nd4jDoubleTensorTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor scalarA;
     Nd4jDoubleTensor vectorA;
     Nd4jDoubleTensor vectorB;
     Nd4jDoubleTensor rankThreeTensor;
-
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setup() {
@@ -66,14 +67,14 @@ public class Nd4jDoubleTensorTest {
     public void youCannotCreateARankZeroTensor() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Tensors must have rank >=2 : []");
-        DoubleTensor.create(new double[] {}, new int[] {});
+        DoubleTensor.create(new double[]{}, new int[]{});
     }
 
     @Test
     public void youCannotCreateARankOneTensor() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        DoubleTensor.create(new double[] {1, 2, 3, 4, 5}, new int[] {5});
+        DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, new int[]{5});
     }
 
     @Test
@@ -637,6 +638,48 @@ public class Nd4jDoubleTensorTest {
 
         assertArrayEquals(new double[]{1, 2, 1, 4}, min.asFlatDoubleArray(), 1e-6);
         assertArrayEquals(new double[]{2, 3, 3, 4}, max.asFlatDoubleArray(), 1e-6);
+    }
+
+    @Test
+    public void canArgFindMaxOfVector() {
+        DoubleTensor tensor = DoubleTensor.create(1, 3, 4, 5, 2);
+
+        assertThat(tensor.argMax(), isScalarWithValue(3));
+        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.zeros(5).reshape(5)));
+        assertThat(tensor.argMax(1), isScalarWithValue(3));
+    }
+
+    @Test
+    public void argMaxReturnsIndexOfFirstMax() {
+        DoubleTensor tensor = DoubleTensor.create(1, 5, 5, 5, 5);
+
+        assertThat(tensor.argMax(), isScalarWithValue(1));
+    }
+
+    @Test
+    public void canFindArgMaxOfMatrix() {
+        DoubleTensor tensor = DoubleTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+
+        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.create(1, 0, 0, 0).reshape(4)));
+        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(2, 0).reshape(2)));
+        assertThat(tensor.argMax(), isScalarWithValue(2));
+    }
+
+    @Test
+    public void canFindArgMaxOfHighRank() {
+        DoubleTensor tensor = DoubleTensor.arange(0, 512).reshape(2, 8, 4, 2, 4);
+
+        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.ones(8, 4, 2, 4)));
+        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(7, new int[]{2, 4, 2, 4})));
+        assertThat(tensor.argMax(2), tensorEqualTo(IntegerTensor.create(3, new int[]{2, 8, 2, 4})));
+        assertThat(tensor.argMax(3), tensorEqualTo(IntegerTensor.ones(2, 8, 4, 4)));
+        assertThat(tensor.argMax(), isScalarWithValue(511));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void argMaxFailsForAxisTooHigh() {
+        DoubleTensor tensor = DoubleTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
+        tensor.argMax(2);
     }
 
     private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {

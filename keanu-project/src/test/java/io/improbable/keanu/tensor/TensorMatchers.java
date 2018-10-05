@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -88,6 +89,10 @@ public class TensorMatchers {
                 description.appendText("Tensor with value ").appendValue(valueMatchers);
             }
         };
+    }
+
+    public static <T> Matcher<Tensor<T>> tensorEqualTo(Tensor<T> tensor) {
+        return both(TensorMatchers.elementwiseEqualTo(tensor)).and(hasShape(tensor.getShape()));
     }
 
     public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {

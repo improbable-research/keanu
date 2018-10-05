@@ -48,6 +48,19 @@ public class TensorShapeValidation {
     }
 
     /**
+     * Check if the given dimension exists within the shape
+     *
+     * @param dimension Proposed dimension
+     * @param shape Shape to check
+     * @throws IllegalArgumentException if the dimension exceeds the rank of the shape
+     */
+    public static void checkDimensionExistsInShape(int dimension, int[] shape) {
+        if (dimension > shape.length - 1) {
+            throw new IllegalArgumentException(String.format("Dimension %d does not exist in tensor of rank %d", dimension, shape.length));
+        }
+    }
+
+    /**
      * This ensures there is at most a single non-scalar shape.
      *
      * @param shapes the tensors for shape checking

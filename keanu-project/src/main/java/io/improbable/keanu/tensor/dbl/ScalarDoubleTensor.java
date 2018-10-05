@@ -11,6 +11,7 @@ import org.apache.commons.math3.util.FastMath;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
@@ -365,6 +366,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     @Override
     public double min() {
         return value;
+    }
+
+    @Override
+    public IntegerTensor argMax() {
+        return IntegerTensor.scalar(0);
+    }
+
+    @Override
+    public IntegerTensor argMax(int axis) {
+        TensorShapeValidation.checkDimensionExistsInShape(axis, this.getShape());
+        return IntegerTensor.create(0).reshape(1);
     }
 
     @Override
@@ -795,41 +807,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return new SimpleDoubleFlattenedView(value);
     }
 
-    private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
-
-        private double value;
-
-        public SimpleDoubleFlattenedView(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public long size() {
-            return 1;
-        }
-
-        @Override
-        public Double get(long index) {
-            if (index != 0) {
-                throw new IndexOutOfBoundsException();
-            }
-            return value;
-        }
-
-        @Override
-        public Double getOrScalar(long index) {
-            return value;
-        }
-
-        @Override
-        public void set(long index, Double value) {
-            if (index != 0) {
-                throw new IndexOutOfBoundsException();
-            }
-            this.value = value;
-        }
-    }
-
     @Override
     public double[] asFlatDoubleArray() {
         return new double[]{value};
@@ -869,5 +846,40 @@ public class ScalarDoubleTensor implements DoubleTensor {
             "data = [" + value + "]" +
             "\nshape = " + Arrays.toString(shape) +
             "\n}";
+    }
+
+    private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
+
+        private double value;
+
+        public SimpleDoubleFlattenedView(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public long size() {
+            return 1;
+        }
+
+        @Override
+        public Double get(long index) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            return value;
+        }
+
+        @Override
+        public Double getOrScalar(long index) {
+            return value;
+        }
+
+        @Override
+        public void set(long index, Double value) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            this.value = value;
+        }
     }
 }

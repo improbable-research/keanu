@@ -1,10 +1,8 @@
 package io.improbable.keanu.tensor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
-import com.google.common.primitives.Ints;
+import org.apache.commons.lang3.ArrayUtils;
 
 public class TensorShape {
 
@@ -12,29 +10,6 @@ public class TensorShape {
 
     public TensorShape(int[] shape) {
         this.shape = Arrays.copyOf(shape, shape.length);
-    }
-
-    public int[] getShape() {
-        return Arrays.copyOf(shape, shape.length);
-    }
-
-    public boolean isScalar() {
-        return isScalar(shape);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        TensorShape that = (TensorShape) o;
-
-        return Arrays.equals(shape, that.shape);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.hashCode(shape);
     }
 
     /**
@@ -158,7 +133,7 @@ public class TensorShape {
 
         return newShape;
     }
-    
+
     public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
     }
@@ -189,5 +164,38 @@ public class TensorShape {
         return newShape;
     }
 
+    /**
+     * Removes a dimension from a shape
+     *
+     * @param shape     the shape to remove the dimension from
+     * @param dimension the dimension to remove
+     * @return the shape without the given dimension
+     */
+    public static int[] argMaxShape(int[] shape, int dimension) {
+        return ArrayUtils.remove(shape, dimension);
+    }
+
+    public int[] getShape() {
+        return Arrays.copyOf(shape, shape.length);
+    }
+
+    public boolean isScalar() {
+        return isScalar(shape);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        TensorShape that = (TensorShape) o;
+
+        return Arrays.equals(shape, that.shape);
+    }
+
+    @Override
+    public int hashCode() {
+        return Arrays.hashCode(shape);
+    }
 }
 
