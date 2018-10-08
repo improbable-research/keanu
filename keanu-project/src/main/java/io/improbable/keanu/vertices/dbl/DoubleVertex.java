@@ -189,6 +189,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SumVertex(this);
     }
 
+    public DoubleVertex sum(int... sumOverDimensions) {
+        return new SumVertex(this, sumOverDimensions);
+    }
+
     public DoubleVertex reshape(int... proposedShape) {
         return new ReshapeVertex(this, proposedShape);
     }

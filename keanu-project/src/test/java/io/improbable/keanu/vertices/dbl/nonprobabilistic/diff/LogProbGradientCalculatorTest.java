@@ -115,7 +115,7 @@ public class LogProbGradientCalculatorTest {
         double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
-        assertArrayEquals(new int[]{1, 1, 1, 1}, dBLogProbWrtAValue.getShape());
+        assertArrayEquals(new int[]{1, 1}, dBLogProbWrtAValue.getShape());
         assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtCValue, equalTo(expectedDLogProbWrtC));
     }
