@@ -12,8 +12,6 @@ class BayesNet(JavaObjectWrapper):
 
 
 java_import(k, "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
-java_import(k, "io.improbable.keanu.algorithms.mcmc.Hamiltonian")
-java_import(k, "io.improbable.keanu.algorithms.mcmc.NUTS")
 
 
 class InferenceAlgorithm:
@@ -30,13 +28,3 @@ class InferenceAlgorithm:
 class MetropolisHastings(InferenceAlgorithm):
     def __init__(self):
         super(MetropolisHastings, self).__init__(k.MetropolisHastings)
-
-
-class Hamiltonian(InferenceAlgorithm):
-    def __init__(self):
-        super(Hamiltonian, self).__init__(k.Hamiltonian)
-
-
-class Nuts(InferenceAlgorithm):
-    def __init__(self):
-        super(Nuts, self).__init__(k.NUTS)
