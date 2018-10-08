@@ -5,9 +5,17 @@ task pytest {
     doLast {
         exec {
             commandLine 'python', '--version'
+        }
+        exec {
             commandLine 'pip', '--version'
+        }
+        exec {
             commandLine 'pip', 'install', 'pipenv'
-            commandLine 'pipenv', 'install',  '--dev'
+        }
+        exec {
+            commandLine 'pipenv', 'install', '--dev'
+        }
+        exec {
             commandLine 'pipenv', 'run', 'pytest'
         }
     }
