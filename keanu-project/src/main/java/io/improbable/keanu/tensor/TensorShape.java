@@ -165,13 +165,24 @@ public class TensorShape {
     }
 
     /**
-     * Removes a dimension from a shape
+     * Removes a dimension from a shape, guaranteeing that the resultant shape is at least rank 2. A row vector (1xN) is
+     * returned when removing a dimension would result in lower than rank 2.
      *
-     * @param shape     the shape to remove the dimension from
      * @param dimension the dimension to remove
+     * @param shape     the shape to remove the dimension from
      * @return the shape without the given dimension
      */
-    public static int[] argMaxShape(int[] shape, int dimension) {
+    public static int[] removeDimensionSafe(int dimension, int[] shape) {
+        TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
+
+        if (shape.length == 1) {
+            return new int[]{1, shape[0]};
+        }
+
+        if (shape.length == 2) {
+            return new int[]{1, dimension == 1 ? shape[0] : shape[1]};
+        }
+
         return ArrayUtils.remove(shape, dimension);
     }
 

@@ -641,28 +641,37 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
-    public void canArgFindMaxOfVector() {
-        DoubleTensor tensor = DoubleTensor.create(1, 3, 4, 5, 2);
+    public void canFindArgMaxOfRowVector() {
+        DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2);
 
-        assertThat(tensor.argMax(), isScalarWithValue(3));
-        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.zeros(5).reshape(5)));
-        assertThat(tensor.argMax(1), isScalarWithValue(3));
+        assertEquals(3, tensorRow.argMax());
+        assertThat(tensorRow.argMax(0), tensorEqualTo(IntegerTensor.zeros(5)));
+        assertThat(tensorRow.argMax(1), isScalarWithValue(3));
+    }
+
+    @Test
+    public void canFindArgMaxOfColumnVector() {
+        DoubleTensor tensorCol = DoubleTensor.create(1, 3, 4, 5, 2).reshape(5, 1);
+
+        assertEquals(3, tensorCol.argMax());
+        assertThat(tensorCol.argMax(0), isScalarWithValue(3));
+        assertThat(tensorCol.argMax(1), tensorEqualTo(IntegerTensor.zeros(5)));
     }
 
     @Test
     public void argMaxReturnsIndexOfFirstMax() {
         DoubleTensor tensor = DoubleTensor.create(1, 5, 5, 5, 5);
 
-        assertThat(tensor.argMax(), isScalarWithValue(1));
+        assertEquals(tensor.argMax(), 1);
     }
 
     @Test
     public void canFindArgMaxOfMatrix() {
         DoubleTensor tensor = DoubleTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
 
-        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.create(1, 0, 0, 0).reshape(4)));
-        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(2, 0).reshape(2)));
-        assertThat(tensor.argMax(), isScalarWithValue(2));
+        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.create(1, 0, 0, 0)));
+        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(2, 0)));
+        assertEquals(2, tensor.argMax());
     }
 
     @Test
@@ -673,7 +682,7 @@ public class Nd4jDoubleTensorTest {
         assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(7, new int[]{2, 4, 2, 4})));
         assertThat(tensor.argMax(2), tensorEqualTo(IntegerTensor.create(3, new int[]{2, 8, 2, 4})));
         assertThat(tensor.argMax(3), tensorEqualTo(IntegerTensor.ones(2, 8, 4, 4)));
-        assertThat(tensor.argMax(), isScalarWithValue(511));
+        assertEquals(511, tensor.argMax());
     }
 
     @Test(expected = IllegalArgumentException.class)

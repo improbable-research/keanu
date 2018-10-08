@@ -47,10 +47,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, int[] shape) {
-        this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
         this.tensor = tensor;
     }
 
@@ -187,15 +188,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public IntegerTensor argMax() {
-        return new Nd4jIntegerTensor(tensor.argMax());
+    public int argMax() {
+        return tensor.argMax().getInt(0);
     }
 
     @Override
     public IntegerTensor argMax(int axis) {
         int[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        return new Nd4jIntegerTensor(tensor.argMax(axis)).reshape(TensorShape.argMaxShape(shape, axis));
+        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape)));
     }
 
     @Override
@@ -890,8 +891,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(slice);
     }
 
-    // Comparisons
-
     /**
      * @param dimension      the dimension to slice on
      * @param splitAtIndices the indices that the dimension to slice on should be slice on
@@ -948,6 +947,8 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
         return splits;
     }
+
+    // Comparisons
 
     @Override
     public BooleanTensor lessThan(double value) {

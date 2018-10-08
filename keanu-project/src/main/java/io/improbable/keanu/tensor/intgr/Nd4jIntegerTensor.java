@@ -487,15 +487,15 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor argMax() {
-        return new Nd4jIntegerTensor(tensor.argMax());
+    public int argMax() {
+        return tensor.argMax().getInt(0);
     }
 
     @Override
     public IntegerTensor argMax(int axis) {
         int[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
-        return new Nd4jIntegerTensor(tensor.argMax(axis)).reshape(TensorShape.argMaxShape(shape, axis));
+        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape)));
     }
 
     @Override

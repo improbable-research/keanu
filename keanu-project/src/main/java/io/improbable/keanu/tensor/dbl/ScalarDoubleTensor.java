@@ -369,14 +369,14 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public IntegerTensor argMax() {
-        return IntegerTensor.scalar(0);
+    public int argMax() {
+        return 0;
     }
 
     @Override
     public IntegerTensor argMax(int axis) {
         TensorShapeValidation.checkDimensionExistsInShape(axis, this.getShape());
-        return IntegerTensor.create(0).reshape(1);
+        return IntegerTensor.scalar(0);
     }
 
     @Override
