@@ -51,7 +51,6 @@ public class SliceVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-
         boolean needReshape = this.getValue().getRank() == inputVertex.getValue().getRank();
         return derivativeOfParentWithRespectToInputs.slice(dimension, index, needReshape);
     }

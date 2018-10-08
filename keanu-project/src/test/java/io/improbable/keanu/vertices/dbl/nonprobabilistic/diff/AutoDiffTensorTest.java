@@ -28,9 +28,9 @@ public class AutoDiffTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        PartialDerivatives dualNumber = output.getDerivativeWrtLatents();
+        PartialDerivatives derivative = output.getDerivativeWrtLatents();
 
-        DoubleTensor wrtA = dualNumber.withRespectTo(A);
+        DoubleTensor wrtA = derivative.withRespectTo(A);
 
         DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 16, 36, 64})
             .diag()
@@ -54,9 +54,9 @@ public class AutoDiffTensorTest {
 
         DoubleVertex output = prod2.plus(5).times(2);
 
-        PartialDerivatives dualNumber = output.getDerivativeWrtLatents();
+        PartialDerivatives derivative = output.getDerivativeWrtLatents();
 
-        DoubleTensor wrtA = dualNumber.withRespectTo(A);
+        DoubleTensor wrtA = derivative.withRespectTo(A);
 
         DoubleTensor expectedWrt = DoubleTensor.create(new double[]{4, 16, 36, 64}).reshape(1, 4, 1, 1);
 
@@ -72,9 +72,9 @@ public class AutoDiffTensorTest {
 
         DoubleVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();
 
-        PartialDerivatives dualNumber = B.getDerivativeWrtLatents();
+        PartialDerivatives derivative = B.getDerivativeWrtLatents();
 
-        DoubleTensor wrtA = dualNumber.withRespectTo(A);
+        DoubleTensor wrtA = derivative.withRespectTo(A);
 
         //B = 1*(a00 + a01 + a10 + a11) + 2*(a00 + a01 + a10 + a11)+ 3*(a00 + a01 + a10 + a11)+ 4*(a00 + a01 + a10 + a11)
         //dBda00 = 1 + 2 + 3 + 4 = 10

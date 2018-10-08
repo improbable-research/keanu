@@ -270,11 +270,11 @@ public class ConcatenationVertexTest {
         DoubleVertex d = a.plus(b);
 
         ConcatenationVertex concat = new ConcatenationVertex(0, c, d);
-        DoubleTensor dualNumberValue = concat.eval();
+        DoubleTensor concatResult = concat.eval();
 
         Assert.assertArrayEquals(
             new double[]{50, 90, 140, 200, 15, 21, 27, 33},
-            dualNumberValue.asFlatDoubleArray(),
+            concatResult.asFlatDoubleArray(),
             0.0001
         );
     }

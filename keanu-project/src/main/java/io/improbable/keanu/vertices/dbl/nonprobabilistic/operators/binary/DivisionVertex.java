@@ -42,7 +42,6 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
 
         // dc = (B * da - A * db) / B^2;
-        DoubleTensor newValue = this.getValue();
         PartialDerivatives thisInfMultiplied;
         PartialDerivatives thatInfMultiplied;
         PartialDerivatives newInf;

@@ -29,7 +29,6 @@ public class SumVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-
         int[] resultDims = TensorShape.dimensionRange(0, inputVertex.getValue().getRank());
         return derivativeOfParentWithRespectToInputs.sumOverOfDimensions(resultDims);
     }
