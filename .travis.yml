@@ -7,5 +7,5 @@ addons:
   sonarcloud:
     organization: "improbable-keanu"
 script:
-  - ./gradlew clean build -i
+  - ./gradlew clean keanu-python:build -i
   - 'if [[ ! -z $SONAR_TOKEN ]]; then sonar-scanner; fi'

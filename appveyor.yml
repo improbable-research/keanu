@@ -2,4 +2,4 @@ version: 1.0.{build}
 environment:
   PYTHON: 3.6
 build_script:
-- cmd: ./gradlew.bat clean build -i
+- cmd: ./gradlew.bat clean keanu-python:build -i
