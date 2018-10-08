@@ -13,7 +13,20 @@ task pytest {
             commandLine 'pip', 'install', 'pipenv'
         }
         exec {
+            // temporary workaround for https://github.com/pypa/pipenv/issues/2924
+            // (pip 18.1 broke pipenv)
+            commandLine 'pipenv', 'run', 'pip', 'install', 'pip==18.0', '--three'
+        }
+        exec {
             commandLine 'pipenv', 'install', '--dev', '--three'
+        }
+        exec {
+            // NB: the python version inside pipenv is not necessarily the same as the version outside pipenv
+            commandLine 'pipenv', 'run', 'python', '--version'
+        }
+        exec {
+            // NB: the pip version inside pipenv is not necessarily the same as the version outside pipenv
+            commandLine 'pipenv', 'run', 'pip', '--version'
         }
         exec {
             commandLine 'pipenv', 'run', 'pytest'
