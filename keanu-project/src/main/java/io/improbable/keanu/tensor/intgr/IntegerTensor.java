@@ -117,7 +117,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor minus(IntegerTensor that);
 
-    default IntegerTensor intMinusThis(int that) {
+    default IntegerTensor reverseMinus(int that) {
         return this.unaryMinus().plus(that);
     }
 
@@ -131,7 +131,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor div(IntegerTensor that);
 
-    default IntegerTensor intDivThis(int that) {
+    default IntegerTensor reverseDiv(int that) {
         return IntegerTensor.scalar(that).div(this);
     }
 

@@ -25,7 +25,7 @@ data class ArithmeticInteger(val value: Int) : IntegerOperators<ArithmeticIntege
 
     override fun minus(value: Int) = ArithmeticInteger(this.value - value)
 
-    override fun intMinusThis(that: Int) = ArithmeticInteger(that - this.value)
+    override fun reverseMinus(that: Int) = ArithmeticInteger(that - this.value)
 
     override fun plus(value: Int) = ArithmeticInteger(this.value + value)
 
@@ -33,7 +33,7 @@ data class ArithmeticInteger(val value: Int) : IntegerOperators<ArithmeticIntege
 
     override fun div(value: Int) = ArithmeticInteger(this.value / value)
 
-    override fun intDivThis(that: Int) = ArithmeticInteger(that / this.value)
+    override fun reverseDiv(that: Int) = ArithmeticInteger(that / this.value)
 
     override fun unaryMinus() = ArithmeticInteger(-this.value)
 

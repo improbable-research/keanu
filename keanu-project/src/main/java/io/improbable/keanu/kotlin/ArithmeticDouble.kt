@@ -39,13 +39,13 @@ data class ArithmeticDouble(val value: Double) : DoubleOperators<ArithmeticDoubl
 
     override fun minus(that: Double) = ArithmeticDouble(this.value - that)
 
-    override fun doubleMinusThis(that: Double) = ArithmeticDouble(that - this.value)
+    override fun reverseMinus(that: Double) = ArithmeticDouble(that - this.value)
 
     override fun plus(that: Double) = ArithmeticDouble(this.value + that)
 
     override fun times(that: Double) = ArithmeticDouble(this.value * that)
 
-    override fun doubleDivThis(that: Double) = ArithmeticDouble(that / this.value)
+    override fun reverseDiv(that: Double) = ArithmeticDouble(that / this.value)
 
     override fun div(that: Double) = ArithmeticDouble(this.value / that)
 

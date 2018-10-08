@@ -137,7 +137,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor minus(double value);
 
-    default DoubleTensor doubleMinusThis(double value) {
+    default DoubleTensor reverseMinus(double value) {
         return DoubleTensor.scalar(value).minus(this);
     }
 
@@ -147,7 +147,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor div(double value);
 
-    default DoubleTensor doubleDivThis(double value) {
+    default DoubleTensor reverseDiv(double value) {
         return DoubleTensor.scalar(value).div(this);
     }
 

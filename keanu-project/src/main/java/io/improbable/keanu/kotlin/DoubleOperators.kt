@@ -10,7 +10,7 @@ interface DoubleOperators<T> : NumberOperators<T> {
     /**
      * @return that - this
      */
-    fun doubleMinusThis(that: Double): T
+    fun reverseMinus(that: Double): T
 
     operator fun times(that: Double): T
 
@@ -19,7 +19,7 @@ interface DoubleOperators<T> : NumberOperators<T> {
     /**
      * @return that / this
      */
-    fun doubleDivThis(that: Double): T
+    fun reverseDiv(that: Double): T
 
     fun pow(exponent: Double): T
 
@@ -39,11 +39,11 @@ interface DoubleOperators<T> : NumberOperators<T> {
 
 operator fun <T : DoubleOperators<T>> Double.plus(that: T) = that + this
 
-operator fun <T : DoubleOperators<T>> Double.minus(that: T) = that.doubleMinusThis(this)
+operator fun <T : DoubleOperators<T>> Double.minus(that: T) = that.reverseMinus(this)
 
 operator fun <T : DoubleOperators<T>> Double.times(that: T) = that * this
 
-operator fun <T : DoubleOperators<T>> Double.div(that: T) = that.doubleDivThis(this)
+operator fun <T : DoubleOperators<T>> Double.div(that: T) = that.reverseDiv(this)
 
 fun <T : DoubleOperators<T>> pow(base: T, exponent: T) = base.pow(exponent)
 
