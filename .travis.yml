@@ -1,9 +1,15 @@
-language: java
-jdk:
-  - oraclejdk8
-addons:
-  sonarcloud:
-    organization: "improbable-keanu"
-script:
-  - ./gradlew clean build -i
-  - 'if [[ ! -z $SONAR_TOKEN ]]; then sonar-scanner; fi'
+matrix:
+  include:
+    - language: java
+      jdk:
+        - oraclejdk8
+      addons:
+        sonarcloud:
+          organization: "improbable-keanu"
+      script:
+        - ./gradlew clean build -x keanu-python -i
+        - 'if [[ ! -z $SONAR_TOKEN ]]; then sonar-scanner; fi'
+    - language: python
+      python: 3.6
+      script:
+        - ./gradlew keanu-python:clean keanu-python:build -i
