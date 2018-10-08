@@ -13,6 +13,7 @@ import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOp
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 public class Nd4jBroadcastTensorTest {
 
@@ -42,7 +43,7 @@ public class Nd4jBroadcastTensorTest {
         assertTimesInPlaceOperationEquals(rank4, matrix, expected);
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void canBroadcastMultiplyToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -53,12 +54,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1, 2, 6, 8, 3, 6, 12, 16}, new int[]{2, 2, 2});
+        DoubleTensor expectedAB = Nd4jDoubleTensor.create(new double[]{1, 2, 6, 8, 3, 6, 12, 16}, new int[]{2, 2, 2});
 
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
+        assertTimesOperationEquals(rank3, matrix, expectedAB);
+        assertTimesInPlaceOperationEquals(rank3, matrix, expectedAB);
     }
 
     @Test
@@ -72,12 +73,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1,  4,  9, 16}, new int[]{1, 2, 2});
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1, 4, 9, 16}, new int[]{1, 2, 2});
 
-        assertTimesOperationEquals(rank4, matrix, expected);
-        assertTimesInPlaceOperationEquals(rank4, matrix, expected);
+        assertTimesOperationEquals(rank3, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -207,7 +208,7 @@ public class Nd4jBroadcastTensorTest {
         assertEquals(expected, diff);
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void canBroadcastAddToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -274,7 +275,7 @@ public class Nd4jBroadcastTensorTest {
         assertEquals(expected, diff);
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void canBroadcastSubtractToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -341,7 +342,7 @@ public class Nd4jBroadcastTensorTest {
         assertEquals(expected, diff);
     }
 
-    @Test
+    @Test(expected = AssertionError.class)
     public void canBroadcastDivideToHigherRankWithDimensionsOfOneTailing() {
 
         /*
