@@ -1,24 +1,29 @@
 assemble.dependsOn(":shadowJar")
 assemble.dependsOn(":codegen:processor:codeGen")
 
-task pytest {
+task installPipenv {
     doLast {
-        exec {
-            commandLine 'python', '--version'
-        }
-        exec {
-            commandLine 'pip', '--version'
-        }
         exec {
             commandLine 'pip', 'install', 'pipenv'
         }
         exec {
             // temporary workaround for https://github.com/pypa/pipenv/issues/2924
             // (pip 18.1 broke pipenv)
-            commandLine 'pipenv', 'run', 'pip', 'install', 'pip==18.0', '--three'
+            commandLine 'pipenv', 'run', 'pip', 'install', 'pip==18.0'
         }
         exec {
             commandLine 'pipenv', 'install', '--dev', '--three'
+        }
+    }
+}
+
+task pythonVersionInfo {
+    doLast {
+        exec {
+            commandLine 'python', '--version'
+        }
+        exec {
+            commandLine 'pip', '--version'
         }
         exec {
             // NB: the python version inside pipenv is not necessarily the same as the version outside pipenv
@@ -28,6 +33,10 @@ task pytest {
             // NB: the pip version inside pipenv is not necessarily the same as the version outside pipenv
             commandLine 'pipenv', 'run', 'pip', '--version'
         }
+    }
+}
+task pytest {
+    doLast {
         exec {
             commandLine 'pipenv', 'run', 'pytest'
         }
@@ -35,3 +44,6 @@ task pytest {
 }
 
 test.dependsOn(pytest)
+pytest.dependsOn(installPipenv)
+pytest.dependsOn(pythonVersionInfo)
+pythonVersionInfo.mustRunAfter(installPipenv)
