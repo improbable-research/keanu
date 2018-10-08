@@ -6,22 +6,12 @@ from keanu.base import KeanuContext, Vertex
 k = KeanuContext().jvm_view()
 
 
-<#macro imports count>
-    <#list 1..count as n>
-        <#nested n>
-    </#list>
-</#macro>
-<#macro constructors count>
-    <#list 1..count as n>
-        <#nested n>
-    </#list>
-</#macro>
-<@imports count="${size}"?number ; n>
-java_import(k, "${.vars["package" + n]}")
-</@imports>
-<@constructors count="${size}"?number ; n>
+<#list imports as import>
+java_import(k, "${import.packageName}")
+</#list>
+<#list constructors as constructor>
 
 
-def ${.vars["py_class" + n]}(*args) -> k.${.vars["class" + n]}:
-    return Vertex(k.${.vars["class" + n]}, args)
-</@constructors>
+def ${constructor.pythonClass}(*args) -> k.${constructor.javaClass}:
+    return Vertex(k.${constructor.javaClass}, args)
+</#list>

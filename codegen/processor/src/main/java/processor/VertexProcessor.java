@@ -4,6 +4,7 @@ import annotation.ExportVertexToPythonBindings;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import lombok.Getter;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;
 import org.reflections.scanners.TypeAnnotationsScanner;
@@ -28,47 +29,77 @@ class VertexProcessor {
     final private static String GENERATED_FILE = "vertex.py";
 
     static void process(String dir) throws IOException, TemplateException {
+        Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
+        cfg.setClassForTemplateLoading(Runner.class, "/");
+        Template fileTemplate = cfg.getTemplate(TEMPLATE_FILE);
+
         File file = new File(dir + GENERATED_FILE);
         if (file.exists() && (!file.delete() || !file.createNewFile())) {
             throw new FileNotFoundException("Couldn't regenerate file: " + file.getPath());
         }
         Writer fileWriter = new FileWriter(file, true);
 
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
-        cfg.setClassForTemplateLoading(Runner.class, "/");
-
-        generateVertices(cfg, fileWriter);
+        generateFile(fileTemplate, fileWriter);
 
         fileWriter.close();
     }
 
-    private static void generateVertices(Configuration cfg, Writer fileWriter) throws IOException, TemplateException {
-        Template vertexTemplate = cfg.getTemplate(TEMPLATE_FILE);
+    private static void generateFile(Template fileTemplate, Writer fileWriter) throws IOException, TemplateException {
+        List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors();
+        Map<String, Object> dataModel = buildDataModel(constructors);
+        fileTemplate.process(dataModel, fileWriter);
+    }
 
-        Reflections reflections = new Reflections(new ConfigurationBuilder()
+    private static List<Constructor> getSortedListOfAnnotatedVertexConstructors() {
+         Reflections reflections = new Reflections(new ConfigurationBuilder()
             .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
             .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
 
         List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
         constructors.sort(Comparator.comparing(Constructor::getName));
 
-        Map<String, Object> input = new HashMap<>();
-        input.put("size", constructors.size());
-        int index = 1;
+        return constructors;
+    }
+
+    private static Map<String, Object> buildDataModel(List<Constructor> constructors) {
+        Map<String, Object> root = new HashMap<>();
+        List<Import> imports = new ArrayList<>();
+        List<Konstructor> konstructors = new ArrayList<>();
+        root.put("imports", imports);
+        root.put("constructors", konstructors);
 
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
 
-            input.put("package" + index, constructor.getDeclaringClass().getCanonicalName());
-            input.put("class" + index, javaClass);
-            input.put("py_class" + index, toPythonClass(javaClass));
-
-            index++;
+            imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
+            konstructors.add(new Konstructor(javaClass, toPythonClass(javaClass)));
         }
-        vertexTemplate.process(input, fileWriter);
+
+        return root;
     }
 
     private static String toPythonClass(String javaClass) {
         return javaClass.replaceAll("Vertex$", "");
+    }
+
+    public static class Import {
+        @Getter
+        private String packageName;
+
+        Import(String packageName) {
+            this.packageName = packageName;
+        }
+    }
+
+    public static class Konstructor {
+        @Getter
+        private String javaClass;
+        @Getter
+        private String pythonClass;
+
+        Konstructor(String javaClass, String pythonClass) {
+            this.javaClass = javaClass;
+            this.pythonClass = pythonClass;
+        }
     }
 }
