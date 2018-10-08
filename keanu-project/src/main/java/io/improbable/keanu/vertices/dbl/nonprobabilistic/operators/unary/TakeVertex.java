@@ -46,11 +46,12 @@ public class TakeVertex extends DoubleUnaryOpVertex {
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
             int[] newPartialShape = TensorShape.concat(
-                TensorShape.selectDimensions(0, partial.getRank() - getShape().length - 1, partial.getShape()),
+                TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
                 inputVertex.getShape()
             );
             DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
-            DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial);
+            int[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
+            DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
             DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
             DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);
             reshapedDerivatives.put(inputVertex, new PartialDerivatives(partialDerivative.getKey(), highRankMask));
