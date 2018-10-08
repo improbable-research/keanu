@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import org.apache.commons.lang3.NotImplementedException;
 import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 import java.util.Arrays;

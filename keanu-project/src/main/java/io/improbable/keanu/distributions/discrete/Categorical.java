@@ -22,7 +22,7 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
 
     public Tensor<T> sample(int[] shape, KeanuRandom random) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
-        if (!sumOfProbabilities.lessThanOrEqual(0.).allFalse()) {
+        if (containsNonPositiveEntry(sumOfProbabilities)) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
 
@@ -54,15 +54,20 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
 
     public DoubleTensor logProb(Tensor<T> x) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
-        if (!sumOfProbabilities.lessThanOrEqual(0.).allFalse()) {
+        if (containsNonPositiveEntry(sumOfProbabilities)) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
 
         DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
-            logProb.plusInPlace(x.elementwiseEquals(Tensor.create(entry.getKey(), x.getShape())).toDoubleMask().timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
+            DoubleTensor xEqualToEntryKeyMask = x.elementwiseEquals(Tensor.create(entry.getKey(), x.getShape())).toDoubleMask();
+            logProb.plusInPlace(xEqualToEntryKeyMask.timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
         }
         return logProb;
+    }
+
+    private boolean containsNonPositiveEntry(DoubleTensor sumOfProbabilities) {
+        return !sumOfProbabilities.lessThanOrEqual(0.).allFalse();
     }
 
     private DoubleTensor getSumOfProbabilities(int[] shape) {
