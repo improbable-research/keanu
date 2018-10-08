@@ -70,6 +70,14 @@ public class SumVertexTest {
     }
 
     @Test
+    public void doesSumScalarCorrectly() {
+        DoubleVertex a = new UniformVertex(0, 10);
+        a.setValue(2);
+
+        assertArrayEquals(new int[]{1, 1}, a.sum(0).getShape());
+    }
+
+    @Test
     public void doesSumAllSimpleAutoDiff() {
         DoubleVertex a = new UniformVertex(new int[]{2, 2, 2}, 0, 10);
         a.setValue(a.sample());

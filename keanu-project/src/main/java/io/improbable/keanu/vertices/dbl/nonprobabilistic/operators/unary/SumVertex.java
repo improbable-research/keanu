@@ -42,17 +42,25 @@ public class SumVertex extends DoubleUnaryOpVertex {
         this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
     }
 
+    private static int[] getSummationResultShape(int[] inputShape, int[] sumOverDimensions) {
+        List<Integer> inputShapeList = new ArrayList<>(Ints.asList(inputShape));
+
+        zeroOutSummedDimensions(inputShapeList, sumOverDimensions);
+
+        return removeZerosWhenRankGreaterThan2(inputShapeList);
+    }
+
+    private static void zeroOutSummedDimensions(List<Integer> inputShapeList, int[] sumOverDimensions) {
+        for (int dim : sumOverDimensions) {
+            inputShapeList.set(dim, 0);
+        }
+    }
+
     /**
      * This is here due to strange behavior in tensor summing over dimensions where
      * dimensions are not dropped if the rank is 2 or less.
      */
-    private static int[] getSummationResultShape(int[] inputShape, int[] sumOverDimensions) {
-        List<Integer> inputShapeList = new ArrayList<>(Ints.asList(inputShape));
-
-        for (int dim : sumOverDimensions) {
-            inputShapeList.set(dim, 0);
-        }
-
+    private static int[] removeZerosWhenRankGreaterThan2(List<Integer> inputShapeList) {
         for (int i = inputShapeList.size() - 1; i >= 0; i--) {
             if (inputShapeList.get(i) == 0) {
                 if (inputShapeList.size() > 2) {
@@ -81,6 +89,17 @@ public class SumVertex extends DoubleUnaryOpVertex {
 
         int[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
+        PartialDerivatives partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputsWithRespectToSelf);
+
+        PartialDerivatives derivativesWrtInput = partialDueToSummationShapeChange
+            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShapeWithoutRankLoss);
+
+        return singletonMap(inputVertex, derivativesWrtInput);
+    }
+
+    private PartialDerivatives getPartialDueToSummationShapeChange(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+
+        int[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
         PartialDerivatives reshapedDiffWrtSelf = new PartialDerivatives(new HashMap<>());
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
@@ -95,10 +114,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
             reshapedDiffWrtSelf.putWithRespectTo(partialDerivative.getKey(), reshapedPartialDerivative);
         }
 
-        PartialDerivatives derivativesWrtInput = reshapedDiffWrtSelf
-            .multiplyAlongWrtDimensions(DoubleTensor.ones(inputVertex.getShape()), wrtShapeWithoutRankLoss);
-
-        return singletonMap(inputVertex, derivativesWrtInput);
+        return reshapedDiffWrtSelf;
     }
 
     private static int[] summedOverShapeWithoutRankLoss(int[] shape, int[] sumOverDimensions) {
