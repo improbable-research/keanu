@@ -56,10 +56,10 @@ public class Nd4jBroadcastTensorTest {
 
         DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        DoubleTensor expectedAB = Nd4jDoubleTensor.create(new double[]{1, 2, 6, 8, 3, 6, 12, 16}, new int[]{2, 2, 2});
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1, 2, 6, 8, 3, 6, 12, 16}, new int[]{2, 2, 2});
 
-        assertTimesOperationEquals(rank3, matrix, expectedAB);
-        assertTimesInPlaceOperationEquals(rank3, matrix, expectedAB);
+        assertTimesOperationEquals(rank3, matrix, expected);
+        assertTimesInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -219,12 +219,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{2, 3, 5, 6, 4, 5, 7, 8}, new int[]{2, 2, 2});
 
-        assertPlusOperationEquals(rank4, matrix, expected);
-        assertPlusInPlaceOperationEquals(rank4, matrix, expected);
+        assertPlusOperationEquals(rank3, matrix, expected);
+        assertPlusInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -238,12 +238,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{2, 4, 6, 8}, new int[]{1, 2, 2});
 
-        assertPlusOperationEquals(rank4, matrix, expected);
-        assertPlusInPlaceOperationEquals(rank4, matrix, expected);
+        assertPlusOperationEquals(rank3, matrix, expected);
+        assertPlusInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -286,12 +286,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2, 1});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{0, -1, -1, -2, 2, 1, 1, 0}, new int[]{2, 2, 2});
 
-        assertMinusOperationEquals(rank4, matrix, expected);
-        assertMinusInPlaceOperationEquals(rank4, matrix, expected);
+        assertMinusOperationEquals(rank3, matrix, expected);
+        assertMinusInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -305,12 +305,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{0, 0, 0, 0}, new int[]{1, 2, 2});
 
-        assertMinusOperationEquals(rank4, matrix, expected);
-        assertMinusInPlaceOperationEquals(rank4, matrix, expected);
+        assertMinusOperationEquals(rank3, matrix, expected);
+        assertMinusInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -353,12 +353,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{10, 20, 30, 40}, new int[]{2, 2, 1});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{10, 20, 30, 40}, new int[]{2, 2, 1});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{10., 5., 4., 2., 30., 15., 8., 4.}, new int[]{2, 2, 2});
 
-        assertDivideOperationEquals(rank4, matrix, expected);
-        assertDivideInPlaceOperationEquals(rank4, matrix, expected);
+        assertDivideOperationEquals(rank3, matrix, expected);
+        assertDivideInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
@@ -372,12 +372,12 @@ public class Nd4jBroadcastTensorTest {
           print(np.shape(ab))
          */
 
-        DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
+        DoubleTensor rank3 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{1, 2, 2});
         DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1., 1., 1., 1.}, new int[]{1, 2, 2});
 
-        assertDivideOperationEquals(rank4, matrix, expected);
-        assertDivideInPlaceOperationEquals(rank4, matrix, expected);
+        assertDivideOperationEquals(rank3, matrix, expected);
+        assertDivideInPlaceOperationEquals(rank3, matrix, expected);
     }
 
     @Test
