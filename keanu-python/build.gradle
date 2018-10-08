@@ -1,0 +1,13 @@
+assemble.dependsOn(":shadowJar")
+assemble.dependsOn(":codegen:processor:codeGen")
+
+task pytest {
+    doLast {
+        exec {
+            commandLine 'pipenv', 'install',  '--dev'
+            commandLine 'pipenv', 'run', 'pytest'
+        }
+    }
+}
+
+test.dependsOn(pytest)
