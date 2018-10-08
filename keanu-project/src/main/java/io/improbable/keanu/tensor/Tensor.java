@@ -55,7 +55,7 @@ public interface Tensor<T> {
     }
 
     static <T> GenericTensor<T> create(T value, int[] shape) {
-        return new GenericTensor<>(value, shape);
+        return GenericTensor.create(value, shape);
     }
 
     int[] SCALAR_SHAPE = new int[]{1, 1};

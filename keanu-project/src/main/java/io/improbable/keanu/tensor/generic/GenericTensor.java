@@ -17,6 +17,10 @@ public class GenericTensor<T> implements Tensor<T> {
     private int[] shape;
     private int[] stride;
 
+    public static <T> GenericTensor<T> create(T data, int[] shape) {
+        return new GenericTensor<>(data, shape);
+    }
+
     public GenericTensor(T[] data, int[] shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
