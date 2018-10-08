@@ -4,16 +4,16 @@ assemble.dependsOn(":codegen:processor:codeGen")
 task pytest {
     doLast {
         exec {
-            commandLine 'python', '--version'
+            commandLine 'python3', '--version'
         }
         exec {
-            commandLine 'pip', '--version'
+            commandLine 'pip3', '--version'
         }
         exec {
-            commandLine 'pip', 'install', 'pipenv'
+            commandLine 'pip3', 'install', 'pipenv'
         }
         exec {
-            commandLine 'pipenv', 'install', '--dev'
+            commandLine 'pipenv', 'install', '--dev', '--three'
         }
         exec {
             commandLine 'pipenv', 'run', 'pytest'
