@@ -1,6 +1,9 @@
 package io.improbable.keanu.tensor;
 
 
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import org.apache.commons.lang3.NotImplementedException;
 import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 import java.util.Arrays;
@@ -38,6 +41,22 @@ public interface Tensor<T> {
 
     static <T> Tensor<T> placeHolder(int[] shape) {
         return new GenericTensor<>(shape);
+    }
+
+    static DoubleTensor create(Double value, int[] shape) {
+        return DoubleTensor.create(value, shape);
+    }
+
+    static IntegerTensor create(Integer value, int[] shape) {
+        return IntegerTensor.create(value, shape);
+    }
+
+    static BooleanTensor create(Boolean value, int[] shape) {
+        return BooleanTensor.create(value, shape);
+    }
+
+    static <T> GenericTensor<T> create(T value, int[] shape) {
+        return new GenericTensor<>(value, shape);
     }
 
     int[] SCALAR_SHAPE = new int[]{1, 1};

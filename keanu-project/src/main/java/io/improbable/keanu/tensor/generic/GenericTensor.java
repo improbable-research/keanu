@@ -1,6 +1,5 @@
 package io.improbable.keanu.tensor.generic;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import static java.util.Arrays.copyOf;
 
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
@@ -8,7 +7,6 @@ import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
@@ -83,35 +81,6 @@ public class GenericTensor<T> implements Tensor<T> {
         return this;
     }
 
-    public boolean isNull() {
-        return this.data == null;
-    }
-
-    public GenericTensor<T> setWithMaskInPlace(DoubleTensor mask, T value) {
-        if (this.getLength() != mask.getLength()) {
-            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
-        }
-
-        if (data == null) {
-            data = (T[]) new Object[(int) this.getLength()];
-        }
-
-        double[] flatArray = mask.asFlatDoubleArray();
-        for (int i = 0; i < flatArray.length; i++) {
-            if (flatArray[i] == 1.) {
-                data[i] = value;
-            }
-        }
-
-        return this;
-    }
-
-    public DoubleTensor equalsMask(T value) {
-        return DoubleTensor.create(
-            Arrays.stream(data).mapToDouble(d -> Objects.equals(value, d) ? 1. : 0.).toArray(),
-            this.shape);
-    }
-
     @Override
     public T scalar() {
         return data[0];
@@ -144,15 +113,15 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public FlattenedView<T> getFlattenedView() {
-        return new BaseSimpleFlattenedView<T>(data);
+        return new BaseSimpleFlattenedView<T>(data, shape);
     }
 
     private static class BaseSimpleFlattenedView<T> implements FlattenedView<T> {
 
         T[] data;
 
-        public BaseSimpleFlattenedView(T[] data) {
-            this.data = data;
+        public BaseSimpleFlattenedView(T[] data, int[] shape) {
+            this.data = data == null ? (T[]) new Object[(int) TensorShape.getLength(shape)] : data;
         }
 
         @Override

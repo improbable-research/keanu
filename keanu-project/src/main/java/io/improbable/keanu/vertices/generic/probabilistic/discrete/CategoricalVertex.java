@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
@@ -22,7 +21,7 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<T> extends Vertex<GenericTensor<T>> implements Probabilistic<GenericTensor<T>> {
+public class CategoricalVertex<T> extends Vertex<Tensor<T>> implements Probabilistic<Tensor<T>> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
@@ -65,7 +64,7 @@ public class CategoricalVertex<T> extends Vertex<GenericTensor<T>> implements Pr
         this.selectableValues = selectableValues;
 
         setParents(this.selectableValues.values());
-        setValue((GenericTensor<T>) Tensor.placeHolder(tensorShape));
+        setValue(Tensor.placeHolder(tensorShape));
     }
 
     public CategoricalVertex(Map<T, DoubleVertex> selectableValues) {
@@ -77,21 +76,21 @@ public class CategoricalVertex<T> extends Vertex<GenericTensor<T>> implements Pr
     }
 
     @Override
-    public GenericTensor<T> sample(KeanuRandom random) {
+    public Tensor<T> sample(KeanuRandom random) {
         Categorical<T> categorical =
             Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.sample(getShape(), random);
     }
 
     @Override
-    public double logProb(GenericTensor<T> value) {
+    public double logProb(Tensor<T> value) {
         Categorical<T> categorical =
             Categorical.withParameters(selectableValuesMappedToDoubleTensor());
         return categorical.logProb(value).sum();
     }
 
     @Override
-    public Map<Vertex, DoubleTensor> dLogProb(GenericTensor<T> value, Set<? extends Vertex> withRespectTo) {
+    public Map<Vertex, DoubleTensor> dLogProb(Tensor<T> value, Set<? extends Vertex> withRespectTo) {
         return Collections.emptyMap();
     }
 

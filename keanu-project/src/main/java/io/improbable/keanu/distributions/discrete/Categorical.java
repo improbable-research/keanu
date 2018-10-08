@@ -3,12 +3,12 @@ package io.improbable.keanu.distributions.discrete;
 import java.util.Map;
 
 import io.improbable.keanu.distributions.Distribution;
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Categorical<T> implements Distribution<GenericTensor<T>> {
+public class Categorical<T> implements Distribution<Tensor<T>> {
 
     private final Map<T, DoubleTensor> selectableValues;
 
@@ -20,7 +20,7 @@ public class Categorical<T> implements Distribution<GenericTensor<T>> {
         this.selectableValues = selectableValues;
     }
 
-    public GenericTensor<T> sample(int[] shape, KeanuRandom random) {
+    public Tensor<T> sample(int[] shape, KeanuRandom random) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
         if (!sumOfProbabilities.lessThanOrEqual(0.).allFalse()) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
@@ -28,7 +28,7 @@ public class Categorical<T> implements Distribution<GenericTensor<T>> {
 
         double p = random.nextDouble();
         DoubleTensor sum = DoubleTensor.zeros(shape);
-        GenericTensor<T> value = new GenericTensor<>(shape);
+        Tensor<T> sample = Tensor.placeHolder(shape);
         BooleanTensor valueSetSoFar = BooleanTensor.falses(shape);
 
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
@@ -36,7 +36,7 @@ public class Categorical<T> implements Distribution<GenericTensor<T>> {
 
             BooleanTensor mask = valueSetSoFar.not().andInPlace(sum.greaterThan(p));
 
-            value.setWithMaskInPlace(mask.toDoubleMask(), entry.getKey());
+            sample = mask.setIf(Tensor.scalar(entry.getKey()), sample);
             valueSetSoFar.orInPlace(mask);
 
             if (valueSetSoFar.allTrue()) {
@@ -46,13 +46,13 @@ public class Categorical<T> implements Distribution<GenericTensor<T>> {
 
         if (!valueSetSoFar.allTrue()) {
             T[] values = (T[]) selectableValues.keySet().toArray();
-            value = new GenericTensor<>(values[values.length - 1], shape);
+            sample = Tensor.create(values[values.length - 1], shape);
         }
 
-        return value;
+        return sample;
     }
 
-    public DoubleTensor logProb(GenericTensor<T> x) {
+    public DoubleTensor logProb(Tensor<T> x) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
         if (!sumOfProbabilities.lessThanOrEqual(0.).allFalse()) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
@@ -60,7 +60,7 @@ public class Categorical<T> implements Distribution<GenericTensor<T>> {
 
         DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
-            logProb.plusInPlace(x.equalsMask(entry.getKey()).timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
+            logProb.plusInPlace(x.elementwiseEquals(Tensor.create(entry.getKey(), x.getShape())).toDoubleMask().timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
         }
         return logProb;
     }

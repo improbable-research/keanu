@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
+import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -46,7 +47,7 @@ public class MultiplexerVertexTest {
         optionGroup2.put(TestEnum.D, ConstantVertex.of(0.5));
         CategoricalVertex<TestEnum> select2 = new CategoricalVertex<>(optionGroup2);
 
-        MultiplexerVertex<GenericTensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
+        MultiplexerVertex<Tensor<TestEnum>> multiplexerVertex = new MultiplexerVertex<>(selectorControlVertex, select1, select2);
 
         LinkedHashMap<TestEnum, Integer> frequencies = new LinkedHashMap<>();
         frequencies.put(TestEnum.A, 0);

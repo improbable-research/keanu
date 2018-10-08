@@ -1,7 +1,6 @@
 package io.improbable.keanu.tensor.generic;
 
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
 import static org.junit.Assert.assertFalse;
@@ -112,60 +111,6 @@ public class SimpleTensorTest {
         Tensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
         assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
-    }
-
-    @Test
-    public void isNullReturnsTrueIfNoDataIsSet() {
-        GenericTensor<Something> tensor = new GenericTensor<>(new int[] {1, 1});
-        assertTrue(tensor.isNull());
-    }
-
-    @Test
-    public void isNullReturnsFalseIfDataIsSet() {
-        GenericTensor<Something> tensor = new GenericTensor<>(new Something[] {Something.A}, new int[] {1, 1});
-        assertFalse(tensor.isNull());
-    }
-
-    @Test
-    public void canSetWhereEqualMatrix() {
-         GenericTensor<Something> tensor = new GenericTensor<>(
-            new Something[]{
-                Something.A, Something.A,
-                Something.C, Something.D,
-            },
-            new int[]{2, 2});
-         DoubleTensor mask = tensor.equalsMask(Something.A);
-         GenericTensor result = tensor.setWithMaskInPlace(mask, Something.B);
-
-         assertArrayEquals(new Something[]{Something.B, Something.B, Something.C, Something.D}, result.asFlatArray());
-    }
-
-    @Test
-    public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        GenericTensor<Something> tensor = new GenericTensor<>(
-            new Something[]{
-                Something.A, Something.B, Something.B,
-                Something.C, Something.D, Something.B,
-                Something.D, Something.A, Something.C
-            },
-            new int[]{3, 3});
-        DoubleTensor mask = DoubleTensor.scalar(1);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, Something.C);
-    }
-
-    @Test
-    public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
-        GenericTensor<Something> tensor = new GenericTensor<>(Something.A);
-        DoubleTensor mask = DoubleTensor.create(new double[] {1., 1., 1., 1.}, 2, 2);
-
-        thrown.expect(IllegalArgumentException.class);
-        thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
-
-        tensor.setWithMaskInPlace(mask, Something.C);
     }
 
 }

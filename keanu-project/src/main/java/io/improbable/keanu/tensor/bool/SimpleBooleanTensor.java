@@ -147,7 +147,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
         T[] result = (T[]) (new Object[data.length]);
         for (int i = 0; i < result.length; i++) {
-            result[i] = data[i] ? trueValuesFlattened.get(i) : falseValuesFlattened.get(i);
+            result[i] = data[i] ? trueValuesFlattened.getOrScalar(i) : falseValuesFlattened.getOrScalar(i);
         }
 
         return new GenericTensor<>(result, copyOf(shape, shape.length));
