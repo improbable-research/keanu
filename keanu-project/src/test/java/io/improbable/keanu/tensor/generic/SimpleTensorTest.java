@@ -3,19 +3,12 @@ package io.improbable.keanu.tensor.generic;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.ConstantGenericVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.operators.unary.GenericTakeVertex;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import org.junit.Rule;
 import org.junit.Test;
 
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
-import org.junit.rules.ExpectedException;
 
 public class SimpleTensorTest {
-
-    @Rule
-    public ExpectedException thrown = ExpectedException.none();
 
     enum Something {
         A, B, C, D
