@@ -26,37 +26,37 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
-        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
 
-        PartialDerivatives rightPartial = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(right.getValue(), this.getShape());
-        PartialDerivatives leftPartial = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(left.getValue(), this.getShape());
+        // dc = A * db + da * B;
+        PartialDerivatives partialsFromLeft;
+        PartialDerivatives partialsFromRight;
 
-        partials.put(left, rightPartial);
-        partials.put(right, leftPartial);
+        if (dLeftWrtInputs.isEmpty()) {
+            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        }
 
-        return partials;
+        if (dRightWrtInputs.isEmpty()) {
+            partialsFromRight = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        }
+
+        return partialsFromLeft.add(partialsFromRight);
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
 
-        // dc = A * db + da * B;
-        PartialDerivatives thisInfMultiplied;
-        PartialDerivatives thatInfMultiplied;
+        PartialDerivatives dOutputsWrtLeft = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(right.getValue(), this.getShape());
+        PartialDerivatives dOutputsWrtRight = derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(left.getValue(), this.getShape());
 
-        if (l.isEmpty()) {
-            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
-        } else {
-            thisInfMultiplied = l.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        }
+        partials.put(left, dOutputsWrtLeft);
+        partials.put(right, dOutputsWrtRight);
 
-        if (r.isEmpty()) {
-            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
-        } else {
-            thatInfMultiplied = r.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
-        }
-
-        return thisInfMultiplied.add(thatInfMultiplied);
+        return partials;
     }
 }

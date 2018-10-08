@@ -26,13 +26,8 @@ public class TanVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-
-        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            DoubleTensor dTan = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
-            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dTan, this.getValue().getShape());
-        }
+        DoubleTensor dTan = inputVertex.getValue().cos().powInPlace(2).reciprocalInPlace();
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dTan, this.getValue().getShape());
     }
 
     @Override

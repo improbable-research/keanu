@@ -26,12 +26,7 @@ public class ExpVertex extends DoubleUnaryOpVertex {
 
     @Override
     protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-
-        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(this.getValue(), inputVertex.getShape());
-        }
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(this.getValue(), inputVertex.getShape());
     }
 
     @Override

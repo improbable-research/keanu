@@ -30,14 +30,14 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        PartialDerivatives partialsLeft = PartialDerivatives
+        PartialDerivatives dOutputsWrtLeft = PartialDerivatives
             .matrixMultiplyAlongWrtDimensions(
                 derivativeOfOutputsWithRespectToSelf,
                 right.getValue(),
                 true
             );
 
-        PartialDerivatives partialsRight = PartialDerivatives
+        PartialDerivatives dOutputsWrtRight = PartialDerivatives
             .matrixMultiplyAlongWrtDimensions(
                 derivativeOfOutputsWithRespectToSelf,
                 left.getValue(),
@@ -45,32 +45,32 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
             );
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(left, partialsLeft);
-        partials.put(right, partialsRight);
+        partials.put(left, dOutputsWrtLeft);
+        partials.put(right, dOutputsWrtRight);
 
         return partials;
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
 
         // dc = A * db + da * B;
-        PartialDerivatives thisInfMultiplied;
-        PartialDerivatives thatInfMultiplied;
+        PartialDerivatives partialsFromLeft;
+        PartialDerivatives partialsFromRight;
 
-        if (l.isEmpty()) {
-            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        if (dLeftWrtInputs.isEmpty()) {
+            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(l, right.getValue(), true);
+            partialsFromLeft = PartialDerivatives.matrixMultiplyAlongOfDimensions(dLeftWrtInputs, right.getValue(), true);
         }
 
-        if (r.isEmpty()) {
-            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
+        if (dRightWrtInputs.isEmpty()) {
+            partialsFromRight = PartialDerivatives.OF_CONSTANT;
         } else {
-            thatInfMultiplied = PartialDerivatives.matrixMultiplyAlongOfDimensions(r, left.getValue(), false);
+            partialsFromRight = PartialDerivatives.matrixMultiplyAlongOfDimensions(dRightWrtInputs, left.getValue(), false);
         }
 
-        return thisInfMultiplied.add(thatInfMultiplied);
+        return partialsFromLeft.add(partialsFromRight);
     }
 
     private static int[] getResultingShape(int[] left, int[] right) {

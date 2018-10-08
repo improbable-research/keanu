@@ -27,15 +27,15 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+        return dLeftWrtInputs.subtract(dRightWrtInputs, getShape());
+    }
+
+    @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         partials.put(left, derivativeOfOutputsWithRespectToSelf);
         partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0));
         return partials;
-    }
-
-    @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
-        return l.subtract(r, getShape());
     }
 }

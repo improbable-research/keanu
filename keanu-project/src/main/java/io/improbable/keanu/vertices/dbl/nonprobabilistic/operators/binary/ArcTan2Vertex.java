@@ -26,18 +26,23 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives x, PartialDerivatives y) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dxWrtInputs, PartialDerivatives dyWrtInputs) {
         DoubleTensor yValue = right.getValue();
         DoubleTensor xValue = left.getValue();
 
-        DoubleTensor denominator = ((yValue.pow(2)).plusInPlace((xValue.pow(2))));
+        DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
 
-        PartialDerivatives thisInfX = x
-            .multiplyAlongOfDimensions((yValue.div(denominator)).unaryMinusInPlace(), xValue.getShape());
-        PartialDerivatives thisInfY = y
-            .multiplyAlongOfDimensions(xValue.div(denominator), yValue.getShape());
+        PartialDerivatives diffFromX = dxWrtInputs.multiplyAlongOfDimensions(
+            yValue.div(denominator).unaryMinusInPlace(),
+            xValue.getShape()
+        );
 
-        return thisInfX.add(thisInfY);
+        PartialDerivatives diffFromY = dyWrtInputs.multiplyAlongOfDimensions(
+            xValue.div(denominator),
+            yValue.getShape()
+        );
+
+        return diffFromX.add(diffFromY);
     }
 
     @Override

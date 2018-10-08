@@ -29,13 +29,9 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
 
         DoubleTensor inputValue = inputVertex.getValue();
 
-        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            DoubleTensor dArcSin = (inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1))
-                .sqrtInPlace().reciprocalInPlace();
-            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin, inputValue.getShape());
-        }
+        DoubleTensor dArcSin = (inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1))
+            .sqrtInPlace().reciprocalInPlace();
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin, inputValue.getShape());
     }
 
     @Override

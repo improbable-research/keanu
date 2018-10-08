@@ -25,6 +25,35 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+
+        // dc = (B * da - A * db) / B^2;
+        PartialDerivatives partialsFromLeft;
+        PartialDerivatives partialsFromRight;
+
+        if (dLeftWrtInputs.isEmpty()) {
+            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        }
+
+        if (dRightWrtInputs.isEmpty()) {
+            partialsFromRight = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        }
+
+        PartialDerivatives dSelfWrtInputs;
+        if (partialsFromLeft.isEmpty() && partialsFromRight.isEmpty()) {
+            dSelfWrtInputs = PartialDerivatives.OF_CONSTANT;
+        } else {
+            dSelfWrtInputs = partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
+        }
+
+        return dSelfWrtInputs;
+    }
+
+    @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         DoubleTensor leftValue = left.getValue();
@@ -36,34 +65,5 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         partials.put(right, derivativeOfOutputsWithRespectToSelf
             .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape()));
         return partials;
-    }
-
-    @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
-
-        // dc = (B * da - A * db) / B^2;
-        PartialDerivatives thisInfMultiplied;
-        PartialDerivatives thatInfMultiplied;
-        PartialDerivatives newInf;
-
-        if (l.isEmpty()) {
-            thisInfMultiplied = PartialDerivatives.OF_CONSTANT;
-        } else {
-            thisInfMultiplied = l.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
-        }
-
-        if (r.isEmpty()) {
-            thatInfMultiplied = PartialDerivatives.OF_CONSTANT;
-        } else {
-            thatInfMultiplied = r.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
-        }
-
-        if (thisInfMultiplied.isEmpty() && thatInfMultiplied.isEmpty()) {
-            newInf = PartialDerivatives.OF_CONSTANT;
-        } else {
-            newInf = thisInfMultiplied.subtract(thatInfMultiplied).divideBy(right.getValue().pow(2));
-        }
-
-        return newInf;
     }
 }

@@ -29,13 +29,9 @@ public class ArcCosVertex extends DoubleUnaryOpVertex {
 
         DoubleTensor inputValue = inputVertex.getValue();
 
-        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1)
-                .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
-            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
-        }
+        DoubleTensor dArcCos = inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1)
+            .sqrtInPlace().reciprocalInPlace().unaryMinusInPlace();
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcCos, inputVertex.getShape());
     }
 
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {

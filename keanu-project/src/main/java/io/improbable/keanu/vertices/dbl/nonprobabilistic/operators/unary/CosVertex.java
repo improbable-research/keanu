@@ -29,12 +29,8 @@ public class CosVertex extends DoubleUnaryOpVertex {
 
         DoubleTensor inputValue = inputVertex.getValue();
 
-        if (derivativeOfParentWithRespectToInputs.isEmpty()) {
-            return PartialDerivatives.OF_CONSTANT;
-        } else {
-            DoubleTensor dCos = inputValue.sin().unaryMinusInPlace();
-            return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dCos, inputValue.getShape());
-        }
+        DoubleTensor dCos = inputValue.sin().unaryMinusInPlace();
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dCos, inputValue.getShape());
     }
 
     @Override

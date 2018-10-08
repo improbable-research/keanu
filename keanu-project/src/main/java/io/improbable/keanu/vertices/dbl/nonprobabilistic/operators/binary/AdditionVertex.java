@@ -26,8 +26,8 @@ public class AdditionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
-        return l.add(r, this.getShape());
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+        return dLeftWrtInputs.add(dRightWrtInputs, this.getShape());
     }
 
     @Override

@@ -13,56 +13,56 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     /**
      * Raises a vertex to the power of another
      *
-     * @param left  the base vertex
-     * @param right the exponent vertex
+     * @param base  the base vertex
+     * @param exponent the exponent vertex
      */
-    public PowerVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right);
+    public PowerVertex(DoubleVertex base, DoubleVertex exponent) {
+        super(base, exponent);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.pow(r);
+    protected DoubleTensor op(DoubleTensor base, DoubleTensor exponent) {
+        return base.pow(exponent);
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives l, PartialDerivatives r) {
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dBaseWrtInputs, PartialDerivatives dExponentWrtInputs) {
 
         // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
-        PartialDerivatives thisInfBase;
-        PartialDerivatives thisInfExponent;
+        PartialDerivatives partialsFromBase;
+        PartialDerivatives partialsFromExponent;
 
-        if (l.isEmpty()) {
-            thisInfBase = PartialDerivatives.OF_CONSTANT;
+        if (dBaseWrtInputs.isEmpty()) {
+            partialsFromBase = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfBase = l.multiplyAlongOfDimensions(
+            partialsFromBase = dBaseWrtInputs.multiplyAlongOfDimensions(
                 right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
                 this.getValue().getShape()
             );
         }
 
-        if (r.isEmpty()) {
-            thisInfExponent = PartialDerivatives.OF_CONSTANT;
+        if (dExponentWrtInputs.isEmpty()) {
+            partialsFromExponent = PartialDerivatives.OF_CONSTANT;
         } else {
-            thisInfExponent = r.multiplyAlongOfDimensions(
+            partialsFromExponent = dExponentWrtInputs.multiplyAlongOfDimensions(
                 left.getValue().log().timesInPlace(this.getValue()),
                 right.getValue().getShape()
             );
         }
 
-        return thisInfBase.add(thisInfExponent);
+        return partialsFromBase.add(partialsFromExponent);
     }
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        DoubleTensor leftValue = left.getValue();
-        DoubleTensor rightValue = right.getValue();
-        DoubleTensor leftPowRight = getValue();
-        DoubleTensor dOutWrtLeft = rightValue.div(leftValue).timesInPlace(leftPowRight);
-        DoubleTensor dOutWrtRight = leftPowRight.times(leftValue.log());
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtLeft, this.getShape()));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtRight, this.getShape()));
+        DoubleTensor baseValue = getBase().getValue();
+        DoubleTensor exponentValue = getExponent().getValue();
+        DoubleTensor basePowExponent = getValue();
+        DoubleTensor dSelfWrtBase = exponentValue.div(baseValue).timesInPlace(basePowExponent);
+        DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
+        partials.put(getBase(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape()));
+        partials.put(getExponent(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape()));
         return partials;
     }
 

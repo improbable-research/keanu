@@ -26,13 +26,13 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
-        throw new UnsupportedOperationException();
+    protected DoubleTensor op(DoubleTensor value) {
+        return DoubleTensor.scalar(value.determinant());
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return DoubleTensor.scalar(value.determinant());
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        throw new UnsupportedOperationException();
     }
 
     @Override
