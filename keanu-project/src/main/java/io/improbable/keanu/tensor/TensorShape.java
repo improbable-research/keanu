@@ -156,20 +156,24 @@ public class TensorShape {
     }
     
     public static long[] shapeDesiredToRankByAppendingOnes(long[] lowRankTensorShape, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true, 1);
     }
 
     public static long[] shapeToDesiredRankByPrependingOnes(long[] lowRankTensorShape, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false);
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false, 1);
     }
 
-    private static long[] increaseRankByPaddingOnes(long[] lowRankTensorShape, int desiredRank, boolean append) {
+    public static long[] shapeToDesiredRankByPrependingNegOnes(long[] lowRankTensorShape, int desiredRank) {
+        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false, -1);
+    }
+
+    private static long[] increaseRankByPaddingOnes(long[] lowRankTensorShape, int desiredRank, boolean append, int val) {
         long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {
             throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");
         }
 
-        Arrays.fill(paddedShape, 1);
+        Arrays.fill(paddedShape, val);
         if (append) {
             System.arraycopy(lowRankTensorShape, 0, paddedShape, 0, lowRankTensorShape.length);
         } else {

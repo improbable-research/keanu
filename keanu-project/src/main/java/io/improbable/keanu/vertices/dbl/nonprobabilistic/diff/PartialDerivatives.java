@@ -396,7 +396,7 @@ public class PartialDerivatives {
         Map<VertexId, DoubleTensor> slicedDerivatives = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {
-            long[] partialDerivativeShape = partialDerivative.getValue().getShape();
+            long[] partialDerivativeShape = Arrays.copyOf(partialDerivative.getValue().getShape(), partialDerivative.getValue().getShape().length);
             partialDerivativeShape[dimension] = 1;
             DoubleTensor slicedPartialDerivative = partialDerivative.getValue().slice(dimension, index);
 

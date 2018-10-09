@@ -103,14 +103,14 @@ public class INDArrayShim {
         int maxRank = Math.max(shapeA.length, shapeB.length);
 
         if (shapeA.length < shapeB.length) {
-            shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
+            shapeA = TensorShape.shapeToDesiredRankByPrependingNegOnes(shapeA, shapeB.length);
         } else {
-            shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
+            shapeB = TensorShape.shapeToDesiredRankByPrependingNegOnes(shapeB, shapeA.length);
         }
 
         List<Integer> along = new ArrayList<>();
 
-        for (int i = maxRank - 1; i >= 0; i--) {
+        for (int i = 0; i < maxRank; i++) {
             if (shapeA[i] == shapeB[i]) {
                 along.add(i);
             }
