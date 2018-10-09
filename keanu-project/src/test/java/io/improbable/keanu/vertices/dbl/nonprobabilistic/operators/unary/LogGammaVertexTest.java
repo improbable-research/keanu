@@ -4,8 +4,8 @@ import static org.apache.commons.math3.special.Gamma.digamma;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfMatrixElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfMatrixElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
@@ -34,8 +34,8 @@ public class LogGammaVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOScalarLogGamma() {
-        calculatesDualNumberOfScalar(
+    public void calculatesDerivativeOScalarLogGamma() {
+        calculatesDerivativeOfScalar(
             0.5,
             digamma(0.5),
             DoubleVertex::logGamma
@@ -52,8 +52,8 @@ public class LogGammaVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfMatrixElementWiseLogGamma() {
-        calculatesDualNumberOfMatrixElementWiseOperator(
+    public void calculatesDerivativeOfMatrixElementWiseLogGamma() {
+        calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{digamma(0.1), digamma(0.2), digamma(0.3), digamma(0.4)}),
             DoubleVertex::logGamma

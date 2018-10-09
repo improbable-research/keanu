@@ -18,7 +18,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
@@ -199,13 +198,13 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
+                               Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
+                               Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
@@ -297,11 +296,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
-            return DualNumber.createConstant(getValue());
+            return PartialDerivatives.OF_CONSTANT;
         } else {
-            return DualNumber.createWithRespectToSelf(getId(), getValue());
+            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
         }
     }
 

@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
@@ -41,13 +40,13 @@ public class ReshapeVertexTest {
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
 
-        PartialDerivatives forward = reshapedN.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = reshapedN.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha));
 
         Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(m).getShape());
         Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, backward.withRespectTo(m).getShape());
 
-        double[] expectedPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m).asFlatDoubleArray();
+        double[] expectedPartial = N.getDerivativeWrtLatents().withRespectTo(m).asFlatDoubleArray();
 
         Assert.assertArrayEquals(expectedPartial, forward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(expectedPartial, backward.withRespectTo(m).asFlatDoubleArray(), 1e-6);
@@ -62,17 +61,17 @@ public class ReshapeVertexTest {
         a.setValue(DoubleTensor.create(new double[]{10, 15, 20, 25}, 2, 2));
 
         DoubleVertex N = m.matrixMultiply(a);
-        DualNumber NDual = N.getDualNumber();
+        PartialDerivatives NDiff = N.getDerivativeWrtLatents();
 
-        DoubleTensor dNdm = NDual.getPartialDerivatives().withRespectTo(m);
-        DoubleTensor dNda = NDual.getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dNdm = NDiff.withRespectTo(m);
+        DoubleTensor dNda = NDiff.withRespectTo(a);
 
         double[] nWrtMpartialsBeforeReshape = dNdm.asFlatDoubleArray();
         double[] nWrtApartialsBeforeReshape = dNda.asFlatDoubleArray();
 
         ReshapeVertex reshapedN = new ReshapeVertex(N, 4, 1);
-        DoubleTensor reshapedPartialWrtM = reshapedN.getDualNumber().getPartialDerivatives().withRespectTo(m);
-        DoubleTensor reshapedPartialWrtA = reshapedN.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor reshapedPartialWrtM = reshapedN.getDerivativeWrtLatents().withRespectTo(m);
+        DoubleTensor reshapedPartialWrtA = reshapedN.getDerivativeWrtLatents().withRespectTo(a);
 
         Assert.assertArrayEquals(nWrtMpartialsBeforeReshape, reshapedPartialWrtM.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(nWrtApartialsBeforeReshape, reshapedPartialWrtA.asFlatDoubleArray(), 1e-6);
@@ -95,7 +94,7 @@ public class ReshapeVertexTest {
 
         DoubleVertex F = D.times(E);
 
-        PartialDerivatives forward = F.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = F.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
 
         Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(A).getShape());
@@ -115,7 +114,7 @@ public class ReshapeVertexTest {
         DoubleVertex D = C.reshape(4, 2, 2);
         DoubleVertex E = D.reshape(4, 4);
 
-        PartialDerivatives forward = E.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = E.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
 
         Assert.assertArrayEquals(new int[]{4, 4, 2, 2, 2, 2}, forward.withRespectTo(A).getShape());

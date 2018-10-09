@@ -96,10 +96,10 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
-        PartialDerivatives forward = sliceN.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = sliceN.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha));
 
-        DoubleTensor originalPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor originalPartial = N.getDerivativeWrtLatents().withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), expectedValue, 1e-6);
         Assert.assertArrayEquals(expectedShape, sliceN.getShape());
@@ -123,8 +123,8 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, 1, 1);
 
-        DoubleTensor originalPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m);
-        DoubleTensor slicePartial = sliceN.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor originalPartial = N.getDerivativeWrtLatents().withRespectTo(m);
+        DoubleTensor slicePartial = sliceN.getDerivativeWrtLatents().withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), new double[]{65, 145}, 1e-6);
         Assert.assertArrayEquals(new int[]{2, 1}, sliceN.getShape());
