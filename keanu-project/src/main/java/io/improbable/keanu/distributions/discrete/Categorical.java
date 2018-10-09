@@ -29,22 +29,22 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
         double p = random.nextDouble();
         DoubleTensor sum = DoubleTensor.zeros(shape);
         Tensor<T> sample = Tensor.placeHolder(shape);
-        BooleanTensor valueSetSoFar = BooleanTensor.falses(shape);
+        BooleanTensor sampleSetSoFar = BooleanTensor.falses(shape);
 
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
             sum.plusInPlace(entry.getValue().div(sumOfProbabilities));
 
-            BooleanTensor mask = valueSetSoFar.not().andInPlace(sum.greaterThan(p));
+            BooleanTensor mask = sampleSetSoFar.not().andInPlace(sum.greaterThan(p));
 
             sample = mask.setIf(Tensor.scalar(entry.getKey()), sample);
-            valueSetSoFar.orInPlace(mask);
+            sampleSetSoFar.orInPlace(mask);
 
-            if (valueSetSoFar.allTrue()) {
+            if (sampleSetSoFar.allTrue()) {
                 break;
             }
         }
 
-        if (!valueSetSoFar.allTrue()) {
+        if (!sampleSetSoFar.allTrue()) {
             T[] values = (T[]) selectableValues.keySet().toArray();
             sample = Tensor.create(values[values.length - 1], shape);
         }
