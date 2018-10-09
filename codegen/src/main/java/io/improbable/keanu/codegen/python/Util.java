@@ -9,9 +9,9 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 
-class Processor {
-     static Writer createFileWriter(String generatedFile) {
-        File file = new File(generatedFile);
+class Util {
+     static Writer createFileWriter(String fileToWrite) {
+        File file = new File(fileToWrite);
         try {
             if (file.exists()) {
                 file.delete();
