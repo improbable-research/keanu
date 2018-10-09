@@ -6,6 +6,7 @@ name = "pypi"
 [packages]
 "py4j" = "*"
 numpy = "*"
+keanu = {editable = true, path = "."}
 
 [dev-packages]
 pytest = "*"
