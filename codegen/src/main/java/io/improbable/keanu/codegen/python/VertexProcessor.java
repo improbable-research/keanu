@@ -28,9 +28,9 @@ class VertexProcessor {
     static void process(String generatedDir) {
         List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors();
         Map<String, Object> dataModel = buildDataModel(constructors);
-        Writer fileWriter = Util.createFileWriter(generatedDir + GENERATED_FILE);
+        Writer fileWriter = FileUtil.createFileWriter(generatedDir + GENERATED_FILE);
 
-        Template fileTemplate = Util.getFileTemplate(TEMPLATE_FILE);
+        Template fileTemplate = FileUtil.getFileTemplate(TEMPLATE_FILE);
         try {
             fileTemplate.process(dataModel, fileWriter);
             fileWriter.close();

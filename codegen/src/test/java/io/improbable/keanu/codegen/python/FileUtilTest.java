@@ -12,7 +12,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class UtilTest {
+public class FileUtilTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -29,7 +29,7 @@ public class UtilTest {
 
         assertFalse(Files.exists(path));
 
-        Util.createFileWriter(path.toAbsolutePath().toString());
+        FileUtil.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
@@ -40,12 +40,12 @@ public class UtilTest {
         testFolder.newFile(TEST_GENERATED_FILE);
         assertTrue(Files.exists(path));
 
-        Util.createFileWriter(path.toAbsolutePath().toString());
+        FileUtil.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
     @Test
     public void canCreateTemplate() {
-        Util.getFileTemplate(TEST_TEMPLATE_FILE);
+        FileUtil.getFileTemplate(TEST_TEMPLATE_FILE);
     }
 }

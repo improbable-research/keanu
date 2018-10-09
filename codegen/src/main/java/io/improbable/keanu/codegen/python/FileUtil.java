@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.io.Writer;
 
-class Util {
+class FileUtil {
      static Writer createFileWriter(String fileToWrite) {
         File file = new File(fileToWrite);
         try {
