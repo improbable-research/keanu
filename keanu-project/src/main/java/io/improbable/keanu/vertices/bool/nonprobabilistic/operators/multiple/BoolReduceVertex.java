@@ -18,7 +18,7 @@ public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<Boo
     private final List<? extends Vertex<BooleanTensor>> inputs;
     private final BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction;
 
-    public BoolReduceVertex(int[] shape, Collection<Vertex<BooleanTensor>> input,
+    public BoolReduceVertex(long[] shape, Collection<Vertex<BooleanTensor>> input,
                             BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> reduceFunction) {
         if (input.size() < 2) {
             throw new IllegalArgumentException("BoolReduceVertex should have at least two input vertices, called with " + input.size());
@@ -31,7 +31,7 @@ public class BoolReduceVertex extends BoolVertex implements NonProbabilistic<Boo
     }
 
 
-    public BoolReduceVertex(int[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
+    public BoolReduceVertex(long[] shape, BiFunction<BooleanTensor, BooleanTensor, BooleanTensor> f, Vertex<BooleanTensor>... input) {
         this(shape, Arrays.asList(input), f);
     }
 

@@ -17,7 +17,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 
-    static BooleanTensor create(boolean[] data, int[] shape) {
+    static BooleanTensor create(boolean[] data, long[] shape) {
         return new SimpleBooleanTensor(data, shape);
     }
 
@@ -26,14 +26,14 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     private final boolean[] data;
-    private final int[] shape;
-    private final int[] stride;
+    private final long[] shape;
+    private final long[] stride;
 
     /**
      * @param data  tensor data used c ordering
      * @param shape desired shape of tensor
      */
-    public SimpleBooleanTensor(boolean[] data, int[] shape) {
+    public SimpleBooleanTensor(boolean[] data, long[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
@@ -52,7 +52,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     /**
      * @param shape shape to use as place holder
      */
-    public SimpleBooleanTensor(int[] shape) {
+    public SimpleBooleanTensor(long[] shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -62,7 +62,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param constant constant boolean value to fill shape
      * @param shape    desired shape of tensor
      */
-    public SimpleBooleanTensor(boolean constant, int[] shape) {
+    public SimpleBooleanTensor(boolean constant, long[] shape) {
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
@@ -70,7 +70,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor reshape(int... newShape) {
+    public BooleanTensor reshape(long... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
@@ -228,7 +228,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 

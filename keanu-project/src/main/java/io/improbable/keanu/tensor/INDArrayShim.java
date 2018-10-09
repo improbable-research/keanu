@@ -99,7 +99,7 @@ public class INDArrayShim {
         }
     }
 
-    private static int[] getBroadcastDimensions(int[] shapeA, int[] shapeB) {
+    private static int[] getBroadcastDimensions(long[] shapeA, long[] shapeB) {
         int maxRank = Math.max(shapeA.length, shapeB.length);
 
         if (shapeA.length < shapeB.length) {

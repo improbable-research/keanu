@@ -35,7 +35,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         this.dimension = dimension;
         this.operands = operands;
         setParents(operands);
-        int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
+        long[][] shapes = extractFromInputs(long[].class, Vertex::getShape);
         setValue(DoubleTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
@@ -57,11 +57,11 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
                                             int dimension) {
 
         Map<VertexId, List<DoubleTensor>> partialsToConcat = new HashMap<>();
-        Map<VertexId, int[]> partialShapes = findShapesOfVertexWithRespectTo(derivativeOfOperandsWrtInputs);
+        Map<VertexId, long[]> partialShapes = findShapesOfVertexWithRespectTo(derivativeOfOperandsWrtInputs);
 
-        for (Map.Entry<VertexId, int[]> partialShape : partialShapes.entrySet()) {
+        for (Map.Entry<VertexId, long[]> partialShape : partialShapes.entrySet()) {
             VertexId wrtVertexId = partialShape.getKey();
-            int[] partialWrtShape = partialShape.getValue();
+            long[] partialWrtShape = partialShape.getValue();
 
             getPartialsToConcatForInput(partialsToConcat, derivativeOfOperandsWrtInputs, operandValues, wrtVertexId, partialWrtShape);
         }
@@ -69,8 +69,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         return concatAll(partialsToConcat, dimension);
     }
 
-    private static Map<VertexId, int[]> findShapesOfVertexWithRespectTo(List<PartialDerivatives> derivativeOfOperandsWrtInputs) {
-        Map<VertexId, int[]> vertexInfo = new HashMap<>();
+    private static Map<VertexId, long[]> findShapesOfVertexWithRespectTo(List<PartialDerivatives> derivativeOfOperandsWrtInputs) {
+        Map<VertexId, long[]> vertexInfo = new HashMap<>();
 
         for (PartialDerivatives derivativeOfOperandWrtInputs : derivativeOfOperandsWrtInputs) {
 
@@ -86,7 +86,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
                                                     List<PartialDerivatives> derivativeOfOperandsWrtInputs,
                                                     List<DoubleTensor> operandValues,
                                                     VertexId wrtVertexId,
-                                                    int[] partialWrtShape) {
+                                                    long[] partialWrtShape) {
 
         for (int i = 0; i < operandValues.size(); i++) {
             PartialDerivatives partialOfOperand = derivativeOfOperandsWrtInputs.get(i);
@@ -95,8 +95,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             if (partialOfOperand.asMap().containsKey(wrtVertexId)) {
                 partialsToConcat.computeIfAbsent(wrtVertexId, k -> new ArrayList<>()).add(partialOfOperand.asMap().get(wrtVertexId));
             } else {
-                int[] wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
-                int[] resultShape = TensorShape.concat(operandValue.getShape(), wrtShape);
+                long[] wrtShape = Arrays.copyOfRange(partialWrtShape, operandValue.getRank(), partialWrtShape.length);
+                long[] resultShape = TensorShape.concat(operandValue.getShape(), wrtShape);
 
                 partialsToConcat.computeIfAbsent(wrtVertexId, k -> new ArrayList<>()).add(DoubleTensor.zeros(resultShape));
             }
@@ -134,7 +134,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         int[] splitIndices = new int[operands.length];
 
         for (int i = 0; i < operands.length; i++) {
-            splitIndices[i] = currentSplitIndex + operands[i].getShape()[dimension];
+            splitIndices[i] = currentSplitIndex + (int) operands[i].getShape()[dimension];
             currentSplitIndex = splitIndices[i];
             splitPartials.put(operands[i], new PartialDerivatives(new HashMap<>()));
         }

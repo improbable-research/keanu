@@ -22,7 +22,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor TWO_SCALAR = scalar(2.0);
 
-    static DoubleTensor create(double value, int[] shape) {
+    static DoubleTensor create(double value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(value);
         } else {
@@ -30,7 +30,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor create(double[] values, int... shape) {
+    static DoubleTensor create(double[] values, long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarDoubleTensor(values[0]);
         } else {
@@ -42,7 +42,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return create(values, 1, values.length);
     }
 
-    static DoubleTensor ones(int... shape) {
+    static DoubleTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
         } else {
@@ -58,7 +58,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor zeros(int... shape) {
+    static DoubleTensor zeros(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
@@ -93,7 +93,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
-    static DoubleTensor placeHolder(int[] shape) {
+    static DoubleTensor placeHolder(long[] shape) {
         return new ScalarDoubleTensor(shape);
     }
 
@@ -118,7 +118,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor setValue(Double value, int... index);
 
     @Override
-    DoubleTensor reshape(int... newShape);
+    DoubleTensor reshape(long... newShape);
 
     DoubleTensor permute(int... rearrange);
 

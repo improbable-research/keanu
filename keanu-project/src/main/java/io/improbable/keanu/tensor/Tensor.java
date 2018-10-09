@@ -1,8 +1,6 @@
 package io.improbable.keanu.tensor;
 
 
-import static org.apache.commons.math3.util.MathArrays.copyOf;
-
 import java.util.Arrays;
 import java.util.List;
 
@@ -28,24 +26,24 @@ public interface Tensor<T> {
             equality[i] = aArray[i].equals(bArray[i]);
         }
 
-        int[] shape = a.getShape();
-        return BooleanTensor.create(equality, copyOf(shape, shape.length));
+        long[] shape = a.getShape();
+        return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
     }
 
     static <T> Tensor<T> scalar(T value) {
         return new GenericTensor<>(value);
     }
 
-    static <T> Tensor<T> placeHolder(int[] shape) {
+    static <T> Tensor<T> placeHolder(long[] shape) {
         return new GenericTensor<>(shape);
     }
 
-    int[] SCALAR_SHAPE = new int[]{1, 1};
-    int[] SCALAR_STRIDE = new int[]{1};
+    long[] SCALAR_SHAPE = new long[]{1, 1};
+    long[] SCALAR_STRIDE = new long[]{1};
 
     int getRank();
 
-    int[] getShape();
+    long[] getShape();
 
     long getLength();
 
@@ -67,7 +65,7 @@ public interface Tensor<T> {
 
     T[] asFlatArray();
 
-    Tensor<T> reshape(int... newShape);
+    Tensor<T> reshape(long... newShape);
 
     FlattenedView<T> getFlattenedView();
 
@@ -113,7 +111,7 @@ public interface Tensor<T> {
         return hasSameShapeAs(that.getShape());
     }
 
-    default boolean hasSameShapeAs(int[] shape) {
+    default boolean hasSameShapeAs(long[] shape) {
         return Arrays.equals(this.getShape(), shape);
     }
 

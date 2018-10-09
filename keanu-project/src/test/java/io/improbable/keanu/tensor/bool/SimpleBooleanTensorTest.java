@@ -24,9 +24,9 @@ public class SimpleBooleanTensorTest {
     @Before
     public void setup() {
 
-        matrixA = SimpleBooleanTensor.create(new boolean[]{true, false, true, false}, new int[]{2, 2});
-        matrixB = SimpleBooleanTensor.create(new boolean[]{false, false, true, true}, new int[]{2, 2});
-        matrixC = SimpleBooleanTensor.create(new boolean[]{true, true, true, false}, new int[]{2, 2});
+        matrixA = SimpleBooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
+        matrixB = SimpleBooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
+        matrixC = SimpleBooleanTensor.create(new boolean[]{true, true, true, false}, new long[]{2, 2});
     }
 
     @Test
@@ -67,8 +67,8 @@ public class SimpleBooleanTensorTest {
 
     @Test
     public void doesSetDoubleIf() {
-        DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new int[]{2, 2});
-        DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new int[]{2, 2});
+        DoubleTensor trueCase = DoubleTensor.create(new double[]{1.5, 2.0, 3.3, 4.65}, new long[]{2, 2});
+        DoubleTensor falseCase = DoubleTensor.create(new double[]{5.1, 7.2, 11.4, 23.22}, new long[]{2, 2});
 
         DoubleTensor result = matrixA.setDoubleIf(trueCase, falseCase);
         assertArrayEquals(new double[]{1.5, 7.2, 3.3, 23.22}, result.asFlatDoubleArray(), 0.0);
@@ -76,8 +76,8 @@ public class SimpleBooleanTensorTest {
 
     @Test
     public void doesSetIntegerIf() {
-        IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
-        IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new int[]{2, 2});
+        IntegerTensor trueCase = IntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
+        IntegerTensor falseCase = IntegerTensor.create(new int[]{5, 7, 11, 23}, new long[]{2, 2});
 
         IntegerTensor result = matrixA.setIntegerIf(trueCase, falseCase);
         assertArrayEquals(new int[]{1, 7, 3, 23}, result.asFlatIntegerArray());
@@ -98,12 +98,12 @@ public class SimpleBooleanTensorTest {
 
         Tensor<Something> trueCase = new GenericTensor<>(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
-            new int[]{2, 2}
+            new long[]{2, 2}
         );
 
         Tensor<Something> falseCase = new GenericTensor<>(
             new Something[]{Something.D, Something.C, Something.C, Something.A},
-            new int[]{2, 2}
+            new long[]{2, 2}
         );
 
         Tensor<Something> result = matrixA.setIf(trueCase, falseCase);
@@ -115,14 +115,14 @@ public class SimpleBooleanTensorTest {
 
     @Test
     public void doesAllTrue() {
-        assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new int[]{2, 2}).allTrue());
-        assertTrue(new SimpleBooleanTensor(new boolean[]{true, true, true, true}, new int[]{2, 2}).allTrue());
+        assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allTrue());
+        assertTrue(new SimpleBooleanTensor(new boolean[]{true, true, true, true}, new long[]{2, 2}).allTrue());
     }
 
     @Test
     public void doesAllFalse() {
-        assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new int[]{2, 2}).allFalse());
-        assertTrue(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new int[]{2, 2}).allFalse());
+        assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
+        assertTrue(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
     }
 
     @Test
@@ -157,7 +157,7 @@ public class SimpleBooleanTensorTest {
     public void canReshape() {
         BooleanTensor reshaped = matrixA.reshape(4, 1);
         assertArrayEquals(reshaped.asFlatIntegerArray(), matrixA.asFlatIntegerArray());
-        assertArrayEquals(new int[]{4, 1}, reshaped.getShape());
+        assertArrayEquals(new long[]{4, 1}, reshaped.getShape());
     }
 
 }

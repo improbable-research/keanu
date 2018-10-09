@@ -95,7 +95,7 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         return new BoolTakeVertex(this, index);
     }
 
-    public BoolVertex reshape(int... proposedShape) {
+    public BoolVertex reshape(long... proposedShape) {
         return new BoolReshapeVertex(this, proposedShape);
     }
 

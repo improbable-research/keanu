@@ -56,10 +56,10 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     }
 
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
-        int[] targetShape = TensorShape.concat(getShape(), inputVertex.getShape());
+        long[] targetShape = TensorShape.concat(getShape(), inputVertex.getShape());
         int dimensionInWrt = dimension + getShape().length;
         int indicesBefore = index;
-        int indicesAfter = targetShape[dimensionInWrt] - index - 1;
+        int indicesAfter = (int) targetShape[dimensionInWrt] - index - 1;
         targetShape[dimensionInWrt] = 1;
         DoubleTensor outputTensor = tensor.reshape(targetShape);
 

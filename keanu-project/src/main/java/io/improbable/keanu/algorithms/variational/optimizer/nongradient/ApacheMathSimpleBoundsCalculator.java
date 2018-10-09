@@ -67,7 +67,7 @@ class ApacheMathSimpleBoundsCalculator {
     }
 
     private void validateBoundsForVertex(Vertex<DoubleTensor> vertex) {
-        int[] vertexShape = vertex.getShape();
+        long[] vertexShape = vertex.getShape();
         if (!optimizerBounds.getLower(vertex).isScalar() && !Arrays.equals(vertexShape, optimizerBounds.getLower(vertex).getShape())) {
             throw new IllegalArgumentException("Lower bounds shape does not match vertex shape");
         }

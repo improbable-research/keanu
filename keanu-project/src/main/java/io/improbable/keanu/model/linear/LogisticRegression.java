@@ -60,7 +60,7 @@ public class LogisticRegression implements ClassificationModel {
     }
 
     private double[] regularizeSigma(DoubleTensor x, double priorSigma, double regularization) {
-        int numFeatures = x.getShape()[0];
+        int numFeatures = (int) x.getShape()[0];
         double[] regularizedSigma = new double[numFeatures];
         for (int i = 0; i < numFeatures; i++) {
             DoubleTensor xColumn = x.slice(0, i);

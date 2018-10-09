@@ -14,10 +14,10 @@ import io.improbable.keanu.tensor.TensorShape;
 public class GenericTensor<T> implements Tensor<T> {
 
     private T[] data;
-    private int[] shape;
-    private int[] stride;
+    private long[] shape;
+    private long[] stride;
 
-    public GenericTensor(T[] data, int[] shape) {
+    public GenericTensor(T[] data, long[] shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -36,7 +36,7 @@ public class GenericTensor<T> implements Tensor<T> {
     /**
      * @param shape placeholder shape
      */
-    public GenericTensor(int[] shape) {
+    public GenericTensor(long[] shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -48,7 +48,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -180,7 +180,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> reshape(int... newShape) {
+    public Tensor<T> reshape(long... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
@@ -198,7 +198,7 @@ public class GenericTensor<T> implements Tensor<T> {
                 tadded.add(getValue(indicesOfCurrent));
             }
         }
-        int[] taddedShape = Arrays.copyOf(shape, shape.length);
+        long[] taddedShape = Arrays.copyOf(shape, shape.length);
         taddedShape[dimension] = 1;
         return new GenericTensor(tadded.toArray(), taddedShape);
     }

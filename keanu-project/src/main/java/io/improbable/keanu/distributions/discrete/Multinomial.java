@@ -44,14 +44,14 @@ public class Multinomial implements DiscreteDistribution {
         );
         CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
-        numCategories = p.getShape()[0];
+        numCategories = (int) p.getShape()[0];
         TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
         this.n = n;
         this.p = p;
     }
 
     @Override
-    public IntegerTensor sample(int[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, n.getShape());
 
         Tensor.FlattenedView<Integer> nFlattened = n.getFlattenedView();
@@ -80,8 +80,8 @@ public class Multinomial implements DiscreteDistribution {
      * @param samples the flat array of samples
      * @return
      */
-    private IntegerTensor constructSampleTensor(int[] shape, int[] samples) {
-        int[] outputShape = shape;
+    private IntegerTensor constructSampleTensor(long[] shape, int[] samples) {
+        long[] outputShape = shape;
         if (shape[0] == 1) {
             outputShape = ArrayUtils.remove(outputShape, 0);
         }
@@ -123,7 +123,7 @@ public class Multinomial implements DiscreteDistribution {
 
     @Override
     public DoubleTensor logProb(IntegerTensor k) {
-        int[] expectedShape = p.getShape();
+        long[] expectedShape = p.getShape();
         TensorShapeValidation.checkAllShapesMatch(
             String.format("Shape mismatch. k: %s, p: %s",
                 Arrays.toString(k.getShape()),

@@ -58,7 +58,7 @@ public class LogProbGradientCalculatorTest {
     @Test
     public void canFindGradientOfSingleVariantGaussianWrtMultivariateLatent() {
 
-        GaussianVertex A = new GaussianVertex(new int[]{3, 2}, 0, 1);
+        GaussianVertex A = new GaussianVertex(new long[]{3, 2}, 0, 1);
         GaussianVertex B = new GaussianVertex(A, 1);
         DoubleTensor bValue = DoubleTensor.create(new double[]{0.1, 0.2, 0.3, -0.2, -0.5, 0.9}, 3, 2);
         B.setValue(bValue);
@@ -77,7 +77,7 @@ public class LogProbGradientCalculatorTest {
     public void canFindGradientOfMultivariantGaussianWrtSingleVariateLatent() {
 
         GaussianVertex A = new GaussianVertex(0, 1);
-        GaussianVertex B = new GaussianVertex(new int[]{3, 2}, A, 1);
+        GaussianVertex B = new GaussianVertex(new long[]{3, 2}, A, 1);
         DoubleTensor bValue = DoubleTensor.create(new double[]{0.1, 0.2, 0.3, -0.2, -0.5, 0.9}, 3, 2);
         B.setValue(bValue);
 
@@ -98,7 +98,7 @@ public class LogProbGradientCalculatorTest {
         GaussianVertex A = new GaussianVertex(0, 1);
         DoubleTensor aValue = DoubleTensor.scalar(0.2);
         A.setValue(aValue);
-        GaussianVertex C = new GaussianVertex(new int[]{3, 2}, 0, 1);
+        GaussianVertex C = new GaussianVertex(new long[]{3, 2}, 0, 1);
         DoubleTensor cValue = DoubleTensor.create(new double[]{-0.1, -0.2, -0.3, 0.2, 0.5, -0.9}, 3, 2);
         C.setValue(cValue);
         DoubleVertex D = A.times(C);
@@ -115,7 +115,7 @@ public class LogProbGradientCalculatorTest {
         double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
-        assertArrayEquals(new int[]{1, 1}, dBLogProbWrtAValue.getShape());
+        assertArrayEquals(new long[]{1, 1}, dBLogProbWrtAValue.getShape());
         assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtCValue, equalTo(expectedDLogProbWrtC));
     }
@@ -130,7 +130,7 @@ public class LogProbGradientCalculatorTest {
 
     @Test
     public void doesMatchForwardAutodiffWithManyOps() {
-        int[] shape = new int[]{2, 2};
+        long[] shape = new long[]{2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
         A.setValue(DoubleTensor.linspace(0.1, 2, 4).reshape(shape));
         DoubleVertex B = new GaussianVertex(shape, 0, 1);

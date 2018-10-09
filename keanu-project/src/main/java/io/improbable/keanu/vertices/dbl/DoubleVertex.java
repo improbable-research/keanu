@@ -193,11 +193,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new SumVertex(this, sumOverDimensions);
     }
 
-    public DoubleVertex reshape(int... proposedShape) {
+    public DoubleVertex reshape(long... proposedShape) {
         return new ReshapeVertex(this, proposedShape);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
+    public DoubleVertex lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);

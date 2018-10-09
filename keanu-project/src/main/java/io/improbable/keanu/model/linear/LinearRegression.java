@@ -60,7 +60,7 @@ public class LinearRegression implements LinearModel {
     }
 
     private static double[] fillPriorOnWeights(DoubleTensor x, double priorOnSigma) {
-        double[] priorWeights = new double[x.getShape()[0]];
+        double[] priorWeights = new double[(int) x.getShape()[0]];
         Arrays.fill(priorWeights, priorOnSigma);
         return priorWeights;
     }

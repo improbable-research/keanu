@@ -4,7 +4,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerReshapeVertex extends IntegerUnaryOpVertex {
-    public IntegerReshapeVertex(IntegerVertex inputVertex, int... proposedShape) {
+    public IntegerReshapeVertex(IntegerVertex inputVertex, long... proposedShape) {
         super(proposedShape, inputVertex);
     }
 

@@ -16,11 +16,11 @@ public class TensorMatchers {
     private TensorMatchers() {}
 
 
-    public static <T> Matcher<Tensor<T>> hasShape(int... shape) {
+    public static <T> Matcher<Tensor<T>> hasShape(long... shape) {
         return hasShape(equalTo(shape));
     }
 
-    public static <T> Matcher<Tensor<T>> hasShape(Matcher<int[]> shapeMatcher) {
+    public static <T> Matcher<Tensor<T>> hasShape(Matcher<long[]> shapeMatcher) {
         return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
             @Override
             protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {

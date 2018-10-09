@@ -47,15 +47,15 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor create(double[] values, int[] shape) {
+    public static Nd4jDoubleTensor create(double[] values, long[] shape) {
         return new Nd4jDoubleTensor(values, shape);
     }
 
-    public static Nd4jDoubleTensor create(double value, int[] shape) {
+    public static Nd4jDoubleTensor create(double value, long[] shape) {
         return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor ones(int... shape) {
+    public static Nd4jDoubleTensor ones(long... shape) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
@@ -63,7 +63,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.eye(n, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor zeros(int[] shape) {
+    public static Nd4jDoubleTensor zeros(long[] shape) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.zeros(shape, BUFFER_TYPE));
     }
 
@@ -83,7 +83,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     private INDArray tensor;
 
-    public Nd4jDoubleTensor(double[] data, int[] shape) {
+    public Nd4jDoubleTensor(double[] data, long[] shape) {
         this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
     }
 
@@ -97,7 +97,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return tensor.shape();
     }
 
@@ -121,7 +121,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor reshape(int... newShape) {
+    public DoubleTensor reshape(long... newShape) {
         return new Nd4jDoubleTensor(tensor.reshape(newShape));
     }
 
@@ -894,7 +894,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
 
-        int[] shape = getShape();
+        long[] shape = getShape();
         if (dimension < 0 || dimension >= shape.length) {
             throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
         }
@@ -1079,9 +1079,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jIntegerTensor(INDArrayExtensions.castToInteger(tensor, true));
     }
 
-    private BooleanTensor fromMask(INDArray mask, int[] shape) {
+    private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[mask.length()];
+        boolean[] boolsFromMask = new boolean[(int) mask.length()];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getDouble(i) != 0.0;

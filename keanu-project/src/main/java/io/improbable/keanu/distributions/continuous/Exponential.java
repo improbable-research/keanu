@@ -21,7 +21,7 @@ public class Exponential implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return random.nextDouble(shape).logInPlace().timesInPlace(lambda).unaryMinusInPlace();
     }
 

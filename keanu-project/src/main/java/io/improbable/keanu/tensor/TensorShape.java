@@ -1,20 +1,16 @@
 package io.improbable.keanu.tensor;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
-
-import com.google.common.primitives.Ints;
 
 public class TensorShape {
 
-    private int[] shape;
+    private long[] shape;
 
-    public TensorShape(int[] shape) {
+    public TensorShape(long[] shape) {
         this.shape = Arrays.copyOf(shape, shape.length);
     }
 
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -42,12 +38,12 @@ public class TensorShape {
      * @return the number of elements in a tensor. This
      * is the product of all ints in shape.
      */
-    public static long getLength(int[] shape) {
+    public static long getLength(long[] shape) {
         if (shape.length == 0) {
             return 0;
         } else {
             long length = 1;
-            for (int dim : shape) {
+            for (long dim : shape) {
                 length *= dim;
             }
             return length;
@@ -60,8 +56,8 @@ public class TensorShape {
      * to a buffer array flat index. This is based on the C convention of
      * row first instead of column.
      */
-    public static int[] getRowFirstStride(int[] shape) {
-        int[] stride = new int[shape.length];
+    public static long[] getRowFirstStride(long[] shape) {
+        long[] stride = new long[shape.length];
         stride[stride.length - 1] = 1;
 
         int buffer = 1;
@@ -79,7 +75,7 @@ public class TensorShape {
      * @param index  the index in each dimension
      * @return the flat index from a N dimensional index
      */
-    public static int getFlatIndex(int[] shape, int[] stride, int... index) {
+    public static int getFlatIndex(long[] shape, long[] stride, int... index) {
         int flatIndex = 0;
         for (int i = 0; i < index.length; i++) {
 
@@ -102,25 +98,25 @@ public class TensorShape {
      * @param flatIndex the index to f
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */
-    public static int[] getShapeIndices(int[] shape, int[] stride, int flatIndex) {
+    public static int[] getShapeIndices(long[] shape, long[] stride, int flatIndex) {
         if (flatIndex > getLength(shape)) {
             throw new IllegalArgumentException("The requested index is out of the bounds of this shape.");
         }
         int[] shapeIndices = new int[stride.length];
         int remainder = flatIndex;
         for (int i = 0; i < stride.length; i++) {
-            shapeIndices[i] = remainder / stride[i];
+            shapeIndices[i] = (int) (remainder / stride[i]);
             remainder -= shapeIndices[i] * stride[i];
         }
         return shapeIndices;
     }
 
-    public static boolean isScalar(int[] shape) {
+    public static boolean isScalar(long[] shape) {
         return getLength(shape) == 1;
     }
 
-    public static int[] concat(int[] shape1, int[] shape2) {
-        int[] result = new int[shape1.length + shape2.length];
+    public static long[] concat(long[] shape1, long[] shape2) {
+        long[] result = new long[shape1.length + shape2.length];
         System.arraycopy(shape1, 0, result, 0, shape1.length);
         System.arraycopy(shape2, 0, result, shape1.length, shape2.length);
         return result;
@@ -145,12 +141,12 @@ public class TensorShape {
         return dims;
     }
 
-    public static int[] selectDimensions(int from, int to, int[] shape) {
+    public static long[] selectDimensions(int from, int to, long[] shape) {
         if (from > to) {
             throw new IllegalArgumentException("to dimension must be less than from");
         }
 
-        int[] newShape = new int[to - from];
+        long[] newShape = new long[to - from];
 
         for (int i = 0; i < (to - from); i++) {
             newShape[i] = shape[i + from];
@@ -159,16 +155,16 @@ public class TensorShape {
         return newShape;
     }
     
-    public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
+    public static long[] shapeDesiredToRankByAppendingOnes(long[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
     }
 
-    public static int[] shapeToDesiredRankByPrependingOnes(int[] lowRankTensorShape, int desiredRank) {
+    public static long[] shapeToDesiredRankByPrependingOnes(long[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false);
     }
 
-    private static int[] increaseRankByPaddingOnes(int[] lowRankTensorShape, int desiredRank, boolean append) {
-        int[] paddedShape = new int[desiredRank];
+    private static long[] increaseRankByPaddingOnes(long[] lowRankTensorShape, int desiredRank, boolean append) {
+        long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {
             throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");
         }
@@ -183,8 +179,8 @@ public class TensorShape {
         return paddedShape;
     }
 
-    public static int[] shapeSlice(int dimension, int[] shape) {
-        int[] newShape = Arrays.copyOf(shape, shape.length);
+    public static long[] shapeSlice(int dimension, long[] shape) {
+        long[] newShape = Arrays.copyOf(shape, shape.length);
         newShape[dimension] = 1;
         return newShape;
     }

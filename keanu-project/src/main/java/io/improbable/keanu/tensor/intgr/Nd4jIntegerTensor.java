@@ -29,15 +29,15 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor create(int[] values, int[] shape) {
+    public static Nd4jIntegerTensor create(int[] values, long[] shape) {
         return new Nd4jIntegerTensor(values, shape);
     }
 
-    public static Nd4jIntegerTensor create(int value, int[] shape) {
+    public static Nd4jIntegerTensor create(int value, long[] shape) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.valueArrayOf(shape, value, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor ones(int[] shape) {
+    public static Nd4jIntegerTensor ones(long[] shape) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
@@ -45,13 +45,13 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.eye(n, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor zeros(int[] shape) {
+    public static Nd4jIntegerTensor zeros(long[] shape) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.zeros(shape, BUFFER_TYPE));
     }
 
     private INDArray tensor;
 
-    public Nd4jIntegerTensor(int[] data, int[] shape) {
+    public Nd4jIntegerTensor(int[] data, long[] shape) {
         this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
     }
 
@@ -60,7 +60,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor reshape(int... newShape) {
+    public IntegerTensor reshape(long... newShape) {
         return new Nd4jIntegerTensor(tensor.reshape(newShape));
     }
 
@@ -522,7 +522,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return tensor.shape();
     }
 
@@ -617,9 +617,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return ((Nd4jIntegerTensor) that).tensor;
     }
 
-    private BooleanTensor fromMask(INDArray mask, int[] shape) {
+    private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[mask.length()];
+        boolean[] boolsFromMask = new boolean[(int) mask.length()];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getInt(i) != 0;

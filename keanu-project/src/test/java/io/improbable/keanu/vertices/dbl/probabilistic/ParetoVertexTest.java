@@ -138,7 +138,7 @@ public class ParetoVertexTest {
     @Test
     public void sampleMatchesLogProb() {
         int sampleCount = 1000000;
-        ParetoVertex vertex = new ParetoVertex(new int[]{sampleCount, 1}, 1.0, 3.0);
+        ParetoVertex vertex = new ParetoVertex(new long[]{sampleCount, 1}, 1.0, 3.0);
 
         double from = 1.0;
         double to = 2.5;
@@ -173,7 +173,7 @@ public class ParetoVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ParetoVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new ParetoVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             trueParams,
             latentParams,
             random
@@ -198,7 +198,7 @@ public class ParetoVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ParetoVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new ParetoVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             trueParams,
             latentParams,
             random
@@ -224,7 +224,7 @@ public class ParetoVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ParetoVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new ParetoVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             trueParams,
             latentParams,
             random

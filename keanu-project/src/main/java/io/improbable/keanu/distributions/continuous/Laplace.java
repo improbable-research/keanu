@@ -32,7 +32,7 @@ public class Laplace implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
         Tensor.FlattenedView<Double> betaWrapped = beta.getFlattenedView();
 
