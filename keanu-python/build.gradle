@@ -4,16 +4,6 @@ assemble.dependsOn(":codegen:processor:codeGen")
 task installPipenv {
     doLast {
         exec {
-            // temporarily fixing the version as 2018.10.9 seems to be broken:
-            // TypeError: stat: path should be string, bytes, os.PathLike or integer, not NoneType
-            commandLine 'pip', 'install', 'pipenv==2018.7.1'
-        }
-        exec {
-            // temporary workaround for https://github.com/pypa/pipenv/issues/2924
-            // (pip 18.1 broke pipenv)
-            commandLine 'pipenv', 'run', 'pip', 'install', 'pip==18.0'
-        }
-        exec {
             commandLine 'pipenv', 'install', '--dev', '--three'
         }
     }
