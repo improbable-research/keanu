@@ -64,15 +64,15 @@ class VertexProcessor {
     private static Map<String, Object> buildDataModel(List<Constructor> constructors) {
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
-        List<Konstructor> konstructors = new ArrayList<>();
+        List<PythonConstructor> pythonConstructors = new ArrayList<>();
         root.put("imports", imports);
-        root.put("constructors", konstructors);
+        root.put("constructors", pythonConstructors);
 
         for (Constructor constructor : constructors) {
             String javaClass = constructor.getDeclaringClass().getSimpleName();
 
             imports.add(new Import(constructor.getDeclaringClass().getCanonicalName()));
-            konstructors.add(new Konstructor(javaClass, toPythonClass(javaClass)));
+            pythonConstructors.add(new PythonConstructor(javaClass, toPythonClass(javaClass)));
         }
 
         return root;
@@ -91,13 +91,13 @@ class VertexProcessor {
         }
     }
 
-    public static class Konstructor {
+    public static class PythonConstructor {
         @Getter
         private String javaClass;
         @Getter
         private String pythonClass;
 
-        Konstructor(String javaClass, String pythonClass) {
+        PythonConstructor(String javaClass, String pythonClass) {
             this.javaClass = javaClass;
             this.pythonClass = pythonClass;
         }
