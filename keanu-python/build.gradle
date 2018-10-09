@@ -4,6 +4,11 @@ assemble.dependsOn(":codegen:processor:codeGen")
 task installPipenv {
     doLast {
         exec {
+            // temporary workaround for https://github.com/pypa/pipenv/issues/2924
+            // (pip 18.1 broke pipenv)
+            commandLine 'pip', 'install', 'pip==18.0'
+        }
+        exec {
             commandLine 'pip', 'install', 'pipenv'
         }
         exec {
