@@ -4,7 +4,7 @@ assemble.dependsOn(":codegen:processor:codeGen")
 task installPipenv {
     doLast {
         exec {
-            commandLine 'pipenv', 'install', '--dev', '--three'
+            commandLine 'pipenv', 'install', '--dev', '--python', '3.6'
         }
     }
 }
