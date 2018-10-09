@@ -8,18 +8,32 @@ import static org.junit.Assert.assertFalse;
 
 import java.util.Arrays;
 
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
-import org.junit.Rule;
-import org.junit.rules.ExpectedException;
 
 public class Nd4jIntegerTensorTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
+
+    @Test
+    public void youCannotCreateARankZeroTensor() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Tensors must have rank >=2 : []");
+        IntegerTensor.create(new int[] {}, new int[] {});
+    }
+
+    @Test
+    public void youCannotCreateARankOneTensor() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Tensors must have rank >=2 : [5]");
+        IntegerTensor.create(new int[] {1, 2, 3, 4, 5}, new int[] {5});
+    }
 
     @Test
     public void doesMinusScalar() {

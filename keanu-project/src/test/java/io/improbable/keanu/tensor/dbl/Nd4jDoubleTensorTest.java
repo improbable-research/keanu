@@ -63,6 +63,20 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test
+    public void youCannotCreateARankZeroTensor() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Tensors must have rank >=2 : []");
+        DoubleTensor.create(new double[] {}, new int[] {});
+    }
+
+    @Test
+    public void youCannotCreateARankOneTensor() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Tensors must have rank >=2 : [5]");
+        DoubleTensor.create(new double[] {1, 2, 3, 4, 5}, new int[] {5});
+    }
+
+    @Test
     public void canElementWiseMultiplyMatrix() {
         DoubleTensor result = matrixA.times(matrixB);
         assertArrayEquals(new double[]{1, 4, 9, 16}, result.asFlatDoubleArray(), 0.0);
