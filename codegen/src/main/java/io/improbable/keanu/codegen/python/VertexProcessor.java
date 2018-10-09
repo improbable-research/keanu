@@ -26,11 +26,10 @@ class VertexProcessor {
     final private static String GENERATED_FILE = "vertex.py";
 
     static void process(String generatedDir) {
-        List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors();
-        Map<String, Object> dataModel = buildDataModel(constructors);
+        Map<String, Object> dataModel = buildDataModel();
         Writer fileWriter = FileUtil.createFileWriter(generatedDir + GENERATED_FILE);
-
         Template fileTemplate = FileUtil.getFileTemplate(TEMPLATE_FILE);
+
         try {
             fileTemplate.process(dataModel, fileWriter);
             fileWriter.close();
@@ -41,18 +40,9 @@ class VertexProcessor {
         }
     }
 
-    private static List<Constructor> getSortedListOfAnnotatedVertexConstructors() {
-         Reflections reflections = new Reflections(new ConfigurationBuilder()
-            .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
-            .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
+    private static Map<String, Object> buildDataModel() {
+        List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors();
 
-        List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
-        constructors.sort(Comparator.comparing(Constructor::getName));
-
-        return constructors;
-    }
-
-    private static Map<String, Object> buildDataModel(List<Constructor> constructors) {
         Map<String, Object> root = new HashMap<>();
         List<Import> imports = new ArrayList<>();
         List<PythonConstructor> pythonConstructors = new ArrayList<>();
@@ -67,6 +57,17 @@ class VertexProcessor {
         }
 
         return root;
+    }
+
+    private static List<Constructor> getSortedListOfAnnotatedVertexConstructors() {
+         Reflections reflections = new Reflections(new ConfigurationBuilder()
+            .setUrls(ClasspathHelper.forPackage("io.improbable.keanu.vertices"))
+            .setScanners(new MethodAnnotationsScanner(), new TypeAnnotationsScanner()));
+
+        List<Constructor> constructors = new ArrayList<>(reflections.getConstructorsAnnotatedWith(ExportVertexToPythonBindings.class));
+        constructors.sort(Comparator.comparing(Constructor::getName));
+
+        return constructors;
     }
 
     private static String toPythonClass(String javaClass) {
