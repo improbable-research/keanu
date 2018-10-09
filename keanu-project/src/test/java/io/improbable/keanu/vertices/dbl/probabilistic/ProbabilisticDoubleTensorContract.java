@@ -214,7 +214,7 @@ public class ProbabilisticDoubleTensorContract {
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void isTreatedAsConstantWhenObserved(V vertexUnderTest) {
         vertexUnderTest.observe(DoubleTensor.ones(vertexUnderTest.getValue().getShape()));
-        assertTrue(vertexUnderTest.getDualNumber().isOfConstant());
+        assertTrue(vertexUnderTest.getDerivativeWrtLatents().asMap().isEmpty());
     }
 
     public static <V extends DoubleVertex & ProbabilisticDouble>

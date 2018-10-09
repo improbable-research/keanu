@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
-public class DualNumbersTest {
+public class AutoDiffTest {
 
     DoubleVertex vA;
     DoubleVertex vB;
@@ -68,10 +68,10 @@ public class DualNumbersTest {
         vB.setValue(B);
         vC.eval();
 
-        DualNumber cDual = vC.getDualNumber();
+        PartialDerivatives dcdx = vC.getDerivativeWrtLatents();
 
-        DoubleTensor C = cDual.getValue();
-        Map<VertexId, DoubleTensor> dc = cDual.getPartialDerivatives().asMap();
+        DoubleTensor C = vC.getValue();
+        Map<VertexId, DoubleTensor> dcdxMap = dcdx.asMap();
 
         double da = 0.00000001;
 
@@ -81,7 +81,7 @@ public class DualNumbersTest {
 
         DoubleTensor dcdaApprox = (vC.getValue().minus(C)).div(da);
 
-        assertEquals(dcdaApprox.scalar(), dc.get(vA.getId()).scalar(), 0.00001);
+        assertEquals(dcdaApprox.scalar(), dcdxMap.get(vA.getId()).scalar(), 0.00001);
 
         double db = da;
 
@@ -91,6 +91,6 @@ public class DualNumbersTest {
 
         DoubleTensor dcdbApprox = (vC.getValue().minus(C)).div(db);
 
-        assertEquals(dcdbApprox.scalar(), dc.get(vB.getId()).scalar(), 0.00001);
+        assertEquals(dcdbApprox.scalar(), dcdxMap.get(vB.getId()).scalar(), 0.00001);
     }
 }

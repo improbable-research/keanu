@@ -10,7 +10,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
@@ -37,8 +36,21 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els), getShape());
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+
+        int[] ofShape = getShape();
+        PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.get(thn);
+        PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.get(els);
+        BooleanTensor predicateValue = predicate.getValue();
+
+        if (predicateValue.allTrue()) {
+            return thnPartial;
+        } else if (predicateValue.allFalse()) {
+            return elsPartial;
+        } else {
+            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask(), ofShape)
+                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask(), ofShape));
+        }
     }
 
     @Override

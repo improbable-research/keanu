@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class DivisionVertex extends DoubleBinaryOpVertex {
@@ -26,6 +25,35 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+
+        // dc = (B * da - A * db) / B^2;
+        PartialDerivatives partialsFromLeft;
+        PartialDerivatives partialsFromRight;
+
+        if (dLeftWrtInputs.isEmpty()) {
+            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromLeft = dLeftWrtInputs.multiplyAlongOfDimensions(right.getValue(), left.getValue().getShape());
+        }
+
+        if (dRightWrtInputs.isEmpty()) {
+            partialsFromRight = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromRight = dRightWrtInputs.multiplyAlongOfDimensions(left.getValue(), right.getValue().getShape());
+        }
+
+        PartialDerivatives dSelfWrtInputs;
+        if (partialsFromLeft.isEmpty() && partialsFromRight.isEmpty()) {
+            dSelfWrtInputs = PartialDerivatives.OF_CONSTANT;
+        } else {
+            dSelfWrtInputs = partialsFromLeft.subtract(partialsFromRight).divideBy(right.getValue().pow(2));
+        }
+
+        return dSelfWrtInputs;
+    }
+
+    @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         DoubleTensor leftValue = left.getValue();
@@ -37,10 +65,5 @@ public class DivisionVertex extends DoubleBinaryOpVertex {
         partials.put(right, derivativeOfOutputsWithRespectToSelf
             .multiplyAlongWrtDimensions(dOutWrtRight, this.getShape()));
         return partials;
-    }
-
-    @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.div(r);
     }
 }

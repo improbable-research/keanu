@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators;
 
+import static org.junit.Assert.assertThat;
+
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
-import static org.hamcrest.MatcherAssert.assertThat;
 
 import java.util.List;
 
@@ -11,31 +12,39 @@ import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class TensorTestOperations {
+    public static void finiteDifferenceMatchesForwardAndReverseModeGradient(List<DoubleVertex> inputVertices,
+                                                                            DoubleVertex outputVertex,
+                                                                            double incrementAmount,
+                                                                            Double delta) {
+        finiteDifferenceMatchesForwardModeGradient(inputVertices, outputVertex, incrementAmount, delta);
+        finiteDifferenceMatchesReverseModeGradient(inputVertices, outputVertex, incrementAmount, delta);
+    }
 
-    public static void finiteDifferenceMatchesGradient(List<DoubleVertex> inputVertices,
-                                                       DoubleVertex outputVertex,
-                                                       final double incrementAmount,
-                                                       final Double delta,
-                                                       final boolean doReverse) {
-        inputVertices.forEach(v -> runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, doReverse));
+    public static void finiteDifferenceMatchesForwardModeGradient(List<DoubleVertex> inputVertices,
+                                                                  DoubleVertex outputVertex,
+                                                                  double incrementAmount,
+                                                                  double delta) {
+        inputVertices.forEach(v ->
+            runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, true));
+    }
+
+    public static void finiteDifferenceMatchesReverseModeGradient(List<DoubleVertex> inputVertices,
+                                                                  DoubleVertex outputVertex,
+                                                                  double incrementAmount,
+                                                                  double delta) {
+        inputVertices.forEach(v ->
+            runGradientTestOnSingleInput(v, outputVertex, incrementAmount, delta, false));
     }
 
     private static void runGradientTestOnSingleInput(DoubleVertex inputVertex,
                                                      DoubleVertex outputVertex,
-                                                     final double incrementAmount,
-                                                     final Double delta,
-                                                     final boolean doReverse) {
+                                                     double incrementAmount,
+                                                     Double delta,
+                                                     boolean isForwardMode) {
         DoubleTensor initialInput = inputVertex.getValue();
 
         DoubleTensor initialOutput = outputVertex.eval();
-        DoubleTensor outputWrtInputForward =
-            outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
-
-        if (doReverse) {
-            DoubleTensor outputWrtInputReverse =
-                Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
-            assertThat(outputWrtInputForward, allCloseTo(delta, outputWrtInputReverse));
-        }
+        DoubleTensor outputWrtInput = dOutputWrtInput(outputVertex, inputVertex, isForwardMode);
 
         int[] dimensionsToSumOver = getWrtDimensions(inputVertex, outputVertex);
 
@@ -46,9 +55,23 @@ public class TensorTestOperations {
 
             DoubleTensor newOutput = outputVertex.eval();
             DoubleTensor differenceInOutput = newOutput.minus(initialOutput);
-            DoubleTensor differenceUsingGradient = outputWrtInputForward.times(incrementTensor).sum(dimensionsToSumOver);
-            assertThat(differenceUsingGradient, allCloseTo(delta, differenceInOutput));
+            DoubleTensor differenceUsingGradient = outputWrtInput.times(incrementTensor).sum(dimensionsToSumOver);
+            assertThat(gradientAssertMessage(outputVertex, inputVertex, isForwardMode),
+                differenceUsingGradient, allCloseTo(delta, differenceInOutput));
         }
+    }
+
+    private static DoubleTensor dOutputWrtInput(DoubleVertex outputVertex, DoubleVertex inputVertex, boolean isForwardMode) {
+        if (isForwardMode) {
+            return outputVertex.getDerivativeWrtLatents().withRespectTo(inputVertex);
+        } else {
+            return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
+        }
+    }
+
+    private static String gradientAssertMessage(DoubleVertex outputVertex, DoubleVertex inputVertex, boolean isForwardMode) {
+        String descriptor = isForwardMode ? "Forward" : "Reverse";
+        return String.format("%s derivative of vertex with ID %s with respect to %s should match finite difference", descriptor, outputVertex.getId(), inputVertex.getId());
     }
 
     private static int[] getWrtDimensions(DoubleVertex wrtVertex,

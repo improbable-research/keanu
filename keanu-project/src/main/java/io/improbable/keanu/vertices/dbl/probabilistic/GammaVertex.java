@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
-import static io.improbable.keanu.distributions.dual.Diffs.K;
-import static io.improbable.keanu.distributions.dual.Diffs.THETA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Gamma;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;

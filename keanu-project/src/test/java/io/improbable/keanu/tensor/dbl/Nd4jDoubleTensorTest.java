@@ -198,7 +198,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        DoubleTensor tensor = Nd4jDoubleTensor.create(new double[] {1., 2., 3., 4.}, new int[] {2, 2});
+        DoubleTensor tensor = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new int[]{2, 2});
         DoubleTensor mask = Nd4jDoubleTensor.scalar(1.);
 
         thrown.expect(IllegalArgumentException.class);
@@ -210,7 +210,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
         DoubleTensor tensor = Nd4jDoubleTensor.scalar(3);
-        DoubleTensor mask = Nd4jDoubleTensor.create(new double[] {1., 1., 1., 1.}, new int[] {2, 2});
+        DoubleTensor mask = Nd4jDoubleTensor.ones(2, 2);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());
@@ -239,6 +239,17 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canBroadcastMultiplyRank4ContainingVectorAndMatrix() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          a = np.array([1, 2, 3, 4, 5, 6, 7, 8]).reshape(2,2,2,1)
+          b = np.array([1, 2, 3, 4]).reshape(2,2,1,1)
+          ab = a * b
+          print(ab)
+          print(np.shape(ab))
+         */
+
         DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2, 1});
         DoubleTensor matrix = matrixA.reshape(2, 2, 1, 1);
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{1, 2, 6, 8, 15, 18, 28, 32}, new int[]{2, 2, 2, 1});
@@ -249,6 +260,17 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canBroadcastMultiplyRank4ContainingMatrixAndMatrix() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          a = np.array([1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6]).reshape(2,2,2,2)
+          b = np.array([1, 2, 3, 4]).reshape(2,2,1,1)
+          ab = a * b
+          print(ab)
+          print(np.shape(ab))
+         */
+
         DoubleTensor rank4 = Nd4jDoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8,
             4, 3, 2, 1, 7, 5, 8, 6
@@ -267,6 +289,20 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canBroadcastMultiplyRank5ContainingMatrixAndMatrix() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          a = np.array([
+          1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
+          6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
+          ]).reshape(2,2,2,2,2)
+          b = np.array([1, 2, 3, 4]).reshape(2,2,1,1,1)
+          ab = a * b
+          print(ab)
+          print(np.shape(ab))
+         */
+
         DoubleTensor rank5 = Nd4jDoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
@@ -284,6 +320,17 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canSuperBroadcast() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          a = np.zeros([2,2,2,2])
+          b = np.array([1,0,1,0]).reshape(2,2)
+          ab = a + b
+          print(ab)
+          print(np.shape(ab))
+         */
+
         DoubleTensor x = Nd4jDoubleTensor.zeros(new int[]{2, 2, 2, 2});
         DoubleTensor y = Nd4jDoubleTensor.create(new double[]{1, 0, 1, 0}, new int[]{2, 2});
 
@@ -369,6 +416,17 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canBroadcastAdd() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          x = np.array([1,2,3]).reshape(3,1)
+          s = np.array([-5, -2, -3, -7, -8, -5, -2, -3, -7, -8, -5, -2, -3, -7, -8]).reshape(3,5)
+          sx = s + x
+          print(sx)
+          print(np.shape(sx))
+         */
+
         DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         DoubleTensor s = Nd4jDoubleTensor.create(new double[]{
             -5, -2, -3, -7, -8,
@@ -377,7 +435,6 @@ public class Nd4jDoubleTensorTest {
         }, new int[]{3, 5});
 
         DoubleTensor diff = s.plus(x);
-
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
             -4, -1, -2, -6, -7,
             -3, 0, -1, -5, -6,
@@ -389,6 +446,17 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canBroadcastSubtract() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          x = np.array([-1,-2,-3]).reshape(3,1)
+          s = np.array([-5, -2, -3, -7, -8, -5, -2, -3, -7, -8, -5, -2, -3, -7, -8]).reshape(3,5)
+          sx = s - x
+          print(sx)
+          print(np.shape(sx))
+         */
+
         DoubleTensor x = Nd4jDoubleTensor.create(new double[]{-1, -2, -3}, new int[]{3, 1});
         DoubleTensor s = Nd4jDoubleTensor.create(new double[]{
             -5, -2, -3, -7, -8,
@@ -409,6 +477,17 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canBroadcastDivide() {
+
+        /*
+          # test to make sure numpy returns same result
+          import numpy as np
+          x = np.array([1,2,3]).reshape(3,1)
+          s = np.array([5, 2, 3, 7, 8, 5, 2, 3, 7, 8, 5, 2, 3, 7, 8]).reshape(3,5)
+          sx = s / x
+          print(sx)
+          print(np.shape(sx))
+         */
+
         DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
         DoubleTensor s = Nd4jDoubleTensor.create(new double[]{
             5, 2, 3, 7, 8,
@@ -560,42 +639,42 @@ public class Nd4jDoubleTensorTest {
 
     private void assertTimesOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.times(right);
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     private void assertTimesInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left = left.timesInPlace(right);
-        assertEquals(left, expected);
+        assertEquals(expected, left);
     }
 
     private void assertPlusOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.plus(right);
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     private void assertPlusInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left = left.plusInPlace(right);
-        assertEquals(left, expected);
+        assertEquals(expected, left);
     }
 
     private void assertDivideOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.div(right);
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     private void assertDivideInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left = left.divInPlace(right);
-        assertEquals(left, expected);
+        assertEquals(expected, left);
     }
 
     private void assertMinusOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         DoubleTensor actual = left.minus(right);
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     private void assertMinusInPlaceOperationEquals(DoubleTensor left, DoubleTensor right, DoubleTensor expected) {
         left = left.minusInPlace(right);
-        assertEquals(left, expected);
+        assertEquals(expected, left);
     }
 
     @Test
@@ -780,10 +859,10 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 5, 10}, new int[]{2, 2});
 
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
-            10, 5, 2, 1, 10, 5, 2, 1,
+            .1, .2, .5, 1, .1, .2, .5, 1,
+            .1, .2, .5, 1, .1, .2, .5, 1,
+            .1, .2, .5, 1, .1, .2, .5, 1,
+            .1, .2, .5, 1, .1, .2, .5, 1,
         }, new int[]{4, 2, 2, 2});
 
         assertDivideOperationEquals(matrix, rank4, expected);
@@ -812,10 +891,10 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor matrix = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
 
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1,
-            4, 3, 2, 1, 4, 3, 2, 1
+            -4, -3, -2, -1, -4, -3, -2, -1,
+            -4, -3, -2, -1, -4, -3, -2, -1,
+            -4, -3, -2, -1, -4, -3, -2, -1,
+            -4, -3, -2, -1, -4, -3, -2, -1
         }, new int[]{4, 2, 2, 2});
 
         assertMinusOperationEquals(matrix, rank4, expected);

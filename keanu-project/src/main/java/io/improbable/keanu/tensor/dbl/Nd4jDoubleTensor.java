@@ -55,7 +55,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor ones(int[] shape) {
+    public static Nd4jDoubleTensor ones(int... shape) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
@@ -892,7 +892,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * )
      */
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
 
         int[] shape = getShape();
         if (dimension < 0 || dimension >= shape.length) {

@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
@@ -27,7 +27,7 @@ public class TakeVertexTest {
         DoubleVertex N = m.multiply(alpha);
 
         TakeVertex take = new TakeVertex(N, 0, 0);
-        DoubleTensor takePartial = take.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor takePartial = take.getDerivativeWrtLatents().withRespectTo(m);
         DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m);
 
         assertEquals(N.getValue(0, 0), take.getValue().scalar(), 1e-6);
@@ -37,7 +37,7 @@ public class TakeVertexTest {
         assertArrayEquals(takePartial.asFlatDoubleArray(), takePartialReverse.asFlatDoubleArray(), 1e-6);
 
         TakeVertex take2 = new TakeVertex(N, 0, 1);
-        DoubleTensor takePartial2 = take2.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor takePartial2 = take2.getDerivativeWrtLatents().withRespectTo(m);
         DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m);
 
         assertEquals(N.getValue(0, 1), take2.getValue().scalar(), 1e-6);
@@ -60,7 +60,7 @@ public class TakeVertexTest {
 
         TakeVertex take = new TakeVertex(N, 0, 0);
 
-        DoubleTensor takePartial = take.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor takePartial = take.getDerivativeWrtLatents().withRespectTo(m);
         DoubleTensor takePartialReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(m);
 
         assertArrayEquals(new int[]{1, 1, 2, 2}, takePartial.getShape());
@@ -70,7 +70,7 @@ public class TakeVertexTest {
 
         TakeVertex take2 = new TakeVertex(N, 0, 1);
 
-        DoubleTensor takePartial2 = take2.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor takePartial2 = take2.getDerivativeWrtLatents().withRespectTo(m);
         DoubleTensor takePartial2Reverse = Differentiator.reverseModeAutoDiff(take2, m, alpha).withRespectTo(m);
 
         assertArrayEquals(new int[]{1, 1, 2, 2}, takePartial2.getShape());
@@ -107,13 +107,13 @@ public class TakeVertexTest {
         DoubleVertex y = L.matrixMultiply(N);
 
         TakeVertex take = new TakeVertex(y, 0, 0);
-        DoubleTensor takeDual = take.getDualNumber().getPartialDerivatives().withRespectTo(alpha);
-        DoubleTensor takeDualReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(alpha);
+        DoubleTensor takeDiff = take.getDerivativeWrtLatents().withRespectTo(alpha);
+        DoubleTensor takeDiffReverse = Differentiator.reverseModeAutoDiff(take, m, alpha).withRespectTo(alpha);
 
-        assertArrayEquals(new int[]{1, 1, 2, 2}, takeDual.getShape());
-        assertArrayEquals(new double[]{56, 92, 103, 174}, takeDual.asFlatDoubleArray(), 1e-6);
-        assertArrayEquals(takeDual.getShape(), takeDualReverse.getShape());
-        assertArrayEquals(takeDual.asFlatDoubleArray(), takeDualReverse.asFlatDoubleArray(), 1e-6);
+        assertArrayEquals(new int[]{1, 1, 2, 2}, takeDiff.getShape());
+        assertArrayEquals(new double[]{56, 92, 103, 174}, takeDiff.asFlatDoubleArray(), 1e-6);
+        assertArrayEquals(takeDiff.getShape(), takeDiffReverse.getShape());
+        assertArrayEquals(takeDiff.asFlatDoubleArray(), takeDiffReverse.asFlatDoubleArray(), 1e-6);
     }
 
     @Test
@@ -133,7 +133,7 @@ public class TakeVertexTest {
 
         DoubleVertex F = D.plus(E);
 
-        PartialDerivatives forward = F.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = F.getDerivativeWrtLatents();
         PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(F, A, B);
 
         assertArrayEquals(new int[]{1, 4, 3, 3, 3}, forward.withRespectTo(A).getShape());
@@ -148,7 +148,7 @@ public class TakeVertexTest {
         DoubleVertex inputC = new UniformVertex(new int[]{2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputA.times(10.0).times(inputB).take(0, 1, 2).plus(inputC);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, 10.0, 1e-10, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, 10.0, 1e-10);
     }
 
 }
