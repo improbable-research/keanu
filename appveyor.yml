@@ -2,6 +2,7 @@ version: 1.0.{build}
 environment:
   PYTHON: "C:\\Python36-x64"
   PIPENV_IGNORE_VIRTUALENVS: 1
+  PIPENV_YES: 1
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 build_script:
