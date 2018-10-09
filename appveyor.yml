@@ -4,4 +4,4 @@ environment:
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 build_script:
-- cmd: ./gradlew.bat clean keanu-python:build -i --stacktrace --debug
+- cmd: ./gradlew.bat clean keanu-python:build -i
