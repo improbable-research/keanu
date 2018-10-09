@@ -29,18 +29,21 @@ public abstract class Vertex<T> implements Observable<T> {
     /**
      * Set a label for this vertex.  This allows easy retrieval of this vertex using nothing but a label name.
      * @param label The label to apply to this vertex.  Uniqueness is only enforced on instantiation of a Bayes Net
+     * @param <V> vertex type
+     * @return this
      */
-    public void setLabel(VertexLabel label) {
+    public <V extends Vertex<T>> V setLabel(VertexLabel label) {
         this.label = label;
-    }
-
-    public <V extends Vertex<T>> V labeledAs(VertexLabel vertexName) {
-        setLabel(vertexName);
         return (V) this;
     }
 
     public VertexLabel getLabel() {
         return this.label;
+    }
+
+    public <V extends Vertex<T>> V removeLabel() {
+        this.label = null;
+        return (V) this;
     }
 
     /**

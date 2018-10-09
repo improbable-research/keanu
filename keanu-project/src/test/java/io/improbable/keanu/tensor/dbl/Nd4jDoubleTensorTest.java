@@ -210,7 +210,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void cannotSetIfMaskLengthIsLargerThanTensorLength() {
         DoubleTensor tensor = Nd4jDoubleTensor.scalar(3);
-        DoubleTensor mask = Nd4jDoubleTensor.create(new double[]{1., 1., 1., 1.}, new int[]{2, 2});
+        DoubleTensor mask = Nd4jDoubleTensor.ones(2, 2);
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("The lengths of the tensor and mask must match, but got tensor length: " + tensor.getLength() + ", mask length: " + mask.getLength());

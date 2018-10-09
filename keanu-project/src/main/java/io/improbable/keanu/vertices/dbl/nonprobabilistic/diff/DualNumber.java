@@ -386,10 +386,10 @@ public class DualNumber implements DoubleOperators<DualNumber> {
         }
     }
 
-    public DualNumber sum() {
-        DoubleTensor sumOfAll = DoubleTensor.scalar(value.sum());
-        int[] resultDims = TensorShape.dimensionRange(0, value.getRank());
-        return new DualNumber(sumOfAll, this.partialDerivatives.sumOverOfDimensions(resultDims));
+    public DualNumber sum(int[] overDimensions) {
+        DoubleTensor sumResult = value.sum(overDimensions);
+        int operandRank = value.getRank();
+        return new DualNumber(sumResult, this.partialDerivatives.sumOverOfDimensions(overDimensions, sumResult.getShape(), operandRank));
     }
 
     public DualNumber reshape(int[] proposedShape) {
