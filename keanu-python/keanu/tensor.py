@@ -28,12 +28,19 @@ class Const(JavaObjectWrapper):
 
 class Tensor(JavaObjectWrapper):
     def __init__(self, t):
-        np_tensor = t if isinstance(t, np.ndarray) else np.array([t])
+        np_tensor = self.__ensure_rank_is_atleast_two(t) if isinstance(t, np.ndarray) else np.array([[t]])
 
         values = context.to_java_array(np_tensor.flatten().tolist())
         shape = context.to_java_array(np_tensor.shape)
 
         super(Tensor, self).__init__(self.__infer_tensor_from_np_tensor(np_tensor), values, shape)
+
+    @staticmethod
+    def __ensure_rank_is_atleast_two(np_tensor):
+        if len(np_tensor.shape) == 1:
+            return np_tensor[..., None]
+        else:
+            return np_tensor
 
     @staticmethod
     def __infer_tensor_from_np_tensor(np_tensor):
