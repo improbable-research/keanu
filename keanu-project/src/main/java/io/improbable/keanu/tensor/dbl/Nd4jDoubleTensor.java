@@ -16,6 +16,7 @@ import org.apache.commons.math3.linear.RealMatrix;
 import org.apache.commons.math3.special.Gamma;
 import org.nd4j.linalg.api.buffer.DataBuffer;
 import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.ReplaceNans;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
 import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
@@ -36,6 +37,7 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import io.improbable.keanu.tensor.validate.TensorValidator;
 
 public class Nd4jDoubleTensor implements DoubleTensor {
 
@@ -53,7 +55,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor ones(int[] shape) {
+    public static Nd4jDoubleTensor ones(int... shape) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
@@ -162,11 +164,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor max(DoubleTensor max) {
-        return duplicate().maxInPlace(max);
-    }
-
-    @Override
     public DoubleTensor matrixInverse() {
         return new Nd4jDoubleTensor(InvertMatrix.invert(tensor, false));
     }
@@ -174,11 +171,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public double max() {
         return tensor.maxNumber().doubleValue();
-    }
-
-    @Override
-    public DoubleTensor min(DoubleTensor min) {
-        return duplicate().minInPlace(min);
     }
 
     @Override
@@ -234,6 +226,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor standardize() {
         return duplicate().standardizeInPlace();
+    }
+
+    @Override
+    public DoubleTensor replaceNaN(double value) {
+        return duplicate().replaceNaNInPlace(value);
     }
 
     @Override
@@ -308,6 +305,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public DoubleTensor log() {
         return duplicate().logInPlace();
+    }
+
+    @Override
+    public DoubleTensor safeLogTimes(DoubleTensor y) {
+        return duplicate().safeLogTimesInPlace(y);
     }
 
     @Override
@@ -481,6 +483,21 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public DoubleTensor logInPlace() {
         Transforms.log(tensor, false);
         return this;
+    }
+
+    /**
+     * This is identical to log().times(y), except that it changes NaN results to 0.
+     * This is important when calculating 0log0, which should return 0
+     * See https://arcsecond.wordpress.com/2009/03/19/0log0-0-for-real/ for some mathematical justification
+     * @param y The tensor value to multiply by
+     * @return the log of this tensor multiplied by y
+     */
+    @Override
+    public DoubleTensor safeLogTimesInPlace(DoubleTensor y) {
+        TensorValidator.NAN_CATCHER.validate(this);
+        TensorValidator.NAN_CATCHER.validate(y);
+        DoubleTensor result = this.logInPlace().timesInPlace(y);
+        return TensorValidator.NAN_FIXER.validate(result);
     }
 
     @Override
@@ -738,21 +755,26 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
-
+        double trueValue = 1.0;
         if (value == 0.0) {
-            INDArray swapOnesForZeros = maskDup.rsub(1.0);
-            tensor.muli(swapOnesForZeros);
-        } else {
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(maskDup, value, Conditions.equals(1.0))
-            );
-
-            Nd4j.getExecutioner().exec(
-                new CompareAndSet(tensor, maskDup, Conditions.notEquals(0.0))
-            );
+            // swap true and false - otherwise the value won't get applied
+            trueValue = 1.0 - trueValue;
+            maskDup.negi().addi(1);
         }
+        double falseValue = 1.0 - trueValue;
+
+        Nd4j.getExecutioner().exec(
+            new CompareAndSet(maskDup, value, Conditions.equals(trueValue))
+        );
+
+        Nd4j.getExecutioner().exec(
+            new CompareAndSet(tensor, maskDup, Conditions.notEquals(falseValue))
+        );
 
         return this;
     }
@@ -777,11 +799,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor minInPlace(DoubleTensor max) {
-        if (max.isScalar()) {
-            Transforms.min(tensor, max.scalar(), false);
+    public DoubleTensor minInPlace(DoubleTensor min) {
+        if (min.isScalar()) {
+            Transforms.min(tensor, min.scalar(), false);
         } else {
-            Transforms.min(tensor, unsafeGetNd4J(max), false);
+            Transforms.min(tensor, unsafeGetNd4J(min), false);
         }
         return this;
     }
@@ -870,7 +892,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * )
      */
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
 
         int[] shape = getShape();
         if (dimension < 0 || dimension >= shape.length) {
@@ -954,6 +976,17 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public BooleanTensor greaterThanOrEqual(double value) {
         return fromMask(tensor.gte(value), copyOf(getShape(), getShape().length));
+    }
+
+    @Override
+    public BooleanTensor notNaN() {
+        return this.elementwiseEquals(this);
+    }
+
+    @Override
+    public DoubleTensor replaceNaNInPlace(double value) {
+        Nd4j.getExecutioner().exec(new ReplaceNans(tensor, value));
+        return this;
     }
 
     @Override

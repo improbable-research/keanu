@@ -1,8 +1,8 @@
 package io.improbable.keanu.tensor;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertArrayEquals;
+
+import org.junit.Test;
 
 public class TensorShapeValidationTest {
 
@@ -53,5 +53,20 @@ public class TensorShapeValidationTest {
     @Test
     public void acceptsNonScalarToScalarParentShape() {
         TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(new int[]{2, 4}, scalar2, scalar1);
+    }
+
+    @Test
+    public void checkSquareMatrixAcceptsSquareMatrices() {
+        TensorShapeValidation.checkShapeIsSquareMatrix(new int[]{3, 3});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkSquareMatrixFailsOnNonMatrices() {
+        TensorShapeValidation.checkShapeIsSquareMatrix(new int[]{3, 3, 3});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void checkSquareMatrixFailsOnNonSquareMatrices() {
+        TensorShapeValidation.checkShapeIsSquareMatrix(new int[]{3, 2});
     }
 }

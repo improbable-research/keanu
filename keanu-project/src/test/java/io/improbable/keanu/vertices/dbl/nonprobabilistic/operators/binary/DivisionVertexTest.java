@@ -1,12 +1,7 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorsAndScalar;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoScalars;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwoScalarVertexValues;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 import org.junit.Test;
 
@@ -29,8 +24,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsDivided() {
-        calculatesDualNumberOfTwoScalars(
+    public void calculatesDerivativeOfTwoScalarsDivided() {
+        calculatesDerivativeOfTwoScalars(
             2.0,
             3.0,
             1.0 / 3.0,
@@ -50,8 +45,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseDivided() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseDivided() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
             DoubleTensor.create(new double[]{1.0 / 2.0, 1.0 / 3.0, 1.0 / 4.0, 1.0 / 5.0}).diag().reshape(1, 4, 1, 4),
@@ -61,8 +56,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarMultiplied() {
-        calculatesDualNumberOfAVectorsAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarMultiplied() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.eye(4).div(2).reshape(1, 4, 1, 4),
@@ -72,8 +67,8 @@ public class DivisionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorsMultiplied() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorsMultiplied() {
+        calculatesDerivativeOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.create(new double[]{1. / 1., 1. / 2., 1. / 3., 1. / 4.}, 1, 4, 1, 1),
@@ -88,6 +83,6 @@ public class DivisionVertexTest {
         DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, 100.0, 150.0);
         DoubleVertex C = A.div(B).times(A);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 0.001, 1e-5, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 0.001, 1e-5);
     }
 }

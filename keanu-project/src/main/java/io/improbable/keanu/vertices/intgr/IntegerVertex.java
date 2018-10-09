@@ -21,6 +21,14 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerConcatenationVertex(dimension, toConcat);
     }
 
+    public static IntegerVertex min(IntegerVertex a, IntegerVertex b) {
+        return new IntegerMinVertex(a, b);
+    }
+
+    public static IntegerVertex max(IntegerVertex a, IntegerVertex b) {
+        return new IntegerMaxVertex(a, b);
+    }
+
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);
     }
