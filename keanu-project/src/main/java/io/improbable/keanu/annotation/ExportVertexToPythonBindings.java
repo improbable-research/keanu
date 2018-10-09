@@ -1,4 +1,4 @@
-package annotation;
+package io.improbable.keanu.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

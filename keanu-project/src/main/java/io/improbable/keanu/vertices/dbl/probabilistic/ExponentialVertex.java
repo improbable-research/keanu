@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;

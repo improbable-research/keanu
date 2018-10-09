@@ -2,7 +2,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
 import java.util.Map;
 
-import annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;

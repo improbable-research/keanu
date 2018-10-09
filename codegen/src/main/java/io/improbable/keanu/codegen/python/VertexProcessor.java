@@ -1,9 +1,9 @@
-package processor;
+package io.improbable.keanu.codegen.python;
 
-import annotation.ExportVertexToPythonBindings;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import lombok.Getter;
 import org.reflections.Reflections;
 import org.reflections.scanners.MethodAnnotationsScanner;

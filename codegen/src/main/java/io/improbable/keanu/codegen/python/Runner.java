@@ -1,4 +1,4 @@
-package processor;
+package io.improbable.keanu.codegen.python;
 
 import freemarker.template.TemplateException;
 

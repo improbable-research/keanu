@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import annotation.ExportVertexToPythonBindings;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import static io.improbable.keanu.distributions.dual.Diffs.K;
 import static io.improbable.keanu.distributions.dual.Diffs.THETA;
 import static io.improbable.keanu.distributions.dual.Diffs.X;

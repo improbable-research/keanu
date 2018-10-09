@@ -3,13 +3,12 @@ plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
 }
 
-mainClassName = 'processor.Runner'
+mainClassName = 'io.improbable.keanu.codegen.python.Runner'
 
 dependencies {
     compile 'org.reflections:reflections:0.9.11'
     compile 'org.freemarker:freemarker:2.3.28'
 
-    compile project(':codegen:annotation')
     compile project(':keanu-project')
 }
 
