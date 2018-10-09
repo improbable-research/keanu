@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfMatrixElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfMatrixElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
@@ -26,8 +26,8 @@ public class ExpVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOScalarExp() {
-        calculatesDualNumberOfScalar(
+    public void calculatesDerivativeOScalarExp() {
+        calculatesDerivativeOfScalar(
             0.5,
             Math.exp(0.5),
             DoubleVertex::exp
@@ -44,8 +44,8 @@ public class ExpVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfMatrixElementWiseexp() {
-        calculatesDualNumberOfMatrixElementWiseOperator(
+    public void calculatesDerivativeOfMatrixElementWiseexp() {
+        calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{Math.exp(0.1), Math.exp(0.2), Math.exp(0.3), Math.exp(0.4)}),
             DoubleVertex::exp
@@ -57,7 +57,7 @@ public class ExpVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.div(3).exp();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-5);
     }
 
 }

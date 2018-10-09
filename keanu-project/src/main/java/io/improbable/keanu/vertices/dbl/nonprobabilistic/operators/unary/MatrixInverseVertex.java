@@ -1,8 +1,12 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class MatrixInverseVertex extends DoubleUnaryOpVertex {
 
@@ -16,8 +20,28 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.matrixInverse();
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+
+        //dc = -A^-1 * da * A^-1
+        DoubleTensor negatedValue = this.getValue().unaryMinus();
+        PartialDerivatives partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(derivativeOfParentWithRespectToInputs, negatedValue, false);
+        partial = PartialDerivatives.matrixMultiplyAlongOfDimensions(partial, this.getValue(), true);
+        return partial;
+    }
+
+    @Override
+    public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
+        Map<Vertex, PartialDerivatives> partials = new HashMap<>();
+        DoubleTensor parentValue = getValue();
+        DoubleTensor negativeValue = getValue().unaryMinus();
+
+        PartialDerivatives newPartials =
+            PartialDerivatives.matrixMultiplyAlongWrtDimensions(derivativeOfOutputsWithRespectToSelf, negativeValue, false);
+        newPartials = PartialDerivatives.matrixMultiplyAlongWrtDimensions(newPartials, parentValue, true);
+
+        partials.put(inputVertex, newPartials);
+
+        return partials;
     }
 
     private static int[] checkInputIsSquareMatrix(int[] shape) {

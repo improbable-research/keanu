@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfMatrixElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfMatrixElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
@@ -26,8 +26,8 @@ public class TanVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOScalarTan() {
-        calculatesDualNumberOfScalar(
+    public void calculatesDerivativeOScalarTan() {
+        calculatesDerivativeOfScalar(
             0.5,
             1 / Math.pow(Math.cos(0.5), 2),
             DoubleVertex::tan
@@ -44,8 +44,8 @@ public class TanVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfMatrixElementWiseTan() {
-        calculatesDualNumberOfMatrixElementWiseOperator(
+    public void calculatesDerivativeOfMatrixElementWiseTan() {
+        calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{
                 1 / Math.pow(Math.cos(0.1), 2),
@@ -62,7 +62,7 @@ public class TanVertexTest {
         DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -1.0, 1.0);
         DoubleVertex outputVertex = inputVertex.div(3).tan();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.0001, 1e-6);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.0001, 1e-6);
     }
 
 }

@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class SigmoidVertex extends DoubleUnaryOpVertex {
@@ -27,12 +26,11 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber a) {
-        DoubleTensor x = a.getValue();
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        DoubleTensor x = inputVertex.getValue();
         DoubleTensor xExp = x.exp();
         DoubleTensor dxdfx = xExp.divInPlace(xExp.plus(1).powInPlace(2));
-        PartialDerivatives infinitesimal = a.getPartialDerivatives().multiplyBy(dxdfx);
-        return new DualNumber(x.sigmoid(), infinitesimal);
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dxdfx, x.getShape());
     }
 
     @Override
@@ -42,7 +40,7 @@ public class SigmoidVertex extends DoubleUnaryOpVertex {
         DoubleTensor derivativeOfSigmoidWrtInput = sigmoidOfInput.minus(sigmoidOfInput.pow(2));
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(derivativeOfSigmoidWrtInput, true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(derivativeOfSigmoidWrtInput, this.getShape()));
         return partials;
     }
 

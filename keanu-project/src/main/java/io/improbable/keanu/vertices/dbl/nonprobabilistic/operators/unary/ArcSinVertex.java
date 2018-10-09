@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ArcSinVertex extends DoubleUnaryOpVertex {
@@ -26,8 +25,13 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        return dualNumber.asin();
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+
+        DoubleTensor inputValue = inputVertex.getValue();
+
+        DoubleTensor dArcSin = (inputValue.unaryMinus().timesInPlace(inputValue).plusInPlace(1))
+            .sqrtInPlace().reciprocalInPlace();
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(dArcSin, inputValue.getShape());
     }
 
     @Override
@@ -40,7 +44,7 @@ public class ArcSinVertex extends DoubleUnaryOpVertex {
             .reciprocalInPlace();
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyBy(dSelfWrtInput, true));
+        partials.put(inputVertex, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtInput, this.getShape()));
 
         return partials;
     }

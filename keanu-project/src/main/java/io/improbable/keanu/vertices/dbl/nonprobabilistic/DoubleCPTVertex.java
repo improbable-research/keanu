@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.CPTCondition;
 
 public class DoubleCPTVertex extends DoubleVertex implements Differentiable, NonProbabilistic<DoubleTensor> {
@@ -45,9 +45,9 @@ public class DoubleCPTVertex extends DoubleVertex implements Differentiable, Non
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         final CPTCondition condition = CPTCondition.from(inputs, (vertex) -> vertex.getValue().scalar());
         DoubleVertex vertex = conditions.get(condition);
-        return vertex == null ? dualNumbers.get(defaultResult) : dualNumbers.get(vertex);
+        return vertex == null ? derivativeOfParentsWithRespectToInputs.get(defaultResult) : derivativeOfParentsWithRespectToInputs.get(vertex);
     }
 }

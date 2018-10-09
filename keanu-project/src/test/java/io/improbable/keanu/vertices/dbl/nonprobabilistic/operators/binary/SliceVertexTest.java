@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 
 import org.junit.Assert;
 import org.junit.Before;
@@ -96,10 +96,10 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, dim, ind);
 
-        PartialDerivatives forward = sliceN.getDualNumber().getPartialDerivatives();
+        PartialDerivatives forward = sliceN.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(sliceN, ImmutableSet.of(m, alpha));
 
-        DoubleTensor originalPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor originalPartial = N.getDerivativeWrtLatents().withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), expectedValue, 1e-6);
         Assert.assertArrayEquals(expectedShape, sliceN.getShape());
@@ -123,8 +123,8 @@ public class SliceVertexTest {
 
         SliceVertex sliceN = new SliceVertex(N, 1, 1);
 
-        DoubleTensor originalPartial = N.getDualNumber().getPartialDerivatives().withRespectTo(m);
-        DoubleTensor slicePartial = sliceN.getDualNumber().getPartialDerivatives().withRespectTo(m);
+        DoubleTensor originalPartial = N.getDerivativeWrtLatents().withRespectTo(m);
+        DoubleTensor slicePartial = sliceN.getDerivativeWrtLatents().withRespectTo(m);
 
         Assert.assertArrayEquals(sliceN.getValue().asFlatDoubleArray(), new double[]{65, 145}, 1e-6);
         Assert.assertArrayEquals(new int[]{2, 1}, sliceN.getShape());
@@ -154,8 +154,8 @@ public class SliceVertexTest {
     @Test
     public void changesMatchGradient() {
         DoubleVertex cube = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
-        SliceVertex slice = new SliceVertex(cube, 0, 0);
-        finiteDifferenceMatchesGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
+        SliceVertex slice = new SliceVertex(cube, 2, 0);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(cube), slice, 10.0, 1e-10);
     }
 
 }

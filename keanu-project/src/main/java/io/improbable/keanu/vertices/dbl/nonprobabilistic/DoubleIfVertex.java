@@ -9,7 +9,6 @@ import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
@@ -35,8 +34,21 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els));
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+
+        int[] ofShape = getShape();
+        PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.get(thn);
+        PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.get(els);
+        BooleanTensor predicateValue = predicate.getValue();
+
+        if (predicateValue.allTrue()) {
+            return thnPartial;
+        } else if (predicateValue.allFalse()) {
+            return elsPartial;
+        } else {
+            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask(), ofShape)
+                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask(), ofShape));
+        }
     }
 
     @Override
@@ -52,8 +64,10 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         BooleanTensor predicateValue = predicate.getValue();
-        partials.put(thn, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.toDoubleMask(), true));
-        partials.put(els, derivativeOfOutputsWithRespectToSelf.multiplyBy(predicateValue.not().toDoubleMask(), true));
+        partials.put(thn, derivativeOfOutputsWithRespectToSelf
+            .multiplyAlongWrtDimensions(predicateValue.toDoubleMask(), this.getShape()));
+        partials.put(els, derivativeOfOutputsWithRespectToSelf
+            .multiplyAlongWrtDimensions(predicateValue.not().toDoubleMask(), this.getShape()));
         return partials;
     }
 
