@@ -6,9 +6,6 @@ task installPipenv {
         exec {
             commandLine 'pip', 'install', 'pipenv'
         }
-        exec {
-            commandLine 'pipenv', 'install', '--dev', '--python', '3.6'
-        }
     }
 }
 
@@ -33,6 +30,14 @@ task pythonVersionInfo {
         }
     }
 }
+
+task installDependencies {
+    doLast {
+        exec {
+            commandLine 'pipenv', 'install', '--dev', '--python', '3.6'
+        }
+    }
+}
 task pytest {
     doLast {
         exec {
@@ -44,4 +49,6 @@ task pytest {
 test.dependsOn(pytest)
 pytest.dependsOn(installPipenv)
 pytest.dependsOn(pythonVersionInfo)
+pytest.dependsOn(installDependencies)
 pythonVersionInfo.mustRunAfter(installPipenv)
+installDependencies.mustRunAfter(pythonVersionInfo)
