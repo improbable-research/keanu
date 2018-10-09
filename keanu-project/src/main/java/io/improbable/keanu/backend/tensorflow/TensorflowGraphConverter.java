@@ -3,6 +3,7 @@ package io.improbable.keanu.backend.tensorflow;
 import static io.improbable.keanu.backend.ProbabilisticGraph.LOG_PROB;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -16,6 +17,7 @@ import org.tensorflow.Graph;
 import org.tensorflow.Output;
 import org.tensorflow.Session;
 import org.tensorflow.Shape;
+import org.tensorflow.op.Operands;
 import org.tensorflow.op.Scope;
 
 import io.improbable.keanu.backend.ProbabilisticGraph;
@@ -31,6 +33,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.Double
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
@@ -58,6 +61,8 @@ public class TensorflowGraphConverter {
 
         opMappers.put(LogVertex.class, TensorflowGraphConverter::createLog);
         opMappers.put(SumVertex.class, TensorflowGraphConverter::createSum);
+
+        opMappers.put(ConcatenationVertex.class, TensorflowGraphConverter::createConcat);
     }
 
     private static Output<?> createSum(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
@@ -90,6 +95,27 @@ public class TensorflowGraphConverter {
 
     private static Output<?> createPow(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
         return createBinaryOp(vertex, lookup, graphBuilder::pow);
+    }
+
+    private static Output<?> createConcat(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        /**
+         *   public static <T, U extends Number> Concat<T> create(Scope scope, Operand<T> values, Operand<U> axis) {
+         *     OperationBuilder opBuilder = scope.graph().opBuilder("ConcatV2", scope.makeOpName("Concat"));
+         *     opBuilder.addInput(values.asOutput());
+         *     opBuilder.addInput(axis.asOutput());
+         *     return new Concat<T>(opBuilder.build());
+         *   }
+         */
+
+        ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
+
+        Output<Double>[] inputs = (Output<Double>[]) Operands.asOutputs(
+            Arrays.stream(concatenationVertex.getOperands())
+                .map(v -> lookup.get(v))
+                .collect(Collectors.toList())
+        );
+
+        return graphBuilder.concat(inputs, concatenationVertex.getDimension(), getTensorflowOpName(concatenationVertex));
     }
 
     private static Output<Double> createDoubleConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {

@@ -14,6 +14,7 @@ import java.nio.IntBuffer;
 
 import org.tensorflow.DataType;
 import org.tensorflow.Operation;
+import org.tensorflow.OperationBuilder;
 import org.tensorflow.Output;
 import org.tensorflow.Shape;
 import org.tensorflow.Tensor;
@@ -106,6 +107,16 @@ public class GraphBuilder {
         return binaryOp(OpType.SUM, name, input, dimRange);
     }
 
+    <T> Output<T> concat(Output<T>[] inputs, int dimension, String name) {
+        Output<Integer> dim = constant(dimension, name + "_dim");
+
+        OperationBuilder opBuilder = scope.graph().opBuilder("ConcatV2", name);
+        opBuilder.addInputList(inputs);
+        opBuilder.addInput(dim.asOutput());
+
+        return opBuilder.build().output(0);
+    }
+
     Output<Double> constant(double value, String name) {
         try (Tensor<Double> tensor = Tensor.create(value, Double.class)) {
             return this.constant(name, tensor, Double.class);
@@ -120,6 +131,12 @@ public class GraphBuilder {
 
     Output<Integer> constant(int[] value, long[] shape, String name) {
         try (Tensor<Integer> tensor = Tensor.create(shape, IntBuffer.wrap(value))) {
+            return this.constant(name, tensor, Integer.class);
+        }
+    }
+
+    Output<Integer> constant(int value, String name) {
+        try (Tensor<Integer> tensor = Tensor.create(value, Integer.class)) {
             return this.constant(name, tensor, Integer.class);
         }
     }

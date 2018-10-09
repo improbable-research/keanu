@@ -39,6 +39,14 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
         setValue(DoubleTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 
+    public int getDimension() {
+        return dimension;
+    }
+
+    public DoubleVertex[] getOperands() {
+        return operands;
+    }
+
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         List<PartialDerivatives> partialsOfInputs = new ArrayList<>();

@@ -73,6 +73,33 @@ public class TensorflowGraphConverterTest {
     }
 
     @Test
+    public void canTensorConcat() {
+        DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
+        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+
+        DoubleVertex B = new GaussianVertex(new int[]{2, 2}, 1, 1);
+        B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+
+        A.setLabel(new VertexLabel("A"));
+        B.setLabel(new VertexLabel("B"));
+
+        DoubleVertex C = DoubleVertex.concat(0, A, B);
+
+        String outputName = "someOutput";
+        C.setLabel(new VertexLabel(outputName));
+
+        ProbabilisticGraph graph = TensorflowGraphConverter.convert(new BayesianNetwork(C.getConnectedGraph()));
+
+        Map<String, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getLabel().toString(), A.getValue());
+        inputs.put(B.getLabel().toString(), B.getValue());
+
+        DoubleTensor result = graph.getOutputs(inputs, Collections.singletonList(outputName)).get(0);
+
+        assertEquals(C.getValue(), result);
+    }
+
+    @Test
     public void canRunTensorMultiplication() {
         DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
