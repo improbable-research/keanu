@@ -8,8 +8,15 @@ mainClassName = 'io.improbable.keanu.codegen.python.Runner'
 dependencies {
     compile 'org.reflections:reflections:0.9.11'
     compile 'org.freemarker:freemarker:2.3.28'
-
     compile project(':keanu-project')
+
+    //testing
+    testCompile 'junit:junit:4.12'
+    testCompile 'org.mockito:mockito-core:2.19.1'
+    testCompile 'org.jfree:jfreechart:1.0.19'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.15.0'
+    testCompile 'org.hamcrest:hamcrest-library:1.3'
+    testCompile 'ca.umontreal.iro.simul:ssj:3.2.1'
 }
 
 task codeGen (type: JavaExec) {

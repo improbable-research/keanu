@@ -1,6 +1,5 @@
 package io.improbable.keanu.codegen.python;
 
-import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
@@ -11,10 +10,8 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -28,26 +25,20 @@ class VertexProcessor {
     final private static String TEMPLATE_FILE = "vertex.py.ftl";
     final private static String GENERATED_FILE = "vertex.py";
 
-    static void process(String dir) throws IOException, TemplateException {
-        Configuration cfg = new Configuration(Configuration.VERSION_2_3_28);
-        cfg.setClassForTemplateLoading(Runner.class, "/");
-        Template fileTemplate = cfg.getTemplate(TEMPLATE_FILE);
-
-        File file = new File(dir + GENERATED_FILE);
-        if (file.exists() && (!file.delete() || !file.createNewFile())) {
-            throw new FileNotFoundException("Couldn't regenerate file: " + file.getPath());
-        }
-        Writer fileWriter = new FileWriter(file, true);
-
-        generateFile(fileTemplate, fileWriter);
-
-        fileWriter.close();
-    }
-
-    private static void generateFile(Template fileTemplate, Writer fileWriter) throws IOException, TemplateException {
+    static void process(String generatedDir) {
         List<Constructor> constructors = getSortedListOfAnnotatedVertexConstructors();
         Map<String, Object> dataModel = buildDataModel(constructors);
-        fileTemplate.process(dataModel, fileWriter);
+        Writer fileWriter = Processor.createFileWriter(generatedDir + GENERATED_FILE);
+
+        Template fileTemplate = Processor.getFileTemplate(TEMPLATE_FILE);
+        try {
+            fileTemplate.process(dataModel, fileWriter);
+            fileWriter.close();
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        } catch (TemplateException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     private static List<Constructor> getSortedListOfAnnotatedVertexConstructors() {
