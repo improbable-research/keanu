@@ -11,4 +11,4 @@ matrix:
     - language: python
       python: 3.6
       script:
-        - ./gradlew keanu-python:clean keanu-python:build -i
+        - ./gradlew keanu-python:clean keanu-python:build -i --stacktrace --debug
