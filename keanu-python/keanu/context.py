@@ -62,11 +62,11 @@ class KeanuContext(metaclass=Singleton):
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
 
-        if isinstance(l[0], int):
+        if isinstance(l[0], bool):
+            return self._gateway.jvm.boolean
+        elif isinstance(l[0], int):
             return self._gateway.jvm.int
         elif isinstance(l[0], float):
             return self._gateway.jvm.double
-        elif isinstance(l[0], bool):
-            return self._gateway.jvm.boolean
         else:
             raise ValueError("Cannot infer class from array because it doesn't contain primitives")

@@ -47,12 +47,12 @@ class Tensor(JavaObjectWrapper):
         if len(np_tensor) == 0:
             raise ValueError("Cannot infer type because tensor is empty")
 
-        if isinstance(np_tensor.item(0), int):
+        if isinstance(np_tensor.item(0), bool):
+            return k.BooleanTensor.create
+        elif isinstance(np_tensor.item(0), int):
             return k.IntegerTensor.create
         elif isinstance(np_tensor.item(0), float):
             return k.DoubleTensor.create
-        elif isinstance(np_tensor.item(0), bool):
-            return k.BooleanTensor.create
         else:
             raise ValueError("Generic types in a tensor are not supported")
 
