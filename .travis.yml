@@ -1,3 +1,6 @@
+env:
+  - PIPENV_IGNORE_VIRTUALENVS=1
+
 matrix:
   include:
     - language: java
