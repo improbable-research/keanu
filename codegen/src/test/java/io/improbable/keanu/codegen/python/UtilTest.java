@@ -40,8 +40,7 @@ public class UtilTest {
         testFolder.newFile(TEST_GENERATED_FILE);
         assertTrue(Files.exists(path));
 
-        Util.
-            gcreateFileWriter(path.toAbsolutePath().toString());
+        Util.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
