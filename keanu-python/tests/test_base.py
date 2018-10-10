@@ -43,11 +43,11 @@ def test_can_pass_array_to_vertex():
 
 
 def test_cannot_pass_generic_to_vertex():
-    class Temp:
+    class GenericExampleClass:
         pass
 
     with pytest.raises(ValueError) as excinfo:
-        kn.Vertex(jvm_view.GaussianVertex, (Temp(), Temp()))
+        kn.Vertex(jvm_view.GaussianVertex, (GenericExampleClass(), GenericExampleClass()))
 
     assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(Temp)
 
@@ -81,6 +81,4 @@ def test_vertex_can_overload_gt():
     assert not sample.isScalar()
 
     flat_arr = sample.asFlatArray()
-    assert len(flat_arr) == 2
-    assert isinstance(flat_arr[0], bool)
-    assert isinstance(flat_arr[1], bool)
+    assert all(isinstance(x, bool) for x in flat_arr)
