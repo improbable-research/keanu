@@ -49,15 +49,19 @@ public interface Tensor<T> {
 
     boolean isShapePlaceholder();
 
-    T getValue(int... index);
+    T getValue(long... index);
 
-    Tensor<T> setValue(T value, int... index);
+    default T getValue(int... index) {
+        return getValue(Arrays.stream(index).mapToLong(i -> i).toArray());
+    }
+
+    Tensor<T> setValue(T value, long... index);
 
     T scalar();
 
     Tensor<T> duplicate();
 
-    Tensor<T> slice(int dimension, int index);
+    Tensor<T> slice(int dimension, long index);
 
     double[] asFlatDoubleArray();
 

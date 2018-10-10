@@ -75,7 +75,7 @@ public class TensorShape {
      * @param index  the index in each dimension
      * @return the flat index from a N dimensional index
      */
-    public static int getFlatIndex(long[] shape, long[] stride, int... index) {
+    public static int getFlatIndex(long[] shape, long[] stride, long... index) {
         int flatIndex = 0;
         for (int i = 0; i < index.length; i++) {
 

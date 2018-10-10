@@ -115,7 +115,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     }
 
     @Override
-    DoubleTensor setValue(Double value, int... index);
+    DoubleTensor setValue(Double value, long... index);
 
     @Override
     DoubleTensor reshape(long... newShape);
@@ -212,14 +212,14 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     double product();
 
     @Override
-    DoubleTensor slice(int dimension, int index);
+    DoubleTensor slice(int dimension, long index);
 
-    List<DoubleTensor> split(int dimension, int... splitAtIndices);
+    List<DoubleTensor> split(int dimension, long... splitAtIndices);
 
-    default List<DoubleTensor> sliceAlongDimension(int dimension, int indexStart, int indexEnd) {
+    default List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
         List<DoubleTensor> slicedTensors = new ArrayList<>();
 
-        for (int i = indexStart; i < indexEnd; i++) {
+        for (long i = indexStart; i < indexEnd; i++) {
             slicedTensors.add(slice(dimension, i));
         }
 

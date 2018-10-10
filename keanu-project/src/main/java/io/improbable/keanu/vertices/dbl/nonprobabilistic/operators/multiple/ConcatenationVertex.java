@@ -130,11 +130,11 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> splitPartials = new HashMap<>();
 
-        int currentSplitIndex = 0;
-        int[] splitIndices = new int[operands.length];
+        long currentSplitIndex = 0;
+        long[] splitIndices = new long[operands.length];
 
         for (int i = 0; i < operands.length; i++) {
-            splitIndices[i] = currentSplitIndex + (int) operands[i].getShape()[dimension];
+            splitIndices[i] = currentSplitIndex + operands[i].getShape()[dimension];
             currentSplitIndex = splitIndices[i];
             splitPartials.put(operands[i], new PartialDerivatives(new HashMap<>()));
         }

@@ -123,7 +123,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(-1);
     }
 
-    public IntegerVertex take(int... index) {
+    public IntegerVertex take(long... index) {
         return new IntegerTakeVertex(this, index);
     }
 

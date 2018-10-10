@@ -87,6 +87,6 @@ public interface BooleanTensor extends Tensor<Boolean> {
     IntegerTensor toIntegerMask();
 
     @Override
-    BooleanTensor slice(int dimension, int index);
+    BooleanTensor slice(int dimension, long index);
 
 }

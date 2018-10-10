@@ -59,7 +59,7 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
             .build();
     }
 
-    public BoolVertex slice(int dimension, int index) {
+    public BoolVertex slice(int dimension, long index) {
         return new BoolSliceVertex(this, dimension, index);
     }
 
@@ -87,11 +87,11 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         super.observe(BooleanTensor.create(values));
     }
 
-    public boolean getValue(int... index) {
+    public boolean getValue(long... index) {
         return getValue().getValue(index);
     }
 
-    public BoolVertex take(int... index) {
+    public BoolVertex take(long... index) {
         return new BoolTakeVertex(this, index);
     }
 

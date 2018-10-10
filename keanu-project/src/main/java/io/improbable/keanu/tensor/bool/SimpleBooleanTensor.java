@@ -212,7 +212,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor slice(int dimension, int index) {
+    public BooleanTensor slice(int dimension, long index) {
         DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
         double[] tadFlat = tadDoubles.asFlatDoubleArray();
         boolean[] tadToBooleans = new boolean[tadFlat.length];
@@ -243,12 +243,12 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public Boolean getValue(int... index) {
+    public Boolean getValue(long... index) {
         return data[getFlatIndex(shape, stride, index)];
     }
 
     @Override
-    public BooleanTensor setValue(Boolean value, int... index) {
+    public BooleanTensor setValue(Boolean value, long... index) {
         data[getFlatIndex(shape, stride, index)] = value;
         return this;
     }

@@ -63,12 +63,12 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public T getValue(int... index) {
+    public T getValue(long... index) {
         return data[getFlatIndex(shape, stride, index)];
     }
 
     @Override
-    public GenericTensor<T> setValue(T value, int... index) {
+    public GenericTensor<T> setValue(T value, long... index) {
         data[getFlatIndex(shape, stride, index)] = value;
         return this;
     }
@@ -189,7 +189,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> slice(int dimension, int index) {
+    public Tensor<T> slice(int dimension, long index) {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();
         for (int i = 0; i < flat.length; i++) {

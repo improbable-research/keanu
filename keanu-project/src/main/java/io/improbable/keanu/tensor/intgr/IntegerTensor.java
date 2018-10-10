@@ -89,7 +89,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     @Override
-    IntegerTensor setValue(Integer value, int... index);
+    IntegerTensor setValue(Integer value, long... index);
 
     @Override
     IntegerTensor reshape(long... newShape);
@@ -146,7 +146,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor apply(Function<Integer, Integer> function);
 
     @Override
-    IntegerTensor slice(int dimension, int index);
+    IntegerTensor slice(int dimension, long index);
 
     // In Place
 

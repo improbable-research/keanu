@@ -130,7 +130,7 @@ public class TensorShapeValidation {
         return concatShape;
     }
 
-    public static void checkIndexIsValid(long[] shape, int... index) {
+    public static void checkIndexIsValid(long[] shape, long... index) {
         if (shape.length != index.length) {
             throw new IllegalArgumentException(
                 "Length of desired index " + Arrays.toString(index) + " must match the length of the shape " + Arrays.toString(shape));

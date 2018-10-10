@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class TakeVertex extends DoubleUnaryOpVertex {
 
-    private final int[] index;
+    private final long[] index;
 
     /**
      * A vertex that extracts a scalar at a given index
@@ -23,7 +23,7 @@ public class TakeVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the input vertex to extract from
      * @param index       the index to extract at
      */
-    public TakeVertex(DoubleVertex inputVertex, int... index) {
+    public TakeVertex(DoubleVertex inputVertex, long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
@@ -51,7 +51,7 @@ public class TakeVertex extends DoubleUnaryOpVertex {
         return new PartialDerivatives(partialsOf);
     }
 
-    private DoubleTensor takeFromPartial(DoubleTensor from, int... indices) {
+    private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
         long[] fromShape = from.getShape();
         long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
         int indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);

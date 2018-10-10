@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 public class SliceVertex extends DoubleUnaryOpVertex {
 
     private final int dimension;
-    private final int index;
+    private final long index;
 
     /**
      * Takes the slice along a given dimension and index of a vertex
@@ -24,7 +24,7 @@ public class SliceVertex extends DoubleUnaryOpVertex {
      * @param dimension   the dimension to extract along
      * @param index       the index of extraction
      */
-    public SliceVertex(DoubleVertex inputVertex, int dimension, int index) {
+    public SliceVertex(DoubleVertex inputVertex, int dimension, long index) {
         super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;
@@ -58,8 +58,8 @@ public class SliceVertex extends DoubleUnaryOpVertex {
     private DoubleTensor padSliceWithZerosToMatchOriginalShape(DoubleTensor tensor) {
         long[] targetShape = TensorShape.concat(getShape(), inputVertex.getShape());
         int dimensionInWrt = dimension + getShape().length;
-        int indicesBefore = index;
-        int indicesAfter = (int) targetShape[dimensionInWrt] - index - 1;
+        long indicesBefore = index;
+        long indicesAfter = targetShape[dimensionInWrt] - index - 1;
         targetShape[dimensionInWrt] = 1;
         DoubleTensor outputTensor = tensor.reshape(targetShape);
 

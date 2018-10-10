@@ -55,12 +55,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer getValue(int... index) {
+    public Integer getValue(long... index) {
         return value;
     }
 
     @Override
-    public IntegerTensor setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, long... index) {
         this.value = value;
         return this;
     }
@@ -254,7 +254,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor slice(int dimension, int index) {
+    public IntegerTensor slice(int dimension, long index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {

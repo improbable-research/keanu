@@ -259,7 +259,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 
-    public DoubleVertex take(int... index) {
+    public DoubleVertex take(long... index) {
         return new TakeVertex(this, index);
     }
 

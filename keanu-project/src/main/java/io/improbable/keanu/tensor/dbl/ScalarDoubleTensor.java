@@ -59,7 +59,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public Double getValue(int[] index) {
+    public Double getValue(long[] index) {
         if (index.length == 1 && index[0] == 0) {
             return value;
         } else {
@@ -68,7 +68,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setValue(Double value, int[] index) {
+    public DoubleTensor setValue(Double value, long[] index) {
         if (index.length == 1 && index[0] == 0) {
             this.value = value;
             return this;
@@ -436,7 +436,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor slice(int dimension, int index) {
+    public DoubleTensor slice(int dimension, long index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
@@ -445,7 +445,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, long[] splitAtIndices) {
         return Collections.singletonList(this);
     }
 

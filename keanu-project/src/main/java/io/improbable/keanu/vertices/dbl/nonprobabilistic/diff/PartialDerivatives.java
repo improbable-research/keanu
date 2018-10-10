@@ -392,7 +392,7 @@ public class PartialDerivatives {
      *                  of 3x3x3x3x3.
      * @return the sliced partials
      */
-    public PartialDerivatives slice(int dimension, int index, boolean reshape) {
+    public PartialDerivatives slice(int dimension, long index, boolean reshape) {
         Map<VertexId, DoubleTensor> slicedDerivatives = new HashMap<>();
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeWithRespectTo.entrySet()) {

@@ -537,12 +537,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer getValue(int... index) {
-        return tensor.getInt(index);
+    public Integer getValue(long... index) {
+        return (int) tensor.getDouble(index);
     }
 
     @Override
-    public IntegerTensor setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, long... index) {
         tensor.putScalar(index, value);
         return this;
     }
@@ -574,7 +574,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor slice(int dimension, int index) {
+    public IntegerTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);
         return new Nd4jIntegerTensor(slice);

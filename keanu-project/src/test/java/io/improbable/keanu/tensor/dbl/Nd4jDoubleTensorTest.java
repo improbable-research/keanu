@@ -521,7 +521,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor C = DoubleTensor.arange(96, 144).reshape(2, 3, 2, 4);
 
         DoubleTensor D = DoubleTensor.concat(dim, A, B, C);
-        List<DoubleTensor> splitTensor = D.split(dim, new int[]{1, 4, 6});
+        List<DoubleTensor> splitTensor = D.split(dim, new long[]{1, 4, 6});
 
         DoubleTensor[] concatList = new DoubleTensor[]{A, B, C};
         for (int i = 0; i < splitTensor.size(); i++) {
@@ -548,20 +548,20 @@ public class Nd4jDoubleTensorTest {
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnZeroLengthSplit() {
         DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
-        A.split(0, new int[]{0});
+        A.split(0, new long[]{0});
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnNegativeDimensionSplit() {
         DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
-        A.split(-1, new int[]{1, 5});
+        A.split(-1, new long[]{1, 5});
     }
 
     @Test
     public void doesSatisfyJavaDocExample() {
         DoubleTensor A = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3}, 2, 6);
 
-        List<DoubleTensor> actual = A.split(1, new int[]{1, 3, 6});
+        List<DoubleTensor> actual = A.split(1, new long[]{1, 3, 6});
 
         DoubleTensor expected0 = DoubleTensor.create(new double[]{1, 7}, 1, 2);
         DoubleTensor expected1 = DoubleTensor.create(new double[]{2, 3, 8, 9}, 2, 2);
@@ -627,11 +627,11 @@ public class Nd4jDoubleTensorTest {
 
     private void assertCanSplit(long[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
 
-        int[] splitIndices = new int[concatenatedIndices.length];
+        long[] splitIndices = new long[concatenatedIndices.length];
         List<DoubleTensor> toConcat = new ArrayList<>();
 
         long previousEndLength = 0;
-        int splitPosition = 0;
+        long splitPosition = 0;
         for (int i = 0; i < concatenatedIndices.length; i++) {
             long[] shape = Arrays.copyOf(baseShape, baseShape.length);
             shape[concatenatedDimension] = concatenatedIndices[i];

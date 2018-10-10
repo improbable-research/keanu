@@ -111,11 +111,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return tensor == null;
     }
 
-    public Double getValue(int... index) {
+    public Double getValue(long... index) {
         return tensor.getDouble(index);
     }
 
-    public DoubleTensor setValue(Double value, int... index) {
+    public DoubleTensor setValue(Double value, long... index) {
         tensor.putScalar(index, value);
         return this;
     }
@@ -863,7 +863,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor slice(int dimension, int index) {
+    public DoubleTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);
         return new Nd4jDoubleTensor(slice);
@@ -892,7 +892,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * )
      */
     @Override
-    public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, long... splitAtIndices) {
 
         long[] shape = getShape();
         if (dimension < 0 || dimension >= shape.length) {
@@ -902,7 +902,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         Nd4j.getCompressor().autoDecompress(tensor);
 
         List<DoubleTensor> splits = new ArrayList<>();
-        int previousSplitIndex = 0;
+        long previousSplitIndex = 0;
         for (int i = 0; i < splitAtIndices.length; i++) {
 
             INDArrayIndex[] indices = new INDArrayIndex[tensor.rank()];
