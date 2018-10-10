@@ -32,6 +32,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
@@ -55,7 +56,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(valueArrayOf(shape, value, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor ones(int[] shape) {
+    public static Nd4jDoubleTensor ones(int... shape) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
@@ -84,10 +85,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, int[] shape) {
-        this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
         this.tensor = tensor;
     }
 
@@ -755,6 +757,9 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public DoubleTensor setWithMaskInPlace(DoubleTensor mask, Double value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
         double trueValue = 1.0;
@@ -889,7 +894,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
      * )
      */
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
 
         int[] shape = getShape();
         if (dimension < 0 || dimension >= shape.length) {

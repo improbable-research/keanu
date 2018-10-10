@@ -150,22 +150,15 @@ public class TensorShape {
             throw new IllegalArgumentException("to dimension must be less than from");
         }
 
-        int[] newShape = new int[to - from + 1];
+        int[] newShape = new int[to - from];
 
-        for (int i = 0; i < (to - from + 1); i++) {
+        for (int i = 0; i < (to - from); i++) {
             newShape[i] = shape[i + from];
         }
 
         return newShape;
     }
-
-    public static int[] slideDimension(int from, int to, int[] shape) {
-        List<Integer> shapeList = new ArrayList<>(Ints.asList(shape));
-        Integer dimLength = shapeList.remove(from);
-        shapeList.add(to, dimLength);
-        return Ints.toArray(shapeList);
-    }
-
+    
     public static int[] shapeDesiredToRankByAppendingOnes(int[] lowRankTensorShape, int desiredRank) {
         return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true);
     }
@@ -194,25 +187,6 @@ public class TensorShape {
         int[] newShape = Arrays.copyOf(shape, shape.length);
         newShape[dimension] = 1;
         return newShape;
-    }
-
-    /**
-     * Writes a lower rank shape over a higher rank shape, starting from the right.
-     * <p>
-     * e.g: high rank shape = [1, 2, 2, 1]
-     * low rank shape = [1, 4]
-     * <p>
-     * Result after copy = [1, 2, 1, 4]
-     *
-     * @param higherRankShape source shape that will get written over
-     * @param lowerRankShape  shape to write
-     * @return the high rank  shape with the lower rank shape inserted on top of it
-     */
-    public static int[] copyLowRankOverHighRankFromTailEnd(int[] higherRankShape, int[] lowerRankShape) {
-        int[] highRankCopy = Arrays.copyOf(higherRankShape, higherRankShape.length);
-        int deltaLength = highRankCopy.length - lowerRankShape.length;
-        System.arraycopy(lowerRankShape, 0, highRankCopy, deltaLength, highRankCopy.length - deltaLength);
-        return highRankCopy;
     }
 
 }

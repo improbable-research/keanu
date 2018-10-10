@@ -121,9 +121,18 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return duplicate();
     }
 
+    /**
+     * @param overDimensions the dimensions to sum over
+     * @return a new scalar with a shape that has the sum over dimensions dropped
+     * but not less than rank 2. E.g. [1.23] shaped [1,1,1] summed over dimension
+     * 2 would be [1.23] with a shape [1,1]. But [1.23] with shape [1,1] summed
+     * over dimension 0 is still shape [1,1]
+     */
     @Override
     public DoubleTensor sum(int... overDimensions) {
-        int[] summedShape = new int[this.shape.length - overDimensions.length];
+        //Matching strange ND4J behavior where rank 0 and 1 aren't supported.
+        int shapeLength = Math.max(2, this.shape.length - overDimensions.length);
+        int[] summedShape = new int[shapeLength];
         Arrays.fill(summedShape, 1);
         return new ScalarDoubleTensor(value, summedShape);
     }

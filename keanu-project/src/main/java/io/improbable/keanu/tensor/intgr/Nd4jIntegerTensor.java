@@ -20,6 +20,7 @@ import org.nd4j.linalg.ops.transforms.Transforms;
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
@@ -57,10 +58,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, int[] shape) {
-        this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
         this.tensor = tensor;
     }
 
@@ -255,6 +257,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor setWithMaskInPlace(IntegerTensor mask, Integer value) {
+        if (this.getLength() != mask.getLength()) {
+            throw new IllegalArgumentException("The lengths of the tensor and mask must match, but got tensor length: " + this.getLength() + ", mask length: " + mask.getLength());
+        }
 
         INDArray maskDup = unsafeGetNd4J(mask).dup();
 

@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
+
 public class TensorShapeValidation {
 
     private TensorShapeValidation() {
@@ -61,6 +63,16 @@ public class TensorShapeValidation {
             return nonScalarShapes.iterator().next().getShape();
         } else {
             throw new IllegalArgumentException("Shapes must match or be scalar");
+        }
+    }
+
+    public static void checkShapeIsSquareMatrix(int[] shape) {
+        if (shape.length != 2) {
+            throw new IllegalArgumentException("Input tensor must be a matrix");
+        }
+
+        if (shape[0] != shape[1]) {
+            throw new IllegalArgumentException("Input matrix must be square");
         }
     }
 
@@ -137,5 +149,8 @@ public class TensorShapeValidation {
         }
     }
 
+    public static void checkRankIsAtLeastTwo(int[] shape) {
+        Preconditions.checkArgument(shape.length > 1, "Tensors must have rank >=2 : " + Arrays.toString(shape));
 
+    }
 }

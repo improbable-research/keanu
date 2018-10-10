@@ -1,18 +1,15 @@
 package io.improbable.keanu.tensor;
 
-import com.google.common.primitives.Ints;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.BroadcastOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastAddOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastDivOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastMulOp;
-import org.nd4j.linalg.api.ops.impl.broadcast.BroadcastSubOp;
-import org.nd4j.linalg.api.shape.Shape;
-import org.nd4j.linalg.factory.Nd4j;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.shape.Shape;
+import org.nd4j.linalg.factory.Broadcast;
+import org.nd4j.linalg.factory.Nd4j;
+
+import com.google.common.primitives.Ints;
 
 /**
  * This class provides shim methods for the ND4J INDArray class.
@@ -21,7 +18,7 @@ import java.util.List;
  * Until this is fixed in the ND4J codebase, these methods can be
  * used to work around the issue. The need for this should be
  * reevaluated each time the ND4J dependency is updated.
- *
+ * <p>
  * To work around another issue in ND4J where you cannot broadcast
  * a higher rank tensor onto a lower rank tensor, the shim broadcast operations
  * ensure the higher rank tensor is always being operated on. In the case of
@@ -43,9 +40,8 @@ public class INDArrayShim {
             return broadcastMultiply(b, a);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastMulOp(a, b, a.dup(), broadcastDimensions)
-            );
+            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
+            return Broadcast.mul(a, b, result, broadcastDimensions);
         }
     }
 
@@ -59,12 +55,11 @@ public class INDArrayShim {
 
     private static INDArray broadcastDivide(INDArray a, INDArray b) {
         if (a.shape().length < b.shape().length) {
-            return broadcastMultiply(b, a.rdiv(1.0));
+            return broadcastMultiply(b.rdiv(1.0), a);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastDivOp(a, b, a.dup(), broadcastDimensions)
-            );
+            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
+            return Broadcast.div(a, b, result, broadcastDimensions);
         }
     }
 
@@ -81,9 +76,8 @@ public class INDArrayShim {
             return broadcastPlus(b, a);
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastAddOp(a, b, a.dup(), broadcastDimensions)
-            );
+            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
+            return Broadcast.add(a, b, result, broadcastDimensions);
         }
     }
 
@@ -97,18 +91,12 @@ public class INDArrayShim {
 
     private static INDArray broadcastMinus(INDArray a, INDArray b) {
         if (a.shape().length < b.shape().length) {
-            return broadcastPlus(a.neg(), b);
+            return broadcastPlus(a, b.neg());
         } else {
             int[] broadcastDimensions = getBroadcastDimensions(a.shape(), b.shape());
-            return execBroadcast(a, b,
-                new BroadcastSubOp(a, b, a.dup(), broadcastDimensions)
-            );
+            INDArray result = Nd4j.create(Shape.broadcastOutputShape(a.shape(), b.shape()));
+            return Broadcast.sub(a, b, result, broadcastDimensions);
         }
-    }
-
-    private static INDArray execBroadcast(INDArray a, INDArray b, BroadcastOp op) {
-        int[] executeAlong = getBroadcastAlongDimensions(a.shape(), b.shape());
-        return Nd4j.getExecutioner().exec(op, executeAlong);
     }
 
     private static int[] getBroadcastDimensions(int[] shapeA, int[] shapeB) {
@@ -123,26 +111,7 @@ public class INDArrayShim {
         List<Integer> along = new ArrayList<>();
 
         for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] != shapeB[i]){
-                along.add(i);
-            }
-        }
-        return Ints.toArray(along);
-    }
-
-    private static int[] getBroadcastAlongDimensions(int[] shapeA, int[] shapeB) {
-        int maxRank = Math.max(shapeA.length, shapeB.length);
-
-        if (shapeA.length < shapeB.length) {
-            shapeA = TensorShape.shapeToDesiredRankByPrependingOnes(shapeA, shapeB.length);
-        } else {
-            shapeB = TensorShape.shapeToDesiredRankByPrependingOnes(shapeB, shapeA.length);
-        }
-
-        List<Integer> along = new ArrayList<>();
-
-        for (int i = maxRank - 1; i >= 0; i--) {
-            if (shapeA[i] == shapeB[i]){
+            if (shapeA[i] == shapeB[i]) {
                 along.add(i);
             }
         }

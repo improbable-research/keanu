@@ -1,4 +1,4 @@
-package io.improbable.keanu.distributions.dual;
+package io.improbable.keanu.distributions.hyperparam;
 
 import com.google.common.collect.Sets;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

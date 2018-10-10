@@ -65,7 +65,7 @@ public class DoubleCPTVertexTest {
 
         Vertex<DoubleTensor> A = network.getContinuousLatentVertices().get(0);
 
-        DoubleTensor actual = doubleCPTVertex.getDualNumber().getPartialDerivatives().withRespectTo(A);
+        DoubleTensor actual = doubleCPTVertex.getDerivativeWrtLatents().withRespectTo(A);
 
         assertEquals(expected, actual);
     }

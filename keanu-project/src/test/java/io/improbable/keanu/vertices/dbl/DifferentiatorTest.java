@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class DifferentiatorTest {
         DoubleVertex B = new GaussianVertex(0, 1);
         DoubleVertex C = A.times(B);
 
-        PartialDerivatives dC = C.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dC = C.getDerivativeWrtLatents();
 
         DoubleTensor dCdA = dC.withRespectTo(A);
         DoubleTensor dCdB = dC.withRespectTo(B);
@@ -88,7 +88,7 @@ public class DifferentiatorTest {
         DoubleVertex H = G.plus(F).sum();
 
         PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
-        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dHForward = H.getDerivativeWrtLatents();
 
         DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
         DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
@@ -119,7 +119,7 @@ public class DifferentiatorTest {
         DoubleVertex F = D.plus(B).exp();
         DoubleVertex H = G.plus(F).sum().times(A).sum().times(C);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3,  true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3);
     }
 
     @Test
