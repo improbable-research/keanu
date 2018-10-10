@@ -3,22 +3,22 @@ package io.improbable.keanu.vertices.intgr;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Before;
 import org.junit.Test;
 
+import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.probabilistic.BinomialVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
 public class IntegerVertexTest {
 
@@ -175,6 +175,33 @@ public class IntegerVertexTest {
 
         assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
         assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
+    }
+
+    @Test
+    public void sampleScalarsAsTensorFillsGivenShapeWithSamples() {
+        final IntegerVertex vertex = new IntegerVertex() {
+            int sampledValue = 0;
+
+            @Override
+            public IntegerTensor sample(KeanuRandom random) {
+                sampledValue += 1;
+                return IntegerTensor.scalar(sampledValue);
+            }
+        };
+
+        final int[] shape = new int[]{2, 2, 2};
+        final IntegerTensor expected = IntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8},
+            shape);
+        final IntegerTensor actual = vertex.sampleScalarValuesAsTensor(shape);
+
+        assertThat(actual, TensorMatchers.isEqualTo(expected));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void sampleScalarsAsTensorFailsForNonScalars() {
+        final IntegerVertex vertex = new BinomialVertex(new int[]{2, 2}, 0.5, 10);
+
+        vertex.sampleScalarValuesAsTensor(new int[]{2, 2});
     }
 
 }

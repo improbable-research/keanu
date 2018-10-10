@@ -1,8 +1,22 @@
 package io.improbable.keanu.vertices.bool;
 
+import static org.junit.Assert.assertArrayEquals;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+
+import static io.improbable.keanu.vertices.bool.BoolVertex.not;
+
+import java.util.Collections;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorMatchers;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -10,13 +24,6 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.CastBoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import org.junit.Before;
-import org.junit.Test;
-
-import java.util.Collections;
-
-import static io.improbable.keanu.vertices.bool.BoolVertex.not;
-import static org.junit.Assert.*;
 
 public class BoolVertexTest {
 
@@ -234,6 +241,33 @@ public class BoolVertexTest {
 
         BoolVertex concatDimOne = BoolVertex.concat(1, A, B);
         assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
+    }
+
+    @Test
+    public void sampleScalarsAsTensorFillsGivenShapeWithSamples() {
+        final BoolVertex vertex = new BoolVertex() {
+            boolean sampledValue = false;
+
+            @Override
+            public BooleanTensor sample(KeanuRandom random) {
+                sampledValue = !sampledValue;
+                return BooleanTensor.scalar(sampledValue);
+            }
+        };
+
+        final int[] shape = new int[]{2, 2, 2};
+        final BooleanTensor expected = BooleanTensor.create(new boolean[]{true, false, true,
+            false, true, false, true, false}, shape);
+        final BooleanTensor actual = vertex.sampleScalarValuesAsTensor(shape);
+
+        assertThat(actual, TensorMatchers.isEqualTo(expected));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void sampleScalarsAsTensorFailsForNonScalars() {
+        final BoolVertex vertex = new BernoulliVertex(new int[]{2, 2}, 0.5);
+
+        vertex.sampleScalarValuesAsTensor(new int[]{2, 2});
     }
 
     private double andProbability(double pA, double pB) {

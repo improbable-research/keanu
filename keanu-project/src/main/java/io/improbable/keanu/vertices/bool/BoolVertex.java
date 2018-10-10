@@ -4,10 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.primitives.Booleans;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexSampler;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
@@ -19,6 +22,7 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolRe
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolSliceVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.BoolTakeVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
+import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public abstract class BoolVertex extends Vertex<BooleanTensor> {
 
@@ -91,6 +95,17 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
         return getValue().getValue(index);
     }
 
+    public BooleanTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
+        final int length = Math.toIntExact(TensorShape.getLength(shape));
+        final boolean[] samples = Booleans.toArray(
+            VertexSampler.sampleManyScalarsFromTensorVertex(this, length, random));
+        return BooleanTensor.create(samples, shape);
+    }
+
+    public BooleanTensor sampleScalarValuesAsTensor(int[] shape) {
+        return sampleScalarValuesAsTensor(shape, KeanuRandom.getDefaultRandom());
+    }
+
     public BoolVertex take(int... index) {
         return new BoolTakeVertex(this, index);
     }
@@ -98,6 +113,5 @@ public abstract class BoolVertex extends Vertex<BooleanTensor> {
     public BoolVertex reshape(int... proposedShape) {
         return new BoolReshapeVertex(this, proposedShape);
     }
-
 
 }

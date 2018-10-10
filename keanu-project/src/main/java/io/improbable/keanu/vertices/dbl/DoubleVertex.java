@@ -1,15 +1,18 @@
 package io.improbable.keanu.vertices.dbl;
 
-
 import java.util.Collections;
 import java.util.Map;
 import java.util.function.Function;
 
+import com.google.common.primitives.Doubles;
+
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexSampler;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.EqualsVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanOrEqualVertex;
@@ -295,6 +298,17 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return getValue().getValue(index);
     }
 
+    public DoubleTensor sampleScalarValuesAsTensor(int[] shape, KeanuRandom random) {
+        final int length = Math.toIntExact(TensorShape.getLength(shape));
+        final double[] samples = Doubles.toArray(
+            VertexSampler.sampleManyScalarsFromTensorVertex(this, length, random));
+        return DoubleTensor.create(samples, shape);
+    }
+
+    public DoubleTensor sampleScalarValuesAsTensor(int[] shape) {
+        return sampleScalarValuesAsTensor(shape, KeanuRandom.getDefaultRandom());
+    }
+
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
@@ -311,4 +325,5 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
             PartialDerivatives.withRespectToSelf(this.getId(), this.getShape())
         );
     }
+
 }
