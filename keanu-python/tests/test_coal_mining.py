@@ -1,6 +1,11 @@
 import pandas as pd
 import keanu as kn
 import numpy as np
+def test_temp_pass():
+    assert True
+
+def test_temp_fail():
+    assert False
 
 def test_coalmining():
     FILE = "data/coal-mining-disaster-data.csv"
