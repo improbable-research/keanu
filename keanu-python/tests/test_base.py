@@ -76,5 +76,11 @@ def test_vertex_can_overload_gt():
     assert sample.isScalar()
 
     greaterThan = gaussian > np.array([[2., 2.]])
+
     sample = greaterThan.sample()
     assert not sample.isScalar()
+
+    flat_arr = sample.asFlatArray()
+    assert len(flat_arr) == 2
+    assert isinstance(flat_arr[0], bool)
+    assert isinstance(flat_arr[1], bool)

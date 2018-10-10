@@ -137,6 +137,8 @@ def assert_vertex_value_equal_numpy(v, np_tensor):
     nd4j_flat = v.getValue().asFlatArray()
     np_flat = np_tensor.flatten().tolist()
 
+    assert len(nd4j_flat) == len(np_flat)
+
     for i in range(len(np_tensor)):
         assert nd4j_flat[i] == np_flat[i]
 
