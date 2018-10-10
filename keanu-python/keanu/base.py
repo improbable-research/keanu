@@ -56,4 +56,4 @@ class Vertex(JavaObjectWrapper, VertexOps):
         elif isinstance(arg, list):
             return context.to_java_array(arg)
         else:
-            raise ValueError("Can't parse generic argument")
+            raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))
