@@ -12,15 +12,15 @@ def test_coalmining():
     data = pd.read_csv(FILE, names=["year", "count"]).set_index("year")
     start_year, end_year = (data.index.min(), data.index.max())
 
-    with kn.Model() as m:
-        m.switchpoint = kn.UniformInt(int(start_year), int(end_year + 1))
+    # with kn.Model() as m:
+    #     m.switchpoint = kn.UniformInt(int(start_year), int(end_year + 1))
 
-        m.early_rate = kn.Exponential(1.0)
-        m.late_rate = kn.Exponential(1.0)
+    #     m.early_rate = kn.Exponential(1.0)
+    #     m.late_rate = kn.Exponential(1.0)
 
-        m.years = np.array(data.index)
-        m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
-        m.disasters = kn.Poisson(m.rates)
+    #     m.years = np.array(data.index)
+    #     m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
+    #     m.disasters = kn.Poisson(m.rates)
 
     # m.disasters.observe(data.values)
 
