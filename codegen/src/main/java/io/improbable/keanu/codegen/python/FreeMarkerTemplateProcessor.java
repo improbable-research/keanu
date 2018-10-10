@@ -14,12 +14,15 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 class FreeMarkerTemplateProcessor {
-    static Writer createFileWriter(String fileToWrite) {
+
+    static void processDataModel(Map<String, Object> dataModel, Template fileTemplate, Writer fileWriter) {
         try {
-            Files.deleteIfExists(Paths.get(fileToWrite));
-            return new FileWriter(new File(fileToWrite), true);
+            fileTemplate.process(dataModel, fileWriter);
+            fileWriter.close();
         } catch (IOException e) {
             throw new UncheckedIOException(e);
+        } catch (TemplateException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -33,14 +36,13 @@ class FreeMarkerTemplateProcessor {
         }
     }
 
-    static void processDataModel(Map<String, Object> dataModel, Template fileTemplate, Writer fileWriter) {
+    static Writer createFileWriter(String fileToWrite) {
         try {
-            fileTemplate.process(dataModel, fileWriter);
-            fileWriter.close();
+            Files.deleteIfExists(Paths.get(fileToWrite));
+            return new FileWriter(new File(fileToWrite), true);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
-        } catch (TemplateException e) {
-            throw new RuntimeException(e);
         }
     }
+
 }
