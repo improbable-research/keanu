@@ -100,19 +100,14 @@ public class INDArrayShim {
     }
 
     private static int[] getBroadcastDimensions(long[] shapeA, long[] shapeB) {
+        int minRank = Math.min(shapeA.length, shapeB.length);
         int maxRank = Math.max(shapeA.length, shapeB.length);
-
-        if (shapeA.length < shapeB.length) {
-            shapeA = TensorShape.shapeToDesiredRankByPrependingNegOnes(shapeA, shapeB.length);
-        } else {
-            shapeB = TensorShape.shapeToDesiredRankByPrependingNegOnes(shapeB, shapeA.length);
-        }
 
         List<Integer> along = new ArrayList<>();
 
-        for (int i = 0; i < maxRank; i++) {
-            if (shapeA[i] == shapeB[i]) {
-                along.add(i);
+        for (int i = minRank - 1; i >= 0; i--) {
+            if (shapeA[shapeA.length - i - 1] == shapeB[shapeB.length - i - 1]) {
+                along.add(maxRank - i - 1);
             }
         }
         return Ints.toArray(along);
