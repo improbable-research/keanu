@@ -18,7 +18,15 @@ public class GenericTensor<T> implements Tensor<T> {
     private int[] stride;
 
     public static <T> GenericTensor<T> create(T data, int[] shape) {
-        return new GenericTensor<>(data, shape);
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
+            return new GenericTensor<>(data);
+        } else {
+            return new GenericTensor<>(data, shape);
+        }
+    }
+
+    public static <T> GenericTensor<T> scalar(T data) {
+        return new GenericTensor<>(data);
     }
 
     public GenericTensor(T[] data, int[] shape) {
@@ -117,15 +125,15 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public FlattenedView<T> getFlattenedView() {
-        return new BaseSimpleFlattenedView<T>(data, shape);
+        return new BaseSimpleFlattenedView<>(data);
     }
 
     private static class BaseSimpleFlattenedView<T> implements FlattenedView<T> {
 
         T[] data;
 
-        public BaseSimpleFlattenedView(T[] data, int[] shape) {
-            this.data = data == null ? (T[]) new Object[(int) TensorShape.getLength(shape)] : data;
+        public BaseSimpleFlattenedView(T[] data) {
+            this.data = data;
         }
 
         @Override

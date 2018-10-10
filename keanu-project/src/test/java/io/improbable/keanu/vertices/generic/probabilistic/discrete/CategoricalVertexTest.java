@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.generic.probabilistic.discrete;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -330,6 +331,16 @@ public class CategoricalVertexTest {
         double expectedLogProb = Arrays.stream(aProbs).map(v -> Math.log(v / (v + bProb))).sum();
 
         assertThat(expectedLogProb, closeTo(logProbA, 1e-6));
+    }
+
+    @Test
+    public void integerKeysCreateIntegerTensorSample() {
+        Map<Integer, DoubleVertex> selectableValues = new LinkedHashMap<>();
+        selectableValues.put(1, ConstantVertex.of(0.1));
+        selectableValues.put(2, ConstantVertex.of(0.9));
+
+        CategoricalVertex<Integer> categoricalVertex = new CategoricalVertex<>(selectableValues);
+        IntegerTensor sample = categoricalVertex.sample();
     }
 
     private <T> Map<T, Double> testScalarSample(Map<T, DoubleVertex> selectableValues,

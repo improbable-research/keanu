@@ -8,19 +8,19 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class Categorical<T> implements Distribution<Tensor<T>> {
+public class Categorical<N, T extends Tensor<N>> implements Distribution<T> {
 
-    private final Map<T, DoubleTensor> selectableValues;
+    private final Map<N, DoubleTensor> selectableValues;
 
-    public static <T> Categorical<T> withParameters(Map<T, DoubleTensor> selectableValues) {
+    public static <N, T extends Tensor<N>> Categorical<N, T> withParameters(Map<N, DoubleTensor> selectableValues) {
         return new Categorical<>(selectableValues);
     }
 
-    private Categorical(Map<T, DoubleTensor> selectableValues) {
+    private Categorical(Map<N, DoubleTensor> selectableValues) {
         this.selectableValues = selectableValues;
     }
 
-    public Tensor<T> sample(int[] shape, KeanuRandom random) {
+    public T sample(int[] shape, KeanuRandom random) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
         if (containsNonPositiveEntry(sumOfProbabilities)) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
@@ -28,15 +28,16 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
 
         double p = random.nextDouble();
         DoubleTensor sum = DoubleTensor.zeros(shape);
-        Tensor<T> sample = Tensor.placeHolder(shape);
+
+        T sample = (T) Tensor.create(selectableValues.keySet().iterator().next(), shape);
         BooleanTensor sampleSetSoFar = BooleanTensor.falses(shape);
 
-        for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
+        for (Map.Entry<N, DoubleTensor> entry : selectableValues.entrySet()) {
             sum.plusInPlace(entry.getValue().div(sumOfProbabilities));
 
             BooleanTensor mask = sampleSetSoFar.not().andInPlace(sum.greaterThan(p));
+            sample = (T) mask.setIf(Tensor.scalar(entry.getKey()), sample);
 
-            sample = mask.setIf(Tensor.scalar(entry.getKey()), sample);
             sampleSetSoFar.orInPlace(mask);
 
             if (sampleSetSoFar.allTrue()) {
@@ -45,21 +46,21 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
         }
 
         if (!sampleSetSoFar.allTrue()) {
-            T[] values = (T[]) selectableValues.keySet().toArray();
-            sample = Tensor.create(values[values.length - 1], shape);
+            N[] values = (N[]) selectableValues.keySet().toArray();
+            sample = (T) Tensor.create(values[values.length - 1], shape);
         }
 
         return sample;
     }
 
-    public DoubleTensor logProb(Tensor<T> x) {
+    public DoubleTensor logProb(T x) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(x.getShape());
         if (containsNonPositiveEntry(sumOfProbabilities)) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");
         }
 
         DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
-        for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
+        for (Map.Entry<N, DoubleTensor> entry : selectableValues.entrySet()) {
             DoubleTensor xEqualToEntryKeyMask = x.elementwiseEquals(Tensor.create(entry.getKey(), x.getShape())).toDoubleMask();
             logProb.plusInPlace(xEqualToEntryKeyMask.timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
         }
