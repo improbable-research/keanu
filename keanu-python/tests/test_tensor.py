@@ -53,7 +53,7 @@ def test_cannot_pass_generic_numpy_tensor_to_Tensor():
 
 
 def test_cannot_pass_empty_numpy_tensor_to_Tensor():
-    with pytest.raises(NotImplementedError) as excinfo:
+    with pytest.raises(ValueError) as excinfo:
         kn.Tensor(np.array([]))
 
     assert str(excinfo.value) == "Cannot infer type because tensor is empty"

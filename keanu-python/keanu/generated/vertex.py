@@ -1,7 +1,8 @@
 ## This is a generated file. DO NOT EDIT.
 
 from py4j.java_gateway import java_import
-from keanu.base import KeanuContext, Vertex
+from keanu.context import KeanuContext
+from keanu.vertex import Vertex
 
 k = KeanuContext().jvm_view()
 

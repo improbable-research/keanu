@@ -49,7 +49,7 @@ def test_cannot_pass_generic_to_vertex():
     with pytest.raises(ValueError) as excinfo:
         kn.Vertex(jvm_view.GaussianVertex, (GenericExampleClass(), GenericExampleClass()))
 
-    assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(Temp)
+    assert str(excinfo.value) == "Can't parse generic argument. Was given {}".format(GenericExampleClass)
 
 
 def test_vertex_can_observe_scalar():
