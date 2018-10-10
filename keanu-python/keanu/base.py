@@ -34,22 +34,26 @@ class VertexOps:
 
 class Vertex(JavaObjectWrapper, VertexOps):
     def __init__(self, ctor, *args):
-        super(Vertex, self).__init__(ctor, *(self.__parse_args(*args)))
+        super(Vertex, self).__init__(ctor, *(Vertex.__parse_args(*args)))
 
     def observe(self, v):
-        from keanu.tensor import Tensor
+        from keanu.const import Tensor
         self.unwrap().observe(Tensor(v).unwrap())
 
-    def __parse_args(self, args):
-        return list(map(self.__parse_arg, args))
+    @staticmethod
+    def __parse_args(args):
+        return list(map(Vertex.__parse_arg, args))
 
-    def __parse_arg(self, arg):
-        if isinstance(arg, np.ndarray) or isinstance(arg, numbers.Number):
-            from keanu.tensor import Const
+    @staticmethod
+    def __parse_arg(arg):
+        if isinstance(arg, np.ndarray):
+            from keanu.const import Const
             return Const(arg).unwrap()
+        elif isinstance(arg, numbers.Number):
+            return arg
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, list):
             return context.to_java_array(arg)
         else:
-            return arg
+            raise ValueError("Can't parse generic argument")

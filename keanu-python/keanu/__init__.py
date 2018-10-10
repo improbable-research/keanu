@@ -2,4 +2,4 @@ from keanu.base import Vertex
 from keanu.generated import *
 from keanu.inference import *
 from keanu.model import *
-from keanu.const import Const
+from keanu.const import *
