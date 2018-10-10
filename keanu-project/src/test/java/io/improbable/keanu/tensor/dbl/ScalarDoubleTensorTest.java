@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
+import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
 
 import java.util.function.Function;
 
@@ -16,6 +17,7 @@ import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.TensorValueException;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
 import io.improbable.keanu.tensor.validate.policy.TensorValidationPolicy;
 
@@ -172,5 +174,20 @@ public class ScalarDoubleTensorTest {
         tensor2 = validator.validate(tensor2);
         assertThat(tensor1, equalTo(notZero));
         assertThat(tensor2, equalTo(one));
+    }
+
+    @Test
+    public void canArgFindMaxOfScalar() {
+        DoubleTensor tensor = DoubleTensor.scalar(1);
+
+        assertEquals(0, tensor.argMax());
+        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.scalar(0)));
+        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.scalar(0)));
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void argMaxFailsForAxisTooHigh() {
+        DoubleTensor tensor = DoubleTensor.scalar(1);
+        tensor.argMax(2);
     }
 }
