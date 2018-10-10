@@ -20,7 +20,7 @@ public class UniformInt implements DiscreteDistribution {
     }
 
     @Override
-    public IntegerTensor sample(int[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor minDouble = xMin.toDouble();
         DoubleTensor delta = xMax.toDouble().minus(minDouble);
         DoubleTensor randoms = random.nextDouble(shape);

@@ -26,7 +26,7 @@ public class Gaussian implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor unityGaussian = random.nextGaussian(shape);
         return unityGaussian.timesInPlace(sigma).plusInPlace(mu);
     }

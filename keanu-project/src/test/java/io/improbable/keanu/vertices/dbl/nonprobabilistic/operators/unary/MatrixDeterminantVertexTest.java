@@ -51,7 +51,7 @@ public class MatrixDeterminantVertexTest {
 
     @Test
     public void canDifferentiateWhenOutputIsScalar() {
-        final int[] shape = new int[]{2, 2};
+        final long[] shape = new long[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
         final DoubleVertex output = input.matrixDeterminant();
@@ -60,7 +60,7 @@ public class MatrixDeterminantVertexTest {
 
     @Test
     public void canDifferentiateWhenOutputIsTensor() {
-        final int[] shape = new int[]{2, 2};
+        final long[] shape = new long[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, shape));
         final DoubleVertex output = input.matrixDeterminant().times(input);
@@ -70,21 +70,21 @@ public class MatrixDeterminantVertexTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void failsForNonMatrixInputs() {
-        final int[] shape = new int[]{2, 2, 2};
+        final long[] shape = new long[]{2, 2, 2};
         final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
         input.matrixDeterminant();
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void failsForNonSquareMatrices() {
-        final int[] shape = new int[]{2, 3};
+        final long[] shape = new long[]{2, 3};
         final DoubleVertex input = new ConstantDoubleVertex(DoubleTensor.create(1, shape));
         input.matrixDeterminant();
     }
 
     @Test(expected = SingularMatrixException.class)
     public void differentiationFailsWhenMatrixIsSingular() {
-        final int[] shape = new int[]{2, 2};
+        final long[] shape = new long[]{2, 2};
         final DoubleVertex input = new UniformVertex(shape, 0, 10);
         input.setValue(DoubleTensor.create(new double[]{0, 0, 0, 0}, shape));
         final DoubleVertex output = input.matrixDeterminant();
@@ -102,7 +102,7 @@ public class MatrixDeterminantVertexTest {
     }
 
     private void assertOptimizerWorksWithDeterminant(double inputGaussianMu) {
-        final int[] shape = new int[]{2, 2};
+        final long[] shape = new long[]{2, 2};
         final DoubleVertex input = new GaussianVertex(shape, inputGaussianMu, 5);
         final DoubleVertex determinant = input.matrixDeterminant();
         final DoubleVertex output = new GaussianVertex(determinant, 1);

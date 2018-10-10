@@ -19,9 +19,9 @@ import io.improbable.keanu.tensor.validate.TensorValidator;
 public class ScalarDoubleTensor implements DoubleTensor {
 
     private Double value;
-    private int[] shape;
+    private long[] shape;
 
-    private ScalarDoubleTensor(Double value, int[] shape) {
+    private ScalarDoubleTensor(Double value, long[] shape) {
         this.value = value;
         this.shape = shape;
     }
@@ -30,7 +30,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         this(value, SCALAR_SHAPE);
     }
 
-    public ScalarDoubleTensor(int[] shape) {
+    public ScalarDoubleTensor(long[] shape) {
         this(null, shape);
     }
 
@@ -40,7 +40,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -60,7 +60,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public Double getValue(int[] index) {
+    public Double getValue(long[] index) {
         if (index.length == 1 && index[0] == 0) {
             return value;
         } else {
@@ -69,7 +69,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setValue(Double value, int[] index) {
+    public DoubleTensor setValue(Double value, long[] index) {
         if (index.length == 1 && index[0] == 0) {
             this.value = value;
             return this;
@@ -99,7 +99,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor reshape(int[] newShape) {
+    public DoubleTensor reshape(long... newShape) {
         if (!TensorShape.isScalar(newShape)) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
         }
@@ -133,7 +133,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor sum(int... overDimensions) {
         //Matching strange ND4J behavior where rank 0 and 1 aren't supported.
         int shapeLength = Math.max(2, this.shape.length - overDimensions.length);
-        int[] summedShape = new int[shapeLength];
+        long[] summedShape = new long[shapeLength];
         Arrays.fill(summedShape, 1);
         return new ScalarDoubleTensor(value, summedShape);
     }
@@ -448,7 +448,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor slice(int dimension, int index) {
+    public DoubleTensor slice(int dimension, long index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
@@ -457,7 +457,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, long[] splitAtIndices) {
         return Collections.singletonList(this);
     }
 

@@ -6,11 +6,11 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public interface BooleanTensor extends Tensor<Boolean> {
 
-    static BooleanTensor create(boolean value, int[] shape) {
+    static BooleanTensor create(boolean value, long[] shape) {
         return new SimpleBooleanTensor(value, shape);
     }
 
-    static BooleanTensor create(boolean[] values, int... shape) {
+    static BooleanTensor create(boolean[] values, long... shape) {
         return new SimpleBooleanTensor(values, shape);
     }
 
@@ -22,15 +22,15 @@ public interface BooleanTensor extends Tensor<Boolean> {
         return new SimpleBooleanTensor(scalarValue);
     }
 
-    static BooleanTensor placeHolder(int[] shape) {
+    static BooleanTensor placeHolder(long[] shape) {
         return new SimpleBooleanTensor(shape);
     }
 
-    static BooleanTensor trues(int... shape) {
+    static BooleanTensor trues(long... shape) {
         return new SimpleBooleanTensor(true, shape);
     }
 
-    static BooleanTensor falses(int... shape) {
+    static BooleanTensor falses(long... shape) {
         return new SimpleBooleanTensor(false, shape);
     }
 
@@ -53,7 +53,7 @@ public interface BooleanTensor extends Tensor<Boolean> {
     }
 
     @Override
-    BooleanTensor reshape(int... newShape);
+    BooleanTensor reshape(long... newShape);
 
     @Override
     BooleanTensor duplicate();
@@ -87,6 +87,6 @@ public interface BooleanTensor extends Tensor<Boolean> {
     IntegerTensor toIntegerMask();
 
     @Override
-    BooleanTensor slice(int dimension, int index);
+    BooleanTensor slice(int dimension, long index);
 
 }

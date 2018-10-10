@@ -143,7 +143,7 @@ public class GammaVertexTest {
 
         int sampleCount = 1000000;
         GammaVertex vertex = new GammaVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             ConstantVertex.of(2.0),
             ConstantVertex.of(7.5)
         );
@@ -179,7 +179,7 @@ public class GammaVertexTest {
 
         int numSamples = 5000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new GammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new GammaVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             thetaK,
             latentThetaK,
             random

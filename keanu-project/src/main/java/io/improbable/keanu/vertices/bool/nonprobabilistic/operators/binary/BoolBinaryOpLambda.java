@@ -10,7 +10,7 @@ public abstract class BoolBinaryOpLambda<A extends Tensor, B extends Tensor> ext
 
     private final BiFunction<A, B, BooleanTensor> boolOp;
 
-    public BoolBinaryOpLambda(int[] shape, Vertex<A> a, Vertex<B> b, BiFunction<A, B, BooleanTensor> boolOp) {
+    public BoolBinaryOpLambda(long[] shape, Vertex<A> a, Vertex<B> b, BiFunction<A, B, BooleanTensor> boolOp) {
         super(shape, a, b);
         this.boolOp = boolOp;
     }

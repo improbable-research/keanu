@@ -128,7 +128,7 @@ public class HalfGaussianVertexTest {
 
         int sampleCount = 1000000;
         HalfGaussianVertex vertex = new HalfGaussianVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             ConstantVertex.of(2.0)
         );
 
@@ -154,7 +154,7 @@ public class HalfGaussianVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new HalfGaussianVertex(new int[]{numSamples, 1}, hyperParams.get(0)),
+            hyperParams -> new HalfGaussianVertex(new long[]{numSamples, 1}, hyperParams.get(0)),
             sigma,
             latentSigmaList,
             random

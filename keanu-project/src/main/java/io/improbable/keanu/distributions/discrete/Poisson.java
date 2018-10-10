@@ -27,7 +27,7 @@ public class Poisson implements DiscreteDistribution {
     }
 
     @Override
-    public IntegerTensor sample(int[] shape, KeanuRandom random) {
+    public IntegerTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> muWrapped = mu.getFlattenedView();
 
         int length = ArrayUtil.prod(shape);

@@ -9,7 +9,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 public class BoolReshapeVertex extends BoolUnaryOpVertex<BooleanTensor> {
 
 
-    public BoolReshapeVertex(BoolVertex inputVertex, int... proposedShape) {
+    public BoolReshapeVertex(BoolVertex inputVertex, long... proposedShape) {
         super(proposedShape, inputVertex);
     }
 

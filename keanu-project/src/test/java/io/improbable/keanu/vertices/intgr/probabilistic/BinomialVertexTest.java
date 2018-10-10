@@ -15,7 +15,7 @@ public class BinomialVertexTest {
         double p = 0.25;
         int n = 5;
 
-        BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, N}, p, n);
+        BinomialVertex testPoissonVertex = new BinomialVertex(new long[]{1, N}, p, n);
         IntegerTensor samples = testPoissonVertex.sample();
 
         double mean = samples.toDouble().average();
@@ -49,7 +49,7 @@ public class BinomialVertexTest {
         int k1 = 20;
         int k2 = 80;
 
-        BinomialVertex testPoissonVertex = new BinomialVertex(new int[]{1, 2}, p, n);
+        BinomialVertex testPoissonVertex = new BinomialVertex(new long[]{1, 2}, p, n);
         BinomialDistribution distribution = new BinomialDistribution(n, p);
 
         double actual = testPoissonVertex.logPmf(new int[]{k1, k2});

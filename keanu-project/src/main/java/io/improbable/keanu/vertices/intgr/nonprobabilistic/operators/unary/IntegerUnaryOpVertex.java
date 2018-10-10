@@ -24,7 +24,7 @@ public abstract class IntegerUnaryOpVertex extends IntegerVertex implements NonP
      * @param shape       the shape of the tensor
      * @param inputVertex the input vertex
      */
-    public IntegerUnaryOpVertex(int[] shape, IntegerVertex inputVertex) {
+    public IntegerUnaryOpVertex(long[] shape, IntegerVertex inputVertex) {
         this.inputVertex = inputVertex;
         setParents(inputVertex);
         setValue(IntegerTensor.placeHolder(shape));

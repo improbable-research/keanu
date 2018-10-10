@@ -32,8 +32,7 @@ public class Nd4jDoubleTensorTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
-    @Rule
-    public ExpectedException expectedException = ExpectedException.none();
+
     Nd4jDoubleTensor matrixA;
     Nd4jDoubleTensor matrixB;
     Nd4jDoubleTensor scalarA;
@@ -41,14 +40,17 @@ public class Nd4jDoubleTensorTest {
     Nd4jDoubleTensor vectorB;
     Nd4jDoubleTensor rankThreeTensor;
 
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
+
     @Before
     public void setup() {
-        matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
-        matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+        matrixA = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
+        matrixB = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         scalarA = Nd4jDoubleTensor.scalar(2.0);
-        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{3, 1});
-        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
-        rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+        vectorA = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{3, 1});
+        vectorB = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{1, 3});
+        rankThreeTensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
     }
 
     @Before
@@ -67,14 +69,14 @@ public class Nd4jDoubleTensorTest {
     public void youCannotCreateARankZeroTensor() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Tensors must have rank >=2 : []");
-        DoubleTensor.create(new double[]{}, new int[]{});
+        DoubleTensor.create(new double[] {}, new long[] {});
     }
 
     @Test
     public void youCannotCreateARankOneTensor() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, new int[]{5});
+        DoubleTensor.create(new double[] {1, 2, 3, 4, 5}, new long[] {5});
     }
 
     @Test
@@ -127,7 +129,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canSetWhereGreaterThanAMatrix() {
-        DoubleTensor mask = matrixA.getGreaterThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
+        DoubleTensor mask = matrixA.getGreaterThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{1, 2, -2, -2}, result.asFlatDoubleArray(), 0.0);
@@ -143,7 +145,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanOrEqualAMatrix() {
-        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
+        DoubleTensor mask = matrixA.getLessThanOrEqualToMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, -2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -159,7 +161,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canSetWhereLessThanAMatrix() {
-        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
+        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, -2.0);
 
         assertArrayEquals(new double[]{-2, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -179,7 +181,7 @@ public class Nd4jDoubleTensorTest {
     @Test
 
     public void canSetToZero() {
-        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new int[]{2, 2}));
+        DoubleTensor mask = matrixA.getLessThanMask(Nd4jDoubleTensor.create(new double[]{2, 2, 2, 2}, new long[]{2, 2}));
         DoubleTensor result = matrixA.setWithMaskInPlace(mask, 0.0);
 
         assertArrayEquals(new double[]{0, 2, 3, 4}, result.asFlatDoubleArray(), 0.0);
@@ -187,13 +189,13 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canTestIfIsNaN() {
-        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
         assertThat(matrix.isNaN(), hasValue(false, false, true, false));
     }
 
     @Test
     public void canSetWhenNaN() {
-        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
 
         DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
         DoubleTensor result = matrix.setWithMaskInPlace(mask, -2.0);
@@ -203,7 +205,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canSetToZeroWhenNaN() {
-        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new int[]{2, 2});
+        Nd4jDoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1, 2, Double.NaN, 4}, new long[]{2, 2});
 
         DoubleTensor mask = DoubleTensor.ones(matrix.getShape());
         DoubleTensor result = matrix.setWithMaskInPlace(mask, 0.0);
@@ -213,7 +215,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void cannotSetIfMaskLengthIsSmallerThanTensorLength() {
-        DoubleTensor tensor = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new int[]{2, 2});
+        DoubleTensor tensor = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new long[]{2, 2});
         DoubleTensor mask = Nd4jDoubleTensor.scalar(1.);
 
         thrown.expect(IllegalArgumentException.class);
@@ -241,7 +243,7 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canApplyUnaryFunctionToRank3() {
-        DoubleTensor rank3Tensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
+        DoubleTensor rank3Tensor = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
         DoubleTensor result = rank3Tensor.apply(a -> a * 2);
         assertArrayEquals(new double[]{2, 4, 6, 8, 10, 12, 14, 16}, result.asFlatDoubleArray(), 0.0);
     }
@@ -257,7 +259,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor rank5 = DoubleTensor.create(new double[]{
             1, 2, 3, 4, 5, 6, 7, 8, 4, 3, 2, 1, 7, 5, 8, 6,
             6, 3, 2, 9, 3, 4, 7, 6, 6, 2, 5, 4, 0, 2, 1, 3
-        }, new int[]{2, 2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2, 2});
         rank5.setAllInPlace(0.0);
         assertAllValuesAre(rank5, 0.0);
         rank5.setAllInPlace(0.8);
@@ -280,9 +282,9 @@ public class Nd4jDoubleTensorTest {
         double[] cData = bData.clone();
         cData[0] = cData[0] - 1.0;
 
-        DoubleTensor a = DoubleTensor.create(aData, new int[]{2, 2, 2, 2, 2});
-        DoubleTensor b = DoubleTensor.create(bData, new int[]{2, 2, 2, 2, 2});
-        DoubleTensor c = DoubleTensor.create(cData, new int[]{2, 2, 2, 2, 2});
+        DoubleTensor a = DoubleTensor.create(aData, new long[]{2, 2, 2, 2, 2});
+        DoubleTensor b = DoubleTensor.create(bData, new long[]{2, 2, 2, 2, 2});
+        DoubleTensor c = DoubleTensor.create(cData, new long[]{2, 2, 2, 2, 2});
         assertTrue("equals with epsilon should be true", a.equalsWithinEpsilon(b, 0.5));
         assertTrue("equals with epsilon should be true (inverted order)", b.equalsWithinEpsilon(a, 0.5));
         assertTrue("equals with epsilon should be not true (max delta is 0.4)", !a.equalsWithinEpsilon(b, 0.2));
@@ -291,9 +293,9 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void doesClampTensor() {
-        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{0.25, 3, -4, -5}, new int[]{1, 4});
+        DoubleTensor A = Nd4jDoubleTensor.create(new double[]{0.25, 3, -4, -5}, new long[]{1, 4});
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(-4.5), DoubleTensor.scalar(2.0));
-        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5}, new int[]{1, 4});
+        DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{0.25, 2.0, -4.0, -4.5}, new long[]{1, 4});
         assertEquals(expected, clampedA);
     }
 
@@ -305,8 +307,8 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canPermute() {
-        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 3});
-        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{4, 5, 6}, new int[]{1, 3});
+        DoubleTensor x = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{1, 3});
+        DoubleTensor y = Nd4jDoubleTensor.create(new double[]{4, 5, 6}, new long[]{1, 3});
 
         DoubleTensor concatDimensionZero = DoubleTensor.concat(0, x, y);
 
@@ -317,8 +319,8 @@ public class Nd4jDoubleTensorTest {
 
         assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, permuttedConcatDimensionOne.asFlatDoubleArray(), 1e-6);
 
-        x = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2});
-        y = Nd4jDoubleTensor.create(new double[]{9, 10, 11, 12, 13, 14, 15, 16}, new int[]{2, 2, 2});
+        x = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2});
+        y = Nd4jDoubleTensor.create(new double[]{9, 10, 11, 12, 13, 14, 15, 16}, new long[]{2, 2, 2});
 
         concatDimensionZero = DoubleTensor.concat(0, x, y);
 
@@ -373,18 +375,18 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canTensorMultiplyWithVectorAndRank4() {
-        DoubleTensor a = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new int[]{1, 1, 3, 1});
+        DoubleTensor a = Nd4jDoubleTensor.create(new double[]{1, 2, 3}, new long[]{1, 1, 3, 1});
         DoubleTensor b = Nd4jDoubleTensor.create(new double[]{
             5, 2, 3, 7, 8,
             5, 2, 3, 7, 8,
             5, 2, 3, 7, 8
-        }, new int[]{1, 3, 1, 5});
+        }, new long[]{1, 3, 1, 5});
 
         DoubleTensor c = a.tensorMultiply(b, new int[]{2, 3}, new int[]{1, 0});
 
         DoubleTensor expected = Nd4jDoubleTensor.create(new double[]{
             30, 12, 18, 42, 48
-        }, new int[]{1, 1, 1, 5});
+        }, new long[]{1, 1, 1, 5});
 
         assertEquals(expected, c);
     }
@@ -401,14 +403,14 @@ public class Nd4jDoubleTensorTest {
             4664., 5018.,
             4796., 5162.,
             4928., 5306.
-        }, new int[]{5, 2});
+        }, new long[]{5, 2});
 
         assertEquals(expected, c);
     }
 
     @Test
     public void canPermuteForTranspose() {
-        DoubleTensor a = DoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+        DoubleTensor a = DoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         DoubleTensor permuted = a.permute(1, 0);
         DoubleTensor transposed = a.transpose();
 
@@ -422,14 +424,14 @@ public class Nd4jDoubleTensorTest {
             3, 4,
             5, 6,
             7, 8
-        }, new int[]{1, 2, 2, 2});
+        }, new long[]{1, 2, 2, 2});
         DoubleTensor permuted = a.permute(0, 1, 3, 2);
         DoubleTensor expected = DoubleTensor.create(new double[]{
             1, 3,
             2, 4,
             5, 7,
             6, 8
-        }, new int[]{1, 2, 2, 2});
+        }, new long[]{1, 2, 2, 2});
 
         assertEquals(expected, permuted);
     }
@@ -450,7 +452,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarMinusInPlaceTensorBehavesSameAsMinus() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new long[]{1, 4});
 
         assertArrayEquals(scalar.minus(tensor).asFlatDoubleArray(), scalar.minusInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
@@ -458,7 +460,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarPlusInPlaceTensorBehavesSameAsPlus() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new long[]{1, 4});
 
         assertArrayEquals(scalar.plus(tensor).asFlatDoubleArray(), scalar.plusInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
@@ -466,7 +468,7 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarTimesInPlaceTensorBehavesSameAsTimes() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new long[]{1, 4});
 
         assertArrayEquals(scalar.times(tensor).asFlatDoubleArray(), scalar.timesInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
@@ -474,54 +476,54 @@ public class Nd4jDoubleTensorTest {
     @Test
     public void scalarDivInPlaceTensorBehavesSameAsDiv() {
         DoubleTensor scalar = DoubleTensor.scalar(1);
-        DoubleTensor tensor = DoubleTensor.create(2, new int[]{1, 4});
+        DoubleTensor tensor = DoubleTensor.create(2, new long[]{1, 4});
 
         assertArrayEquals(scalar.div(tensor).asFlatDoubleArray(), scalar.divInPlace(tensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorMinusInPlaceLargerTensorBehavesSameAsMinus() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new long[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new long[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.minus(largerTensor).asFlatDoubleArray(), smallerTensor.minusInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorPlusInPlaceLargerTensorBehavesSameAsPlus() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new long[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new long[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.plus(largerTensor).asFlatDoubleArray(), smallerTensor.plusInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimes() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new long[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new long[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.times(largerTensor).asFlatDoubleArray(), smallerTensor.timesInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorTimesInPlaceLargerTensorBehavesSameAsTimess() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new long[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new long[]{2, 2, 2});
 
         assertArrayEquals(largerTensor.times(smallerTensor).asFlatDoubleArray(), largerTensor.timesInPlace(smallerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void smallerTensorDivInPlaceLargerTensorBehavesSameAsDiv() {
-        DoubleTensor smallerTensor = DoubleTensor.create(2, new int[]{2, 2});
-        DoubleTensor largerTensor = DoubleTensor.create(3, new int[]{2, 2, 2});
+        DoubleTensor smallerTensor = DoubleTensor.create(2, new long[]{2, 2});
+        DoubleTensor largerTensor = DoubleTensor.create(3, new long[]{2, 2, 2});
 
         assertArrayEquals(smallerTensor.div(largerTensor).asFlatDoubleArray(), smallerTensor.divInPlace(largerTensor).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void doesCompareGreaterThanOrEqualScalarTensor() {
-        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new int[]{2, 2});
+        DoubleTensor matrix = Nd4jDoubleTensor.create(new double[]{1., 2., 3., 4.}, new long[]{2, 2});
         BooleanTensor result = matrix.greaterThanOrEqual(Nd4jDoubleTensor.scalar(3.));
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
@@ -536,7 +538,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor C = DoubleTensor.arange(96, 144).reshape(2, 3, 2, 4);
 
         DoubleTensor D = DoubleTensor.concat(dim, A, B, C);
-        List<DoubleTensor> splitTensor = D.split(dim, new int[]{1, 4, 6});
+        List<DoubleTensor> splitTensor = D.split(dim, new long[]{1, 4, 6});
 
         DoubleTensor[] concatList = new DoubleTensor[]{A, B, C};
         for (int i = 0; i < splitTensor.size(); i++) {
@@ -547,36 +549,36 @@ public class Nd4jDoubleTensorTest {
 
     @Test
     public void canSplitHighRank() {
-        assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 2, 6}, 1);
+        assertCanSplit(new long[]{2, 3, 4, 5, 7, 2}, new int[]{3, 2, 6}, 1);
     }
 
     @Test
     public void canSplitEndDimension() {
-        assertCanSplit(new int[]{2, 3, 4, 5}, new int[]{3, 4, 2}, 3);
+        assertCanSplit(new long[]{2, 3, 4, 5}, new int[]{3, 4, 2}, 3);
     }
 
     @Test
     public void canSplitFirstDimension() {
-        assertCanSplit(new int[]{2, 3, 4, 5, 7, 2}, new int[]{3, 4, 2, 6, 9, 2}, 0);
+        assertCanSplit(new long[]{2, 3, 4, 5, 7, 2}, new int[]{3, 4, 2, 6, 9, 2}, 0);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnZeroLengthSplit() {
         DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
-        A.split(0, new int[]{0});
+        A.split(0, new long[]{0});
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void doesThrowOnNegativeDimensionSplit() {
         DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
-        A.split(-1, new int[]{1, 5});
+        A.split(-1, new long[]{1, 5});
     }
 
     @Test
     public void doesSatisfyJavaDocExample() {
         DoubleTensor A = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 1, 2, 3}, 2, 6);
 
-        List<DoubleTensor> actual = A.split(1, new int[]{1, 3, 6});
+        List<DoubleTensor> actual = A.split(1, new long[]{1, 3, 6});
 
         DoubleTensor expected0 = DoubleTensor.create(new double[]{1, 7}, 1, 2);
         DoubleTensor expected1 = DoubleTensor.create(new double[]{2, 3, 8, 9}, 2, 2);
@@ -645,7 +647,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2);
 
         assertEquals(3, tensorRow.argMax());
-        assertThat(tensorRow.argMax(0), tensorEqualTo(IntegerTensor.zeros(5)));
+        assertThat(tensorRow.argMax(0), tensorEqualTo(IntegerTensor.zeros(1, 5)));
         assertThat(tensorRow.argMax(1), isScalarWithValue(3));
     }
 
@@ -655,7 +657,7 @@ public class Nd4jDoubleTensorTest {
 
         assertEquals(3, tensorCol.argMax());
         assertThat(tensorCol.argMax(0), isScalarWithValue(3));
-        assertThat(tensorCol.argMax(1), tensorEqualTo(IntegerTensor.zeros(5)));
+        assertThat(tensorCol.argMax(1), tensorEqualTo(IntegerTensor.zeros(1, 5)));
     }
 
     @Test
@@ -679,8 +681,8 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor tensor = DoubleTensor.arange(0, 512).reshape(2, 8, 4, 2, 4);
 
         assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.ones(8, 4, 2, 4)));
-        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(7, new int[]{2, 4, 2, 4})));
-        assertThat(tensor.argMax(2), tensorEqualTo(IntegerTensor.create(3, new int[]{2, 8, 2, 4})));
+        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
+        assertThat(tensor.argMax(2), tensorEqualTo(IntegerTensor.create(3, new long[]{2, 8, 2, 4})));
         assertThat(tensor.argMax(3), tensorEqualTo(IntegerTensor.ones(2, 8, 4, 4)));
         assertEquals(511, tensor.argMax());
     }
@@ -691,15 +693,15 @@ public class Nd4jDoubleTensorTest {
         tensor.argMax(2);
     }
 
-    private void assertCanSplit(int[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
+    private void assertCanSplit(long[] baseShape, int[] concatenatedIndices, int concatenatedDimension) {
 
-        int[] splitIndices = new int[concatenatedIndices.length];
+        long[] splitIndices = new long[concatenatedIndices.length];
         List<DoubleTensor> toConcat = new ArrayList<>();
 
         long previousEndLength = 0;
-        int splitPosition = 0;
+        long splitPosition = 0;
         for (int i = 0; i < concatenatedIndices.length; i++) {
-            int[] shape = Arrays.copyOf(baseShape, baseShape.length);
+            long[] shape = Arrays.copyOf(baseShape, baseShape.length);
             shape[concatenatedDimension] = concatenatedIndices[i];
 
             splitIndices[i] = splitPosition + concatenatedIndices[i];

@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.intgr;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -33,7 +35,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
     private INDArray tensor;
 
-    public Nd4jIntegerTensor(int[] data, int[] shape) {
+    public Nd4jIntegerTensor(int[] data, long[] shape) {
         this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
@@ -46,23 +48,23 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor create(int[] values, int[] shape) {
+    public static Nd4jIntegerTensor create(int[] values, long[] shape) {
         return new Nd4jIntegerTensor(values, shape);
     }
 
-    public static Nd4jIntegerTensor create(int value, int[] shape) {
+    public static Nd4jIntegerTensor create(int value, long[] shape) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.valueArrayOf(shape, value, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor ones(int[] shape) {
+    public static Nd4jIntegerTensor ones(long[] shape) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor eye(int n) {
+    public static Nd4jIntegerTensor eye(long n) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.eye(n, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor zeros(int[] shape) {
+    public static Nd4jIntegerTensor zeros(long[] shape) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.zeros(shape, BUFFER_TYPE));
     }
 
@@ -74,7 +76,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor reshape(int... newShape) {
+    public IntegerTensor reshape(long... newShape) {
         return new Nd4jIntegerTensor(tensor.reshape(newShape));
     }
 
@@ -493,7 +495,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor argMax(int axis) {
-        int[] shape = this.getShape();
+        long[] shape = this.getShape();
         TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
         return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape)));
     }
@@ -548,7 +550,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return tensor.shape();
     }
 
@@ -563,12 +565,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer getValue(int... index) {
-        return tensor.getInt(index);
+    public Integer getValue(long... index) {
+        return (int) tensor.getDouble(index);
     }
 
     @Override
-    public IntegerTensor setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, long... index) {
         tensor.putScalar(index, value);
         return this;
     }
@@ -600,7 +602,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor slice(int dimension, int index) {
+    public IntegerTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);
         return new Nd4jIntegerTensor(slice);
@@ -636,9 +638,9 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return tensor.toString();
     }
 
-    private BooleanTensor fromMask(INDArray mask, int[] shape) {
+    private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[mask.length()];
+        boolean[] boolsFromMask = new boolean[checkedCast(mask.length())];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getInt(i) != 0;

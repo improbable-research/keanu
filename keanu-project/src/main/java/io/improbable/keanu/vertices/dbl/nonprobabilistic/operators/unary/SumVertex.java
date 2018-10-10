@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.google.common.primitives.Ints;
+import com.google.common.primitives.Longs;
 
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -41,17 +41,17 @@ public class SumVertex extends DoubleUnaryOpVertex {
         this(inputVertex, TensorShape.dimensionRange(0, inputVertex.getShape().length));
     }
 
-    private static int[] getSummationResultShape(int[] inputShape, int[] sumOverDimensions) {
-        List<Integer> inputShapeList = new ArrayList<>(Ints.asList(inputShape));
+    private static long[] getSummationResultShape(long[] inputShape, int[] sumOverDimensions) {
+        List<Long> inputShapeList = new ArrayList<>(Longs.asList(inputShape));
 
         zeroOutSummedDimensions(inputShapeList, sumOverDimensions);
 
         return removeZerosWhenRankGreaterThan2(inputShapeList);
     }
 
-    private static void zeroOutSummedDimensions(List<Integer> inputShapeList, int[] sumOverDimensions) {
+    private static void zeroOutSummedDimensions(List<Long> inputShapeList, int[] sumOverDimensions) {
         for (int dim : sumOverDimensions) {
-            inputShapeList.set(dim, 0);
+            inputShapeList.set(dim, 0l);
         }
     }
 
@@ -59,18 +59,18 @@ public class SumVertex extends DoubleUnaryOpVertex {
      * This is here due to strange behavior in tensor summing over dimensions where
      * dimensions are not dropped if the rank is 2 or less.
      */
-    private static int[] removeZerosWhenRankGreaterThan2(List<Integer> inputShapeList) {
+    private static long[] removeZerosWhenRankGreaterThan2(List<Long> inputShapeList) {
         for (int i = inputShapeList.size() - 1; i >= 0; i--) {
             if (inputShapeList.get(i) == 0) {
                 if (inputShapeList.size() > 2) {
                     inputShapeList.remove(i);
                 } else {
-                    inputShapeList.set(i, 1);
+                    inputShapeList.set(i, 1l);
                 }
             }
         }
 
-        return Ints.toArray(inputShapeList);
+        return Longs.toArray(inputShapeList);
     }
 
     @Override
@@ -88,7 +88,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        int[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
+        long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
 
         PartialDerivatives partialDueToSummationShapeChange = getPartialDueToSummationShapeChange(derivativeOfOutputsWithRespectToSelf);
 
@@ -100,12 +100,12 @@ public class SumVertex extends DoubleUnaryOpVertex {
 
     private PartialDerivatives getPartialDueToSummationShapeChange(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        int[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
+        long[] wrtShapeWithoutRankLoss = summedOverShapeWithoutRankLoss(inputVertex.getShape(), overDimensions);
         PartialDerivatives reshapedDiffWrtSelf = new PartialDerivatives(new HashMap<>());
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
 
-            int[] newPartialShape = TensorShape.concat(
+            long[] newPartialShape = TensorShape.concat(
                 TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
                 wrtShapeWithoutRankLoss
             );
@@ -118,8 +118,8 @@ public class SumVertex extends DoubleUnaryOpVertex {
         return reshapedDiffWrtSelf;
     }
 
-    private static int[] summedOverShapeWithoutRankLoss(int[] shape, int[] sumOverDimensions) {
-        int[] shapeCopy = Arrays.copyOf(shape, shape.length);
+    private static long[] summedOverShapeWithoutRankLoss(long[] shape, int[] sumOverDimensions) {
+        long[] shapeCopy = Arrays.copyOf(shape, shape.length);
         for (int sumOverDimension : sumOverDimensions) {
             shapeCopy[sumOverDimension] = 1;
         }

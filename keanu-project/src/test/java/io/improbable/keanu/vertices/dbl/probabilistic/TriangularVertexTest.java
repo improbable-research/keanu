@@ -35,7 +35,7 @@ public class TriangularVertexTest {
 
         int sampleCount = 1000000;
         TriangularVertex vertex = new TriangularVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             0.0,
             10.0,
             5.0

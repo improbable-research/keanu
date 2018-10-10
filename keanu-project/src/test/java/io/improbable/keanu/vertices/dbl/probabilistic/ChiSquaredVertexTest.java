@@ -28,7 +28,7 @@ public class ChiSquaredVertexTest {
         int N = 100000;
         double epsilon = 0.1;
         int k = 10;
-        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(new int[]{N, 1}, k);
+        ChiSquaredVertex testChiVertex = new ChiSquaredVertex(new long[]{N, 1}, k);
 
         SummaryStatistics stats = new SummaryStatistics();
         Arrays.stream(testChiVertex.sample(random).asFlatArray())
@@ -46,7 +46,7 @@ public class ChiSquaredVertexTest {
     @Test
     public void chiSampleMethodMatchesLogProbMethod() {
         int sampleCount = 1000000;
-        ChiSquaredVertex vertex = new ChiSquaredVertex(new int[]{sampleCount, 1}, 2);
+        ChiSquaredVertex vertex = new ChiSquaredVertex(new long[]{sampleCount, 1}, 2);
 
         double from = 2;
         double to = 4;
