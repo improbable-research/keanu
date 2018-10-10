@@ -553,7 +553,7 @@ public class Nd4jIntegerTensorTest {
         IntegerTensor tensorRow = IntegerTensor.create(1, 3, 4, 5, 2);
 
         assertEquals(3, tensorRow.argMax());
-        assertThat(tensorRow.argMax(0), tensorEqualTo(IntegerTensor.zeros(5)));
+        assertThat(tensorRow.argMax(0), tensorEqualTo(IntegerTensor.zeros(1, 5)));
         assertThat(tensorRow.argMax(1), isScalarWithValue(3));
     }
 
@@ -563,7 +563,7 @@ public class Nd4jIntegerTensorTest {
 
         assertEquals(3, tensorCol.argMax());
         assertThat(tensorCol.argMax(0), isScalarWithValue(3));
-        assertThat(tensorCol.argMax(1), tensorEqualTo(IntegerTensor.zeros(5)));
+        assertThat(tensorCol.argMax(1), tensorEqualTo(IntegerTensor.zeros(1, 5)));
     }
 
     @Test
