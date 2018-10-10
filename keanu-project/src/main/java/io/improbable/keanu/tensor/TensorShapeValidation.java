@@ -96,6 +96,12 @@ public class TensorShapeValidation {
             .collect(toSet());
     }
 
+    public static void checkShapesMatch(long[] actual, long[] expected) {
+        if (!Arrays.equals(actual, expected)) {
+            throw new IllegalArgumentException(String.format("Expected shape %s but got %s", Arrays.toString(expected), Arrays.toString(actual)));
+        }
+    }
+
     public static long[] checkAllShapesMatch(long[]... shapes) {
         return checkAllShapesMatch(Arrays.stream(shapes), Optional.empty());
     }

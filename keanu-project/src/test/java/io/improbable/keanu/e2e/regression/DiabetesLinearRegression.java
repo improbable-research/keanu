@@ -1,23 +1,24 @@
 package io.improbable.keanu.e2e.regression;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.junit.Assert.assertEquals;
+
+import java.util.List;
+
+import org.junit.Test;
+
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.model.linear.LinearRegression;
+import io.improbable.keanu.model.LinearModelScore;
+import io.improbable.keanu.model.regression.LinearRegression;
+import io.improbable.keanu.model.regression.LinearRegressionModel;
+import io.improbable.keanu.model.regression.LinearRidgeRegression;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
-
-import java.util.List;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html
@@ -26,21 +27,20 @@ import static org.junit.Assert.assertTrue;
  */
 public class DiabetesLinearRegression {
 
-    public static class Data {
-        public DoubleTensor bmi;
-        public DoubleTensor y;
+    private static Data readData() {
+        return ReadCsv
+            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
+            .asVectorizedColumnsDefinedBy(Data.class)
+            .load(true);
     }
 
     @Test
     public void doesLinearRegressionOnBMI() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data = readData();
 
         // Linear Regression
-        DoubleVertex weight = new GaussianVertex(0.0, 2.0);
-        DoubleVertex b = new GaussianVertex(0.0, 2.0);
+        DoubleVertex weight = new GaussianVertex(0.0, 100);
+        DoubleVertex b = new GaussianVertex(0.0, 100);
         DoubleVertex x = ConstantVertex.of(data.bmi);
         DoubleVertex yMu = x.multiply(weight);
 
@@ -57,23 +57,20 @@ public class DiabetesLinearRegression {
 
     @Test
     public void doesLinearRegressionOnBMIAsModel() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data = readData();
 
-        LinearRegression regression = new LinearRegression(data.bmi, data.y, 0.0, 2.0, 100);
-        regression.fit();
+        LinearRegressionModel regression = LinearRidgeRegression
+            .withFeatureShape(data.bmi.getShape())
+            .setPriorOnWeightsAndIntercept(0, 100)
+            .build();
+        regression.fit(data.bmi, data.y);
         assertEquals(938.2378, regression.getWeight(0), 0.5);
-        assertEquals(152.9189, regression.getIntercept().getValue().scalar(), 0.5);
+        assertEquals(152.9189, regression.getIntercept(), 0.5);
     }
 
     @Test
     public void canPredictFutureValuesWithLinearRegression() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data = readData();
 
         int sizeOfTestData = 100;
 
@@ -85,11 +82,18 @@ public class DiabetesLinearRegression {
         DoubleTensor yTrainingData = splitYData.get(0);
         DoubleTensor yTestData = splitYData.get(1);
 
-        LinearRegression regression = new LinearRegression(xTrainingData, yTrainingData);
-        regression.fit();
+        LinearRegressionModel regression = LinearRegression
+            .withFeatureShape(xTrainingData.getShape())
+            .build();
+        regression.fit(xTrainingData, yTrainingData);
 
-        double accuracyOnTestData = regression.score(xTestData, yTestData);
-        assertThat(accuracyOnTestData, both(greaterThan(0.)).and(lessThan(1.)));
+        double accuracyOnTestData = LinearModelScore.coefficientOfDetermination(regression.predict(xTestData), yTestData);
+        assertThat(accuracyOnTestData, greaterThan(0.3));
+    }
+
+    public static class Data {
+        public DoubleTensor bmi;
+        public DoubleTensor y;
     }
 
 }
