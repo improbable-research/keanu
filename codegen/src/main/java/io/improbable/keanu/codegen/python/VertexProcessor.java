@@ -1,7 +1,6 @@
 package io.improbable.keanu.codegen.python;
 
 import freemarker.template.Template;
-import freemarker.template.TemplateException;
 import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import lombok.Getter;
 import org.reflections.Reflections;
@@ -10,8 +9,6 @@ import org.reflections.scanners.TypeAnnotationsScanner;
 import org.reflections.util.ClasspathHelper;
 import org.reflections.util.ConfigurationBuilder;
 
-import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -27,17 +24,10 @@ class VertexProcessor {
 
     static void process(String generatedDir) {
         Map<String, Object> dataModel = buildDataModel();
-        Writer fileWriter = FileUtil.createFileWriter(generatedDir + GENERATED_FILE);
-        Template fileTemplate = FileUtil.getFileTemplate(TEMPLATE_FILE);
+        Template fileTemplate = FreeMarkerTemplateProcessor.getFileTemplate(TEMPLATE_FILE);
+        Writer fileWriter = FreeMarkerTemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
 
-        try {
-            fileTemplate.process(dataModel, fileWriter);
-            fileWriter.close();
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        } catch (TemplateException e) {
-            throw new RuntimeException(e);
-        }
+        FreeMarkerTemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
     }
 
     private static Map<String, Object> buildDataModel() {
