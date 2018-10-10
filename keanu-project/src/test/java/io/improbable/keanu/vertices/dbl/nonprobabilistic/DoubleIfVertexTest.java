@@ -19,7 +19,7 @@ import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
 public class DoubleIfVertexTest {
 
     @Test
-    public void canExtractDualNumberFromTruePredicate() {
+    public void canExtractPartialFromTruePredicate() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, true}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
@@ -31,15 +31,15 @@ public class DoubleIfVertexTest {
         DoubleVertex c = a.matrixMultiply(b);
         DoubleVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dCdb = c.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
 
         DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dIfdB = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dIfdB = ifVertex.getDerivativeWrtLatents().withRespectTo(b);
 
         Assert.assertArrayEquals(dCda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dCdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
@@ -49,7 +49,7 @@ public class DoubleIfVertexTest {
     }
 
     @Test
-    public void canExtractDualNumberFromTruePredicateDifferentRankOf() {
+    public void canExtractPartialFromTruePredicateDifferentRankOf() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, true, true, false, true, true, true, false}, 2, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
@@ -61,15 +61,15 @@ public class DoubleIfVertexTest {
         DoubleVertex c = a.times(b);
         DoubleVertex d = b.div(a);
 
-        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dCdb = c.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
 
         DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dIfdB = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dIfdB = ifVertex.getDerivativeWrtLatents().withRespectTo(b);
 
         DoubleTensor dIfdAReverse = Differentiator.reverseModeAutoDiff(ifVertex, a).withRespectTo(a);
         DoubleTensor dIfdBReverse = Differentiator.reverseModeAutoDiff(ifVertex, b).withRespectTo(b);
@@ -82,7 +82,7 @@ public class DoubleIfVertexTest {
     }
 
     @Test
-    public void canExtractDualNumberFromFalsePredicate() {
+    public void canExtractPartialFromFalsePredicate() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{false, false, false, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
@@ -94,15 +94,15 @@ public class DoubleIfVertexTest {
         DoubleVertex c = a.matrixMultiply(b);
         DoubleVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dDda = d.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dDdb = d.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dDdb = d.getDerivativeWrtLatents().withRespectTo(b);
 
         DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dIfdB = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dIfdB = ifVertex.getDerivativeWrtLatents().withRespectTo(b);
 
         Assert.assertArrayEquals(dDda.asFlatDoubleArray(), dIfdA.asFlatDoubleArray(), 1e-6);
         Assert.assertArrayEquals(dDdb.asFlatDoubleArray(), dIfdB.asFlatDoubleArray(), 1e-6);
@@ -112,7 +112,7 @@ public class DoubleIfVertexTest {
     }
 
     @Test
-    public void canExtractDualNumberFromMixedPredicate() {
+    public void canExtractPartialFromMixedPredicate() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
@@ -124,14 +124,14 @@ public class DoubleIfVertexTest {
         DoubleVertex c = a.matrixMultiply(b);
         DoubleVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dDda = d.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
 
         DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(d);
 
-        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
+        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
 
         Assert.assertArrayEquals(new double[]{
             5, 7,
@@ -149,7 +149,7 @@ public class DoubleIfVertexTest {
     }
 
     @Test
-    public void canExtractDualNumberFromMixedPredicateWithDifferentParentsAndFillInZeroes() {
+    public void canExtractPartialFromMixedPredicateWithDifferentParentsAndFillInZeroes() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
@@ -168,15 +168,15 @@ public class DoubleIfVertexTest {
 
         DoubleVertex f = d.matrixMultiply(e);
 
-        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dFdd = f.getDualNumber().getPartialDerivatives().withRespectTo(d);
+        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dFdd = f.getDerivativeWrtLatents().withRespectTo(d);
 
         DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
-        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dIfdD = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(d);
+        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dIfdD = ifVertex.getDerivativeWrtLatents().withRespectTo(d);
 
         Assert.assertArrayEquals(new double[]{
             5, 7,
@@ -205,7 +205,7 @@ public class DoubleIfVertexTest {
     }
 
     @Test
-    public void canExtractDualNumberFromMixedPredicateWithDifferentParentsRankThree() {
+    public void canExtractPartialFromMixedPredicateWithDifferentParentsRankThree() {
         BoolVertex bool = new ConstantBoolVertex(BooleanTensor.create(new boolean[]{true, false, true, false, true, false, true, false}, 2, 2, 2));
 
         DoubleVertex a = new UniformVertex(0, 10);
@@ -224,15 +224,15 @@ public class DoubleIfVertexTest {
 
         DoubleVertex f = d.plus(e);
 
-        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dFdd = f.getDualNumber().getPartialDerivatives().withRespectTo(d);
+        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dFdd = f.getDerivativeWrtLatents().withRespectTo(d);
 
         DoubleVertex ifVertex = If.isTrue(bool)
             .then(c)
             .orElse(f);
 
-        DoubleTensor dIfdA = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dIfdD = ifVertex.getDualNumber().getPartialDerivatives().withRespectTo(d);
+        DoubleTensor dIfdA = ifVertex.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dIfdD = ifVertex.getDerivativeWrtLatents().withRespectTo(d);
 
         Assert.assertArrayEquals(dCda.getShape(), dIfdA.getShape());
         Assert.assertArrayEquals(dFdd.getShape(), dIfdD.getShape());

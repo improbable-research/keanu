@@ -13,7 +13,7 @@ import com.google.common.collect.ImmutableList;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Gaussian;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.VertexId;
@@ -115,7 +115,7 @@ public class LogProbGradientCalculatorTest {
         double expectedDLogProbWrtA = B.dLogProb(bValue, D).get(D).times(cValue).sum();
         DoubleTensor expectedDLogProbWrtC = B.dLogProb(bValue, D).get(D).times(aValue);
 
-        assertArrayEquals(new int[]{1, 1, 1, 1}, dBLogProbWrtAValue.getShape());
+        assertArrayEquals(new int[]{1, 1}, dBLogProbWrtAValue.getShape());
         assertThat(dBLogProbWrtAValue.scalar(), equalTo(expectedDLogProbWrtA));
         assertThat(dBLogProbWrtCValue, equalTo(expectedDLogProbWrtC));
     }
@@ -149,7 +149,7 @@ public class LogProbGradientCalculatorTest {
         DoubleTensor dJLogProbWrtAValue = gradient.get(A.getId());
         DoubleTensor dJLogProbWrtBValue = gradient.get(B.getId());
 
-        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dHForward = H.getDerivativeWrtLatents();
 
         DoubleTensor dHdA = dHForward.withRespectTo(A);
         DoubleTensor dHdB = dHForward.withRespectTo(B);

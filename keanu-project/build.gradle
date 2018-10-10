@@ -1,8 +1,6 @@
 buildscript {
     ext.kotlin_version = '1.2.31'
-    repositories {
-        mavenCentral()
-    }
+
     dependencies {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
@@ -11,9 +9,8 @@ buildscript {
 plugins {
     id 'io.franzbecker.gradle-lombok' version '1.14'
     id 'maven'
+    id 'jacoco'
 }
-
-apply plugin: 'jacoco'
 
 archivesBaseName = "keanu"
 
@@ -25,7 +22,6 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile group: 'com.opencsv', name: 'opencsv', version: '4.2'
     compile group: 'org.slf4j', name: 'slf4j-nop', version: '1.7.10'
-    compile project(':codegen:annotation')
 
     //testing
     testCompile 'junit:junit:4.12'

@@ -17,7 +17,6 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.VertexId;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class Differentiator {
@@ -75,7 +74,7 @@ public class Differentiator {
 
             PartialDerivatives dwrtV;
             if (TensorShape.isScalar(wrtShape)) {
-                dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-prevRank, 0));
+                dwrtV = partialsOf.sumOverWrtDimensions(TensorShape.dimensionRange(-prevRank, 0), wrtShape, prevRank);
             } else {
                 dwrtV = partialsOf;
             }
@@ -122,22 +121,22 @@ public class Differentiator {
         return ofWrt;
     }
 
-    public static <V extends Vertex & Differentiable> DualNumber calculateDual(V vertex) {
-        Map<Vertex, DualNumber> dualNumbers = new HashMap<>();
+    public static <V extends Vertex & Differentiable> PartialDerivatives forwardModeAutoDiff(V vertex) {
+        Map<Vertex, PartialDerivatives> partialsOf = new HashMap<>();
         Deque<V> stack = new ArrayDeque<>();
         stack.push(vertex);
 
         while (!stack.isEmpty()) {
 
             V head = stack.peek();
-            Set<Vertex> parentsThatDualNumberIsNotCalculated = parentsThatDualNumberIsNotCalculated(dualNumbers, head.getParents());
+            Set<Vertex> parentsThatPartialIsNotCalculated = parentsThatPartialIsNotCalculated(partialsOf, head.getParents());
 
-            if (parentsThatDualNumberIsNotCalculated.isEmpty()) {
+            if (parentsThatPartialIsNotCalculated.isEmpty()) {
                 V top = stack.pop();
-                DualNumber dual = top.calculateDualNumber(dualNumbers);
-                dualNumbers.put(top, dual);
+                PartialDerivatives dTopWrtInputs = top.forwardModeAutoDifferentiation(partialsOf);
+                partialsOf.put(top, dTopWrtInputs);
             } else {
-                for (Vertex parent : parentsThatDualNumberIsNotCalculated) {
+                for (Vertex parent : parentsThatPartialIsNotCalculated) {
                     if (parent instanceof Differentiable) {
                         stack.push((V) parent);
                     }
@@ -145,13 +144,13 @@ public class Differentiator {
             }
         }
 
-        return dualNumbers.get(vertex);
+        return partialsOf.get(vertex);
     }
 
-    private static Set<Vertex> parentsThatDualNumberIsNotCalculated(Map<Vertex, DualNumber> dualNumbers, Collection<? extends Vertex> parents) {
+    private static Set<Vertex> parentsThatPartialIsNotCalculated(Map<Vertex, PartialDerivatives> partialsOf, Collection<? extends Vertex> parents) {
         Set<Vertex> notCalculatedParents = new HashSet<>();
         for (Vertex next : parents) {
-            if (!dualNumbers.containsKey(next) && next instanceof Differentiable) {
+            if (!partialsOf.containsKey(next) && next instanceof Differentiable) {
                 notCalculatedParents.add(next);
             }
         }
