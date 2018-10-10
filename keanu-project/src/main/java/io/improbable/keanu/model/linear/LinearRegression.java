@@ -4,12 +4,8 @@ import static com.google.common.primitives.Ints.checkedCast;
 
 import java.util.Arrays;
 
-import com.google.common.primitives.Ints;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 

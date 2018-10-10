@@ -2,8 +2,6 @@ package io.improbable.keanu.model.linear;
 
 import static com.google.common.primitives.Ints.checkedCast;
 
-import com.google.common.primitives.Ints;
-
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;

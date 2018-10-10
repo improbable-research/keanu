@@ -19,8 +19,6 @@ import org.nd4j.linalg.factory.Nd4j;
 import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import com.google.common.primitives.Ints;
-
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
@@ -62,8 +60,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {

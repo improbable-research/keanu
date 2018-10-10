@@ -89,8 +89,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     private INDArray tensor;
 
     public Nd4jDoubleTensor(double[] data, long[] shape) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
     }
 
     public Nd4jDoubleTensor(INDArray tensor) {

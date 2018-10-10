@@ -10,8 +10,6 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 
-import com.google.common.primitives.Ints;
-
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
@@ -70,6 +68,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, long[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
