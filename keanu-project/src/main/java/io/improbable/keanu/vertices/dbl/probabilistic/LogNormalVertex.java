@@ -74,12 +74,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
 
     @Override
     public double logProb(DoubleTensor value) {
-        DoubleTensor muValues = mu.getValue();
-        DoubleTensor sigmaValues = sigma.getValue();
-
-        DoubleTensor logPdfs = logNormal.logProb(value);
-
-        return logPdfs.sum();
+        return logNormal.logProb(value).sum();
     }
 
     @Override
