@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.junit.Test;
+import org.tensorflow.TensorFlowException;
 
 import io.improbable.keanu.backend.ProbabilisticGraph;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -97,6 +98,57 @@ public class TensorflowGraphConverterTest {
         DoubleTensor result = graph.getOutputs(inputs, Collections.singletonList(outputName)).get(0);
 
         assertEquals(C.getValue(), result);
+    }
+
+    /**
+     * Tensorflow does not support autodiff through a concat at the moment
+     */
+    @Test(expected = TensorFlowException.class)
+    public void canAutoDiffTensorConcat() {
+        DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
+        A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
+        A.setLabel(new VertexLabel("A"));
+
+        DoubleVertex B = new GaussianVertex(new int[]{2, 2}, 1, 1);
+        B.setValue(DoubleTensor.create(new double[]{5, 6, 7, 8}, 2, 2));
+        B.setLabel(new VertexLabel("B"));
+
+        DoubleVertex C = new GaussianVertex(new int[]{2, 2}, 1, 1);
+        C.setValue(DoubleTensor.create(new double[]{-3, 2, -4, 9}, 2, 2));
+        C.setLabel(new VertexLabel("C"));
+
+        DoubleVertex D = DoubleVertex.concat(0, A.times(C), B.times(C));
+        DoubleVertex E = new GaussianVertex(new int[]{4, 2}, D, 1);
+        E.setLabel(new VertexLabel("E"));
+        E.observe(DoubleTensor.create(new double[]{0, 0, 0, 0, 0, 0, 0, 0}, 4, 2));
+
+        Map<String, DoubleTensor> inputs = new HashMap<>();
+        inputs.put(A.getLabel().toString(), A.getValue());
+        inputs.put(B.getLabel().toString(), B.getValue());
+        inputs.put(C.getLabel().toString(), C.getValue());
+        inputs.put(E.getLabel().toString(), E.getValue());
+
+        BayesianNetwork network = new BayesianNetwork(E.getConnectedGraph());
+        double expectedLogProb = network.getLogOfMasterP();
+
+        LogProbGradientCalculator calculator = new LogProbGradientCalculator(
+            network.getLatentOrObservedVertices(),
+            network.getContinuousLatentVertices()
+        );
+
+        Map<VertexId, DoubleTensor> keanuGradients = calculator.getJointLogProbGradientWrtLatents();
+
+        try (ProbabilisticGraph graph = TensorflowGraphConverter.convert(network)) {
+
+            double tensorflowLogProb = graph.logProb(inputs);
+            Map<String, DoubleTensor> tensorflowGradients = graph.logProbGradients(inputs);
+
+            assertEquals(keanuGradients.get(A.getId()), tensorflowGradients.get("A"));
+            assertEquals(keanuGradients.get(B.getId()), tensorflowGradients.get("B"));
+            assertEquals(keanuGradients.get(C.getId()), tensorflowGradients.get("C"));
+            assertEquals(keanuGradients.get(E.getId()), tensorflowGradients.get("E"));
+            assertEquals(expectedLogProb, tensorflowLogProb, 1e-2);
+        }
     }
 
     @Test

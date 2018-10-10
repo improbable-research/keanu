@@ -895,7 +895,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     public List<DoubleTensor> split(int dimension, int... splitAtIndices) {
 
         int[] shape = getShape();
-        if (dimension < 0 || dimension >= shape.length) {
+        if(dimension < 0){
+            dimension += shape.length;
+        }
+
+        if (dimension >= shape.length) {
             throw new IllegalArgumentException("Invalid dimension to split on " + dimension);
         }
 
