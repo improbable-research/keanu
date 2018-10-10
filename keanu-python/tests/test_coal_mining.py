@@ -22,11 +22,13 @@ def test_coalmining():
         m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
         m.disasters = kn.Poisson(m.rates)
 
-    m.disasters.observe(data.values)
+    # m.disasters.observe(data.values)
 
-    net = kn.BayesNet(m.switchpoint.getConnectedGraph())
-    posterior_dist_samples = kn.MetropolisHastings().get_posterior_samples(net, net.getLatentVertices(), 50000)
-    posterior_dist_samples.drop(10000).downSample(5)
+    # net = kn.BayesNet(m.switchpoint.getConnectedGraph())
+    # posterior_dist_samples = kn.MetropolisHastings().get_posterior_samples(net, net.getLatentVertices(), 50000)
+    # posterior_dist_samples.drop(10000).downSample(5)
 
-    switch_year = posterior_dist_samples.getIntegerTensorSamples(m.switchpoint.unwrap()).getScalarMode()
-    assert switch_year == 1890
+    # switch_year = posterior_dist_samples.getIntegerTensorSamples(m.switchpoint.unwrap()).getScalarMode()
+    # assert switch_year == 1890
+
+    assert False
