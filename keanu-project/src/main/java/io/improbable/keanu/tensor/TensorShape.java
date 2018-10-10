@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor;
 
 import java.util.Arrays;
 
+import org.apache.commons.lang3.ArrayUtils;
+
 public class TensorShape {
 
     private long[] shape;
@@ -183,6 +185,28 @@ public class TensorShape {
         long[] newShape = Arrays.copyOf(shape, shape.length);
         newShape[dimension] = 1;
         return newShape;
+    }
+
+    /**
+     * Removes a dimension from a shape, guaranteeing that the resultant shape is at least rank 2. A row vector (1xN) is
+     * returned when removing a dimension would result in lower than rank 2.
+     *
+     * @param dimension the dimension to remove
+     * @param shape     the shape to remove the dimension from
+     * @return the shape without the given dimension
+     */
+    public static long[] removeDimensionSafe(int dimension, long[] shape) {
+        TensorShapeValidation.checkDimensionExistsInShape(dimension, shape);
+
+        if (shape.length == 1) {
+            return new long[]{1, shape[0]};
+        }
+
+        if (shape.length == 2) {
+            return new long[]{1, dimension == 1 ? shape[0] : shape[1]};
+        }
+
+        return ArrayUtils.remove(shape, dimension);
     }
 
 }

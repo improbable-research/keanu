@@ -31,11 +31,10 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
-import com.google.common.primitives.Ints;
-
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -47,6 +46,16 @@ import io.improbable.keanu.tensor.validate.TensorValidator;
 public class Nd4jDoubleTensor implements DoubleTensor {
 
     private static final DataBuffer.Type BUFFER_TYPE = DataBuffer.Type.DOUBLE;
+    private INDArray tensor;
+
+    public Nd4jDoubleTensor(double[] data, long[] shape) {
+        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
+    }
+
+    public Nd4jDoubleTensor(INDArray tensor) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
+        this.tensor = tensor;
+    }
 
     public static Nd4jDoubleTensor scalar(double scalarValue) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.scalar(scalarValue, BUFFER_TYPE));
@@ -86,15 +95,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(arangeWithStep);
     }
 
-    private INDArray tensor;
-
-    public Nd4jDoubleTensor(double[] data, long[] shape) {
-        this(TypedINDArrayFactory.create(data, shape, BUFFER_TYPE));
-    }
-
-    public Nd4jDoubleTensor(INDArray tensor) {
-        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
-        this.tensor = tensor;
+    static INDArray unsafeGetNd4J(DoubleTensor that) {
+        if (that.isScalar()) {
+            return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
+        }
+        return ((Nd4jDoubleTensor) that).tensor;
     }
 
     @Override
@@ -182,6 +187,18 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     @Override
     public double min() {
         return tensor.minNumber().doubleValue();
+    }
+
+    @Override
+    public int argMax() {
+        return tensor.argMax().getInt(0);
+    }
+
+    @Override
+    public IntegerTensor argMax(int axis) {
+        long[] shape = this.getShape();
+        TensorShapeValidation.checkDimensionExistsInShape(axis, shape);
+        return new Nd4jIntegerTensor(tensor.argMax(axis).reshape(TensorShape.removeDimensionSafe(axis, shape)));
     }
 
     @Override
@@ -1035,13 +1052,6 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         }
     }
 
-    static INDArray unsafeGetNd4J(DoubleTensor that) {
-        if (that.isScalar()) {
-            return TypedINDArrayFactory.scalar(that.scalar(), BUFFER_TYPE).reshape(that.getShape());
-        }
-        return ((Nd4jDoubleTensor) that).tensor;
-    }
-
     @Override
     public FlattenedView<Double> getFlattenedView() {
         return new Nd4jDoubleFlattenedView(tensor);
@@ -1095,6 +1105,21 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new SimpleBooleanTensor(boolsFromMask, shape);
     }
 
+    @Override
+    public double[] asFlatDoubleArray() {
+        return tensor.dup().data().asDouble();
+    }
+
+    @Override
+    public int[] asFlatIntegerArray() {
+        return tensor.dup().data().asInt();
+    }
+
+    @Override
+    public Double[] asFlatArray() {
+        return ArrayUtils.toObject(asFlatDoubleArray());
+    }
+
     private static class Nd4jDoubleFlattenedView implements FlattenedView<Double> {
 
         INDArray tensor;
@@ -1126,20 +1151,5 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         public void set(long index, Double value) {
             tensor.data().put(index, value);
         }
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return tensor.dup().data().asDouble();
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return tensor.dup().data().asInt();
-    }
-
-    @Override
-    public Double[] asFlatArray() {
-        return ArrayUtils.toObject(asFlatDoubleArray());
     }
 }

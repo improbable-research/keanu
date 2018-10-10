@@ -7,9 +7,9 @@ import com.google.common.math.IntMath;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
@@ -432,6 +432,17 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public int argMax() {
+        return 0;
+    }
+
+    @Override
+    public IntegerTensor argMax(int axis) {
+        TensorShapeValidation.checkDimensionExistsInShape(axis, this.getShape());
+        return IntegerTensor.scalar(0);
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor that) {
         if (that.isScalar()) {
             return greaterThan(that.scalar());
@@ -472,6 +483,28 @@ public class ScalarIntegerTensor implements IntegerTensor {
         return new SimpleIntegerFlattenedView(value);
     }
 
+    @Override
+    public double[] asFlatDoubleArray() {
+        return new double[]{value};
+    }
+
+    @Override
+    public int[] asFlatIntegerArray() {
+        return new int[]{value};
+    }
+
+    @Override
+    public Integer[] asFlatArray() {
+        return new Integer[]{value};
+    }
+
+    @Override
+    public String toString() {
+        return "ScalarIntegerTensor{" +
+            "value=" + value +
+            '}';
+    }
+
     private static class SimpleIntegerFlattenedView implements FlattenedView<Integer> {
 
         private int value;
@@ -506,28 +539,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
             this.value = value;
         }
 
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return new double[]{value};
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return new int[]{value};
-    }
-
-    @Override
-    public Integer[] asFlatArray() {
-        return new Integer[]{value};
-    }
-
-    @Override
-    public String toString() {
-        return "ScalarIntegerTensor{" +
-            "value=" + value +
-            '}';
     }
 
 }
