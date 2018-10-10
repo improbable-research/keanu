@@ -19,7 +19,8 @@ def test_coalmining():
         m.late_rate = kn.Exponential(1.0)
 
         m.years = np.array(data.index)
-        m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
+        m.beforeSwitch = m.switchpoint > m.years
+        # m.rates = kn.DoubleIf([1, 1], beforeSwitch, m.early_rate, m.late_rate)
     #     m.disasters = kn.Poisson(m.rates)
 
     # m.disasters.observe(data.values)
