@@ -29,6 +29,8 @@ import org.nd4j.linalg.indexing.conditions.Conditions;
 import org.nd4j.linalg.inverse.InvertMatrix;
 import org.nd4j.linalg.ops.transforms.Transforms;
 
+import com.google.common.primitives.Ints;
+
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
@@ -1081,7 +1083,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[(int) mask.length()];
+        boolean[] boolsFromMask = new boolean[Ints.saturatedCast(mask.length())];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getDouble(i) != 0.0;

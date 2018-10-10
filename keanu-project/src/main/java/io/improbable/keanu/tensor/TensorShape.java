@@ -75,8 +75,8 @@ public class TensorShape {
      * @param index  the index in each dimension
      * @return the flat index from a N dimensional index
      */
-    public static int getFlatIndex(long[] shape, long[] stride, long... index) {
-        int flatIndex = 0;
+    public static long getFlatIndex(long[] shape, long[] stride, long... index) {
+        long flatIndex = 0;
         for (int i = 0; i < index.length; i++) {
 
             if (index[i] >= shape[i]) {
@@ -98,14 +98,14 @@ public class TensorShape {
      * @param flatIndex the index to f
      * @return converts from a flat index to a N dimensional index. Where N = the dimensionality of the shape.
      */
-    public static int[] getShapeIndices(long[] shape, long[] stride, int flatIndex) {
+    public static long[] getShapeIndices(long[] shape, long[] stride, long flatIndex) {
         if (flatIndex > getLength(shape)) {
             throw new IllegalArgumentException("The requested index is out of the bounds of this shape.");
         }
-        int[] shapeIndices = new int[stride.length];
-        int remainder = flatIndex;
+        long[] shapeIndices = new long[stride.length];
+        long remainder = flatIndex;
         for (int i = 0; i < stride.length; i++) {
-            shapeIndices[i] = (int) (remainder / stride[i]);
+            shapeIndices[i] = remainder / stride[i];
             remainder -= shapeIndices[i] * stride[i];
         }
         return shapeIndices;
@@ -156,18 +156,18 @@ public class TensorShape {
     }
     
     public static long[] shapeDesiredToRankByAppendingOnes(long[] lowRankTensorShape, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, true, 1);
+        return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, true, 1);
     }
 
     public static long[] shapeToDesiredRankByPrependingOnes(long[] lowRankTensorShape, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false, 1);
+        return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, false, 1);
     }
 
     public static long[] shapeToDesiredRankByPrependingNegOnes(long[] lowRankTensorShape, int desiredRank) {
-        return increaseRankByPaddingOnes(lowRankTensorShape, desiredRank, false, -1);
+        return increaseRankByPaddingValue(lowRankTensorShape, desiredRank, false, -1);
     }
 
-    private static long[] increaseRankByPaddingOnes(long[] lowRankTensorShape, int desiredRank, boolean append, int val) {
+    private static long[] increaseRankByPaddingValue(long[] lowRankTensorShape, int desiredRank, boolean append, int val) {
         long[] paddedShape = new long[desiredRank];
         if (lowRankTensorShape.length > desiredRank) {
             throw new IllegalArgumentException("low rank tensor must be rank less than or equal to desired rank");

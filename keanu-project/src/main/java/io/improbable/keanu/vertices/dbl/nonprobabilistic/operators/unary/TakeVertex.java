@@ -54,9 +54,9 @@ public class TakeVertex extends DoubleUnaryOpVertex {
     private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
         long[] fromShape = from.getShape();
         long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-        int indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
+        long indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
         long[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
-        int subShapeLength = (int) TensorShape.getLength(subFromShape);
+        long subShapeLength = TensorShape.getLength(subFromShape);
 
         return from.reshape(subShapeLength, -1)
             .slice(0, indexToTakeFrom)

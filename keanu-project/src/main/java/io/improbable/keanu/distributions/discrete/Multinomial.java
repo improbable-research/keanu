@@ -24,7 +24,7 @@ public class Multinomial implements DiscreteDistribution {
     public static final DebugTensorValidator CATEGORY_PROBABILITIES_CANNOT_BE_ZERO = new DebugTensorValidator<>(TensorValidator.ZERO_CATCHER);
     private final IntegerTensor n;
     private final DoubleTensor p;
-    private final int numCategories;
+    private final long numCategories;
 
     public static Multinomial withParameters(IntegerTensor n, DoubleTensor p) {
         return new Multinomial(n, p);
@@ -44,7 +44,7 @@ public class Multinomial implements DiscreteDistribution {
         );
         CATEGORY_PROBABILITIES_CANNOT_BE_ZERO.validate(p);
 
-        numCategories = (int) p.getShape()[0];
+        numCategories = p.getShape()[0];
         TensorShapeValidation.checkAllShapesMatch(n.getShape(), p.slice(0, 0).getShape());
         this.n = n;
         this.p = p;

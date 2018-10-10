@@ -8,6 +8,8 @@ import java.util.Arrays;
 
 import org.apache.commons.lang3.ArrayUtils;
 
+import com.google.common.primitives.Ints;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -34,7 +36,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean[] data, long[] shape) {
-        this.data = new boolean[(int) TensorShape.getLength(shape)];
+        this.data = new boolean[Ints.saturatedCast(TensorShape.getLength(shape))];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -244,12 +246,12 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public Boolean getValue(long... index) {
-        return data[getFlatIndex(shape, stride, index)];
+        return data[Ints.saturatedCast(getFlatIndex(shape, stride, index))];
     }
 
     @Override
     public BooleanTensor setValue(Boolean value, long... index) {
-        data[getFlatIndex(shape, stride, index)] = value;
+        data[Ints.saturatedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
     }
 

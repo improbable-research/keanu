@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import com.google.common.primitives.Ints;
+
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
 
@@ -64,12 +66,12 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public T getValue(long... index) {
-        return data[getFlatIndex(shape, stride, index)];
+        return data[Ints.saturatedCast(getFlatIndex(shape, stride, index))];
     }
 
     @Override
     public GenericTensor<T> setValue(T value, long... index) {
-        data[getFlatIndex(shape, stride, index)] = value;
+        data[Ints.saturatedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
     }
 
@@ -193,7 +195,7 @@ public class GenericTensor<T> implements Tensor<T> {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();
         for (int i = 0; i < flat.length; i++) {
-            int[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
+            long[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
             if (indicesOfCurrent[dimension] == index) {
                 tadded.add(getValue(indicesOfCurrent));
             }

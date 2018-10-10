@@ -31,8 +31,8 @@ public class TensorShapeTest {
 
     @Test
     public void canGetShapeIndices() {
-        Assert.assertArrayEquals(new int[]{2, 2}, TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 10));
-        Assert.assertArrayEquals(new int[]{1, 1, 1}, TensorShape.getShapeIndices(new long[]{3, 3, 3}, new long[]{9, 3, 1}, 13));
+        Assert.assertArrayEquals(new long[]{2, 2}, TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 10));
+        Assert.assertArrayEquals(new long[]{1, 1, 1}, TensorShape.getShapeIndices(new long[]{3, 3, 3}, new long[]{9, 3, 1}, 13));
     }
 
     @Test
@@ -48,7 +48,7 @@ public class TensorShapeTest {
         long[] stride = TensorShape.getRowFirstStride(shape);
 
         for (int i = 0; i < buffer.length; i++) {
-            int[] indexOfi = TensorShape.getShapeIndices(shape, stride, i);
+            long[] indexOfi = TensorShape.getShapeIndices(shape, stride, i);
             assertEquals(i, tensor.getValue(indexOfi), 1e-10);
         }
     }

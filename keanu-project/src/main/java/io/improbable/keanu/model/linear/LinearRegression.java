@@ -2,6 +2,8 @@ package io.improbable.keanu.model.linear;
 
 import java.util.Arrays;
 
+import com.google.common.primitives.Ints;
+
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -60,7 +62,7 @@ public class LinearRegression implements LinearModel {
     }
 
     private static double[] fillPriorOnWeights(DoubleTensor x, double priorOnSigma) {
-        double[] priorWeights = new double[(int) x.getShape()[0]];
+        double[] priorWeights = new double[Ints.saturatedCast(x.getShape()[0])];
         Arrays.fill(priorWeights, priorOnSigma);
         return priorWeights;
     }
