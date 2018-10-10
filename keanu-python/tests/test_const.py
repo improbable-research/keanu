@@ -51,7 +51,7 @@ def test_const_does_not_take_generic_numpy_tensor():
     with pytest.raises(ValueError) as excinfo:
         kn.Const(np_tensor)
 
-    assert str(excinfo.value) == "Generic types in a tensor are not supported"
+    assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(Temp)
 
 
 def test_const_does_not_take_generic():
@@ -98,7 +98,7 @@ def test_cannot_pass_generic_to_Tensor():
     with pytest.raises(ValueError) as excinfo:
         kn.Tensor(Temp())
 
-    assert str(excinfo.value) == "Generic types in a tensor are not supported"
+    assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(Temp)
 
 
 def test_integer_numpy_tensor_passed_to_Tensor_creates_Nd4jIntegerTensor():
@@ -123,7 +123,7 @@ def test_cannot_pass_generic_numpy_tensor_to_Tensor():
     with pytest.raises(ValueError) as excinfo:
         kn.Tensor(np.array([Temp(), Temp()]))
 
-    assert str(excinfo.value) == "Generic types in a tensor are not supported"
+    assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(Temp)
 
 
 def test_cannot_pass_empty_numpy_tensor_to_Tensor():
