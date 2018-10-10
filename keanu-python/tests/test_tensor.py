@@ -21,7 +21,7 @@ def test_bool_passed_to_Tensor_creates_SimpleBooleanTensor():
 
 
 def test_cannot_pass_generic_to_Tensor():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Tensor(GenericExampleClass())
 
     assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
@@ -46,14 +46,14 @@ def test_bool_numpy_tensor_passed_to_Tensor_creates_SimpleBooleanTensor():
 
 
 def test_cannot_pass_generic_numpy_tensor_to_Tensor():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Tensor(np.array([GenericExampleClass(), GenericExampleClass()]))
 
     assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
 
 
 def test_cannot_pass_empty_numpy_tensor_to_Tensor():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Tensor(np.array([]))
 
     assert str(excinfo.value) == "Cannot infer type because tensor is empty"

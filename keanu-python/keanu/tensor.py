@@ -25,7 +25,7 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(t, numbers.Number):
             super(Tensor, self).__init__(Tensor.__infer_tensor_from_scalar(t), t)
         else:
-            raise ValueError("Generic types in a tensor are not supported. Was given {}".format(type(t)))
+            raise NotImplementedError("Generic types in a tensor are not supported. Was given {}".format(type(t)))
 
     @staticmethod
     def __ensure_rank_is_atleast_two(np_tensor):
@@ -46,7 +46,7 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(np_tensor.item(0), float):
             return k.DoubleTensor.create
         else:
-            raise ValueError("Generic types in a tensor are not supported. Was given {}".format(type(np_tensor.item(0))))
+            raise NotImplementedError("Generic types in a tensor are not supported. Was given {}".format(type(np_tensor.item(0))))
 
     @staticmethod
     def __infer_tensor_from_scalar(scalar):
@@ -57,5 +57,5 @@ class Tensor(JavaObjectWrapper):
         elif isinstance(scalar, float):
             return k.DoubleTensor.scalar
         else:
-            raise ValueError("Generic types in a tensor are not supported. Was given {}".format(type(scalar)))
+            raise NotImplementedError("Generic types in a tensor are not supported. Was given {}".format(type(scalar)))
 

@@ -23,7 +23,7 @@ class Const(JavaObjectWrapper):
             ctor = Const.__infer_const_from_scalar(t)
             val = t
         else:
-            raise ValueError("Argument t must be either a numpy array or an instance of numbers.Number. Was given {} instead".format(type(t)))
+            raise NotImplementedError("Argument t must be either a numpy array or an instance of numbers.Number. Was given {} instead".format(type(t)))
 
         super(Const, self).__init__(ctor, val)
 
@@ -43,4 +43,4 @@ class Const(JavaObjectWrapper):
         elif isinstance(scalar, float):
             return k.ConstantDoubleVertex
         else:
-            raise ValueError("Generic types in a tensor are not supported. Was given {}".format(type(scalar)))
+            raise NotImplementedError("Generic types in a tensor are not supported. Was given {}".format(type(scalar)))

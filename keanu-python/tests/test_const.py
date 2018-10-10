@@ -48,14 +48,14 @@ def test_const_takes_bool():
 
 def test_const_does_not_take_generic_numpy_tensor():
     np_tensor = np.array([[GenericExampleClass()]])
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Const(np_tensor)
 
     assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
 
 
 def test_const_does_not_take_generic():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Const(GenericExampleClass())
 
     assert str(excinfo.value) == "Argument t must be either a numpy array or an instance of numbers.Number. Was given {} instead".format(GenericExampleClass)
@@ -95,7 +95,7 @@ def test_bool_passed_to_Tensor_creates_SimpleBooleanTensor():
 
 
 def test_cannot_pass_generic_to_Tensor():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Tensor(GenericExampleClass())
 
     assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
@@ -120,7 +120,7 @@ def test_bool_numpy_tensor_passed_to_Tensor_creates_SimpleBooleanTensor():
 
 
 def test_cannot_pass_generic_numpy_tensor_to_Tensor():
-    with pytest.raises(ValueError) as excinfo:
+    with pytest.raises(NotImplementedError) as excinfo:
         kn.Tensor(np.array([GenericExampleClass(), GenericExampleClass()]))
 
     assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
