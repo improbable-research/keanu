@@ -22,7 +22,7 @@ public class SumVertex extends DoubleUnaryOpVertex {
     private final int[] overDimensions;
 
     /**
-     * Performs a sum across specified dimensions
+     * Performs a sum across specified dimensions. Negative dimension indexing is not supported.
      *
      * @param inputVertex    the vertex to have its values summed
      * @param overDimensions dimensions to sum over
