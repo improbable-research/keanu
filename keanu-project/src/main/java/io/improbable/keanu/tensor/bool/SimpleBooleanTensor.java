@@ -10,6 +10,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
@@ -34,6 +35,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape desired shape of tensor
      */
     public SimpleBooleanTensor(boolean[] data, int[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
@@ -53,6 +55,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape shape to use as place holder
      */
     public SimpleBooleanTensor(int[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -63,6 +66,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param shape    desired shape of tensor
      */
     public SimpleBooleanTensor(boolean constant, int[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
