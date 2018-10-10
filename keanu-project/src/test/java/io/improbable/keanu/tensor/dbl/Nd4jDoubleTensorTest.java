@@ -566,9 +566,15 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void doesThrowOnNegativeDimensionSplit() {
+    public void doesThrowOnInvalidNegativeDimensionSplit() {
         DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
-        A.split(-1, new int[]{1, 5});
+        A.split(-3, new int[]{1, 5});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidDimensionSplit() {
+        DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
+        A.split(3, new int[]{1, 5});
     }
 
     @Test

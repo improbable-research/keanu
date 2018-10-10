@@ -139,7 +139,7 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             splitPartials.put(operands[i], new PartialDerivatives(new HashMap<>()));
         }
 
-        int wrtDimensionToSliceOn = operands[0].getShape().length + dimension;
+        int wrtDimensionToSliceOn = -operands[0].getShape().length + dimension;
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = entry.getValue();
 
