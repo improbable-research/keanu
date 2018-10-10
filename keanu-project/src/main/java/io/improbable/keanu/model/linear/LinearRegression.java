@@ -1,5 +1,7 @@
 package io.improbable.keanu.model.linear;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import java.util.Arrays;
 
 import com.google.common.primitives.Ints;
@@ -62,7 +64,7 @@ public class LinearRegression implements LinearModel {
     }
 
     private static double[] fillPriorOnWeights(DoubleTensor x, double priorOnSigma) {
-        double[] priorWeights = new double[Ints.saturatedCast(x.getShape()[0])];
+        double[] priorWeights = new double[checkedCast(x.getShape()[0])];
         Arrays.fill(priorWeights, priorOnSigma);
         return priorWeights;
     }

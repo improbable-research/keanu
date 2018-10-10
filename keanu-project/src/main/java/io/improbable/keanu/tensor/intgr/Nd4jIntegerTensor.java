@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.intgr;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import java.util.Arrays;
 import java.util.function.Function;
 
@@ -49,7 +51,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
-    public static Nd4jIntegerTensor eye(int n) {
+    public static Nd4jIntegerTensor eye(long n) {
         return new Nd4jIntegerTensor(TypedINDArrayFactory.eye(n, BUFFER_TYPE));
     }
 
@@ -629,7 +631,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[Ints.saturatedCast(mask.length())];
+        boolean[] boolsFromMask = new boolean[checkedCast(mask.length())];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getInt(i) != 0;

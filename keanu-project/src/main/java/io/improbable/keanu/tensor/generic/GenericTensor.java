@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.generic;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 
 import java.util.ArrayList;
@@ -66,12 +68,12 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public T getValue(long... index) {
-        return data[Ints.saturatedCast(getFlatIndex(shape, stride, index))];
+        return data[checkedCast(getFlatIndex(shape, stride, index))];
     }
 
     @Override
     public GenericTensor<T> setValue(T value, long... index) {
-        data[Ints.saturatedCast(getFlatIndex(shape, stride, index))] = value;
+        data[checkedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
     }
 

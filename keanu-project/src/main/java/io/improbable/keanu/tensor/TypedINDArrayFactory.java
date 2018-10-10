@@ -33,7 +33,7 @@ public class TypedINDArrayFactory {
         return Nd4j.ones(shape);
     }
 
-    public static INDArray eye(int n, DataBuffer.Type bufferType) {
+    public static INDArray eye(long n, DataBuffer.Type bufferType) {
         Nd4j.setDataType(bufferType);
         return Nd4j.eye(n);
     }

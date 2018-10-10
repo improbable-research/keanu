@@ -50,7 +50,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor eye(int n) {
+    static DoubleTensor eye(long n) {
         if (n == 1) {
             return new ScalarDoubleTensor(1.0);
         } else {

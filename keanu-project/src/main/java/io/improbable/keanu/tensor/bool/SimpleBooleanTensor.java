@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.bool;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 
 import java.util.Arrays;
@@ -38,7 +40,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
      */
     public SimpleBooleanTensor(boolean[] data, long[] shape) {
         TensorShapeValidation.checkRankIsAtLeastTwo(shape);
-        this.data = new boolean[Ints.saturatedCast(TensorShape.getLength(shape))];
+        this.data = new boolean[checkedCast(TensorShape.getLength(shape))];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -249,12 +251,12 @@ public class SimpleBooleanTensor implements BooleanTensor {
 
     @Override
     public Boolean getValue(long... index) {
-        return data[Ints.saturatedCast(getFlatIndex(shape, stride, index))];
+        return data[checkedCast(getFlatIndex(shape, stride, index))];
     }
 
     @Override
     public BooleanTensor setValue(Boolean value, long... index) {
-        data[Ints.saturatedCast(getFlatIndex(shape, stride, index))] = value;
+        data[checkedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
     }
 

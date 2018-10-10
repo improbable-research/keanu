@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.dbl;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import static io.improbable.keanu.tensor.TypedINDArrayFactory.valueArrayOf;
 
 import java.util.ArrayList;
@@ -62,7 +64,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.ones(shape, BUFFER_TYPE));
     }
 
-    public static Nd4jDoubleTensor eye(int n) {
+    public static Nd4jDoubleTensor eye(long n) {
         return new Nd4jDoubleTensor(TypedINDArrayFactory.eye(n, BUFFER_TYPE));
     }
 
@@ -935,7 +937,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     @Override
     public BooleanTensor lessThan(double value) {
-        return fromMask(tensor.lt(value), copyOf(getShape(), Ints.saturatedCast(getShape().length)));
+        return fromMask(tensor.lt(value), copyOf(getShape(), getShape().length));
     }
 
     @Override
@@ -1086,7 +1088,7 @@ public class Nd4jDoubleTensor implements DoubleTensor {
 
     private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[Ints.saturatedCast(mask.length())];
+        boolean[] boolsFromMask = new boolean[checkedCast(mask.length())];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getDouble(i) != 0.0;

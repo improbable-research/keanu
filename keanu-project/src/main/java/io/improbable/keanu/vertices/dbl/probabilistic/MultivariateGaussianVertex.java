@@ -53,7 +53,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param covariance the scale of the identity matrix
      */
     public MultivariateGaussianVertex(DoubleVertex mu, double covariance) {
-        this(mu, ConstantVertex.of(DoubleTensor.eye((int)mu.getShape()[0])).times(covariance));
+        this(mu, ConstantVertex.of(DoubleTensor.eye(mu.getShape()[0])).times(covariance));
     }
 
     public MultivariateGaussianVertex(double mu, double covariance) {
