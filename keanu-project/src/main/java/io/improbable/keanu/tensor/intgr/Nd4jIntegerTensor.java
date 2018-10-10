@@ -1,25 +1,33 @@
 package io.improbable.keanu.tensor.intgr;
 
+import static java.util.Arrays.copyOf;
+
+import java.util.Arrays;
+import java.util.function.Function;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.CompareAndSet;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldGreaterThanOrEqual;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThan;
+import org.nd4j.linalg.api.ops.impl.transforms.comparison.OldLessThanOrEqual;
+import org.nd4j.linalg.factory.Nd4j;
+import org.nd4j.linalg.indexing.conditions.Conditions;
+import org.nd4j.linalg.ops.transforms.Transforms;
+
+import com.google.common.primitives.Ints;
+
 import io.improbable.keanu.tensor.INDArrayExtensions;
 import io.improbable.keanu.tensor.INDArrayShim;
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.TypedINDArrayFactory;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
-import org.apache.commons.lang3.ArrayUtils;
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.ops.impl.transforms.comparison.*;
-import org.nd4j.linalg.factory.Nd4j;
-import org.nd4j.linalg.indexing.conditions.Conditions;
-import org.nd4j.linalg.ops.transforms.Transforms;
-
-import java.util.Arrays;
-import java.util.function.Function;
-
-import static java.util.Arrays.copyOf;
 
 public class Nd4jIntegerTensor implements IntegerTensor {
 
@@ -52,10 +60,12 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     private INDArray tensor;
 
     public Nd4jIntegerTensor(int[] data, long[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.tensor = TypedINDArrayFactory.create(data, shape, BUFFER_TYPE);
     }
 
     public Nd4jIntegerTensor(INDArray tensor) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(tensor.shape());
         this.tensor = tensor;
     }
 
@@ -619,7 +629,7 @@ public class Nd4jIntegerTensor implements IntegerTensor {
 
     private BooleanTensor fromMask(INDArray mask, long[] shape) {
         DataBuffer data = mask.data();
-        boolean[] boolsFromMask = new boolean[(int) mask.length()];
+        boolean[] boolsFromMask = new boolean[Ints.saturatedCast(mask.length())];
 
         for (int i = 0; i < boolsFromMask.length; i++) {
             boolsFromMask[i] = data.getInt(i) != 0;

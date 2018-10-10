@@ -8,7 +8,9 @@ import static junit.framework.TestCase.assertTrue;
 import java.util.Arrays;
 
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -21,12 +23,29 @@ public class SimpleBooleanTensorTest {
     BooleanTensor matrixB;
     BooleanTensor matrixC;
 
+    @Rule
+    public ExpectedException thrown = ExpectedException.none();
+
     @Before
     public void setup() {
 
         matrixA = SimpleBooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         matrixB = SimpleBooleanTensor.create(new boolean[]{false, false, true, true}, new long[]{2, 2});
         matrixC = SimpleBooleanTensor.create(new boolean[]{true, true, true, false}, new long[]{2, 2});
+    }
+
+    @Test
+    public void youCannotCreateARankZeroTensor() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Tensors must have rank >=2 : []");
+        SimpleBooleanTensor.create(new boolean[] {}, new long[] {});
+    }
+
+    @Test
+    public void youCannotCreateARankOneTensor() {
+        thrown.expect(IllegalArgumentException.class);
+        thrown.expectMessage("Tensors must have rank >=2 : [5]");
+        SimpleBooleanTensor.create(new boolean[] {true, false, false, true, true}, new long[] {5});
     }
 
     @Test
