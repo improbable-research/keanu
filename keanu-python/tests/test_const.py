@@ -6,28 +6,28 @@ def test_const_takes_int_numpy_tensor():
     np_tensor = np.array([[1, 2], [3, 4]])
     v = kn.Const(np_tensor)
 
-    assert v.getClass().getSimpleName() == "ConstantIntegerVertex"
+    assert_java_class(v, "ConstantIntegerVertex")
     assert_vertex_value_equal_numpy(v, np_tensor)
 
 
 def test_const_takes_int():
     v = kn.Const(3)
 
-    assert v.getClass().getSimpleName() == "ConstantIntegerVertex"
+    assert_java_class(v, "ConstantIntegerVertex")
     assert_vertex_value_equals_scalar(v, 3)
 
 def test_const_takes_double_numpy_tensor():
     np_tensor = np.array([[1., 2.], [3., 4.]])
     v = kn.Const(np_tensor)
 
-    assert v.getClass().getSimpleName() == "ConstantDoubleVertex"
+    assert_java_class(v, "ConstantDoubleVertex")
     assert_vertex_value_equal_numpy(v, np_tensor)
 
 
 def test_const_takes_double():
     v = kn.Const(3.4)
 
-    assert v.getClass().getSimpleName() == "ConstantDoubleVertex"
+    assert_java_class(v, "ConstantDoubleVertex")
     assert_vertex_value_equals_scalar(v, 3.4)
 
 
@@ -35,14 +35,14 @@ def test_const_takes_bool_numpy_tensor():
     np_tensor = np.array([[True, True], [False, True]])
     v = kn.Const(np_tensor)
 
-    assert v.getClass().getSimpleName() == "ConstantBoolVertex"
+    assert_java_class(v, "ConstantBoolVertex")
     assert_vertex_value_equal_numpy(v, np_tensor)
 
 
 def test_const_takes_bool():
     v = kn.Const(True)
 
-    assert v.getClass().getSimpleName() == "ConstantBoolVertex"
+    assert_java_class(v, "ConstantBoolVertex")
     assert_vertex_value_equals_scalar(v, True)
 
 
@@ -78,19 +78,19 @@ def test_const_takes_numpy_tensor_of_rank_one():
 
 def test_integer_passed_to_Tensor_creates_ScalarIntegerTensor():
     t = kn.Tensor(1)
-    assert t.getClass().getSimpleName() == "ScalarIntegerTensor"
+    assert_java_class(t, "ScalarIntegerTensor")
     assert t.isScalar()
 
 
 def test_double_passed_to_Tensor_creates_ScalarDoubleTensor():
     t = kn.Tensor(1.)
-    assert t.getClass().getSimpleName() == "ScalarDoubleTensor"
+    assert_java_class(t, "ScalarDoubleTensor")
     assert t.isScalar()
 
 
 def test_bool_passed_to_Tensor_creates_SimpleBooleanTensor():
     t = kn.Tensor(True)
-    assert t.getClass().getSimpleName() == "SimpleBooleanTensor"
+    assert_java_class(t, "SimpleBooleanTensor")
     assert t.isScalar()
 
 
@@ -103,19 +103,19 @@ def test_cannot_pass_generic_to_Tensor():
 
 def test_integer_numpy_tensor_passed_to_Tensor_creates_Nd4jIntegerTensor():
     t = kn.Tensor(np.array([1,2]))
-    assert t.getClass().getSimpleName() == "Nd4jIntegerTensor"
+    assert_java_class(t, "Nd4jIntegerTensor")
     assert not t.isScalar()
 
 
 def test_double_numpy_tensor_passed_to_Tensor_creates_Nd4jDoubleTensor():
     t = kn.Tensor(np.array([1.,2.]))
-    assert t.getClass().getSimpleName() == "Nd4jDoubleTensor"
+    assert_java_class(t, "Nd4jDoubleTensor")
     assert not t.isScalar()
 
 
 def test_bool_numpy_tensor_passed_to_Tensor_creates_SimpleBooleanTensor():
     t = kn.Tensor(np.array([True, False]))
-    assert t.getClass().getSimpleName() == "SimpleBooleanTensor"
+    assert_java_class(t, "SimpleBooleanTensor")
     assert not t.isScalar()
 
 
@@ -140,8 +140,13 @@ def assert_vertex_value_equal_numpy(v, np_tensor):
     for i in range(len(np_tensor)):
         assert nd4j_flat[i] == np_flat[i]
 
+
 def assert_vertex_value_equals_scalar(v, scalar):
     assert v.getValue().scalar() == scalar
+
+
+def assert_java_class(java_object_wrapper, java_class_str):
+    assert java_object_wrapper.getClass().getSimpleName() == java_class_str
 
 
 class Temp:
