@@ -18,6 +18,7 @@ import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import java.util.Map;
 
 import org.junit.Test;
+import org.nd4j.linalg.exception.ND4JIllegalStateException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -57,7 +58,7 @@ public class MultinomialVertexTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ND4JIllegalStateException.class)
     public void itThrowsIfTheParametersAreDifferentShapes() {
         IntegerTensor n = IntegerTensor.create(100, 200);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).transpose();

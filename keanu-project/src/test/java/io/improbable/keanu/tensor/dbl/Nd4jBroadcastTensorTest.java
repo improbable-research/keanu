@@ -43,7 +43,7 @@ public class Nd4jBroadcastTensorTest {
         assertTimesInPlaceOperationEquals(rank4, matrix, expected);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void canBroadcastMultiplyToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -208,7 +208,7 @@ public class Nd4jBroadcastTensorTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void canBroadcastAddToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -275,7 +275,7 @@ public class Nd4jBroadcastTensorTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void canBroadcastSubtractToHigherRankWithDimensionsOfOneTailing() {
 
         /*
@@ -342,7 +342,7 @@ public class Nd4jBroadcastTensorTest {
         assertEquals(expected, diff);
     }
 
-    @Test(expected = AssertionError.class)
+    @Test(expected = IllegalArgumentException.class)
     public void canBroadcastDivideToHigherRankWithDimensionsOfOneTailing() {
 
         /*
