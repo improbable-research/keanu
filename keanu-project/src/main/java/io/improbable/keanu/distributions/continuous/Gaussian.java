@@ -36,7 +36,7 @@ public class Gaussian {
         this.sigma = sigma;
     }
 
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor unityGaussian = random.nextGaussian(shape);
         return unityGaussian.timesInPlace(sigma.getValue()).plusInPlace(mu.getValue());
     }

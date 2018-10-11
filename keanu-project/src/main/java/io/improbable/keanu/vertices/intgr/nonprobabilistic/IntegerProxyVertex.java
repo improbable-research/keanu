@@ -24,7 +24,7 @@ public class IntegerProxyVertex extends IntegerVertex implements ProxyVertex<Int
         this(Tensor.SCALAR_SHAPE, label);
     }
 
-    public IntegerProxyVertex(int[] shape, VertexLabel label) {
+    public IntegerProxyVertex(long[] shape, VertexLabel label) {
         setValue(IntegerTensor.placeHolder(shape));
         setLabel(label);
     }

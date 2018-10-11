@@ -53,6 +53,12 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVert
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
+    /**
+     * @param dimension dimension to concat along. Negative dimension indexing is not supported.
+     * @param toConcat  array of things to concat. Must match in all dimensions except for the provided
+     *                  dimension
+     * @return a vertex that represents the concatenation of the toConcat
+     */
     public static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
     }
@@ -185,19 +191,30 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new ArcTan2Vertex(this, that);
     }
 
+    /**
+     * Sum over all dimensions. This will always result in a scalar.
+     *
+     * @return a vertex representing the summation result
+     */
     public DoubleVertex sum() {
         return new SumVertex(this);
     }
 
+    /**
+     * Sum over specified dimensions.
+     *
+     * @param sumOverDimensions dimensions to sum over. Negative dimension indexing is not supported
+     * @return a vertex representing the summation result
+     */
     public DoubleVertex sum(int... sumOverDimensions) {
         return new SumVertex(this, sumOverDimensions);
     }
 
-    public DoubleVertex reshape(int... proposedShape) {
+    public DoubleVertex reshape(long... proposedShape) {
         return new ReshapeVertex(this, proposedShape);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
+    public DoubleVertex lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
@@ -259,7 +276,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 
-    public DoubleVertex take(int... index) {
+    public DoubleVertex take(long... index) {
         return new TakeVertex(this, index);
     }
 

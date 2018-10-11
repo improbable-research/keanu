@@ -21,27 +21,27 @@ public class IntegerSliceVertexTest {
         IntegerSliceVertex rowOne = new IntegerSliceVertex(matrixA, 0, 0);
 
         Assert.assertArrayEquals(new int[]{1, 2, 3}, rowOne.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{1, 3}, rowOne.getShape());
+        Assert.assertArrayEquals(new long[]{1, 3}, rowOne.getShape());
 
         IntegerSliceVertex rowTwo = new IntegerSliceVertex(matrixA, 0, 1);
 
         Assert.assertArrayEquals(new int[]{4, 5, 6}, rowTwo.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{1, 3}, rowTwo.getShape());
+        Assert.assertArrayEquals(new long[]{1, 3}, rowTwo.getShape());
 
         IntegerSliceVertex columnOne = new IntegerSliceVertex(matrixA, 1, 0);
 
         Assert.assertArrayEquals(new int[]{1, 4}, columnOne.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{2, 1}, columnOne.getShape());
+        Assert.assertArrayEquals(new long[]{2, 1}, columnOne.getShape());
 
         IntegerSliceVertex columnTwo = new IntegerSliceVertex(matrixA, 1, 1);
 
         Assert.assertArrayEquals(new int[]{2, 5}, columnTwo.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{2, 1}, columnTwo.getShape());
+        Assert.assertArrayEquals(new long[]{2, 1}, columnTwo.getShape());
 
         IntegerSliceVertex columnThree = new IntegerSliceVertex(matrixA, 1, 2);
 
         Assert.assertArrayEquals(new int[]{3, 6}, columnThree.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{2, 1}, columnThree.getShape());
+        Assert.assertArrayEquals(new long[]{2, 1}, columnThree.getShape());
     }
 
     @Test
@@ -51,15 +51,15 @@ public class IntegerSliceVertexTest {
 
         IntegerSliceVertex dimenZeroFace = new IntegerSliceVertex(cube, 0, 0);
         Assert.assertArrayEquals(new int[]{1, 2, 3, 4}, dimenZeroFace.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{2, 2}, dimenZeroFace.getShape());
+        Assert.assertArrayEquals(new long[]{2, 2}, dimenZeroFace.getShape());
 
         IntegerSliceVertex dimenOneFace = new IntegerSliceVertex(cube, 1, 0);
         Assert.assertArrayEquals(new int[]{1, 2, 5, 6}, dimenOneFace.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{2, 2}, dimenOneFace.getShape());
+        Assert.assertArrayEquals(new long[]{2, 2}, dimenOneFace.getShape());
 
         IntegerSliceVertex dimenTwoFace = new IntegerSliceVertex(cube, 2, 0);
         Assert.assertArrayEquals(new int[]{1, 3, 5, 7}, dimenTwoFace.getValue().asFlatIntegerArray());
-        Assert.assertArrayEquals(new int[]{2, 2}, dimenTwoFace.getShape());
+        Assert.assertArrayEquals(new long[]{2, 2}, dimenTwoFace.getShape());
     }
 
 }

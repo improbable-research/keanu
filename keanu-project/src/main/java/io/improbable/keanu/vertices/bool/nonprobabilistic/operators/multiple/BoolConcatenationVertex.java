@@ -28,7 +28,7 @@ public class BoolConcatenationVertex extends BoolVertex implements NonProbabilis
         this.dimension = dimension;
         this.input = input;
         setParents(input);
-        int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
+        long[][] shapes = extractFromInputs(long[].class, Vertex::getShape);
         setValue(BooleanTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 

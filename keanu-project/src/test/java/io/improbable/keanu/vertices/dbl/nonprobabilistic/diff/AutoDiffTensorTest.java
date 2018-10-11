@@ -17,7 +17,7 @@ public class AutoDiffTensorTest {
     @Test
     public void diffWrtVectorOverMultipleMultiplies() {
 
-        DoubleVertex A = new UniformVertex(new int[]{1, 4}, 0, 1);
+        DoubleVertex A = new UniformVertex(new long[]{1, 4}, 0, 1);
         A.setValue(new double[]{-1, 3, 5, -2});
 
         DoubleVertex prod = A.times(ConstantVertex.of(new double[]{1, 2, 3, 4}));
@@ -67,7 +67,7 @@ public class AutoDiffTensorTest {
     @Test
     public void diffWrtScalarOverMultipleMultipliesAndSummation() {
 
-        DoubleVertex A = new UniformVertex(new int[]{2, 2}, 0, 1);
+        DoubleVertex A = new UniformVertex(new long[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
         DoubleVertex B = A.sum().times(ConstantVertex.of(new double[]{1, 2, 3, 4})).sum();

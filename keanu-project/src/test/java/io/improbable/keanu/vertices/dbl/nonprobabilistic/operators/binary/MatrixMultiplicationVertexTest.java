@@ -60,7 +60,7 @@ public class MatrixMultiplicationVertexTest {
             5, 7,
             0, 0,
             6, 8
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         DoubleTensor expecteddCdb = DoubleTensor.create(new double[]{
             1, 0,
@@ -71,7 +71,7 @@ public class MatrixMultiplicationVertexTest {
             4, 0,
             0, 3,
             0, 4
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         //of d wrt a,b
         assertEquals(expecteddCda, dCda);
@@ -97,7 +97,7 @@ public class MatrixMultiplicationVertexTest {
             8, 0,
             0, 7,
             0, 8
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         DoubleTensor expecteddDdb = DoubleTensor.create(new double[]{
             1, 3,
@@ -108,7 +108,7 @@ public class MatrixMultiplicationVertexTest {
             1, 3,
             0, 0,
             2, 4
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         assertEquals(expecteddDda, dDda);
         assertEquals(expecteddDdb, dDdb);
@@ -276,8 +276,8 @@ public class MatrixMultiplicationVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputA = new UniformVertex(new int[]{2, 5}, -10.0, 10.0);
-        DoubleVertex inputB = new UniformVertex(new int[]{5, 4}, -10.0, 10.0);
+        DoubleVertex inputA = new UniformVertex(new long[]{2, 5}, -10.0, 10.0);
+        DoubleVertex inputB = new UniformVertex(new long[]{5, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputA.matrixMultiply(inputB);
         final double INCREMENT = 10;
         final double DELTA = 1e-10;

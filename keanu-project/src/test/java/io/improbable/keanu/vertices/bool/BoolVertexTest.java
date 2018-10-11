@@ -168,7 +168,7 @@ public class BoolVertexTest {
     @Test
     public void canObserveTensor() {
         BoolVertex flip = new BernoulliVertex(0.5);
-        BooleanTensor observation = BooleanTensor.create(new boolean[]{true, false, true, false}, new int[]{2, 2});
+        BooleanTensor observation = BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2});
         flip.observe(observation);
         assertArrayEquals(observation.asFlatArray(), flip.getValue().asFlatArray());
         assertArrayEquals(flip.getShape(), observation.getShape());
@@ -192,14 +192,14 @@ public class BoolVertexTest {
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new BernoulliVertex(new int[]{2, 1}, 0.5);
+        BoolVertex flip = new BernoulliVertex(new long[]{2, 1}, 0.5);
         flip.setValue(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        BoolVertex flip = new BernoulliVertex(new int[]{2, 1}, 0.5);
+        BoolVertex flip = new BernoulliVertex(new long[]{2, 1}, 0.5);
         flip.setAndCascade(true);
         assertArrayEquals(new Boolean[]{true}, flip.getValue().asFlatArray());
     }
@@ -216,9 +216,9 @@ public class BoolVertexTest {
     public void canReshape() {
         BoolVertex flip = new BernoulliVertex(0.5);
         flip.setAndCascade(BooleanTensor.trues(2, 2));
-        assertArrayEquals(flip.getShape(), new int[]{2, 2});
+        assertArrayEquals(flip.getShape(), new long[]{2, 2});
         BoolVertex reshaped = flip.reshape(4, 1);
-        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+        assertArrayEquals(reshaped.getShape(), new long[]{4, 1});
     }
 
     @Test
@@ -230,10 +230,10 @@ public class BoolVertexTest {
         B.setValue(BooleanTensor.falses(2, 2));
 
         BoolVertex concatDimZero = BoolVertex.concat(0, A, A);
-        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+        assertArrayEquals(concatDimZero.getShape(), new long[]{4, 2});
 
         BoolVertex concatDimOne = BoolVertex.concat(1, A, B);
-        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
+        assertArrayEquals(concatDimOne.getShape(), new long[]{2, 4});
     }
 
     private double andProbability(double pA, double pB) {
