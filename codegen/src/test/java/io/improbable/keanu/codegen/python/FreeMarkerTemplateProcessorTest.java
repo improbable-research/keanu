@@ -12,9 +12,9 @@ import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -62,24 +62,24 @@ public class FreeMarkerTemplateProcessorTest {
 
 
     @Test
-    public void canProcessTemplate() {
+    public void canProcessTemplate() throws URISyntaxException, IOException {
         Path generatedFilePath = Paths.get(testFolder.getRoot().toString(), TEST_GENERATED_FILE);
 
-        URL expectedContentFileUrl = getClass().getClassLoader().getResource("result.txt");
+        URI expectedContentFileUrl = ClassLoader.getSystemResource("result.txt").toURI();
         assertNotNull(expectedContentFileUrl);
 
         Path expectedContentFilePath = Paths.get(expectedContentFileUrl.getPath());
 
         Writer writer = FreeMarkerTemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
         Template template = FreeMarkerTemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
-        Map<String, Object> dataModel = buildDataModel();
+        Map<String, Object> dataModel = buildTestDataModel();
 
         FreeMarkerTemplateProcessor.processDataModel(dataModel, template, writer);
 
         assertFilesContainSameContent(generatedFilePath, expectedContentFilePath);
     }
 
-    private Map<String, Object> buildDataModel() {
+    private Map<String, Object> buildTestDataModel() {
         List<Product> products = Arrays.asList(new Product("shoes"), new Product("pants"));
         int expenses = 100;
         Map<String, Object> dataModel = new HashMap<>();
@@ -88,15 +88,11 @@ public class FreeMarkerTemplateProcessorTest {
         return dataModel;
     }
 
-    private void assertFilesContainSameContent(Path generatedFilePath, Path expectedContentFilePath) {
-        try {
-            byte[] generatedFileBytes = Files.readAllBytes(generatedFilePath);
-            byte[] expectedContentFileBytes = Files.readAllBytes(expectedContentFilePath);
+    private void assertFilesContainSameContent(Path generatedFilePath, Path expectedContentFilePath) throws IOException {
+        byte[] generatedFileBytes = Files.readAllBytes(generatedFilePath);
+        byte[] expectedContentFileBytes = Files.readAllBytes(expectedContentFilePath);
 
-            assertArrayEquals(generatedFileBytes, expectedContentFileBytes);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        assertArrayEquals(generatedFileBytes, expectedContentFileBytes);
     }
 
     public static class Product {
