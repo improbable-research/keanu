@@ -59,7 +59,7 @@ def test_vertex_can_observe_scalar():
     assert gaussian.getValue().scalar() == 4.
 
 
-def test_vertex_can_observe_tensor():
+def test_vertex_can_observe_ndarray():
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
     ndarray = np.array([[1.,2.]])
