@@ -69,14 +69,14 @@ public class Nd4jDoubleTensorTest {
     public void youCannotCreateARankZeroTensor() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Tensors must have rank >=2 : []");
-        DoubleTensor.create(new double[] {}, new long[] {});
+        DoubleTensor.create(new double[]{}, new long[]{});
     }
 
     @Test
     public void youCannotCreateARankOneTensor() {
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Tensors must have rank >=2 : [5]");
-        DoubleTensor.create(new double[] {1, 2, 3, 4, 5}, new long[] {5});
+        DoubleTensor.create(new double[]{1, 2, 3, 4, 5}, new long[]{5});
     }
 
     @Test
@@ -270,7 +270,7 @@ public class Nd4jDoubleTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         double value = 42.0;
         double otherValue = 42.1;
-        DoubleTensor allTheSame = DoubleTensor.create(value, new long[] {2, 3});
+        DoubleTensor allTheSame = DoubleTensor.create(value, new long[]{2, 3});
         DoubleTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
@@ -580,9 +580,15 @@ public class Nd4jDoubleTensorTest {
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void doesThrowOnNegativeDimensionSplit() {
+    public void doesThrowOnInvalidNegativeDimensionSplit() {
         DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
-        A.split(-1, new long[]{1, 5});
+        A.split(-3, new long[]{1, 5});
+    }
+
+    @Test(expected = IllegalArgumentException.class)
+    public void doesThrowOnInvalidDimensionSplit() {
+        DoubleTensor A = DoubleTensor.arange(0, 100).reshape(10, 10);
+        A.split(3, new long[]{1, 5});
     }
 
     @Test

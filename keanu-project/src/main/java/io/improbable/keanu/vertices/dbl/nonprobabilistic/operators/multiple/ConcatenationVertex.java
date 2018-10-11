@@ -28,7 +28,8 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
     /**
      * A vertex that can concatenate any amount of vertices along a given dimension.
      *
-     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different.
+     * @param dimension the dimension to concatenate on. This is the only dimension in which sizes may be different. Negative
+     *                  dimension indexing is not supported.
      * @param operands  the operands vertices to concatenate
      */
     public ConcatenationVertex(int dimension, DoubleVertex... operands) {
@@ -139,11 +140,14 @@ public class ConcatenationVertex extends DoubleVertex implements Differentiable,
             splitPartials.put(operands[i], new PartialDerivatives(new HashMap<>()));
         }
 
-        int wrtDimensionToSliceOn = operands[0].getShape().length + dimension;
+        int operandsRank = operands[0].getShape().length;
+        int wrtStartsAt = -operandsRank;
+        int wrtSplitOn = wrtStartsAt + dimension;
+
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = entry.getValue();
 
-            List<DoubleTensor> splitPartial = partial.split(wrtDimensionToSliceOn, splitIndices);
+            List<DoubleTensor> splitPartial = partial.split(wrtSplitOn, splitIndices);
 
             for (int i = 0; i < splitPartial.size(); i++) {
                 splitPartials.get(operands[i]).putWithRespectTo(entry.getKey(), splitPartial.get(i));
