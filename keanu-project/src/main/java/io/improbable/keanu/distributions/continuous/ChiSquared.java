@@ -20,7 +20,7 @@ public class ChiSquared implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, k.toDouble().div(2));
     }
 

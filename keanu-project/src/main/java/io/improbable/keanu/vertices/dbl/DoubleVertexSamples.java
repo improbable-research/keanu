@@ -16,7 +16,7 @@ public class DoubleVertexSamples extends VertexSamples<DoubleTensor> {
             throw new IllegalStateException("No samples exist for averaging.");
         }
 
-        int[] shape = samples.iterator().next().getShape();
+        long[] shape = samples.iterator().next().getShape();
 
         return this.samples.stream()
             .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace)

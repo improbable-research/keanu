@@ -1,5 +1,7 @@
 package io.improbable.keanu.model.linear;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -60,7 +62,7 @@ public class LogisticRegression implements ClassificationModel {
     }
 
     private double[] regularizeSigma(DoubleTensor x, double priorSigma, double regularization) {
-        int numFeatures = x.getShape()[0];
+        int numFeatures = checkedCast(x.getShape()[0]);
         double[] regularizedSigma = new double[numFeatures];
         for (int i = 0; i < numFeatures; i++) {
             DoubleTensor xColumn = x.slice(0, i);

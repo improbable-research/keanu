@@ -18,7 +18,7 @@ public class Categorical<T> implements Distribution<T> {
         this.selectableValues = selectableValues;
     }
 
-    public T sample(int[] shape, KeanuRandom random) {
+    public T sample(long[] shape, KeanuRandom random) {
         double sumOfProbabilities = getSumOfProbabilities();
         double p = random.nextDouble();
         double sum = 0;

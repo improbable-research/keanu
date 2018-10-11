@@ -26,7 +26,7 @@ public class NonGradientOptimizerTest {
     @Test
     public void canFindMAPGivenBounds() {
 
-        DoubleVertex A = new GaussianVertex(new int[]{1, 2}, ConstantVertex.of(new double[]{1, -3}), 1);
+        DoubleVertex A = new GaussianVertex(new long[]{1, 2}, ConstantVertex.of(new double[]{1, -3}), 1);
         A.setValue(new double[]{0, 0});
 
         OptimizerBounds bounds = new OptimizerBounds();

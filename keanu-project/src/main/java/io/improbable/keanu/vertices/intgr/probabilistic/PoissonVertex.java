@@ -31,7 +31,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
      * @param shape the desired shape of the vertex
      * @param mu    the mu of the Poisson with either the same shape as specified for this vertex or a scalar
      */
-    public PoissonVertex(int[] shape, DoubleVertex mu) {
+    public PoissonVertex(long[] shape, DoubleVertex mu) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
 
@@ -40,7 +40,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
         setValue(IntegerTensor.placeHolder(shape));
     }
 
-    public PoissonVertex(int[] shape, double mu) {
+    public PoissonVertex(long[] shape, double mu) {
         this(shape, new ConstantDoubleVertex(mu));
     }
 

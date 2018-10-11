@@ -145,7 +145,7 @@ public class LaplaceVertexTest {
 
         int sampleCount = 1000000;
         LaplaceVertex vertex = new LaplaceVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             ConstantVertex.of(0.0),
             ConstantVertex.of(2.0)
         );
@@ -177,7 +177,7 @@ public class LaplaceVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LaplaceVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LaplaceVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             muBeta,
             latentMuBeta,
             random

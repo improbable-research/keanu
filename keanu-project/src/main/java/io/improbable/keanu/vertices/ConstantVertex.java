@@ -68,7 +68,7 @@ public class ConstantVertex {
     }
 
     public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(values, new int[]{1, values.length}));
+        return new ConstantGenericVertex<>(new GenericTensor<>(values, new long[]{1, values.length}));
     }
 
     public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {

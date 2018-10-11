@@ -21,10 +21,10 @@ public class MultinomialVertex extends IntegerVertex implements ProbabilisticInt
     private final DoubleVertex p;
     private final IntegerVertex n;
 
-    public MultinomialVertex(int[] tensorShape, IntegerVertex n, DoubleVertex p) {
+    public MultinomialVertex(long[] tensorShape, IntegerVertex n, DoubleVertex p) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, n.getShape());
-        int[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
+        long[] pShapeExcludingFirstDimension = ArrayUtils.remove(p.getShape(), 0);
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, pShapeExcludingFirstDimension);
 
         this.p = p;

@@ -38,7 +38,7 @@ public class StudentT implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor chi2Samples = ChiSquared.withParameters(v).sample(shape, random);
         return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }
