@@ -2,6 +2,11 @@ import keanu as kn
 import numpy as np
 import pytest
 
+
+@pytest.fixture
+def generic():
+    pass
+
 @pytest.mark.parametrize("arr, expected_java_class", [
     ([[1, 2], [3, 4]], "ConstantIntegerVertex"),
     ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
@@ -27,19 +32,19 @@ def test_const_takes_num(num, expected_java_class):
     assert_vertex_value_equals_scalar(v, num)
 
 
-def test_const_does_not_take_generic_ndarray():
-    ndarray = np.array([[GenericExampleClass()]])
+def test_const_does_not_take_generic_ndarray(generic):
+    ndarray = np.array([[generic]])
     with pytest.raises(NotImplementedError) as excinfo:
         kn.Const(ndarray)
 
-    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(GenericExampleClass)
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
-def test_const_does_not_take_generic():
+def test_const_does_not_take_generic(generic):
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Const(GenericExampleClass())
+        kn.Const(generic)
 
-    assert str(excinfo.value) == "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(GenericExampleClass)
+    assert str(excinfo.value) == "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(generic))
 
 
 def test_const_does_not_take_empty_ndarray():
@@ -73,7 +78,3 @@ def assert_vertex_value_equals_scalar(v, scalar):
 
 def assert_java_class(java_object_wrapper, java_class_str):
     assert java_object_wrapper.getClass().getSimpleName() == java_class_str
-
-
-class GenericExampleClass:
-    pass
