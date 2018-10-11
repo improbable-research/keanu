@@ -6,6 +6,7 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
 import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
 
@@ -381,6 +382,18 @@ public class Nd4jIntegerTensorTest {
         BooleanTensor result = matrix.greaterThanOrEqual(Nd4jIntegerTensor.scalar(3));
         Boolean[] expected = new Boolean[]{false, false, true, true};
         assertArrayEquals(expected, result.asFlatArray());
+    }
+
+
+    @Test
+    public void canElementwiseEqualsAScalarValue() {
+        int value = 42;
+        int otherValue = 43;
+        IntegerTensor allTheSame = IntegerTensor.create(value, new long[] {2, 3});
+        IntegerTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
+
+        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
     @Test

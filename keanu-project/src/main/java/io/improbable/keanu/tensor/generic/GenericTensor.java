@@ -10,10 +10,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import com.google.common.primitives.Ints;
+import org.nd4j.linalg.util.ArrayUtil;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 
 public class GenericTensor<T> implements Tensor<T> {
 
@@ -44,6 +45,16 @@ public class GenericTensor<T> implements Tensor<T> {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
+    }
+
+    public GenericTensor(long[] shape, T value) {
+        this(fillArray(shape, value), shape);
+    }
+
+    private static <T> T[] fillArray(long[] shape, T value) {
+        Object[] data = new Object[ArrayUtil.prod(shape)];
+        Arrays.fill(data, value);
+        return (T[]) data;
     }
 
     @Override
@@ -110,6 +121,11 @@ public class GenericTensor<T> implements Tensor<T> {
     @Override
     public FlattenedView<T> getFlattenedView() {
         return new BaseSimpleFlattenedView<T>(data);
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(T value) {
+        return elementwiseEquals(new GenericTensor<>(shape, value));
     }
 
     private static class BaseSimpleFlattenedView<T> implements FlattenedView<T> {

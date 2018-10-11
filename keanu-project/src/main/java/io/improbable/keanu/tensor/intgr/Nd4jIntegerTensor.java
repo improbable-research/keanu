@@ -602,6 +602,11 @@ public class Nd4jIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public BooleanTensor elementwiseEquals(Integer value) {
+        return fromMask(tensor.eq(value), copyOf(getShape(), getShape().length));
+    }
+
+    @Override
     public IntegerTensor slice(int dimension, long index) {
         INDArray dup = tensor.dup();
         INDArray slice = dup.slice(index, dimension);

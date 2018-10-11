@@ -40,6 +40,15 @@ public class ScalarDoubleTensorTest {
     }
 
     @Test
+    public void canElementwiseEqualsAScalarValue() {
+        double value = 42.0;
+        DoubleTensor tensor = DoubleTensor.create(value);
+
+        assertThat(tensor.elementwiseEquals(value), hasValue(true));
+        assertThat(tensor.elementwiseEquals(value + 0.1), hasValue(false));
+    }
+
+    @Test
     public void doesClampScalarWithinBounds() {
         DoubleTensor A = DoubleTensor.scalar(0.25);
         DoubleTensor clampedA = A.clamp(DoubleTensor.scalar(0.0), DoubleTensor.scalar(1.0));

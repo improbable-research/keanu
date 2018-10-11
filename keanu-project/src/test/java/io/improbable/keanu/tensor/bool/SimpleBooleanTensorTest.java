@@ -1,8 +1,11 @@
 package io.improbable.keanu.tensor.bool;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
 
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.Arrays;
@@ -142,6 +145,17 @@ public class SimpleBooleanTensorTest {
     public void doesAllFalse() {
         assertFalse(new SimpleBooleanTensor(new boolean[]{false, true, false, false}, new long[]{2, 2}).allFalse());
         assertTrue(new SimpleBooleanTensor(new boolean[]{false, false, false, false}, new long[]{2, 2}).allFalse());
+    }
+
+
+    @Test
+    public void canElementwiseEqualsAScalarValue() {
+        boolean value = true;
+        BooleanTensor allTheSame = BooleanTensor.create(value, new long[] {2, 3});
+        Tensor<Boolean> notAllTheSame = allTheSame.duplicate().setValue(!value, 1, 1);
+
+        assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));
+        assertThat(notAllTheSame.elementwiseEquals(value), hasValue(true, true, true, true, false, true));
     }
 
     @Test

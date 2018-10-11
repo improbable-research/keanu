@@ -3,11 +3,22 @@ package io.improbable.keanu.tensor.intgr;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.assertEquals;
 
+import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
 
 import org.junit.Test;
 
 public class ScalarIntegerTensorTest {
+
+    @Test
+    public void canElementwiseEqualsAScalarValue() {
+        int value = 42;
+        IntegerTensor tensor = IntegerTensor.create(value);
+
+        assertThat(tensor.elementwiseEquals(value), hasValue(true));
+        assertThat(tensor.elementwiseEquals(value + 1), hasValue(false));
+    }
+
     @Test
     public void canArgFindMaxOfScalar() {
         IntegerTensor tensor = IntegerTensor.scalar(1);

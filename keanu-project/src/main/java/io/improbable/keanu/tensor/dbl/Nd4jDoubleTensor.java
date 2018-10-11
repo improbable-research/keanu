@@ -1053,6 +1053,11 @@ public class Nd4jDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public BooleanTensor elementwiseEquals(Double value) {
+        return fromMask(tensor.eq(value), copyOf(getShape(), getShape().length));
+    }
+
+    @Override
     public FlattenedView<Double> getFlattenedView() {
         return new Nd4jDoubleFlattenedView(tensor);
     }

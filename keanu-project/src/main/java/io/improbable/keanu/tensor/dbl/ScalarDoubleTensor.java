@@ -808,6 +808,11 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public BooleanTensor elementwiseEquals(Double value) {
+        return BooleanTensor.create(this.scalar().equals(value));
+    }
+
+    @Override
     public double[] asFlatDoubleArray() {
         return new double[]{value};
     }

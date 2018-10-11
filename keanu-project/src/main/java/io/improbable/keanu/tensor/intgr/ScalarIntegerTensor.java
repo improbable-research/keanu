@@ -484,6 +484,11 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public BooleanTensor elementwiseEquals(Integer value) {
+        return BooleanTensor.create(this.scalar().equals(value));
+    }
+
+    @Override
     public double[] asFlatDoubleArray() {
         return new double[]{value};
     }

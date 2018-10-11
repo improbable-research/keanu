@@ -316,6 +316,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
         return new SimpleBooleanFlattenedView(data);
     }
 
+    @Override
+    public BooleanTensor elementwiseEquals(Boolean value) {
+        return Tensor.elementwiseEquals(this, BooleanTensor.create(value, this.getShape()));
+    }
+
     private static class SimpleBooleanFlattenedView implements FlattenedView<Boolean> {
 
         private boolean[] data;
