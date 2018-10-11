@@ -20,8 +20,9 @@ def test_coalmining():
 
         m.years = np.array(data.index)
         # m.beforeSwitch = m.switchpoint > m.years
-        # m.rates = kn.DoubleIf([1, 1], beforeSwitch, m.early_rate, m.late_rate)
-    #     m.disasters = kn.Poisson(m.rates)
+        m.rates = m.early_rate # TEMP
+        # m.rates = kn.DoubleIf([1, 1], m.beforeSwitch, m.early_rate, m.late_rate)
+        m.disasters = kn.Poisson(m.rates)
 
     # m.disasters.observe(data.values)
 
@@ -31,4 +32,3 @@ def test_coalmining():
 
     switch_year = posterior_dist_samples.getIntegerTensorSamples(m.switchpoint.unwrap()).getScalarMode()
     assert switch_year == 1890
-    
