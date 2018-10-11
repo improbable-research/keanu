@@ -1,5 +1,5 @@
-assemble.dependsOn(":shadowJar")
-assemble.dependsOn(":codegen:processor:codeGen")
+test.dependsOn(":shadowJar")
+test.dependsOn(":codegen:processor:codeGen")
 
 task installPipenv {
     doLast {
