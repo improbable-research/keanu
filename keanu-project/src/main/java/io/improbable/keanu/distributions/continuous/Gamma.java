@@ -38,7 +38,7 @@ public class Gamma implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         Tensor.FlattenedView<Double> thetaWrapped = theta.getFlattenedView();
         Tensor.FlattenedView<Double> kWrapped = k.getFlattenedView();
 

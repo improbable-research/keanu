@@ -22,7 +22,7 @@ public class SumVertexTest {
 
     @Test
     public void doesSumAllDimensions() {
-        DoubleVertex a = new UniformVertex(new int[]{1, 5}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{1, 5}, 0, 10);
         a.setValue(new double[]{1, 2, 3, 4, 5});
 
         DoubleVertex summed = a.sum();
@@ -32,7 +32,7 @@ public class SumVertexTest {
 
     @Test
     public void doesSumAllSpecifiedDimensions() {
-        DoubleVertex a = new UniformVertex(new int[]{1, 5}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{1, 5}, 0, 10);
         a.setValue(new double[]{1, 2, 3, 4, 5});
 
         DoubleVertex summed = a.sum(0, 1);
@@ -43,7 +43,7 @@ public class SumVertexTest {
 
     @Test
     public void doesSumSpecifiedDimensions() {
-        int[] shape = {2, 2, 2, 2};
+        long[] shape = {2, 2, 2, 2};
         DoubleVertex a = new UniformVertex(shape, 0, 10);
         a.setValue(DoubleTensor.arange(0, TensorShape.getLength(shape)).reshape(shape));
 
@@ -56,17 +56,17 @@ public class SumVertexTest {
 
     @Test
     public void doesCalculateCorrectShape() {
-        int[] shape = {2, 3, 4, 5, 6, 1};
+        long[] shape = {2, 3, 4, 5, 6, 1};
         DoubleVertex a = new UniformVertex(shape, 0, 10);
         DoubleTensor highrank = DoubleTensor.arange(0, TensorShape.getLength(shape)).reshape(shape);
         a.setValue(highrank);
 
-        assertArrayEquals(new int[]{3, 5, 6, 1}, a.sum(0, 2).getShape());
-        assertArrayEquals(new int[]{5, 6}, a.sum(0, 1, 2, 5).getShape());
-        assertArrayEquals(new int[]{6, 1}, a.sum(0, 1, 2, 3).getShape());
-        assertArrayEquals(new int[]{2, 1}, a.sum(1, 2, 3, 4, 5).getShape());
-        assertArrayEquals(new int[]{1, 3}, a.sum(0, 2, 3, 4, 5).getShape());
-        assertArrayEquals(new int[]{1, 1}, a.sum(0, 1, 2, 3, 4, 5).getShape());
+        assertArrayEquals(new long[]{3, 5, 6, 1}, a.sum(0, 2).getShape());
+        assertArrayEquals(new long[]{5, 6}, a.sum(0, 1, 2, 5).getShape());
+        assertArrayEquals(new long[]{6, 1}, a.sum(0, 1, 2, 3).getShape());
+        assertArrayEquals(new long[]{2, 1}, a.sum(1, 2, 3, 4, 5).getShape());
+        assertArrayEquals(new long[]{1, 3}, a.sum(0, 2, 3, 4, 5).getShape());
+        assertArrayEquals(new long[]{1, 1}, a.sum(0, 1, 2, 3, 4, 5).getShape());
     }
 
     @Test
@@ -74,12 +74,12 @@ public class SumVertexTest {
         DoubleVertex a = new UniformVertex(0, 10);
         a.setValue(2);
 
-        assertArrayEquals(new int[]{1, 1}, a.sum(0).getShape());
+        assertArrayEquals(new long[]{1, 1}, a.sum(0).getShape());
     }
 
     @Test
     public void doesSumAllSimpleAutoDiff() {
-        DoubleVertex a = new UniformVertex(new int[]{2, 2, 2}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
         a.setValue(a.sample());
 
         DoubleVertex b = a.sum();
@@ -87,7 +87,7 @@ public class SumVertexTest {
         DoubleTensor dbdaForward = b.getDerivativeWrtLatents().withRespectTo(a);
         DoubleTensor dbdaReverse = Differentiator.reverseModeAutoDiff(b, a).withRespectTo(a);
 
-        DoubleTensor expectedDbDa = DoubleTensor.ones(new int[]{1, 1, 2, 2, 2});
+        DoubleTensor expectedDbDa = DoubleTensor.ones(new long[]{1, 1, 2, 2, 2});
 
         assertThat(dbdaForward, equalTo(expectedDbDa));
         assertThat(dbdaReverse, equalTo(expectedDbDa));
@@ -95,7 +95,7 @@ public class SumVertexTest {
 
     @Test
     public void doesSumSpecifiedSimpleAutoDiff() {
-        DoubleVertex a = new UniformVertex(new int[]{2, 2}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{2, 2}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 4).reshape(2, 2));
 
         int sumDimension = 1;
@@ -112,7 +112,7 @@ public class SumVertexTest {
 
     @Test
     public void doesSumSpecifiedRank3AutoDiff() {
-        DoubleVertex a = new UniformVertex(new int[]{2, 2, 2}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{2, 2, 2}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         int sumDimension = 1;
@@ -129,12 +129,12 @@ public class SumVertexTest {
 
     @Test
     public void canDoSumAutoDiffWhenSumIsNotWrtOrOf() {
-        DoubleVertex a = new UniformVertex(new int[]{2, 3}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{2, 3}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
 
         DoubleVertex d = a.sum();
 
-        DoubleVertex e = new UniformVertex(new int[]{2, 2}, 0, 10);
+        DoubleVertex e = new UniformVertex(new long[]{2, 2}, 0, 10);
         e.setValue(DoubleTensor.arange(4, 8).reshape(2, 2));
 
         DoubleVertex f = d.times(e);
@@ -161,7 +161,7 @@ public class SumVertexTest {
 
     @Test
     public void canDoSumAutoDiffWhenOfIsScalar() {
-        DoubleVertex a = new UniformVertex(new int[]{2, 3}, 0, 10);
+        DoubleVertex a = new UniformVertex(new long[]{2, 3}, 0, 10);
         a.setValue(DoubleTensor.arange(0, 6).reshape(2, 3));
 
         DoubleVertex d = a.sum();
@@ -212,7 +212,7 @@ public class SumVertexTest {
 
     @Test
     public void changesMatchGradientWhenSummingAll() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
         DoubleVertex outputVertex = inputVertex.sum().times(inputVertex);
 
@@ -221,7 +221,7 @@ public class SumVertexTest {
 
     @Test
     public void changesMatchGradientWhenSummingSpecificDimensions() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         inputVertex.setValue(DoubleTensor.arange(0, 8).reshape(2, 2, 2));
 
         DoubleVertex outputVertex = inputVertex.sum(0)

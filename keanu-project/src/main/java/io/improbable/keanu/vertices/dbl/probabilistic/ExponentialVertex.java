@@ -32,7 +32,7 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
      * @param lambda      the lambda of the Exponential with either be the same shape as specified for this
      *                    vertex or scalar.
      */
-    public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
+    public ExponentialVertex(long[] tensorShape, DoubleVertex lambda) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
 

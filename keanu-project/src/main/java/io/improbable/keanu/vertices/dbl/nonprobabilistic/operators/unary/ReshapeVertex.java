@@ -12,7 +12,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class ReshapeVertex extends DoubleUnaryOpVertex {
 
-    public ReshapeVertex(DoubleVertex inputVertex, int... proposedShape) {
+    public ReshapeVertex(DoubleVertex inputVertex, long... proposedShape) {
         super(proposedShape, inputVertex);
     }
 
@@ -32,7 +32,7 @@ public class ReshapeVertex extends DoubleUnaryOpVertex {
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
-            int[] newPartialShape = TensorShape.concat(
+            long[] newPartialShape = TensorShape.concat(
                 TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
                 inputVertex.getShape()
             );

@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.generic;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 
 import java.util.ArrayList;
@@ -17,10 +19,10 @@ import io.improbable.keanu.tensor.bool.BooleanTensor;
 public class GenericTensor<T> implements Tensor<T> {
 
     private T[] data;
-    private int[] shape;
-    private int[] stride;
+    private long[] shape;
+    private long[] stride;
 
-    public GenericTensor(T[] data, int[] shape) {
+    public GenericTensor(T[] data, long[] shape) {
         this.data = Arrays.copyOf(data, data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -39,17 +41,17 @@ public class GenericTensor<T> implements Tensor<T> {
     /**
      * @param shape placeholder shape
      */
-    public GenericTensor(int[] shape) {
+    public GenericTensor(long[] shape) {
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
     }
 
-    public GenericTensor(int[] shape, T value) {
+    public GenericTensor(long[] shape, T value) {
         this(fillArray(shape, value), shape);
     }
 
-    private static <T> T[] fillArray(int[] shape, T value) {
+    private static <T> T[] fillArray(long[] shape, T value) {
         Object[] data = new Object[ArrayUtil.prod(shape)];
         Arrays.fill(data, value);
         return (T[]) data;
@@ -61,7 +63,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -76,13 +78,13 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public T getValue(int... index) {
-        return data[getFlatIndex(shape, stride, index)];
+    public T getValue(long... index) {
+        return data[checkedCast(getFlatIndex(shape, stride, index))];
     }
 
     @Override
-    public GenericTensor<T> setValue(T value, int... index) {
-        data[getFlatIndex(shape, stride, index)] = value;
+    public GenericTensor<T> setValue(T value, long... index) {
+        data[checkedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
     }
 
@@ -198,7 +200,7 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> reshape(int... newShape) {
+    public Tensor<T> reshape(long... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
@@ -207,16 +209,16 @@ public class GenericTensor<T> implements Tensor<T> {
     }
 
     @Override
-    public Tensor<T> slice(int dimension, int index) {
+    public Tensor<T> slice(int dimension, long index) {
         T[] flat = asFlatArray();
         List<T> tadded = new ArrayList<>();
         for (int i = 0; i < flat.length; i++) {
-            int[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
+            long[] indicesOfCurrent = TensorShape.getShapeIndices(shape, stride, i);
             if (indicesOfCurrent[dimension] == index) {
                 tadded.add(getValue(indicesOfCurrent));
             }
         }
-        int[] taddedShape = Arrays.copyOf(shape, shape.length);
+        long[] taddedShape = Arrays.copyOf(shape, shape.length);
         taddedShape[dimension] = 1;
         return new GenericTensor(tadded.toArray(), taddedShape);
     }

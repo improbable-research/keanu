@@ -32,11 +32,11 @@ public class WriteCsvTest {
 
     @Before
     public void setup() {
-        GaussianVertex g1 = new GaussianVertex(new int[]{1, 5}, 0, 1);
-        GaussianVertex g2 = new GaussianVertex(new int[]{1, 4}, 0, 1);
+        GaussianVertex g1 = new GaussianVertex(new long[]{1, 5}, 0, 1);
+        GaussianVertex g2 = new GaussianVertex(new long[]{1, 4}, 0, 1);
 
-        GaussianVertex f1 = new GaussianVertex(new int[]{5, 1}, 0, 1);
-        GaussianVertex f2 = new GaussianVertex(new int[]{4, 1}, 0, 1);
+        GaussianVertex f1 = new GaussianVertex(new long[]{5, 1}, 0, 1);
+        GaussianVertex f2 = new GaussianVertex(new long[]{4, 1}, 0, 1);
 
         g1.setValue(new double[]{1, 2, 3, 4, 5});
         g2.setValue(new double[]{5, 4, 3, 2});

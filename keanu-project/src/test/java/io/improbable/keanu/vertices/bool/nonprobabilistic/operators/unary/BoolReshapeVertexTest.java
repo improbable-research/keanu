@@ -16,7 +16,7 @@ public class BoolReshapeVertexTest {
         BoolReshapeVertex reshapeVertex = new BoolReshapeVertex(a, 4, 1);
         reshapeVertex.getValue();
 
-        Assert.assertArrayEquals(new int[]{4, 1}, reshapeVertex.getShape());
+        Assert.assertArrayEquals(new long[]{4, 1}, reshapeVertex.getShape());
         Assert.assertArrayEquals(new int[]{1, 1, 0, 0}, reshapeVertex.getValue().asFlatIntegerArray());
     }
 

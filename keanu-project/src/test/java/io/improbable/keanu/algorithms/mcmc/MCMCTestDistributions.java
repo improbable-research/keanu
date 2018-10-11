@@ -15,14 +15,14 @@ import static org.junit.Assert.assertTrue;
 public class MCMCTestDistributions {
 
     public static BayesianNetwork createSimpleGaussian(double mu, double sigma, KeanuRandom random) {
-        GaussianVertex A = new GaussianVertex(new int[]{2, 1}, mu, sigma);
+        GaussianVertex A = new GaussianVertex(new long[]{2, 1}, mu, sigma);
         A.setAndCascade(A.sample(random));
         return new BayesianNetwork(A.getConnectedGraph());
     }
 
     public static void samplesMatchSimpleGaussian(double mu, double sigma, List<DoubleTensor> samples) {
 
-        int[] shape = samples.get(0).getShape();
+        long[] shape = samples.get(0).getShape();
 
         DoubleTensor summed = samples.stream()
             .reduce(DoubleTensor.zeros(shape), DoubleTensor::plusInPlace);

@@ -21,7 +21,7 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
     protected final Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda;
     protected final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
-    public DoubleBinaryOpLambda(int[] shape,
+    public DoubleBinaryOpLambda(long[] shape,
                                 Vertex<A> left,
                                 Vertex<B> right,
                                 BiFunction<A, B, DoubleTensor> op,
@@ -36,7 +36,7 @@ public class DoubleBinaryOpLambda<A, B> extends DoubleVertex implements NonProba
         setValue(DoubleTensor.placeHolder(shape));
     }
 
-    public DoubleBinaryOpLambda(int[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
+    public DoubleBinaryOpLambda(long[] shape, Vertex<A> left, Vertex<B> right, BiFunction<A, B, DoubleTensor> op) {
         this(shape, left, right, op, null, null);
     }
 

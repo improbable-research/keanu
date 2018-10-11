@@ -12,7 +12,7 @@ public class GenericTensorTest {
     public void canElementwiseEqualsAScalarValue() {
         String value = "foo";
         String otherValue = "bar";
-        GenericTensor allTheSame = new GenericTensor(new int[] {2, 3}, value);
+        GenericTensor allTheSame = new GenericTensor(new long[] {2, 3}, value);
         GenericTensor notAllTheSame = allTheSame.duplicate().setValue(otherValue, 1, 1);
 
         assertThat(allTheSame.elementwiseEquals(value).allTrue(), equalTo(true));

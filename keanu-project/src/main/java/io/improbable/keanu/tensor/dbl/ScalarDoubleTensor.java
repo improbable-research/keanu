@@ -11,6 +11,7 @@ import org.apache.commons.math3.util.FastMath;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.validate.TensorValidator;
@@ -18,9 +19,9 @@ import io.improbable.keanu.tensor.validate.TensorValidator;
 public class ScalarDoubleTensor implements DoubleTensor {
 
     private Double value;
-    private int[] shape;
+    private long[] shape;
 
-    private ScalarDoubleTensor(Double value, int[] shape) {
+    private ScalarDoubleTensor(Double value, long[] shape) {
         this.value = value;
         this.shape = shape;
     }
@@ -29,7 +30,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
         this(value, SCALAR_SHAPE);
     }
 
-    public ScalarDoubleTensor(int[] shape) {
+    public ScalarDoubleTensor(long[] shape) {
         this(null, shape);
     }
 
@@ -39,7 +40,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -59,7 +60,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public Double getValue(int[] index) {
+    public Double getValue(long[] index) {
         if (index.length == 1 && index[0] == 0) {
             return value;
         } else {
@@ -68,7 +69,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor setValue(Double value, int[] index) {
+    public DoubleTensor setValue(Double value, long[] index) {
         if (index.length == 1 && index[0] == 0) {
             this.value = value;
             return this;
@@ -98,7 +99,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor reshape(int[] newShape) {
+    public DoubleTensor reshape(long... newShape) {
         if (!TensorShape.isScalar(newShape)) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
         }
@@ -132,7 +133,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     public DoubleTensor sum(int... overDimensions) {
         //Matching strange ND4J behavior where rank 0 and 1 aren't supported.
         int shapeLength = Math.max(2, this.shape.length - overDimensions.length);
-        int[] summedShape = new int[shapeLength];
+        long[] summedShape = new long[shapeLength];
         Arrays.fill(summedShape, 1);
         return new ScalarDoubleTensor(value, summedShape);
     }
@@ -368,6 +369,17 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
+    public int argMax() {
+        return 0;
+    }
+
+    @Override
+    public IntegerTensor argMax(int axis) {
+        TensorShapeValidation.checkDimensionExistsInShape(axis, this.getShape());
+        return IntegerTensor.scalar(0);
+    }
+
+    @Override
     public double average() {
         return value;
     }
@@ -436,7 +448,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public DoubleTensor slice(int dimension, int index) {
+    public DoubleTensor slice(int dimension, long index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
@@ -445,7 +457,7 @@ public class ScalarDoubleTensor implements DoubleTensor {
     }
 
     @Override
-    public List<DoubleTensor> split(int dimension, int[] splitAtIndices) {
+    public List<DoubleTensor> split(int dimension, long[] splitAtIndices) {
         return Collections.singletonList(this);
     }
 
@@ -800,41 +812,6 @@ public class ScalarDoubleTensor implements DoubleTensor {
         return BooleanTensor.create(this.scalar().equals(value));
     }
 
-    private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
-
-        private double value;
-
-        public SimpleDoubleFlattenedView(double value) {
-            this.value = value;
-        }
-
-        @Override
-        public long size() {
-            return 1;
-        }
-
-        @Override
-        public Double get(long index) {
-            if (index != 0) {
-                throw new IndexOutOfBoundsException();
-            }
-            return value;
-        }
-
-        @Override
-        public Double getOrScalar(long index) {
-            return value;
-        }
-
-        @Override
-        public void set(long index, Double value) {
-            if (index != 0) {
-                throw new IndexOutOfBoundsException();
-            }
-            this.value = value;
-        }
-    }
-
     @Override
     public double[] asFlatDoubleArray() {
         return new double[]{value};
@@ -874,5 +851,40 @@ public class ScalarDoubleTensor implements DoubleTensor {
             "data = [" + value + "]" +
             "\nshape = " + Arrays.toString(shape) +
             "\n}";
+    }
+
+    private static class SimpleDoubleFlattenedView implements FlattenedView<Double> {
+
+        private double value;
+
+        public SimpleDoubleFlattenedView(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public long size() {
+            return 1;
+        }
+
+        @Override
+        public Double get(long index) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            return value;
+        }
+
+        @Override
+        public Double getOrScalar(long index) {
+            return value;
+        }
+
+        @Override
+        public void set(long index, Double value) {
+            if (index != 0) {
+                throw new IndexOutOfBoundsException();
+            }
+            this.value = value;
+        }
     }
 }

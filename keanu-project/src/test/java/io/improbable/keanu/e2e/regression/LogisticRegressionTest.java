@@ -65,7 +65,7 @@ public class LogisticRegressionTest {
     private DoubleTensor generateX(int nSamples) {
         DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
-            xVertices[i] = new GaussianVertex(new int[] {1, nSamples}, 0.0, SIGMAS[i]);
+            xVertices[i] = new GaussianVertex(new long[] {1, nSamples}, 0.0, SIGMAS[i]);
         }
         return DoubleVertex.concat(0, xVertices).sample(random);
     }

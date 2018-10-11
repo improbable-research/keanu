@@ -24,7 +24,7 @@ public class InverseGamma implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         final DoubleTensor gammaSample = random.nextGamma(shape, beta.reciprocal(), alpha);
         return gammaSample.reciprocal();
     }
