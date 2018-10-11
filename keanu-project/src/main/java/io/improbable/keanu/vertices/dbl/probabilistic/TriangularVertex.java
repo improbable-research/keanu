@@ -29,7 +29,7 @@ public class TriangularVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param xMax        the xMax of the Triangular with either the same shape as specified for this vertex or a scalar
      * @param c           the center of the Triangular with either the same shape as specified for this vertex or a scalar
      */
-    public TriangularVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, DoubleVertex c) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape(), c.getShape());
 
@@ -40,27 +40,27 @@ public class TriangularVertex extends DoubleVertex implements ProbabilisticDoubl
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public TriangularVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double c) {
+    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double c) {
         this(tensorShape, xMin, xMax, new ConstantDoubleVertex(c));
     }
 
-    public TriangularVertex(int[] tensorShape, DoubleVertex xMin, double xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, double xMax, DoubleVertex c) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), c);
     }
 
-    public TriangularVertex(int[] tensorShape, DoubleVertex xMin, double xMax, double c) {
+    public TriangularVertex(long[] tensorShape, DoubleVertex xMin, double xMax, double c) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c));
     }
 
-    public TriangularVertex(int[] tensorShape, double xMin, DoubleVertex xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, double xMin, DoubleVertex xMax, DoubleVertex c) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, c);
     }
 
-    public TriangularVertex(int[] tensorShape, double xMin, double xMax, DoubleVertex c) {
+    public TriangularVertex(long[] tensorShape, double xMin, double xMax, DoubleVertex c) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), c);
     }
 
-    public TriangularVertex(int[] tensorShape, double xMin, double xMax, double c) {
+    public TriangularVertex(long[] tensorShape, double xMin, double xMax, double c) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), new ConstantDoubleVertex(c));
     }
 

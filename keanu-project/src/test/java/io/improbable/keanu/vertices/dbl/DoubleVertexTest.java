@@ -22,7 +22,7 @@ public class DoubleVertexTest {
     @Test
     public void canObserveTensor() {
         DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
-        DoubleTensor observation = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new int[]{2, 2});
+        DoubleTensor observation = Nd4jDoubleTensor.create(new double[]{1, 2, 3, 4}, new long[]{2, 2});
         gaussianVertex.observe(observation);
         assertArrayEquals(observation.asFlatDoubleArray(), gaussianVertex.getValue().asFlatDoubleArray(), 0.0);
         assertArrayEquals(observation.getShape(), gaussianVertex.getShape());
@@ -46,14 +46,14 @@ public class DoubleVertexTest {
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        DoubleVertex gaussianVertex = new GaussianVertex(new int[]{1, 2}, 0, 1);
+        DoubleVertex gaussianVertex = new GaussianVertex(new long[]{1, 2}, 0, 1);
         gaussianVertex.setValue(2);
         assertArrayEquals(new double[]{2}, gaussianVertex.getValue().asFlatDoubleArray(), 0.0);
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        DoubleVertex gaussianVertex = new GaussianVertex(new int[]{1, 2}, 0, 1);
+        DoubleVertex gaussianVertex = new GaussianVertex(new long[]{1, 2}, 0, 1);
         gaussianVertex.setAndCascade(2);
         assertArrayEquals(new double[]{2}, gaussianVertex.getValue().asFlatDoubleArray(), 0.0);
     }
@@ -70,9 +70,9 @@ public class DoubleVertexTest {
     public void canReshape() {
         DoubleVertex gaussianVertex = new GaussianVertex(0, 1);
         gaussianVertex.setAndCascade(DoubleTensor.ones(2, 2));
-        assertArrayEquals(gaussianVertex.getShape(), new int[]{2, 2});
+        assertArrayEquals(gaussianVertex.getShape(), new long[]{2, 2});
         DoubleVertex reshaped = gaussianVertex.reshape(4, 1);
-        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+        assertArrayEquals(reshaped.getShape(), new long[]{4, 1});
     }
 
     @Test
@@ -84,9 +84,9 @@ public class DoubleVertexTest {
         B.setValue(DoubleTensor.arange(5, 9).reshape(2, 2));
 
         DoubleVertex concatDimZero = DoubleVertex.concat(0, A, B);
-        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+        assertArrayEquals(concatDimZero.getShape(), new long[]{4, 2});
 
         DoubleVertex concatDimOne = DoubleVertex.concat(1, A, B);
-        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
+        assertArrayEquals(concatDimOne.getShape(), new long[]{2, 4});
     }
 }

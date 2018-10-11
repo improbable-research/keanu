@@ -28,7 +28,7 @@ public class IntegerConcatenationVertex extends IntegerVertex implements NonProb
         this.dimension = dimension;
         this.input = input;
         setParents(input);
-        int[][] shapes = extractFromInputs(int[].class, Vertex::getShape);
+        long[][] shapes = extractFromInputs(long[].class, Vertex::getShape);
         setValue(IntegerTensor.placeHolder(checkShapesCanBeConcatenated(dimension, shapes)));
     }
 

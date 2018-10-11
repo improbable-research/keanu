@@ -126,7 +126,7 @@ public class HalfCauchyVertexTest {
 
         int sampleCount = 1000000;
         HalfCauchyVertex vertex = new HalfCauchyVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             ConstantVertex.of(2.0)
         );
 
@@ -152,7 +152,7 @@ public class HalfCauchyVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new HalfCauchyVertex(new int[]{numSamples, 1}, hyperParams.get(0)),
+            hyperParams -> new HalfCauchyVertex(new long[]{numSamples, 1}, hyperParams.get(0)),
             scale,
             latentScaleList,
             random

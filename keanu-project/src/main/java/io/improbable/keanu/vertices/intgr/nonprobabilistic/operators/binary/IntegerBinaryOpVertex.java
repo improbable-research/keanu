@@ -30,7 +30,7 @@ public abstract class IntegerBinaryOpVertex extends IntegerVertex implements Non
      * @param a     first input vertex
      * @param b     second input vertex
      */
-    public IntegerBinaryOpVertex(int[] shape, IntegerVertex a, IntegerVertex b) {
+    public IntegerBinaryOpVertex(long[] shape, IntegerVertex a, IntegerVertex b) {
         this.a = a;
         this.b = b;
         setParents(a, b);

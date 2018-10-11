@@ -62,7 +62,7 @@ public class SmoothUniform implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
 
         DoubleTensor r1 = random.nextDouble(shape);
         DoubleTensor r2 = random.nextDouble(shape);

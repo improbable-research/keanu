@@ -36,8 +36,8 @@ public class ConcatenationVertexTest {
         ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
         ConcatenationVertex concatOne = new ConcatenationVertex(1, a, b, c);
 
-        Assert.assertArrayEquals(new int[]{2, 3}, concatZero.getShape());
-        Assert.assertArrayEquals(new int[]{1, 9}, concatOne.getShape());
+        Assert.assertArrayEquals(new long[]{2, 3}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{1, 9}, concatOne.getShape());
 
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatOne.getValue().asFlatDoubleArray(), 0.001);
@@ -53,7 +53,7 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concatZero = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{1, 9}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -66,7 +66,7 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -79,7 +79,7 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concat = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -104,12 +104,12 @@ public class ConcatenationVertexTest {
 
         ConcatenationVertex concatZero = new ConcatenationVertex(0, a, b);
 
-        Assert.assertArrayEquals(new int[]{4, 2}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{4, 2}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 10, 15, 20, 25}, concatZero.getValue().asFlatDoubleArray(), 0.001);
 
         ConcatenationVertex concatOne = new ConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{2, 4}, concatOne.getShape());
+        Assert.assertArrayEquals(new long[]{2, 4}, concatOne.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 10, 15, 3, 4, 20, 25}, concatOne.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -128,7 +128,7 @@ public class ConcatenationVertexTest {
             concatZero.getValue().asFlatDoubleArray(),
             0.001
         );
-        Assert.assertArrayEquals(new int[]{4, 2, 2}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2}, concatZero.getShape());
 
         ConcatenationVertex concatThree = new ConcatenationVertex(2, a, b);
         Assert.assertArrayEquals(
@@ -136,7 +136,7 @@ public class ConcatenationVertexTest {
             concatThree.getValue().asFlatDoubleArray(),
             0.001
         );
-        Assert.assertArrayEquals(new int[]{2, 2, 4}, concatThree.getShape());
+        Assert.assertArrayEquals(new long[]{2, 2, 4}, concatThree.getShape());
     }
 
     @Test
@@ -212,15 +212,15 @@ public class ConcatenationVertexTest {
         PartialDerivatives forward = concat.getDerivativeWrtLatents();
         PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(concat, a, b, c, d);
 
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(c).getShape());
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, forward.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, forward.withRespectTo(c).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, forward.withRespectTo(d).getShape());
 
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, reverse.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, reverse.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, reverse.withRespectTo(c).getShape());
-        Assert.assertArrayEquals(new int[]{2, 4, 2, 2}, reverse.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(c).getShape());
+        Assert.assertArrayEquals(new long[]{2, 4, 2, 2}, reverse.withRespectTo(d).getShape());
     }
 
     @Test
@@ -242,13 +242,13 @@ public class ConcatenationVertexTest {
         PartialDerivatives forward = concat.getDerivativeWrtLatents();
         PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(concat, a, b, d);
 
-        Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, forward.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 1, 1}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, forward.withRespectTo(d).getShape());
 
-        Assert.assertArrayEquals(new int[]{4, 2, 1, 1}, reverse.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, reverse.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{4, 2, 2, 2}, reverse.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 1, 1}, reverse.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, reverse.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2, 2}, reverse.withRespectTo(d).getShape());
     }
 
     @Test
@@ -270,13 +270,13 @@ public class ConcatenationVertexTest {
         PartialDerivatives forward = concat.getDerivativeWrtLatents();
         PartialDerivatives reverse = Differentiator.reverseModeAutoDiff(concat, a, b, d);
 
-        Assert.assertArrayEquals(new int[]{2, 5, 2, 3}, forward.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{2, 5, 2, 3}, forward.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{2, 5, 3, 2}, forward.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, forward.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, forward.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 3, 2}, forward.withRespectTo(d).getShape());
 
-        Assert.assertArrayEquals(new int[]{2, 5, 2, 3}, reverse.withRespectTo(a).getShape());
-        Assert.assertArrayEquals(new int[]{2, 5, 2, 3}, reverse.withRespectTo(b).getShape());
-        Assert.assertArrayEquals(new int[]{2, 5, 3, 2}, reverse.withRespectTo(d).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, reverse.withRespectTo(a).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 2, 3}, reverse.withRespectTo(b).getShape());
+        Assert.assertArrayEquals(new long[]{2, 5, 3, 2}, reverse.withRespectTo(d).getShape());
     }
 
     @Test
@@ -461,9 +461,9 @@ public class ConcatenationVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputA = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex inputB = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex inputC = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputA = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputB = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex inputC = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex outputVertex = new ConcatenationVertex(0, inputA, inputB, inputC);
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB, inputC), outputVertex, 10.0, 1e-10);
     }

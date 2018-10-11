@@ -20,7 +20,7 @@ public class MultivariateGaussian implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar(shape, mu.getShape());
         final DoubleTensor choleskyCov = covariance.choleskyDecomposition();
         final DoubleTensor variateSamples = random.nextGaussian(mu.getShape());

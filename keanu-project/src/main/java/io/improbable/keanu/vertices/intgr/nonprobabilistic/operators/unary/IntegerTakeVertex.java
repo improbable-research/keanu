@@ -6,7 +6,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
 public class IntegerTakeVertex extends IntegerUnaryOpVertex {
-    private final int[] index;
+    private final long[] index;
 
     /**
      * A vertex that extracts a scalar at a given index
@@ -14,7 +14,7 @@ public class IntegerTakeVertex extends IntegerUnaryOpVertex {
      * @param inputVertex the input vertex to extract from
      * @param index the index to extract at
      */
-    public IntegerTakeVertex(IntegerVertex inputVertex, int... index) {
+    public IntegerTakeVertex(IntegerVertex inputVertex, long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);

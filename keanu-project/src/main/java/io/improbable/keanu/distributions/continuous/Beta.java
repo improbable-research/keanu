@@ -28,7 +28,7 @@ public class Beta implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
 
         final DoubleTensor y1 = random.nextGamma(shape, DoubleTensor.ONE_SCALAR, alpha);
         final DoubleTensor y2 = random.nextGamma(shape, DoubleTensor.ONE_SCALAR, beta);
