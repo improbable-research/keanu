@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.K;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.THETA;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
@@ -48,6 +49,7 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param theta the theta (scale) of the Gamma with either the same shape as specified for this vertex
      * @param k     the k (shape) of the Gamma with either the same shape as specified for this vertex
      */
+    @ExportVertexToPythonBindings
     public GammaVertex(DoubleVertex theta, DoubleVertex k) {
         this(checkHasSingleNonScalarShapeOrAllScalar(theta.getShape(), k.getShape()), theta, k);
     }
