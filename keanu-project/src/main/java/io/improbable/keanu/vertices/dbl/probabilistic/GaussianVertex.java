@@ -19,7 +19,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble {
+public class GaussianVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -112,8 +112,8 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 
     @Override

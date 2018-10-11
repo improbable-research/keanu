@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble {
+public class DirichletVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex concentration;
 
@@ -87,7 +87,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Dirichlet.withParameters(concentration.getValue()).sample(getShape(), random);
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Dirichlet.withParameters(concentration.getValue()).sample(shape, random);
     }
 }

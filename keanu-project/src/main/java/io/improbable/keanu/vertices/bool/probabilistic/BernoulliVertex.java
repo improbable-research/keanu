@@ -16,7 +16,7 @@ import io.improbable.keanu.vertices.dbl.Differentiable;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean {
+public class BernoulliVertex extends ProbabilisticBooleanVertex {
 
     private final Vertex<DoubleTensor> probTrue;
 
@@ -78,7 +78,7 @@ public class BernoulliVertex extends BoolVertex implements ProbabilisticBoolean 
     }
 
     @Override
-    public BooleanTensor sample(KeanuRandom random) {
-        return Bernoulli.withParameters(probTrue.getValue()).sample(this.getShape(), random);
+    protected BooleanTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Bernoulli.withParameters(probTrue.getValue()).sample(shape, random);
     }
 }

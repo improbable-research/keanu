@@ -19,7 +19,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
+public class ParetoVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex scale;
     private final DoubleVertex location;
@@ -110,8 +110,8 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Pareto.withParameters(location.getValue(), scale.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Pareto.withParameters(location.getValue(), scale.getValue()).sample(shape, random);
     }
 
     @Override

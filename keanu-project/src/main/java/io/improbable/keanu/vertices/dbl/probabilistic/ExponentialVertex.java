@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class ExponentialVertex extends DoubleVertex implements ProbabilisticDouble {
+public class ExponentialVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex lambda;
 
@@ -82,8 +82,8 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Exponential.withParameters(lambda.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Exponential.withParameters(lambda.getValue()).sample(shape, random);
     }
 
 }

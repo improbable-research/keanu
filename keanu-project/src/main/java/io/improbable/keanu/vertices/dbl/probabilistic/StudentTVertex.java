@@ -17,7 +17,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble {
+public class StudentTVertex extends ProbabilisticDoubleVertex {
 
     private final IntegerVertex v;
 
@@ -70,7 +70,7 @@ public class StudentTVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return StudentT.withParameters(v.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return StudentT.withParameters(v.getValue()).sample(shape, random);
     }
 }

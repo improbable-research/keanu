@@ -18,7 +18,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
+public class GammaVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex theta;
     private final DoubleVertex k;
@@ -95,8 +95,8 @@ public class GammaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Gamma.withParameters(theta.getValue(), k.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Gamma.withParameters(theta.getValue(), k.getValue()).sample(shape, random);
     }
 
 }

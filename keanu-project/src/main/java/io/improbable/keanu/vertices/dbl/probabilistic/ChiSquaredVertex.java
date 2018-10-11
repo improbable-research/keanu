@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDouble {
+public class ChiSquaredVertex extends ProbabilisticDoubleVertex {
 
     private IntegerVertex k;
 
@@ -54,8 +54,8 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return ChiSquared.withParameters(k.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return ChiSquared.withParameters(k.getValue()).sample(shape, random);
     }
 
     @Override

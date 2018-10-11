@@ -19,7 +19,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
+public class BetaVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex alpha;
     private final DoubleVertex beta;
@@ -110,8 +110,8 @@ public class BetaVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return distribution().sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return distribution().sample(shape, random);
     }
 
 }

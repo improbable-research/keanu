@@ -18,7 +18,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger {
+public class PoissonVertex extends ProbabilisticIntegerVertex {
 
     private final DoubleVertex mu;
 
@@ -76,7 +76,7 @@ public class PoissonVertex extends IntegerVertex implements ProbabilisticInteger
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return Poisson.withParameters(mu.getValue()).sample(getShape(), random);
+    protected IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Poisson.withParameters(mu.getValue()).sample(shape, random);
     }
 }

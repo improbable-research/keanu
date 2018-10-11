@@ -18,7 +18,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
+public class CauchyVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex location;
     private final DoubleVertex scale;
@@ -111,7 +111,7 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Cauchy.withParameters(location.getValue(), scale.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Cauchy.withParameters(location.getValue(), scale.getValue()).sample(shape, random);
     }
 }

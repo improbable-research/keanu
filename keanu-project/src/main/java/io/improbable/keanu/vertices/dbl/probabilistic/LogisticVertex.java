@@ -18,7 +18,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble {
+public class LogisticVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
@@ -90,7 +90,7 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Logistic.withParameters(mu.getValue(), s.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Logistic.withParameters(mu.getValue(), s.getValue()).sample(shape, random);
     }
 }

@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger {
+public class UniformIntVertex extends ProbabilisticIntegerVertex {
 
     private IntegerVertex min;
     private IntegerVertex max;
@@ -86,7 +86,7 @@ public class UniformIntVertex extends IntegerVertex implements ProbabilisticInte
     }
 
     @Override
-    public IntegerTensor sample(KeanuRandom random) {
-        return UniformInt.withParameters(min.getValue(), max.getValue()).sample(getShape(), random);
+    protected IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return UniformInt.withParameters(min.getValue(), max.getValue()).sample(shape, random);
     }
 }

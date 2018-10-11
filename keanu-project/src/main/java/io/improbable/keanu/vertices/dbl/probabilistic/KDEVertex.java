@@ -11,7 +11,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
+public class KDEVertex extends ProbabilisticDoubleVertex {
 
     private final double bandwidth;
     private DoubleTensor samples;
@@ -103,7 +103,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return sample(1, random);
     }
 

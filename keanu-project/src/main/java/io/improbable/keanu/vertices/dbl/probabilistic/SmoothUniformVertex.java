@@ -18,7 +18,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDouble {
+public class SmoothUniformVertex extends ProbabilisticDoubleVertex {
 
     private static final double DEFAULT_EDGE_SHARPNESS = 0.01;
 
@@ -140,7 +140,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return SmoothUniform.withParameters(xMin.getValue(), xMax.getValue(), this.edgeSharpness).sample(shape, random);
     }
 }

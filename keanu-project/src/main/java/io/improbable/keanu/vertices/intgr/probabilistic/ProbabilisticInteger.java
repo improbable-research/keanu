@@ -32,4 +32,5 @@ public interface ProbabilisticInteger extends Probabilistic<IntegerTensor> {
     default Map<Vertex, DoubleTensor> dLogPmf(IntegerTensor value, Set<Vertex> withRespectTo) {
         return dLogProb(value, withRespectTo);
     }
+
 }

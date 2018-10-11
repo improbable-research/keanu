@@ -10,7 +10,7 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public class MultivariateGaussianVertex extends DoubleVertex implements ProbabilisticDouble {
+public class MultivariateGaussianVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex mu;
     private final DoubleVertex covariance;
@@ -74,8 +74,8 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(mu.getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(shape, random);
     }
 
     private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {

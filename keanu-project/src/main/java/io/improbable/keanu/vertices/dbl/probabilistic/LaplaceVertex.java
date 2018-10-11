@@ -18,7 +18,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
+public class LaplaceVertex extends ProbabilisticDoubleVertex {
 
     private final DoubleVertex mu;
     private final DoubleVertex beta;
@@ -98,8 +98,8 @@ public class LaplaceVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DoubleTensor sample(KeanuRandom random) {
-        return Laplace.withParameters(mu.getValue(), beta.getValue()).sample(getShape(), random);
+    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+        return Laplace.withParameters(mu.getValue(), beta.getValue()).sample(shape, random);
     }
 
 }
