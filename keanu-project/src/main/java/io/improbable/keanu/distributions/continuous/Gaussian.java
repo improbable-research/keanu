@@ -23,7 +23,7 @@ public class Gaussian {
     private final DoubleVertex sigma;
 
     public static Gaussian withParameters(DoubleTensor mu, DoubleTensor sigma) {
-        return new Gaussian(new ConstantDoubleVertex(0), new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
+        return new Gaussian(new ConstantDoubleVertex(0.0), new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
     public static Gaussian withParameters(DoubleVertex x, DoubleVertex mu, DoubleVertex sigma) {
