@@ -24,10 +24,10 @@ class VertexProcessor {
 
     static void process(String generatedDir) {
         Map<String, Object> dataModel = buildDataModel();
-        Template fileTemplate = FreeMarkerTemplateProcessor.getFileTemplate(TEMPLATE_FILE);
-        Writer fileWriter = FreeMarkerTemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
+        Template fileTemplate = TemplateProcessor.getFileTemplate(TEMPLATE_FILE);
+        Writer fileWriter = TemplateProcessor.createFileWriter(generatedDir + GENERATED_FILE);
 
-        FreeMarkerTemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
+        TemplateProcessor.processDataModel(dataModel, fileTemplate, fileWriter);
     }
 
     private static Map<String, Object> buildDataModel() {

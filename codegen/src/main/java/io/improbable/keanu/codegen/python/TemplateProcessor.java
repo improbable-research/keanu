@@ -13,7 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Map;
 
-class FreeMarkerTemplateProcessor {
+class TemplateProcessor {
 
     static void processDataModel(Map<String, Object> dataModel, Template fileTemplate, Writer fileWriter) {
         try {

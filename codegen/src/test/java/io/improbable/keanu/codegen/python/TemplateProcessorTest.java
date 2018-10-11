@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FreeMarkerTemplateProcessorTest {
+public class TemplateProcessorTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -38,7 +38,7 @@ public class FreeMarkerTemplateProcessorTest {
 
         assertFalse(Files.exists(path));
 
-        FreeMarkerTemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
+        TemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
@@ -49,13 +49,13 @@ public class FreeMarkerTemplateProcessorTest {
         testFolder.newFile(TEST_GENERATED_FILE);
         assertTrue(Files.exists(path));
 
-        FreeMarkerTemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
+        TemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
     @Test
     public void canCreateTemplate() {
-        FreeMarkerTemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
+        TemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
     }
 
 
@@ -64,11 +64,11 @@ public class FreeMarkerTemplateProcessorTest {
         Path generatedFilePath = Paths.get(testFolder.getRoot().toString(), TEST_GENERATED_FILE);
         Path expectedContentFilePath = new File(ClassLoader.getSystemResource("result.txt").getFile()).toPath();
 
-        Writer writer = FreeMarkerTemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
-        Template template = FreeMarkerTemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
+        Writer writer = TemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
+        Template template = TemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
         Map<String, Object> dataModel = buildTestDataModel();
 
-        FreeMarkerTemplateProcessor.processDataModel(dataModel, template, writer);
+        TemplateProcessor.processDataModel(dataModel, template, writer);
 
         assertFilesContainSameContent(generatedFilePath, expectedContentFilePath);
     }
