@@ -14,7 +14,7 @@ def test_can_pass_scalar_to_vertex():
     assert sample.isScalar()
 
 
-def test_can_pass_np_tensor_to_vertex():
+def test_can_pass_ndarray_to_vertex():
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (np.array([[0.1, 0.4]]), np.array([[0.4, 0.5]])))
     sample = gaussian.sample()
 
@@ -62,8 +62,8 @@ def test_vertex_can_observe_scalar():
 def test_vertex_can_observe_tensor():
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
 
-    np_tensor = np.array([[1.,2.]])
-    gaussian.observe(np_tensor)
+    ndarray = np.array([[1.,2.]])
+    gaussian.observe(ndarray)
 
     nd4j_tensor_flat = gaussian.getValue().asFlatArray()
     assert nd4j_tensor_flat[0] == 1.

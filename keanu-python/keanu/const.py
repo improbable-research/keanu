@@ -17,22 +17,22 @@ java_import(k, "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantInte
 class Const(JavaObjectWrapper):
     def __init__(self, t):
         if isinstance(t, np.ndarray):
-            ctor = Const.__infer_const_from_np_tensor(t)
+            ctor = Const.__infer_const_from_ndarray(t)
             val = Tensor(t).unwrap()
         elif isinstance(t, numbers.Number):
             ctor = Const.__infer_const_from_scalar(t)
             val = t
         else:
-            raise NotImplementedError("Argument t must be either a numpy array or an instance of numbers.Number. Was given {} instead".format(type(t)))
+            raise NotImplementedError("Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(t)))
 
         super(Const, self).__init__(ctor, val)
 
     @staticmethod
-    def __infer_const_from_np_tensor(np_tensor):
-        if len(np_tensor) == 0:
-            raise ValueError("Cannot infer type because tensor is empty")
+    def __infer_const_from_ndarray(ndarray):
+        if len(ndarray) == 0:
+            raise ValueError("Cannot infer type because the ndarray is empty")
 
-        return Const.__infer_const_from_scalar(np_tensor.item(0))
+        return Const.__infer_const_from_scalar(ndarray.item(0))
 
     @staticmethod
     def __infer_const_from_scalar(scalar):
@@ -43,4 +43,4 @@ class Const(JavaObjectWrapper):
         elif isinstance(scalar, float):
             return k.ConstantDoubleVertex
         else:
-            raise NotImplementedError("Generic types in a tensor are not supported. Was given {}".format(type(scalar)))
+            raise NotImplementedError("Generic types in an ndarray are not supported. Was given {}".format(type(scalar)))
