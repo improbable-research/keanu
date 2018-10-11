@@ -1,5 +1,5 @@
 test.dependsOn(":shadowJar")
-test.dependsOn(":codegen:processor:codeGen")
+test.dependsOn(":codegen:codeGen")
 
 task installPipenv {
     doLast {
