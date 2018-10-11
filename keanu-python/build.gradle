@@ -41,7 +41,7 @@ task installDependencies {
 task pytest {
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'pytest'
+            commandLine 'pipenv', 'run', 'pytest', 'tests/test_appveyor_hanging.py'
         }
     }
 }
