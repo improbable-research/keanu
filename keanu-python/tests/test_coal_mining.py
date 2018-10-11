@@ -24,7 +24,7 @@ def test_coalmining():
         # m.rates = kn.DoubleIf([1, 1], m.beforeSwitch, m.early_rate, m.late_rate)
         m.disasters = kn.Poisson(m.rates)
 
-    # m.disasters.observe(data.values)
+    m.disasters.observe(data.values)
 
     net = kn.BayesNet(m.switchpoint.getConnectedGraph())
     posterior_dist_samples = kn.MetropolisHastings().get_posterior_samples(net, net.getLatentVertices(), 50000)
