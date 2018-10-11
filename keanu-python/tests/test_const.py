@@ -2,28 +2,28 @@ import keanu as kn
 import numpy as np
 import pytest
 
-@pytest.mark.parametrize("arr, expected_class", [
+@pytest.mark.parametrize("arr, expected_java_class", [
     ([[1, 2], [3, 4]], "ConstantIntegerVertex"),
     ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
     ([[True, False], [False, True]], "ConstantBoolVertex")
 ])
-def test_const_takes_ndarray(arr, expected_class):
+def test_const_takes_ndarray(arr, expected_java_class):
     ndarray = np.array(arr)
     v = kn.Const(ndarray)
 
-    assert_java_class(v, expected_class)
+    assert_java_class(v, expected_java_class)
     assert_vertex_value_equal_ndarray(v, ndarray)
 
 
-@pytest.mark.parametrize("num, expected_class", [
+@pytest.mark.parametrize("num, expected_java_class", [
     (3, "ConstantIntegerVertex"),
     (3.4, "ConstantDoubleVertex"),
     (True, "ConstantBoolVertex")
 ])
-def test_const_takes_num(num, expected_class):
+def test_const_takes_num(num, expected_java_class):
     v = kn.Const(num)
 
-    assert_java_class(v, expected_class)
+    assert_java_class(v, expected_java_class)
     assert_vertex_value_equals_scalar(v, num)
 
 
