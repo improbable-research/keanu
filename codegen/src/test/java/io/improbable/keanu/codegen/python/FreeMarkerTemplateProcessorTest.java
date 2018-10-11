@@ -11,6 +11,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URI;
@@ -65,7 +66,7 @@ public class FreeMarkerTemplateProcessorTest {
     @Test
     public void canProcessTemplate() throws IOException {
         Path generatedFilePath = Paths.get(testFolder.getRoot().toString(), TEST_GENERATED_FILE);
-        Path expectedContentFilePath = Paths.get(ClassLoader.getSystemResource("result.txt").getPath());
+        Path expectedContentFilePath = new File(ClassLoader.getSystemResource("result.txt").getFile()).toPath();
 
         Writer writer = FreeMarkerTemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
         Template template = FreeMarkerTemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
