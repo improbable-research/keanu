@@ -44,7 +44,7 @@ public class MatrixInverseVertex extends DoubleUnaryOpVertex {
         return partials;
     }
 
-    private static int[] checkInputIsSquareMatrix(int[] shape) {
+    private static long[] checkInputIsSquareMatrix(long[] shape) {
         if (shape.length != 2) {
             throw new IllegalArgumentException("Can only invert a Matrix (received rank: " + shape.length + ")");
         }

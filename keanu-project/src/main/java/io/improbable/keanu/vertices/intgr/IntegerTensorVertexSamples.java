@@ -22,7 +22,7 @@ public class IntegerTensorVertexSamples extends VertexSamples<IntegerTensor> {
             throw new IllegalStateException("No samples exist for averaging.");
         }
 
-        int[] shape = samples.iterator().next().getShape();
+        long[] shape = samples.iterator().next().getShape();
 
         return this.samples.stream()
             .reduce(IntegerTensor.zeros(shape), IntegerTensor::plusInPlace)

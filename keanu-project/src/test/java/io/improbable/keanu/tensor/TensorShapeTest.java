@@ -11,14 +11,14 @@ public class TensorShapeTest {
 
     @Test
     public void canCalculateRowFirstStride() {
-        int[] shape = new int[]{2, 3, 7, 4};
+        long[] shape = new long[]{2, 3, 7, 4};
 
-        assertArrayEquals(new int[]{84, 28, 4, 1}, TensorShape.getRowFirstStride(shape));
+        assertArrayEquals(new long[]{84, 28, 4, 1}, TensorShape.getRowFirstStride(shape));
     }
 
     @Test
     public void canCalculateLength() {
-        int[] shape = new int[]{2, 3, 7, 4};
+        long[] shape = new long[]{2, 3, 7, 4};
         assertEquals(168, TensorShape.getLength(shape));
     }
 
@@ -31,13 +31,13 @@ public class TensorShapeTest {
 
     @Test
     public void canGetShapeIndices() {
-        Assert.assertArrayEquals(new int[]{2, 2}, TensorShape.getShapeIndices(new int[]{5, 4}, new int[]{4, 1}, 10));
-        Assert.assertArrayEquals(new int[]{1, 1, 1}, TensorShape.getShapeIndices(new int[]{3, 3, 3}, new int[]{9, 3, 1}, 13));
+        Assert.assertArrayEquals(new long[]{2, 2}, TensorShape.getShapeIndices(new long[]{5, 4}, new long[]{4, 1}, 10));
+        Assert.assertArrayEquals(new long[]{1, 1, 1}, TensorShape.getShapeIndices(new long[]{3, 3, 3}, new long[]{9, 3, 1}, 13));
     }
 
     @Test
     public void canGetElementFromShapeIndices() {
-        int[] shape = new int[]{2, 2, 3};
+        long[] shape = new long[]{2, 2, 3};
 
         double[] buffer = new double[(int) TensorShape.getLength(shape)];
         for (int i = 0; i < buffer.length; i++) {
@@ -45,10 +45,10 @@ public class TensorShapeTest {
         }
 
         DoubleTensor tensor = DoubleTensor.create(buffer, shape);
-        int[] stride = TensorShape.getRowFirstStride(shape);
+        long[] stride = TensorShape.getRowFirstStride(shape);
 
         for (int i = 0; i < buffer.length; i++) {
-            int[] indexOfi = TensorShape.getShapeIndices(shape, stride, i);
+            long[] indexOfi = TensorShape.getShapeIndices(shape, stride, i);
             assertEquals(i, tensor.getValue(indexOfi), 1e-10);
         }
     }

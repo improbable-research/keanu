@@ -83,7 +83,7 @@ public class SmoothUniformVertexTest {
 
         double edgeSharpness = 1.0;
         SmoothUniformVertex vertex = new SmoothUniformVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             0.0,
             1.0,
             edgeSharpness

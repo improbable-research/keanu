@@ -55,14 +55,14 @@ public class BinaryOperationTestHelpers {
                                                           double[] expected,
                                                           BiFunction<DoubleVertex, DoubleVertex, DoubleVertex> op) {
 
-        UniformVertex A = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
-        A.setAndCascade(Nd4jDoubleTensor.create(aValues, new int[]{2, 2}));
-        UniformVertex B = new UniformVertex(new int[]{2, 2}, 0.0, 1.0);
-        B.setAndCascade(Nd4jDoubleTensor.create(bValues, new int[]{2, 2}));
+        UniformVertex A = new UniformVertex(new long[]{2, 2}, 0.0, 1.0);
+        A.setAndCascade(Nd4jDoubleTensor.create(aValues, new long[]{2, 2}));
+        UniformVertex B = new UniformVertex(new long[]{2, 2}, 0.0, 1.0);
+        B.setAndCascade(Nd4jDoubleTensor.create(bValues, new long[]{2, 2}));
 
         DoubleTensor result = op.apply(A, B).getValue();
 
-        DoubleTensor expectedTensor = Nd4jDoubleTensor.create(expected, new int[]{2, 2});
+        DoubleTensor expectedTensor = Nd4jDoubleTensor.create(expected, new long[]{2, 2});
 
         assertEquals(expectedTensor.getValue(0, 0), result.getValue(0, 0), 1e-5);
         assertEquals(expectedTensor.getValue(0, 1), result.getValue(0, 1), 1e-5);

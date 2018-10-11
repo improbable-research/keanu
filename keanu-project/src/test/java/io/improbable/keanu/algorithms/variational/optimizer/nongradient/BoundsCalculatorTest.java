@@ -16,8 +16,8 @@ public class BoundsCalculatorTest {
     @Test
     public void calculatesBoundsWhenAllAreSpecified() {
 
-        DoubleVertex A = new UniformVertex(new int[]{1, 2}, -2, 1);
-        DoubleVertex B = new UniformVertex(new int[]{1, 2}, -2, 1);
+        DoubleVertex A = new UniformVertex(new long[]{1, 2}, -2, 1);
+        DoubleVertex B = new UniformVertex(new long[]{1, 2}, -2, 1);
         B.observe(2);
         DoubleVertex D = A.plus(B);
 
@@ -36,19 +36,19 @@ public class BoundsCalculatorTest {
     @Test
     public void calculatesBoundsWhenNotAllAreSpecified() {
 
-        DoubleVertex A = new UniformVertex(new int[]{1, 2}, -2, 1);
-        DoubleVertex B = new UniformVertex(new int[]{1, 2}, -2, 1);
+        DoubleVertex A = new UniformVertex(new long[]{1, 2}, -2, 1);
+        DoubleVertex B = new UniformVertex(new long[]{1, 2}, -2, 1);
         B.observe(new double[]{2, 3});
-        DoubleVertex C = new GaussianVertex(new int[]{1, 2}, 0, 1);
+        DoubleVertex C = new GaussianVertex(new long[]{1, 2}, 0, 1);
         DoubleVertex D = A.plus(B);
         DoubleVertex E = C.plus(D);
-        DoubleVertex F = new GaussianVertex(new int[]{2, 2}, new ConcatenationVertex(0, E, D), 1);
+        DoubleVertex F = new GaussianVertex(new long[]{2, 2}, new ConcatenationVertex(0, E, D), 1);
 
         OptimizerBounds bounds = new OptimizerBounds();
         bounds.addBound(A, DoubleTensor.create(new double[]{-2, -1}), 1);
         bounds.addBound(F,
-            DoubleTensor.create(new double[]{-2, -1, -3, -4}, new int[]{2, 2}),
-            DoubleTensor.create(new double[]{2, 1, 3, 4}, new int[]{2, 2})
+            DoubleTensor.create(new double[]{-2, -1, -3, -4}, new long[]{2, 2}),
+            DoubleTensor.create(new double[]{2, 1, 3, 4}, new long[]{2, 2})
         );
 
         ImmutableList<DoubleVertex> latentVertices = ImmutableList.of(A, C, F);

@@ -15,7 +15,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives
 
 public class TakeVertex extends DoubleUnaryOpVertex {
 
-    private final int[] index;
+    private final long[] index;
 
     /**
      * A vertex that extracts a scalar at a given index
@@ -23,7 +23,7 @@ public class TakeVertex extends DoubleUnaryOpVertex {
      * @param inputVertex the input vertex to extract from
      * @param index       the index to extract at
      */
-    public TakeVertex(DoubleVertex inputVertex, int... index) {
+    public TakeVertex(DoubleVertex inputVertex, long... index) {
         super(Tensor.SCALAR_SHAPE, inputVertex);
         this.index = index;
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
@@ -43,7 +43,7 @@ public class TakeVertex extends DoubleUnaryOpVertex {
         for (Map.Entry<VertexId, DoubleTensor> entry : derivativeOfParentWithRespectToInputs.asMap().entrySet()) {
             DoubleTensor atIndexTensor = takeFromPartial(entry.getValue(), index);
             int desiredRank = atIndexTensor.getShape().length + newValue.getShape().length;
-            int[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
+            long[] paddedShape = TensorShape.shapeToDesiredRankByPrependingOnes(atIndexTensor.getShape(), desiredRank);
             atIndexTensor = atIndexTensor.reshape(paddedShape);
             partialsOf.put(entry.getKey(), atIndexTensor);
         }
@@ -51,12 +51,12 @@ public class TakeVertex extends DoubleUnaryOpVertex {
         return new PartialDerivatives(partialsOf);
     }
 
-    private DoubleTensor takeFromPartial(DoubleTensor from, int... indices) {
-        int[] fromShape = from.getShape();
-        int[] subFromShape = Arrays.copyOf(fromShape, indices.length);
-        int indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
-        int[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
-        int subShapeLength = (int) TensorShape.getLength(subFromShape);
+    private DoubleTensor takeFromPartial(DoubleTensor from, long... indices) {
+        long[] fromShape = from.getShape();
+        long[] subFromShape = Arrays.copyOf(fromShape, indices.length);
+        long indexToTakeFrom = TensorShape.getFlatIndex(subFromShape, TensorShape.getRowFirstStride(subFromShape), indices);
+        long[] takeShape = Arrays.copyOfRange(fromShape, indices.length, fromShape.length);
+        long subShapeLength = TensorShape.getLength(subFromShape);
 
         return from.reshape(subShapeLength, -1)
             .slice(0, indexToTakeFrom)
@@ -69,12 +69,12 @@ public class TakeVertex extends DoubleUnaryOpVertex {
 
         for (Map.Entry<VertexId, DoubleTensor> partialDerivative : derivativeOfOutputsWithRespectToSelf.asMap().entrySet()) {
             DoubleTensor partial = partialDerivative.getValue();
-            int[] newPartialShape = TensorShape.concat(
+            long[] newPartialShape = TensorShape.concat(
                 TensorShape.selectDimensions(0, partial.getRank() - getShape().length, partial.getShape()),
                 inputVertex.getShape()
             );
             DoubleTensor highRankZeros = DoubleTensor.zeros(newPartialShape);
-            int[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
+            long[] partialUpRankShape = TensorShape.shapeDesiredToRankByAppendingOnes(partial.getShape(), newPartialShape.length);
             DoubleTensor partialBroadcastToHighRank = highRankZeros.plus(partial.reshape(partialUpRankShape));
             DoubleTensor takeMask = DoubleTensor.zeros(inputVertex.getShape()).setValue(1., index);
             DoubleTensor highRankMask = partialBroadcastToHighRank.times(takeMask);

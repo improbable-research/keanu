@@ -12,10 +12,10 @@ public class DoubleVertexSamplesTest {
     @Test
     public void doesCalculateAverage() {
 
-        DoubleTensor a = DoubleTensor.create(new double[]{0, 16, 4}, new int[]{1, 3});
-        DoubleTensor b = DoubleTensor.create(new double[]{-4, -8, 4}, new int[]{1, 3});
-        DoubleTensor c = DoubleTensor.create(new double[]{8, -4, 12}, new int[]{1, 3});
-        DoubleTensor d = DoubleTensor.create(new double[]{4, 4, 8}, new int[]{1, 3});
+        DoubleTensor a = DoubleTensor.create(new double[]{0, 16, 4}, new long[]{1, 3});
+        DoubleTensor b = DoubleTensor.create(new double[]{-4, -8, 4}, new long[]{1, 3});
+        DoubleTensor c = DoubleTensor.create(new double[]{8, -4, 12}, new long[]{1, 3});
+        DoubleTensor d = DoubleTensor.create(new double[]{4, 4, 8}, new long[]{1, 3});
 
         DoubleVertexSamples samples = new DoubleVertexSamples(Arrays.asList(a, b, c, d));
 

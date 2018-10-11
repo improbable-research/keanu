@@ -33,7 +33,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param mu          the mu of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      * @param sigma       the sigma of the Gaussian with either the same tensorShape as specified for this vertex or a scalar
      */
-    public GaussianVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+    public GaussianVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -59,15 +59,15 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
         this(new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(int[] tensorShape, DoubleVertex mu, double sigma) {
+    public GaussianVertex(long[] tensorShape, DoubleVertex mu, double sigma) {
         this(tensorShape, mu, new ConstantDoubleVertex(sigma));
     }
 
-    public GaussianVertex(int[] tensorShape, double mu, DoubleVertex sigma) {
+    public GaussianVertex(long[] tensorShape, double mu, DoubleVertex sigma) {
         this(tensorShape, new ConstantDoubleVertex(mu), sigma);
     }
 
-    public GaussianVertex(int[] tensorShape, double mu, double sigma) {
+    public GaussianVertex(long[] tensorShape, double mu, double sigma) {
         this(tensorShape, new ConstantDoubleVertex(mu), new ConstantDoubleVertex(sigma));
     }
 

@@ -31,7 +31,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     public KDEVertex(List<Double> samples) {
         this(DoubleTensor.create(samples.stream()
             .mapToDouble(Double::doubleValue)
-            .toArray(), new int[]{samples.size(), 1}));
+            .toArray(), new long[]{samples.size(), 1}));
     }
 
     public KDEVertex(List<Double> samples, double bandwidth) {
@@ -41,7 +41,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     private DoubleTensor getDiffs(DoubleTensor x) {
-        DoubleTensor diffs = DoubleTensor.zeros(new int[]{samples.getShape()[0], x.getShape()[1]});
+        DoubleTensor diffs = DoubleTensor.zeros(new long[]{samples.getShape()[0], x.getShape()[1]});
         return diffs.plusInPlace(x).minusInPlace(samples).divInPlace(bandwidth);
     }
 
@@ -88,7 +88,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
         DoubleTensor value = Uniform.withParameters(
             DoubleTensor.scalar(0),
             DoubleTensor.scalar(samples.getLength())
-        ).sample(new int[]{1, nSamples}, random);
+        ).sample(new long[]{1, nSamples}, random);
 
         DoubleTensor index = value.floorInPlace();
         double[] shuffledSamples = new double[nSamples];
@@ -99,7 +99,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
         }
 
         DoubleTensor sampleMus = DoubleTensor.create(shuffledSamples);
-        return random.nextGaussian(new int[]{1, nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
+        return random.nextGaussian(new long[]{1, nSamples}).timesInPlace(bandwidth).plusInPlace(sampleMus);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class KDEVertex extends DoubleVertex implements ProbabilisticDouble {
         samples = sample(nSamples, random);
     }
 
-    public int[] getSampleShape() {
+    public long[] getSampleShape() {
         return samples.getShape();
     }
 }

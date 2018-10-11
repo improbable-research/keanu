@@ -5,16 +5,14 @@ import static junit.framework.TestCase.assertTrue;
 import lombok.Getter;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.rules.TemporaryFolder;
 
+import java.io.File;
 import java.io.IOException;
-import java.io.UncheckedIOException;
 import java.io.Writer;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -23,7 +21,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class FreeMarkerTemplateProcessorTest {
+public class TemplateProcessorTest {
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
@@ -40,7 +38,7 @@ public class FreeMarkerTemplateProcessorTest {
 
         assertFalse(Files.exists(path));
 
-        FreeMarkerTemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
+        TemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
@@ -51,35 +49,31 @@ public class FreeMarkerTemplateProcessorTest {
         testFolder.newFile(TEST_GENERATED_FILE);
         assertTrue(Files.exists(path));
 
-        FreeMarkerTemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
+        TemplateProcessor.createFileWriter(path.toAbsolutePath().toString());
         assertTrue(Files.exists(path));
     }
 
     @Test
     public void canCreateTemplate() {
-        FreeMarkerTemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
+        TemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
     }
 
 
     @Test
-    public void canProcessTemplate() {
+    public void canProcessTemplate() throws IOException {
         Path generatedFilePath = Paths.get(testFolder.getRoot().toString(), TEST_GENERATED_FILE);
+        Path expectedContentFilePath = new File(ClassLoader.getSystemResource("result.txt").getFile()).toPath();
 
-        URL expectedContentFileUrl = getClass().getClassLoader().getResource("result.txt");
-        assertNotNull(expectedContentFileUrl);
+        Writer writer = TemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
+        Template template = TemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
+        Map<String, Object> dataModel = buildTestDataModel();
 
-        Path expectedContentFilePath = Paths.get(expectedContentFileUrl.getPath());
-
-        Writer writer = FreeMarkerTemplateProcessor.createFileWriter(generatedFilePath.toAbsolutePath().toString());
-        Template template = FreeMarkerTemplateProcessor.getFileTemplate(TEST_TEMPLATE_FILE);
-        Map<String, Object> dataModel = buildDataModel();
-
-        FreeMarkerTemplateProcessor.processDataModel(dataModel, template, writer);
+        TemplateProcessor.processDataModel(dataModel, template, writer);
 
         assertFilesContainSameContent(generatedFilePath, expectedContentFilePath);
     }
 
-    private Map<String, Object> buildDataModel() {
+    private Map<String, Object> buildTestDataModel() {
         List<Product> products = Arrays.asList(new Product("shoes"), new Product("pants"));
         int expenses = 100;
         Map<String, Object> dataModel = new HashMap<>();
@@ -88,15 +82,11 @@ public class FreeMarkerTemplateProcessorTest {
         return dataModel;
     }
 
-    private void assertFilesContainSameContent(Path generatedFilePath, Path expectedContentFilePath) {
-        try {
-            byte[] generatedFileBytes = Files.readAllBytes(generatedFilePath);
-            byte[] expectedContentFileBytes = Files.readAllBytes(expectedContentFilePath);
+    private void assertFilesContainSameContent(Path generatedFilePath, Path expectedContentFilePath) throws IOException {
+        byte[] generatedFileBytes = Files.readAllBytes(generatedFilePath);
+        byte[] expectedContentFileBytes = Files.readAllBytes(expectedContentFilePath);
 
-            assertArrayEquals(generatedFileBytes, expectedContentFileBytes);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
+        assertArrayEquals(generatedFileBytes, expectedContentFileBytes);
     }
 
     public static class Product {

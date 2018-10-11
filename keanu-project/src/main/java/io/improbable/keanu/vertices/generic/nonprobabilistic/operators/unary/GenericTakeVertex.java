@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
 public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>,Tensor<T>> {
 
-    private final int[] index;
+    private final long[] index;
 
     /**
      * A vertex that extracts a scalar at a given index
@@ -15,7 +15,7 @@ public class GenericTakeVertex<T> extends UnaryOpVertex<Tensor<T>,Tensor<T>> {
      * @param inputVertex the input vertex
      * @param index       the index of extraction
      */
-    public GenericTakeVertex(Vertex<Tensor<T>> inputVertex, int... index) {
+    public GenericTakeVertex(Vertex<Tensor<T>> inputVertex, long... index) {
         super(inputVertex);
         TensorShapeValidation.checkIndexIsValid(inputVertex.getShape(), index);
         this.index = index;

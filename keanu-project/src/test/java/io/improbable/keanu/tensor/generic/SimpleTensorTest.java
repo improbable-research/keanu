@@ -23,7 +23,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[]{3, 3}
+            new long[]{3, 3}
         );
 
         assertEquals(Something.D, somethingTensor.getValue(1, 1));
@@ -38,7 +38,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[]{3, 3}
+            new long[]{3, 3}
         );
 
         assertEquals(Something.D, somethingTensor.getValue(1, 1));
@@ -57,12 +57,12 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[]{3, 3}
+            new long[]{3, 3}
         );
 
         Tensor<Something> reshapedSomething = somethingTensor.reshape(9, 1);
 
-        assertArrayEquals(new int[]{9, 1}, reshapedSomething.getShape());
+        assertArrayEquals(new long[]{9, 1}, reshapedSomething.getShape());
         assertArrayEquals(somethingTensor.asFlatArray(), reshapedSomething.asFlatArray());
     }
 
@@ -75,7 +75,7 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[]{3, 3}
+            new long[]{3, 3}
         );
 
         ConstantGenericVertex<Something> somethingVertex = new ConstantGenericVertex(somethingTensor);
@@ -94,15 +94,15 @@ public class SimpleTensorTest {
                 Something.C, Something.D, Something.B,
                 Something.D, Something.A, Something.C
             },
-            new int[]{3, 3}
+            new long[]{3, 3}
         );
 
         Tensor<Something> taddedSomethingRow = somethingTensor.slice(0, 1);
-        assertArrayEquals(new int[]{1, 3}, taddedSomethingRow.getShape());
+        assertArrayEquals(new long[]{1, 3}, taddedSomethingRow.getShape());
         assertArrayEquals(new Something[]{Something.C, Something.D, Something.B}, taddedSomethingRow.asFlatArray());
 
         Tensor<Something> taddedSomethingColumn = somethingTensor.slice(1, 1);
-        assertArrayEquals(new int[]{3, 1}, taddedSomethingColumn.getShape());
+        assertArrayEquals(new long[]{3, 1}, taddedSomethingColumn.getShape());
         assertArrayEquals(new Something[]{Something.B, Something.D, Something.A}, taddedSomethingColumn.asFlatArray());
     }
 
