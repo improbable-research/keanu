@@ -30,7 +30,7 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param xMin        the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
      * @param xMax        the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
-    public UniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
+    public UniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
@@ -63,15 +63,15 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax) {
+    public UniformVertex(long[] tensorShape, DoubleVertex xMin, double xMax) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax));
     }
 
-    public UniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax) {
+    public UniformVertex(long[] tensorShape, double xMin, DoubleVertex xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax);
     }
 
-    public UniformVertex(int[] tensorShape, double xMin, double xMax) {
+    public UniformVertex(long[] tensorShape, double xMin, double xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax));
     }
 

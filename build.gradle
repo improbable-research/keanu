@@ -1,17 +1,29 @@
-
 plugins {
     id 'com.palantir.git-version' version '0.11.0'
-}
-
-repositories {
-    mavenLocal()
-    mavenCentral()
+    id 'com.github.johnrengelman.shadow' version '2.0.2'
 }
 
 allprojects {
     version gitVersion()
+
+    apply plugin: "java"
+
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+
+    repositories {
+        mavenLocal()
+        mavenCentral()
+    }
+
+    group = "io.improbable"
 }
 
 dependencies {
+    compile project(":keanu-project")
+}
 
+shadowJar {
+    destinationDir = file("$rootDir/keanu-python/keanu")
+    archiveName = "keanu-python-all.jar"
 }

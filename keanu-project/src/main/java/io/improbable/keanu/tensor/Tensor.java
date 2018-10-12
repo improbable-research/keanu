@@ -3,7 +3,6 @@ package io.improbable.keanu.tensor;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
-import static org.apache.commons.math3.util.MathArrays.copyOf;
 
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +29,8 @@ public interface Tensor<T> {
             equality[i] = aArray[i].equals(bArray[i]);
         }
 
-        int[] shape = a.getShape();
-        return BooleanTensor.create(equality, copyOf(shape, shape.length));
+        long[] shape = a.getShape();
+        return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
     }
 
     static DoubleTensor scalar(Double value) {
@@ -62,7 +61,7 @@ public interface Tensor<T> {
         return GenericTensor.scalar(value);
     }
 
-    static <T> Tensor<T> placeHolder(int[] shape) {
+    static <T> Tensor<T> placeHolder(long[] shape) {
         return new GenericTensor<>(shape);
     }
 
@@ -94,26 +93,30 @@ public interface Tensor<T> {
         return GenericTensor.create(value, shape);
     }
 
-    int[] SCALAR_SHAPE = new int[]{1, 1};
-    int[] SCALAR_STRIDE = new int[]{1};
+    long[] SCALAR_SHAPE = new long[]{1, 1};
+    long[] SCALAR_STRIDE = new long[]{1};
 
     int getRank();
 
-    int[] getShape();
+    long[] getShape();
 
     long getLength();
 
     boolean isShapePlaceholder();
 
-    T getValue(int... index);
+    T getValue(long... index);
 
-    Tensor<T> setValue(T value, int... index);
+    default T getValue(int... index) {
+        return getValue(Arrays.stream(index).mapToLong(i -> i).toArray());
+    }
+
+    Tensor<T> setValue(T value, long... index);
 
     T scalar();
 
     Tensor<T> duplicate();
 
-    Tensor<T> slice(int dimension, int index);
+    Tensor<T> slice(int dimension, long index);
 
     double[] asFlatDoubleArray();
 
@@ -121,7 +124,7 @@ public interface Tensor<T> {
 
     T[] asFlatArray();
 
-    Tensor<T> reshape(int... newShape);
+    Tensor<T> reshape(long... newShape);
 
     FlattenedView<T> getFlattenedView();
 
@@ -167,12 +170,14 @@ public interface Tensor<T> {
         return hasSameShapeAs(that.getShape());
     }
 
-    default boolean hasSameShapeAs(int[] shape) {
+    default boolean hasSameShapeAs(long[] shape) {
         return Arrays.equals(this.getShape(), shape);
     }
 
     default BooleanTensor elementwiseEquals(Tensor that) {
         return elementwiseEquals(this, that);
     }
+
+    BooleanTensor elementwiseEquals(T value);
 
 }

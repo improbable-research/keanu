@@ -1,16 +1,16 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-
-import java.util.HashMap;
-import java.util.Map;
 
 public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
 
@@ -18,7 +18,8 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     private final Vertex<? extends DoubleTensor> thn;
     private final Vertex<? extends DoubleTensor> els;
 
-    public DoubleIfVertex(int[] shape,
+    @ExportVertexToPythonBindings
+    public DoubleIfVertex(long[] shape,
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
@@ -35,8 +36,21 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
-        return DualNumber.ifThenElse(predicate.getValue(), dualNumbers.get(thn), dualNumbers.get(els), getShape());
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
+
+        long[] ofShape = getShape();
+        PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.get(thn);
+        PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.get(els);
+        BooleanTensor predicateValue = predicate.getValue();
+
+        if (predicateValue.allTrue()) {
+            return thnPartial;
+        } else if (predicateValue.allFalse()) {
+            return elsPartial;
+        } else {
+            return thnPartial.multiplyAlongOfDimensions(predicateValue.toDoubleMask(), ofShape)
+                .add(elsPartial.multiplyAlongOfDimensions(predicateValue.not().toDoubleMask(), ofShape));
+        }
     }
 
     @Override

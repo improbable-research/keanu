@@ -27,7 +27,7 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
      * @param tensorShape the desired shape of the vertex
      * @param k           the number of degrees of freedom
      */
-    public ChiSquaredVertex(int[] tensorShape, IntegerVertex k) {
+    public ChiSquaredVertex(long[] tensorShape, IntegerVertex k) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, k.getShape());
 
         this.k = k;
@@ -35,7 +35,7 @@ public class ChiSquaredVertex extends DoubleVertex implements ProbabilisticDoubl
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public ChiSquaredVertex(int[] tensorShape, int k) {
+    public ChiSquaredVertex(long[] tensorShape, int k) {
         this(tensorShape, new ConstantIntegerVertex(k));
     }
 

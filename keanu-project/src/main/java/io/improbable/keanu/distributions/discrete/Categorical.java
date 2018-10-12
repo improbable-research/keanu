@@ -20,7 +20,7 @@ public class Categorical<N, T extends Tensor<N>> implements Distribution<T> {
         this.selectableValues = selectableValues;
     }
 
-    public T sample(int[] shape, KeanuRandom random) {
+    public T sample(long[] shape, KeanuRandom random) {
         DoubleTensor sumOfProbabilities = getSumOfProbabilities(shape);
         if (containsNonPositiveEntry(sumOfProbabilities)) {
             throw new IllegalArgumentException("Cannot sample from a zero probability setup.");

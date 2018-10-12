@@ -1,8 +1,9 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.L;
-import static io.improbable.keanu.distributions.dual.Diffs.S;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -11,7 +12,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Cauchy;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,7 +33,7 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param location    the location of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      * @param scale       the scale of the Cauchy with either the same tensorShape as specified for this vertex or a scalar
      */
-    public CauchyVertex(int[] tensorShape, DoubleVertex location, DoubleVertex scale) {
+    public CauchyVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
@@ -42,6 +43,7 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    @ExportVertexToPythonBindings
     public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
@@ -58,15 +60,15 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
         this(new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    public CauchyVertex(int[] tensorShape, DoubleVertex location, double scale) {
+    public CauchyVertex(long[] tensorShape, DoubleVertex location, double scale) {
         this(tensorShape, location, new ConstantDoubleVertex(scale));
     }
 
-    public CauchyVertex(int[] tensorShape, double location, DoubleVertex scale) {
+    public CauchyVertex(long[] tensorShape, double location, DoubleVertex scale) {
         this(tensorShape, new ConstantDoubleVertex(location), scale);
     }
 
-    public CauchyVertex(int[] tensorShape, double location, double scale) {
+    public CauchyVertex(long[] tensorShape, double location, double scale) {
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 

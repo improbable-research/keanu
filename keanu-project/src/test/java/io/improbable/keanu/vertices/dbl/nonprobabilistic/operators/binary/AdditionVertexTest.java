@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.*;
 
 import org.junit.Test;
@@ -24,8 +24,8 @@ public class AdditionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsAdded() {
-        calculatesDualNumberOfTwoScalars(
+    public void calculatesDerivativeOfTwoScalarsAdded() {
+        calculatesDerivativeOfTwoScalars(
             2.0,
             3.0,
             1.0,
@@ -45,8 +45,8 @@ public class AdditionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseAdded() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseAdded() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 2, 2),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 2, 2),
             DoubleTensor.eye(4).reshape(2, 2, 2, 2),
@@ -56,8 +56,8 @@ public class AdditionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarAdded() {
-        calculatesDualNumberOfAVectorAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarAdded() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.eye(4).reshape(1, 4, 1, 4),
@@ -67,8 +67,8 @@ public class AdditionVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorsAdded() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorsAdded() {
+        calculatesDerivativeOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.ones(1, 4, 1, 1),
@@ -79,10 +79,10 @@ public class AdditionVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex A = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
-        DoubleVertex B = new UniformVertex(new int[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex A = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
+        DoubleVertex B = new UniformVertex(new long[]{2, 2, 2}, -10.0, 10.0);
         DoubleVertex C = A.plus(B);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B), C, 1e-6, 1e-10);
     }
 }

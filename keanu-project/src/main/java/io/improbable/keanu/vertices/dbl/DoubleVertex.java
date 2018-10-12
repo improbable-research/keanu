@@ -18,9 +18,16 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compa
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex;
 import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.NotEqualsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.*;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
@@ -33,6 +40,7 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVert
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ReshapeVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
@@ -45,6 +53,12 @@ import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVert
 
 public abstract class DoubleVertex extends Vertex<DoubleTensor> implements DoubleOperators<DoubleVertex>, Differentiable {
 
+    /**
+     * @param dimension dimension to concat along. Negative dimension indexing is not supported.
+     * @param toConcat  array of things to concat. Must match in all dimensions except for the provided
+     *                  dimension
+     * @return a vertex that represents the concatenation of the toConcat
+     */
     public static DoubleVertex concat(int dimension, DoubleVertex... toConcat) {
         return new ConcatenationVertex(dimension, toConcat);
     }
@@ -75,6 +89,10 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
 
     public DoubleVertex matrixInverse() {
         return new MatrixInverseVertex(this);
+    }
+
+    public DoubleVertex matrixDeterminant() {
+        return new MatrixDeterminantVertex(this);
     }
 
     public DoubleVertex divideBy(DoubleVertex that) {
@@ -173,22 +191,37 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new ArcTan2Vertex(this, that);
     }
 
+    /**
+     * Sum over all dimensions. This will always result in a scalar.
+     *
+     * @return a vertex representing the summation result
+     */
     public DoubleVertex sum() {
         return new SumVertex(this);
     }
 
-    public DoubleVertex reshape(int... proposedShape) {
+    /**
+     * Sum over specified dimensions.
+     *
+     * @param sumOverDimensions dimensions to sum over. Negative dimension indexing is not supported
+     * @return a vertex representing the summation result
+     */
+    public DoubleVertex sum(int... sumOverDimensions) {
+        return new SumVertex(this, sumOverDimensions);
+    }
+
+    public DoubleVertex reshape(long... proposedShape) {
         return new ReshapeVertex(this, proposedShape);
     }
 
-    public DoubleVertex lambda(int[] outputShape, Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
+    public DoubleVertex lambda(long[] outputShape, Function<DoubleTensor, DoubleTensor> op,
+                               Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(outputShape, this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
     public DoubleVertex lambda(Function<DoubleTensor, DoubleTensor> op,
-                               Function<Map<Vertex, DualNumber>, DualNumber> forwardModeAutoDiffLambda,
+                               Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
         return new DoubleUnaryOpLambda<>(this, op, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
@@ -243,7 +276,7 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
         return new LessThanOrEqualVertex<>(this, rhs);
     }
 
-    public DoubleVertex take(int... index) {
+    public DoubleVertex take(long... index) {
         return new TakeVertex(this, index);
     }
 
@@ -280,11 +313,11 @@ public abstract class DoubleVertex extends Vertex<DoubleTensor> implements Doubl
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
-            return DualNumber.createConstant(getValue());
+            return PartialDerivatives.OF_CONSTANT;
         } else {
-            return DualNumber.createWithRespectToSelf(getId(), getValue());
+            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
         }
     }
 

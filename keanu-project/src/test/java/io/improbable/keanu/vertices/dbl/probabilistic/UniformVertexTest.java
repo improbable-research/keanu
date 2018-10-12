@@ -27,7 +27,7 @@ public class UniformVertexTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        UniformVertex testUniformVertex = new UniformVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformVertex testUniformVertex = new UniformVertex(new long[]{1, N}, lowerBound, upperBound);
         samples.addAll(testUniformVertex.sample(random).asFlatList());
     }
 
@@ -47,7 +47,7 @@ public class UniformVertexTest {
 
     @Test
     public void canUseFullDoubleRange() {
-        UniformVertex testUniformVertex = new UniformVertex(new int[]{1, 100}, Double.MIN_VALUE, Double.MAX_VALUE);
+        UniformVertex testUniformVertex = new UniformVertex(new long[]{1, 100}, Double.MIN_VALUE, Double.MAX_VALUE);
         DoubleTensor sample = testUniformVertex.sample(random);
 
         Set<Double> uniqueValues = new HashSet<>(sample.asFlatList());
@@ -57,19 +57,19 @@ public class UniformVertexTest {
 
     @Test
     public void logProbUpperBoundIsNegativeInfinity() {
-        UniformVertex testUniformVertex = new UniformVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformVertex testUniformVertex = new UniformVertex(new long[]{1, N}, lowerBound, upperBound);
         assertEquals(testUniformVertex.logProb(Nd4jDoubleTensor.scalar(upperBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 
     @Test
     public void logProbLowerBoundIsNotNegativeInfinity() {
-        UniformVertex testUniformVertex = new UniformVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformVertex testUniformVertex = new UniformVertex(new long[]{1, N}, lowerBound, upperBound);
         assertNotEquals(testUniformVertex.logProb(Nd4jDoubleTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 
     @Test
     public void uniformSampleMethodMatchesLogProbMethod() {
-        UniformVertex testUniformVertex = new UniformVertex(new int[] {1, N}, ConstantVertex.of(lowerBound), ConstantVertex.of(upperBound));
+        UniformVertex testUniformVertex = new UniformVertex(new long[] {1, N}, ConstantVertex.of(lowerBound), ConstantVertex.of(upperBound));
         ProbabilisticDoubleTensorContract.sampleMethodMatchesLogProbMethod(testUniformVertex, lowerBound, upperBound - 1, 0.5, 1e-2, random);
     }
 }

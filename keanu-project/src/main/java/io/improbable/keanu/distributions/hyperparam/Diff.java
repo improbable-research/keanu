@@ -1,4 +1,4 @@
-package io.improbable.keanu.distributions.dual;
+package io.improbable.keanu.distributions.hyperparam;
 
 
 import java.util.Objects;

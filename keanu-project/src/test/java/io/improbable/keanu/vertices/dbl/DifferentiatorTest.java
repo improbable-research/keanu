@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import org.junit.Test;
@@ -26,7 +26,7 @@ public class DifferentiatorTest {
         DoubleVertex B = new GaussianVertex(0, 1);
         DoubleVertex C = A.times(B);
 
-        PartialDerivatives dC = C.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dC = C.getDerivativeWrtLatents();
 
         DoubleTensor dCdA = dC.withRespectTo(A);
         DoubleTensor dCdB = dC.withRespectTo(B);
@@ -75,7 +75,7 @@ public class DifferentiatorTest {
     @Test
     public void reverseAutoDiffMatchesForwardWithSingleOutputWithRespectToMany() {
 
-        int[] shape = new int[]{2, 2};
+        long[] shape = new long[]{2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
         A.setValue(DoubleTensor.linspace(0.1, 2, 4).reshape(shape));
         DoubleVertex B = new GaussianVertex(shape, 0, 1);
@@ -88,7 +88,7 @@ public class DifferentiatorTest {
         DoubleVertex H = G.plus(F).sum();
 
         PartialDerivatives dHReverse = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));
-        PartialDerivatives dHForward = H.getDualNumber().getPartialDerivatives();
+        PartialDerivatives dHForward = H.getDerivativeWrtLatents();
 
         DoubleTensor dHdAReverse = dHReverse.withRespectTo(A);
         DoubleTensor dHdBReverse = dHReverse.withRespectTo(B);
@@ -103,7 +103,7 @@ public class DifferentiatorTest {
     @Test
     public void reverseAutoDiffOfRank3MatchesForwardWithSingleOutputWithRespectToMany() {
 
-        int[] shape = new int[]{2, 2, 2};
+        long[] shape = new long[]{2, 2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
         A.setValue(DoubleTensor.linspace(0.1, 2, (int) TensorShape.getLength(shape)).reshape(shape));
         DoubleVertex B = new GaussianVertex(shape, 0, 1);
@@ -119,23 +119,23 @@ public class DifferentiatorTest {
         DoubleVertex F = D.plus(B).exp();
         DoubleVertex H = G.plus(F).sum().times(A).sum().times(C);
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3,  true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(A, B, C), H, 0.001, 1e-3);
     }
 
     @Test
     public void canReverseAutoDiffOfMultiplicationLogSinAndSumWithSingleConditionalOutputWithRespectToMany() {
 
-        DoubleVertex A = new GaussianVertex(new int[]{2, 2}, 0, 1);
-        A.setValue(DoubleTensor.create(3.0, new int[]{2, 2}));
-        DoubleVertex B = new GaussianVertex(new int[]{2, 2}, 0, 1);
-        B.setValue(DoubleTensor.create(5.0, new int[]{2, 2}));
+        DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
+        A.setValue(DoubleTensor.create(3.0, new long[]{2, 2}));
+        DoubleVertex B = new GaussianVertex(new long[]{2, 2}, 0, 1);
+        B.setValue(DoubleTensor.create(5.0, new long[]{2, 2}));
         DoubleVertex D = A.times(B);
         DoubleVertex C = A.sin();
         DoubleVertex E = C.times(D);
         DoubleVertex G = E.log();
         DoubleVertex F = D.plus(B);
 
-        BoolVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new int[]{2, 2}));
+        BoolVertex predicate = ConstantVertex.of(BooleanTensor.create(new boolean[]{true, false, true, false}, new long[]{2, 2}));
         DoubleVertex H = If.isTrue(predicate).then(G).orElse(F);
 
         PartialDerivatives dH = Differentiator.reverseModeAutoDiff(H, ImmutableSet.of(A, B));

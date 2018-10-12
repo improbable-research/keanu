@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.toDiagonalArray;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfMatrixElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDualNumberOfScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfMatrixElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.calculatesDerivativeOfScalar;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOn2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.UnaryOperationTestHelpers.operatesOnScalarVertexValue;
 
@@ -26,8 +26,8 @@ public class ArcTanVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsAtan() {
-        calculatesDualNumberOfScalar(
+    public void calculatesDerivativeOfTwoScalarsAtan() {
+        calculatesDerivativeOfScalar(
             0.5,
             1.0 / (1.0 + 0.5 * 0.5),
             DoubleVertex::atan
@@ -44,8 +44,8 @@ public class ArcTanVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseAtan() {
-        calculatesDualNumberOfMatrixElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseAtan() {
+        calculatesDerivativeOfMatrixElementWiseOperator(
             new double[]{0.1, 0.2, 0.3, 0.4},
             toDiagonalArray(new double[]{
                 1.0 / (1.0 + 0.1 * 0.1),
@@ -59,10 +59,10 @@ public class ArcTanVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{2, 2, 2}, -2.0, 2.0);
+        DoubleVertex inputVertex = new UniformVertex(new long[]{2, 2, 2}, -2.0, 2.0);
         DoubleVertex outputVertex = inputVertex.times(2).atan();
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 0.001, 1e-4);
     }
 
 }

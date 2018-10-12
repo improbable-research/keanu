@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 
@@ -28,15 +27,15 @@ public class DifferenceVertex extends DoubleBinaryOpVertex {
     }
 
     @Override
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+        return dLeftWrtInputs.subtract(dRightWrtInputs, getShape());
+    }
+
+    @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
         partials.put(left, derivativeOfOutputsWithRespectToSelf);
         partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(-1.0));
         return partials;
-    }
-
-    @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.minus(r);
     }
 }

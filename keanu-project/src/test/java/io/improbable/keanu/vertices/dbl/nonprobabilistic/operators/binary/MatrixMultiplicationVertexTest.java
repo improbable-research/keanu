@@ -1,6 +1,6 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesGradient;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
@@ -14,7 +14,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 
@@ -45,8 +44,8 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex c = a.matrixMultiply(b);
 
         //of c wrt a,b
-        DoubleTensor dCda = c.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dCdb = c.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dCda = c.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dCdb = c.getDerivativeWrtLatents().withRespectTo(b);
 
         PartialDerivatives dCdxReverse = Differentiator.reverseModeAutoDiff(c, new HashSet<>(Arrays.asList(a, b)));
         DoubleTensor dCdaReverse = dCdxReverse.withRespectTo(a);
@@ -61,7 +60,7 @@ public class MatrixMultiplicationVertexTest {
             5, 7,
             0, 0,
             6, 8
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         DoubleTensor expecteddCdb = DoubleTensor.create(new double[]{
             1, 0,
@@ -72,7 +71,7 @@ public class MatrixMultiplicationVertexTest {
             4, 0,
             0, 3,
             0, 4
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         //of d wrt a,b
         assertEquals(expecteddCda, dCda);
@@ -82,8 +81,8 @@ public class MatrixMultiplicationVertexTest {
 
         DoubleVertex d = b.matrixMultiply(a);
 
-        DoubleTensor dDda = d.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dDdb = d.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dDda = d.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dDdb = d.getDerivativeWrtLatents().withRespectTo(b);
 
         PartialDerivatives dDdxReverse = Differentiator.reverseModeAutoDiff(d, new HashSet<>(Arrays.asList(a, b)));
         DoubleTensor dDdaReverse = dDdxReverse.withRespectTo(a);
@@ -98,7 +97,7 @@ public class MatrixMultiplicationVertexTest {
             8, 0,
             0, 7,
             0, 8
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         DoubleTensor expecteddDdb = DoubleTensor.create(new double[]{
             1, 3,
@@ -109,7 +108,7 @@ public class MatrixMultiplicationVertexTest {
             1, 3,
             0, 0,
             2, 4
-        }, new int[]{2, 2, 2, 2});
+        }, new long[]{2, 2, 2, 2});
 
         assertEquals(expecteddDda, dDda);
         assertEquals(expecteddDdb, dDdb);
@@ -119,8 +118,8 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex e = c.plus(d);
 
         //of e wrt a, b
-        DoubleTensor dEda = e.getDualNumber().getPartialDerivatives().withRespectTo(a);
-        DoubleTensor dEdb = e.getDualNumber().getPartialDerivatives().withRespectTo(b);
+        DoubleTensor dEda = e.getDerivativeWrtLatents().withRespectTo(a);
+        DoubleTensor dEdb = e.getDerivativeWrtLatents().withRespectTo(b);
 
         PartialDerivatives dEdxReverse = Differentiator.reverseModeAutoDiff(e, new HashSet<>(Arrays.asList(a, b)));
         DoubleTensor dEdaReverse = dEdxReverse.withRespectTo(a);
@@ -145,18 +144,18 @@ public class MatrixMultiplicationVertexTest {
         alpha.setValue(DoubleTensor.create(new double[]{1, 3, 5, 2, 4, 6}, 2, 3));
 
         DoubleVertex N = m.matrixMultiply(alpha);
-        DualNumber NDual = N.getDualNumber();
+        PartialDerivatives NDiff = N.getDerivativeWrtLatents();
 
         PartialDerivatives reverseModePartialDiff = Differentiator.reverseModeAutoDiff(N, new HashSet<>(Arrays.asList(m, alpha)));
 
-        DoubleTensor dNdmForward = NDual.getPartialDerivatives().withRespectTo(m);
+        DoubleTensor dNdmForward = NDiff.withRespectTo(m);
         DoubleTensor dNdmReverse = reverseModePartialDiff.withRespectTo(m);
         DoubleTensor expectedDNdm = DoubleTensor.create(new double[]{1, 2, 3, 4, 5, 6}, 1, 3, 1, 2);
 
         assertEquals(expectedDNdm, dNdmForward);
         assertEquals(expectedDNdm, dNdmReverse);
 
-        DoubleTensor dNdAlphaForward = NDual.getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor dNdAlphaForward = NDiff.withRespectTo(alpha);
         DoubleTensor dNdAlphaReverse = reverseModePartialDiff.withRespectTo(alpha);
         DoubleTensor expectedDNdAlpha = DoubleTensor.create(new double[]{
             1, 0, 0,
@@ -194,10 +193,10 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex N = m.matrixMultiply(alpha);
         DoubleVertex y = N.matrixMultiply(beta);
 
-        DualNumber yDual = y.getDualNumber();
+        PartialDerivatives yDiff = y.getDerivativeWrtLatents();
         PartialDerivatives dydx = Differentiator.reverseModeAutoDiff(y, m, alpha, beta);
 
-        DoubleTensor dydmForward = yDual.getPartialDerivatives().withRespectTo(m);
+        DoubleTensor dydmForward = yDiff.withRespectTo(m);
         DoubleTensor dydmReverse = dydx.withRespectTo(m);
         DoubleTensor expectedDydm = DoubleTensor.create(new double[]{
             23, 34, 31, 46
@@ -206,7 +205,7 @@ public class MatrixMultiplicationVertexTest {
         assertEquals(expectedDydm, dydmForward);
         assertEquals(expectedDydm, dydmReverse);
 
-        DoubleTensor dydalphaForward = yDual.getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor dydalphaForward = yDiff.withRespectTo(alpha);
         DoubleTensor dydalphaReverse = dydx.withRespectTo(alpha);
         DoubleTensor expectedDydalpha = DoubleTensor.create(new double[]{
             5, 6,
@@ -218,7 +217,7 @@ public class MatrixMultiplicationVertexTest {
         assertEquals(expectedDydalpha, dydalphaForward);
         assertEquals(expectedDydalpha, dydalphaReverse);
 
-        DoubleTensor dydbetaForward = yDual.getPartialDerivatives().withRespectTo(beta);
+        DoubleTensor dydbetaForward = yDiff.withRespectTo(beta);
         DoubleTensor dydbetaReverse = dydx.withRespectTo(beta);
         DoubleTensor expectedDydbeta = DoubleTensor.create(new double[]{
             5, 0,
@@ -257,10 +256,10 @@ public class MatrixMultiplicationVertexTest {
         DoubleVertex L = beta.matrixMultiply(alpha);
         //y = L x N = (beta x alpha) x (alpha x m)
         DoubleVertex y = L.matrixMultiply(N);
-        DualNumber yDual = y.getDualNumber();
+        PartialDerivatives yDiff = y.getDerivativeWrtLatents();
         PartialDerivatives dydx = Differentiator.reverseModeAutoDiff(y, new HashSet<>(Arrays.asList(alpha)));
 
-        DoubleTensor dydalphaForward = yDual.getPartialDerivatives().withRespectTo(alpha);
+        DoubleTensor dydalphaForward = yDiff.withRespectTo(alpha);
         DoubleTensor dydalphaReverse = dydx.withRespectTo(alpha);
         DoubleTensor expectedDydalpha = DoubleTensor.create(new double[]{
             56, 92,
@@ -277,13 +276,13 @@ public class MatrixMultiplicationVertexTest {
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputA = new UniformVertex(new int[]{2, 5}, -10.0, 10.0);
-        DoubleVertex inputB = new UniformVertex(new int[]{5, 4}, -10.0, 10.0);
+        DoubleVertex inputA = new UniformVertex(new long[]{2, 5}, -10.0, 10.0);
+        DoubleVertex inputB = new UniformVertex(new long[]{5, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputA.matrixMultiply(inputB);
         final double INCREMENT = 10;
         final double DELTA = 1e-10;
 
-        finiteDifferenceMatchesGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA, true);
+        finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputA, inputB), outputVertex, INCREMENT, DELTA);
     }
 
 }

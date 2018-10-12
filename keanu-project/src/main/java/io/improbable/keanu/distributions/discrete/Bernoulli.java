@@ -18,7 +18,7 @@ public class Bernoulli implements Distribution<BooleanTensor> {
     }
 
     @Override
-    public BooleanTensor sample(int[] shape, KeanuRandom random) {
+    public BooleanTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor uniforms = random.nextDouble(shape);
         return uniforms.lessThan(probTrue);
     }

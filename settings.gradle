@@ -1,3 +1,4 @@
 include 'keanu-project',
+        'codegen',
         'keanu-docs:code',
         'keanu-examples:coalMiningDisasters'

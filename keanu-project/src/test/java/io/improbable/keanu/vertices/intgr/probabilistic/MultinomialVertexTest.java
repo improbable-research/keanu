@@ -19,6 +19,7 @@ import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import java.util.Map;
 
 import org.junit.Test;
+import org.nd4j.linalg.exception.ND4JIllegalStateException;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
@@ -58,7 +59,7 @@ public class MultinomialVertexTest {
         }
     }
 
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = ND4JIllegalStateException.class)
     public void itThrowsIfTheParametersAreDifferentShapes() {
         IntegerTensor n = IntegerTensor.create(100, 200);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, 0.3, 0.4).transpose();
@@ -76,7 +77,7 @@ public class MultinomialVertexTest {
         },
             4, 2);
         Multinomial multinomial = Multinomial.withParameters(n, p);
-        multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
+        multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -212,7 +213,7 @@ public class MultinomialVertexTest {
         int n = 100;
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(IntegerTensor.scalar(n), p);
-        IntegerTensor samples = multinomial.sample(new int[]{2, 2}, KeanuRandom.getDefaultRandom());
+        IntegerTensor samples = multinomial.sample(new long[]{2, 2}, KeanuRandom.getDefaultRandom());
         assertThat(samples, hasShape(4, 2, 2));
         assertThat(samples, allValues(both(greaterThan(-1)).and(lessThan(n))));
     }
@@ -224,7 +225,7 @@ public class MultinomialVertexTest {
         IntegerTensor n = IntegerTensor.scalar(100);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
-        IntegerTensor samples = multinomial.sample(new int[]{1, 1}, mockRandomAlwaysZero);
+        IntegerTensor samples = multinomial.sample(new long[]{1, 1}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(100, 0, 0, 0));
     }
 
@@ -235,7 +236,7 @@ public class MultinomialVertexTest {
         IntegerTensor n = IntegerTensor.scalar(100);
         DoubleTensor p = DoubleTensor.create(0.1, 0.2, .3, 0.4).transpose();
         Multinomial multinomial = Multinomial.withParameters(n, p);
-        IntegerTensor samples = multinomial.sample(new int[]{1, 1}, mockRandomAlwaysZero);
+        IntegerTensor samples = multinomial.sample(new long[]{1, 1}, mockRandomAlwaysZero);
         assertThat(samples, hasValue(0, 0, 0, 100));
     }
 
@@ -283,7 +284,7 @@ public class MultinomialVertexTest {
         IntegerTensor n = IntegerTensor.scalar(500);
 
         MultinomialVertex vertex = new MultinomialVertex(
-            new int[]{1, N},
+            new long[]{1, N},
             ConstantVertex.of(n),
             ConstantVertex.of(p)
         );

@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorAndScalar;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoScalars;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAScalarAndVector;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAVectorAndScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoMatricesElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoScalars;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwoScalarVertexValues;
 
@@ -25,13 +25,13 @@ public class ArcTan2VertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsTan2() {
+    public void calculatesDerivativeOfTwoScalarsTan2() {
         double x = 0.5;
         double y = Math.sqrt(3) / 2.0;
         double wrtX = -y / (Math.pow(y, 2) + Math.pow(x, 2));
         double wrtY = x / (Math.pow(y, 2) + Math.pow(x, 2));
 
-        calculatesDualNumberOfTwoScalars(
+        calculatesDerivativeOfTwoScalars(
             x,
             y,
             wrtX,
@@ -51,8 +51,8 @@ public class ArcTan2VertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseTan2() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseTan2() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
             DoubleTensor.create(new double[]{-2. / (1 + 4), -3. / (4 + 9), -4. / (9. + 16), -5. / (16 + 25)}).diag().reshape(1, 4, 1, 4),
@@ -62,8 +62,8 @@ public class ArcTan2VertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarTan2() {
-        calculatesDualNumberOfAVectorAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarTan2() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.create(new double[]{-2. / (1. + 4.), -2. / (4. + 4.), -2. / (9. + 4.), -2. / (16. + 4.)}).diag().reshape(1, 4, 1, 4),
@@ -73,8 +73,8 @@ public class ArcTan2VertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorsTan2() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorsTan2() {
+        calculatesDerivativeOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.create(new double[]{-1. / (4. + 1.), -2. / (4. + 4.), -3. / (4. + 9.), -4. / (4. + 16.)}).reshape(1, 4, 1, 1),

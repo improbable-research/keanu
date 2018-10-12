@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorAndScalar;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoScalars;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAScalarAndVector;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAVectorAndScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoMatricesElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoScalars;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwoScalarVertexValues;
 
@@ -20,8 +20,8 @@ public class PowerVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsPower() {
-        calculatesDualNumberOfTwoScalars(2.0, 3.0, 3. * 4., Math.log(2.) * 8., DoubleVertex::pow);
+    public void calculatesDerivativeOfTwoScalarsPower() {
+        calculatesDerivativeOfTwoScalars(2.0, 3.0, 3. * 4., Math.log(2.) * 8., DoubleVertex::pow);
     }
 
     @Test
@@ -35,8 +35,8 @@ public class PowerVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWisePower() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWisePower() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0 * 4, 4.0 * 27, 5.0 * 256}).diag().reshape(1, 4, 1, 4),
@@ -46,8 +46,8 @@ public class PowerVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarPower() {
-        calculatesDualNumberOfAVectorAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarPower() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             3,
             DoubleTensor.create(new double[]{3.0, 3.0 * 4., 3.0 * 9, 3.0 * 16}).diag().reshape(1, 4, 1, 4),
@@ -57,8 +57,8 @@ public class PowerVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorPower() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorPower() {
+        calculatesDerivativeOfAScalarAndVector(
             3,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.create(new double[]{1., 2.0 * 3, 3.0 * 9., 4.0 * 27}).reshape(1, 4, 1, 1),
