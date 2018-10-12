@@ -11,6 +11,7 @@ import org.junit.Test;
 
 import com.google.common.collect.ImmutableList;
 
+import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -31,7 +32,7 @@ public class LogProbGradientCalculatorTest {
         Map<VertexId, DoubleTensor> gradient = calculator.getJointLogProbGradientWrtLatents();
         DoubleTensor dALogProbWrtAValue = gradient.get(A.getId());
 
-        Gaussian distribution = Gaussian.withParameters(ConstantVertex.of(0.5), ConstantVertex.of(0.0), ConstantVertex.of(1.0));
+        ContinuousDistribution distribution = Gaussian.withParameters(DoubleTensor.ZERO_SCALAR, DoubleTensor.ONE_SCALAR);
         DoubleTensor expected = distribution.dLogProb(DoubleTensor.scalar(0.5)).get(Diffs.X).getValue();
 
         assertThat(dALogProbWrtAValue, equalTo(expected));

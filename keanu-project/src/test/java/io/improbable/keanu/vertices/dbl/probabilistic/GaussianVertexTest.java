@@ -1,7 +1,5 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 import static io.improbable.keanu.vertices.dbl.probabilistic.ProbabilisticDoubleTensorContract.moveAlongDistributionAndTestGradientOnARangeOfHyperParameterValues;
@@ -19,7 +17,6 @@ import io.improbable.keanu.distributions.gradient.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -51,25 +48,6 @@ public class GaussianVertexTest {
         double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
         GaussianVertex tensorGaussianVertex = new GaussianVertex(0, 1);
         ProbabilisticDoubleTensorContract.matchesKnownLogDensityOfVector(tensorGaussianVertex, new double[]{0.25, -0.75}, expectedLogDensity);
-    }
-
-    @Test
-    public void matchesKnownLogDensityOfVectorForGraph() {
-
-        NormalDistribution distribution = new NormalDistribution(0.0, 1.0);
-        double expectedLogDensity = distribution.logDensity(0.25) + distribution.logDensity(-0.75);
-
-        DoubleVertex mu = ConstantVertex.of(0.0);
-        DoubleVertex sigma = ConstantVertex.of(1.0);
-        GaussianVertex tensorGaussianVertex = new GaussianVertex(mu, sigma);
-
-        LogProbGraph logProbGraph = tensorGaussianVertex.logProbGraph();
-        logProbGraph.getInput(mu).setValue(DoubleTensor.scalar(0.0));
-        logProbGraph.getInput(sigma).setValue(DoubleTensor.scalar(1.0));
-        logProbGraph.getInput(tensorGaussianVertex).setValue(DoubleTensor.create(0.25, -0.75));
-        double logProb = logProbGraph.getLogProbOutput().eval().scalar();
-
-        assertThat(logProb, equalTo(expectedLogDensity));
     }
 
     @Test

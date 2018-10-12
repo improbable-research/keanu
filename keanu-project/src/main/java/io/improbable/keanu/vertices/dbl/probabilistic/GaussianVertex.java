@@ -13,7 +13,6 @@ import java.util.Set;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -24,7 +23,6 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
-    private final Gaussian distribution;
 
     /**
      * One mu or sigma or both that match a proposed tensor shape of Gaussian
@@ -41,7 +39,6 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
         this.mu = mu;
         this.sigma = sigma;
-        distribution = Gaussian.withParameters(this, mu, sigma);
         setParents(mu, sigma);
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
@@ -84,16 +81,18 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
     @Override
     public double logProb(DoubleTensor value) {
-        return distribution.logProb(value).sum();
-    }
 
-    public LogProbGraph logProbGraph() {
-        return distribution.logProbGraph();
+        DoubleTensor muValues = mu.getValue();
+        DoubleTensor sigmaValues = sigma.getValue();
+
+        DoubleTensor logPdfs = Gaussian.withParameters(muValues, sigmaValues).logProb(value);
+
+        return logPdfs.sum();
     }
 
     @Override
     public Map<Vertex, DoubleTensor> dLogProb(DoubleTensor value, Set<? extends Vertex> withRespectTo) {
-        Diffs dlnP = distribution.dLogProb(value);
+        Diffs dlnP = Gaussian.withParameters(mu.getValue(), sigma.getValue()).dLogProb(value);
 
         Map<Vertex, DoubleTensor> dLogProbWrtParameters = new HashMap<>();
 
@@ -114,7 +113,7 @@ public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble 
 
     @Override
     public DoubleTensor sample(KeanuRandom random) {
-        return distribution.sample(getShape(), random);
+        return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(getShape(), random);
     }
 
     @Override

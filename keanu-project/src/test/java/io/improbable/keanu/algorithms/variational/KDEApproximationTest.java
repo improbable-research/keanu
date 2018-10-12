@@ -15,7 +15,6 @@ import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -63,9 +62,8 @@ public class KDEApproximationTest {
 
         DoubleTensor x = DoubleTensor.linspace(-3., 3., 100);
         DoubleTensor gaussianLogPdf = Gaussian.withParameters(
-            ConstantVertex.of(x),
-            ConstantVertex.of(mu),
-            ConstantVertex.of(sigma)
+            DoubleTensor.scalar(mu),
+            DoubleTensor.scalar(sigma)
         ).logProb(x);
 
         DoubleTensor expectedPdf = DoubleTensor.create(Math.E, x.getShape()).pow(gaussianLogPdf);
@@ -86,9 +84,8 @@ public class KDEApproximationTest {
 
         DoubleTensor xTensor = DoubleTensor.linspace(-1. + mu, 1. + mu, 10);
         Diffs diffLog = Gaussian.withParameters(
-            ConstantVertex.of(xTensor),
-            ConstantVertex.of(mu),
-            ConstantVertex.of(sigma)
+            DoubleTensor.scalar(mu),
+            DoubleTensor.scalar(sigma)
         ).dLogProb(xTensor);
 
         DoubleTensor approximateDerivative = KDE.dLogPdf(xTensor, KDE).get(KDE);
