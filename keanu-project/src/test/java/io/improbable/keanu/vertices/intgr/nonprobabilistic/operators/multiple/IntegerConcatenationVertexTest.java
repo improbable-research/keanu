@@ -17,8 +17,8 @@ public class IntegerConcatenationVertexTest {
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, a, b);
         IntegerConcatenationVertex concatOne = new IntegerConcatenationVertex(1, a, b, c);
 
-        Assert.assertArrayEquals(new int[]{2, 3}, concatZero.getShape());
-        Assert.assertArrayEquals(new int[]{1, 9}, concatOne.getShape());
+        Assert.assertArrayEquals(new long[]{2, 3}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{1, 9}, concatOne.getShape());
 
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6}, concatZero.getValue().asFlatDoubleArray(), 0.001);
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatOne.getValue().asFlatDoubleArray(), 0.001);
@@ -32,7 +32,7 @@ public class IntegerConcatenationVertexTest {
 
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{1, 9}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{1, 9}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 5, 6, 7, 8, 9}, concatZero.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -43,7 +43,7 @@ public class IntegerConcatenationVertexTest {
 
         IntegerConcatenationVertex concat = new IntegerConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -54,7 +54,7 @@ public class IntegerConcatenationVertexTest {
 
         IntegerConcatenationVertex concat = new IntegerConcatenationVertex(1, a, b);
 
-        Assert.assertArrayEquals(new int[]{1, 4}, concat.getShape());
+        Assert.assertArrayEquals(new long[]{1, 4}, concat.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, concat.getValue().asFlatDoubleArray(), 0.001);
     }
 
@@ -68,28 +68,28 @@ public class IntegerConcatenationVertexTest {
 
     @Test
     public void canConcatMatricesOfSameSize() {
-        IntegerVertex m = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2}));
-        IntegerVertex a = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{10, 15, 20, 25}, new int[]{2, 2}));
+        IntegerVertex m = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2}));
+        IntegerVertex a = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{10, 15, 20, 25}, new long[]{2, 2}));
 
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, m, a);
 
-        Assert.assertArrayEquals(new int[]{4, 2}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{4, 2}, concatZero.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4, 10, 15, 20, 25}, concatZero.getValue().asFlatDoubleArray(), 0.001);
 
         IntegerConcatenationVertex concatOne = new IntegerConcatenationVertex(1, m, a);
 
-        Assert.assertArrayEquals(new int[]{2, 4}, concatOne.getShape());
+        Assert.assertArrayEquals(new long[]{2, 4}, concatOne.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 10, 15, 3, 4, 20, 25}, concatOne.getValue().asFlatDoubleArray(), 0.001);
     }
 
     @Test
     public void canConcatHighDimensionalShapes() {
-        IntegerVertex a = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, new int[]{2, 2, 2}));
-        IntegerVertex b = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{10, 20, 30, 40, 50, 60, 70, 80}, new int[]{2, 2, 2}));
+        IntegerVertex a = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4, 5, 6, 7, 8}, new long[]{2, 2, 2}));
+        IntegerVertex b = new ConstantIntegerVertex(Nd4jIntegerTensor.create(new int[]{10, 20, 30, 40, 50, 60, 70, 80}, new long[]{2, 2, 2}));
 
         IntegerConcatenationVertex concatZero = new IntegerConcatenationVertex(0, a, b);
 
-        Assert.assertArrayEquals(new int[]{4, 2, 2}, concatZero.getShape());
+        Assert.assertArrayEquals(new long[]{4, 2, 2}, concatZero.getShape());
         Assert.assertArrayEquals(
             new double[]{1, 2, 3, 4, 5, 6, 7, 8, 10, 20, 30, 40, 50, 60, 70, 80},
             concatZero.getValue().asFlatDoubleArray(),
@@ -97,7 +97,7 @@ public class IntegerConcatenationVertexTest {
         );
 
         IntegerConcatenationVertex concatThree = new IntegerConcatenationVertex(2, a, b);
-        Assert.assertArrayEquals(new int[]{2, 2, 4}, concatThree.getShape());
+        Assert.assertArrayEquals(new long[]{2, 2, 4}, concatThree.getShape());
         Assert.assertArrayEquals(
             new double[]{1, 2, 10, 20, 3, 4, 30, 40, 5, 6, 50, 60, 7, 8, 70, 80},
             concatThree.getValue().asFlatDoubleArray(),

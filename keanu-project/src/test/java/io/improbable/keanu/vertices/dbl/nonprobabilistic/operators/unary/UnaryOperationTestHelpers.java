@@ -53,11 +53,11 @@ public class UnaryOperationTestHelpers {
                                                        double[] expected,
                                                        Function<DoubleVertex, DoubleVertex> op) {
 
-        ConstantDoubleVertex A = new ConstantDoubleVertex(DoubleTensor.create(aValues, new int[]{2, 2}));
+        ConstantDoubleVertex A = new ConstantDoubleVertex(DoubleTensor.create(aValues, new long[]{2, 2}));
 
         DoubleTensor result = op.apply(A).getValue();
 
-        DoubleTensor expectedTensor = Nd4jDoubleTensor.create(expected, new int[]{2, 2});
+        DoubleTensor expectedTensor = Nd4jDoubleTensor.create(expected, new long[]{2, 2});
 
         assertEquals(expectedTensor.getValue(0, 0), result.getValue(0, 0), 1e-5);
         assertEquals(expectedTensor.getValue(0, 1), result.getValue(0, 1), 1e-5);
@@ -69,8 +69,8 @@ public class UnaryOperationTestHelpers {
                                                                        double[] expectedGradientWrtA,
                                                                        Function<DoubleVertex, DoubleVertex> op) {
 
-        int[] matrixShape = new int[]{2, 2};
-        int[] expectedShape = TensorShape.concat(matrixShape, matrixShape);
+        long[] matrixShape = new long[]{2, 2};
+        long[] expectedShape = TensorShape.concat(matrixShape, matrixShape);
         UniformVertex A = new UniformVertex(matrixShape, 0.0, 1.0);
         A.setAndCascade(Nd4jDoubleTensor.create(aValues, matrixShape));
 

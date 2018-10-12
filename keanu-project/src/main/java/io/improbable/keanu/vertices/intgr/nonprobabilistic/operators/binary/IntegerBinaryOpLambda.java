@@ -17,7 +17,7 @@ public class IntegerBinaryOpLambda<A, B> extends IntegerVertex implements NonPro
     protected final Vertex<B> right;
     protected final BiFunction<A, B, IntegerTensor> op;
 
-    public IntegerBinaryOpLambda(int[] shape,
+    public IntegerBinaryOpLambda(long[] shape,
                                  Vertex<A> left,
                                  Vertex<B> right,
                                  BiFunction<A, B, IntegerTensor> op) {

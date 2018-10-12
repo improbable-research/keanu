@@ -94,7 +94,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSumVertex(this);
     }
 
-    public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
+    public IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }
 
@@ -123,7 +123,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(-1);
     }
 
-    public IntegerVertex take(int... index) {
+    public IntegerVertex take(long... index) {
         return new IntegerTakeVertex(this, index);
     }
 
@@ -131,7 +131,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSliceVertex(this, dimension, index);
     }
 
-    public IntegerVertex reshape(int... proposedShape) {
+    public IntegerVertex reshape(long... proposedShape) {
         return new IntegerReshapeVertex(this, proposedShape);
     }
 

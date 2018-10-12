@@ -36,7 +36,7 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
      * @param xMax          the xMax of the Smooth Uniform with either the same shape as specified for this vertex or a scalar
      * @param edgeSharpness the edge sharpness of the Smooth Uniform
      */
-    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax, double edgeSharpness) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, xMin.getShape(), xMax.getShape());
 
         this.xMin = xMin;
@@ -87,31 +87,31 @@ public class SmoothUniformVertex extends DoubleVertex implements ProbabilisticDo
         this(new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, double xMax, double edgeSharpness) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, double xMin, DoubleVertex xMax, double edgeSharpness) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, double xMin, double xMax, double edgeSharpness) {
+    public SmoothUniformVertex(long[] tensorShape, double xMin, double xMax, double edgeSharpness) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), edgeSharpness);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
+    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, DoubleVertex xMax) {
         this(tensorShape, xMin, xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, DoubleVertex xMin, double xMax) {
+    public SmoothUniformVertex(long[] tensorShape, DoubleVertex xMin, double xMax) {
         this(tensorShape, xMin, new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, double xMin, DoubleVertex xMax) {
+    public SmoothUniformVertex(long[] tensorShape, double xMin, DoubleVertex xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), xMax, DEFAULT_EDGE_SHARPNESS);
     }
 
-    public SmoothUniformVertex(int[] tensorShape, double xMin, double xMax) {
+    public SmoothUniformVertex(long[] tensorShape, double xMin, double xMax) {
         this(tensorShape, new ConstantDoubleVertex(xMin), new ConstantDoubleVertex(xMax), DEFAULT_EDGE_SHARPNESS);
     }
 

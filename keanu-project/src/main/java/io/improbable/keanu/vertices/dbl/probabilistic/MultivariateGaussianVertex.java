@@ -23,7 +23,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
      * @param mu         the mu of the Multivariate Gaussian
      * @param covariance the covariance matrix of the Multivariate Gaussian
      */
-    public MultivariateGaussianVertex(int[] shape, DoubleVertex mu, DoubleVertex covariance) {
+    public MultivariateGaussianVertex(long[] shape, DoubleVertex mu, DoubleVertex covariance) {
 
         checkValidMultivariateShape(mu.getShape(), covariance.getShape());
 
@@ -78,7 +78,7 @@ public class MultivariateGaussianVertex extends DoubleVertex implements Probabil
         return MultivariateGaussian.withParameters(mu.getValue(), covariance.getValue()).sample(mu.getShape(), random);
     }
 
-    private static int[] checkValidMultivariateShape(int[] muShape, int[] covarianceShape) {
+    private static long[] checkValidMultivariateShape(long[] muShape, long[] covarianceShape) {
         if (covarianceShape.length != 2
             || muShape.length != 2
             || covarianceShape[0] != covarianceShape[1]

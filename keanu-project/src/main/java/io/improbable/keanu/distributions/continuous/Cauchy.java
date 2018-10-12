@@ -26,7 +26,7 @@ public class Cauchy implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         if (!scale.greaterThan(0.0).allTrue()) {
             throw new IllegalArgumentException("Invalid argument for Scale. It must be greater than 0. Scale: " + scale.scalar());
         }

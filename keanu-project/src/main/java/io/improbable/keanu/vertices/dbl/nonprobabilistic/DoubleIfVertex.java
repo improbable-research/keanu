@@ -19,7 +19,7 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     private final Vertex<? extends DoubleTensor> els;
 
     @ExportVertexToPythonBindings
-    public DoubleIfVertex(int[] shape,
+    public DoubleIfVertex(long[] shape,
                           Vertex<? extends BooleanTensor> predicate,
                           Vertex<? extends DoubleTensor> thn,
                           Vertex<? extends DoubleTensor> els) {
@@ -38,7 +38,7 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
 
-        int[] ofShape = getShape();
+        long[] ofShape = getShape();
         PartialDerivatives thnPartial = derivativeOfParentsWithRespectToInputs.get(thn);
         PartialDerivatives elsPartial = derivativeOfParentsWithRespectToInputs.get(els);
         BooleanTensor predicateValue = predicate.getValue();

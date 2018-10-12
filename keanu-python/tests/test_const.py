@@ -2,144 +2,73 @@ import keanu as kn
 import numpy as np
 import pytest
 
-def test_const_takes_int_numpy_tensor():
-    np_tensor = np.array([[1, 2], [3, 4]])
-    v = kn.Const(np_tensor)
 
-    assert_java_class(v, "ConstantIntegerVertex")
-    assert_vertex_value_equal_numpy(v, np_tensor)
+@pytest.fixture
+def generic():
+    pass
 
+@pytest.mark.parametrize("arr, expected_java_class", [
+    ([[1, 2], [3, 4]], "ConstantIntegerVertex"),
+    ([[1., 2.], [3., 4.]], "ConstantDoubleVertex"),
+    ([[True, False], [False, True]], "ConstantBoolVertex")
+])
+def test_const_takes_ndarray(arr, expected_java_class):
+    ndarray = np.array(arr)
+    v = kn.Const(ndarray)
 
-def test_const_takes_int():
-    v = kn.Const(3)
-
-    assert_java_class(v, "ConstantIntegerVertex")
-    assert_vertex_value_equals_scalar(v, 3)
-
-def test_const_takes_double_numpy_tensor():
-    np_tensor = np.array([[1., 2.], [3., 4.]])
-    v = kn.Const(np_tensor)
-
-    assert_java_class(v, "ConstantDoubleVertex")
-    assert_vertex_value_equal_numpy(v, np_tensor)
+    assert_java_class(v, expected_java_class)
+    assert_vertex_value_equal_ndarray(v, ndarray)
 
 
-def test_const_takes_double():
-    v = kn.Const(3.4)
+@pytest.mark.parametrize("num, expected_java_class", [
+    (3, "ConstantIntegerVertex"),
+    (3.4, "ConstantDoubleVertex"),
+    (True, "ConstantBoolVertex")
+])
+def test_const_takes_num(num, expected_java_class):
+    v = kn.Const(num)
 
-    assert_java_class(v, "ConstantDoubleVertex")
-    assert_vertex_value_equals_scalar(v, 3.4)
-
-
-def test_const_takes_bool_numpy_tensor():
-    np_tensor = np.array([[True, True], [False, True]])
-    v = kn.Const(np_tensor)
-
-    assert_java_class(v, "ConstantBoolVertex")
-    assert_vertex_value_equal_numpy(v, np_tensor)
+    assert_java_class(v, expected_java_class)
+    assert_vertex_value_equals_scalar(v, num)
 
 
-def test_const_takes_bool():
-    v = kn.Const(True)
-
-    assert_java_class(v, "ConstantBoolVertex")
-    assert_vertex_value_equals_scalar(v, True)
-
-
-def test_const_does_not_take_generic_numpy_tensor():
-    np_tensor = np.array([[GenericExampleClass()]])
+def test_const_does_not_take_generic_ndarray(generic):
+    ndarray = np.array([[generic]])
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Const(np_tensor)
+        kn.Const(ndarray)
 
-    assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
+    assert str(excinfo.value) == "Generic types in an ndarray are not supported. Was given {}".format(type(generic))
 
 
-def test_const_does_not_take_generic():
+def test_const_does_not_take_generic(generic):
     with pytest.raises(NotImplementedError) as excinfo:
-        kn.Const(GenericExampleClass())
+        kn.Const(generic)
 
-    assert str(excinfo.value) == "Argument t must be either a numpy array or an instance of numbers.Number. Was given {} instead".format(GenericExampleClass)
+    assert str(excinfo.value) == "Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(generic))
 
 
-def test_const_does_not_take_empty_numpy_tensor():
-    np_tensor = np.array([])
+def test_const_does_not_take_empty_ndarray():
+    ndarray = np.array([])
     with pytest.raises(ValueError) as excinfo:
-        kn.Const(np_tensor)
+        kn.Const(ndarray)
 
-    assert str(excinfo.value) == "Cannot infer type because tensor is empty"
-
-
-def test_const_takes_numpy_tensor_of_rank_one():
-    np_tensor = np.array([1 ,2])
-    v = kn.Const(np_tensor)
-
-    assert_vertex_value_equal_numpy(v, np_tensor)
+    assert str(excinfo.value) == "Cannot infer type because the ndarray is empty"
 
 
-def test_integer_passed_to_Tensor_creates_ScalarIntegerTensor():
-    t = kn.Tensor(1)
-    assert_java_class(t, "ScalarIntegerTensor")
-    assert t.isScalar()
+def test_const_takes_ndarray_of_rank_one():
+    ndarray = np.array([1 ,2])
+    v = kn.Const(ndarray)
+
+    assert_vertex_value_equal_ndarray(v, ndarray)
 
 
-def test_double_passed_to_Tensor_creates_ScalarDoubleTensor():
-    t = kn.Tensor(1.)
-    assert_java_class(t, "ScalarDoubleTensor")
-    assert t.isScalar()
-
-
-def test_bool_passed_to_Tensor_creates_SimpleBooleanTensor():
-    t = kn.Tensor(True)
-    assert_java_class(t, "SimpleBooleanTensor")
-    assert t.isScalar()
-
-
-def test_cannot_pass_generic_to_Tensor():
-    with pytest.raises(NotImplementedError) as excinfo:
-        kn.Tensor(GenericExampleClass())
-
-    assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
-
-
-def test_integer_numpy_tensor_passed_to_Tensor_creates_Nd4jIntegerTensor():
-    t = kn.Tensor(np.array([1,2]))
-    assert_java_class(t, "Nd4jIntegerTensor")
-    assert not t.isScalar()
-
-
-def test_double_numpy_tensor_passed_to_Tensor_creates_Nd4jDoubleTensor():
-    t = kn.Tensor(np.array([1.,2.]))
-    assert_java_class(t, "Nd4jDoubleTensor")
-    assert not t.isScalar()
-
-
-def test_bool_numpy_tensor_passed_to_Tensor_creates_SimpleBooleanTensor():
-    t = kn.Tensor(np.array([True, False]))
-    assert_java_class(t, "SimpleBooleanTensor")
-    assert not t.isScalar()
-
-
-def test_cannot_pass_generic_numpy_tensor_to_Tensor():
-    with pytest.raises(NotImplementedError) as excinfo:
-        kn.Tensor(np.array([GenericExampleClass(), GenericExampleClass()]))
-
-    assert str(excinfo.value) == "Generic types in a tensor are not supported. Was given {}".format(GenericExampleClass)
-
-
-def test_cannot_pass_empty_numpy_tensor_to_Tensor():
-    with pytest.raises(ValueError) as excinfo:
-        kn.Tensor(np.array([]))
-
-    assert str(excinfo.value) == "Cannot infer type because tensor is empty"
-
-
-def assert_vertex_value_equal_numpy(v, np_tensor):
+def assert_vertex_value_equal_ndarray(v, ndarray):
     nd4j_flat = v.getValue().asFlatArray()
-    np_flat = np_tensor.flatten().tolist()
+    np_flat = ndarray.flatten().tolist()
 
     assert len(nd4j_flat) == len(np_flat)
 
-    for i in range(len(np_tensor)):
+    for i in range(len(ndarray)):
         assert nd4j_flat[i] == np_flat[i]
 
 
@@ -149,7 +78,3 @@ def assert_vertex_value_equals_scalar(v, scalar):
 
 def assert_java_class(java_object_wrapper, java_class_str):
     assert java_object_wrapper.getClass().getSimpleName() == java_class_str
-
-
-class GenericExampleClass:
-    pass

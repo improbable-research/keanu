@@ -28,7 +28,7 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
     private final Supplier<PartialDerivatives> forwardModeAutoDiffLambda;
     private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
-    public ReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivatives> forwardModeAutoDiffLambda,
                         Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
@@ -44,14 +44,14 @@ public class ReduceVertex extends DoubleVertex implements Differentiable, NonPro
         setValue(DoubleTensor.placeHolder(shape));
     }
 
-    public ReduceVertex(int[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
+    public ReduceVertex(long[] shape, BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction,
                         Supplier<PartialDerivatives> forwardModeAutoDiffLambda,
                         Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda,
                         Vertex<DoubleTensor>... input) {
         this(shape, Arrays.asList(input), reduceFunction, forwardModeAutoDiffLambda, reverseModeAutoDiffLambda);
     }
 
-    public ReduceVertex(int[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
+    public ReduceVertex(long[] shape, Collection<? extends Vertex<DoubleTensor>> inputs,
                         BiFunction<DoubleTensor, DoubleTensor, DoubleTensor> reduceFunction) {
         this(shape, inputs, reduceFunction, null, null);
     }

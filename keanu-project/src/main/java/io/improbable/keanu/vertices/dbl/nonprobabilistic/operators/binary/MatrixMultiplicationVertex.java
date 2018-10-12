@@ -73,7 +73,7 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
         return partialsFromLeft.add(partialsFromRight);
     }
 
-    private static int[] getResultingShape(int[] left, int[] right) {
+    private static long[] getResultingShape(long[] left, long[] right) {
         if (left.length != 2 || right.length != 2) {
             throw new IllegalArgumentException("Matrix multiply must be used on matrices");
         }
@@ -82,6 +82,6 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
             throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
         }
 
-        return new int[]{left[0], right[1]};
+        return new long[]{left[0], right[1]};
     }
 }

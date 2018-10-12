@@ -24,7 +24,7 @@ public class ReshapeVertexTest {
         ReshapeVertex reshapeVertex = new ReshapeVertex(a, 4, 1);
         reshapeVertex.getValue();
 
-        Assert.assertArrayEquals(new int[]{4, 1}, reshapeVertex.getShape());
+        Assert.assertArrayEquals(new long[]{4, 1}, reshapeVertex.getShape());
         Assert.assertArrayEquals(new double[]{1, 2, 3, 4}, reshapeVertex.getValue().asFlatDoubleArray(), 1e-6);
     }
 
@@ -43,8 +43,8 @@ public class ReshapeVertexTest {
         PartialDerivatives forward = reshapedN.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(reshapedN, ImmutableSet.of(m, alpha));
 
-        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(m).getShape());
-        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, backward.withRespectTo(m).getShape());
+        Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, forward.withRespectTo(m).getShape());
+        Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, backward.withRespectTo(m).getShape());
 
         double[] expectedPartial = N.getDerivativeWrtLatents().withRespectTo(m).asFlatDoubleArray();
 
@@ -97,16 +97,16 @@ public class ReshapeVertexTest {
         PartialDerivatives forward = F.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(F, ImmutableSet.of(A, B));
 
-        Assert.assertArrayEquals(new int[]{4, 1, 2, 2}, forward.withRespectTo(A).getShape());
+        Assert.assertArrayEquals(new long[]{4, 1, 2, 2}, forward.withRespectTo(A).getShape());
         Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void partialCorrectlyFlowsThroughTwoReshapes() {
-        DoubleVertex A = new UniformVertex(new int[]{2, 2, 2, 2}, 0, 10);
+        DoubleVertex A = new UniformVertex(new long[]{2, 2, 2, 2}, 0, 10);
         A.setValue(A.sample());
 
-        DoubleVertex B = new UniformVertex(new int[]{2, 2, 2, 2}, 0, 10);
+        DoubleVertex B = new UniformVertex(new long[]{2, 2, 2, 2}, 0, 10);
         B.setValue(B.sample());
 
         DoubleVertex C = A.plus(B);
@@ -117,13 +117,13 @@ public class ReshapeVertexTest {
         PartialDerivatives forward = E.getDerivativeWrtLatents();
         PartialDerivatives backward = Differentiator.reverseModeAutoDiff(E, ImmutableSet.of(A, B));
 
-        Assert.assertArrayEquals(new int[]{4, 4, 2, 2, 2, 2}, forward.withRespectTo(A).getShape());
+        Assert.assertArrayEquals(new long[]{4, 4, 2, 2, 2, 2}, forward.withRespectTo(A).getShape());
         Assert.assertArrayEquals(forward.withRespectTo(A).asFlatDoubleArray(), backward.withRespectTo(A).asFlatDoubleArray(), 1e-6);
     }
 
     @Test
     public void changesMatchGradient() {
-        DoubleVertex inputVertex = new UniformVertex(new int[]{4, 4}, -10.0, 10.0);
+        DoubleVertex inputVertex = new UniformVertex(new long[]{4, 4}, -10.0, 10.0);
         DoubleVertex outputVertex = inputVertex.times(1.5).reshape(2, 2, 2, 2);
 
         finiteDifferenceMatchesForwardAndReverseModeGradient(ImmutableList.of(inputVertex), outputVertex, 10.0, 1e-10);

@@ -45,9 +45,6 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self):
         return self._gateway.new_jvm_view()
 
-    def list_vertex_classes(self):
-        return self._gateway.jvm.io.improbable.keanu.python.Keanu().getVertexClasses()
-
     def to_java_array(self, l, klass=None, cast=lambda x: x):
         if klass is None:
             klass = self.__infer_class_from_array(l)

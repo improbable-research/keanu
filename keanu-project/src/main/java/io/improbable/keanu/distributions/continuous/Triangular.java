@@ -22,7 +22,7 @@ public class Triangular implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         final DoubleTensor p = random.nextDouble(shape);
         final DoubleTensor q = p.unaryMinus().plusInPlace(1);
         final DoubleTensor range = xMax.minus(xMin);
