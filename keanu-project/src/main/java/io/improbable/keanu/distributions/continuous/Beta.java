@@ -8,9 +8,12 @@ import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LogProbGraph;
+import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.dbl.Differentiator;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.PlaceHolderDoubleVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class Beta implements ContinuousDistribution {
 
@@ -58,14 +61,6 @@ public class Beta implements ContinuousDistribution {
         return lessMask.timesInPlace(lessThan).plusInPlace(greaterMask.timesInPlace(greaterThan));
     }
 
-    @Override
-    public DoubleTensor logProb(DoubleTensor x) {
-        logProbGraph.getInput(this.x).setValue(x);
-        logProbGraph.getInput(this.alpha).setValue(alpha.getValue());
-        logProbGraph.getInput(this.beta).setValue(beta.getValue());
-        return logProbGraph.getLogProbOutput().eval();
-    }
-
     public LogProbGraph logProbGraph() {
 
         final PlaceHolderDoubleVertex xInput = new PlaceHolderDoubleVertex();
@@ -89,21 +84,34 @@ public class Beta implements ContinuousDistribution {
     }
 
     @Override
+    public DoubleTensor logProb(DoubleTensor x) {
+        logProbGraph.getInput(this.x).setValue(x);
+        logProbGraph.getInput(this.alpha).setValue(alpha.getValue());
+        logProbGraph.getInput(this.beta).setValue(beta.getValue());
+        return logProbGraph.getLogProbOutput().eval();
+    }
+
+    @Override
     public Diffs dLogProb(DoubleTensor x) {
-        final DoubleTensor alphaValue = alpha.getValue();
-        final DoubleTensor betaValue = beta.getValue();
 
-        final DoubleTensor oneMinusX = x.unaryMinus().plusInPlace(1);
-        final DoubleTensor digammaAlphaPlusBeta = alphaValue.plus(betaValue).digammaInPlace();
-        final DoubleTensor alphaMinusOneDivX = x.reciprocal().timesInPlace(alphaValue.minus(1));
+        Vertex<DoubleTensor> placeHolderX = logProbGraph.getInput(this.x);
+        Vertex<DoubleTensor> placeHolderAlpha = logProbGraph.getInput(this.alpha);
+        Vertex<DoubleTensor> placeHolderBeta = logProbGraph.getInput(this.beta);
 
-        final DoubleTensor dLogPdx = alphaMinusOneDivX.minusInPlace(oneMinusX.reciprocal().timesInPlace(betaValue.minus(1)));
-        final DoubleTensor dLogPda = x.log().plusInPlace(digammaAlphaPlusBeta.minus(alphaValue.digamma()));
-        final DoubleTensor dLogPdb = oneMinusX.logInPlace().plusInPlace(digammaAlphaPlusBeta.minusInPlace(betaValue.digamma()));
+        placeHolderX.setValue(x);
+        placeHolderAlpha.setValue(alpha.getValue());
+        placeHolderBeta.setValue(beta.getValue());
+
+        PartialDerivatives dLogProb = Differentiator.reverseModeAutoDiff(
+            logProbGraph.getLogProbOutput(),
+            (DoubleVertex) placeHolderAlpha,
+            (DoubleVertex) placeHolderBeta,
+            (DoubleVertex) placeHolderX
+        );
 
         return new Diffs()
-            .put(A, dLogPda)
-            .put(B, dLogPdb)
-            .put(X, dLogPdx);
+            .put(A, dLogProb.withRespectTo(placeHolderAlpha))
+            .put(B, dLogProb.withRespectTo(placeHolderBeta))
+            .put(X, dLogProb.withRespectTo(placeHolderX));
     }
 }
