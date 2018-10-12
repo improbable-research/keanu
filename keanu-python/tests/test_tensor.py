@@ -16,6 +16,7 @@ def test_num_passed_to_Tensor_creates_scalar_tensor(num, expected_java_class):
     t = kn.Tensor(num)
     assert_java_class(t, expected_java_class)
     assert t.isScalar()
+    assert t.scalar() == num
 
 
 def test_cannot_pass_generic_to_Tensor(generic):

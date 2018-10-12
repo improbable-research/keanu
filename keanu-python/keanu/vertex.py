@@ -4,8 +4,8 @@ import numbers
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
 
+
 context = KeanuContext()
-k = context.jvm_view()
 
 
 class VertexOps:
