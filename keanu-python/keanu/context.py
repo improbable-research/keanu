@@ -45,13 +45,13 @@ class KeanuContext(metaclass=Singleton):
     def jvm_view(self):
         return self._gateway.new_jvm_view()
 
-    def to_java_array(self, l, klass=None, cast=lambda x: x):
+    def to_java_array(self, l, klass=None):
         if klass is None:
             klass = self.__infer_class_from_array(l)
         array = self._gateway.new_array(klass, len(l))
 
         for idx, o in enumerate(l):
-            array[idx] = cast(o)
+            array[idx] = o
 
         return array
 
