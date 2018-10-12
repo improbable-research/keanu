@@ -3,19 +3,25 @@ import keanu as kn
 import numpy as np
 
 
-def coal_mining_model():
-    FILE = "data/coal-mining-disaster-data.csv"
-    data = pd.read_csv(FILE, names=["year", "count"]).set_index("year")
-    start_year, end_year = (data.index.min(), data.index.max())
+class CoalMining():
+    def __init__(self):
+        FILE = "data/coal-mining-disaster-data.csv"
+        self._data = pd.read_csv(FILE, names=["year", "count"]).set_index("year")
 
-    with kn.Model() as m:
-        m.switchpoint = kn.UniformInt(int(start_year), int(end_year + 1))
+    def model(self):
+        start_year, end_year = (self._data.index.min(), self._data.index.max())
 
-        m.early_rate = kn.Exponential(1.0)
-        m.late_rate = kn.Exponential(1.0)
+        with kn.Model() as m:
+            m.switchpoint = kn.UniformInt(int(start_year), int(end_year + 1))
 
-        m.years = np.array(data.index)
-        m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
-        m.disasters = kn.Poisson(m.rates)
+            m.early_rate = kn.Exponential(1.0)
+            m.late_rate = kn.Exponential(1.0)
 
-    return m
+            m.years = np.array(self._data.index)
+            m.rates = kn.DoubleIf([1, 1], m.switchpoint > m.years, m.early_rate, m.late_rate)
+            m.disasters = kn.Poisson(m.rates)
+
+        return m
+
+    def training_data(self):
+        return self._data.values
