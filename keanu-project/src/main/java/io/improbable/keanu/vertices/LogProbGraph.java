@@ -3,7 +3,6 @@ package io.improbable.keanu.vertices;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
 public class LogProbGraph {
