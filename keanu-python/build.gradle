@@ -45,6 +45,16 @@ task pytest {
         }
     }
 }
+// TEMP task while I debug appveyor
+task test_appveyor {
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'python', 'tests/test_appveyor_hanging.py'
+        }
+    }
+}
+test_appveyor.dependsOn(":shadowJar")
+test_appveyor.dependsOn(":codegen:codeGen")
 
 test.dependsOn(pytest)
 pytest.dependsOn(installPipenv)
