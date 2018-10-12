@@ -3,6 +3,7 @@ import numbers
 
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
+from keanu.const import Const
 
 
 context = KeanuContext()
@@ -29,7 +30,6 @@ class Vertex(JavaObjectWrapper, VertexOps):
     @staticmethod
     def __parse_arg(arg):
         if isinstance(arg, np.ndarray):
-            from keanu.const import Const
             return Const(arg).unwrap()
         elif isinstance(arg, numbers.Number):
             return arg
