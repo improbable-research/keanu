@@ -28,7 +28,7 @@ def test_can_pass_ndarray_to_vertex(jvm_view):
     assert shape[1] == 2
 
 
-def test_can_pass_java_object_to_vertex(jvm_view):
+def test_can_pass_vertex_to_vertex(jvm_view):
     mu = kn.Vertex(jvm_view.GaussianVertex, (0., 1.))
     gaussian = kn.Vertex(jvm_view.GaussianVertex, (mu, 1.))
     sample = gaussian.sample()
