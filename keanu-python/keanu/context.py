@@ -55,6 +55,9 @@ class KeanuContext(metaclass=Singleton):
 
         return array
 
+    def to_java_long_array(self, l):
+        return self.to_java_array(l, self._gateway.jvm.long)
+
     def __infer_class_from_array(self, l):
         if len(l) == 0:
             raise ValueError("Cannot infer type because array is empty")
