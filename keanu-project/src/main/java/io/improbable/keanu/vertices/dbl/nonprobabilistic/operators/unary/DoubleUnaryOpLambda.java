@@ -18,7 +18,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
     private final Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda;
     private final Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda;
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex,
+    public DoubleUnaryOpLambda(long[] shape, Vertex<IN> inputVertex,
                                Function<IN, DoubleTensor> op,
                                Function<Map<Vertex, PartialDerivatives>, PartialDerivatives> forwardModeAutoDiffLambda,
                                Function<PartialDerivatives, Map<Vertex, PartialDerivatives>> reverseModeAutoDiffLambda) {
@@ -30,7 +30,7 @@ public class DoubleUnaryOpLambda<IN> extends DoubleVertex implements Differentia
         setValue(DoubleTensor.placeHolder(shape));
     }
 
-    public DoubleUnaryOpLambda(int[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
+    public DoubleUnaryOpLambda(long[] shape, Vertex<IN> inputVertex, Function<IN, DoubleTensor> op) {
         this(shape, inputVertex, op, null, null);
     }
 

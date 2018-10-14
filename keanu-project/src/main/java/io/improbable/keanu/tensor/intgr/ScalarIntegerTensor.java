@@ -7,16 +7,16 @@ import com.google.common.math.IntMath;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 
 public class ScalarIntegerTensor implements IntegerTensor {
 
     private Integer value;
-    private int[] shape;
+    private long[] shape;
 
-    private ScalarIntegerTensor(Integer value, int[] shape) {
+    private ScalarIntegerTensor(Integer value, long[] shape) {
         this.value = value;
         this.shape = shape;
     }
@@ -25,7 +25,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
         this(value, SCALAR_SHAPE);
     }
 
-    public ScalarIntegerTensor(int[] shape) {
+    public ScalarIntegerTensor(long[] shape) {
         this(null, shape);
     }
 
@@ -35,7 +35,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -55,12 +55,12 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public Integer getValue(int... index) {
+    public Integer getValue(long... index) {
         return value;
     }
 
     @Override
-    public IntegerTensor setValue(Integer value, int... index) {
+    public IntegerTensor setValue(Integer value, long... index) {
         this.value = value;
         return this;
     }
@@ -86,7 +86,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor reshape(int[] newShape) {
+    public IntegerTensor reshape(long... newShape) {
         if (!TensorShape.isScalar(newShape)) {
             throw new IllegalArgumentException("Cannot reshape scalar to non scalar");
         }
@@ -108,7 +108,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
 
     @Override
     public IntegerTensor sum(int... overDimensions) {
-        int[] summedShape = new int[this.shape.length - overDimensions.length];
+        long[] summedShape = new long[this.shape.length - overDimensions.length];
         Arrays.fill(summedShape, 1);
         return new ScalarIntegerTensor(value, summedShape);
     }
@@ -254,7 +254,7 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
-    public IntegerTensor slice(int dimension, int index) {
+    public IntegerTensor slice(int dimension, long index) {
         if (dimension == 0 && index == 0) {
             return duplicate();
         } else {
@@ -432,6 +432,17 @@ public class ScalarIntegerTensor implements IntegerTensor {
     }
 
     @Override
+    public int argMax() {
+        return 0;
+    }
+
+    @Override
+    public IntegerTensor argMax(int axis) {
+        TensorShapeValidation.checkDimensionExistsInShape(axis, this.getShape());
+        return IntegerTensor.scalar(0);
+    }
+
+    @Override
     public BooleanTensor greaterThan(IntegerTensor that) {
         if (that.isScalar()) {
             return greaterThan(that.scalar());
@@ -472,6 +483,33 @@ public class ScalarIntegerTensor implements IntegerTensor {
         return new SimpleIntegerFlattenedView(value);
     }
 
+    @Override
+    public BooleanTensor elementwiseEquals(Integer value) {
+        return BooleanTensor.create(this.scalar().equals(value));
+    }
+
+    @Override
+    public double[] asFlatDoubleArray() {
+        return new double[]{value};
+    }
+
+    @Override
+    public int[] asFlatIntegerArray() {
+        return new int[]{value};
+    }
+
+    @Override
+    public Integer[] asFlatArray() {
+        return new Integer[]{value};
+    }
+
+    @Override
+    public String toString() {
+        return "ScalarIntegerTensor{" +
+            "value=" + value +
+            '}';
+    }
+
     private static class SimpleIntegerFlattenedView implements FlattenedView<Integer> {
 
         private int value;
@@ -506,28 +544,6 @@ public class ScalarIntegerTensor implements IntegerTensor {
             this.value = value;
         }
 
-    }
-
-    @Override
-    public double[] asFlatDoubleArray() {
-        return new double[]{value};
-    }
-
-    @Override
-    public int[] asFlatIntegerArray() {
-        return new int[]{value};
-    }
-
-    @Override
-    public Integer[] asFlatArray() {
-        return new Integer[]{value};
-    }
-
-    @Override
-    public String toString() {
-        return "ScalarIntegerTensor{" +
-            "value=" + value +
-            '}';
     }
 
 }

@@ -19,7 +19,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor TWO_SCALAR = scalar(2);
 
-    static IntegerTensor create(int value, int[] shape) {
+    static IntegerTensor create(int value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(value);
         } else {
@@ -27,7 +27,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor create(int[] values, int... shape) {
+    static IntegerTensor create(int[] values, long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarIntegerTensor(values[0]);
         } else {
@@ -39,7 +39,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return create(values, 1, values.length);
     }
 
-    static IntegerTensor ones(int... shape) {
+    static IntegerTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(1);
         } else {
@@ -55,7 +55,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor zeros(int... shape) {
+    static IntegerTensor zeros(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(0);
         } else {
@@ -67,7 +67,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
-    static IntegerTensor placeHolder(int[] shape) {
+    static IntegerTensor placeHolder(long[] shape) {
         return new ScalarIntegerTensor(shape);
     }
 
@@ -89,10 +89,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     @Override
-    IntegerTensor setValue(Integer value, int... index);
+    IntegerTensor setValue(Integer value, long... index);
 
     @Override
-    IntegerTensor reshape(int... newShape);
+    IntegerTensor reshape(long... newShape);
 
     @Override
     IntegerTensor duplicate();
@@ -146,7 +146,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor apply(Function<Integer, Integer> function);
 
     @Override
-    IntegerTensor slice(int dimension, int index);
+    IntegerTensor slice(int dimension, long index);
 
     // In Place
 

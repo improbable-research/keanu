@@ -69,7 +69,7 @@ public class Differentiator {
 
             Vertex wrtVertex = v.getKey();
             PartialDerivatives partialsOf = v.getValue();
-            int[] wrtShape = wrtVertex.getShape();
+            long[] wrtShape = wrtVertex.getShape();
             int prevRank = visiting.getShape().length;
 
             PartialDerivatives dwrtV;

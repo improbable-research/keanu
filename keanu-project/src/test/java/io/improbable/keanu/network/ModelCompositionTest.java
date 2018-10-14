@@ -118,7 +118,7 @@ public class ModelCompositionTest {
 
         trueLocation.setValue(9.9);
         size.setValue(9.9);
-        GaussianVertex sourceOfTruth = new GaussianVertex(new int[]{NUM_SAMPLES, 1}, REAL_HYPER_LOC, REAL_HYPER_SIZE);
+        GaussianVertex sourceOfTruth = new GaussianVertex(new long[]{NUM_SAMPLES, 1}, REAL_HYPER_LOC, REAL_HYPER_SIZE);
 
         gaussOutputVertex.observe(sourceOfTruth.sample());
         GradientOptimizer optimizer = GradientOptimizer.of(outerNet);

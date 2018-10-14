@@ -120,7 +120,7 @@ public abstract class Vertex<T> implements Observable<T> {
         }
     }
 
-    public int[] getShape() {
+    public long[] getShape() {
         if (value instanceof Tensor) {
             return ((Tensor) value).getShape();
         } else {

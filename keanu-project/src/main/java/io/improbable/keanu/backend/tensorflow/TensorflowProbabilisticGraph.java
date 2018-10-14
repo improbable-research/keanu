@@ -77,7 +77,7 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
             DoubleTensor tensor = inputEntry.getValue();
 
             Tensor<Double> input = Tensor.create(
-                toLongs(tensor.getShape()),
+                tensor.getShape(),
                 DoubleBuffer.wrap(tensor.asFlatDoubleArray())
             );
 
@@ -103,23 +103,7 @@ public class TensorflowProbabilisticGraph implements ProbabilisticGraph {
         tensor.writeTo(buffer);
         double[] resultAsArray = buffer.array();
 
-        return DoubleTensor.create(resultAsArray, toInts(tensor.shape()));
-    }
-
-    private static long[] toLongs(int[] ints) {
-        long[] longs = new long[ints.length];
-        for (int i = 0; i < ints.length; i++) {
-            longs[i] = ints[i];
-        }
-        return longs;
-    }
-
-    private static int[] toInts(long[] longs) {
-        int[] ints = new int[longs.length];
-        for (int i = 0; i < longs.length; i++) {
-            ints[i] = (int) longs[i];
-        }
-        return ints;
+        return DoubleTensor.create(resultAsArray, tensor.shape());
     }
 
     @Override

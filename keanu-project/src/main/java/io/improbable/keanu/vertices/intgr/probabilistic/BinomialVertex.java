@@ -21,7 +21,7 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
     private final DoubleVertex p;
     private final IntegerVertex n;
 
-    public BinomialVertex(int[] tensorShape, DoubleVertex p, IntegerVertex n) {
+    public BinomialVertex(long[] tensorShape, DoubleVertex p, IntegerVertex n) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, p.getShape(), n.getShape());
         this.p = p;
@@ -31,15 +31,15 @@ public class BinomialVertex extends IntegerVertex implements ProbabilisticIntege
         setValue(IntegerTensor.placeHolder(tensorShape));
     }
 
-    public BinomialVertex(int[] tensorShape, double p, IntegerVertex n) {
+    public BinomialVertex(long[] tensorShape, double p, IntegerVertex n) {
         this(tensorShape, ConstantVertex.of(p), n);
     }
 
-    public BinomialVertex(int[] tensorShape, DoubleVertex p, int n) {
+    public BinomialVertex(long[] tensorShape, DoubleVertex p, int n) {
         this(tensorShape, p, ConstantVertex.of(n));
     }
 
-    public BinomialVertex(int[] tensorShape, double p, int n) {
+    public BinomialVertex(long[] tensorShape, double p, int n) {
         this(tensorShape, ConstantVertex.of(p), ConstantVertex.of(n));
     }
 

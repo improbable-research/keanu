@@ -140,7 +140,7 @@ public class LogNormalVertexTest {
     public void logNormalSampleMethodMatchesLogProbMethod() {
 
         int sampleCount = 1000000;
-        LogNormalVertex vertex = new LogNormalVertex(new int[]{sampleCount, 1}, 0.0, 2.0);
+        LogNormalVertex vertex = new LogNormalVertex(new long[]{sampleCount, 1}, 0.0, 2.0);
 
         double from = 0.1;
         double to = 8;
@@ -169,7 +169,7 @@ public class LogNormalVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LogNormalVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LogNormalVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             muSigma,
             latentMuSigma,
             random

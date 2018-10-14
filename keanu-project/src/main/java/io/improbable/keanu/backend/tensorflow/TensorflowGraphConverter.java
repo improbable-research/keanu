@@ -124,7 +124,7 @@ public class TensorflowGraphConverter {
 
         if (value instanceof DoubleTensor) {
             DoubleTensor doubleValue = (DoubleTensor) value;
-            return graphBuilder.constant(doubleValue.asFlatDoubleArray(), toLongs(doubleValue.getShape()), getTensorflowOpName(vertex));
+            return graphBuilder.constant(doubleValue.asFlatDoubleArray(), doubleValue.getShape(), getTensorflowOpName(vertex));
         } else {
             throw new IllegalArgumentException("Can only convert doubles at the moment");
         }
@@ -137,7 +137,7 @@ public class TensorflowGraphConverter {
 
         if (value instanceof DoubleTensor) {
 
-            int[] shape = ((DoubleTensor) value).getShape();
+            long[] shape = ((DoubleTensor) value).getShape();
             String tensorflowOpName = getTensorflowOpName(vertex);
 
             return graphBuilder.placeholder(tensorflowOpName, toShape(shape), Double.class);
@@ -146,12 +146,8 @@ public class TensorflowGraphConverter {
         throw new IllegalArgumentException("Can only convert doubles at the moment");
     }
 
-    private static Shape toShape(int[] intShape) {
-        long[] restOfShape = new long[intShape.length - 1];
-        for (int i = 1; i < intShape.length; i++) {
-            restOfShape[i - 1] = intShape[i];
-        }
-        return Shape.make(intShape[0], restOfShape);
+    private static Shape toShape(long[] shape) {
+        return Shape.make(shape[0], Arrays.copyOfRange(shape, 1, shape.length));
     }
 
     interface GraphBuilderUnaryOp {

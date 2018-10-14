@@ -30,7 +30,7 @@ public class LogNormal implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return Gaussian.withParameters(mu, sigma).sample(shape, random).expInPlace();
     }
 
