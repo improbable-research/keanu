@@ -13,9 +13,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import org.apache.commons.math3.analysis.function.Sigmoid;
 import org.tensorflow.Graph;
 import org.tensorflow.Output;
 import org.tensorflow.Session;
@@ -24,22 +24,41 @@ import org.tensorflow.op.Operands;
 import org.tensorflow.op.Scope;
 
 import io.improbable.keanu.backend.ProbabilisticGraph;
+import io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType;
 import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.PowerVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.multiple.ConcatenationVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.AbsVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcCosVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcSinVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ArcTanVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CeilVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.CosVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.DoubleUnaryOpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.ExpVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.FloorVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogGammaVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.LogVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixDeterminantVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.MatrixInverseVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.RoundVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SinVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.SumVertex;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.unary.TanVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class TensorflowGraphConverter {
@@ -49,21 +68,38 @@ public class TensorflowGraphConverter {
     static {
         opMappers = new HashMap<>();
 
-        opMappers.put(ConstantDoubleVertex.class, TensorflowGraphConverter::createDoubleConstant);
-
         //binary ops
-        opMappers.put(AdditionVertex.class, binaryOp(g -> g::add));
-        opMappers.put(DifferenceVertex.class, binaryOp(g -> g::sub));
-        opMappers.put(DivisionVertex.class, binaryOp(g -> g::div));
-        opMappers.put(MultiplicationVertex.class, binaryOp(g -> g::mul));
-        opMappers.put(MatrixMultiplicationVertex.class, binaryOp(g -> g::mmul));
-        opMappers.put(PowerVertex.class, binaryOp(g -> g::pow));
+        opMappers.put(AdditionVertex.class, binaryOp(OpType.ADD));
+        opMappers.put(DifferenceVertex.class, binaryOp(OpType.SUBTRACT));
+        opMappers.put(DivisionVertex.class, binaryOp(OpType.DIVIDE));
+        opMappers.put(MultiplicationVertex.class, binaryOp(OpType.MULTIPLY));
+        opMappers.put(MatrixMultiplicationVertex.class, binaryOp(OpType.MATRIX_MULTIPLY));
+        opMappers.put(MaxVertex.class, binaryOp(OpType.MAX));
+        opMappers.put(MinVertex.class, binaryOp(OpType.MIN));
+        opMappers.put(ArcTan2Vertex.class, binaryOp(OpType.ATAN2));
+        opMappers.put(PowerVertex.class, binaryOp(OpType.POW));
 
         //unary ops
-        opMappers.put(LogVertex.class, unaryOp(g -> g::log));
-        opMappers.put(SumVertex.class, unaryOp(g -> g::reduceSum));
+        opMappers.put(AbsVertex.class, unaryOp(OpType.ABS));
+        opMappers.put(ArcCosVertex.class, unaryOp(OpType.ACOS));
+        opMappers.put(ArcSinVertex.class, unaryOp(OpType.ASIN));
+        opMappers.put(ArcTanVertex.class, unaryOp(OpType.ATAN));
+        opMappers.put(CeilVertex.class, unaryOp(OpType.CEIL));
+        opMappers.put(CosVertex.class, unaryOp(OpType.COS));
+        opMappers.put(ExpVertex.class, unaryOp(OpType.EXP));
+        opMappers.put(FloorVertex.class, unaryOp(OpType.FLOOR));
+        opMappers.put(LogGammaVertex.class, unaryOp(OpType.LOG_GAMMA));
+        opMappers.put(LogVertex.class, unaryOp(OpType.LOG));
+        opMappers.put(MatrixDeterminantVertex.class, unaryOp(OpType.MATRIX_DETERMINANT));
+        opMappers.put(MatrixInverseVertex.class, unaryOp(OpType.MATRIX_INVERSE));
+        opMappers.put(RoundVertex.class, unaryOp(OpType.ROUND));
+        opMappers.put(Sigmoid.class, unaryOp(OpType.SIGMOID));
+        opMappers.put(SinVertex.class, unaryOp(OpType.SIN));
+        opMappers.put(TanVertex.class, unaryOp(OpType.TAN));
 
         //special case ops
+        opMappers.put(ConstantDoubleVertex.class, TensorflowGraphConverter::createDoubleConstant);
+        opMappers.put(SumVertex.class, TensorflowGraphConverter::createSum);
         opMappers.put(ConcatenationVertex.class, TensorflowGraphConverter::createConcat);
     }
 
@@ -71,36 +107,22 @@ public class TensorflowGraphConverter {
         Output<?> apply(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder);
     }
 
-    interface GraphBuilderUnaryOp {
-        Output<?> apply(Output<Double> operand, String name);
-    }
-
-    interface GraphBuilderBinaryOp {
-        Output<?> apply(Output<Double> leftOperand, Output<Double> rightOperand, String name);
-    }
-
-    private static Output<?> createUnaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderUnaryOp op) {
-        DoubleUnaryOpVertex unaryOpVertex = (DoubleUnaryOpVertex) vertex;
-
-        Output<Double> operand = (Output<Double>) lookup.get(unaryOpVertex.getInputVertex());
-
-        return op.apply(operand, getTensorflowOpName(unaryOpVertex));
-    }
-
-    private static Output<?> createBinaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderBinaryOp op) {
-        DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
-        Output<Double> leftOperand = (Output<Double>) lookup.get(binaryOpVertex.getLeft());
-        Output<Double> rightOperand = (Output<Double>) lookup.get(binaryOpVertex.getRight());
-        return op.apply(leftOperand, rightOperand, getTensorflowOpName(binaryOpVertex));
-    }
-
     static class OpBuilder {
-        static OpMapper binaryOp(Function<GraphBuilder, GraphBuilderBinaryOp> op) {
-            return (vertex, lookup, graphBuilder) -> createBinaryOp(vertex, lookup, op.apply(graphBuilder));
+        static OpMapper binaryOp(OpType op) {
+            return (vertex, lookup, graphBuilder) -> {
+                DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
+                Output<?> leftOperand = lookup.get(binaryOpVertex.getLeft());
+                Output<?> rightOperand = lookup.get(binaryOpVertex.getRight());
+                return graphBuilder.binaryOp(op, getTensorflowOpName(binaryOpVertex), leftOperand, rightOperand);
+            };
         }
 
-        static OpMapper unaryOp(Function<GraphBuilder, GraphBuilderUnaryOp> op) {
-            return (vertex, lookup, graphBuilder) -> createUnaryOp(vertex, lookup, op.apply(graphBuilder));
+        static OpMapper unaryOp(OpType op) {
+            return (vertex, lookup, graphBuilder) -> {
+                DoubleUnaryOpVertex unaryOpVertex = (DoubleUnaryOpVertex) vertex;
+                Output<?> operand = lookup.get(unaryOpVertex.getInputVertex());
+                return graphBuilder.unaryOp(op, getTensorflowOpName(unaryOpVertex), operand);
+            };
         }
     }
 
@@ -114,6 +136,17 @@ public class TensorflowGraphConverter {
         );
 
         return graphBuilder.concat(inputs, concatenationVertex.getDimension(), getTensorflowOpName(concatenationVertex));
+    }
+
+    private static <T> Output<T> createSum(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
+        SumVertex summationVertex = (SumVertex) vertex;
+        Output<?> input = lookup.get(summationVertex.getInputVertex());
+        String name = getTensorflowOpName(vertex);
+
+        int dims = input.shape().numDimensions();
+        Output<Integer> dimRange = graphBuilder.constant(TensorShape.dimensionRange(0, dims), new long[]{dims}, name + "_dimRange");
+
+        return graphBuilder.binaryOp(OpType.SUM, name, input, dimRange);
     }
 
     private static Output<Double> createDoubleConstant(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
