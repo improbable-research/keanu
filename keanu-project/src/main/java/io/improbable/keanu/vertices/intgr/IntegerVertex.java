@@ -107,8 +107,16 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(that);
     }
 
+    public IntegerVertex reverseMinus(int that) {
+        return new ConstantIntegerVertex(that).minus(this);
+    }
+
     public IntegerVertex div(IntegerVertex that) {
         return divideBy(that);
+    }
+
+    public IntegerVertex reverseDiv(int that) {
+        return (new ConstantIntegerVertex(that)).div(this);
     }
 
     public IntegerVertex times(int that) {
