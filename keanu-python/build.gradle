@@ -49,7 +49,7 @@ task pytest {
 task test_appveyor {
     doLast {
         exec {
-            commandLine 'pipenv', 'run', 'python', 'tests/test_appveyor_hanging.py'
+            commandLine 'pipenv', 'run', 'pytest', 'tests/test_appveyor_hanging.py'
         }
     }
 }
