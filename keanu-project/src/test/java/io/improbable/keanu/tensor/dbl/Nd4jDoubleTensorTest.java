@@ -7,7 +7,7 @@ import static org.junit.Assert.assertEquals;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
 import static io.improbable.keanu.tensor.TensorMatchers.isScalarWithValue;
-import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 import static junit.framework.TestCase.assertTrue;
 
 import java.util.ArrayList;
@@ -658,7 +658,7 @@ public class Nd4jDoubleTensorTest {
         DoubleTensor tensorRow = DoubleTensor.create(1, 3, 4, 5, 2);
 
         assertEquals(3, tensorRow.argMax());
-        assertThat(tensorRow.argMax(0), tensorEqualTo(IntegerTensor.zeros(1, 5)));
+        assertThat(tensorRow.argMax(0), valuesAndShapesMatch(IntegerTensor.zeros(1, 5)));
         assertThat(tensorRow.argMax(1), isScalarWithValue(3));
     }
 
@@ -668,7 +668,7 @@ public class Nd4jDoubleTensorTest {
 
         assertEquals(3, tensorCol.argMax());
         assertThat(tensorCol.argMax(0), isScalarWithValue(3));
-        assertThat(tensorCol.argMax(1), tensorEqualTo(IntegerTensor.zeros(1, 5)));
+        assertThat(tensorCol.argMax(1), valuesAndShapesMatch(IntegerTensor.zeros(1, 5)));
     }
 
     @Test
@@ -682,8 +682,8 @@ public class Nd4jDoubleTensorTest {
     public void canFindArgMaxOfMatrix() {
         DoubleTensor tensor = DoubleTensor.create(1, 2, 4, 3, 3, 1, 3, 1).reshape(2, 4);
 
-        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.create(1, 0, 0, 0)));
-        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(2, 0)));
+        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.create(1, 0, 0, 0)));
+        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(2, 0)));
         assertEquals(2, tensor.argMax());
     }
 
@@ -691,10 +691,10 @@ public class Nd4jDoubleTensorTest {
     public void canFindArgMaxOfHighRank() {
         DoubleTensor tensor = DoubleTensor.arange(0, 512).reshape(2, 8, 4, 2, 4);
 
-        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.ones(8, 4, 2, 4)));
-        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
-        assertThat(tensor.argMax(2), tensorEqualTo(IntegerTensor.create(3, new long[]{2, 8, 2, 4})));
-        assertThat(tensor.argMax(3), tensorEqualTo(IntegerTensor.ones(2, 8, 4, 4)));
+        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.ones(8, 4, 2, 4)));
+        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.create(7, new long[]{2, 4, 2, 4})));
+        assertThat(tensor.argMax(2), valuesAndShapesMatch(IntegerTensor.create(3, new long[]{2, 8, 2, 4})));
+        assertThat(tensor.argMax(3), valuesAndShapesMatch(IntegerTensor.ones(2, 8, 4, 4)));
         assertEquals(511, tensor.argMax());
     }
 
