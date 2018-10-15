@@ -1,6 +1,8 @@
 package io.improbable.keanu.backend.tensorflow;
 
 import static io.improbable.keanu.backend.ProbabilisticGraph.LOG_PROB;
+import static io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter.OpBuilder.binaryOp;
+import static io.improbable.keanu.backend.tensorflow.TensorflowGraphConverter.OpBuilder.unaryOp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.tensorflow.Graph;
@@ -41,72 +44,67 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class TensorflowGraphConverter {
 
-    interface OpMapper {
-        Output<?> apply(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder);
-    }
-
     private static Map<Class<?>, OpMapper> opMappers;
 
     static {
         opMappers = new HashMap<>();
 
         opMappers.put(ConstantDoubleVertex.class, TensorflowGraphConverter::createDoubleConstant);
-        opMappers.put(AdditionVertex.class, TensorflowGraphConverter::createAddition);
-        opMappers.put(DifferenceVertex.class, TensorflowGraphConverter::createSubtraction);
-        opMappers.put(DivisionVertex.class, TensorflowGraphConverter::createDivision);
-        opMappers.put(MultiplicationVertex.class, TensorflowGraphConverter::createMultiplication);
-        opMappers.put(MatrixMultiplicationVertex.class, TensorflowGraphConverter::createMatrixMultiplication);
 
-        opMappers.put(PowerVertex.class, TensorflowGraphConverter::createPow);
+        //binary ops
+        opMappers.put(AdditionVertex.class, binaryOp(g -> g::add));
+        opMappers.put(DifferenceVertex.class, binaryOp(g -> g::sub));
+        opMappers.put(DivisionVertex.class, binaryOp(g -> g::div));
+        opMappers.put(MultiplicationVertex.class, binaryOp(g -> g::mul));
+        opMappers.put(MatrixMultiplicationVertex.class, binaryOp(g -> g::mmul));
+        opMappers.put(PowerVertex.class, binaryOp(g -> g::pow));
 
-        opMappers.put(LogVertex.class, TensorflowGraphConverter::createLog);
-        opMappers.put(SumVertex.class, TensorflowGraphConverter::createSum);
+        //unary ops
+        opMappers.put(LogVertex.class, unaryOp(g -> g::log));
+        opMappers.put(SumVertex.class, unaryOp(g -> g::reduceSum));
 
+        //special case ops
         opMappers.put(ConcatenationVertex.class, TensorflowGraphConverter::createConcat);
     }
 
-    private static Output<?> createSum(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createUnaryOp(vertex, lookup, graphBuilder::reduceSum);
+    interface OpMapper {
+        Output<?> apply(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder);
     }
 
-    private static Output<?> createLog(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createUnaryOp(vertex, lookup, graphBuilder::log);
+    interface GraphBuilderUnaryOp {
+        Output<?> apply(Output<Double> operand, String name);
     }
 
-    private static Output<?> createAddition(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createBinaryOp(vertex, lookup, graphBuilder::add);
+    interface GraphBuilderBinaryOp {
+        Output<?> apply(Output<Double> leftOperand, Output<Double> rightOperand, String name);
     }
 
-    private static Output<?> createSubtraction(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createBinaryOp(vertex, lookup, graphBuilder::sub);
+    private static Output<?> createUnaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderUnaryOp op) {
+        DoubleUnaryOpVertex unaryOpVertex = (DoubleUnaryOpVertex) vertex;
+
+        Output<Double> operand = (Output<Double>) lookup.get(unaryOpVertex.getInputVertex());
+
+        return op.apply(operand, getTensorflowOpName(unaryOpVertex));
     }
 
-    private static Output<?> createMultiplication(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createBinaryOp(vertex, lookup, graphBuilder::mul);
+    private static Output<?> createBinaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderBinaryOp op) {
+        DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
+        Output<Double> leftOperand = (Output<Double>) lookup.get(binaryOpVertex.getLeft());
+        Output<Double> rightOperand = (Output<Double>) lookup.get(binaryOpVertex.getRight());
+        return op.apply(leftOperand, rightOperand, getTensorflowOpName(binaryOpVertex));
     }
 
-    private static Output<?> createDivision(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createBinaryOp(vertex, lookup, graphBuilder::div);
-    }
+    static class OpBuilder {
+        static OpMapper binaryOp(Function<GraphBuilder, GraphBuilderBinaryOp> op) {
+            return (vertex, lookup, graphBuilder) -> createBinaryOp(vertex, lookup, op.apply(graphBuilder));
+        }
 
-    private static Output<?> createMatrixMultiplication(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createBinaryOp(vertex, lookup, graphBuilder::mmul);
-    }
-
-    private static Output<?> createPow(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        return createBinaryOp(vertex, lookup, graphBuilder::pow);
+        static OpMapper unaryOp(Function<GraphBuilder, GraphBuilderUnaryOp> op) {
+            return (vertex, lookup, graphBuilder) -> createUnaryOp(vertex, lookup, op.apply(graphBuilder));
+        }
     }
 
     private static Output<?> createConcat(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilder graphBuilder) {
-        /**
-         *   public static <T, U extends Number> Concat<T> create(Scope scope, Operand<T> values, Operand<U> axis) {
-         *     OperationBuilder opBuilder = scope.graph().opBuilder("ConcatV2", scope.makeOpName("Concat"));
-         *     opBuilder.addInput(values.asOutput());
-         *     opBuilder.addInput(axis.asOutput());
-         *     return new Concat<T>(opBuilder.build());
-         *   }
-         */
-
         ConcatenationVertex concatenationVertex = (ConcatenationVertex) vertex;
 
         Output<Double>[] inputs = (Output<Double>[]) Operands.asOutputs(
@@ -150,37 +148,6 @@ public class TensorflowGraphConverter {
         return Shape.make(shape[0], Arrays.copyOfRange(shape, 1, shape.length));
     }
 
-    interface GraphBuilderUnaryOp {
-        Output<?> apply(Output<Double> operand, String name);
-    }
-
-    private static Output<?> createUnaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderUnaryOp op) {
-        DoubleUnaryOpVertex unaryOpVertex = (DoubleUnaryOpVertex) vertex;
-
-        Output<Double> operand = (Output<Double>) lookup.get(unaryOpVertex.getInputVertex());
-
-        return op.apply(operand, getTensorflowOpName(unaryOpVertex));
-    }
-
-    interface GraphBuilderBinaryOp {
-        Output<?> apply(Output<Double> leftOperand, Output<Double> rightOperand, String name);
-    }
-
-    private static Output<?> createBinaryOp(Vertex<?> vertex, Map<Vertex<?>, Output<?>> lookup, GraphBuilderBinaryOp op) {
-        DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
-        Output<Double> leftOperand = (Output<Double>) lookup.get(binaryOpVertex.getLeft());
-        Output<Double> rightOperand = (Output<Double>) lookup.get(binaryOpVertex.getRight());
-        return op.apply(leftOperand, rightOperand, getTensorflowOpName(binaryOpVertex));
-    }
-
-    private static long[] toLongs(int[] ints) {
-        long[] longs = new long[ints.length];
-        for (int i = 0; i < ints.length; i++) {
-            longs[i] = ints[i];
-        }
-        return longs;
-    }
-
     private static String getTensorflowOpName(Vertex vertex) {
 
         String name = vertex.getLabel() != null ? vertex.getLabel().toString() : vertex.getId().toString();
@@ -188,8 +155,6 @@ public class TensorflowGraphConverter {
     }
 
     public static ProbabilisticGraph convert(BayesianNetwork network) {
-
-//        addLogProb(network);
 
         Graph graph = new Graph();
         Scope scope = new Scope(graph);
@@ -229,13 +194,7 @@ public class TensorflowGraphConverter {
             }
         }
 
-        Output<Double> totalLogProb = logProbOps.get(0);
-        for (int i = 1; i < logProbOps.size(); i++) {
-
-            Output<Double> logProbContrib = logProbOps.get(i);
-            String name = i == logProbOps.size() - 1 ? LOG_PROB : "logProb" + i;
-            totalLogProb = graphBuilder.add(totalLogProb, logProbContrib, name);
-        }
+        addLogProbSum(logProbOps, graphBuilder);
 
         Map<String, Output<?>> gradientByInput = addGradients(graph, placeHolderOps);
 
@@ -279,34 +238,15 @@ public class TensorflowGraphConverter {
         return (Output<Double>) lookup.get(logProbGraph.getLogProbOutput());
     }
 
-//    private static void addLogProb(BayesianNetwork network) {
-//
-//        List<Vertex> latentOrObservedVertices = network.getLatentOrObservedVertices();
-//
-//        DoubleVertex logProb = null;
-//        for (Vertex v : latentOrObservedVertices) {
-//
-//            if (v instanceof Probabilistic) {
-//                if (v instanceof GaussianVertex) {
-//                    GaussianVertex gaussianVertex = ((GaussianVertex) v);
-//
-//                    DoubleVertex logProbGraph = gaussianVertex.logProbGraph(gaussianVertex);
-//
-//                    if (logProb == null) {
-//                        logProb = logProbGraph;
-//                    } else {
-//                        logProb = logProb.plus(logProbGraph);
-//                    }
-//                } else {
-//                    throw new IllegalArgumentException("Only supports log prob of Gaussian distributions");
-//                }
-//            }
-//        }
-//
-//        if (logProb != null) {
-//            logProb.setLabel(new VertexLabel(LOG_PROB));
-//        }
-//    }
+    private static void addLogProbSum(List<Output<Double>> logProbOps, GraphBuilder graphBuilder) {
+        Output<Double> totalLogProb = logProbOps.get(0);
+        for (int i = 1; i < logProbOps.size(); i++) {
+
+            Output<Double> logProbContrib = logProbOps.get(i);
+            String name = i == logProbOps.size() - 1 ? LOG_PROB : "logProb" + i;
+            totalLogProb = graphBuilder.add(totalLogProb, logProbContrib, name);
+        }
+    }
 
     private static Map<String, Output<?>> addGradients(Graph graph, List<String> placeHolderOps) {
 
