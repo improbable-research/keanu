@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package keanu;
+
+option java_package = "io.improbable.keanu";
+option java_outer_classname = "KeanuSavedBayesNet";
+
+message BayesNet {
+    repeated Vertex vertices = 1;
+}
+
+message Vertex {
+    uint32 id = 1;
+    string label = 2;
+    string vertexType = 3;
+    VertexValue value = 4;
+    repeated HyperParams hyperParameters = 5;
+}
+
+message VertexValue {
+    enum ValueType {
+        DOUBLE = 0;
+        INT = 1;
+        BOOL = 2;
+        STRING = 3;
+    }
+
+    ValueType type = 1;
+    double doubleVal = 2;
+    int64 intVal = 3;
+    bool boolVal = 4;
+    string stringVal = 5;
+}
+
+message HyperParams {
+    string name = 1;
+    uint32 parentID = 2;
+}
