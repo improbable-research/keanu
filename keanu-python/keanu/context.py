@@ -65,7 +65,7 @@ class KeanuContext(metaclass=Singleton):
         if isinstance(l[0], bool):
             return self._gateway.jvm.boolean
         elif isinstance(l[0], int):
-            return self._gateway.jvm.long
+            return self._gateway.jvm.int
         elif isinstance(l[0], float):
             return self._gateway.jvm.double
         else:
