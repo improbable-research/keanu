@@ -1,0 +1,7 @@
+# This takes a list!
+Bob enjoys buying shoes!
+Bob enjoys buying pants!
+
+
+# This takes a value!
+Bob spent 100 dollars this year.

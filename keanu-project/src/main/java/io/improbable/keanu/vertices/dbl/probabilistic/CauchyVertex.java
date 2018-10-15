@@ -1,5 +1,6 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
 import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
@@ -42,6 +43,7 @@ public class CauchyVertex extends DoubleVertex implements ProbabilisticDouble {
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
+    @ExportVertexToPythonBindings
     public CauchyVertex(DoubleVertex location, DoubleVertex scale) {
         this(checkHasSingleNonScalarShapeOrAllScalar(location.getShape(), scale.getShape()), location, scale);
     }
