@@ -55,6 +55,9 @@ task test_appveyor {
 }
 test_appveyor.dependsOn(":shadowJar")
 test_appveyor.dependsOn(":codegen:codeGen")
+test_appveyor.dependsOn(installPipenv)
+test_appveyor.dependsOn(pythonVersionInfo)
+test_appveyor.dependsOn(installDependencies)
 
 test.dependsOn(pytest)
 pytest.dependsOn(installPipenv)
