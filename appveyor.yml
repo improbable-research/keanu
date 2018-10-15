@@ -6,4 +6,4 @@ environment:
 install:
 - "SET PATH=%PYTHON%;%PYTHON%\\Scripts;%PATH%"
 build_script:
-- cmd: ./gradlew.bat :keanu-python:test_appveyor -i --debug
+- cmd: ./gradlew.bat :keanu-python:test_appveyor -i --debug --stacktrace
