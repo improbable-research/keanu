@@ -3,9 +3,10 @@ import numbers
 
 from keanu.context import KeanuContext
 from keanu.base import JavaObjectWrapper
+from keanu.const import Const
+
 
 context = KeanuContext()
-k = context.jvm_view()
 
 
 class VertexOps:
@@ -29,13 +30,12 @@ class Vertex(JavaObjectWrapper, VertexOps):
     @staticmethod
     def __parse_arg(arg):
         if isinstance(arg, np.ndarray):
-            from keanu.const import Const
             return Const(arg).unwrap()
         elif isinstance(arg, numbers.Number):
             return arg
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
-        elif isinstance(arg, list):
-            return context.to_java_array(arg)
+        elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
+            return context.to_java_long_array(arg)
         else:
             raise ValueError("Can't parse generic argument. Was given {}".format(type(arg)))

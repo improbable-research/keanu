@@ -60,6 +60,7 @@ def test_const_takes_ndarray_of_rank_one():
     v = kn.Const(ndarray)
 
     assert_vertex_value_equal_ndarray(v, ndarray)
+    assert v.getValue().getRank() == 2
 
 
 def assert_vertex_value_equal_ndarray(v, ndarray):

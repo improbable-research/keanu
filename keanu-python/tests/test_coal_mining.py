@@ -1,15 +1,14 @@
 import pandas as pd
 import keanu as kn
-import examples
+from examples import CoalMining
 
 
 
 def test_coalmining():
-    model = examples.coal_mining_model()
+    coal_mining = CoalMining()
+    model = coal_mining.model()
 
-    FILE = "data/coal-mining-disaster-data.csv"
-    data = pd.read_csv(FILE, names=["year", "count"]).set_index("year")
-    model.disasters.observe(data.values)
+    model.disasters.observe(coal_mining.training_data())
 
     net = kn.BayesNet(model.switchpoint.getConnectedGraph())
     posterior_dist_samples = kn.MetropolisHastings().get_posterior_samples(net, net.getLatentVertices(), 50000)

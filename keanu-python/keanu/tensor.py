@@ -19,7 +19,7 @@ class Tensor(JavaObjectWrapper):
 
             ctor = Tensor.__infer_tensor_from_ndarray(normalized_ndarray)
             values = context.to_java_array(normalized_ndarray.flatten().tolist())
-            shape = context.to_java_array(normalized_ndarray.shape)
+            shape = context.to_java_long_array(normalized_ndarray.shape)
 
             super(Tensor, self).__init__(ctor, values, shape)
         elif isinstance(t, numbers.Number):
