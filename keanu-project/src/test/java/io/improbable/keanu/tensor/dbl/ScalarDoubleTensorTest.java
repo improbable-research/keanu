@@ -5,7 +5,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-import static io.improbable.keanu.tensor.TensorMatchers.tensorEqualTo;
+import static io.improbable.keanu.tensor.TensorMatchers.valuesAndShapesMatch;
 
 import java.util.function.Function;
 
@@ -190,8 +190,8 @@ public class ScalarDoubleTensorTest {
         DoubleTensor tensor = DoubleTensor.scalar(1);
 
         assertEquals(0, tensor.argMax());
-        assertThat(tensor.argMax(0), tensorEqualTo(IntegerTensor.scalar(0)));
-        assertThat(tensor.argMax(1), tensorEqualTo(IntegerTensor.scalar(0)));
+        assertThat(tensor.argMax(0), valuesAndShapesMatch(IntegerTensor.scalar(0)));
+        assertThat(tensor.argMax(1), valuesAndShapesMatch(IntegerTensor.scalar(0)));
     }
 
     @Test(expected = IllegalArgumentException.class)
