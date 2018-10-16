@@ -2,12 +2,12 @@ package io.improbable.keanu.tensor;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.kotlin.Operators;
+import io.improbable.keanu.kotlin.NumberOperators;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> extends Tensor<N>, Operators<T> {
+public interface NumberTensor<N extends Number, T extends NumberTensor<N,T>> extends Tensor<N>, NumberOperators<T> {
 
     N sum();
 
