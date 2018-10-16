@@ -6,6 +6,4 @@ public interface ModelGraph<INPUT, OUTPUT> {
     BayesianNetwork getNet();
 
     void observeValues(INPUT input, OUTPUT output);
-
-    OUTPUT predict(INPUT input);
 }

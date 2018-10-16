@@ -44,7 +44,6 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         net = new BayesianNetwork(yVertex.getConnectedGraph());
     }
 
-    @Override
     public OUTPUT predict(DoubleTensor input) {
         xVertex.setAndCascade(input);
         return yVertex.getValue();
