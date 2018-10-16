@@ -27,7 +27,7 @@ message VertexValue {
     }
 }
 
-message HyperParams {
+message NamedInputs {
     string name = 1;
     uint32 parentID = 2;
 }
