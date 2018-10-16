@@ -16,11 +16,8 @@ plugins {
     id 'jacoco'
 }
 
-apply plugin: 'java'
-apply plugin: 'jacoco'
 apply plugin: 'com.google.protobuf'
 
-group = 'io.improbable'
 archivesBaseName = "keanu"
 
 dependencies {
@@ -46,7 +43,7 @@ dependencies {
 protobuf {
     protoc {
         // The artifact spec for the Protobuf Compiler
-        artifact = 'com.google.protobuf:protoc:3.0.0'
+        artifact = 'com.google.protobuf:protoc:3.6.1'
     }
 }
 

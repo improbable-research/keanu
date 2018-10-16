@@ -18,18 +18,13 @@ message Vertex {
 }
 
 message VertexValue {
-    enum ValueType {
-        DOUBLE = 0;
-        INT = 1;
-        BOOL = 2;
-        STRING = 3;
+    oneof values {
+        double doubleVal = 1;
+        int64 intVal = 2;
+        bool boolVal = 3;
+        string stringVal = 4;
+        bytes genericVal = 5;
     }
-
-    ValueType type = 1;
-    double doubleVal = 2;
-    int64 intVal = 3;
-    bool boolVal = 4;
-    string stringVal = 5;
 }
 
 message HyperParams {
