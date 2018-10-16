@@ -1,10 +1,18 @@
-language: java
-jdk:
-  - oraclejdk8
-addons:
-  sonarcloud:
-    organization: improbable-keanu
-script: deployment/buildAndDeploy.sh
-before_install:
-- openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
-  -in deployment/secret-keys-keanu.gpg.enc -out deployment/secret-keys-keanu.gpg -d
+matrix:
+  include:
+    - language: java
+      jdk: oraclejdk8
+      addons:
+        sonarcloud:
+          organization: "improbable-keanu"
+      script: deployment/buildAndDeploy.sh
+      before_install:
+      - openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
+        -in deployment/secret-keys-keanu.gpg.enc -out deploymentxw/secret-keys-keanu.gpg -d
+    - language: python
+      python: 3.6
+      env:
+        - PIPENV_IGNORE_VIRTUALENVS=1
+        - PIPENV_YES=1
+      script:
+        - ./gradlew keanu-python:clean keanu-python:build -i

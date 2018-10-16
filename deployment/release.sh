@@ -9,4 +9,3 @@ git flow release start $version
 git flow release publish $version
 git flow release finish $version
 git push origin --tags
-git push
