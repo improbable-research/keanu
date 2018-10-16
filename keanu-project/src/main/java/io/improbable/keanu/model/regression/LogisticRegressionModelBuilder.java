@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import lombok.experimental.UtilityClass;
 
 /**
  * Utility for building a logistic regression model without regularisation.
@@ -44,7 +43,7 @@ public class LogisticRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LogisticRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MaximumLikelihoodModelFitter<>());
+        return new LogisticRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MaximumLikelihoodModelFitter<>(regressionGraph));
     }
 
     private long getFeatureCount() {

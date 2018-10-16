@@ -87,7 +87,7 @@ public class LinearRidgeRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LinearRegressionModel(this.inputTrainingData, this.outputTrainingData, regressionGraph, new MAPModelFitter<>());
+        return new LinearRegressionModel(this.inputTrainingData, this.outputTrainingData, regressionGraph, new MAPModelFitter<>(regressionGraph));
     }
 
     private long getFeatureCount() {

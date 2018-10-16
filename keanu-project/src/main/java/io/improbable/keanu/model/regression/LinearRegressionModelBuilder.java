@@ -1,12 +1,10 @@
 package io.improbable.keanu.model.regression;
 
 import io.improbable.keanu.model.MaximumLikelihoodModelFitter;
-import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import lombok.experimental.UtilityClass;
 
 /**
  * Builder class for doing linear regression without regularisation.
@@ -50,7 +48,7 @@ public class LinearRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LinearRegressionModel(this.inputTrainingData, this.outputTrainingData, regressionGraph, new MaximumLikelihoodModelFitter<>());
+        return new LinearRegressionModel(this.inputTrainingData, this.outputTrainingData, regressionGraph, new MaximumLikelihoodModelFitter<>(regressionGraph));
     }
 
     private long getFeatureCount() {

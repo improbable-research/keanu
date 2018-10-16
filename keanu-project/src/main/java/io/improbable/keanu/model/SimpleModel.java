@@ -26,6 +26,6 @@ abstract public class SimpleModel<INPUT, OUTPUT> implements Model<INPUT, OUTPUT>
     }
 
     public void fit() {
-        modelFitter.fit(modelGraph, inputTrainingData, outputTrainingData);
+        modelFitter.fit(inputTrainingData, outputTrainingData);
     }
 }

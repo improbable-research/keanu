@@ -6,7 +6,6 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import lombok.experimental.UtilityClass;
 
 /**
  * Utility for building a logistic regression model.
@@ -74,7 +73,7 @@ public class LogisticRidgeRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LogisticRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MAPModelFitter<>());
+        return new LogisticRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MAPModelFitter<>(regressionGraph));
     }
 
     private long getFeatureCount() {
