@@ -1,0 +1,54 @@
+test.dependsOn(":shadowJar")
+test.dependsOn(":codegen:codeGen")
+
+task installPipenv {
+    doLast {
+        exec {
+            commandLine 'pip', 'install', 'pipenv'
+        }
+    }
+}
+
+task pythonVersionInfo {
+    doLast {
+        exec {
+            commandLine 'python', '--version'
+        }
+        exec {
+            commandLine 'pip', '--version'
+        }
+        exec {
+            commandLine 'pipenv', '--version'
+        }
+        exec {
+            // NB: the python version inside pipenv is not necessarily the same as the version outside pipenv
+            commandLine 'pipenv', 'run', 'python', '--version'
+        }
+        exec {
+            // NB: the pip version inside pipenv is not necessarily the same as the version outside pipenv
+            commandLine 'pipenv', 'run', 'pip', '--version'
+        }
+    }
+}
+
+task installDependencies {
+    doLast {
+        exec {
+            commandLine 'pipenv', 'install', '--dev', '--python', '3.6'
+        }
+    }
+}
+task pytest {
+    doLast {
+        exec {
+            commandLine 'pipenv', 'run', 'pytest'
+        }
+    }
+}
+
+test.dependsOn(pytest)
+pytest.dependsOn(installPipenv)
+pytest.dependsOn(pythonVersionInfo)
+pytest.dependsOn(installDependencies)
+pythonVersionInfo.mustRunAfter(installPipenv)
+installDependencies.mustRunAfter(pythonVersionInfo)

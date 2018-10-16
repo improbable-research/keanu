@@ -27,8 +27,3 @@ shadowJar {
     destinationDir = file("$rootDir/keanu-python/keanu")
     archiveName = "keanu-python-all.jar"
 }
-
-task buildPython {
-    dependsOn(shadowJar)
-    dependsOn(":codegen:processor:codeGen")
-}
