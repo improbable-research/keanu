@@ -17,7 +17,6 @@ import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.lessThan;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html

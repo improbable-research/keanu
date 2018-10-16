@@ -63,11 +63,17 @@ Interested in more technical examples? Explore [Examples](keanu-docs/examples.md
 
 ## Development
 
+#### Annotations
+
 We use [Lombok](https://projectlombok.org/) annotations, which you will need to enable in your IDE.
 
 For IntelliJ:
  - Install the [Lombok plugin](https://plugins.jetbrains.com/plugin/6317-lombok-plugin)
  - Settings > Build, Execution, Deployment > Compiler > Annotation Processors - Enable annotation processing
+
+#### Formatting
+
+We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew spotlessApply` and commit the changes.
 
 ## Hiring
 
