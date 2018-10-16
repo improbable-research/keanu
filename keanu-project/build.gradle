@@ -43,6 +43,13 @@ dependencies {
 
 }
 
+protobuf {
+    protoc {
+        // The artifact spec for the Protobuf Compiler
+        artifact = 'com.google.protobuf:protoc:3.0.0'
+    }
+}
+
 test {
     systemProperty "io.improbable.keanu.defaultRandom.seed", '1'
     systemProperty "dtype", 'double'
