@@ -11,7 +11,6 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.regression.LinearLassoRegression;
 import io.improbable.keanu.model.regression.LinearRegressionModel;
 
 public class LinearLassoRegressionTest {
@@ -24,11 +23,12 @@ public class LinearLassoRegressionTest {
     public void findsExpectedParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
 
-        LinearRegressionModel regression = LinearLassoRegression
-            .withFeatureShape(data.xTrain.getShape())
+        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit(data.xTrain, data.yTrain);
+        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -40,11 +40,12 @@ public class LinearLassoRegressionTest {
     @Test
     public void findsExpectedParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
-        LinearRegressionModel regression = LinearLassoRegression
-            .withFeatureShape(data.xTrain.getShape())
+        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit(data.xTrain, data.yTrain);
+        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -57,11 +58,12 @@ public class LinearLassoRegressionTest {
     public void findsExpectedParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(20);
 
-        LinearRegressionModel regression = LinearLassoRegression
-            .withFeatureShape(data.xTrain.getShape())
+        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit(data.xTrain, data.yTrain);
+        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -74,16 +76,18 @@ public class LinearLassoRegressionTest {
     public void decreasingSigmaDecreasesL1NormOfWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(20);
 
-        LinearRegressionModel regressionWide = LinearLassoRegression
-            .withFeatureShape(data.xTrain.getShape())
+        LinearRegressionModel regressionWide = LinearRegressionModel.lassoRegressionModelBuilder()
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 100000)
             .build();
-        LinearRegressionModel regressionNarrow = LinearLassoRegression
-            .withFeatureShape(data.xTrain.getShape())
+        LinearRegressionModel regressionNarrow = LinearRegressionModel.lassoRegressionModelBuilder()
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .setPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
-        regressionWide.fit(data.xTrain, data.yTrain);
-        regressionNarrow.fit(data.xTrain, data.yTrain);
+        regressionWide.fit();
+        regressionNarrow.fit();
 
         assertThat(regressionNarrow.getWeights().abs().sum(), lessThan(regressionWide.getWeights().abs().sum()));
 
@@ -93,11 +97,12 @@ public class LinearLassoRegressionTest {
     public void bringsUncorrelatedWeightsVeryCloseToZero() {
         LinearRegressionTestUtils.TestData data = generateThreeFeatureDataWithOneUncorrelatedFeature();
 
-        LinearRegressionModel regression = LinearLassoRegression
-            .withFeatureShape(data.xTrain.getShape())
+        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .build();
 
-        regression.fit(data.xTrain, data.yTrain);
+        regression.fit();
 
         assertEquals(0., regression.getWeight(2), 1e-3);
     }

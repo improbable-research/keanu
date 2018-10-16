@@ -12,7 +12,6 @@ import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.model.LogisticModelScore;
-import io.improbable.keanu.model.regression.LogisticRegression;
 import io.improbable.keanu.model.regression.LogisticRegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -50,8 +49,11 @@ public class LogisticRegressionTest {
 
     @Test
     public void testLogisticRegression() {
-        LogisticRegressionModel model = LogisticRegression.withFeatureShape(xTrain.getShape()).build();
-        model.fit(xTrain, yTrain);
+        LogisticRegressionModel model = LogisticRegressionModel.builder()
+            .setInputTrainingData(xTrain)
+            .setOutputTrainingData(yTrain)
+            .build();
+        model.fit();
         double accuracy = LogisticModelScore.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
         assertWeightsAreCalculated(model.getWeights());

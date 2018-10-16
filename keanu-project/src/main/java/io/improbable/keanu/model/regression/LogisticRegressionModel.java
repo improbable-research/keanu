@@ -15,9 +15,21 @@ public class LogisticRegressionModel extends SimpleModel<DoubleTensor, BooleanTe
 
     private final LinearRegressionGraph linearModelGraph;
 
-    LogisticRegressionModel(LinearRegressionGraph<BooleanTensor> linearModelGraph, ModelFitter<DoubleTensor, BooleanTensor> fitter) {
-        super(linearModelGraph, fitter);
+    LogisticRegressionModel(DoubleTensor inputTrainingData, BooleanTensor outputTrainingData, LinearRegressionGraph<BooleanTensor> linearModelGraph, ModelFitter<DoubleTensor, BooleanTensor> fitter) {
+        super(inputTrainingData, outputTrainingData, linearModelGraph, fitter);
         this.linearModelGraph = linearModelGraph;
+    }
+
+    public static LogisticRegressionModelBuilder builder() {
+        return new LogisticRegressionModelBuilder();
+    }
+
+    public static LogisticLassoRegressionModelBuilder lassoRegressionModelBuilder() {
+        return new LogisticLassoRegressionModelBuilder();
+    }
+
+    public static LogisticRidgeRegressionModelBuilder ridgeRegressionModelBuilder() {
+        return new LogisticRidgeRegressionModelBuilder();
     }
 
     static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {

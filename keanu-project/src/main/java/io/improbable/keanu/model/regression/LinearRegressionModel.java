@@ -9,12 +9,23 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 public class LinearRegressionModel extends SimpleModel<DoubleTensor, DoubleTensor> {
-
     private final LinearRegressionGraph linearModelGraph;
 
-    LinearRegressionModel(LinearRegressionGraph<DoubleTensor> linearModelGraph, ModelFitter<DoubleTensor, DoubleTensor> fitter) {
-        super(linearModelGraph, fitter);
+    LinearRegressionModel(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData, LinearRegressionGraph<DoubleTensor> linearModelGraph, ModelFitter<DoubleTensor, DoubleTensor> fitter) {
+        super(inputTrainingData, outputTrainingData, linearModelGraph, fitter);
         this.linearModelGraph = linearModelGraph;
+    }
+
+    public static LinearRegressionModelBuilder builder() {
+        return new LinearRegressionModelBuilder();
+    }
+
+    public static LinearRidgeRegressionModelBuilder ridgeRegressionModelBuilder() {
+        return new LinearRidgeRegressionModelBuilder();
+    }
+
+    public static LinearLassoRegressionModelBuilder lassoRegressionModelBuilder() {
+        return new LinearLassoRegressionModelBuilder();
     }
 
     static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {

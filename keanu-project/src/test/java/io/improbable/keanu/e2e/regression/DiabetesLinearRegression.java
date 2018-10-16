@@ -10,9 +10,7 @@ import org.junit.Test;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.LinearModelScore;
-import io.improbable.keanu.model.regression.LinearRegression;
 import io.improbable.keanu.model.regression.LinearRegressionModel;
-import io.improbable.keanu.model.regression.LinearRidgeRegression;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.util.csv.ReadCsv;
@@ -59,11 +57,12 @@ public class DiabetesLinearRegression {
     public void doesLinearRegressionOnBMIAsModel() {
         Data data = readData();
 
-        LinearRegressionModel regression = LinearRidgeRegression
-            .withFeatureShape(data.bmi.getShape())
+        LinearRegressionModel regression = LinearRegressionModel.ridgeRegressionModelBuilder()
+            .setInputTrainingData(data.bmi)
+            .setOutputTrainingData(data.y)
             .setPriorOnWeightsAndIntercept(0, 100)
             .build();
-        regression.fit(data.bmi, data.y);
+        regression.fit();
         assertEquals(938.2378, regression.getWeight(0), 0.5);
         assertEquals(152.9189, regression.getIntercept(), 0.5);
     }
@@ -82,10 +81,11 @@ public class DiabetesLinearRegression {
         DoubleTensor yTrainingData = splitYData.get(0);
         DoubleTensor yTestData = splitYData.get(1);
 
-        LinearRegressionModel regression = LinearRegression
-            .withFeatureShape(xTrainingData.getShape())
+        LinearRegressionModel regression = LinearRegressionModel.builder()
+            .setInputTrainingData(xTrainingData)
+            .setOutputTrainingData(yTrainingData)
             .build();
-        regression.fit(xTrainingData, yTrainingData);
+        regression.fit();
 
         double accuracyOnTestData = LinearModelScore.coefficientOfDetermination(regression.predict(xTestData), yTestData);
         assertThat(accuracyOnTestData, greaterThan(0.3));
