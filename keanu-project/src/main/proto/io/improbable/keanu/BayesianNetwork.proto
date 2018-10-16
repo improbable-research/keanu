@@ -10,7 +10,7 @@ message BayesNet {
 }
 
 message Vertex {
-    uint32 id = 1;
+    int64 id = 1;
     string label = 2;
     string vertexType = 3;
     VertexValue value = 4;
@@ -29,5 +29,5 @@ message VertexValue {
 
 message NamedInputs {
     string name = 1;
-    uint32 parentID = 2;
+    int64 parentID = 2;
 }
