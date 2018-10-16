@@ -14,15 +14,10 @@ import lombok.Getter;
 import lombok.Value;
 
 public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
-    @Getter
     private final DoubleVertex xVertex;
-    @Getter
     private final Vertex<OUTPUT> yVertex;
-    @Getter
     private final Vertex<OUTPUT> yObservationVertex;
-    @Getter
     private final DoubleVertex weightsVertex;
-    @Getter
     private final DoubleVertex interceptVertex;
     @Getter
     private final BayesianNetwork net;
@@ -53,6 +48,18 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
     public void observeValues(DoubleTensor input, OUTPUT output) {
         xVertex.setValue(input);
         yObservationVertex.observe(output);
+    }
+
+    public DoubleTensor getX() {
+        return xVertex.getValue();
+    }
+
+    public DoubleTensor getWeights() {
+        return weightsVertex.getValue();
+    }
+
+    public double getIntercept() {
+        return interceptVertex.getValue().scalar();
     }
 
     @Value

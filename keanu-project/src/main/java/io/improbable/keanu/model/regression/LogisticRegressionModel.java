@@ -38,15 +38,15 @@ public class LogisticRegressionModel implements Model<DoubleTensor, BooleanTenso
     }
 
     public DoubleTensor getY() {
-        return linearModelGraph.getXVertex().getValue();
+        return linearModelGraph.getX();
     }
 
     public DoubleTensor getWeights() {
-        return linearModelGraph.getWeightsVertex().getValue();
+        return linearModelGraph.getWeights();
     }
 
     public double getIntercept() {
-        return linearModelGraph.getInterceptVertex().getValue().scalar();
+        return linearModelGraph.getIntercept();
     }
 
     @Override

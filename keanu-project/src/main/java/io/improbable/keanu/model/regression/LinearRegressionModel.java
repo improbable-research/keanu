@@ -31,20 +31,20 @@ public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> 
     }
 
     public DoubleTensor getY() {
-        return linearModelGraph.getXVertex().getValue();
+        return linearModelGraph.getX();
     }
 
     public DoubleTensor getWeights() {
-        return linearModelGraph.getWeightsVertex().getValue();
+        return linearModelGraph.getWeights();
     }
 
     public double getIntercept() {
-        return linearModelGraph.getInterceptVertex().getValue().scalar();
+        return linearModelGraph.getIntercept();
     }
 
     public double getWeight(int index) {
-        DoubleVertex weight = linearModelGraph.getWeightsVertex();
-        return weight.getValue().isScalar() ? weight.getValue().scalar() : weight.getValue(0, index);
+        DoubleTensor weight = linearModelGraph.getWeights();
+        return weight.isScalar() ? weight.scalar() : weight.getValue(0, index);
     }
 
     @Override
