@@ -11,12 +11,13 @@ import io.improbable.keanu.distributions.discrete.Binomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 
-public class BinomialVertex extends ProbabilisticIntegerVertex {
+public class BinomialVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private final DoubleVertex p;
     private final IntegerVertex n;
@@ -70,7 +71,7 @@ public class BinomialVertex extends ProbabilisticIntegerVertex {
     }
 
     @Override
-    protected IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Binomial.withParameters(p.getValue(), n.getValue()).sample(shape, random);
     }
 }

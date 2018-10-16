@@ -10,12 +10,13 @@ import io.improbable.keanu.distributions.discrete.UniformInt;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
 import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex;
 
-public class UniformIntVertex extends ProbabilisticIntegerVertex {
+public class UniformIntVertex extends IntegerVertex implements ProbabilisticInteger, SamplableWithManyScalars<IntegerTensor> {
 
     private IntegerVertex min;
     private IntegerVertex max;
@@ -86,7 +87,7 @@ public class UniformIntVertex extends ProbabilisticIntegerVertex {
     }
 
     @Override
-    protected IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public IntegerTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return UniformInt.withParameters(min.getValue(), max.getValue()).sample(shape, random);
     }
 }

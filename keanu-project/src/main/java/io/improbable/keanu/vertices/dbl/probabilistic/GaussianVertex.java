@@ -13,13 +13,14 @@ import java.util.Set;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public class GaussianVertex extends ProbabilisticDoubleVertex {
+public class GaussianVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex sigma;
@@ -112,7 +113,7 @@ public class GaussianVertex extends ProbabilisticDoubleVertex {
     }
 
     @Override
-    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Gaussian.withParameters(mu.getValue(), sigma.getValue()).sample(shape, random);
     }
 

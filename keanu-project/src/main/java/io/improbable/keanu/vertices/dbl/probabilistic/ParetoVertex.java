@@ -13,13 +13,14 @@ import java.util.Set;
 import io.improbable.keanu.distributions.continuous.Pareto;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public class ParetoVertex extends ProbabilisticDoubleVertex {
+public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex scale;
     private final DoubleVertex location;
@@ -110,7 +111,7 @@ public class ParetoVertex extends ProbabilisticDoubleVertex {
     }
 
     @Override
-    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Pareto.withParameters(location.getValue(), scale.getValue()).sample(shape, random);
     }
 

@@ -11,12 +11,13 @@ import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class UniformVertex extends ProbabilisticDoubleVertex {
+public class UniformVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex xMin;
     private final DoubleVertex xMax;
@@ -103,7 +104,7 @@ public class UniformVertex extends ProbabilisticDoubleVertex {
     }
 
     @Override
-    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Uniform.withParameters(xMin.getValue(), xMax.getValue()).sample(shape, random);
     }
 

@@ -11,9 +11,8 @@ import com.google.common.collect.ImmutableSet;
 import io.improbable.keanu.algorithms.graphtraversal.DiscoverGraph;
 import io.improbable.keanu.algorithms.graphtraversal.VertexValuePropagation;
 import io.improbable.keanu.tensor.Tensor;
-import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public abstract class Vertex<T> implements Observable<T> {
+public abstract class Vertex<T> implements Observable<T>, Samplable<T>, HasShape {
 
     private final VertexId id = new VertexId();
     private Set<Vertex> children = Collections.emptySet();
@@ -44,17 +43,6 @@ public abstract class Vertex<T> implements Observable<T> {
     public <V extends Vertex<T>> V removeLabel() {
         this.label = null;
         return (V) this;
-    }
-
-    /**
-     * @param random source of randomness
-     * @return a sample from the vertex's distribution. For non-probabilistic vertices,
-     * this will always be the same value.
-     */
-    public abstract T sample(KeanuRandom random);
-
-    public T sample() {
-        return sample(KeanuRandom.getDefaultRandom());
     }
 
     /**
@@ -120,6 +108,7 @@ public abstract class Vertex<T> implements Observable<T> {
         }
     }
 
+    @Override
     public long[] getShape() {
         if (value instanceof Tensor) {
             return ((Tensor) value).getShape();

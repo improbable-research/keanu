@@ -13,12 +13,13 @@ import java.util.Set;
 import io.improbable.keanu.distributions.continuous.Logistic;
 import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.SamplableWithManyScalars;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 
-public class LogisticVertex extends ProbabilisticDoubleVertex {
+public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble, SamplableWithManyScalars<DoubleTensor> {
 
     private final DoubleVertex mu;
     private final DoubleVertex s;
@@ -90,7 +91,7 @@ public class LogisticVertex extends ProbabilisticDoubleVertex {
     }
 
     @Override
-    protected DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
+    public DoubleTensor sampleWithShape(long[] shape, KeanuRandom random) {
         return Logistic.withParameters(mu.getValue(), s.getValue()).sample(shape, random);
     }
 }
