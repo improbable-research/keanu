@@ -7,3 +7,4 @@ nbproject
 build
 /out
 keanu-python/keanu/keanu-python-all.jar
+**/*.gpg
