@@ -43,7 +43,9 @@ public class LogisticRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LogisticRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MaximumLikelihoodModelFitter<>(regressionGraph));
+        MaximumLikelihoodModelFitter<DoubleTensor, BooleanTensor> fitter = new MaximumLikelihoodModelFitter<>(regressionGraph);
+        fitter.fit(inputTrainingData, outputTrainingData);
+        return new LogisticRegressionModel(regressionGraph);
     }
 
     private long getFeatureCount() {

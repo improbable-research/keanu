@@ -73,7 +73,9 @@ public class LogisticRidgeRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LogisticRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MAPModelFitter<>(regressionGraph));
+        MAPModelFitter<DoubleTensor, BooleanTensor> fitter = new MAPModelFitter<>(regressionGraph);
+        fitter.fit(inputTrainingData, outputTrainingData);
+        return new LogisticRegressionModel(regressionGraph);
     }
 
     private long getFeatureCount() {

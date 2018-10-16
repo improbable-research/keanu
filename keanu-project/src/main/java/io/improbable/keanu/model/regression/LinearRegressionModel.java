@@ -2,7 +2,6 @@ package io.improbable.keanu.model.regression;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.SimpleModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -11,8 +10,8 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 public class LinearRegressionModel extends SimpleModel<DoubleTensor, DoubleTensor> {
     private final LinearRegressionGraph linearModelGraph;
 
-    LinearRegressionModel(DoubleTensor inputTrainingData, DoubleTensor outputTrainingData, LinearRegressionGraph<DoubleTensor> linearModelGraph, ModelFitter<DoubleTensor, DoubleTensor> fitter) {
-        super(inputTrainingData, outputTrainingData, linearModelGraph, fitter);
+    LinearRegressionModel(LinearRegressionGraph<DoubleTensor> linearModelGraph) {
+        super(linearModelGraph);
         this.linearModelGraph = linearModelGraph;
     }
 

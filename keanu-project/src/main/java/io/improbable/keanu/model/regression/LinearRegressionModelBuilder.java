@@ -48,7 +48,9 @@ public class LinearRegressionModelBuilder {
             weightsVertex
         );
 
-        return new LinearRegressionModel(this.inputTrainingData, this.outputTrainingData, regressionGraph, new MaximumLikelihoodModelFitter<>(regressionGraph));
+        MaximumLikelihoodModelFitter<DoubleTensor, DoubleTensor> fitter = new MaximumLikelihoodModelFitter<>(regressionGraph);
+        fitter.fit(inputTrainingData, outputTrainingData);
+        return new LinearRegressionModel(regressionGraph);
     }
 
     private long getFeatureCount() {

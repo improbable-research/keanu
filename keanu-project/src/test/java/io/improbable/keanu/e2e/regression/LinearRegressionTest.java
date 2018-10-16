@@ -48,7 +48,6 @@ public class LinearRegressionTest {
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -88,7 +87,6 @@ public class LinearRegressionTest {
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -126,8 +124,6 @@ public class LinearRegressionTest {
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .build();
-        regression.fit();
-
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),

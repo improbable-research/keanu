@@ -83,7 +83,9 @@ public class LinearLassoRegressionModelBuilder {
             interceptVertex,
             weightsVertex
         );
-        return new LinearRegressionModel(inputTrainingData, outputTrainingData, regressionGraph, new MAPModelFitter<>(regressionGraph));
+        MAPModelFitter<DoubleTensor, DoubleTensor> fitter = new MAPModelFitter<>(regressionGraph);
+        fitter.fit(inputTrainingData, outputTrainingData);
+        return new LinearRegressionModel(regressionGraph);
     }
 
     private long getFeatureCount() {

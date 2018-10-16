@@ -3,7 +3,6 @@ package io.improbable.keanu.model.regression;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.model.ModelFitter;
 import io.improbable.keanu.model.SimpleModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -15,8 +14,8 @@ public class LogisticRegressionModel extends SimpleModel<DoubleTensor, BooleanTe
 
     private final LinearRegressionGraph linearModelGraph;
 
-    LogisticRegressionModel(DoubleTensor inputTrainingData, BooleanTensor outputTrainingData, LinearRegressionGraph<BooleanTensor> linearModelGraph, ModelFitter<DoubleTensor, BooleanTensor> fitter) {
-        super(inputTrainingData, outputTrainingData, linearModelGraph, fitter);
+    LogisticRegressionModel(LinearRegressionGraph<BooleanTensor> linearModelGraph) {
+        super(linearModelGraph);
         this.linearModelGraph = linearModelGraph;
     }
 

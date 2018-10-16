@@ -26,7 +26,6 @@ public class LinearRidgeRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -43,7 +42,6 @@ public class LinearRidgeRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -61,7 +59,6 @@ public class LinearRidgeRegressionTest {
                 .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -84,8 +81,6 @@ public class LinearRidgeRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
-        regressionWide.fit();
-        regressionNarrow.fit();
 
         assertThat(regressionNarrow.getWeights().pow(2).sum(), lessThan(regressionWide.getWeights().pow(2).sum()));
 

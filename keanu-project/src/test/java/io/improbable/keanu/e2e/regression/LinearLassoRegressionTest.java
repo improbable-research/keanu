@@ -28,7 +28,6 @@ public class LinearLassoRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -45,7 +44,6 @@ public class LinearLassoRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -63,7 +61,6 @@ public class LinearLassoRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
             .build();
-        regression.fit();
 
         assertWeightsAndInterceptMatchTestData(
             regression.getWeights(),
@@ -86,8 +83,6 @@ public class LinearLassoRegressionTest {
             .setOutputTrainingData(data.yTrain)
             .setPriorOnWeightsAndIntercept(0, 0.00001)
             .build();
-        regressionWide.fit();
-        regressionNarrow.fit();
 
         assertThat(regressionNarrow.getWeights().abs().sum(), lessThan(regressionWide.getWeights().abs().sum()));
 
@@ -101,8 +96,6 @@ public class LinearLassoRegressionTest {
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .build();
-
-        regression.fit();
 
         assertEquals(0., regression.getWeight(2), 1e-3);
     }

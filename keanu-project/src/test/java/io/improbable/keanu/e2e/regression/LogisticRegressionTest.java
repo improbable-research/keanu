@@ -53,7 +53,7 @@ public class LogisticRegressionTest {
             .setInputTrainingData(xTrain)
             .setOutputTrainingData(yTrain)
             .build();
-        model.fit();
+
         double accuracy = LogisticModelScore.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
         assertWeightsAreCalculated(model.getWeights());
