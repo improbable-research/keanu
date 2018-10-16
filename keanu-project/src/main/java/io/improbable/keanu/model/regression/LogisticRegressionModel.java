@@ -3,14 +3,14 @@ package io.improbable.keanu.model.regression;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.model.SimpleModel;
+import io.improbable.keanu.model.BayesianModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
-public class LogisticRegressionModel extends SimpleModel<DoubleTensor, BooleanTensor> {
+public class LogisticRegressionModel extends BayesianModel<DoubleTensor, BooleanTensor> {
 
     private final LinearRegressionGraph linearModelGraph;
 

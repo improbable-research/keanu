@@ -2,12 +2,12 @@ package io.improbable.keanu.model.regression;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.model.SimpleModel;
+import io.improbable.keanu.model.BayesianModel;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
-public class LinearRegressionModel extends SimpleModel<DoubleTensor, DoubleTensor> {
+public class LinearRegressionModel extends BayesianModel<DoubleTensor, DoubleTensor> {
     private final LinearRegressionGraph linearModelGraph;
 
     LinearRegressionModel(LinearRegressionGraph<DoubleTensor> linearModelGraph) {
