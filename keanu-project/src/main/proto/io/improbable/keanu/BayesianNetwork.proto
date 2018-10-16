@@ -14,7 +14,7 @@ message Vertex {
     string label = 2;
     string vertexType = 3;
     VertexValue value = 4;
-    repeated HyperParams hyperParameters = 5;
+    repeated NamedInputs inputs = 5;
 }
 
 message VertexValue {
