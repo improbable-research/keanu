@@ -1,9 +1,6 @@
 package io.improbable.keanu.tensor;
 
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.tensor.intgr.IntegerTensor;
-
 import java.util.Arrays;
 import java.util.List;
 
