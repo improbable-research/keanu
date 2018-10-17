@@ -214,7 +214,7 @@ public class ProbabilisticDoubleTensorContract {
     public static <V extends DoubleVertex & ProbabilisticDouble>
     void isTreatedAsConstantWhenObserved(V vertexUnderTest) {
         vertexUnderTest.observe(DoubleTensor.ones(vertexUnderTest.getValue().getShape()));
-        assertTrue(vertexUnderTest.getDualNumber().isOfConstant());
+        assertTrue(vertexUnderTest.getDerivativeWrtLatents().asMap().isEmpty());
     }
 
     public static <V extends DoubleVertex & ProbabilisticDouble>
@@ -264,7 +264,7 @@ public class ProbabilisticDoubleTensorContract {
         V tensorVertex = vertexUnderTestSupplier.get();
 
         Map<Vertex, DoubleTensor> actualDerivatives = tensorVertex.dLogProb(
-            DoubleTensor.create(vector, new int[]{vector.length, 1}),
+            DoubleTensor.create(vector, new long[]{vector.length, 1}),
             tensorVertex
         );
 
@@ -332,7 +332,7 @@ public class ProbabilisticDoubleTensorContract {
             }
         }
 
-        int[] shape = isVector ? new int[]{1, 2} : new int[]{2, 1};
+        long[] shape = isVector ? new long[]{1, 2} : new long[]{2, 1};
 
         for (Map.Entry<Pair<Double, Double>, Long> entry : sampleBucket.entrySet()) {
             double percentage = (double) entry.getValue() / sampleCount;

@@ -22,7 +22,7 @@ public class UniformIntVertexTest {
     @Before
     public void setup() {
         random = new KeanuRandom(1);
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, N}, lowerBound, upperBound);
         samples.addAll(testUniformVertex.sample(random).asFlatList());
     }
 
@@ -67,7 +67,7 @@ public class UniformIntVertexTest {
 
     @Test
     public void canUseFullIntRange() {
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, 100}, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, 100}, Integer.MIN_VALUE, Integer.MAX_VALUE);
         IntegerTensor sample = testUniformVertex.sample(random);
 
         Set<Integer> uniqueValues = new HashSet<>(sample.asFlatList());
@@ -77,13 +77,13 @@ public class UniformIntVertexTest {
 
     @Test
     public void logProbUpperBoundIsNegativeInfinity() {
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, N}, lowerBound, upperBound);
         assertEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(upperBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 
     @Test
     public void logProbLowerBoundIsNotNegativeInfinity() {
-        UniformIntVertex testUniformVertex = new UniformIntVertex(new int[]{1, N}, lowerBound, upperBound);
+        UniformIntVertex testUniformVertex = new UniformIntVertex(new long[]{1, N}, lowerBound, upperBound);
         assertNotEquals(testUniformVertex.logProb(Nd4jIntegerTensor.scalar(lowerBound)), Double.NEGATIVE_INFINITY, 1e-6);
     }
 }

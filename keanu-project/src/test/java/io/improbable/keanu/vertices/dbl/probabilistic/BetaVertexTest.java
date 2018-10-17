@@ -144,7 +144,7 @@ public class BetaVertexTest {
 
         int sampleCount = 1000000;
         BetaVertex vertex = new BetaVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             5.0,
             2.0
         );
@@ -161,7 +161,7 @@ public class BetaVertexTest {
 
         int sampleCount = 1100000;
         BetaVertex vertex = new BetaVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             2.0,
             5.0
         );
@@ -193,7 +193,7 @@ public class BetaVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new BetaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new BetaVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             alphaBeta,
             latentAlphaBeta,
             random

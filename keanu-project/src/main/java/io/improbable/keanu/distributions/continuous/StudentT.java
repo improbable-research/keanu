@@ -3,10 +3,10 @@ package io.improbable.keanu.distributions.continuous;
 import static java.lang.Math.PI;
 import static java.lang.Math.log;
 
-import static io.improbable.keanu.distributions.dual.Diffs.T;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -38,7 +38,7 @@ public class StudentT implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor chi2Samples = ChiSquared.withParameters(v).sample(shape, random);
         return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }

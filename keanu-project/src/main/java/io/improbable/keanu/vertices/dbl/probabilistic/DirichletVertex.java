@@ -1,14 +1,14 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.C;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.C;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Dirichlet;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -25,7 +25,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
      * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
-    public DirichletVertex(int[] tensorShape, DoubleVertex concentration) {
+    public DirichletVertex(long[] tensorShape, DoubleVertex concentration) {
         this.concentration = concentration;
         if (concentration.getValue().getLength() < 2) {
             throw new IllegalArgumentException("Dirichlet must be comprised of more than one concentration parameter");
@@ -49,7 +49,7 @@ public class DirichletVertex extends DoubleVertex implements ProbabilisticDouble
      * @param tensorShape   the desired shape of the vertex
      * @param concentration the concentration values of the dirichlet
      */
-    public DirichletVertex(int[] tensorShape, double concentration) {
+    public DirichletVertex(long[] tensorShape, double concentration) {
         this(tensorShape, new ConstantDoubleVertex(DoubleTensor.create(concentration, tensorShape)));
     }
 

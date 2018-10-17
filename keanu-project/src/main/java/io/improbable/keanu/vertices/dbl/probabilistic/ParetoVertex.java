@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.L;
-import static io.improbable.keanu.distributions.dual.Diffs.S;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.L;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -11,13 +11,13 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Pareto;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
 
@@ -33,7 +33,7 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param location    the location value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      * @param scale       the scale value(s) of the Pareto.  Must either be the same shape as tensorShape or a scalar
      */
-    public ParetoVertex(int[] tensorShape, DoubleVertex location, DoubleVertex scale) {
+    public ParetoVertex(long[] tensorShape, DoubleVertex location, DoubleVertex scale) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, location.getShape(), scale.getShape());
 
         this.scale = scale;
@@ -58,15 +58,15 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
         this(new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
-    public ParetoVertex(int[] tensorShape, double location, DoubleVertex scale) {
+    public ParetoVertex(long[] tensorShape, double location, DoubleVertex scale) {
         this(tensorShape, new ConstantDoubleVertex(location), scale);
     }
 
-    public ParetoVertex(int[] tensorShape, DoubleVertex location, double scale) {
+    public ParetoVertex(long[] tensorShape, DoubleVertex location, double scale) {
         this(tensorShape, location, new ConstantDoubleVertex(scale));
     }
 
-    public ParetoVertex(int[] tensorShape, double location, double scale) {
+    public ParetoVertex(long[] tensorShape, double location, double scale) {
         this(tensorShape, new ConstantDoubleVertex(location), new ConstantDoubleVertex(scale));
     }
 
@@ -115,11 +115,11 @@ public class ParetoVertex extends DoubleVertex implements ProbabilisticDouble {
     }
 
     @Override
-    public DualNumber calculateDualNumber(Map<Vertex, DualNumber> dualNumbers) {
+    public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {
         if (isObserved()) {
-            return DualNumber.createConstant(getValue());
+            return PartialDerivatives.OF_CONSTANT;
         } else {
-            return DualNumber.createWithRespectToSelf(getId(), getValue());
+            return PartialDerivatives.withRespectToSelf(this.getId(), this.getShape());
         }
     }
 }

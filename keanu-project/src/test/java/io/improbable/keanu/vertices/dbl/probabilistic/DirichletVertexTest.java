@@ -52,7 +52,7 @@ public class DirichletVertexTest {
 
         Assert.assertTrue(twoDimDirichletPdf1 == twoDimDirichletPdf2 && twoDimDirichletPdf2 == twoDimDirichletPdf3);
 
-        dirichlet = new DirichletVertex(new int[]{1, 4}, 1);
+        dirichlet = new DirichletVertex(new long[]{1, 4}, 1);
 
         double fourDimDirichletPdf1 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.1, 0.2, 0.3, 0.4}));
         double fourDimDirichletPdf2 = dirichlet.logPdf(DoubleTensor.create(new double[]{0.7, 0.1, 0.1, 0.1}));
@@ -76,7 +76,7 @@ public class DirichletVertexTest {
     public void canSplitManyStringsOfVaryingSizeWithKnownMean() {
         DirichletVertex dirichlet = new DirichletVertex(10, 5, 3);
         int numSamples = 50000;
-        DoubleTensor samples = Nd4jDoubleTensor.zeros(new int[]{numSamples, 3});
+        DoubleTensor samples = Nd4jDoubleTensor.zeros(new long[]{numSamples, 3});
 
         for (int i = 0; i < numSamples; i++) {
             DoubleTensor sample = dirichlet.sample(random);
@@ -147,7 +147,7 @@ public class DirichletVertexTest {
         concentrationHyperParam.setValue(hyperParamValue);
 
         DirichletVertex dirichlet = new DirichletVertex(concentrationHyperParam);
-        DoubleTensor startingValue = Nd4jDoubleTensor.create(new double[]{0.1, 0.9}, new int[]{1, 2});
+        DoubleTensor startingValue = Nd4jDoubleTensor.create(new double[]{0.1, 0.9}, new long[]{1, 2});
 
         double start = 0.1;
         double end = 0.9;
@@ -174,7 +174,7 @@ public class DirichletVertexTest {
 
             assertEquals(diffLnDensityApproxExpected, actualDiff, 0.001);
 
-            startingValue = Nd4jDoubleTensor.create(new double[]{dirchletValue[0] + step, dirchletValue[1] - step}, new int[]{1, 2});
+            startingValue = Nd4jDoubleTensor.create(new double[]{dirchletValue[0] + step, dirchletValue[1] - step}, new long[]{1, 2});
         }
     }
 
@@ -234,7 +234,7 @@ public class DirichletVertexTest {
                     break;
                 }
                 double x3 = 1 - x1 - x2;
-                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(new double[]{x1, x2, x3}, new int[]{1, 3});
+                Nd4jDoubleTensor bucket = new Nd4jDoubleTensor(new double[]{x1, x2, x3}, new long[]{1, 3});
                 double densityAtBucketCenter = Math.exp(vertexUnderTest.logProb(bucket)) * bucketVolume;
                 double actual = percentage;
                 assertThat("Problem with logProb at " + bucketCenter, densityAtBucketCenter, closeTo(actual, maxError));

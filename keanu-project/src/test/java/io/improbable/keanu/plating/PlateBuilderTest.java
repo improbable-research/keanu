@@ -114,7 +114,7 @@ public class PlateBuilderTest {
     public void ifAVertexIsLabeledThatIsWhatsUsedToReferToItInThePlate() {
         VertexLabel label = new VertexLabel("label");
 
-        Vertex<?> startVertex = ConstantVertex.of(1.).labeledAs(label);
+        Vertex<?> startVertex = ConstantVertex.of(1.).setLabel(label);
 
         Plates plates = new PlateBuilder<Integer>()
             .withInitialState(startVertex)

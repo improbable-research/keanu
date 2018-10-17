@@ -18,7 +18,7 @@ public class HalfGaussianVertex extends GaussianVertex {
      * @param tensorShape the desired shape of the tensor in this vertex
      * @param sigma       the sigma of the HalfGaussian with either the same tensorShape as specified for this vertex or a scalar
      */
-    public HalfGaussianVertex(int[] tensorShape, DoubleVertex sigma) {
+    public HalfGaussianVertex(long[] tensorShape, DoubleVertex sigma) {
         super(tensorShape, MU_ZERO, sigma);
     }
 
@@ -30,7 +30,7 @@ public class HalfGaussianVertex extends GaussianVertex {
         super(MU_ZERO, new ConstantDoubleVertex(sigma));
     }
 
-    public HalfGaussianVertex(int[] tensorShape, double sigma) {
+    public HalfGaussianVertex(long[] tensorShape, double sigma) {
         super(tensorShape, MU_ZERO, new ConstantDoubleVertex(sigma));
     }
 

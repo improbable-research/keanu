@@ -8,7 +8,6 @@ import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 /**
@@ -27,13 +26,13 @@ public class MatrixDeterminantVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        throw new UnsupportedOperationException();
+    protected DoubleTensor op(DoubleTensor value) {
+        return DoubleTensor.scalar(value.determinant());
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor value) {
-        return DoubleTensor.scalar(value.determinant());
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        throw new UnsupportedOperationException();
     }
 
     @Override

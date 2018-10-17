@@ -63,7 +63,7 @@ public class TensorTestOperations {
 
     private static DoubleTensor dOutputWrtInput(DoubleVertex outputVertex, DoubleVertex inputVertex, boolean isForwardMode) {
         if (isForwardMode) {
-            return outputVertex.getDualNumber().getPartialDerivatives().withRespectTo(inputVertex);
+            return outputVertex.getDerivativeWrtLatents().withRespectTo(inputVertex);
         } else {
             return Differentiator.reverseModeAutoDiff(outputVertex, inputVertex).withRespectTo(inputVertex);
         }

@@ -3,13 +3,15 @@ package io.improbable.keanu.tensor.intgr;
 import java.util.Arrays;
 import java.util.function.Function;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
+import com.google.common.primitives.Ints;
+
 import io.improbable.keanu.kotlin.IntegerOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, IntegerOperators<IntegerTensor> {
 
@@ -19,7 +21,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor TWO_SCALAR = scalar(2);
 
-    static IntegerTensor create(int value, int[] shape) {
+    static IntegerTensor create(int value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(value);
         } else {
@@ -27,7 +29,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor create(int[] values, int... shape) {
+    static IntegerTensor create(int[] values, long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarIntegerTensor(values[0]);
         } else {
@@ -35,11 +37,19 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
+    static IntegerTensor create(long[] values, long... shape) {
+        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
+            return new ScalarIntegerTensor(Ints.checkedCast(values[0]));
+        } else {
+            return Nd4jIntegerTensor.create(Arrays.stream(values).mapToInt(Ints::checkedCast).toArray(), shape);
+        }
+    }
+
     static IntegerTensor create(int... values) {
         return create(values, 1, values.length);
     }
 
-    static IntegerTensor ones(int... shape) {
+    static IntegerTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(1);
         } else {
@@ -55,7 +65,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         }
     }
 
-    static IntegerTensor zeros(int... shape) {
+    static IntegerTensor zeros(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarIntegerTensor(0);
         } else {
@@ -67,7 +77,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
         return new ScalarIntegerTensor(scalarValue);
     }
 
-    static IntegerTensor placeHolder(int[] shape) {
+    static IntegerTensor placeHolder(long[] shape) {
         return new ScalarIntegerTensor(shape);
     }
 
@@ -89,10 +99,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     }
 
     @Override
-    IntegerTensor setValue(Integer value, int... index);
+    IntegerTensor setValue(Integer value, long... index);
 
     @Override
-    IntegerTensor reshape(int... newShape);
+    IntegerTensor reshape(long... newShape);
 
     @Override
     IntegerTensor duplicate();
@@ -117,6 +127,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
 
     IntegerTensor minus(IntegerTensor that);
 
+    default IntegerTensor reverseMinus(int that) {
+        return this.unaryMinus().plus(that);
+    }
+
     IntegerTensor plus(IntegerTensor that);
 
     IntegerTensor times(IntegerTensor that);
@@ -126,6 +140,10 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor tensorMultiply(IntegerTensor value, int[] dimLeft, int[] dimsRight);
 
     IntegerTensor div(IntegerTensor that);
+
+    default IntegerTensor reverseDiv(int that) {
+        return IntegerTensor.scalar(that).div(this);
+    }
 
     IntegerTensor unaryMinus();
 
@@ -146,7 +164,7 @@ public interface IntegerTensor extends NumberTensor<Integer, IntegerTensor>, Int
     IntegerTensor apply(Function<Integer, Integer> function);
 
     @Override
-    IntegerTensor slice(int dimension, int index);
+    IntegerTensor slice(int dimension, long index);
 
     // In Place
 

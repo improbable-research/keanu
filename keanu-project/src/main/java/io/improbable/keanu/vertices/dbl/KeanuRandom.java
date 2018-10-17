@@ -55,7 +55,7 @@ public class KeanuRandom {
         bufferType = DataBuffer.Type.DOUBLE;
     }
 
-    public DoubleTensor nextDouble(int[] shape) {
+    public DoubleTensor nextDouble(long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(nextDouble());
         } else {
@@ -79,7 +79,7 @@ public class KeanuRandom {
         return randomValue;
     }
 
-    public DoubleTensor nextGaussian(int[] shape) {
+    public DoubleTensor nextGaussian(long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(nextGaussian());
         } else {
@@ -87,11 +87,11 @@ public class KeanuRandom {
         }
     }
 
-    public DoubleTensor nextGamma(int[] shape, DoubleTensor theta, DoubleTensor k) {
+    public DoubleTensor nextGamma(long[] shape, DoubleTensor theta, DoubleTensor k) {
         return Gamma.withParameters(theta, k).sample(shape, this);
     }
 
-    public DoubleTensor nextLaplace(int[] shape, DoubleTensor mu, DoubleTensor beta) {
+    public DoubleTensor nextLaplace(long[] shape, DoubleTensor mu, DoubleTensor beta) {
         return Laplace.withParameters(mu, beta).sample(shape, this);
     }
 
@@ -107,11 +107,11 @@ public class KeanuRandom {
         return nd4jRandom.nextBoolean();
     }
 
-    public IntegerTensor nextInt(int[] shape) {
+    public IntegerTensor nextInt(long[] shape) {
         return new Nd4jIntegerTensor(doubleNextInt(shape));
     }
 
-    public IntegerTensor nextPoisson(int[] shape, DoubleTensor mu) {
+    public IntegerTensor nextPoisson(long[] shape, DoubleTensor mu) {
         return Poisson.withParameters(mu).sample(shape, this);
 
     }
@@ -120,17 +120,17 @@ public class KeanuRandom {
         return nd4jRandom.nextInt(maxExclusive);
     }
 
-    private INDArray doubleNextInt(int[] shape) {
+    private INDArray doubleNextInt(long[] shape) {
         Nd4j.setDataType(bufferType);
         return nd4jRandom.nextInt(shape);
     }
 
-    private INDArray doubleNextDouble(int[] shape) {
+    private INDArray doubleNextDouble(long[] shape) {
         Nd4j.setDataType(bufferType);
         return nd4jRandom.nextDouble(shape);
     }
 
-    private INDArray doubleNextGaussian(int[] shape) {
+    private INDArray doubleNextGaussian(long[] shape) {
         Nd4j.setDataType(bufferType);
         return nd4jRandom.nextGaussian(shape);
     }

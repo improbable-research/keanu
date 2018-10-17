@@ -17,11 +17,11 @@ public class HalfCauchyVertex extends CauchyVertex {
      * @param tensorShape the desired shape of the tensor in this vertex
      * @param scale       the scale of the HalfCauchy with either the same tensorShape as specified for this vertex or a scalar
      */
-    public HalfCauchyVertex(int[] tensorShape, DoubleVertex scale) {
+    public HalfCauchyVertex(long[] tensorShape, DoubleVertex scale) {
         super(tensorShape, LOC_ZERO, scale);
     }
 
-    public HalfCauchyVertex(int[] tensorShape, double scale) {
+    public HalfCauchyVertex(long[] tensorShape, double scale) {
         super(tensorShape, LOC_ZERO, scale);
     }
 

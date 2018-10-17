@@ -14,8 +14,8 @@ public class DifferenceVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsSubtracted() {
-        calculatesDualNumberOfTwoScalars(2.0, 3.0, 1.0, -1.0, DoubleVertex::minus);
+    public void calculatesDerivativeOfTwoScalarsSubtracted() {
+        calculatesDerivativeOfTwoScalars(2.0, 3.0, 1.0, -1.0, DoubleVertex::minus);
     }
 
     @Test
@@ -29,8 +29,8 @@ public class DifferenceVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseSubtracted() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseSubtracted() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
             DoubleTensor.create(new double[]{1.0, 1.0, 1.0, 1.0}).diag().reshape(1, 4, 1, 4),
@@ -40,8 +40,8 @@ public class DifferenceVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarSubtracted() {
-        calculatesDualNumberOfAVectorAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarSubtracted() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.eye(4).reshape(1, 4, 1, 4),
@@ -51,8 +51,8 @@ public class DifferenceVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorSubtracted() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorSubtracted() {
+        calculatesDerivativeOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.ones(1, 4, 1, 1),

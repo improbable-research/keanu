@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class LogGammaVertex extends DoubleUnaryOpVertex {
@@ -26,11 +25,8 @@ public class LogGammaVertex extends DoubleUnaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber dualNumber) {
-        DoubleTensor logGammaOfInput = op(dualNumber.getValue());
-        PartialDerivatives dLogGamma = dualNumber.getPartialDerivatives()
-            .multiplyAlongOfDimensions(inputVertex.getValue().digamma(), getShape());
-        return new DualNumber(logGammaOfInput, dLogGamma);
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives derivativeOfParentWithRespectToInputs) {
+        return derivativeOfParentWithRespectToInputs.multiplyAlongOfDimensions(inputVertex.getValue().digamma(), getShape());
     }
 
     @Override

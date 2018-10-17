@@ -1,20 +1,21 @@
 package io.improbable.keanu.tensor.bool;
 
+import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public interface BooleanTensor extends Tensor<Boolean> {
+public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<BooleanTensor> {
 
-    static BooleanTensor create(boolean value, int[] shape) {
+    static BooleanTensor create(boolean value, long[] shape) {
         return new SimpleBooleanTensor(value, shape);
     }
 
-    static BooleanTensor create(boolean[] values, int... shape) {
+    static BooleanTensor create(boolean[] values, long... shape) {
         return new SimpleBooleanTensor(values, shape);
     }
 
-    static BooleanTensor create(boolean[] values) {
+    static BooleanTensor create(boolean... values) {
         return create(values, 1, values.length);
     }
 
@@ -22,15 +23,15 @@ public interface BooleanTensor extends Tensor<Boolean> {
         return new SimpleBooleanTensor(scalarValue);
     }
 
-    static BooleanTensor placeHolder(int[] shape) {
+    static BooleanTensor placeHolder(long[] shape) {
         return new SimpleBooleanTensor(shape);
     }
 
-    static BooleanTensor trues(int... shape) {
+    static BooleanTensor trues(long... shape) {
         return new SimpleBooleanTensor(true, shape);
     }
 
-    static BooleanTensor falses(int... shape) {
+    static BooleanTensor falses(long... shape) {
         return new SimpleBooleanTensor(false, shape);
     }
 
@@ -53,14 +54,22 @@ public interface BooleanTensor extends Tensor<Boolean> {
     }
 
     @Override
-    BooleanTensor reshape(int... newShape);
+    BooleanTensor reshape(long... newShape);
 
     @Override
     BooleanTensor duplicate();
 
     BooleanTensor and(BooleanTensor that);
 
+    default BooleanTensor and(boolean that) {
+        return this.and(BooleanTensor.scalar(that));
+    }
+
     BooleanTensor or(BooleanTensor that);
+
+    default BooleanTensor or(boolean that) {
+        return this.or(BooleanTensor.scalar(that));
+    }
 
     BooleanTensor not();
 
@@ -87,6 +96,6 @@ public interface BooleanTensor extends Tensor<Boolean> {
     IntegerTensor toIntegerMask();
 
     @Override
-    BooleanTensor slice(int dimension, int index);
+    BooleanTensor slice(int dimension, long index);
 
 }

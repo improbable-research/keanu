@@ -1,5 +1,7 @@
 package com.examples;
 
+import java.util.Arrays;
+
 import io.improbable.keanu.algorithms.NetworkSamples;
 import io.improbable.keanu.algorithms.mcmc.MetropolisHastings;
 import io.improbable.keanu.network.BayesianNetwork;
@@ -9,8 +11,6 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertexSamples;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-
-import java.util.Arrays;
 
 /**
  * Is treatment A significantly more likely to drive purchases than treatment B?
@@ -32,11 +32,11 @@ public class ABTesting {
 
         // manufacture observations
         int nObsA = 1500;
-        BooleanTensor observationsA = RANDOM.nextDouble(new int[]{1, nObsA}).lessThan(0.05);
+        BooleanTensor observationsA = RANDOM.nextDouble(new long[]{1, nObsA}).lessThan(0.05);
         observationA.observe(observationsA);
 
         int nObsB = 750;
-        BooleanTensor observationsB = RANDOM.nextDouble(new int[]{1, nObsB}).lessThan(0.04);
+        BooleanTensor observationsB = RANDOM.nextDouble(new long[]{1, nObsB}).lessThan(0.04);
         observationB.observe(observationsB);
 
         //infer the most probable probabilities

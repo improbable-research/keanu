@@ -61,7 +61,7 @@ public class MetropolisHastingsTest {
     @Test
     public void samplesContinuousTensorPrior() {
 
-        int[] shape = new int[]{1, 1};
+        long[] shape = new long[]{1, 1};
         DoubleVertex A = new GaussianVertex(shape, 20.0, 1.0);
         DoubleVertex B = new GaussianVertex(shape, 20.0, 1.0);
 
@@ -207,7 +207,7 @@ public class MetropolisHastingsTest {
     public void doesNotDoExtraWorkOnRejectionWhenRejectionCacheEnabled() {
         AtomicInteger n = new AtomicInteger(0);
 
-        DoubleVertex start = new GaussianVertex(new int[]{1, 3}, 0, 1);
+        DoubleVertex start = new GaussianVertex(new long[]{1, 3}, 0, 1);
 
         DoubleVertex blackBox = start.lambda(
             (startValue) -> {
@@ -279,7 +279,7 @@ public class MetropolisHastingsTest {
         int downSampleInterval = 2;
         GaussianVertex A = new GaussianVertex(0, 1);
         BayesianNetwork network = new BayesianNetwork(A.getConnectedGraph());
-        NetworkSamples samples = algo.generatePosteriorSamples(network, network.getLatentVertices())
+        NetworkSamples samples = MetropolisHastings.withDefaultConfig().generatePosteriorSamples(network, network.getLatentVertices())
             .dropCount(dropCount)
             .downSampleInterval(downSampleInterval)
             .generate(sampleCount);

@@ -7,7 +7,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
@@ -31,14 +30,14 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
 
-        PartialDerivatives partialsLeft = PartialDerivatives
+        PartialDerivatives dOutputsWrtLeft = PartialDerivatives
             .matrixMultiplyAlongWrtDimensions(
                 derivativeOfOutputsWithRespectToSelf,
                 right.getValue(),
                 true
             );
 
-        PartialDerivatives partialsRight = PartialDerivatives
+        PartialDerivatives dOutputsWrtRight = PartialDerivatives
             .matrixMultiplyAlongWrtDimensions(
                 derivativeOfOutputsWithRespectToSelf,
                 left.getValue(),
@@ -46,18 +45,35 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
             );
 
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        partials.put(left, partialsLeft);
-        partials.put(right, partialsRight);
+        partials.put(left, dOutputsWrtLeft);
+        partials.put(right, dOutputsWrtRight);
 
         return partials;
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.matrixMultiplyBy(r);
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dLeftWrtInputs, PartialDerivatives dRightWrtInputs) {
+
+        // dc = A * db + da * B;
+        PartialDerivatives partialsFromLeft;
+        PartialDerivatives partialsFromRight;
+
+        if (dLeftWrtInputs.isEmpty()) {
+            partialsFromLeft = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromLeft = PartialDerivatives.matrixMultiplyAlongOfDimensions(dLeftWrtInputs, right.getValue(), true);
+        }
+
+        if (dRightWrtInputs.isEmpty()) {
+            partialsFromRight = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromRight = PartialDerivatives.matrixMultiplyAlongOfDimensions(dRightWrtInputs, left.getValue(), false);
+        }
+
+        return partialsFromLeft.add(partialsFromRight);
     }
 
-    private static int[] getResultingShape(int[] left, int[] right) {
+    private static long[] getResultingShape(long[] left, long[] right) {
         if (left.length != 2 || right.length != 2) {
             throw new IllegalArgumentException("Matrix multiply must be used on matrices");
         }
@@ -66,6 +82,6 @@ public class MatrixMultiplicationVertex extends DoubleBinaryOpVertex {
             throw new IllegalArgumentException("Can not multiply matrices of shapes " + Arrays.toString(left) + " X " + Arrays.toString(right));
         }
 
-        return new int[]{left[0], right[1]};
+        return new long[]{left[0], right[1]};
     }
 }

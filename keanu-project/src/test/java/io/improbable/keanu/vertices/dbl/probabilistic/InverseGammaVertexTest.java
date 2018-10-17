@@ -142,7 +142,7 @@ public class InverseGammaVertexTest {
 
         int sampleCount = 1000000;
         InverseGammaVertex vertex = new InverseGammaVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             2.0,
             3.0
         );
@@ -174,7 +174,7 @@ public class InverseGammaVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new InverseGammaVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new InverseGammaVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             aB,
             latentAB,
             random
