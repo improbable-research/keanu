@@ -21,15 +21,15 @@ import java.util.stream.IntStream;
 import static java.util.stream.Collectors.toMap;
 
 
-public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<Tensor<T>> implements Probabilistic<Tensor<T>> {
+public class CategoricalVertex<T> extends Vertex<Tensor<T>> implements Probabilistic<Tensor<T>> {
 
     private final Map<T, DoubleVertex> selectableValues;
 
-    public static <T, TENSOR extends Tensor<T>> CategoricalVertex<T, TENSOR> of(Map<T, Double> selectableValues) {
+    public static <T> CategoricalVertex<T> of(Map<T, Double> selectableValues) {
         return new CategoricalVertex<>(defensiveCopy(selectableValues));
     }
 
-    public static <T> CategoricalVertex<T, TENSOR> of(DirichletVertex vertex, List<T> categories) {
+    public static <T> CategoricalVertex<T> of(DirichletVertex vertex, List<T> categories) {
         final long length = TensorShape.getLength(vertex.getShape());
         if (length != categories.size()) {
             throw new IllegalArgumentException("Categories must have length of vertex's size");
@@ -58,7 +58,7 @@ public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<Tenso
         return copy;
     }
 
-    public CategoricalVertex(int[] tensorShape, Map<T, DoubleVertex> selectableValues) {
+    public CategoricalVertex(long[] tensorShape, Map<T, DoubleVertex> selectableValues) {
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, selectableValuesShapes(selectableValues));
 
         this.selectableValues = selectableValues;
@@ -99,7 +99,7 @@ public class CategoricalVertex<T, TENSOR extends Tensor<T>> extends Vertex<Tenso
             e -> e.getValue().getValue()));
     }
 
-    private static int[][] selectableValuesShapes(Map<?, DoubleVertex> selectableValues) {
-        return selectableValues.values().stream().map(Vertex::getShape).toArray(int[][]::new);
+    private static long[][] selectableValuesShapes(Map<?, DoubleVertex> selectableValues) {
+        return selectableValues.values().stream().map(Vertex::getShape).toArray(long[][]::new);
     }
 }

@@ -44,7 +44,7 @@ public class GenericTensor<T> implements Tensor<T> {
         }
     }
 
-    public GenericTensor(T data, int[] shape) {
+    public GenericTensor(T data, long[] shape) {
         this.data = (T[]) (new Object[(int) TensorShape.getLength(shape)]);
         Arrays.fill(this.data, data);
 

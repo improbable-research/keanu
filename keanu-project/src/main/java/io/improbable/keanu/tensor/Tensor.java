@@ -33,30 +33,6 @@ public interface Tensor<T> {
         return BooleanTensor.create(equality, Arrays.copyOf(shape, shape.length));
     }
 
-    static DoubleTensor scalar(Double value) {
-       return DoubleTensor.scalar(value);
-    }
-
-    static DoubleTensor scalar(double value) {
-        return DoubleTensor.scalar(value);
-    }
-
-    static IntegerTensor scalar(Integer value) {
-        return IntegerTensor.scalar(value);
-    }
-
-    static IntegerTensor scalar(int value) {
-        return IntegerTensor.scalar(value);
-    }
-
-    static BooleanTensor scalar(Boolean value) {
-        return BooleanTensor.scalar(value);
-    }
-
-    static BooleanTensor scalar(boolean value) {
-        return BooleanTensor.scalar(value);
-    }
-
     static <T> Tensor<T> scalar(T value) {
         return GenericTensor.scalar(value);
     }
@@ -65,31 +41,7 @@ public interface Tensor<T> {
         return new GenericTensor<>(shape);
     }
 
-    static DoubleTensor create(Double value, int[] shape) {
-        return DoubleTensor.create(value, shape);
-    }
-
-    static DoubleTensor create(double value, int[] shape) {
-        return DoubleTensor.create(value, shape);
-    }
-
-    static IntegerTensor create(Integer value, int[] shape) {
-        return IntegerTensor.create(value, shape);
-    }
-
-    static IntegerTensor create(int value, int[] shape) {
-        return IntegerTensor.create(value, shape);
-    }
-
-    static BooleanTensor create(Boolean value, int[] shape) {
-        return BooleanTensor.create(value, shape);
-    }
-
-    static BooleanTensor create(boolean value, int[] shape) {
-        return BooleanTensor.create(value, shape);
-    }
-
-    static <T> GenericTensor<T> create(T value, int[] shape) {
+    static <T> GenericTensor<T> create(T value, long[] shape) {
         return GenericTensor.create(value, shape);
     }
 

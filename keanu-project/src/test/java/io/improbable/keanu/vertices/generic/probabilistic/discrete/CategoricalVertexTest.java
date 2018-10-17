@@ -98,7 +98,7 @@ public class CategoricalVertexTest {
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
 
-        int[] proposalShape = new int[]{3, 5, 6};
+        long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Proposed shape " + Arrays.toString(proposalShape) + " does not match other non scalar shapes");
@@ -115,7 +115,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
         selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
-        int[] proposalShape = new int[]{3, 5, 6};
+        long[] proposalShape = new long[]{3, 5, 6};
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("More than a single non-scalar shape");
@@ -133,7 +133,7 @@ public class CategoricalVertexTest {
         selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
         selectableValues.put(TestEnum.C, ConstantVertex.of(1.));
 
-        int[] proposalShape = new int[]{2, 2};
+        long[] proposalShape = new long[]{2, 2};
 
         new CategoricalVertex<>(proposalShape, selectableValues);
     }
@@ -326,21 +326,11 @@ public class CategoricalVertexTest {
 
         CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        GenericTensor<TestEnum> value = new GenericTensor<>(TestEnum.A, new int[] {2, 2});
+        GenericTensor<TestEnum> value = new GenericTensor<>(TestEnum.A, new long[] {2, 2});
         double logProbA = categoricalVertex.logProb(value);
         double expectedLogProb = Arrays.stream(aProbs).map(v -> Math.log(v / (v + bProb))).sum();
 
         assertThat(expectedLogProb, closeTo(logProbA, 1e-6));
-    }
-
-    @Test
-    public void integerKeysCreateIntegerTensorSample() {
-        Map<Integer, DoubleVertex> selectableValues = new LinkedHashMap<>();
-        selectableValues.put(1, ConstantVertex.of(0.1));
-        selectableValues.put(2, ConstantVertex.of(0.9));
-
-        CategoricalVertex<Integer> categoricalVertex = new CategoricalVertex<>(selectableValues);
-        IntegerTensor sample = categoricalVertex.sample();
     }
 
     private <T> Map<T, Double> testScalarSample(Map<T, DoubleVertex> selectableValues,
