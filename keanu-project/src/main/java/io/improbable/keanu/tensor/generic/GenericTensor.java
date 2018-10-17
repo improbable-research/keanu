@@ -140,7 +140,7 @@ public class GenericTensor<T> implements Tensor<T> {
 
     @Override
     public FlattenedView<T> getFlattenedView() {
-        return new BaseSimpleFlattenedView<>(data);
+        return new BaseSimpleFlattenedView<T>(data);
     }
 
     @Override

@@ -269,11 +269,11 @@ public class MultinomialVertexTest {
             Colours.BLUE, ConstantVertex.of(p.getValue(2)));
         CategoricalVertex<Colours> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        double pRed = categoricalVertex.logProb(new GenericTensor<>(Colours.RED));
+        double pRed = categoricalVertex.logProb(GenericTensor.scalar(Colours.RED));
         assertThat(multinomial.logProb(IntegerTensor.create(1, 0, 0).transpose()).scalar(), closeTo(pRed, 1e-7));
-        double pGreen = categoricalVertex.logProb(new GenericTensor<>(Colours.GREEN));
+        double pGreen = categoricalVertex.logProb(GenericTensor.scalar(Colours.GREEN));
         assertThat(multinomial.logProb(IntegerTensor.create(0, 1, 0).transpose()).scalar(), closeTo(pGreen, 1e-7));
-        double pBlue = categoricalVertex.logProb(new GenericTensor<>(Colours.BLUE));
+        double pBlue = categoricalVertex.logProb(GenericTensor.scalar(Colours.BLUE));
         assertThat(multinomial.logProb(IntegerTensor.create(0, 0, 1).transpose()).scalar(), closeTo(pBlue, 1e-7));
     }
 
