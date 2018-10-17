@@ -7,14 +7,21 @@ from keanu.vertex import Vertex
 k = KeanuContext().jvm_view()
 
 
+java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex")
 java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
+java_import(k, "io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex")
 java_import(k, "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(k, "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
+
+
+def ConstantBool(*args) -> k.ConstantBoolVertex:
+    return Vertex(k.ConstantBoolVertex, args)
 
 
 def GreaterThan(*args) -> k.GreaterThanVertex:
@@ -23,6 +30,10 @@ def GreaterThan(*args) -> k.GreaterThanVertex:
 
 def CastDouble(*args) -> k.CastDoubleVertex:
     return Vertex(k.CastDoubleVertex, args)
+
+
+def ConstantDouble(*args) -> k.ConstantDoubleVertex:
+    return Vertex(k.ConstantDoubleVertex, args)
 
 
 def DoubleIf(*args) -> k.DoubleIfVertex:
@@ -39,6 +50,10 @@ def Exponential(*args) -> k.ExponentialVertex:
 
 def Gamma(*args) -> k.GammaVertex:
     return Vertex(k.GammaVertex, args)
+
+
+def ConstantInteger(*args) -> k.ConstantIntegerVertex:
+    return Vertex(k.ConstantIntegerVertex, args)
 
 
 def Poisson(*args) -> k.PoissonVertex:
