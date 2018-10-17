@@ -11,8 +11,16 @@ context = KeanuContext()
 
 class VertexOps:
     def __gt__(self, other):
-        from keanu.generated.vertex import GreaterThan
-        return GreaterThan(self, other)
+        return kn.generated.vertex.GreaterThan(self, other)
+
+    def __mul__(self, other):
+        return kn.generated.vertex.Multiplication(self, other)
+
+    def __add__(self, other):
+        return kn.generated.vertex.Addition(self, other)
+
+    def __sub__(self, other):
+        return kn.generated.vertex.Difference(self, other)
 
 
 class Vertex(JavaObjectWrapper, VertexOps):

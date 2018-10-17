@@ -12,6 +12,9 @@ java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.bin
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MultiplicationVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
@@ -38,6 +41,18 @@ def ConstantDouble(*args) -> k.ConstantDoubleVertex:
 
 def DoubleIf(*args) -> k.DoubleIfVertex:
     return Vertex(k.DoubleIfVertex, args)
+
+
+def Addition(*args) -> k.AdditionVertex:
+    return Vertex(k.AdditionVertex, args)
+
+
+def Difference(*args) -> k.DifferenceVertex:
+    return Vertex(k.DifferenceVertex, args)
+
+
+def Multiplication(*args) -> k.MultiplicationVertex:
+    return Vertex(k.MultiplicationVertex, args)
 
 
 def Cauchy(*args) -> k.CauchyVertex:
