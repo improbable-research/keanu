@@ -70,7 +70,7 @@ public interface BooleanTensor extends Tensor<Boolean> {
 
     BooleanTensor setBooleanIf(BooleanTensor trueValue, BooleanTensor falseValue);
 
-    <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue);
+    <T> Tensor<T> where(Tensor<T> trueValue, Tensor<T> falseValue);
 
     BooleanTensor andInPlace(BooleanTensor that);
 

@@ -128,7 +128,7 @@ public class SimpleBooleanTensorTest {
             new long[]{2, 2}
         );
 
-        Tensor<Something> result = matrixA.setIf(trueCase, falseCase);
+        Tensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
             result.asFlatArray()

@@ -24,7 +24,7 @@ public class IfVertex<T> extends Vertex<Tensor<T>> implements NonProbabilistic<T
     }
 
     private Tensor<T> op(BooleanTensor predicate, Tensor<T> thn, Tensor<T> els) {
-        return predicate.setIf(thn, els);
+        return predicate.where(thn, els);
     }
 
     @Override

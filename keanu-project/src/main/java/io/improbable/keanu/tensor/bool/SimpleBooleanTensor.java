@@ -147,7 +147,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public <T> Tensor<T> setIf(Tensor<T> trueValue, Tensor<T> falseValue) {
+    public <T> Tensor<T> where(Tensor<T> trueValue, Tensor<T> falseValue) {
         FlattenedView<T> trueValuesFlattened = trueValue.getFlattenedView();
         FlattenedView<T> falseValuesFlattened = falseValue.getFlattenedView();
 

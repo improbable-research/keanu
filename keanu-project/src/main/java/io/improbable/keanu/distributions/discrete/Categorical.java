@@ -36,7 +36,7 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
             sum.plusInPlace(entry.getValue().div(sumOfProbabilities));
 
             BooleanTensor mask = sampleSetSoFar.not().andInPlace(sum.greaterThan(p));
-            sample = mask.setIf(Tensor.scalar(entry.getKey()), sample);
+            sample = mask.where(Tensor.scalar(entry.getKey()), sample);
 
             sampleSetSoFar.orInPlace(mask);
 
