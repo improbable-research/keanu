@@ -3,6 +3,7 @@ package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -16,6 +17,7 @@ public class MultiplicationVertex extends DoubleBinaryOpVertex {
      * @param left  vertex to be multiplied
      * @param right vertex to be multiplied
      */
+    @ExportVertexToPythonBindings
     public MultiplicationVertex(DoubleVertex left, DoubleVertex right) {
         super(left, right);
     }
