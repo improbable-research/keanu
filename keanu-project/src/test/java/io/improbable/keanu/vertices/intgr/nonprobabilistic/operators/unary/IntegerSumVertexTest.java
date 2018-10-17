@@ -11,7 +11,7 @@ public class IntegerSumVertexTest {
     @Test
     public void doesSum() {
 
-        IntegerVertex in = new UniformIntVertex(new int[]{1, 5}, 0, 10);
+        IntegerVertex in = new UniformIntVertex(new long[]{1, 5}, 0, 10);
         in.setValue(new int[]{1, 2, 3, 4, 5});
         IntegerVertex summed = in.sum();
 

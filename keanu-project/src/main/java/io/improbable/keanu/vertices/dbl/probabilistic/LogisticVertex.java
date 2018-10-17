@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.S;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.S;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Logistic;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,7 +32,7 @@ public class LogisticVertex extends DoubleVertex implements ProbabilisticDouble 
      * @param mu          the mu (location) of the Logistic with either the same shape as specified for this vertex or mu scalar
      * @param s           the s (scale) of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
-    public LogisticVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex s) {
+    public LogisticVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex s) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), s.getShape());
 

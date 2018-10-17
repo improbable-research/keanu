@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.MU;
-import static io.improbable.keanu.distributions.dual.Diffs.SIGMA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.MU;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.SIGMA;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.LogNormal;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.Vertex;
@@ -32,7 +32,7 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
      *                    vertex or mu scalar
      * @param sigma       the sigma of the Logistic with either the same shape as specified for this vertex or mu scalar
      */
-    public LogNormalVertex(int[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
+    public LogNormalVertex(long[] tensorShape, DoubleVertex mu, DoubleVertex sigma) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, mu.getShape(), sigma.getShape());
 
@@ -42,15 +42,15 @@ public class LogNormalVertex extends DoubleVertex implements ProbabilisticDouble
         setValue(DoubleTensor.placeHolder(tensorShape));
     }
 
-    public LogNormalVertex(int[] tensorShape, DoubleVertex mu, double sigma) {
+    public LogNormalVertex(long[] tensorShape, DoubleVertex mu, double sigma) {
         this(tensorShape, mu, ConstantVertex.of(sigma));
     }
 
-    public LogNormalVertex(int[] tensorShape, double mu, DoubleVertex sigma) {
+    public LogNormalVertex(long[] tensorShape, double mu, DoubleVertex sigma) {
         this(tensorShape, ConstantVertex.of(mu), sigma);
     }
 
-    public LogNormalVertex(int[] tensorShape, double mu, double sigma) {
+    public LogNormalVertex(long[] tensorShape, double mu, double sigma) {
         this(tensorShape, ConstantVertex.of(mu), ConstantVertex.of(sigma));
     }
 

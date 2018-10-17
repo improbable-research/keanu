@@ -21,6 +21,14 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerConcatenationVertex(dimension, toConcat);
     }
 
+    public static IntegerVertex min(IntegerVertex a, IntegerVertex b) {
+        return new IntegerMinVertex(a, b);
+    }
+
+    public static IntegerVertex max(IntegerVertex a, IntegerVertex b) {
+        return new IntegerMaxVertex(a, b);
+    }
+
     public IntegerVertex minus(IntegerVertex that) {
         return new IntegerDifferenceVertex(this, that);
     }
@@ -86,7 +94,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSumVertex(this);
     }
 
-    public IntegerVertex lambda(int[] shape, Function<IntegerTensor, IntegerTensor> op) {
+    public IntegerVertex lambda(long[] shape, Function<IntegerTensor, IntegerTensor> op) {
         return new IntegerUnaryOpLambda<>(shape, this, op);
     }
 
@@ -99,8 +107,16 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(that);
     }
 
+    public IntegerVertex reverseMinus(int that) {
+        return new ConstantIntegerVertex(that).minus(this);
+    }
+
     public IntegerVertex div(IntegerVertex that) {
         return divideBy(that);
+    }
+
+    public IntegerVertex reverseDiv(int that) {
+        return (new ConstantIntegerVertex(that)).div(this);
     }
 
     public IntegerVertex times(int that) {
@@ -115,7 +131,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return multiply(-1);
     }
 
-    public IntegerVertex take(int... index) {
+    public IntegerVertex take(long... index) {
         return new IntegerTakeVertex(this, index);
     }
 
@@ -123,7 +139,7 @@ public abstract class IntegerVertex extends Vertex<IntegerTensor> implements Int
         return new IntegerSliceVertex(this, dimension, index);
     }
 
-    public IntegerVertex reshape(int... proposedShape) {
+    public IntegerVertex reshape(long... proposedShape) {
         return new IntegerReshapeVertex(this, proposedShape);
     }
 

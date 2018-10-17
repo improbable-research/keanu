@@ -16,7 +16,6 @@ import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
 import io.improbable.keanu.vertices.VertexLabel;
-import io.improbable.keanu.vertices.VertexLabelException;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -88,9 +87,9 @@ public class FoodPoisoningTest {
         VertexLabel pIllLabel = new VertexLabel("pIll");
 
         Consumer<Plate> personMaker = (plate) -> {
-            BernoulliVertex didEatOysters = plate.add( new BernoulliVertex(0.4).labeledAs(didEatOystersLabel));
-            BernoulliVertex didEatLamb = plate.add(new BernoulliVertex(0.4).labeledAs(didEatLambLabel));
-            BernoulliVertex didEatPoo = plate.add(new BernoulliVertex(0.4).labeledAs(didEatPooLabel));
+            BernoulliVertex didEatOysters = plate.add(didEatOystersLabel, new BernoulliVertex(0.4));
+            BernoulliVertex didEatLamb = plate.add(didEatLambLabel, new BernoulliVertex(0.4));
+            BernoulliVertex didEatPoo = plate.add(didEatPooLabel, new BernoulliVertex(0.4));
 
             BoolVertex ingestedPathogen =
                 didEatOysters.and(infectedOysters).or(
@@ -101,11 +100,10 @@ public class FoodPoisoningTest {
 
             DoubleVertex pIll = If.isTrue(ingestedPathogen)
                 .then(0.9)
-                .orElse(0.1)
-                .labeledAs(pIllLabel);
+                .orElse(0.1);
 
-            plate.add(pIll);
-            plate.add(new BernoulliVertex(pIll).labeledAs(isIllLabel));
+            plate.add(pIllLabel, pIll);
+            plate.add(isIllLabel, new BernoulliVertex(pIll));
         };
 
         Plates personPlates = new PlateBuilder()

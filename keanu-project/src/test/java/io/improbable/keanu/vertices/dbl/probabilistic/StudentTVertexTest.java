@@ -37,7 +37,7 @@ public class StudentTVertexTest {
 
         int v = 3;
 
-        StudentTVertex studentT = new StudentTVertex(new int[]{N, 1}, v);
+        StudentTVertex studentT = new StudentTVertex(new long[]{N, 1}, v);
 
         List<Double> samples = studentT.sample(random).asFlatList();
 

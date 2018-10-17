@@ -4,12 +4,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.factory.Nd4j;
+
 import io.improbable.keanu.kotlin.DoubleOperators;
 import io.improbable.keanu.tensor.NumberTensor;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
 public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, DoubleOperators<DoubleTensor> {
 
@@ -21,7 +22,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor TWO_SCALAR = scalar(2.0);
 
-    static DoubleTensor create(double value, int[] shape) {
+    static DoubleTensor create(double value, long[] shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(value);
         } else {
@@ -29,7 +30,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor create(double[] values, int... shape) {
+    static DoubleTensor create(double[] values, long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE) && values.length == 1) {
             return new ScalarDoubleTensor(values[0]);
         } else {
@@ -41,7 +42,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return create(values, 1, values.length);
     }
 
-    static DoubleTensor ones(int... shape) {
+    static DoubleTensor ones(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(1.0);
         } else {
@@ -49,7 +50,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor eye(int n) {
+    static DoubleTensor eye(long n) {
         if (n == 1) {
             return new ScalarDoubleTensor(1.0);
         } else {
@@ -57,7 +58,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         }
     }
 
-    static DoubleTensor zeros(int... shape) {
+    static DoubleTensor zeros(long... shape) {
         if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
             return new ScalarDoubleTensor(0.0);
         } else {
@@ -92,7 +93,7 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new ScalarDoubleTensor(scalarValue);
     }
 
-    static DoubleTensor placeHolder(int[] shape) {
+    static DoubleTensor placeHolder(long[] shape) {
         return new ScalarDoubleTensor(shape);
     }
 
@@ -105,11 +106,19 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
         return new Nd4jDoubleTensor(concat);
     }
 
-    @Override
-    DoubleTensor setValue(Double value, int... index);
+    static DoubleTensor min(DoubleTensor a, DoubleTensor b) {
+        return a.duplicate().minInPlace(b);
+    }
+
+    static DoubleTensor max(DoubleTensor a, DoubleTensor b) {
+        return a.duplicate().maxInPlace(b);
+    }
 
     @Override
-    DoubleTensor reshape(int... newShape);
+    DoubleTensor setValue(Double value, long... index);
+
+    @Override
+    DoubleTensor reshape(long... newShape);
 
     DoubleTensor permute(int... rearrange);
 
@@ -128,11 +137,19 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor minus(double value);
 
+    default DoubleTensor reverseMinus(double value) {
+        return DoubleTensor.scalar(value).minus(this);
+    }
+
     DoubleTensor plus(double value);
 
     DoubleTensor times(double value);
 
     DoubleTensor div(double value);
+
+    default DoubleTensor reverseDiv(double value) {
+        return DoubleTensor.scalar(value).div(this);
+    }
 
     DoubleTensor matrixMultiply(DoubleTensor value);
 
@@ -145,6 +162,12 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     DoubleTensor sqrt();
 
     DoubleTensor log();
+
+    DoubleTensor safeLogTimes(DoubleTensor y);
+
+    DoubleTensor logGamma();
+
+    DoubleTensor digamma();
 
     DoubleTensor sin();
 
@@ -164,13 +187,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor exp();
 
-    DoubleTensor max(DoubleTensor max);
-
     DoubleTensor matrixInverse();
 
     double max();
-
-    DoubleTensor min(DoubleTensor min);
 
     double min();
 
@@ -181,6 +200,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     boolean equalsWithinEpsilon(DoubleTensor other, double epsilon);
 
     DoubleTensor standardize();
+
+    DoubleTensor replaceNaN(double value);
 
     DoubleTensor clamp(DoubleTensor min, DoubleTensor max);
 
@@ -199,14 +220,14 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
     double product();
 
     @Override
-    DoubleTensor slice(int dimension, int index);
+    DoubleTensor slice(int dimension, long index);
 
-    List<DoubleTensor> split(int dimension, int[] splitAtIndices);
+    List<DoubleTensor> split(int dimension, long... splitAtIndices);
 
-    default List<DoubleTensor> sliceAlongDimension(int dimension, int indexStart, int indexEnd) {
+    default List<DoubleTensor> sliceAlongDimension(int dimension, long indexStart, long indexEnd) {
         List<DoubleTensor> slicedTensors = new ArrayList<>();
 
-        for (int i = indexStart; i < indexEnd; i++) {
+        for (long i = indexStart; i < indexEnd; i++) {
             slicedTensors.add(slice(dimension, i));
         }
 
@@ -231,6 +252,12 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor logInPlace();
 
+    DoubleTensor safeLogTimesInPlace(DoubleTensor y);
+
+    DoubleTensor logGammaInPlace();
+
+    DoubleTensor digammaInPlace();
+
     DoubleTensor sinInPlace();
 
     DoubleTensor cosInPlace();
@@ -249,9 +276,9 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor expInPlace();
 
-    DoubleTensor maxInPlace(DoubleTensor max);
+    DoubleTensor minInPlace(DoubleTensor min);
 
-    DoubleTensor minInPlace(DoubleTensor max);
+    DoubleTensor maxInPlace(DoubleTensor max);
 
     DoubleTensor clampInPlace(DoubleTensor min, DoubleTensor max);
 
@@ -265,6 +292,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     DoubleTensor standardizeInPlace();
 
+    DoubleTensor replaceNaNInPlace(double value);
+
     DoubleTensor setAllInPlace(double value);
 
     // Comparisons
@@ -276,5 +305,8 @@ public interface DoubleTensor extends NumberTensor<Double, DoubleTensor>, Double
 
     BooleanTensor greaterThanOrEqual(double value);
 
+    BooleanTensor notNaN();
+
+    default BooleanTensor isNaN() { return notNaN().not(); }
 
 }

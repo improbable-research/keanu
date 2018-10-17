@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.bool.BoolVertex;
 
 public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
     private final int dimension;
-    private final int index;
+    private final long index;
 
     /**
      * Takes the slice along a given dimension and index of a vertex
@@ -16,7 +16,7 @@ public class BoolSliceVertex extends BoolUnaryOpVertex<BooleanTensor> {
      * @param dimension the dimension to extract along
      * @param index the index of extraction
      */
-    public BoolSliceVertex(BoolVertex inputVertex, int dimension, int index) {
+    public BoolSliceVertex(BoolVertex inputVertex, int dimension, long index) {
         super(shapeSlice(dimension, inputVertex.getShape()), inputVertex);
         this.dimension = dimension;
         this.index = index;

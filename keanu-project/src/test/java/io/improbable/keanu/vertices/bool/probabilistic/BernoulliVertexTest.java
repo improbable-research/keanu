@@ -30,7 +30,7 @@ public class BernoulliVertexTest {
 
     @Test
     public void doesTensorSample() {
-        int[] expectedShape = new int[]{1, 100};
+        long[] expectedShape = new long[]{1, 100};
         BernoulliVertex bernoulliVertex = new BernoulliVertex(expectedShape, 0.25);
         BooleanTensor samples = bernoulliVertex.sample();
         assertArrayEquals(expectedShape, samples.getShape());
@@ -39,7 +39,7 @@ public class BernoulliVertexTest {
     @Test
     public void doesExpectedLogProbOnTensor() {
         double probTrue = 0.25;
-        BernoulliVertex bernoulliVertex = new BernoulliVertex(new int[]{1, 2}, probTrue);
+        BernoulliVertex bernoulliVertex = new BernoulliVertex(new long[]{1, 2}, probTrue);
         double actualLogPmf = bernoulliVertex.logPmf(BooleanTensor.create(new boolean[]{true, false}));
         double expectedLogPmf = Math.log(probTrue) + Math.log(1 - probTrue);
         assertEquals(expectedLogPmf, actualLogPmf, 1e-10);
@@ -48,9 +48,9 @@ public class BernoulliVertexTest {
     @Test
     public void doesCalculateDiffLogProbWithRespectToHyperParamHandCalculated() {
 
-        DoubleVertex A = new GaussianVertex(new int[]{1, 2}, 0, 1);
+        DoubleVertex A = new GaussianVertex(new long[]{1, 2}, 0, 1);
         A.setValue(new double[]{0.25, 0.6});
-        DoubleVertex B = new GaussianVertex(new int[]{1, 2}, 0, 1);
+        DoubleVertex B = new GaussianVertex(new long[]{1, 2}, 0, 1);
         B.setValue(new double[]{0.5, 0.2});
         DoubleVertex C = A.times(B);
         BernoulliVertex D = new BernoulliVertex(C);
@@ -106,7 +106,7 @@ public class BernoulliVertexTest {
     @Test
     public void doesCalculateDiffLogProbWithRespectToRank3HyperParam() {
 
-        int[] shape = new int[]{2, 2, 2};
+        long[] shape = new long[]{2, 2, 2};
         DoubleVertex A = new GaussianVertex(shape, 0, 1);
         DoubleTensor AValue = DoubleTensor.create(new double[]{
             0.1, 0.2,
@@ -183,7 +183,7 @@ public class BernoulliVertexTest {
         int n = 1;
         double min = 0;
         double max = 1;
-        DoubleVertex A = new UniformVertex(new int[]{1, n}, min, max);
+        DoubleVertex A = new UniformVertex(new long[]{1, n}, min, max);
 
         BernoulliVertex observedVertex = new BernoulliVertex(A.sigmoid());
         BooleanTensor observation = observedVertex.sample();

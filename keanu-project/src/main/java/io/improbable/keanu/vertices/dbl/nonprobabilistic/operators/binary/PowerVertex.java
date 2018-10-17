@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class PowerVertex extends DoubleBinaryOpVertex {
@@ -14,33 +13,56 @@ public class PowerVertex extends DoubleBinaryOpVertex {
     /**
      * Raises a vertex to the power of another
      *
-     * @param left  the base vertex
-     * @param right the exponent vertex
+     * @param base  the base vertex
+     * @param exponent the exponent vertex
      */
-    public PowerVertex(DoubleVertex left, DoubleVertex right) {
-        super(left, right);
+    public PowerVertex(DoubleVertex base, DoubleVertex exponent) {
+        super(base, exponent);
     }
 
     @Override
-    protected DoubleTensor op(DoubleTensor l, DoubleTensor r) {
-        return l.pow(r);
+    protected DoubleTensor op(DoubleTensor base, DoubleTensor exponent) {
+        return base.pow(exponent);
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber l, DualNumber r) {
-        return l.pow(r);
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dBaseWrtInputs, PartialDerivatives dExponentWrtInputs) {
+
+        // dc = (A ^ B) * B * (dA / A) + (dB * log (A))
+        PartialDerivatives partialsFromBase;
+        PartialDerivatives partialsFromExponent;
+
+        if (dBaseWrtInputs.isEmpty()) {
+            partialsFromBase = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromBase = dBaseWrtInputs.multiplyAlongOfDimensions(
+                right.getValue().times(left.getValue().pow(right.getValue().minus(1))),
+                this.getValue().getShape()
+            );
+        }
+
+        if (dExponentWrtInputs.isEmpty()) {
+            partialsFromExponent = PartialDerivatives.OF_CONSTANT;
+        } else {
+            partialsFromExponent = dExponentWrtInputs.multiplyAlongOfDimensions(
+                left.getValue().log().timesInPlace(this.getValue()),
+                right.getValue().getShape()
+            );
+        }
+
+        return partialsFromBase.add(partialsFromExponent);
     }
 
     @Override
     public Map<Vertex, PartialDerivatives> reverseModeAutoDifferentiation(PartialDerivatives derivativeOfOutputsWithRespectToSelf) {
         Map<Vertex, PartialDerivatives> partials = new HashMap<>();
-        DoubleTensor leftValue = left.getValue();
-        DoubleTensor rightValue = right.getValue();
-        DoubleTensor leftPowRight = getValue();
-        DoubleTensor dOutWrtLeft = rightValue.div(leftValue).timesInPlace(leftPowRight);
-        DoubleTensor dOutWrtRight = leftPowRight.times(leftValue.log());
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtLeft, true));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtRight, true));
+        DoubleTensor baseValue = getBase().getValue();
+        DoubleTensor exponentValue = getExponent().getValue();
+        DoubleTensor basePowExponent = getValue();
+        DoubleTensor dSelfWrtBase = exponentValue.div(baseValue).timesInPlace(basePowExponent);
+        DoubleTensor dSelfWrtExponent = basePowExponent.times(baseValue.log());
+        partials.put(getBase(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtBase, this.getShape()));
+        partials.put(getExponent(), derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dSelfWrtExponent, this.getShape()));
         return partials;
     }
 

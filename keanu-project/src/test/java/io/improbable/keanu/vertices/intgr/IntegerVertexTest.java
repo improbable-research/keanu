@@ -96,7 +96,7 @@ public class IntegerVertexTest {
     @Test
     public void canObserveTensor() {
         IntegerVertex binomialVertex = new BinomialVertex(0.5, 20);
-        IntegerTensor observation = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new int[]{2, 2});
+        IntegerTensor observation = Nd4jIntegerTensor.create(new int[]{1, 2, 3, 4}, new long[]{2, 2});
         binomialVertex.observe(observation);
         assertArrayEquals(observation.asFlatIntegerArray(), binomialVertex.getValue().asFlatIntegerArray());
         assertArrayEquals(observation.getShape(), binomialVertex.getShape());
@@ -121,14 +121,14 @@ public class IntegerVertexTest {
 
     @Test
     public void canSetValueAsScalarOnNonScalarVertex() {
-        IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
+        IntegerVertex binomialVertex = new BinomialVertex(new long[]{2, 1}, 0.5, 20);
         binomialVertex.setValue(2);
         assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
     }
 
     @Test
     public void canSetAndCascadeAsScalarOnNonScalarVertex() {
-        IntegerVertex binomialVertex = new BinomialVertex(new int[]{2, 1}, 0.5, 20);
+        IntegerVertex binomialVertex = new BinomialVertex(new long[]{2, 1}, 0.5, 20);
         binomialVertex.setAndCascade(2);
         assertArrayEquals(new int[]{2}, binomialVertex.getValue().asFlatIntegerArray());
     }
@@ -145,9 +145,9 @@ public class IntegerVertexTest {
     public void canReshape() {
         IntegerVertex binomialVertex = new BinomialVertex(0, 1);
         binomialVertex.setAndCascade(IntegerTensor.ones(2, 2));
-        assertArrayEquals(binomialVertex.getShape(), new int[]{2, 2});
+        assertArrayEquals(binomialVertex.getShape(), new long[]{2, 2});
         IntegerVertex reshaped = binomialVertex.reshape(4, 1);
-        assertArrayEquals(reshaped.getShape(), new int[]{4, 1});
+        assertArrayEquals(reshaped.getShape(), new long[]{4, 1});
     }
 
     @Test
@@ -159,10 +159,22 @@ public class IntegerVertexTest {
         B.setValue(IntegerTensor.ones(2, 2));
 
         IntegerVertex concatDimZero = IntegerVertex.concat(0, A, B);
-        assertArrayEquals(concatDimZero.getShape(), new int[]{4, 2});
+        assertArrayEquals(concatDimZero.getShape(), new long[]{4, 2});
 
         IntegerVertex concatDimOne = IntegerVertex.concat(1, A, B);
-        assertArrayEquals(concatDimOne.getShape(), new int[]{2, 4});
+        assertArrayEquals(concatDimOne.getShape(), new long[]{2, 4});
+    }
+
+    @Test
+    public void canFindMinAndMax() {
+        IntegerVertex A = ConstantVertex.of(1, 2, 3, 4);
+        IntegerVertex B = ConstantVertex.of(2, 4, 1, 5);
+
+        IntegerVertex min = IntegerVertex.min(A, B);
+        IntegerVertex max = IntegerVertex.max(A, B);
+
+        assertArrayEquals(new int[]{1, 2, 1, 4}, min.getValue().asFlatIntegerArray());
+        assertArrayEquals(new int[]{2, 4, 3, 5}, max.getValue().asFlatIntegerArray());
     }
 
 }

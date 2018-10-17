@@ -60,7 +60,7 @@ in your gradle or maven build file.
 In your project's build.gradle:
 
 ```$groovy
-compile group: 'io.improbable', name: 'keanu', version: '0.0.12'
+compile group: 'io.improbable', name: 'keanu', version: '0.0.13'
 ```
 
 #### Maven
@@ -71,6 +71,6 @@ In your project's pom.xml:
 <dependency>
     <groupId>io.improbable</groupId>
     <artifactId>keanu</artifactId>
-    <version>0.0.12</version>
+    <version>0.0.13</version>
 </dependency>
 ```

@@ -1,6 +1,7 @@
 package io.improbable.keanu.vertices.generic.nonprobabilistic;
 
 import io.improbable.keanu.tensor.Tensor;
+import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -62,11 +63,8 @@ public class If {
         }
 
         public Vertex<Tensor<T>> orElse(Vertex<? extends Tensor<T>> els) {
-            if (Arrays.equals(thn.getShape(), els.getShape())) {
-                return new IfVertex<>(els.getShape(), predicate, thn, els);
-            } else {
-                throw new IllegalArgumentException("Else must match then shape");
-            }
+            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
+            return new IfVertex<>(els.getShape(), predicate, thn, els);
         }
     }
 
@@ -82,11 +80,8 @@ public class If {
         }
 
         public BoolVertex orElse(Vertex<? extends BooleanTensor> els) {
-            if (Arrays.equals(thn.getShape(), els.getShape())) {
-                return new BooleanIfVertex(els.getShape(), predicate, thn, els);
-            } else {
-                throw new IllegalArgumentException("Else must match then shape");
-            }
+            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
+            return new BooleanIfVertex(els.getShape(), predicate, thn, els);
         }
     }
 
@@ -102,15 +97,19 @@ public class If {
         }
 
         public DoubleVertex orElse(Vertex<? extends DoubleTensor> els) {
-            if (Arrays.equals(thn.getShape(), els.getShape())) {
-                return new DoubleIfVertex(els.getShape(), predicate, thn, els);
-            } else {
-                throw new IllegalArgumentException("Else must match then shape");
-            }
+            assertShapesMatchOrAreScalar(thn.getShape(), els.getShape(), predicate.getShape());
+            return new DoubleIfVertex(els.getShape(), predicate, thn, els);
         }
 
         public DoubleVertex orElse(double els) {
             return orElse(new ConstantDoubleVertex(els));
+        }
+    }
+
+    private static void assertShapesMatchOrAreScalar(long[] thnShape, long[] elsShape, long[] predicateShape) {
+        if (!Arrays.equals(thnShape, elsShape)
+            || (!TensorShape.isScalar(predicateShape) && !TensorShape.isScalar(thnShape) && !Arrays.equals(predicateShape, thnShape))) {
+            throw new IllegalArgumentException("The shape of the then and else condition must match. The predicate should either match or be scalar.");
         }
     }
 }

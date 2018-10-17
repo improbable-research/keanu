@@ -129,7 +129,7 @@ public class LogisticVertexTest {
 
         int sampleCount = 1000000;
         LogisticVertex vertex = new LogisticVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             ConstantVertex.of(0.0),
             ConstantVertex.of(0.5)
         );
@@ -159,11 +159,10 @@ public class LogisticVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new LogisticVertex(new int[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
+            hyperParams -> new LogisticVertex(new long[]{numSamples, 1}, hyperParams.get(0), hyperParams.get(1)),
             aB,
             latentAB,
             random
         );
     }
-
 }

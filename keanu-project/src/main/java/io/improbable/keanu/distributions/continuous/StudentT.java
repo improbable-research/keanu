@@ -3,12 +3,10 @@ package io.improbable.keanu.distributions.continuous;
 import static java.lang.Math.PI;
 import static java.lang.Math.log;
 
-import static io.improbable.keanu.distributions.dual.Diffs.T;
-
-import org.apache.commons.math3.special.Gamma;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.T;
 
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -28,8 +26,8 @@ public class StudentT implements ContinuousDistribution {
      * ARL-TR-2168 March 2000
      * 5.1.23 page 36
      *
-     * @param v      Degrees of Freedom
-     * @return       a new ContinuousDistribution object
+     * @param v Degrees of Freedom
+     * @return a new ContinuousDistribution object
      */
     public static ContinuousDistribution withParameters(IntegerTensor v) {
         return new StudentT(v);
@@ -40,7 +38,7 @@ public class StudentT implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         DoubleTensor chi2Samples = ChiSquared.withParameters(v).sample(shape, random);
         return random.nextGaussian(shape).divInPlace(chi2Samples.divInPlace(v.toDouble()).sqrtInPlace());
     }
@@ -51,8 +49,8 @@ public class StudentT implements ContinuousDistribution {
         DoubleTensor vAsDouble = v.toDouble();
         DoubleTensor halfVPlusOne = vAsDouble.plus(1).divInPlace(2);
 
-        DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.apply(Gamma::logGamma);
-        DoubleTensor logGammaHalfV = vAsDouble.div(2).applyInPlace(Gamma::logGamma);
+        DoubleTensor logGammaHalfVPlusOne = halfVPlusOne.logGamma();
+        DoubleTensor logGammaHalfV = vAsDouble.div(2).logGammaInPlace();
         DoubleTensor halfLogV = vAsDouble.log().divInPlace(2);
 
         return logGammaHalfVPlusOne

@@ -2,6 +2,8 @@ package io.improbable.keanu.tensor.bool;
 
 import static java.util.Arrays.copyOf;
 
+import static com.google.common.primitives.Ints.checkedCast;
+
 import static io.improbable.keanu.tensor.TensorShape.getFlatIndex;
 
 import java.util.Arrays;
@@ -10,6 +12,7 @@ import org.apache.commons.lang3.ArrayUtils;
 
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.TensorShape;
+import io.improbable.keanu.tensor.TensorShapeValidation;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.generic.GenericTensor;
@@ -17,7 +20,7 @@ import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
 public class SimpleBooleanTensor implements BooleanTensor {
 
-    static BooleanTensor create(boolean[] data, int[] shape) {
+    static BooleanTensor create(boolean[] data, long[] shape) {
         return new SimpleBooleanTensor(data, shape);
     }
 
@@ -26,15 +29,16 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     private final boolean[] data;
-    private final int[] shape;
-    private final int[] stride;
+    private final long[] shape;
+    private final long[] stride;
 
     /**
      * @param data  tensor data used c ordering
      * @param shape desired shape of tensor
      */
-    public SimpleBooleanTensor(boolean[] data, int[] shape) {
-        this.data = new boolean[(int) TensorShape.getLength(shape)];
+    public SimpleBooleanTensor(boolean[] data, long[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
+        this.data = new boolean[checkedCast(TensorShape.getLength(shape))];
         System.arraycopy(data, 0, this.data, 0, this.data.length);
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -52,7 +56,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
     /**
      * @param shape shape to use as place holder
      */
-    public SimpleBooleanTensor(int[] shape) {
+    public SimpleBooleanTensor(long[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = null;
         this.shape = Arrays.copyOf(shape, shape.length);
         this.stride = TensorShape.getRowFirstStride(shape);
@@ -62,7 +67,8 @@ public class SimpleBooleanTensor implements BooleanTensor {
      * @param constant constant boolean value to fill shape
      * @param shape    desired shape of tensor
      */
-    public SimpleBooleanTensor(boolean constant, int[] shape) {
+    public SimpleBooleanTensor(boolean constant, long[] shape) {
+        TensorShapeValidation.checkRankIsAtLeastTwo(shape);
         this.data = new boolean[(int) TensorShape.getLength(shape)];
         Arrays.fill(this.data, constant);
         this.shape = Arrays.copyOf(shape, shape.length);
@@ -70,7 +76,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor reshape(int... newShape) {
+    public BooleanTensor reshape(long... newShape) {
         if (TensorShape.getLength(shape) != TensorShape.getLength(newShape)) {
             throw new IllegalArgumentException("Cannot reshape a tensor to a shape of different length. Failed to reshape: "
                 + Arrays.toString(shape) + " to: " + Arrays.toString(newShape));
@@ -212,7 +218,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public BooleanTensor slice(int dimension, int index) {
+    public BooleanTensor slice(int dimension, long index) {
         DoubleTensor tadDoubles = Nd4jDoubleTensor.create(asFlatDoubleArray(), shape).slice(dimension, index);
         double[] tadFlat = tadDoubles.asFlatDoubleArray();
         boolean[] tadToBooleans = new boolean[tadFlat.length];
@@ -228,7 +234,7 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public int[] getShape() {
+    public long[] getShape() {
         return Arrays.copyOf(shape, shape.length);
     }
 
@@ -243,13 +249,13 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
-    public Boolean getValue(int... index) {
-        return data[getFlatIndex(shape, stride, index)];
+    public Boolean getValue(long... index) {
+        return data[checkedCast(getFlatIndex(shape, stride, index))];
     }
 
     @Override
-    public BooleanTensor setValue(Boolean value, int... index) {
-        data[getFlatIndex(shape, stride, index)] = value;
+    public BooleanTensor setValue(Boolean value, long... index) {
+        data[checkedCast(getFlatIndex(shape, stride, index))] = value;
         return this;
     }
 
@@ -308,6 +314,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
     @Override
     public FlattenedView<Boolean> getFlattenedView() {
         return new SimpleBooleanFlattenedView(data);
+    }
+
+    @Override
+    public BooleanTensor elementwiseEquals(Boolean value) {
+        return Tensor.elementwiseEquals(this, BooleanTensor.create(value, this.getShape()));
     }
 
     private static class SimpleBooleanFlattenedView implements FlattenedView<Boolean> {

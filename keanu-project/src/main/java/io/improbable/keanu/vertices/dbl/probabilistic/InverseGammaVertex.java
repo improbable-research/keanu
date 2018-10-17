@@ -1,8 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.A;
-import static io.improbable.keanu.distributions.dual.Diffs.B;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.A;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.B;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.InverseGamma;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,7 +32,7 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
      * @param alpha       the alpha of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      * @param beta        the beta of the Inverse Gamma with either the same shape as specified for this vertex or alpha scalar
      */
-    public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
+    public InverseGammaVertex(long[] tensorShape, DoubleVertex alpha, DoubleVertex beta) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, alpha.getShape(), beta.getShape());
 
@@ -65,15 +65,15 @@ public class InverseGammaVertex extends DoubleVertex implements ProbabilisticDou
         this(new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(int[] tensorShape, DoubleVertex alpha, double beta) {
+    public InverseGammaVertex(long[] tensorShape, DoubleVertex alpha, double beta) {
         this(tensorShape, alpha, new ConstantDoubleVertex(beta));
     }
 
-    public InverseGammaVertex(int[] tensorShape, double alpha, DoubleVertex beta) {
+    public InverseGammaVertex(long[] tensorShape, double alpha, DoubleVertex beta) {
         this(tensorShape, new ConstantDoubleVertex(alpha), beta);
     }
 
-    public InverseGammaVertex(int[] tensorShape, double alpha, double beta) {
+    public InverseGammaVertex(long[] tensorShape, double alpha, double beta) {
         this(tensorShape, new ConstantDoubleVertex(alpha), new ConstantDoubleVertex(beta));
     }
 

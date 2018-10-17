@@ -1,5 +1,6 @@
 package io.improbable.keanu.tensor;
 
+import static org.hamcrest.Matchers.both;
 import static org.hamcrest.Matchers.closeTo;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -16,11 +17,11 @@ public class TensorMatchers {
     private TensorMatchers() {}
 
 
-    public static <T> Matcher<Tensor<T>> hasShape(int... shape) {
+    public static <T> Matcher<Tensor<T>> hasShape(long... shape) {
         return hasShape(equalTo(shape));
     }
 
-    public static <T> Matcher<Tensor<T>> hasShape(Matcher<int[]> shapeMatcher) {
+    public static <T> Matcher<Tensor<T>> hasShape(Matcher<long[]> shapeMatcher) {
         return new TypeSafeDiagnosingMatcher<Tensor<T>>() {
             @Override
             protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
@@ -63,18 +64,18 @@ public class TensorMatchers {
             @Override
             protected boolean matchesSafely(Tensor<T> item, Description mismatchDescription) {
                 mismatchDescription.appendText("Tensor");
-                Tensor.FlattenedView<T> itemFlattened = item.getFlattenedView();
-                if (itemFlattened.size() != valueMatchers.size()) {
+                T[] itemArray = item.asFlatArray();
+                if (itemArray.length != valueMatchers.size()) {
                     mismatchDescription
                         .appendText(" with different size ")
-                        .appendValue(itemFlattened.size());
+                        .appendValue(itemArray.length);
                     return false;
                 }
                 for (int i = 0; i < valueMatchers.size(); i++) {
-                    if (!valueMatchers.get(i).matches(itemFlattened.getOrScalar(i))) {
+                    if (!valueMatchers.get(i).matches(itemArray[i])) {
                         mismatchDescription
                             .appendText(" with different value ")
-                            .appendValue(itemFlattened.getOrScalar(i))
+                            .appendValue(itemArray[i])
                             .appendText(" at entry ")
                             .appendValue(i);
                         return false;
@@ -88,6 +89,10 @@ public class TensorMatchers {
                 description.appendText("Tensor with value ").appendValue(valueMatchers);
             }
         };
+    }
+
+    public static <T> Matcher<Tensor<T>> valuesAndShapesMatch(Tensor<T> tensor) {
+        return both(TensorMatchers.valuesMatch(tensor)).and(hasShape(tensor.getShape()));
     }
 
     public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
@@ -117,7 +122,7 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
+    public static <T> Matcher<Tensor<T>> valuesMatch(Tensor<T> other) {
         return hasValue(other.asFlatArray());
     }
 

@@ -1,7 +1,8 @@
 package io.improbable.keanu.vertices.dbl.probabilistic;
 
-import static io.improbable.keanu.distributions.dual.Diffs.LAMBDA;
-import static io.improbable.keanu.distributions.dual.Diffs.X;
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.LAMBDA;
+import static io.improbable.keanu.distributions.hyperparam.Diffs.X;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNonScalarShapeOrAllScalar;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
@@ -10,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 
 import io.improbable.keanu.distributions.continuous.Exponential;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
@@ -32,7 +33,7 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
      * @param lambda      the lambda of the Exponential with either be the same shape as specified for this
      *                    vertex or scalar.
      */
-    public ExponentialVertex(int[] tensorShape, DoubleVertex lambda) {
+    public ExponentialVertex(long[] tensorShape, DoubleVertex lambda) {
 
         checkTensorsMatchNonScalarShapeOrAreScalar(tensorShape, lambda.getShape());
 
@@ -46,6 +47,7 @@ public class ExponentialVertex extends DoubleVertex implements ProbabilisticDoub
      *
      * @param lambda the lambda of the Exponential with either the same shape as specified for this vertex or scalar
      */
+    @ExportVertexToPythonBindings
     public ExponentialVertex(DoubleVertex lambda) {
         this(checkHasSingleNonScalarShapeOrAllScalar(lambda.getShape()), lambda);
     }

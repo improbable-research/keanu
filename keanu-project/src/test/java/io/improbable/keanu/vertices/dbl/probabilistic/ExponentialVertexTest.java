@@ -35,7 +35,7 @@ public class ExponentialVertexTest {
 
     @Test
     public void maskAppliedToValuesWhereXLessThanA() {
-        DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{1, -2}, new int[]{2, 1});
+        DoubleTensor matrixX = Nd4jDoubleTensor.create(new double[]{1, -2}, new long[]{2, 1});
 
         DoubleTensor maskResult = Exponential.withParameters(DoubleTensor.ONE_SCALAR).logProb(matrixX);
         assertArrayEquals(new double[]{-1, Double.NEGATIVE_INFINITY}, maskResult.asFlatDoubleArray(), 0.0);
@@ -126,7 +126,7 @@ public class ExponentialVertexTest {
 
         int sampleCount = 1000000;
         ExponentialVertex vertex = new ExponentialVertex(
-            new int[]{sampleCount, 1},
+            new long[]{sampleCount, 1},
             ConstantVertex.of(0.5)
         );
 
@@ -152,7 +152,7 @@ public class ExponentialVertexTest {
 
         int numSamples = 2000;
         VertexVariationalMAP.inferHyperParamsFromSamples(
-            hyperParams -> new ExponentialVertex(new int[]{numSamples, 1}, hyperParams.get(0)),
+            hyperParams -> new ExponentialVertex(new long[]{numSamples, 1}, hyperParams.get(0)),
             generationParameters,
             latents,
             random

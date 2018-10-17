@@ -23,7 +23,7 @@ public class ConstantVertex {
         return new ConstantBoolVertex(value);
     }
 
-    public static ConstantBoolVertex of(boolean[] value) {
+    public static ConstantBoolVertex of(boolean... value) {
         return new ConstantBoolVertex(value);
     }
 
@@ -39,7 +39,7 @@ public class ConstantVertex {
         return new ConstantIntegerVertex(value);
     }
 
-    public static ConstantIntegerVertex of(int[] value) {
+    public static ConstantIntegerVertex of(int... value) {
         return new ConstantIntegerVertex(value);
     }
 
@@ -55,7 +55,7 @@ public class ConstantVertex {
         return new ConstantDoubleVertex(value);
     }
 
-    public static ConstantDoubleVertex of(double[] value) {
+    public static ConstantDoubleVertex of(double... value) {
         return new ConstantDoubleVertex(value);
     }
 
@@ -68,7 +68,7 @@ public class ConstantVertex {
     }
 
     public static <GENERIC> ConstantGenericVertex<GenericTensor<GENERIC>> of(GENERIC[] values) {
-        return new ConstantGenericVertex<>(new GenericTensor<>(values, new int[]{1, values.length}));
+        return new ConstantGenericVertex<>(new GenericTensor<>(values, new long[]{1, values.length}));
     }
 
     public static <TENSOR extends Tensor> ConstantGenericVertex<TENSOR> of(TENSOR tensor) {

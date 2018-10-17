@@ -1,9 +1,7 @@
 package io.improbable.keanu.distributions.continuous;
 
-import org.apache.commons.math3.special.Gamma;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
-import io.improbable.keanu.distributions.dual.Diffs;
+import io.improbable.keanu.distributions.hyperparam.Diffs;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
@@ -22,7 +20,7 @@ public class ChiSquared implements ContinuousDistribution {
     }
 
     @Override
-    public DoubleTensor sample(int[] shape, KeanuRandom random) {
+    public DoubleTensor sample(long[] shape, KeanuRandom random) {
         return random.nextGamma(shape, DoubleTensor.TWO_SCALAR, k.toDouble().div(2));
     }
 
@@ -30,7 +28,7 @@ public class ChiSquared implements ContinuousDistribution {
     public DoubleTensor logProb(DoubleTensor x) {
         DoubleTensor halfK = k.toDouble().div(2);
         DoubleTensor numerator = halfK.minus(1).timesInPlace(x.log()).minusInPlace(x.div(2));
-        DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.apply(Gamma::gamma).logInPlace());
+        DoubleTensor denominator = halfK.times(LOG_TWO).plusInPlace(halfK.logGamma());
         return numerator.minusInPlace(denominator);
     }
 

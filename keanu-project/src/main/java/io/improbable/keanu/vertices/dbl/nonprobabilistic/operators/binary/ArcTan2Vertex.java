@@ -6,7 +6,6 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.DualNumber;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
 public class ArcTan2Vertex extends DoubleBinaryOpVertex {
@@ -27,13 +26,23 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
     }
 
     @Override
-    protected DualNumber dualOp(DualNumber x, DualNumber y) {
-        DoubleTensor denominator = ((y.getValue().pow(2)).plusInPlace((x.getValue().pow(2))));
+    protected PartialDerivatives forwardModeAutoDifferentiation(PartialDerivatives dxWrtInputs, PartialDerivatives dyWrtInputs) {
+        DoubleTensor yValue = right.getValue();
+        DoubleTensor xValue = left.getValue();
 
-        PartialDerivatives thisInfX = x.getPartialDerivatives().multiplyBy((y.getValue().div(denominator)).unaryMinusInPlace());
-        PartialDerivatives thisInfY = y.getPartialDerivatives().multiplyBy(x.getValue().div(denominator));
-        PartialDerivatives newInf = thisInfX.add(thisInfY);
-        return new DualNumber(x.getValue().atan2(y.getValue()), newInf);
+        DoubleTensor denominator = yValue.pow(2).plusInPlace(xValue.pow(2));
+
+        PartialDerivatives diffFromX = dxWrtInputs.multiplyAlongOfDimensions(
+            yValue.div(denominator).unaryMinusInPlace(),
+            xValue.getShape()
+        );
+
+        PartialDerivatives diffFromY = dyWrtInputs.multiplyAlongOfDimensions(
+            xValue.div(denominator),
+            yValue.getShape()
+        );
+
+        return diffFromX.add(diffFromY);
     }
 
     @Override
@@ -46,8 +55,8 @@ public class ArcTan2Vertex extends DoubleBinaryOpVertex {
         DoubleTensor dOutWrtX = yValue.div(denominator).unaryMinusInPlace();
         DoubleTensor dOutWrtY = xValue.div(denominator);
 
-        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtX, true));
-        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyBy(dOutWrtY, true));
+        partials.put(left, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtX, this.getShape()));
+        partials.put(right, derivativeOfOutputsWithRespectToSelf.multiplyAlongWrtDimensions(dOutWrtY, this.getShape()));
         return partials;
     }
 }

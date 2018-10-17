@@ -8,6 +8,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import com.google.common.base.Preconditions;
+
 public class TensorShapeValidation {
 
     private TensorShapeValidation() {
@@ -22,7 +24,7 @@ public class TensorShapeValidation {
      * @throws IllegalArgumentException if there is more than one non-scalar shape OR if the non-scalar shape does
      *                                  not match the proposal shape.
      */
-    public static void checkTensorsMatchNonScalarShapeOrAreScalar(int[] proposalShape, int[]... shapes) {
+    public static void checkTensorsMatchNonScalarShapeOrAreScalar(long[] proposalShape, long[]... shapes) {
 
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
 
@@ -34,7 +36,7 @@ public class TensorShapeValidation {
                 throw new IllegalArgumentException("More than a single non-scalar shape");
             }
 
-            int[] nonScalarShape = nonScalarShapes.iterator().next().getShape();
+            long[] nonScalarShape = nonScalarShapes.iterator().next().getShape();
             boolean nonScalarShapeDoesNotMatchProposal = !Arrays.equals(nonScalarShape, proposalShape);
 
             if (nonScalarShapeDoesNotMatchProposal) {
@@ -46,13 +48,26 @@ public class TensorShapeValidation {
     }
 
     /**
+     * Check if the given dimension exists within the shape
+     *
+     * @param dimension Proposed dimension
+     * @param shape     Shape to check
+     * @throws IllegalArgumentException if the dimension exceeds the rank of the shape
+     */
+    public static void checkDimensionExistsInShape(int dimension, long[] shape) {
+        if (dimension >= shape.length) {
+            throw new IllegalArgumentException(String.format("Dimension %d does not exist in tensor of rank %d", dimension, shape.length));
+        }
+    }
+
+    /**
      * This ensures there is at most a single non-scalar shape.
      *
      * @param shapes the tensors for shape checking
      * @return either a scalar shape OR the single non-scalar shape.
      * @throws IllegalArgumentException if there is more than one non-scalar shape
      */
-    public static int[] checkHasSingleNonScalarShapeOrAllScalar(int[]... shapes) {
+    public static long[] checkHasSingleNonScalarShapeOrAllScalar(long[]... shapes) {
         Set<TensorShape> nonScalarShapes = getNonScalarShapes(shapes);
 
         if (nonScalarShapes.isEmpty()) {
@@ -64,30 +79,40 @@ public class TensorShapeValidation {
         }
     }
 
-    private static Set<TensorShape> getNonScalarShapes(int[]... shapes) {
+    public static void checkShapeIsSquareMatrix(long[] shape) {
+        if (shape.length != 2) {
+            throw new IllegalArgumentException("Input tensor must be a matrix");
+        }
+
+        if (shape[0] != shape[1]) {
+            throw new IllegalArgumentException("Input matrix must be square");
+        }
+    }
+
+    private static Set<TensorShape> getNonScalarShapes(long[]... shapes) {
         return Arrays.stream(shapes)
             .map(TensorShape::new)
             .filter(shape -> !shape.isScalar())
             .collect(toSet());
     }
 
-    public static int[] checkAllShapesMatch(int[]... shapes) {
+    public static long[] checkAllShapesMatch(long[]... shapes) {
         return checkAllShapesMatch(Arrays.stream(shapes), Optional.empty());
     }
 
-    public static int[] checkAllShapesMatch(String errorMessage, int[]... shapes) {
+    public static long[] checkAllShapesMatch(String errorMessage, long[]... shapes) {
         return checkAllShapesMatch(Arrays.stream(shapes), Optional.of(errorMessage));
     }
 
-    public static int[] checkAllShapesMatch(String errorMessage, Collection<int[]> shapes) {
+    public static long[] checkAllShapesMatch(String errorMessage, Collection<long[]> shapes) {
         return checkAllShapesMatch(shapes.stream(), Optional.of(errorMessage));
     }
 
-    public static int[] checkAllShapesMatch(Collection<int[]> shapes) {
+    public static long[] checkAllShapesMatch(Collection<long[]> shapes) {
         return checkAllShapesMatch(shapes.stream(), Optional.empty());
     }
 
-    private static int[] checkAllShapesMatch(Stream<int[]> shapesStream, Optional<String> errorMessage) {
+    private static long[] checkAllShapesMatch(Stream<long[]> shapesStream, Optional<String> errorMessage) {
         Set<TensorShape> uniqueShapes = shapesStream
             .map(TensorShape::new)
             .collect(toSet());
@@ -99,8 +124,8 @@ public class TensorShapeValidation {
         return uniqueShapes.iterator().next().getShape();
     }
 
-    public static int[] checkShapesCanBeConcatenated(int dimension, int[]... shapes) {
-        int[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
+    public static long[] checkShapesCanBeConcatenated(int dimension, long[]... shapes) {
+        long[] concatShape = Arrays.copyOf(shapes[0], shapes[0].length);
 
         for (int i = 1; i < shapes.length; i++) {
             if (shapes[i].length != concatShape.length) {
@@ -120,7 +145,7 @@ public class TensorShapeValidation {
         return concatShape;
     }
 
-    public static void checkIndexIsValid(int[] shape, int... index) {
+    public static void checkIndexIsValid(long[] shape, long... index) {
         if (shape.length != index.length) {
             throw new IllegalArgumentException(
                 "Length of desired index " + Arrays.toString(index) + " must match the length of the shape " + Arrays.toString(shape));
@@ -137,5 +162,8 @@ public class TensorShapeValidation {
         }
     }
 
+    public static void checkRankIsAtLeastTwo(long[] shape) {
+        Preconditions.checkArgument(shape.length > 1, "Tensors must have rank >=2 : " + Arrays.toString(shape));
 
+    }
 }

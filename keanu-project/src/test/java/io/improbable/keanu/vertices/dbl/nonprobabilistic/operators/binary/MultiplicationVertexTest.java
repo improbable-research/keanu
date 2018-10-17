@@ -1,9 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAScalarAndVector;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfAVectorsAndScalar;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoMatricesElementWiseOperator;
-import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDualNumberOfTwoScalars;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAScalarAndVector;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfAVectorAndScalar;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoMatricesElementWiseOperator;
+import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.calculatesDerivativeOfTwoScalars;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwo2x2MatrixVertexValues;
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.BinaryOperationTestHelpers.operatesOnTwoScalarVertexValues;
 
@@ -20,8 +20,8 @@ public class MultiplicationVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoScalarsMultiplied() {
-        calculatesDualNumberOfTwoScalars(2.0, 3.0, 3.0, 2.0, DoubleVertex::multiply);
+    public void calculatesDerivativeOfTwoScalarsMultiplied() {
+        calculatesDerivativeOfTwoScalars(2.0, 3.0, 3.0, 2.0, DoubleVertex::multiply);
     }
 
     @Test
@@ -35,8 +35,8 @@ public class MultiplicationVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoMatricesElementWiseMultiplied() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoMatricesElementWiseMultiplied() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 2, 2),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 2, 2),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}).diag().reshape(2, 2, 2, 2),
@@ -46,8 +46,8 @@ public class MultiplicationVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfTwoVectorsElementWiseMultiplied() {
-        calculatesDualNumberOfTwoMatricesElementWiseOperator(
+    public void calculatesDerivativeOfTwoVectorsElementWiseMultiplied() {
+        calculatesDerivativeOfTwoMatricesElementWiseOperator(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}, 1, 4),
             DoubleTensor.create(new double[]{2.0, 3.0, 4.0, 5.0}).diag().reshape(1, 4, 1, 4),
@@ -57,8 +57,8 @@ public class MultiplicationVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberOfAVectorsAndScalarMultiplied() {
-        calculatesDualNumberOfAVectorsAndScalar(
+    public void calculatesDerivativeOfAVectorsAndScalarMultiplied() {
+        calculatesDerivativeOfAVectorAndScalar(
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             2,
             DoubleTensor.eye(4).times(2).reshape(1, 4, 1, 4),
@@ -68,8 +68,8 @@ public class MultiplicationVertexTest {
     }
 
     @Test
-    public void calculatesDualNumberofAScalarAndVectorsMultiplied() {
-        calculatesDualNumberOfAScalarAndVector(
+    public void calculatesDerivativeofAScalarAndVectorsMultiplied() {
+        calculatesDerivativeOfAScalarAndVector(
             2,
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}),
             DoubleTensor.create(new double[]{1.0, 2.0, 3.0, 4.0}).reshape(1, 4, 1, 1),
