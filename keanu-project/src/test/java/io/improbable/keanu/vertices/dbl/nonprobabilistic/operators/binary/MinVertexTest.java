@@ -1,11 +1,9 @@
 package io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary;
 
 import com.google.common.collect.ImmutableList;
-
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
-
 import org.junit.Test;
 
 import static io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.TensorTestOperations.finiteDifferenceMatchesForwardAndReverseModeGradient;

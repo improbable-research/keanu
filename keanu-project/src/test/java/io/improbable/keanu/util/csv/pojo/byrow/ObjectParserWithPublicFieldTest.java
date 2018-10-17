@@ -1,17 +1,15 @@
 package io.improbable.keanu.util.csv.pojo.byrow;
 
-import static java.util.stream.Collectors.toList;
-
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.util.csv.pojo.CsvProperty;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.junit.Before;
-import org.junit.Test;
-
-import io.improbable.keanu.util.csv.pojo.CsvProperty;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertEquals;
 
 public class ObjectParserWithPublicFieldTest {
 

@@ -1,7 +1,5 @@
 package io.improbable.keanu.model.regression;
 
-import java.util.function.Function;
-
 import io.improbable.keanu.model.ModelGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.TensorShape;
@@ -12,6 +10,8 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import lombok.Getter;
 import lombok.Value;
+
+import java.util.function.Function;
 
 public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, OUTPUT> {
     private final DoubleVertex xVertex;

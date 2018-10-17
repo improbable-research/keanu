@@ -1,13 +1,13 @@
 package io.improbable.keanu.algorithms.mcmc.proposal;
 
-import java.util.Set;
-
 import io.improbable.keanu.distributions.ContinuousDistribution;
 import io.improbable.keanu.distributions.continuous.Gaussian;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Probabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
+
+import java.util.Set;
 
 public class GaussianProposalDistribution implements ProposalDistribution {
 

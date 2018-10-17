@@ -1,11 +1,10 @@
 package io.improbable.keanu.tensor.generic;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertThat;
+import org.junit.Test;
 
 import static io.improbable.keanu.tensor.TensorMatchers.hasValue;
-
-import org.junit.Test;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertThat;
 
 public class GenericTensorTest {
     @Test

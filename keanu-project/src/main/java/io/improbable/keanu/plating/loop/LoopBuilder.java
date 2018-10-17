@@ -1,13 +1,6 @@
 package io.improbable.keanu.plating.loop;
 
-import java.util.Map;
-import java.util.NoSuchElementException;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-import java.util.function.Supplier;
-
 import com.google.common.collect.ImmutableMap;
-
 import io.improbable.keanu.plating.Plate;
 import io.improbable.keanu.plating.PlateBuilder;
 import io.improbable.keanu.plating.Plates;
@@ -20,6 +13,12 @@ import io.improbable.keanu.vertices.bool.nonprobabilistic.BoolProxyVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleProxyVertex;
 import io.improbable.keanu.vertices.generic.nonprobabilistic.If;
+
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 public class LoopBuilder {
     private final VertexDictionary initialState;

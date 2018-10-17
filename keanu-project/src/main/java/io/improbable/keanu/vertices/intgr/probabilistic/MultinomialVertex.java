@@ -1,12 +1,5 @@
 package io.improbable.keanu.vertices.intgr.probabilistic;
 
-import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
-
-import java.util.Map;
-import java.util.Set;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import io.improbable.keanu.distributions.discrete.Multinomial;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
@@ -15,6 +8,12 @@ import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Map;
+import java.util.Set;
+
+import static io.improbable.keanu.tensor.TensorShapeValidation.checkTensorsMatchNonScalarShapeOrAreScalar;
 
 public class MultinomialVertex extends IntegerVertex implements ProbabilisticInteger {
 

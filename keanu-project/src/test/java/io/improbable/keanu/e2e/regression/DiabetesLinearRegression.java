@@ -1,24 +1,23 @@
 package io.improbable.keanu.e2e.regression;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.closeTo;
-import static org.hamcrest.Matchers.greaterThan;
-
-import java.util.List;
-
-import io.improbable.keanu.model.regression.RegressionRegularization;
-import io.improbable.keanu.util.CsvDataResource;
-import org.junit.Rule;
-import org.junit.Test;
-
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.RegressionModel;
+import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.util.CsvDataResource;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import org.junit.Rule;
+import org.junit.Test;
+
+import java.util.List;
+
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html

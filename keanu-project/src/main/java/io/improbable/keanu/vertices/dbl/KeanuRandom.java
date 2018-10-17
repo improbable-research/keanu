@@ -1,14 +1,5 @@
 package io.improbable.keanu.vertices.dbl;
 
-import java.util.Arrays;
-import java.util.concurrent.atomic.AtomicReference;
-
-import org.nd4j.linalg.api.buffer.DataBuffer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.api.rng.DefaultRandom;
-import org.nd4j.linalg.api.rng.Random;
-import org.nd4j.linalg.factory.Nd4j;
-
 import io.improbable.keanu.distributions.continuous.Gamma;
 import io.improbable.keanu.distributions.continuous.Laplace;
 import io.improbable.keanu.distributions.discrete.Poisson;
@@ -18,6 +9,14 @@ import io.improbable.keanu.tensor.dbl.Nd4jDoubleTensor;
 import io.improbable.keanu.tensor.dbl.ScalarDoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.tensor.intgr.Nd4jIntegerTensor;
+import org.nd4j.linalg.api.buffer.DataBuffer;
+import org.nd4j.linalg.api.ndarray.INDArray;
+import org.nd4j.linalg.api.rng.DefaultRandom;
+import org.nd4j.linalg.api.rng.Random;
+import org.nd4j.linalg.factory.Nd4j;
+
+import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class KeanuRandom {
 
