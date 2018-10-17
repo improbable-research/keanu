@@ -5,9 +5,10 @@ matrix:
       addons:
         sonarcloud:
           organization: "improbable-keanu"
-      script:
-        - ./gradlew clean build -x :keanu-python:build -i
-        - 'if [[ ! -z $SONAR_TOKEN ]]; then sonar-scanner; fi'
+      script: deployment/buildAndDeploy.sh
+      before_install:
+      - openssl aes-256-cbc -K $encrypted_eec04b57ffc0_key -iv $encrypted_eec04b57ffc0_iv
+        -in deployment/secret-keys-keanu.gpg.enc -out deployment/secret-keys-keanu.gpg -d
     - language: python
       python: 3.6
       env:
