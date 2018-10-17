@@ -7,6 +7,16 @@ import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
+/**
+ * A general linear regression model that can be fitted to input and output training data.
+ * You can construct a regression model as follows:
+ * <pre>
+ * LinearRegressionModel model = LinearRegressionModel.builder()
+ *     .setInputTrainingData(inputTrainingData)
+ *     .setOutputTrainingData(outputTrainingData)
+ *     .build();
+ * </pre>
+ */
 public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> {
     private final LinearRegressionGraph<DoubleTensor> linearModelGraph;
 

@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 
 /**
- * Class for building a logistic regression model.
+ * Builder class for creating a logistic lasso regression model.
  * <p>
  * This builds <a href="https://en.wikipedia.org/wiki/Lasso_(statistics)">lasso</a> logistic regression, meaning that
  * the weights have a Laplace prior distribution, i.e. the model has <a href="http://mathworld.wolfram.com/L1-Norm.html">L1 norm regularisation</a>.

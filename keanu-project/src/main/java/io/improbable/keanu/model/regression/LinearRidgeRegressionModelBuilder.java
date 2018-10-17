@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 /**
- * Builds a linear regression model.
+ * Builder class for creating a linear ridge regression model.
  * <p>
  * This builds <a href="https://en.wikipedia.org/wiki/Tikhonov_regularization">ridge</a> linear regression, meaning that
  * the weights have a Gaussian prior distribution, i.e. the model has <a href="http://mathworld.wolfram.com/L2-Norm.html">L2 norm regularisation</a>.

@@ -10,6 +10,16 @@ import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 
+/**
+ * A general logistic regression model that can be fitted to input and output training data.
+ * You can construct a regression model as follows:
+ * <pre>
+ * LogisticRegressionModel model = LogisticRegressionModel.builder()
+ *     .setInputTrainingData(inputTrainingData)
+ *     .setOutputTrainingData(outputTrainingData)
+ *     .build();
+ * </pre>
+ */
 public class LogisticRegressionModel implements Model<DoubleTensor, BooleanTensor> {
 
     private final LinearRegressionGraph<BooleanTensor> linearModelGraph;

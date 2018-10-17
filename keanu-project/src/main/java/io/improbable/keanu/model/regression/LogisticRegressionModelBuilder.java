@@ -8,7 +8,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 /**
- * Utility for building a logistic regression model without regularisation.
+ * Builder class for building a logistic regression model without regularisation.
  *
  * @see LogisticRegressionModel
  */

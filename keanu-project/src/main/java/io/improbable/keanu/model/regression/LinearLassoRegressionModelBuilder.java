@@ -7,7 +7,7 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.LaplaceVertex;
 
 /**
- * Utility for building a linear regression model.
+ * Builder class for creating a linear lasso regression model.
  * <p>
  * This builds <a href="https://en.wikipedia.org/wiki/Lasso_(statistics)">lasso</a> linear regression, meaning that
  * the weights have a Laplace prior distribution, i.e. the model has <a href="http://mathworld.wolfram.com/L1-Norm.html">L1 norm regularisation</a>.
