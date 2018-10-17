@@ -44,9 +44,10 @@ public class CategoricalVertexTest {
 
     @Test
     public void cantCreateCategoricalVertexIfShapeIsNotSpecifiedAndNonScalarShapesDoNotMatch() {
+        DoubleTensor t2 = DoubleTensor.create(new double[] {0., 0.5, 0.8, 0.2}, 4, 1);
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
-        selectableValues.put(TestEnum.B, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
         thrown.expect(IllegalArgumentException.class);
         thrown.expectMessage("Shapes must match or be scalar");
@@ -56,7 +57,7 @@ public class CategoricalVertexTest {
 
     @Test
     public void cantCreateCategoricalVertexIfShapeIsNotSpecifiedAndNonScalarLengthsDoNotMatch() {
-        DoubleTensor t2 = DoubleTensor.create(new double[] {0., 0.5, 0.8, 0.2}, 4, 1);
+        DoubleTensor t2 = DoubleTensor.create(new double[] {0., 0.5}, 2, 1);
 
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
@@ -101,9 +102,11 @@ public class CategoricalVertexTest {
 
     @Test
     public void cantCreateCategoricalVertexIfShapeIsSpecifiedAndNonScalarShapeDoNotMatch() {
+        DoubleTensor t2 = DoubleTensor.create(0.5, new long[] {4, 4, 4});
+
         Map<TestEnum, DoubleVertex> selectableValues = new LinkedHashMap<>();
         selectableValues.put(TestEnum.A, ConstantVertex.of(t1));
-        selectableValues.put(TestEnum.B, ConstantVertex.of(t1));
+        selectableValues.put(TestEnum.B, ConstantVertex.of(t2));
 
         long[] proposalShape = new long[]{3, 5, 6};
 
