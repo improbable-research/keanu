@@ -30,12 +30,15 @@ import io.improbable.keanu.tensor.TensorShape;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.LogProbGraph;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexBinaryOp;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.AndBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.OrBinaryVertex;
+import io.improbable.keanu.vertices.bool.nonprobabilistic.operators.unary.NotVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.ArcTan2Vertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DifferenceVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DivisionVertex;
-import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.DoubleBinaryOpVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MatrixMultiplicationVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MaxVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.MinVertex;
@@ -68,7 +71,7 @@ public class TensorflowGraphConverter {
     static {
         opMappers = new HashMap<>();
 
-        //binary ops
+        //double binary ops
         opMappers.put(AdditionVertex.class, binaryOp(OpType.ADD));
         opMappers.put(DifferenceVertex.class, binaryOp(OpType.SUBTRACT));
         opMappers.put(DivisionVertex.class, binaryOp(OpType.DIVIDE));
@@ -78,6 +81,11 @@ public class TensorflowGraphConverter {
         opMappers.put(MinVertex.class, binaryOp(OpType.MIN));
         opMappers.put(ArcTan2Vertex.class, binaryOp(OpType.ATAN2));
         opMappers.put(PowerVertex.class, binaryOp(OpType.POW));
+
+        //bool binary ops
+        opMappers.put(AndBinaryVertex.class, binaryOp(OpType.AND));
+        opMappers.put(OrBinaryVertex.class, binaryOp(OpType.OR));
+        opMappers.put(NotVertex.class, unaryOp(OpType.NOT));
 
         //unary ops
         opMappers.put(AbsVertex.class, unaryOp(OpType.ABS));
@@ -110,10 +118,10 @@ public class TensorflowGraphConverter {
     static class OpBuilder {
         static OpMapper binaryOp(OpType op) {
             return (vertex, lookup, graphBuilder) -> {
-                DoubleBinaryOpVertex binaryOpVertex = (DoubleBinaryOpVertex) vertex;
+                VertexBinaryOp<?, ?> binaryOpVertex = (VertexBinaryOp<?,?>) vertex;
                 Output<?> leftOperand = lookup.get(binaryOpVertex.getLeft());
                 Output<?> rightOperand = lookup.get(binaryOpVertex.getRight());
-                return graphBuilder.binaryOp(op, getTensorflowOpName(binaryOpVertex), leftOperand, rightOperand);
+                return graphBuilder.binaryOp(op, getTensorflowOpName(vertex), leftOperand, rightOperand);
             };
         }
 

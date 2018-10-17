@@ -6,13 +6,14 @@ import static io.improbable.keanu.tensor.TensorShapeValidation.checkHasSingleNon
 import java.util.Map;
 
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexBinaryOp<DoubleVertex, DoubleVertex> {
 
     protected final DoubleVertex left;
     protected final DoubleVertex right;
@@ -53,14 +54,15 @@ public abstract class DoubleBinaryOpVertex extends DoubleVertex implements NonPr
         return op(left.getValue(), right.getValue());
     }
 
+    @Override
     public DoubleVertex getLeft() {
         return left;
     }
 
+    @Override
     public DoubleVertex getRight() {
         return right;
     }
-
 
     @Override
     public PartialDerivatives forwardModeAutoDifferentiation(Map<Vertex, PartialDerivatives> derivativeOfParentsWithRespectToInputs) {

@@ -6,38 +6,49 @@ import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexBinaryOp;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 
-public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor> {
+public abstract class BoolBinaryOpVertex<A extends Tensor, B extends Tensor> extends BoolVertex implements NonProbabilistic<BooleanTensor>, VertexBinaryOp<Vertex<A>, Vertex<B>> {
 
-    protected final Vertex<A> a;
-    protected final Vertex<B> b;
+    protected final Vertex<A> left;
+    protected final Vertex<B> right;
 
-    public BoolBinaryOpVertex(Vertex<A> a, Vertex<B> b) {
-        this(checkHasSingleNonScalarShapeOrAllScalar(a.getShape(), b.getShape()), a, b);
+    public BoolBinaryOpVertex(Vertex<A> left, Vertex<B> right) {
+        this(checkHasSingleNonScalarShapeOrAllScalar(left.getShape(), right.getShape()), left, right);
     }
 
-    public BoolBinaryOpVertex(long[] shape, Vertex<A> a, Vertex<B> b) {
-        this.a = a;
-        this.b = b;
-        setParents(a, b);
+    public BoolBinaryOpVertex(long[] shape, Vertex<A> left, Vertex<B> right) {
+        this.left = left;
+        this.right = right;
+        setParents(left, right);
         setValue(BooleanTensor.placeHolder(shape));
     }
 
     @Override
     public BooleanTensor sample(KeanuRandom random) {
-        return op(a.sample(random), b.sample(random));
+        return op(left.sample(random), right.sample(random));
+    }
+
+    @Override
+    public Vertex<A> getLeft() {
+        return left;
+    }
+
+    @Override
+    public Vertex<B> getRight() {
+        return right;
     }
 
     @Override
     public boolean contradictsObservation() {
-        return isObserved() && !op(a.getValue(), b.getValue()).elementwiseEquals(getValue()).allTrue();
+        return isObserved() && !op(left.getValue(), right.getValue()).elementwiseEquals(getValue()).allTrue();
     }
 
     @Override
     public BooleanTensor calculate() {
-        return op(a.getValue(), b.getValue());
+        return op(left.getValue(), right.getValue());
     }
 
     protected abstract BooleanTensor op(A l, B r);

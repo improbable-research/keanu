@@ -3,12 +3,7 @@ package io.improbable.keanu.backend.tensorflow;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.ADD;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONCAT_V2;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.CONSTANT;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.DIVIDE;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.MATRIX_MULTIPLY;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.MULTIPLY;
 import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_HOLDER;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.POW;
-import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.SUBTRACT;
 
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
@@ -20,8 +15,6 @@ import org.tensorflow.Output;
 import org.tensorflow.Shape;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Scope;
-
-import io.improbable.keanu.tensor.TensorShape;
 
 public class GraphBuilder {
 
@@ -41,34 +34,42 @@ public class GraphBuilder {
     }
 
     public enum OpType {
+        //Number ops
         ADD("Add"),
-        ATAN2("Atan2"),
-        SUBTRACT("Sub"),
-        DIVIDE("Div"),
-        MATRIX_MULTIPLY("MatMul"),
-        MAX("Max"),
-        MIN("Min"),
-        MULTIPLY("Mul"),
-        POW("Pow"),
-        CONCAT_V2("ConcatV2"),
         ABS("Abs"),
+        ATAN2("Atan2"),
         ACOS("Acos"),
         ASIN("Asin"),
         ATAN("Atan"),
         CEIL("Ceil"),
         COS("Cos"),
+        DIVIDE("Div"),
         EXP("Exp"),
         FLOOR("Floor"),
-        LOG_GAMMA("Lgamma"),
         LOG("Log"),
+        LOG_GAMMA("Lgamma"),
+        MATRIX_MULTIPLY("MatMul"),
+        MAX("Max"),
+        MIN("Min"),
+        MULTIPLY("Mul"),
         MATRIX_DETERMINANT("MatrixDeterminant"),
         MATRIX_INVERSE("MatrixInverse"),
+        POW("Pow"),
         RESHAPE("Reshape"),
         ROUND("Round"),
+        SUBTRACT("Sub"),
         SIGMOID("Sigmoid"),
         SIN("Sin"),
         SUM("Sum"),
         TAN("Tan"),
+
+        //Boolean
+        AND("LogicalAnd"),
+        OR("LogicalOr"),
+        NOT("LogicalNot"),
+
+        //Generic
+        CONCAT_V2("ConcatV2"),
         CONSTANT("Const"),
         PLACE_HOLDER("Placeholder"),
         NO_OP("NoOp");
