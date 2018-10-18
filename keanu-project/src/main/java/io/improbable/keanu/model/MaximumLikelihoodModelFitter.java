@@ -11,10 +11,10 @@ public class MaximumLikelihoodModelFitter<INPUT, OUTPUT> implements ModelFitter<
     }
 
     /**
-     * Uses the maximum likelihood algorithm to fit the model graph to a given set of input and output data.
-     * This will mutate the graph which can then be used to construct
-     * {@link io.improbable.keanu.model.regression.LogisticRegressionModel LogisticRegressionModel} or
-     * {@link io.improbable.keanu.model.regression.LinearRegressionModel LinearRegressionModel} objects
+     * Uses the maximum likelihood algorithm to fit the {@link io.improbable.keanu.model.ModelGraph ModelGraph} to a given set of input and output data.
+     * This will mutate the graph which can then be used to construct a graph-backed model.
+     * For example, a {@link io.improbable.keanu.model.regression.LogisticRegressionModel LogisticRegressionModel} or a
+     * {@link io.improbable.keanu.model.regression.LinearRegressionModel LinearRegressionModel}.
      *
      * @param input The input data to your model graph
      * @param output The output data to your model graph
