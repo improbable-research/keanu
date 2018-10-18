@@ -10,6 +10,7 @@ k = KeanuContext().jvm_view()
 java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
@@ -29,6 +30,10 @@ def CastDouble(*args) -> k.CastDoubleVertex:
 
 def DoubleIf(*args) -> k.DoubleIfVertex:
     return Vertex(k.DoubleIfVertex, args)
+
+
+def Addition(*args) -> k.AdditionVertex:
+    return Vertex(k.AdditionVertex, args)
 
 
 def Cauchy(*args) -> k.CauchyVertex:

@@ -52,13 +52,13 @@ def test_thermometers_max_likelihood_gradient():
     assert temperature > 20.995 and temperature < 21.005
 
 def test_map_non_gradient():
-    a = kn.Gaussian(0., 1.)
-    b = kn.Gaussian(0., 1.)
+    a = kn.Gaussian(0., 50.)
+    b = kn.Gaussian(0., 50.)
     c = a + b
+    d = kn.Gaussian(c, 1.)
+    d.observe(20.0)
 
-    c.observe(20.0)
-
-    net = kn.BayesNet(c.temperature.getConnectedGraph())
+    net = kn.BayesNet(d.getConnectedGraph())
     non_gradient_optimizer = kn.NonGradientOptimizer(net)
 
     logProb = non_gradient_optimizer.max_a_posteriori()
