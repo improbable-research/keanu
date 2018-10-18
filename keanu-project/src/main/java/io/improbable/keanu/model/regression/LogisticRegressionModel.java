@@ -47,10 +47,6 @@ public class LogisticRegressionModel implements Model<DoubleTensor, BooleanTenso
         };
     }
 
-    public DoubleTensor getY() {
-        return linearModelGraph.getX();
-    }
-
     public DoubleTensor getWeights() {
         return linearModelGraph.getWeights();
     }

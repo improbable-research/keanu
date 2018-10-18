@@ -40,10 +40,6 @@ public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> 
         return yVertex -> new LinearRegressionGraph.OutputVertices<>(yVertex, new GaussianVertex(yVertex, measurementSigma));
     }
 
-    public DoubleTensor getY() {
-        return linearModelGraph.getX();
-    }
-
     public DoubleTensor getWeights() {
         return linearModelGraph.getWeights();
     }

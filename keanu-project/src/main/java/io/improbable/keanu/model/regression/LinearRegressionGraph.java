@@ -50,10 +50,6 @@ public class LinearRegressionGraph<OUTPUT> implements ModelGraph<DoubleTensor, O
         yObservationVertex.observe(output);
     }
 
-    public DoubleTensor getX() {
-        return xVertex.getValue();
-    }
-
     public DoubleTensor getWeights() {
         return weightsVertex.getValue();
     }
