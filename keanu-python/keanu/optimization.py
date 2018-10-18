@@ -13,6 +13,7 @@ java_import(k, "io.improbable.keanu.algorithms.variational.optimizer.nongradient
 class Optimizer:
     def __init__(self, optimizer):
         self.optimizer = optimizer
+        self.net = optimizer.net
 
     def max_a_posteriori(self):
         return self.optimizer.maxAPosteriori()
@@ -35,7 +36,7 @@ class GradientOptimizer(Optimizer):
         if absolute_threshold is not None:
             builder = builder.absoluteThreshold(absolute_threshold)
 
-        super(GradientOptimizer, self).__init__(builder.build)
+        super(GradientOptimizer, self).__init__(builder.build())
 
 
 class NonGradientOptimizer(Optimizer):
@@ -54,4 +55,4 @@ class NonGradientOptimizer(Optimizer):
         if stopping_trust_region_radius is not None:
             builder = builder.stoppingTrustRegionRadius(stopping_trust_region_radius)
 
-        super(NonGradientOptimizer, self).__init__(builder.build)
+        super(NonGradientOptimizer, self).__init__(builder.build())

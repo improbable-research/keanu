@@ -60,6 +60,7 @@ def test_thermometers_max_likelihood_gradient():
 
     assert temperature > 20.995 and temperature < 21.005
 
+
 def test_non_gradient_can_set_builder_properties():
     thermometers = Thermometers()
     model = thermometers.model()
