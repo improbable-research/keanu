@@ -89,7 +89,7 @@ public class LogisticLassoRegressionModelBuilder {
     public LogisticRegressionModel build() {
         DoubleVertex interceptVertex = new LaplaceVertex(priorOnInterceptMean, priorOnInterceptBeta);
         DoubleVertex weightsVertex = new LaplaceVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnWeightsBetas));
-        LinearRegressionGraph<BooleanTensor> regressionGraph = new LinearRegressionGraph<>(
+        RegressionGraph<BooleanTensor> regressionGraph = new RegressionGraph<>(
             this.inputTrainingData.getShape(),
             LogisticRegressionModel.logisticOutputTransform(),
             interceptVertex,

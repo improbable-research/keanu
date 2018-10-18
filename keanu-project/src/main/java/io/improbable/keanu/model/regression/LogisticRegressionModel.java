@@ -22,9 +22,9 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
  */
 public class LogisticRegressionModel implements Model<DoubleTensor, BooleanTensor> {
 
-    private final LinearRegressionGraph<BooleanTensor> linearModelGraph;
+    private final RegressionGraph<BooleanTensor> linearModelGraph;
 
-    LogisticRegressionModel(LinearRegressionGraph<BooleanTensor> linearModelGraph) {
+    LogisticRegressionModel(RegressionGraph<BooleanTensor> linearModelGraph) {
         this.linearModelGraph = linearModelGraph;
     }
 
@@ -40,10 +40,10 @@ public class LogisticRegressionModel implements Model<DoubleTensor, BooleanTenso
         return new LogisticRidgeRegressionModelBuilder();
     }
 
-    static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {
+    static Function<DoubleVertex, RegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {
         return probabilities -> {
             DoubleVertex sigmoid = probabilities.sigmoid();
-            return new LinearRegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertex.of(0.5)), new BernoulliVertex(sigmoid));
+            return new RegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertex.of(0.5)), new BernoulliVertex(sigmoid));
         };
     }
 

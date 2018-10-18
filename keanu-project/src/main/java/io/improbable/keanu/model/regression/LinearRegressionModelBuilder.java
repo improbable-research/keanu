@@ -45,7 +45,7 @@ public class LinearRegressionModelBuilder {
 
         DoubleVertex interceptVertex = new GaussianVertex(DEFAULT_MU, DEFAULT_SIGMA);
         DoubleVertex weightsVertex = new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SIGMA));
-        LinearRegressionGraph<DoubleTensor> regressionGraph = new LinearRegressionGraph<>(
+        RegressionGraph<DoubleTensor> regressionGraph = new RegressionGraph<>(
             this.inputTrainingData.getShape(),
             LinearRegressionModel.gaussianOutputTransform(observationSigma),
             interceptVertex,

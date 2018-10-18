@@ -89,7 +89,7 @@ public class LogisticRidgeRegressionModelBuilder {
     public LogisticRegressionModel build() {
         DoubleVertex interceptVertex = new GaussianVertex(priorOnInterceptMean, priorOnInterceptSigma);
         DoubleVertex weightsVertex = new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnWeightsSigmas));
-        LinearRegressionGraph<BooleanTensor> regressionGraph = new LinearRegressionGraph<>(
+        RegressionGraph<BooleanTensor> regressionGraph = new RegressionGraph<>(
             this.inputTrainingData.getShape(),
             LogisticRegressionModel.logisticOutputTransform(),
             interceptVertex,

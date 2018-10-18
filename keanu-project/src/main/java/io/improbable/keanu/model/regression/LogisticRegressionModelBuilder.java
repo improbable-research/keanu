@@ -40,7 +40,7 @@ public class LogisticRegressionModelBuilder {
     public LogisticRegressionModel build() {
         DoubleVertex interceptVertex = new GaussianVertex(DEFAULT_MU, DEFAULT_SIGMA);
         DoubleVertex weightsVertex = new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SIGMA));
-        LinearRegressionGraph<BooleanTensor> regressionGraph = new LinearRegressionGraph<>(
+        RegressionGraph<BooleanTensor> regressionGraph = new RegressionGraph<>(
             this.inputTrainingData.getShape(),
             LogisticRegressionModel.logisticOutputTransform(),
             interceptVertex,

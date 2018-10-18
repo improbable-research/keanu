@@ -18,9 +18,9 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  * </pre>
  */
 public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> {
-    private final LinearRegressionGraph<DoubleTensor> linearModelGraph;
+    private final RegressionGraph<DoubleTensor> linearModelGraph;
 
-    LinearRegressionModel(LinearRegressionGraph<DoubleTensor> linearModelGraph) {
+    LinearRegressionModel(RegressionGraph<DoubleTensor> linearModelGraph) {
         this.linearModelGraph = linearModelGraph;
     }
 
@@ -36,8 +36,8 @@ public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> 
         return new LinearLassoRegressionModelBuilder();
     }
 
-    static Function<DoubleVertex, LinearRegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {
-        return yVertex -> new LinearRegressionGraph.OutputVertices<>(yVertex, new GaussianVertex(yVertex, measurementSigma));
+    static Function<DoubleVertex, RegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {
+        return yVertex -> new RegressionGraph.OutputVertices<>(yVertex, new GaussianVertex(yVertex, measurementSigma));
     }
 
     public DoubleTensor getWeights() {

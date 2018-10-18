@@ -100,7 +100,7 @@ public class LinearLassoRegressionModelBuilder {
 
         DoubleVertex interceptVertex = new LaplaceVertex(priorOnInterceptMean, priorOnInterceptBeta);
         DoubleVertex weightsVertex = new LaplaceVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnWeightsBetas));
-        LinearRegressionGraph<DoubleTensor> regressionGraph = new LinearRegressionGraph<>(
+        RegressionGraph<DoubleTensor> regressionGraph = new RegressionGraph<>(
             this.inputTrainingData.getShape(),
             LinearRegressionModel.gaussianOutputTransform(observationSigma),
             interceptVertex,

@@ -103,7 +103,7 @@ public class LinearRidgeRegressionModelBuilder {
 
         DoubleVertex interceptVertex = new GaussianVertex(priorOnInterceptMean, priorOnInterceptSigma);
         DoubleVertex weightsVertex = new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnWeightsSigmas));
-        LinearRegressionGraph<DoubleTensor> regressionGraph = new LinearRegressionGraph<>(
+        RegressionGraph<DoubleTensor> regressionGraph = new RegressionGraph<>(
             this.inputTrainingData.getShape(),
             LinearRegressionModel.gaussianOutputTransform(observationSigma),
             interceptVertex,
