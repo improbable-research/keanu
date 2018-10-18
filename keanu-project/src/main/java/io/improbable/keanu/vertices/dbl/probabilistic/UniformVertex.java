@@ -9,6 +9,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.Set;
 
+import io.improbable.keanu.annotation.ExportVertexToPythonBindings;
 import io.improbable.keanu.distributions.continuous.Uniform;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.Vertex;
@@ -47,6 +48,7 @@ public class UniformVertex extends DoubleVertex implements ProbabilisticDouble {
      * @param xMin the inclusive lower bound of the Uniform with either the same shape as specified for this vertex or a scalar
      * @param xMax the exclusive upper bound of the Uniform with either the same shape as specified for this vertex or a scalar
      */
+    @ExportVertexToPythonBindings
     public UniformVertex(DoubleVertex xMin, DoubleVertex xMax) {
         this(checkHasSingleNonScalarShapeOrAllScalar(xMin.getShape(), xMax.getShape()), xMin, xMax);
     }

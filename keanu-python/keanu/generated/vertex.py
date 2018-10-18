@@ -13,6 +13,8 @@ java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.CauchyVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.ExponentialVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GammaVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex")
+java_import(k, "io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex")
 java_import(k, "io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex")
 java_import(k, "io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex")
 
@@ -39,6 +41,14 @@ def Exponential(*args) -> k.ExponentialVertex:
 
 def Gamma(*args) -> k.GammaVertex:
     return Vertex(k.GammaVertex, args)
+
+
+def Gaussian(*args) -> k.GaussianVertex:
+    return Vertex(k.GaussianVertex, args)
+
+
+def Uniform(*args) -> k.UniformVertex:
+    return Vertex(k.UniformVertex, args)
 
 
 def Poisson(*args) -> k.PoissonVertex:
