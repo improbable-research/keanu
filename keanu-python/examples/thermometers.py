@@ -1,5 +1,4 @@
 import keanu as kn
-import numpy as np
 
 class Thermometers():
 
