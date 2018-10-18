@@ -92,7 +92,7 @@ public final class ModelComposition {
 
     private static void cleanOutputLabels(Map<VertexLabel, Vertex> outputMap) {
         outputMap.values().stream()
-            .forEach(v -> v.setLabel(null));
+            .forEach(v -> v.setLabel((VertexLabel) null));
     }
 
 }
