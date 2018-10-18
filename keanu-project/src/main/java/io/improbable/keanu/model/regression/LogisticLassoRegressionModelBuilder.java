@@ -41,6 +41,12 @@ public class LogisticLassoRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Set the input parameters to the Laplace distribution describing the prior belief about the weights of the regression model
+     *
+     * @param means An array of means of the laplace distribution describing the prior belief about the regression weights
+     * @param betas An array of beta parameters of the laplace distribution describing the prior belief about the regression weights
+     */
     public LogisticLassoRegressionModelBuilder setPriorOnWeights(double[] means, double[] betas) {
         RegressionWeights.checkLaplaceParameters(getFeatureCount(), means, betas);
 
@@ -50,12 +56,24 @@ public class LogisticLassoRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Set the input parameters to the Laplace distribution describing the prior belief about the intercept of the regression model
+     *
+     * @param mean The mean of the laplace distribution describing the prior belief about the regression intercept
+     * @param beta The beta parameter of the laplace distribution describing the prior belief about the regression intercept
+     */
     public LogisticLassoRegressionModelBuilder setPriorOnIntercept(double mean, double beta) {
         this.priorOnInterceptMean = mean;
         this.priorOnInterceptBeta = beta;
         return this;
     }
 
+    /**
+     * Set the input parameters to the Laplace distribution describing the prior belief about both the intercept and weights of the regression model
+     *
+     * @param mean The mean of the laplace distribution describing the prior belief about both the regression intercept and weights
+     * @param beta The beta parameter of the laplace distribution describing the prior belief about both the regression intercept and weights
+     */
     public LogisticLassoRegressionModelBuilder setPriorOnWeightsAndIntercept(double mean, double beta) {
         setPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), beta));
         setPriorOnIntercept(mean, beta);

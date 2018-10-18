@@ -39,6 +39,12 @@ public class LinearRidgeRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Set the input parameters to the gaussian distribution describing the prior belief about the weights of the regression model
+     *
+     * @param means An array of means of the gaussian distribution describing the prior belief about the regression weights
+     * @param sigmas An array of sigma parameters of the gaussian distribution describing the prior belief about the regression weights
+     */
     public LinearRidgeRegressionModelBuilder setPriorOnWeights(double[] means, double[] sigmas) {
         RegressionWeights.checkGaussianParameters(getFeatureCount(), means, sigmas);
 
@@ -48,12 +54,24 @@ public class LinearRidgeRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Set the input parameters to the gaussian distribution describing the prior belief about the intercept of the regression model
+     *
+     * @param mean The mean of the gaussian distribution describing the prior belief about the regression intercept
+     * @param sigma The sigma parameter of the gaussian distribution describing the prior belief about the regression intercept
+     */
     public LinearRidgeRegressionModelBuilder setPriorOnIntercept(double mean, double sigma) {
         this.priorOnInterceptMean = mean;
         this.priorOnInterceptSigma = sigma;
         return this;
     }
 
+    /**
+     * Set the input parameters to the gaussian distribution describing the prior belief about both the intercept and weights of the regression model
+     *
+     * @param mean The mean of the gaussian distribution describing the prior belief about both the regression intercept and weights
+     * @param sigma The sigma parameter of the gaussian distribution describing the prior belief about both the regression intercept and weights
+     */
     public LinearRidgeRegressionModelBuilder setPriorOnWeightsAndIntercept(double mean, double sigma) {
         setPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), sigma));
         setPriorOnIntercept(mean, sigma);
