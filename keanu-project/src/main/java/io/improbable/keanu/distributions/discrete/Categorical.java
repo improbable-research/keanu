@@ -35,7 +35,7 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
         BooleanTensor sampleValuesSetSoFar = BooleanTensor.falses(shape);
 
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
-            sum.plusInPlace(entry.getValue().div(sumOfProbabilities));
+            sum = sum.plus(entry.getValue().div(sumOfProbabilities));
 
             BooleanTensor maskForUnassignedSampleValues = sampleValuesSetSoFar.xor(sum.greaterThan(p));
             sample = maskForUnassignedSampleValues.where(Tensor.scalar(entry.getKey()), sample);
@@ -65,7 +65,7 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
         DoubleTensor logProb = DoubleTensor.zeros(x.getShape());
         for (Map.Entry<T, DoubleTensor> entry : selectableValues.entrySet()) {
             DoubleTensor xEqualToEntryKeyMask = x.elementwiseEquals(Tensor.create(entry.getKey(), x.getShape())).toDoubleMask();
-            logProb.plusInPlace(xEqualToEntryKeyMask.timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
+            logProb = logProb.plus(xEqualToEntryKeyMask.timesInPlace(entry.getValue().div(sumOfProbabilities).logInPlace()));
         }
         return logProb;
     }
@@ -77,7 +77,7 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
     private DoubleTensor getSumOfProbabilities(long[] shape) {
         DoubleTensor sumP = DoubleTensor.zeros(shape);
         for (DoubleTensor p : selectableValues.values()) {
-            sumP.plusInPlace(p);
+            sumP = sumP.plus(p);
         }
         return sumP;
     }
