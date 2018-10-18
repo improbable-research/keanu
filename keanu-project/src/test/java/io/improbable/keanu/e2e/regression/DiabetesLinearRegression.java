@@ -6,6 +6,8 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import io.improbable.keanu.util.CsvDataResource;
+import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
@@ -13,7 +15,6 @@ import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.LinearRegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.csv.ReadCsv;
 import io.improbable.keanu.vertices.ConstantVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -24,17 +25,11 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  * http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
  */
 public class DiabetesLinearRegression {
-
-    private static Data readData() {
-        return ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
-    }
+    @Rule CsvDataResource<Data> csvDataResource = new CsvDataResource("data/datasets/diabetes/diabetes_standardized_training.csv", Data.class);
 
     @Test
     public void doesLinearRegressionOnBMI() {
-        Data data = readData();
+        Data data = csvDataResource.getData();
 
         // Linear Regression
         DoubleVertex weight = new GaussianVertex(0.0, 100);
@@ -55,7 +50,7 @@ public class DiabetesLinearRegression {
 
     @Test
     public void doesLinearRegressionOnBMIAsModel() {
-        Data data = readData();
+        Data data = csvDataResource.getData();
 
         LinearRegressionModel regression = LinearRegressionModel.ridgeRegressionModelBuilder()
             .setInputTrainingData(data.bmi)
@@ -68,7 +63,7 @@ public class DiabetesLinearRegression {
 
     @Test
     public void canPredictFutureValuesWithLinearRegression() {
-        Data data = readData();
+        Data data = csvDataResource.getData();
 
         int sizeOfTestData = 100;
 
