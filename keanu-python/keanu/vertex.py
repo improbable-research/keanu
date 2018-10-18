@@ -40,7 +40,7 @@ class Vertex(JavaObjectWrapper, VertexOps):
         if isinstance(arg, np.ndarray):
             return kn.Const(arg).unwrap()
         elif isinstance(arg, numbers.Number):
-            return arg
+            return Vertex.__parse_arg(np.array([[arg]]))
         elif isinstance(arg, JavaObjectWrapper):
             return arg.unwrap()
         elif isinstance(arg, list) and all(isinstance(x, numbers.Number) for x in arg):
