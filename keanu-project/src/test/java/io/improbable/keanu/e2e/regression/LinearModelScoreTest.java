@@ -9,7 +9,7 @@ import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.LinearModelScore;
+import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
@@ -22,14 +22,14 @@ public class LinearModelScoreTest {
     @Test
     public void coefficientOfDeterminationIsVeryLowForRandomData() {
         DoubleVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
-        assertThat(LinearModelScore.coefficientOfDetermination(generator.sample(), generator.sample()), lessThan(0.0));
+        assertThat(ModelScoring.coefficientOfDetermination(generator.sample(), generator.sample()), lessThan(0.0));
     }
 
     @Test
     public void coefficientOfDeterminationIs1ForSameData() {
         DoubleVertex generator = new UniformVertex(new long[]{1, 1000}, -1000, 1000);
         DoubleTensor sample = generator.sample();
-        assertEquals(1, LinearModelScore.coefficientOfDetermination(sample, sample), 1e-8);
+        assertEquals(1, ModelScoring.coefficientOfDetermination(sample, sample), 1e-8);
     }
 
     @Test
@@ -38,6 +38,6 @@ public class LinearModelScoreTest {
         DoubleVertex noisy = new GaussianVertex(input, 50);
         DoubleTensor inputSample = input.sample();
         input.setAndCascade(inputSample);
-        assertThat(LinearModelScore.coefficientOfDetermination(inputSample, noisy.sample()), greaterThan(0.9));
+        assertThat(ModelScoring.coefficientOfDetermination(inputSample, noisy.sample()), greaterThan(0.9));
     }
 }

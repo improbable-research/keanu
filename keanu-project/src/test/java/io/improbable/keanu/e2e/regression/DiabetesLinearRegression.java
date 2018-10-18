@@ -9,7 +9,7 @@ import java.util.List;
 import org.junit.Test;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.model.LinearModelScore;
+import io.improbable.keanu.model.ModelScoring;
 import io.improbable.keanu.model.regression.LinearRegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -85,7 +85,7 @@ public class DiabetesLinearRegression {
             .setOutputTrainingData(yTrainingData)
             .build();
 
-        double accuracyOnTestData = LinearModelScore.coefficientOfDetermination(regression.predict(xTestData), yTestData);
+        double accuracyOnTestData = ModelScoring.coefficientOfDetermination(regression.predict(xTestData), yTestData);
         assertThat(accuracyOnTestData, greaterThan(0.3));
     }
 

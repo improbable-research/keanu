@@ -5,13 +5,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static junit.framework.TestCase.assertTrue;
 
+import io.improbable.keanu.model.ModelScoring;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.LogisticModelScore;
 import io.improbable.keanu.model.regression.LogisticRegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
@@ -54,7 +54,7 @@ public class LogisticRegressionTest {
             .setOutputTrainingData(yTrain)
             .build();
 
-        double accuracy = LogisticModelScore.accuracy(model.predict(xTest), yTest);
+        double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
         assertWeightsAreCalculated(model.getWeights());
     }
