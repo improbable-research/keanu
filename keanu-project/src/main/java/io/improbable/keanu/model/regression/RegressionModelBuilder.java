@@ -81,6 +81,7 @@ public class RegressionModelBuilder {
      * @param means An array of means of the distribution describing the prior belief about the regression weights
      * @param scaleParameters An array of scale parameters of the distribution describing the prior belief about the regression weights.
      *                        This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
+     * @return An updated version of this builder
      */
     public RegressionModelBuilder setPriorOnWeights(double[] means, double[] scaleParameters) {
         RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means, getFeatureCount());
@@ -98,6 +99,7 @@ public class RegressionModelBuilder {
      * @param mean The mean of the distribution describing the prior belief about the regression intercept
      * @param scaleParameter The scale parameter of the distribution describing the prior belief about the regression intercept.
      *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
+     * @return An updated version of this builder
      */
     public RegressionModelBuilder setPriorOnIntercept(double mean, double scaleParameter) {
         this.priorOnInterceptMean = mean;
@@ -110,7 +112,8 @@ public class RegressionModelBuilder {
      *
      * @param mean The mean of the distribution describing the prior belief about both the regression intercept and weights
      * @param scaleParameter The scale parameter of the distribution describing the prior belief about both regression intercept and weights.
-     *      *                This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
+     *                       This will represent sigmas if no or ridge regularization is used and will represent betas if lasso regularization is used.
+     * @return An updated version of this builder
      */
     public RegressionModelBuilder setPriorOnWeightsAndIntercept(double mean, double scaleParameter) {
         setPriorOnWeights(RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), mean), RegressionWeights.fillPriorOnWeights(this.inputTrainingData.getShape(), scaleParameter));
@@ -120,6 +123,7 @@ public class RegressionModelBuilder {
 
     /**
      * Builds and fits LinearRegressionModel using the data passed to the builder.
+     * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<DoubleTensor> buildLinearRegressionModel() {
         checkVariablesAreCorrectlyInitialised();
@@ -137,6 +141,7 @@ public class RegressionModelBuilder {
 
     /**
      * Builds and fits LogisticRegressionModel using the data passed to the builder.
+     * @return A linear regression model from the data passed to the builder
      */
     public RegressionModel<BooleanTensor> buildLogisticRegressionModel() {
         checkVariablesAreCorrectlyInitialised();
