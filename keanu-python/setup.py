@@ -7,7 +7,7 @@ def readme():
 setup(name='keanu',
       description='A probabilistic approach from an Improbabilistic company',
       long_description=readme(),
-      version='0.0.5',
+      version='0.0.1',
       author='Improbable Worlds',
       author_email='keanu-engineering@improbable.io',
       url='https://github.com/improbable-research/keanu',
