@@ -10,17 +10,48 @@ context = KeanuContext()
 
 
 class VertexOps:
-    def __gt__(self, other):
-        return kn.generated.vertex.GreaterThan(self, other)
-
-    def __mul__(self, other):
-        return kn.generated.vertex.Multiplication(self, other)
+    """
+    __array_ufunc__ is a NumPy thing that enables you to intercept and handle the numpy operation.
+    Without this the right operators would fail.
+    See https://docs.scipy.org/doc/numpy-1.13.0/neps/ufunc-overrides.html
+    """
+    def __array_ufunc__(self, ufunc, method, *inputs, **kwargs):
+        methods = {
+            "add" : VertexOps.__radd__,
+            "subtract" : VertexOps.__rsub__,
+            "multiply" : VertexOps.__rmul__,
+            "greater" : VertexOps.__lt__,
+            "less" : VertexOps.__gt__,
+        }
+        if method == "__call__":
+            dispatch_method = methods[ufunc.__name__]
+            return dispatch_method(inputs[1], inputs[0])
+        else:
+            raise NotImplementedError("ufunc method %s not implemented" % method)
 
     def __add__(self, other):
         return kn.generated.vertex.Addition(self, other)
 
+    def __radd__(self, other):
+        return kn.generated.vertex.Addition(other, self)
+
     def __sub__(self, other):
         return kn.generated.vertex.Difference(self, other)
+
+    def __rsub__(self, other):
+        return kn.generated.vertex.Difference(other, self)
+
+    def __mul__(self, other):
+        return kn.generated.vertex.Multiplication(self, other)
+
+    def __rmul__(self, other):
+        return kn.generated.vertex.Multiplication(other, self)
+
+    def __gt__(self, other):
+        return kn.generated.vertex.GreaterThan(self, other)
+
+    def __lt__(self, other):
+        return kn.generated.vertex.LessThan(self, other)
 
 
 class Vertex(JavaObjectWrapper, VertexOps):

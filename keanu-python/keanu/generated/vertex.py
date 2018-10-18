@@ -9,6 +9,7 @@ k = KeanuContext().jvm_view()
 
 java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.ConstantBoolVertex")
 java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.GreaterThanVertex")
+java_import(k, "io.improbable.keanu.vertices.bool.nonprobabilistic.operators.binary.compare.LessThanVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.CastDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex")
 java_import(k, "io.improbable.keanu.vertices.dbl.nonprobabilistic.DoubleIfVertex")
@@ -30,6 +31,10 @@ def ConstantBool(*args) -> k.ConstantBoolVertex:
 
 def GreaterThan(*args) -> k.GreaterThanVertex:
     return Vertex(k.GreaterThanVertex, args)
+
+
+def LessThan(*args) -> k.LessThanVertex:
+    return Vertex(k.LessThanVertex, args)
 
 
 def CastDouble(*args) -> k.CastDoubleVertex:
