@@ -6,13 +6,14 @@ import static org.junit.Assert.assertEquals;
 
 import java.util.List;
 
+import io.improbable.keanu.model.regression.RegressionRegularization;
 import io.improbable.keanu.util.CsvDataResource;
 import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
 import io.improbable.keanu.model.ModelScoring;
-import io.improbable.keanu.model.regression.LinearRegressionModel;
+import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -25,7 +26,8 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  * http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
  */
 public class DiabetesLinearRegression {
-    @Rule CsvDataResource<Data> csvDataResource = new CsvDataResource("data/datasets/diabetes/diabetes_standardized_training.csv", Data.class);
+    @Rule
+    public CsvDataResource<Data> csvDataResource = new CsvDataResource<>("data/datasets/diabetes/diabetes_standardized_training.csv", Data.class);
 
     @Test
     public void doesLinearRegressionOnBMI() {
@@ -52,13 +54,14 @@ public class DiabetesLinearRegression {
     public void doesLinearRegressionOnBMIAsModel() {
         Data data = csvDataResource.getData();
 
-        LinearRegressionModel regression = LinearRegressionModel.ridgeRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.RIDGE)
             .setInputTrainingData(data.bmi)
             .setOutputTrainingData(data.y)
             .setPriorOnWeightsAndIntercept(0, 100)
-            .build();
-        assertEquals(938.2378, regression.getWeight(0), 0.5);
-        assertEquals(152.9189, regression.getIntercept(), 0.5);
+            .buildLinearRegressionModel();
+        assertEquals(938.2378, linearRegressionModel.getWeight(0), 0.5);
+        assertEquals(152.9189, linearRegressionModel.getIntercept(), 0.5);
     }
 
     @Test
@@ -75,12 +78,12 @@ public class DiabetesLinearRegression {
         DoubleTensor yTrainingData = splitYData.get(0);
         DoubleTensor yTestData = splitYData.get(1);
 
-        LinearRegressionModel regression = LinearRegressionModel.builder()
+        RegressionModel<DoubleTensor> linearRegressionModel = RegressionModel.builder()
             .setInputTrainingData(xTrainingData)
             .setOutputTrainingData(yTrainingData)
-            .build();
+            .buildLinearRegressionModel();
 
-        double accuracyOnTestData = ModelScoring.coefficientOfDetermination(regression.predict(xTestData), yTestData);
+        double accuracyOnTestData = ModelScoring.coefficientOfDetermination(linearRegressionModel.predict(xTestData), yTestData);
         assertThat(accuracyOnTestData, greaterThan(0.3));
     }
 

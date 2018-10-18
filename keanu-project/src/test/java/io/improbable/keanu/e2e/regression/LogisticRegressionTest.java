@@ -6,13 +6,13 @@ import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
 import static junit.framework.TestCase.assertTrue;
 
 import io.improbable.keanu.model.ModelScoring;
+import io.improbable.keanu.model.regression.RegressionModel;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.regression.LogisticRegressionModel;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -49,10 +49,10 @@ public class LogisticRegressionTest {
 
     @Test
     public void testLogisticRegression() {
-        LogisticRegressionModel model = LogisticRegressionModel.builder()
+        RegressionModel<BooleanTensor> model = RegressionModel.builder()
             .setInputTrainingData(xTrain)
             .setOutputTrainingData(yTrain)
-            .build();
+            .buildLogisticRegressionModel();
 
         double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);

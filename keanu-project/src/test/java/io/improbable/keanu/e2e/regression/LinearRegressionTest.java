@@ -8,7 +8,7 @@ import org.junit.Test;
 import io.improbable.keanu.DeterministicRule;
 import io.improbable.keanu.algorithms.variational.optimizer.Optimizer;
 import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.model.regression.LinearRegressionModel;
+import io.improbable.keanu.model.regression.RegressionModel;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -44,14 +44,14 @@ public class LinearRegressionTest {
     public void modelFindsParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
 
-        LinearRegressionModel regression = LinearRegressionModel.builder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -83,14 +83,14 @@ public class LinearRegressionTest {
     @Test
     public void modelFindsParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
-        LinearRegressionModel regression = LinearRegressionModel.builder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -120,14 +120,14 @@ public class LinearRegressionTest {
     public void modelFindsParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataUniformWeights(20);
 
-        LinearRegressionModel regression = LinearRegressionModel.builder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }

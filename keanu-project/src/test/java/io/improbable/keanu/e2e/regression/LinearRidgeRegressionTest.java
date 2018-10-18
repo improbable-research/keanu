@@ -5,11 +5,12 @@ import static org.hamcrest.Matchers.lessThan;
 
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 
+import io.improbable.keanu.model.regression.RegressionRegularization;
 import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.regression.LinearRegressionModel;
+import io.improbable.keanu.model.regression.RegressionModel;
 
 public class LinearRidgeRegressionTest {
 
@@ -21,15 +22,16 @@ public class LinearRidgeRegressionTest {
     public void findsParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
 
-        LinearRegressionModel regression = LinearRegressionModel.ridgeRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.RIDGE)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -37,15 +39,16 @@ public class LinearRidgeRegressionTest {
     @Test
     public void findsParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
-        LinearRegressionModel regression = LinearRegressionModel.ridgeRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.RIDGE)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -54,15 +57,16 @@ public class LinearRidgeRegressionTest {
     public void findsParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataGaussianWeights(20);
 
-        LinearRegressionModel regression = LinearRegressionModel.ridgeRegressionModelBuilder()
-                .setInputTrainingData(data.xTrain)
-                .setOutputTrainingData(data.yTrain)
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.RIDGE)
+            .setInputTrainingData(data.xTrain)
+            .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -71,18 +75,20 @@ public class LinearRidgeRegressionTest {
     public void decreasingSigmaDecreasesL2NormOfWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataGaussianWeights(20);
 
-        LinearRegressionModel regressionWide = LinearRegressionModel.ridgeRegressionModelBuilder()
+        RegressionModel linearRegressionModelWide = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.RIDGE)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnWeightsAndIntercept(0, 100000)
-            .build();
-        LinearRegressionModel regressionNarrow = LinearRegressionModel.ridgeRegressionModelBuilder()
+            .buildLinearRegressionModel();
+        RegressionModel linearRegressionModelNarrow = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.RIDGE)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnWeightsAndIntercept(0, 0.00001)
-            .build();
+            .buildLinearRegressionModel();
 
-        assertThat(regressionNarrow.getWeights().pow(2).sum(), lessThan(regressionWide.getWeights().pow(2).sum()));
+        assertThat(linearRegressionModelNarrow.getWeights().pow(2).sum(), lessThan(linearRegressionModelWide.getWeights().pow(2).sum()));
 
     }
 

@@ -7,11 +7,12 @@ import static org.junit.Assert.assertEquals;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.assertWeightsAndInterceptMatchTestData;
 import static io.improbable.keanu.e2e.regression.LinearRegressionTestUtils.generateThreeFeatureDataWithOneUncorrelatedFeature;
 
+import io.improbable.keanu.model.regression.RegressionRegularization;
 import org.junit.Rule;
 import org.junit.Test;
 
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.regression.LinearRegressionModel;
+import io.improbable.keanu.model.regression.RegressionModel;
 
 public class LinearLassoRegressionTest {
 
@@ -23,15 +24,16 @@ public class LinearLassoRegressionTest {
     public void findsExpectedParamsForOneWeight() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateSingleFeatureData();
 
-        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.LASSO)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -39,15 +41,16 @@ public class LinearLassoRegressionTest {
     @Test
     public void findsExpectedParamsForTwoWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateTwoFeatureData();
-        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.LASSO)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -56,15 +59,16 @@ public class LinearLassoRegressionTest {
     public void findsExpectedParamsForManyWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(20);
 
-        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.LASSO)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 40)
-            .build();
+            .buildLinearRegressionModel();
 
         assertWeightsAndInterceptMatchTestData(
-            regression.getWeights(),
-            regression.getIntercept(),
+            linearRegressionModel.getWeights(),
+            linearRegressionModel.getIntercept(),
             data
         );
     }
@@ -73,18 +77,20 @@ public class LinearLassoRegressionTest {
     public void decreasingSigmaDecreasesL1NormOfWeights() {
         LinearRegressionTestUtils.TestData data = LinearRegressionTestUtils.generateMultiFeatureDataLaplaceWeights(20);
 
-        LinearRegressionModel regressionWide = LinearRegressionModel.lassoRegressionModelBuilder()
+        RegressionModel linearRegressionModelWide = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.LASSO)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnIntercept(0, 100000)
-            .build();
-        LinearRegressionModel regressionNarrow = LinearRegressionModel.lassoRegressionModelBuilder()
+            .buildLinearRegressionModel();
+        RegressionModel linearRegressionModelNarrow = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.LASSO)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
             .setPriorOnWeightsAndIntercept(0, 0.00001)
-            .build();
+            .buildLinearRegressionModel();
 
-        assertThat(regressionNarrow.getWeights().abs().sum(), lessThan(regressionWide.getWeights().abs().sum()));
+        assertThat(linearRegressionModelNarrow.getWeights().abs().sum(), lessThan(linearRegressionModelWide.getWeights().abs().sum()));
 
     }
 
@@ -92,12 +98,13 @@ public class LinearLassoRegressionTest {
     public void bringsUncorrelatedWeightsVeryCloseToZero() {
         LinearRegressionTestUtils.TestData data = generateThreeFeatureDataWithOneUncorrelatedFeature();
 
-        LinearRegressionModel regression = LinearRegressionModel.lassoRegressionModelBuilder()
+        RegressionModel linearRegressionModel = RegressionModel.builder()
+            .setRegularization(RegressionRegularization.LASSO)
             .setInputTrainingData(data.xTrain)
             .setOutputTrainingData(data.yTrain)
-            .build();
+            .buildLinearRegressionModel();
 
-        assertEquals(0., regression.getWeight(2), 1e-3);
+        assertEquals(0., linearRegressionModel.getWeight(2), 1e-3);
     }
 
 }

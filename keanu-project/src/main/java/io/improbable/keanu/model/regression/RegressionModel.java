@@ -3,7 +3,10 @@ package io.improbable.keanu.model.regression;
 import java.util.function.Function;
 
 import io.improbable.keanu.model.Model;
+import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
@@ -17,35 +20,34 @@ import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
  *     .build();
  * </pre>
  */
-public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> {
-    private final RegressionGraph<DoubleTensor> linearModelGraph;
+public class RegressionModel<OUTPUT> implements Model<DoubleTensor, OUTPUT> {
+    private final RegressionGraph<OUTPUT> modelGraph;
 
-    LinearRegressionModel(RegressionGraph<DoubleTensor> linearModelGraph) {
-        this.linearModelGraph = linearModelGraph;
+    RegressionModel(RegressionGraph<OUTPUT> modelGraph) {
+        this.modelGraph = modelGraph;
     }
 
-    public static LinearRegressionModelBuilder builder() {
-        return new LinearRegressionModelBuilder();
-    }
-
-    public static LinearRidgeRegressionModelBuilder ridgeRegressionModelBuilder() {
-        return new LinearRidgeRegressionModelBuilder();
-    }
-
-    public static LinearLassoRegressionModelBuilder lassoRegressionModelBuilder() {
-        return new LinearLassoRegressionModelBuilder();
+    public static RegressionModelBuilder builder() {
+        return new RegressionModelBuilder();
     }
 
     static Function<DoubleVertex, RegressionGraph.OutputVertices<DoubleTensor>> gaussianOutputTransform(double measurementSigma) {
         return yVertex -> new RegressionGraph.OutputVertices<>(yVertex, new GaussianVertex(yVertex, measurementSigma));
     }
 
+    static Function<DoubleVertex, RegressionGraph.OutputVertices<BooleanTensor>> logisticOutputTransform() {
+        return probabilities -> {
+            DoubleVertex sigmoid = probabilities.sigmoid();
+            return new RegressionGraph.OutputVertices<>(sigmoid.greaterThan(ConstantVertex.of(0.5)), new BernoulliVertex(sigmoid));
+        };
+    }
+
     public DoubleTensor getWeights() {
-        return linearModelGraph.getWeights();
+        return modelGraph.getWeights();
     }
 
     public double getIntercept() {
-        return linearModelGraph.getIntercept();
+        return modelGraph.getIntercept();
     }
 
     public double getWeight(int index) {
@@ -53,7 +55,7 @@ public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> 
     }
 
     @Override
-    public DoubleTensor predict(DoubleTensor tensor) {
-        return linearModelGraph.predict(tensor);
+    public OUTPUT predict(DoubleTensor tensor) {
+        return modelGraph.predict(tensor);
     }
 }
