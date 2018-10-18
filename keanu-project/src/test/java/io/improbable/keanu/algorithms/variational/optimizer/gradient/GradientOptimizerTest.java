@@ -9,6 +9,7 @@ import java.util.function.BiConsumer;
 
 import org.junit.Test;
 
+import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex;
 
@@ -26,7 +27,7 @@ public class GradientOptimizerTest {
         optimizer.maxAPosteriori();
 
         assertTrue(fitnessTimesCalled.get() > 0);
-        assertTrue(gradientTimesCalled.get() > 0);
+        assertTrue(gxradientTimesCalled.get() > 0);
     }
 
     @Test(expected = UnsupportedOperationException.class)
@@ -35,5 +36,11 @@ public class GradientOptimizerTest {
         PoissonVertex v2 = new PoissonVertex(v1);
 
         GradientOptimizer optimizer = GradientOptimizer.ofConnectedGraph(v1);
+
+        GradientOptimizer.GradientOptimizerBuilder b = GradientOptimizer.builder();
+        b = b.bayesianNetwork(new BayesianNetwork(v1.getConnectedGraph()));
+        b = b.build()
+
+
     }
 }

@@ -9,32 +9,49 @@ k = KeanuContext().jvm_view()
 java_import(k, "io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer")
 java_import(k, "io.improbable.keanu.algorithms.variational.optimizer.nongradient.NonGradientOptimizer")
 
-class GradientOptimizer(JavaObjectWrapper):
-    def __init__(self, net):
-        if isinstance(net, BayesNet):
-            super(GradientOptimizer, self).__init__(k.GradientOptimizer.of, net.unwrap())
-        elif isinstance(net, Vertex):
-            super(GradientOptimizer, self).__init__(k.GradientOptimizer.of, net.unwrap().getConnectedGraph())
-        else:
-            raise NotImplementedError("Provide a Vertex or BayesNet to the optimizer")
+
+class Optimizer:
+    def __init__(self, optimizer):
+        self.optimizer = optimizer
 
     def max_a_posteriori(self):
-        return self.maxAPosteriori()
+        return self.optimizer.maxAPosteriori()
 
     def max_likelihood(self):
-        return self.maxLikelihood()
+        return self.optimizer.maxLikelihood()
 
-class NonGradientOptimizer(JavaObjectWrapper):
-    def __init__(self, net):
+
+class GradientOptimizer(Optimizer):
+    def __init__(self, net, max_evaluations=None, relative_threshold=None, absolute_threshold=None):
+        builder = k.GradientOptimizer.builder()
         if isinstance(net, BayesNet):
-            super(NonGradientOptimizer, self).__init__(k.NonGradientOptimizer.of, net.unwrap())
+            builder = builder.bayesianNetwork(net.unwrap())
         elif isinstance(net, Vertex):
-            super(NonGradientOptimizer, self).__init__(k.NonGradientOptimizer.of, net.unwrap().getConnectedGraph())
-        else:
-            raise NotImplementedError("Provide a Vertex or BayesNet to the optimizer")
+            builder = builder.bayesianNetwork(BayesNet(net.unwrap().getConnectedGraph()).unwrap())
+        if max_evaluations is not None:
+            builder = builder.maxEvaluations(max_evaluations)
+        if relative_threshold is not None:
+            builder = builder.relativeThreshold(relative_threshold)
+        if absolute_threshold is not None:
+            builder = builder.absoluteThreshold(absolute_threshold)
 
-    def max_a_posteriori(self):
-        return self.maxAPosteriori()
+        super(GradientOptimizer, self).__init__(builder.build)
 
-    def max_likelihood(self):
-        return self.maxLikelihood()
+
+class NonGradientOptimizer(Optimizer):
+    def __init__(self, net, max_evaluations=None, bounds_range=None, initial_trust_region_radius=None, stopping_trust_region_radius=None):
+        builder = k.NonGradientOptimizer.builder()
+        if isinstance(net, BayesNet):
+            builder = builder.bayesianNetwork(net.unwrap())
+        elif isinstance(net, Vertex):
+            builder = builder.bayesianNetwork(BayesNet(net.unwrap().getConnectedGraph()).unwrap())
+        if max_evaluations is not None:
+            builder = builder.maxEvaluations(max_evaluations)
+        if bounds_range is not None:
+            builder = builder.boundsRange(bounds_range)
+        if initial_trust_region_radius is not None:
+            builder = builder.initialTrustRegionRadius(initial_trust_region_radius)
+        if stopping_trust_region_radius is not None:
+            builder = builder.stoppingTrustRegionRadius(stopping_trust_region_radius)
+
+        super(NonGradientOptimizer, self).__init__(builder.build)
