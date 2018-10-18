@@ -5,11 +5,12 @@ import java.util.Map;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
+import io.improbable.keanu.vertices.VertexUnaryOp;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.PartialDerivatives;
 
-public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor> {
+public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonProbabilistic<DoubleTensor>, VertexUnaryOp<DoubleVertex> {
 
     protected final DoubleVertex inputVertex;
 
@@ -53,7 +54,7 @@ public abstract class DoubleUnaryOpVertex extends DoubleVertex implements NonPro
         }
     }
 
-    public DoubleVertex getInputVertex(){
+    public DoubleVertex getInput(){
         return inputVertex;
     }
 

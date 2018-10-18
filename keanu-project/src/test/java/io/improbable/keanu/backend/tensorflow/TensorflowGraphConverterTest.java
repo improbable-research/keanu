@@ -5,6 +5,7 @@ import static org.junit.Assert.assertEquals;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.bytedeco.javacpp.tensorflow;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -13,13 +14,17 @@ import io.improbable.keanu.backend.ProbabilisticWithGradientGraph;
 import io.improbable.keanu.network.BayesianNetwork;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.tensor.intgr.IntegerTensor;
 import io.improbable.keanu.vertices.VertexId;
 import io.improbable.keanu.vertices.VertexLabel;
 import io.improbable.keanu.vertices.bool.BoolVertex;
 import io.improbable.keanu.vertices.bool.probabilistic.BernoulliVertex;
 import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.diff.LogProbGradientCalculator;
+import io.improbable.keanu.vertices.dbl.nonprobabilistic.operators.binary.AdditionVertex;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
+import io.improbable.keanu.vertices.intgr.IntegerVertex;
+import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 
 public class TensorflowGraphConverterTest {
 
@@ -50,7 +55,7 @@ public class TensorflowGraphConverterTest {
     }
 
     @Test
-    public void canRunTensorAddition() {
+    public void canRunDoubleTensorAddition() {
         DoubleVertex A = new GaussianVertex(new long[]{2, 2}, 0, 1);
         A.setValue(DoubleTensor.create(new double[]{1, 2, 3, 4}, 2, 2));
 
@@ -77,6 +82,33 @@ public class TensorflowGraphConverterTest {
     }
 
     @Test
+    public void canRunIntegerTensorAddition() {
+        IntegerVertex A = new UniformIntVertex(new long[]{2, 2}, 0, 1);
+        A.setValue(IntegerTensor.create(new int[]{1, 2, 3, 4}, 2, 2));
+
+        IntegerVertex B = new UniformIntVertex(new long[]{2, 2}, 1, 1);
+        B.setValue(IntegerTensor.create(new int[]{5, 6, 7, 8}, 2, 2));
+
+        A.setLabel(new VertexLabel("A"));
+        B.setLabel(new VertexLabel("B"));
+
+        IntegerVertex C = A.times(B).abs();
+
+        String outputName = "someOutput";
+        C.setLabel(new VertexLabel(outputName));
+
+        ComputableGraph graph = TensorflowGraphConverter.convert(C.getConnectedGraph());
+
+        Map<String, IntegerTensor> inputs = new HashMap<>();
+        inputs.put(A.getLabel().toString(), A.getValue());
+        inputs.put(B.getLabel().toString(), B.getValue());
+
+        IntegerTensor result = graph.eval(inputs, outputName);
+
+        assertEquals(C.getValue(), result);
+    }
+
+    @Test
     public void canRunTensorAnd() {
         BoolVertex A = new BernoulliVertex(new long[]{2, 2}, 0.5);
         A.setValue(BooleanTensor.create(new boolean[]{true, false, true, false}, 2, 2));
@@ -87,7 +119,7 @@ public class TensorflowGraphConverterTest {
         A.setLabel(new VertexLabel("A"));
         B.setLabel(new VertexLabel("B"));
 
-        BoolVertex C = A.and(B);
+        BoolVertex C = A.and(B).not();
 
         String outputName = "someOutput";
         C.setLabel(new VertexLabel(outputName));
