@@ -65,3 +65,15 @@ def test_can_do_multiplication(lhs, rhs, expected_result):
     result = lhs * rhs
     assert type(result) == kn.Vertex
     assert tensors_equal(result.getValue(), expected_result)
+
+@pytest.mark.parametrize("lhs, rhs, expected_result", [
+    (kn.Const(np.array([15., 10.])), kn.Const(np.array([2., 4.])), np.array([[7.5], [2.5 ]])),
+    (kn.Const(np.array([15., 10.])),          np.array([2., 4.]) , np.array([[7.5], [2.5 ]])),
+    (         np.array([15., 10.]) , kn.Const(np.array([2., 4.])), np.array([[7.5], [2.5 ]])),
+    (kn.Const(np.array([15., 10.])),                    2.       , np.array([[7.5], [5.  ]])),
+    (                   15.,         kn.Const(np.array([2., 4.])), np.array([[7.5], [3.75]])),
+])
+def test_can_do_division(lhs, rhs, expected_result):
+    result = lhs / rhs
+    assert type(result) == kn.Vertex
+    assert tensors_equal(result.getValue(), expected_result)    

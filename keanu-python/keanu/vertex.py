@@ -20,14 +20,18 @@ class VertexOps:
             "add" : VertexOps.__radd__,
             "subtract" : VertexOps.__rsub__,
             "multiply" : VertexOps.__rmul__,
+            "true_divide" : VertexOps.__rtruediv__,
             "greater" : VertexOps.__lt__,
             "less" : VertexOps.__gt__,
         }
         if method == "__call__":
-            dispatch_method = methods[ufunc.__name__]
-            return dispatch_method(inputs[1], inputs[0])
+            try:
+                dispatch_method = methods[ufunc.__name__]
+                return dispatch_method(inputs[1], inputs[0])
+            except KeyError:
+                raise NotImplementedError("NumPy ufunc of type %s not implemented" % ufunc.__name__)
         else:
-            raise NotImplementedError("ufunc method %s not implemented" % method)
+            raise NotImplementedError("NumPy ufunc method %s not implemented" % method)
 
     def __add__(self, other):
         return kn.generated.vertex.Addition(self, other)
@@ -46,6 +50,12 @@ class VertexOps:
 
     def __rmul__(self, other):
         return kn.generated.vertex.Multiplication(other, self)
+
+    def __truediv__(self, other):
+        return kn.generated.vertex.Division(self, other)
+
+    def __rtruediv__(self, other):
+        return kn.generated.vertex.Division(other, self)
 
     def __gt__(self, other):
         return kn.generated.vertex.GreaterThan(self, other)
