@@ -9,6 +9,7 @@ java_import(k, "io.improbable.keanu.algorithms.mcmc.MetropolisHastings")
 
 class BayesNet(JavaObjectWrapper):
     def __init__(self, vertices):
+        self.vertices = vertices
         super(BayesNet, self).__init__(k.BayesianNetwork, vertices)
 
 

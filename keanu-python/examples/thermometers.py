@@ -1,15 +1,10 @@
 import keanu as kn
 
-class Thermometers():
+def model():
 
-    def __init__(self):
-        pass
+    with kn.Model() as m:
+    	m.temperature = kn.Uniform(0., 100.)
+    	m.thermometer_one = kn.Gaussian(m.temperature, 1.0)
+    	m.thermometer_two = kn.Gaussian(m.temperature, 1.0)
 
-    def model(self):
-
-        with kn.Model() as m:
-        	m.temperature = kn.Uniform(0., 100.)
-        	m.thermometer_one = kn.Gaussian(m.temperature, 1.0)
-        	m.thermometer_two = kn.Gaussian(m.temperature, 1.0)
-
-        return m
+    return m
