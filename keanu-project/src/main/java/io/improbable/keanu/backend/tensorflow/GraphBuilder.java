@@ -7,14 +7,16 @@ import static io.improbable.keanu.backend.tensorflow.GraphBuilder.OpType.PLACE_H
 
 import java.nio.DoubleBuffer;
 import java.nio.IntBuffer;
+import java.nio.LongBuffer;
 
 import org.tensorflow.DataType;
-import org.tensorflow.Operation;
 import org.tensorflow.OperationBuilder;
 import org.tensorflow.Output;
 import org.tensorflow.Shape;
 import org.tensorflow.Tensor;
 import org.tensorflow.op.Scope;
+import org.tensorflow.op.core.BroadcastTo;
+import org.tensorflow.op.core.Where3;
 
 public class GraphBuilder {
 
@@ -22,15 +24,6 @@ public class GraphBuilder {
 
     public GraphBuilder(Scope scope) {
         this.scope = scope;
-    }
-
-    public <T> Output<T> getOutput(String name) {
-
-        Operation operation = scope.graph().operation(name);
-        if (operation == null) {
-            return null;
-        }
-        return operation.output(0);
     }
 
     public enum OpType {
@@ -93,6 +86,11 @@ public class GraphBuilder {
         }
     }
 
+
+    <T> Output<T> add(Output<T> left, Output<T> right) {
+        return binaryOp(ADD, scope.makeOpName("Add"), left, right);
+    }
+
     <T> Output<T> add(Output<T> left, Output<T> right, String name) {
         return binaryOp(ADD, name, left, right);
     }
@@ -107,10 +105,26 @@ public class GraphBuilder {
         return opBuilder.build().output(0);
     }
 
+    <T> Output<T> where(Output<Boolean> predicate, Output<T> thn, Output<T> els) {
+        return Where3.create(scope, predicate, thn, els).asOutput();
+    }
+
+    <T, U extends Number> Output<T> broadcastTo(Output<T> input, Output<U> shape) {
+        return BroadcastTo.create(scope, input, shape).asOutput();
+    }
+
+    Output<Double> constant(double value) {
+        return constant(value, scope.makeOpName("Constant"));
+    }
+
     Output<Double> constant(double value, String name) {
         try (Tensor<Double> tensor = Tensor.create(value, Double.class)) {
             return this.constant(name, tensor, Double.class);
         }
+    }
+
+    Output<Double> constant(double[] value, long[] shape) {
+        return constant(value, shape, scope.makeOpName("Constant"));
     }
 
     Output<Double> constant(double[] value, long[] shape, String name) {
@@ -119,10 +133,38 @@ public class GraphBuilder {
         }
     }
 
+    Output<Boolean> constant(Boolean[] value, long[] shape) {
+        return constant(value, shape, scope.makeOpName("Constant"));
+    }
+
+    Output<Boolean> constant(Boolean[] value, long[] shape, String name) {
+        try (Tensor<Boolean> tensor = TensorflowData.toTensorFlow(shape, value)) {
+            return this.constant(name, tensor, Boolean.class);
+        }
+    }
+
+    Output<Integer> constant(int[] value, long[] shape) {
+        return constant(value, shape, scope.makeOpName("Constant"));
+    }
+
     Output<Integer> constant(int[] value, long[] shape, String name) {
         try (Tensor<Integer> tensor = Tensor.create(shape, IntBuffer.wrap(value))) {
             return this.constant(name, tensor, Integer.class);
         }
+    }
+
+    Output<Long> constant(long[] value, long[] shape) {
+        return constant(value, shape, scope.makeOpName("Constant"));
+    }
+
+    Output<Long> constant(long[] value, long[] shape, String name) {
+        try (Tensor<Long> tensor = Tensor.create(shape, LongBuffer.wrap(value))) {
+            return this.constant(name, tensor, Long.class);
+        }
+    }
+
+    Output<Integer> constant(int value) {
+        return constant(value, scope.makeOpName("Constant"));
     }
 
     Output<Integer> constant(int value, String name) {

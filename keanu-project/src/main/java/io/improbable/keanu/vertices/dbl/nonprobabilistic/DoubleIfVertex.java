@@ -53,6 +53,18 @@ public class DoubleIfVertex extends DoubleVertex implements NonProbabilistic<Dou
         }
     }
 
+    public Vertex<? extends BooleanTensor> getPredicate() {
+        return predicate;
+    }
+
+    public Vertex<? extends DoubleTensor> getThn() {
+        return thn;
+    }
+
+    public Vertex<? extends DoubleTensor> getEls() {
+        return els;
+    }
+
     @Override
     public DoubleTensor calculate() {
         return op(predicate.getValue(), thn.getValue(), els.getValue());

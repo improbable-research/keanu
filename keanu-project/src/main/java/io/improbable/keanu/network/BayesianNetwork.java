@@ -54,7 +54,7 @@ public class BayesianNetwork {
         return labelMap;
     }
 
-    List<? extends Vertex> getVertices() {
+    public List<? extends Vertex> getVertices() {
         return vertices;
     }
 
