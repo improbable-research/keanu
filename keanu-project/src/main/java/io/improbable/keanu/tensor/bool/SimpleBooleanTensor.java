@@ -95,6 +95,11 @@ public class SimpleBooleanTensor implements BooleanTensor {
     }
 
     @Override
+    public BooleanTensor xor(BooleanTensor that) {
+        return duplicate().xorInPlace(that);
+    }
+
+    @Override
     public BooleanTensor not() {
         return duplicate().notInPlace();
     }
@@ -173,6 +178,15 @@ public class SimpleBooleanTensor implements BooleanTensor {
         Boolean[] thatData = that.asFlatArray();
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i] || thatData[i];
+        }
+        return this;
+    }
+
+    @Override
+    public BooleanTensor xorInPlace(BooleanTensor that) {
+        Boolean[] thatData = that.asFlatArray();
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i] ^ thatData[i];
         }
         return this;
     }

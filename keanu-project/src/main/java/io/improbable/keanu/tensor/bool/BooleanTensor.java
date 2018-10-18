@@ -62,6 +62,8 @@ public interface BooleanTensor extends Tensor<Boolean> {
 
     BooleanTensor or(BooleanTensor that);
 
+    BooleanTensor xor(BooleanTensor that);
+
     BooleanTensor not();
 
     DoubleTensor setDoubleIf(DoubleTensor trueValue, DoubleTensor falseValue);
@@ -75,6 +77,8 @@ public interface BooleanTensor extends Tensor<Boolean> {
     BooleanTensor andInPlace(BooleanTensor that);
 
     BooleanTensor orInPlace(BooleanTensor that);
+
+    BooleanTensor xorInPlace(BooleanTensor that);
 
     BooleanTensor notInPlace();
 
