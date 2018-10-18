@@ -1,13 +1,13 @@
 from setuptools import setup
 
 def readme():
-    with open('README.rst') as f:
+    with open('README.rst', "r") as f:
         return f.read()
 
 setup(name='keanu',
       description='A probabilistic approach from an Improbabilistic company',
       long_description=readme(),
-      version='0.0.1',
+      version='0.0.5',
       author='Improbable Worlds',
       author_email='keanu-engineering@improbable.io',
       url='https://github.com/improbable-research/keanu',
