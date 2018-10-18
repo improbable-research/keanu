@@ -1,7 +1,9 @@
 package io.improbable.keanu.distributions.discrete;
 
 import java.util.Map;
+import java.util.Set;
 
+import com.google.common.collect.ImmutableList;
 import io.improbable.keanu.distributions.Distribution;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
@@ -46,8 +48,9 @@ public class Categorical<T> implements Distribution<Tensor<T>> {
         }
 
         if (!sampleValuesSetSoFar.allTrue()) {
-            T[] values = (T[]) selectableValues.keySet().toArray();
-            sample = Tensor.create(values[values.length - 1], shape);
+            Set<T> values = selectableValues.keySet();
+            T lastValue = ImmutableList.copyOf(values).get(values.size() - 1);
+            sample = Tensor.create(lastValue, shape);
         }
 
         return sample;
