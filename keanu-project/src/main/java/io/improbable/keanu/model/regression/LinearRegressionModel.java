@@ -49,8 +49,7 @@ public class LinearRegressionModel implements Model<DoubleTensor, DoubleTensor> 
     }
 
     public double getWeight(int index) {
-        DoubleTensor weight = linearModelGraph.getWeights();
-        return weight.isScalar() ? weight.scalar() : weight.getValue(0, index);
+        return getWeights().getFlattenedView().getOrScalar(index);
     }
 
     @Override
