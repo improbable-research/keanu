@@ -64,7 +64,7 @@ def test_thermometers_max_likelihood_gradient():
 def test_non_gradient_can_set_builder_properties():
     thermometers = Thermometers()
     model = thermometers.model()
-    gradient_optimizer = kn.NonGradientOptimizer(model.temperature, 5000, 10., 0.1, 0.2)
+    non_gradient_optimizer = kn.NonGradientOptimizer(model.temperature, 5000, 10., 0.1, 0.2)
     pass
 
 
