@@ -43,7 +43,8 @@ public class LinearLassoRegressionModelBuilder {
      * @param betas An array of beta parameters of the laplace distribution describing the prior belief about the regression weights
      */
     public LinearLassoRegressionModelBuilder setPriorOnWeights(double[] means, double[] betas) {
-        RegressionWeights.checkLaplaceParameters(getFeatureCount(), means, betas);
+        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means, getFeatureCount());
+        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(betas, getFeatureCount());
 
         this.priorOnWeightsMeans = means;
         this.priorOnWeightsBetas = betas;

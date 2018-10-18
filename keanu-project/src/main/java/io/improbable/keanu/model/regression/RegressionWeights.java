@@ -6,20 +6,17 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 class RegressionWeights {
-    private static void checkAmount(long desiredAmount, double[] amountToCheck, String name) {
-        if (amountToCheck.length != desiredAmount) {
-            throw new IllegalArgumentException(String.format("Expected %d %s, instead got %d", desiredAmount, name, amountToCheck.length));
+    /**
+     * Takes an array that contains the parameters for the distributions of weights in a regression model,
+     * and checks that the number of parameters in the array matches the intended number of regression features.
+     *
+     * @param arrayToCheck The array to be checked
+     * @param numberOfFeatures The number of features which the array being checked is expected to have
+     */
+    public static void checkArrayHasCorrectNumberOfFeatures(double[] arrayToCheck, long numberOfFeatures) {
+        if (arrayToCheck.length != numberOfFeatures) {
+            throw new IllegalArgumentException(String.format("Expected regression weights of length %d, instead got %d", numberOfFeatures, arrayToCheck.length));
         }
-    }
-
-    static void checkLaplaceParameters(long featureCount, double[] means, double[] betas) {
-        checkAmount(featureCount, means, "means");
-        checkAmount(featureCount, betas, "betas");
-    }
-
-    static void checkGaussianParameters(long featureCount, double[] means, double[] sigmas) {
-        checkAmount(featureCount, means, "means");
-        checkAmount(featureCount, sigmas, "sigmas");
     }
 
     static double[] fillPriorOnWeights(long[] featureShape, double weight) {

@@ -49,7 +49,8 @@ public class LogisticRidgeRegressionModelBuilder {
      * @param sigmas An array of sigma parameters of the gaussian distribution describing the prior belief about the regression weights
      */
     public LogisticRidgeRegressionModelBuilder setPriorOnWeights(double[] means, double[] sigmas) {
-        RegressionWeights.checkGaussianParameters(getFeatureCount(), means, sigmas);
+        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(means, getFeatureCount());
+        RegressionWeights.checkArrayHasCorrectNumberOfFeatures(sigmas, getFeatureCount());
 
         this.priorOnWeightsMeans = means;
         this.priorOnWeightsSigmas = sigmas;
