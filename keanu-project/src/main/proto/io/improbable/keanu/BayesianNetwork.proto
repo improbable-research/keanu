@@ -5,7 +5,7 @@ package keanu;
 option java_package = "io.improbable.keanu";
 option java_outer_classname = "KeanuSavedBayesNet";
 
-message BayesNet {
+message BayesianNetwork {
     repeated Vertex vertices = 1;
 }
 
@@ -14,20 +14,20 @@ message Vertex {
     string label = 2;
     string vertexType = 3;
     VertexValue value = 4;
-    repeated NamedInputs inputs = 5;
+    repeated NamedParent parents = 5;
 }
 
 message VertexValue {
-    oneof values {
+    oneof valueType {
         double doubleVal = 1;
-        int64 intVal = 2;
+        int32 intVal = 2;
         bool boolVal = 3;
         string stringVal = 4;
         bytes genericVal = 5;
     }
 }
 
-message NamedInputs {
+message NamedParent {
     string name = 1;
     int64 parentID = 2;
 }
