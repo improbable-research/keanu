@@ -63,6 +63,10 @@ public class LogisticRidgeRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Builds and fits LogisticRegressionModel using the data and priors passed to the builder.
+     * The model is fit using the Maximum A Posteriori algorithm and ridge regularization is performed on the weights.
+     */
     public LogisticRegressionModel build() {
         DoubleVertex interceptVertex = new GaussianVertex(priorOnInterceptMean, priorOnInterceptSigma);
         DoubleVertex weightsVertex = new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnWeightsSigmas));

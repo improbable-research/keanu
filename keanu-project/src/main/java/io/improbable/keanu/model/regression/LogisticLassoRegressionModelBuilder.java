@@ -62,6 +62,11 @@ public class LogisticLassoRegressionModelBuilder {
         return this;
     }
 
+
+    /**
+     * Builds and fits LogisticRegressionModel using the data and priors passed to the builder.
+     * The model is fit using the Maximum A Posteriori algorithm and lasso regularization is performed on the weights.
+     */
     public LogisticRegressionModel build() {
         DoubleVertex interceptVertex = new LaplaceVertex(priorOnInterceptMean, priorOnInterceptBeta);
         DoubleVertex weightsVertex = new LaplaceVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(priorOnWeightsMeans), ConstantVertex.of(priorOnWeightsBetas));

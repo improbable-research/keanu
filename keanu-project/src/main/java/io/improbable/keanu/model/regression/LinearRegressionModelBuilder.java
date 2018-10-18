@@ -34,6 +34,10 @@ public class LinearRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Builds and fits LinearRegressionModel using the data passed to the builder.
+     * The model is fit using the Maximum Likelihood algorithm.
+     */
     public LinearRegressionModel build() {
         if (inputTrainingData == null || outputTrainingData == null) {
             throw new IllegalArgumentException("You have not provided both the input and output variables");

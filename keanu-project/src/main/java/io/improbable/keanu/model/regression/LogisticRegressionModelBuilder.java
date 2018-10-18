@@ -33,6 +33,10 @@ public class LogisticRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Builds and fits LogisticRegressionModel using the data passed to the builder.
+     * The model is fit using the Maximum Likelihood algorithm and no regularization is performed on the weights.
+     */
     public LogisticRegressionModel build() {
         DoubleVertex interceptVertex = new GaussianVertex(DEFAULT_MU, DEFAULT_SIGMA);
         DoubleVertex weightsVertex = new GaussianVertex(new long[]{1, getFeatureCount()}, ConstantVertex.of(DEFAULT_MU), ConstantVertex.of(DEFAULT_SIGMA));

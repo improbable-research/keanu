@@ -62,6 +62,10 @@ public class LinearLassoRegressionModelBuilder {
         return this;
     }
 
+    /**
+     * Builds and fits LinearRegressionModel using the data and priors passed to the builder.
+     * The model is fit using the Maximum A Posteriori algorithm, and uses lasso regression to regularize the weights.
+     */
     public LinearRegressionModel build() {
         if (inputTrainingData == null || outputTrainingData == null) {
             throw new IllegalArgumentException("You have not provided both the input and output variables");
