@@ -301,7 +301,7 @@ public class CategoricalVertexTest {
 
         CategoricalVertex<TestEnum> categoricalVertex = new CategoricalVertex<>(selectableValues);
 
-        GenericTensor<TestEnum> value = new GenericTensor<>(TestEnum.A, new long[] {2, 2});
+        GenericTensor<TestEnum> value = GenericTensor.create(TestEnum.A, new long[] {2, 2});
         double logProbA = categoricalVertex.logProb(value);
         double expectedLogProb = Arrays.stream(aProbs).map(v -> Math.log(v / (v + bProb))).sum();
 

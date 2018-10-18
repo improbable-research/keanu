@@ -23,11 +23,7 @@ public class GenericTensor<T> implements Tensor<T> {
     private long[] stride;
 
     public static <T> GenericTensor<T> create(T data, long[] shape) {
-        if (Arrays.equals(shape, Tensor.SCALAR_SHAPE)) {
-            return new GenericTensor<>(data);
-        } else {
-            return new GenericTensor<>(data, shape);
-        }
+        return new GenericTensor<>(shape, data);
     }
 
     public static <T> GenericTensor<T> scalar(T data) {
@@ -42,14 +38,6 @@ public class GenericTensor<T> implements Tensor<T> {
         if (getLength() != data.length) {
             throw new IllegalArgumentException("Shape size does not match data length");
         }
-    }
-
-    public GenericTensor(T data, long[] shape) {
-        this.data = (T[]) (new Object[(int) TensorShape.getLength(shape)]);
-        Arrays.fill(this.data, data);
-
-        this.shape = Arrays.copyOf(shape, shape.length);
-        this.stride = TensorShape.getRowFirstStride(shape);
     }
 
     public GenericTensor(T scalar) {
