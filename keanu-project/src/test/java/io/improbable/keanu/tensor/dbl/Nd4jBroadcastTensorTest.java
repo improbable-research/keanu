@@ -13,7 +13,6 @@ import static io.improbable.keanu.tensor.dbl.Nd4jTensorTestHelpers.assertTimesOp
 
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.rules.ExpectedException;
 
 public class Nd4jBroadcastTensorTest {
 

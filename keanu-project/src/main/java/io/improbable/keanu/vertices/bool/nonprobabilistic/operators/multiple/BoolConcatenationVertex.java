@@ -3,11 +3,9 @@ package io.improbable.keanu.vertices.bool.nonprobabilistic.operators.multiple;
 import static io.improbable.keanu.tensor.TensorShapeValidation.checkShapesCanBeConcatenated;
 
 import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.function.Function;
 
 import io.improbable.keanu.tensor.bool.BooleanTensor;
-import io.improbable.keanu.tensor.bool.SimpleBooleanTensor;
 import io.improbable.keanu.vertices.NonProbabilistic;
 import io.improbable.keanu.vertices.Vertex;
 import io.improbable.keanu.vertices.bool.BoolVertex;

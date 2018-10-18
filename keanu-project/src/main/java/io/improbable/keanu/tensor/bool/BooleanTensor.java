@@ -1,10 +1,11 @@
 package io.improbable.keanu.tensor.bool;
 
+import io.improbable.keanu.kotlin.BooleanOperators;
 import io.improbable.keanu.tensor.Tensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.tensor.intgr.IntegerTensor;
 
-public interface BooleanTensor extends Tensor<Boolean> {
+public interface BooleanTensor extends Tensor<Boolean>, BooleanOperators<BooleanTensor> {
 
     static BooleanTensor create(boolean value, long[] shape) {
         return new SimpleBooleanTensor(value, shape);
@@ -60,7 +61,15 @@ public interface BooleanTensor extends Tensor<Boolean> {
 
     BooleanTensor and(BooleanTensor that);
 
+    default BooleanTensor and(boolean that) {
+        return this.and(BooleanTensor.scalar(that));
+    }
+
     BooleanTensor or(BooleanTensor that);
+
+    default BooleanTensor or(boolean that) {
+        return this.or(BooleanTensor.scalar(that));
+    }
 
     BooleanTensor xor(BooleanTensor that);
 
