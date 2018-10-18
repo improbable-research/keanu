@@ -14,14 +14,14 @@ k = context.jvm_view()
 def Const(t) -> Vertex:
     if isinstance(t, np.ndarray):
         ctor = __infer_const_from_ndarray(t)
-        val = Tensor(t)
+        val = t
     elif isinstance(t, numbers.Number):
         ctor = __infer_const_from_scalar(t)
-        val = t
+        val = np.array([[t]])
     else:
         raise NotImplementedError("Argument t must be either an ndarray or an instance of numbers.Number. Was given {} instead".format(type(t)))
 
-    return ctor(val)
+    return ctor(Tensor(val))
 
 def __infer_const_from_ndarray(ndarray):
     if len(ndarray) == 0:
