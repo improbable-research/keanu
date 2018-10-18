@@ -116,7 +116,7 @@ public class SimpleBooleanTensorTest {
     }
 
     @Test
-    public void doesSetGenericIf() {
+    public void doesWhereWithNonScalarTensors() {
 
         Tensor<Something> trueCase = new GenericTensor<>(
             new Something[]{Something.A, Something.B, Something.C, Something.D},
@@ -131,6 +131,19 @@ public class SimpleBooleanTensorTest {
         Tensor<Something> result = matrixA.where(trueCase, falseCase);
         assertArrayEquals(
             new Something[]{Something.A, Something.C, Something.C, Something.A},
+            result.asFlatArray()
+        );
+    }
+
+    @Test
+    public void doesWhereWithScalarTensors() {
+
+        Tensor<Something> trueCase = GenericTensor.scalar(Something.A);
+        Tensor<Something> falseCase = GenericTensor.scalar(Something.C);
+
+        Tensor<Something> result = matrixA.where(trueCase, falseCase);
+        assertArrayEquals(
+            new Something[] {Something.A, Something.C, Something.A, Something.C},
             result.asFlatArray()
         );
     }
