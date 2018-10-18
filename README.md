@@ -76,7 +76,7 @@ For IntelliJ:
 We use [Spotless](https://github.com/diffplug/spotless/tree/master/plugin-gradle) to automatically enforce some basic code style checks. If your build fails due to a formatting issue, simply run `./gradlew spotlessApply` and commit the changes.
 
 
-### Python Code Generation
+#### Python Code Generation
 
 [Custom annotations](keanu-project/src/main/java/io/improbable/keanu/annotation) are used for python code generation. Currently, there is only support for Python 3.6 and it must be installed by default in your dev environment. Simply run `./gradlew codeGen` to generate the code and commit the changes.
 
