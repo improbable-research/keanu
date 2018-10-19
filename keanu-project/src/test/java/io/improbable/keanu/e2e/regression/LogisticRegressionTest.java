@@ -1,7 +1,18 @@
 package io.improbable.keanu.e2e.regression;
 
+import static io.improbable.keanu.tensor.TensorMatchers.lessThanOrEqualTo;
+import static org.hamcrest.MatcherAssert.assertThat;
+
+import static io.improbable.keanu.tensor.TensorMatchers.allCloseTo;
+
+import io.improbable.keanu.model.ModelScoring;
+import io.improbable.keanu.model.regression.RegressionModel;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+
 import io.improbable.keanu.DeterministicRule;
-import io.improbable.keanu.model.linear.LogisticRegression;
 import io.improbable.keanu.tensor.bool.BooleanTensor;
 import io.improbable.keanu.tensor.dbl.DoubleTensor;
 import io.improbable.keanu.vertices.ConstantVertex;
@@ -11,25 +22,16 @@ import io.improbable.keanu.vertices.dbl.DoubleVertex;
 import io.improbable.keanu.vertices.dbl.KeanuRandom;
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.Rule;
-import org.junit.Test;
-
-import static junit.framework.TestCase.assertTrue;
-
 public class LogisticRegressionTest {
 
-    @Rule
-    public DeterministicRule deterministicRule = new DeterministicRule();
-
     private static final int NUM_FEATURES = 3;
-    private static final double[] SIGMAS = new double[] {1.0, 1.0, 1.0};
-    private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[] {0.5, -3.0, 1.5}, 1, 3);
+    private static final double[] SIGMAS = new double[]{1.0, 1.0, 1.0};
+    private static final DoubleTensor TRUE_WEIGHTS = DoubleTensor.create(new double[]{0.5, -3.0, 1.5}, 1, 3);
     private static final double TRUE_INTERCEPT = 0.0;
     private static final int NUM_SAMPLES_TRAINING = 1250;
     private static final int NUM_SAMPLES_TESTING = 200;
-
+    @Rule
+    public DeterministicRule deterministicRule = new DeterministicRule();
     private DoubleTensor xTrain;
     private BooleanTensor yTrain;
     private DoubleTensor xTest;
@@ -47,25 +49,18 @@ public class LogisticRegressionTest {
 
     @Test
     public void testLogisticRegression() {
-        LogisticRegression model = new LogisticRegression(xTrain, yTrain);
-        model.fit();
-        double accuracy = model.accuracy(xTest, yTest);
+        RegressionModel<BooleanTensor> model = RegressionModel.withTrainingData(xTrain, yTrain)
+            .build();
+
+        double accuracy = ModelScoring.accuracy(model.predict(xTest), yTest);
         Assert.assertTrue(accuracy > 0.75);
         assertWeightsAreCalculated(model.getWeights());
-    }
-
-    @Test
-    public void testRegularizedLogisticRegression() {
-        LogisticRegression unregularizedModel = new LogisticRegression(xTrain, yTrain);
-        LogisticRegression regularizedModel = new LogisticRegression(xTrain, yTrain, 5.);
-
-        assertRegularizedWeightsAreSmaller(unregularizedModel.getWeights(), regularizedModel.getWeights());
     }
 
     private DoubleTensor generateX(int nSamples) {
         DoubleVertex[] xVertices = new DoubleVertex[NUM_FEATURES];
         for (int i = 0; i < NUM_FEATURES; i++) {
-            xVertices[i] = new GaussianVertex(new long[] {1, nSamples}, 0.0, SIGMAS[i]);
+            xVertices[i] = new GaussianVertex(new long[]{1, nSamples}, 0.0, SIGMAS[i]);
         }
         return DoubleVertex.concat(0, xVertices).sample(random);
     }
@@ -76,11 +71,11 @@ public class LogisticRegressionTest {
         return yVertex.getValue();
     }
 
-    private void assertWeightsAreCalculated(DoubleVertex weights) {
-        assertTrue(weights.getValue().equalsWithinEpsilon(TRUE_WEIGHTS, 0.15));
+    private void assertWeightsAreCalculated(DoubleTensor weights) {
+        assertThat(weights, allCloseTo(Double.valueOf(0.15), TRUE_WEIGHTS));
     }
 
     private void assertRegularizedWeightsAreSmaller(DoubleVertex unregularizedWeights, DoubleVertex regularizedWeights) {
-        assertTrue(regularizedWeights.getValue().abs().lessThanOrEqual(unregularizedWeights.getValue().abs()).allTrue());
+        assertThat(regularizedWeights.getValue().abs(), lessThanOrEqualTo(unregularizedWeights.getValue().abs()));
     }
 }

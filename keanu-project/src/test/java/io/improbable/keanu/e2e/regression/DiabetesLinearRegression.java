@@ -1,22 +1,24 @@
 package io.improbable.keanu.e2e.regression;
 
-import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
-import io.improbable.keanu.model.linear.LinearRegression;
-import io.improbable.keanu.network.BayesianNetwork;
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.util.csv.ReadCsv;
-import io.improbable.keanu.vertices.ConstantVertex;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
-import org.junit.Test;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.closeTo;
+import static org.hamcrest.Matchers.greaterThan;
 
 import java.util.List;
 
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.both;
-import static org.hamcrest.Matchers.greaterThan;
-import static org.hamcrest.Matchers.lessThan;
-import static org.junit.Assert.assertEquals;
+import io.improbable.keanu.model.regression.RegressionRegularization;
+import io.improbable.keanu.util.CsvDataResource;
+import org.junit.Rule;
+import org.junit.Test;
+
+import io.improbable.keanu.algorithms.variational.optimizer.gradient.GradientOptimizer;
+import io.improbable.keanu.model.ModelScoring;
+import io.improbable.keanu.model.regression.RegressionModel;
+import io.improbable.keanu.network.BayesianNetwork;
+import io.improbable.keanu.tensor.dbl.DoubleTensor;
+import io.improbable.keanu.vertices.ConstantVertex;
+import io.improbable.keanu.vertices.dbl.DoubleVertex;
+import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex;
 
 /**
  * This data set was taken from https://www4.stat.ncsu.edu/~boos/var.select/diabetes.html
@@ -24,22 +26,16 @@ import static org.junit.Assert.assertEquals;
  * http://scikit-learn.org/stable/auto_examples/linear_model/plot_ols.html
  */
 public class DiabetesLinearRegression {
-
-    public static class Data {
-        public DoubleTensor bmi;
-        public DoubleTensor y;
-    }
+    @Rule
+    public CsvDataResource<Data> csvDataResource = new CsvDataResource<>("data/datasets/diabetes/diabetes_standardized_training.csv", Data.class);
 
     @Test
     public void doesLinearRegressionOnBMI() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data = csvDataResource.getData();
 
         // Linear Regression
-        DoubleVertex weight = new GaussianVertex(0.0, 2.0);
-        DoubleVertex b = new GaussianVertex(0.0, 2.0);
+        DoubleVertex weight = new GaussianVertex(0.0, 100);
+        DoubleVertex b = new GaussianVertex(0.0, 100);
         DoubleVertex x = ConstantVertex.of(data.bmi);
         DoubleVertex yMu = x.multiply(weight);
 
@@ -50,29 +46,25 @@ public class DiabetesLinearRegression {
         GradientOptimizer optimizer = GradientOptimizer.of(bayesNet);
         optimizer.maxLikelihood();
 
-        assertEquals(938.2378, weight.getValue().scalar(), 0.01);
-        assertEquals(152.9189, b.getValue().scalar(), 0.01);
+        assertThat(weight.getValue().scalar(), closeTo(938.2378, 0.01));
+        assertThat(b.getValue().scalar(),closeTo(152.9189, 0.01));
     }
 
     @Test
     public void doesLinearRegressionOnBMIAsModel() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data = csvDataResource.getData();
 
-        LinearRegression regression = new LinearRegression(data.bmi, data.y, 0.0, 2.0, 100);
-        regression.fit();
-        assertEquals(938.2378, regression.getWeight(0), 0.5);
-        assertEquals(152.9189, regression.getIntercept().getValue().scalar(), 0.5);
+        RegressionModel linearRegressionModel = RegressionModel.withTrainingData(data.bmi, data.y)
+            .withRegularization(RegressionRegularization.RIDGE)
+            .withPriorOnWeightsAndIntercept(0, 100)
+            .build();
+        assertThat(linearRegressionModel.getWeight(0), closeTo(938.2378, 0.5));
+        assertThat(linearRegressionModel.getIntercept(), closeTo(152.9189,0.5));
     }
 
     @Test
     public void canPredictFutureValuesWithLinearRegression() {
-        Data data = ReadCsv
-            .fromResources("data/datasets/diabetes/diabetes_standardized_training.csv")
-            .asVectorizedColumnsDefinedBy(Data.class)
-            .load(true);
+        Data data = csvDataResource.getData();
 
         int sizeOfTestData = 100;
 
@@ -84,11 +76,16 @@ public class DiabetesLinearRegression {
         DoubleTensor yTrainingData = splitYData.get(0);
         DoubleTensor yTestData = splitYData.get(1);
 
-        LinearRegression regression = new LinearRegression(xTrainingData, yTrainingData);
-        regression.fit();
+        RegressionModel<DoubleTensor> linearRegressionModel = RegressionModel.withTrainingData(xTrainingData, yTrainingData)
+            .build();
 
-        double accuracyOnTestData = regression.score(xTestData, yTestData);
-        assertThat(accuracyOnTestData, both(greaterThan(0.)).and(lessThan(1.)));
+        double accuracyOnTestData = ModelScoring.coefficientOfDetermination(linearRegressionModel.predict(xTestData), yTestData);
+        assertThat(accuracyOnTestData, greaterThan(0.3));
+    }
+
+    public static class Data {
+        public DoubleTensor bmi;
+        public DoubleTensor y;
     }
 
 }
