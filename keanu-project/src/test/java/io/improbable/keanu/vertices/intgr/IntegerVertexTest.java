@@ -7,9 +7,6 @@ import static org.junit.Assert.assertTrue;
 
 import java.util.function.Function;
 
-import io.improbable.keanu.tensor.dbl.DoubleTensor;
-import io.improbable.keanu.vertices.dbl.DoubleVertex;
-import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex;
 import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex;
 import org.junit.Before;
 import org.junit.Test;

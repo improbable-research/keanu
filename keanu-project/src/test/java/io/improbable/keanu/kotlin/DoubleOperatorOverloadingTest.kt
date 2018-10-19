@@ -1,21 +1,16 @@
 package io.improbable.keanu.kotlin
 
 import io.improbable.keanu.DeterministicRule
-import io.improbable.keanu.vertices.dbl.DoubleVertex
 import io.improbable.keanu.vertices.dbl.nonprobabilistic.ConstantDoubleVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.GaussianVertex
 import io.improbable.keanu.vertices.dbl.probabilistic.UniformVertex
-import io.improbable.keanu.vertices.intgr.IntegerVertex
-import io.improbable.keanu.vertices.intgr.nonprobabilistic.ConstantIntegerVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.PoissonVertex
-import io.improbable.keanu.vertices.intgr.probabilistic.UniformIntVertex
 import junit.framework.TestCase.assertEquals
 import org.junit.Rule
 import org.junit.Test
 import kotlin.math.pow
 
 
-class OperatorOverloadingTest {
+class DoubleOperatorOverloadingTest {
 
     @Rule
     @JvmField
@@ -58,42 +53,6 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun integerVertexPlus() {
-        val a = PoissonVertex(1.0)
-        val b = PoissonVertex(2.0)
-
-        val e1 = a.value + b.value
-        val r1 = a + b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value + 2
-        val r2 = a + 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 + a.value
-        val r3 = 2 + a
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
-    fun arithmeticIntegerPlus() {
-        val a = ArithmeticInteger(1)
-        val b = ArithmeticInteger(2)
-
-        val e1 = a.value + b.value
-        val r1 = a + b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value + 2
-        val r2 = a + 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 + a.value
-        val r3 = 2 + a
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
     fun doubleVertexMinus() {
         val a = GaussianVertex(0.0, 1.0)
         val b = GaussianVertex(0.0, 1.0)
@@ -130,42 +89,6 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun integerVertexMinus() {
-        val a = PoissonVertex(1.0)
-        val b = PoissonVertex(2.0)
-
-        val e1 = a.value - b.value
-        val r1 = a - b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value - 2
-        val r2 = a - 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 - a.value
-        val r3 = 2 - a
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
-    fun arithmeticIntegerMinus() {
-        val a = ArithmeticInteger(1)
-        val b = ArithmeticInteger(2)
-
-        val e1 = a.value - b.value
-        val r1 = a - b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value - 2
-        val r2 = a - 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 - a.value
-        val r3 = 2 - a
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
     fun doubleVertexUnaryMinus() {
         val a = GaussianVertex(0.0, 1.0)
 
@@ -177,24 +100,6 @@ class OperatorOverloadingTest {
     @Test
     fun arithmeticDoubleUnaryMinus() {
         val a = ArithmeticDouble(1.0)
-
-        val e1 = -a.value
-        val r1 = -a
-        assertEquals(e1, r1.value)
-    }
-
-    @Test
-    fun integerVertexUnaryMinus() {
-        val a = PoissonVertex(1.0)
-
-        val e1 = -a.value
-        val r1 = -a
-        assertEquals(e1, r1.value)
-    }
-
-    @Test
-    fun arithmeticIntegerUnaryMinus() {
-        val a = ArithmeticInteger(2)
 
         val e1 = -a.value
         val r1 = -a
@@ -234,42 +139,6 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun integerVertexTimes() {
-        val a = PoissonVertex(1.0)
-        val b = PoissonVertex(2.0)
-
-        val e1 = a.value * b.value
-        val r1 = a * b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value * 2
-        val r2 = a * 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 * a.value
-        val r3 = 2 * a
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
-    fun arithmeticIntegerTimes() {
-        val a = ArithmeticInteger(1)
-        val b = ArithmeticInteger(2)
-
-        val e1 = a.value * b.value
-        val r1 = a * b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value * 2
-        val r2 = a * 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 * a.value
-        val r3 = 2 * a
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
     fun doubleVertexPow() {
         val a = GaussianVertex(0.0, 2.0)
         val b = GaussianVertex(0.0, 3.0)
@@ -296,38 +165,6 @@ class OperatorOverloadingTest {
         val e2 = a.value.pow(3.0)
         val r2 = a.pow(3.0)
         assertEquals(e2, r2.value)
-    }
-
-    @Test
-    fun integerVertexPow() {
-        val a = PoissonVertex(2.0)
-        val b = PoissonVertex(3.0)
-
-        val e1 = a.value.pow(b.value)
-        val r1 = a.pow(b)
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value.pow(3)
-        val r2 = a.pow(3)
-        assertEquals(e2, r2.value)
-    }
-
-    @Test
-    fun arithmeticIntegerPow() {
-        val a = ArithmeticInteger(2)
-        val b = ArithmeticInteger(3)
-
-        val e1 = 8
-        val r1 = a.pow(b)
-        assertEquals(e1, r1.value)
-
-        val e2 = 8
-        val r2 = a.pow(3)
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 * a.value
-        val r3 = 2 * a
-        assertEquals(e3, r3.value)
     }
 
     @Test
@@ -366,43 +203,6 @@ class OperatorOverloadingTest {
         assertEquals(e3, r3.value)
     }
 
-
-    @Test
-    fun integerVertexDivide() {
-        val a = PoissonVertex(1.0)
-        val b = ConstantIntegerVertex(2)
-
-        val e1 = a.value / b.value
-        val r1 = a / b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value / 2
-        val r2 = a / 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 / (a.value + 1)
-        val r3 = 2 / (a + 1)
-        assertEquals(e3, r3.value)
-    }
-
-    @Test
-    fun arithmeticIntegerDivide() {
-        val a = ArithmeticInteger(1)
-        val b = ArithmeticInteger(2)
-
-        val e1 = a.value / b.value
-        val r1 = a / b
-        assertEquals(e1, r1.value)
-
-        val e2 = a.value / 2
-        val r2 = a / 2
-        assertEquals(e2, r2.value)
-
-        val e3 = 2 / a.value
-        val r3 = 2 / a
-        assertEquals(e3, r3.value)
-    }
-
     @Test
     fun doubleVertexNestedOperators() {
         val a = 4.0
@@ -434,74 +234,7 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun integerVertexNestedOperators() {
-        val a = 4
-        val b = PoissonVertex(1.0)
-        val c = PoissonVertex(2.0)
-        val d = ConstantIntegerVertex(1)
-        val e = UniformIntVertex(1, 10)
-        val f = 10
-        val g = 5
-
-        val result = a / ((((b + c - d) / e) * f) - g)
-        val expected = a / ((((b.value + c.value - d.value) / e.value) * f) - g)
-        assertEquals(expected, result.value)
-    }
-
-    @Test
-    fun arithmeticIntegerNestedOperators() {
-        val a = 4
-        val b = ArithmeticInteger(1)
-        val c = ArithmeticInteger(2)
-        val d = ArithmeticInteger(3)
-        val e = ArithmeticInteger(10)
-        val f = 10
-        val g = 5
-
-        val result = a / ((((b + c - d) / e) * f) - g)
-        val expected = a / ((((b.value + c.value - d.value) / e.value) * f) - g)
-        assertEquals(expected, result.value)
-    }
-
-    @Test
-    fun runSimpleModel() {
-        val modelA = SimpleModel<ArithmeticDouble, ArithmeticInteger>()
-
-        val ad1 = ArithmeticDouble(1.0)
-        val ad2 = ArithmeticDouble(1.5)
-        val resultD1 = modelA.add(ad1, ad2)
-
-        val ai1 = ArithmeticInteger(1)
-        val ai2 = ArithmeticInteger(2)
-        val resultI1 = modelA.add(ai1, ai2)
-
-        val modelB = SimpleModel<DoubleVertex, IntegerVertex>()
-
-        val dv1 = ConstantDoubleVertex(1.0)
-        val dv2 = ConstantDoubleVertex(1.5)
-        val resultD2 = modelB.add(dv1, dv2)
-
-        val iv1 = ConstantIntegerVertex(1)
-        val iv2 = ConstantIntegerVertex(2)
-        val resultI2 = modelB.add(iv1, iv2)
-
-        assertEquals(resultD1.value, resultD2.value.scalar())
-        assertEquals(resultI1.value, resultI2.value.scalar())
-    }
-
-    class SimpleModel<A : DoubleOperators<A>, B : IntegerOperators<B>> {
-
-        fun add(a: A, b: A): A {
-            return a + b
-        }
-
-        fun add(a: B, b: B): B {
-            return a + b
-        }
-    }
-
-    @Test
-    fun vertexOperatorTest() {
+    fun doubleVertexPrefixOperators() {
         val a = ConstantDoubleVertex(0.123)
 
         assertEquals(Math.acos(a.value.scalar()), acos(a).value.scalar())
@@ -515,7 +248,7 @@ class OperatorOverloadingTest {
     }
 
     @Test
-    fun arithmeticDoubleOperatorTest() {
+    fun arithmeticDoublePrefixOperators() {
         val a = ArithmeticDouble(0.123)
 
         assertEquals(Math.acos(a.value), acos(a).value)
@@ -527,6 +260,5 @@ class OperatorOverloadingTest {
         assertEquals(Math.pow(a.value, 2.345), pow(a, 2.345).value)
         assertEquals(Math.pow(a.value, a.value), pow(a, a).value)
     }
-
 
 }

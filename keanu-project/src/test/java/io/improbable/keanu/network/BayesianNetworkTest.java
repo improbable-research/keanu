@@ -86,8 +86,8 @@ public class BayesianNetworkTest {
         BoolVertex b = new BernoulliVertex(0.5);
         BoolVertex ored = a.or(b);
 
-        a.setLabel(new VertexLabel(LABEL_A));
-        b.setLabel(new VertexLabel(LABEL_A));
+        a.setLabel(LABEL_A);
+        b.setLabel(LABEL_A);
 
         BayesianNetwork net = new BayesianNetwork(a.getConnectedGraph());
     }

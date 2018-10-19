@@ -91,8 +91,8 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> tensorEqualTo(Tensor<T> tensor) {
-        return both(TensorMatchers.elementwiseEqualTo(tensor)).and(hasShape(tensor.getShape()));
+    public static <T> Matcher<Tensor<T>> valuesAndShapesMatch(Tensor<T> tensor) {
+        return both(TensorMatchers.valuesMatch(tensor)).and(hasShape(tensor.getShape()));
     }
 
     public static <T> Matcher<Tensor<T>> allValues(Matcher<T> valueMatcher) {
@@ -137,7 +137,7 @@ public class TensorMatchers {
         };
     }
 
-    public static <T> Matcher<Tensor<T>> elementwiseEqualTo(Tensor<T> other) {
+    public static <T> Matcher<Tensor<T>> valuesMatch(Tensor<T> other) {
         return hasValue(other.asFlatArray());
     }
 

@@ -75,6 +75,10 @@ public class VertexMatchers {
         };
     }
 
+    public static <DATATYPE, TENSOR extends Tensor<DATATYPE>> Matcher<Vertex<TENSOR>> hasValue(TENSOR tensor) {
+        return hasValue(TensorMatchers.valuesAndShapesMatch(tensor));
+    }
+
     public static <T> Matcher<Vertex<T>> hasValue(Matcher<? super T> valueMatcher) {
         return new TypeSafeDiagnosingMatcher<Vertex<T>>() {
             @Override
