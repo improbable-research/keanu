@@ -124,17 +124,8 @@ public class RegressionModelBuilder<OUTPUT> {
     }
 
     private void performDataFitting(LinearRegressionGraph<OUTPUT> regressionGraph, OUTPUT outputTrainingData) {
-        ModelFitter<DoubleTensor, OUTPUT> fitter;
-        switch (this.regularization) {
-            case NONE:
-                fitter = new MaximumLikelihoodModelFitter<>(regressionGraph);
-                fitter.fit(inputTrainingData, outputTrainingData);
-                break;
-            default:
-                fitter = new MAPModelFitter<>(regressionGraph);
-                fitter.fit(inputTrainingData, outputTrainingData);
-                break;
-        }
+        ModelFitter<DoubleTensor, OUTPUT> fitter = this.regularization.createFitterForGraph(regressionGraph);
+        fitter.fit(inputTrainingData, outputTrainingData);
     }
 
     private long getFeatureCount() {
